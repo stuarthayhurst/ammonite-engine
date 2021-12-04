@@ -12,7 +12,11 @@ using namespace glm;
 
 int width = 1024;
 int height = 768;
+
 char title[] = "Tutorial 3";
+
+//Field of view
+float fov = 45;
 
 int main() {
   //Initialise GLFW
@@ -55,8 +59,8 @@ int main() {
   GLuint programID = LoadShaders("shaders/SimpleVertexShader.vert", "shaders/SimpleFragmentShader.frag");
 
 
-  //Projection matrix : 45° Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
-  glm::mat4 Projection = glm::perspective(glm::radians(45.0f), (float) width / (float)height, 0.1f, 100.0f);
+  //Projection matrix : 45° Field of View, aspect ratio, display range : 0.1 unit <-> 100 units
+  glm::mat4 Projection = glm::perspective(glm::radians(fov), (float) width / (float)height, 0.1f, 100.0f);
 
   //Camera matrix
   glm::mat4 View = glm::lookAt(
