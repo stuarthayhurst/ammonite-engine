@@ -47,7 +47,7 @@ void computeMatricesFromInputs() {
   glfwGetCursorPos(window, &xpos, &ypos);
 
   //Reset mouse position for next frame
-  glfwSetCursorPos(window, 1024/2, 768/2);
+  glfwSetCursorPos(window, width/2, height/2);
 
   //Compute new orientation
   horizontalAngle += mouseSpeed * deltaTime * float(1024/2 - xpos);
