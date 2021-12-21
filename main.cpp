@@ -60,14 +60,12 @@ int main() {
 
   //Move cursor to middle
   glfwPollEvents();
-  glfwSetCursorPos(window, width/2, height/2);
+  glfwSetCursorPos(window, width / 2, height / 2);
 
-  //Cull triangles
+  //Enable culling triangles
   glEnable(GL_CULL_FACE);
-
-  //Enable depth test
+  //Enable depth test and only show fragments closer than the previous
   glEnable(GL_DEPTH_TEST);
-  //Accept fragment if it closer to the camera than the former one
   glDepthFunc(GL_LESS);
 
   //Create the VAO
@@ -77,7 +75,6 @@ int main() {
 
   //Create and compile shaders
   GLuint programID = LoadShaders("shaders/SimpleVertexShader.vert", "shaders/SimpleFragmentShader.frag");
-
   //Get an ID for the model view projection
   GLuint MatrixID = glGetUniformLocation(programID, "MVP");
 
@@ -128,7 +125,6 @@ int main() {
   //Give vertices to OpenGL
   glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
 
-
   static float colourVal[12][3] = {
     {0.1, 1.0, 1},
     {0.2, 0.9, 1},
@@ -144,6 +140,7 @@ int main() {
     {0.2, 0.9, 1}
   };
 
+  //Fill faces of cube with colours
   static GLfloat g_color_buffer_data[12*3*3];
   for (int triangle = 0; triangle < 12; triangle++) {
     for (int v = 0; v < 3; v++) {
@@ -166,7 +163,7 @@ int main() {
     //Use the shaders
     glUseProgram(programID);
 
-    // Compute the MVP matrix from keyboard and mouse input
+    //Compute the MVP matrix from keyboard and mouse input
     computeMatricesFromInputs();
     glm::mat4 ProjectionMatrix = getProjectionMatrix();
     glm::mat4 ViewMatrix = getViewMatrix();
@@ -176,31 +173,31 @@ int main() {
     //Send the transformation to the current shader in "MVP" uniform
     glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &mvp[0][0]);
 
-    //1st attribute buffer : vertices
+    //Vertex attribute buffer
     glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
     glVertexAttribPointer(
-      0,        //attribute 0, must match the layout in the shader
+      0,        //shader location
       3,        //size
       GL_FLOAT, //type
-      GL_FALSE, //normalized?
+      GL_FALSE, //normalized
       0,        //stride
       (void*)0  //array buffer offset
     );
 
-    // 2nd attribute buffer : colors
+    //Colour attribute buffer
     glEnableVertexAttribArray(1);
     glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
     glVertexAttribPointer(
-      1,        //attribute 1, must match the layout in the shader
-      3,        //size
-      GL_FLOAT, //type
-      GL_FALSE, //normalized?
-      0,        //stride
-      (void*)0  //array buffer offset
+      1,
+      3,
+      GL_FLOAT,
+      GL_FALSE,
+      0,
+      (void*)0
     );
 
-    //Draw triangle
+    //Draw the triangles
     glDrawArrays(GL_TRIANGLES, 0, 12*3); //12*3 indicies starting at 0 (12 triangles, 6 squares)
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(1);
