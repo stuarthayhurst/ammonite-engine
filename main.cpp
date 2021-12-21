@@ -9,11 +9,14 @@
 using namespace glm;
 
 #include "common/loadShader.h"
+#include "common/controls.hpp"
 
-int width = 1024;
-int height = 768;
+float width = 1024.0f;
+float height = 768.0f;
 
-char title[] = "Tutorial 4";
+char title[] = "Tutorial 6";
+
+GLFWwindow* window;
 
 //Field of view
 float fov = 45;
@@ -32,7 +35,6 @@ int main() {
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); //Disable older OpenGL 
 
   //Open a window and create its OpenGL context
-  GLFWwindow* window;
   window = glfwCreateWindow(width, height, title, NULL, NULL);
   if (window == NULL) {
     fprintf(stderr, "Failed to open window");
@@ -50,6 +52,13 @@ int main() {
   //Allow input
   glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
 
+  //Move cursor to middle
+  glfwPollEvents();
+  glfwSetCursorPos(window, width/2, height/2);
+
+  //Cull triangles
+  glEnable(GL_CULL_FACE);
+
   //Enable depth test
   glEnable(GL_DEPTH_TEST);
   //Accept fragment if it closer to the camera than the former one
@@ -62,22 +71,6 @@ int main() {
 
   //Create and compile shaders
   GLuint programID = LoadShaders("shaders/SimpleVertexShader.vert", "shaders/SimpleFragmentShader.frag");
-
-
-  //Projection matrix : 45° Field of View, aspect ratio, display range : 0.1 unit <-> 100 units
-  glm::mat4 Projection = glm::perspective(glm::radians(fov), (float) width / (float)height, 0.1f, 100.0f);
-
-  //Camera matrix
-  glm::mat4 View = glm::lookAt(
-    glm::vec3(4,3,3), //Camera is at (4,3,3), in World Space
-    glm::vec3(0,0,0), //and looks at the origin
-    glm::vec3(0,1,0)  //Head is up (set to 0,-1,0 to look upside-down)
-  );
-
-  //Model matrix : an identity matrix (model be at the origin)
-  glm::mat4 Model = glm::mat4(1.0f);
-  //Our ModelViewProjection : multiplication of our 3 matrices
-  glm::mat4 mvp = Projection * View * Model; // Remember, matrix multiplication is the other way around
 
   //Get an ID for the model view projection
   GLuint MatrixID = glGetUniformLocation(programID, "MVP");
@@ -166,6 +159,14 @@ int main() {
 
     //Use the shaders
     glUseProgram(programID);
+
+    // Compute the MVP matrix from keyboard and mouse input
+    computeMatricesFromInputs();
+    glm::mat4 ProjectionMatrix = getProjectionMatrix();
+    glm::mat4 ViewMatrix = getViewMatrix();
+    glm::mat4 ModelMatrix = glm::mat4(1.0);
+    glm::mat4 mvp = ProjectionMatrix * ViewMatrix * ModelMatrix;
+
     //Send the transformation to the current shader in "MVP" uniform
     glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &mvp[0][0]);
 
