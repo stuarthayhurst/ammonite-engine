@@ -28,8 +28,8 @@ extern GLFWwindow* window;
 
 //Set movement and mouse speed
 float speed = 3.0f; //3 units per second
-const float baseMouseSpeed = 0.05f;
-const float mouseSpeedMultiplier = 1.5f;
+const float baseMouseSpeed = 0.005f;
+const float mouseSpeedMultiplier = 1.0f;
 const float mouseSpeed = baseMouseSpeed * mouseSpeedMultiplier;
 
 void computeMatricesFromInputs() {
@@ -40,9 +40,6 @@ void computeMatricesFromInputs() {
   double currentTime = glfwGetTime();
   float deltaTime = float(currentTime - lastTime);
 
-  //Update lastTime
-  lastTime = currentTime;
-
   double xpos, ypos;
   glfwGetCursorPos(window, &xpos, &ypos);
 
@@ -50,8 +47,8 @@ void computeMatricesFromInputs() {
   glfwSetCursorPos(window, width / 2, height / 2);
 
   //Compute new orientation
-  horizontalAngle += mouseSpeed * deltaTime * float(width / 2 - xpos);
-  verticalAngle += mouseSpeed * deltaTime * float(height / 2 - ypos);
+  horizontalAngle += mouseSpeed * float(width / 2 - xpos);
+  verticalAngle += mouseSpeed * float(height / 2 - ypos);
 
   //Direction, Spherical coordinates to Cartesian coordinates conversion
   glm::vec3 direction(
@@ -92,4 +89,7 @@ void computeMatricesFromInputs() {
     position+direction, //Looks here (at the same position, plus "direction")
     up                  //Up
   );
+
+  //Update lastTime
+  lastTime = currentTime;
 }
