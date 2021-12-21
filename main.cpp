@@ -16,23 +16,30 @@ float width = 1024.0f;
 float height = 768.0f;
 float fov = 45;
 
+//OpenGL settings
+int antialiasingLevel = 4;
+int openglMajorVersion = 3;
+int openglMinorVersion = 3;
+
 char title[] = "Tutorial 6";
 GLFWwindow* window;
 
 int main() {
-  //Initialise GLFW
-  glewExperimental = true; //Needed for core profile
+  //Setup GLFW
+  glewExperimental = true;
   if (!glfwInit()) {
     fprintf(stderr, "Failed to initialize GLFW");
     return -1;
   }
 
-  glfwWindowHint(GLFW_SAMPLES, 4); //4x antialiasing
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3); //OpenGL 3.3
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); //Disable older OpenGL 
+  //Setup OpenGL version and antialiasing
+  glfwWindowHint(GLFW_SAMPLES, antialiasingLevel);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, openglMajorVersion);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, openglMinorVersion);
+  //Disable older OpenGL
+  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-  //Open a window and create its OpenGL context
+  //Create a window and an OpenGL context
   window = glfwCreateWindow(width, height, title, NULL, NULL);
   if (window == NULL) {
     fprintf(stderr, "Failed to open window");
