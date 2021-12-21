@@ -26,7 +26,6 @@ GLFWwindow* window;
 
 int main() {
   //Setup GLFW
-  glewExperimental = true;
   if (!glfwInit()) {
     fprintf(stderr, "Failed to initialize GLFW");
     return -1;
@@ -46,16 +45,18 @@ int main() {
     glfwTerminate();
     return -1;
   }
+  glfwMakeContextCurrent(window);
 
-  glfwMakeContextCurrent(window); // Initialize GLEW
-  glewExperimental = true; //Needed in core profile
+  //Setup GLEW
+  glewExperimental = true;
   if (glewInit() != GLEW_OK) {
     fprintf(stderr, "Failed to initialize GLEW");
     return -1;
   }
 
-  //Allow input
+  //Allow catching escape, hide cursor and enable unlimited movement
   glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
+  glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
   //Move cursor to middle
   glfwPollEvents();
