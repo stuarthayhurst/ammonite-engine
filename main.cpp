@@ -141,20 +141,20 @@ int main() {
   };
 
   //Fill faces of cube with colours
-  static GLfloat g_color_buffer_data[12*3*3];
+  static GLfloat g_colour_buffer_data[12*3*3];
   for (int triangle = 0; triangle < 12; triangle++) {
     for (int v = 0; v < 3; v++) {
       for (int colour = 0; colour < 3; colour++) {
-        g_color_buffer_data[triangle * 9 + (v * 3 + colour)] = colourVal[triangle][colour];
+        g_colour_buffer_data[triangle * 9 + (v * 3 + colour)] = colourVal[triangle][colour];
       }
     }
   }
 
   //Create a colour buffer
-  GLuint colorbuffer;
-  glGenBuffers(1, &colorbuffer);
-  glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);
+  GLuint colourbuffer;
+  glGenBuffers(1, &colourbuffer);
+  glBindBuffer(GL_ARRAY_BUFFER, colourbuffer);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(g_colour_buffer_data), g_colour_buffer_data, GL_STATIC_DRAW);
 
   //Loop until window closed
   while(glfwGetKey(window, GLFW_KEY_ESCAPE ) != GLFW_PRESS && glfwWindowShouldClose(window) == 0) {
@@ -187,7 +187,7 @@ int main() {
 
     //Colour attribute buffer
     glEnableVertexAttribArray(1);
-    glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, colourbuffer);
     glVertexAttribPointer(
       1,
       3,
@@ -209,7 +209,7 @@ int main() {
 
   //Cleanup VBO, shader and window
   glDeleteBuffers(1, &vertexbuffer);
-  glDeleteBuffers(1, &colorbuffer);
+  glDeleteBuffers(1, &colourbuffer);
   glDeleteProgram(programID);
   glDeleteVertexArrays(1, &VertexArrayID);
   glfwTerminate();
