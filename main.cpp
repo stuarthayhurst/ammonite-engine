@@ -156,6 +156,9 @@ int main() {
   glBindBuffer(GL_ARRAY_BUFFER, colourbuffer);
   glBufferData(GL_ARRAY_BUFFER, sizeof(g_colour_buffer_data), g_colour_buffer_data, GL_STATIC_DRAW);
 
+  //Framerate variables
+  float frameTime;
+
   //Loop until window closed
   while(glfwGetKey(window, GLFW_KEY_ESCAPE ) != GLFW_PRESS && glfwWindowShouldClose(window) == 0) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -164,11 +167,14 @@ int main() {
     glUseProgram(programID);
 
     //Compute the MVP matrix from keyboard and mouse input
-    computeMatricesFromInputs();
+    //Also get the time for the last frame, as it's convenient
+    frameTime = computeMatricesFromInputs();
     glm::mat4 ProjectionMatrix = getProjectionMatrix();
     glm::mat4 ViewMatrix = getViewMatrix();
     glm::mat4 ModelMatrix = glm::mat4(1.0);
     glm::mat4 mvp = ProjectionMatrix * ViewMatrix * ModelMatrix;
+
+    cout << 1 / frameTime << endl;
 
     //Send the transformation to the current shader in "MVP" uniform
     glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &mvp[0][0]);

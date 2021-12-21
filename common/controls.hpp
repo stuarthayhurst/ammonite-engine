@@ -32,14 +32,13 @@ const float baseMouseSpeed = 0.05f;
 const float mouseSpeedMultiplier = 1.5f;
 const float mouseSpeed = baseMouseSpeed * mouseSpeedMultiplier;
 
-void computeMatricesFromInputs() {
+float computeMatricesFromInputs() {
   //glfwGetTime is called only once, the first time this function is called
   static double lastTime = glfwGetTime();
 
   //Time difference between first and last frame
   double currentTime = glfwGetTime();
   float deltaTime = float(currentTime - lastTime);
-  cout << deltaTime << endl;
 
   double xpos, ypos;
   glfwGetCursorPos(window, &xpos, &ypos);
@@ -93,4 +92,5 @@ void computeMatricesFromInputs() {
 
   //Update lastTime
   lastTime = currentTime;
+  return deltaTime;
 }
