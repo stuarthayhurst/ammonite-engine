@@ -21,7 +21,7 @@ int antialiasingLevel = 4;
 int openglMajorVersion = 3;
 int openglMinorVersion = 3;
 
-char title[] = "Tutorial 6";
+char title[] = "OpenGL Experiments";
 GLFWwindow* window;
 
 int main() {
