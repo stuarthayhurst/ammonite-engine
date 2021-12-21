@@ -32,7 +32,7 @@ const float baseMouseSpeed = 0.05f;
 const float mouseSpeedMultiplier = 1.5f;
 const float mouseSpeed = baseMouseSpeed * mouseSpeedMultiplier;
 
-float computeMatricesFromInputs() {
+void computeMatricesFromInputs() {
   //glfwGetTime is called only once, the first time this function is called
   static double lastTime = glfwGetTime();
 
@@ -92,6 +92,4 @@ float computeMatricesFromInputs() {
     position+direction, //Looks here (at the same position, plus "direction")
     up                  //Up
   );
-
-  return deltaTime;
 }
