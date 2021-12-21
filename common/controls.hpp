@@ -40,6 +40,9 @@ float computeMatricesFromInputs() {
   double currentTime = glfwGetTime();
   float deltaTime = float(currentTime - lastTime);
 
+  //Update lastTime
+  lastTime = currentTime;
+
   double xpos, ypos;
   glfwGetCursorPos(window, &xpos, &ypos);
 
@@ -90,7 +93,5 @@ float computeMatricesFromInputs() {
     up                  //Up
   );
 
-  //Update lastTime
-  lastTime = currentTime;
   return deltaTime;
 }
