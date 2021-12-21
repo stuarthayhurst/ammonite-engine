@@ -11,15 +11,13 @@ using namespace glm;
 #include "common/loadShader.h"
 #include "common/controls.hpp"
 
+//Window and view settings
 float width = 1024.0f;
 float height = 768.0f;
+float fov = 45;
 
 char title[] = "Tutorial 6";
-
 GLFWwindow* window;
-
-//Field of view
-float fov = 45;
 
 int main() {
   //Initialise GLFW

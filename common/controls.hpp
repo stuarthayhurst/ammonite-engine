@@ -23,7 +23,6 @@ float horizontalAngle = 3.14f;
 //Vertical angle : 0, look at the horizon
 float verticalAngle = 0.0f;
 
-
 //Get fov, height and width
 extern float fov;
 extern float height, width;
