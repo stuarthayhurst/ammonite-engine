@@ -17,11 +17,11 @@ float height = 768.0f;
 float fov = 45;
 
 //OpenGL settings
-int antialiasingLevel = 4;
-int openglMajorVersion = 3;
-int openglMinorVersion = 3;
+const int antialiasingLevel = 4;
+const int openglMajorVersion = 3;
+const int openglMinorVersion = 3;
 
-char title[] = "OpenGL Experiments";
+const char title[] = "OpenGL Experiments";
 GLFWwindow* window;
 
 int main() {

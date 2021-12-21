@@ -1,7 +1,5 @@
 #include <GLFW/glfw3.h>
-extern GLFWwindow* window;
 
-// Include GLM
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 using namespace glm;
@@ -18,20 +16,21 @@ glm::mat4 getProjectionMatrix() {
 
 //Starting position
 glm::vec3 position = glm::vec3(0, 0, 5);
-//Horizontal angle : toward -Z
+//Horizontal angle, toward -Z
 float horizontalAngle = 3.14f;
-//Vertical angle : 0, look at the horizon
+//Vertical angle, 0, look at the horizon
 float verticalAngle = 0.0f;
 
-//Get fov, height and width
+//Get fov, height, width and the window
 extern float fov;
 extern float height, width;
+extern GLFWwindow* window;
 
-float speed = 3.0f; // 3 units / second
-float baseMouseSpeed = 0.05f;
-float mouseSpeedMultiplier = 1.5f;
-
-float mouseSpeed = baseMouseSpeed * mouseSpeedMultiplier;
+//Set movement and mouse speed
+float speed = 3.0f; //3 units per second
+const float baseMouseSpeed = 0.05f;
+const float mouseSpeedMultiplier = 1.5f;
+const float mouseSpeed = baseMouseSpeed * mouseSpeedMultiplier;
 
 void computeMatricesFromInputs() {
   //glfwGetTime is called only once, the first time this function is called
@@ -52,7 +51,7 @@ void computeMatricesFromInputs() {
   horizontalAngle += mouseSpeed * deltaTime * float(1024/2 - xpos);
   verticalAngle += mouseSpeed * deltaTime * float(768/2 - ypos);
 
-  //Direction : Spherical coordinates to Cartesian coordinates conversion
+  //Direction, Spherical coordinates to Cartesian coordinates conversion
   glm::vec3 direction(
     cos(verticalAngle) * sin(horizontalAngle),
     sin(verticalAngle),
@@ -66,7 +65,7 @@ void computeMatricesFromInputs() {
     cos(horizontalAngle - 3.14f/2.0f)
   );
 
-  //Up vector : perpendicular to both direction and right
+  //Up vector, perpendicular to both direction and right
   glm::vec3 up = glm::cross(right, direction);
 
   //Movement
@@ -83,13 +82,13 @@ void computeMatricesFromInputs() {
     position -= right * deltaTime * speed;
   }
 
-  // Projection matrix : 45&deg; Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
+  //Projection matrix : 45&deg; Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
   ProjectionMatrix = glm::perspective(glm::radians(fov), width / height, 0.1f, 100.0f);
-  // Camera matrix
+  //Camera matrix
   ViewMatrix = glm::lookAt(
-    position,           // Camera is here
-    position+direction, // and looks here : at the same position, plus "direction"
-    up                  // Head is up (set to 0,-1,0 to look upside-down)
+    position,           //Camera is here
+    position+direction, //Looks here (at the same position, plus "direction")
+    up                  //Up
   );
 
   //Update lastTime
