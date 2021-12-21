@@ -8,7 +8,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 using namespace glm;
 
-#include "common/loadShader.h"
+#include "common/loadShader.hpp"
 #include "common/controls.hpp"
 
 //Window and view settings
