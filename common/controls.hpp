@@ -96,24 +96,26 @@ void computeMatricesFromInputs() {
   glm::vec3 absoluteUp = glm::vec3(0, 1, 0);
 
   //Movement
-  if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) { //Move forward
-    position += direction * deltaTime * speed;
-  }
-  if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) { //Move back
-    position -= direction * deltaTime * speed;
-  }
-  if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) { //Move right
-    position += right * deltaTime * speed;
-  }
-  if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) { //Move left
-    position -= right * deltaTime * speed;
-  }
+  if (inputBound == true) {
+    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) { //Move forward
+      position += direction * deltaTime * speed;
+    }
+    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) { //Move back
+      position -= direction * deltaTime * speed;
+    }
+    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) { //Move right
+      position += right * deltaTime * speed;
+    }
+    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) { //Move left
+      position -= right * deltaTime * speed;
+    }
 
-  if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) { //Move up
-    position += absoluteUp * deltaTime * speed;
-  }
-  if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) { //Move down
-    position -= absoluteUp * deltaTime * speed;
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) { //Move up
+      position += absoluteUp * deltaTime * speed;
+    }
+    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) { //Move down
+      position -= absoluteUp * deltaTime * speed;
+    }
   }
 
   //Projection matrix : 45&deg; Field of View, ratio, display range : 0.1 unit <-> 100 units
