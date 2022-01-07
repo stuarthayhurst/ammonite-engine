@@ -67,6 +67,12 @@ void computeMatricesFromInputs() {
   //Up vector, perpendicular to both direction and right
   glm::vec3 up = glm::cross(right, direction);
 
+  glm::vec3 absoluteUp = glm::vec3(
+    0,
+    1,
+    0
+  );
+
   //Movement
   if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) { //Move forward
     position += direction * deltaTime * speed;
@@ -79,6 +85,13 @@ void computeMatricesFromInputs() {
   }
   if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) { //Move left
     position -= right * deltaTime * speed;
+  }
+
+  if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) { //Move left
+    position += absoluteUp * deltaTime * speed;
+  }
+  if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) { //Move left
+    position -= absoluteUp * deltaTime * speed;
   }
 
   //Projection matrix : 45&deg; Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
