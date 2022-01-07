@@ -1,6 +1,10 @@
 ## opengl-experiments
   - A repository to experiment with an OpenGL based renderer for dataset
 
+## Running:
+  - `make clean build` will clean the build area and build the demo from fresh
+  - `./build/main` will run the built demo
+
 ## Build system:
   - `make build` - Builds demo binary, a working demonstration of the renderer
   - `make clean` - Cleans the build area (`build/`)
