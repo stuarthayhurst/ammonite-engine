@@ -42,10 +42,10 @@ void computeMatricesFromInputs() {
 
   double xpos, ypos;
 
+  //Save last input toggle key state and current input state
   static bool inputBound = true;
-
-  int inputToggleState;
   static int lastInputToggleState = GLFW_RELEASE;
+  int inputToggleState;
 
   inputToggleState = glfwGetKey(window, GLFW_KEY_C);
 
@@ -54,6 +54,14 @@ void computeMatricesFromInputs() {
     if (lastInputToggleState == GLFW_RELEASE) {
       inputBound = !inputBound;
     }
+
+    //Hide and unhide cursor as necessary
+    if (inputBound == true) {
+      glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+    } else {
+      glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    }
+
     lastInputToggleState = inputToggleState;
   }
 
@@ -66,7 +74,6 @@ void computeMatricesFromInputs() {
     horizontalAngle += mouseSpeed * float(width / 2 - xpos);
     verticalAngle += mouseSpeed * float(height / 2 - ypos);
   }
-
 
   //Direction, Spherical coordinates to Cartesian coordinates conversion
   glm::vec3 direction(
