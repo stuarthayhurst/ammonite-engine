@@ -41,14 +41,32 @@ void computeMatricesFromInputs() {
   float deltaTime = float(currentTime - lastTime);
 
   double xpos, ypos;
-  glfwGetCursorPos(window, &xpos, &ypos);
 
-  //Reset mouse position for next frame
-  glfwSetCursorPos(window, width / 2, height / 2);
+  static bool inputBound = true;
 
-  //Compute new orientation
-  horizontalAngle += mouseSpeed * float(width / 2 - xpos);
-  verticalAngle += mouseSpeed * float(height / 2 - ypos);
+  int inputToggleState;
+  static int lastInputToggleState = GLFW_RELEASE;
+
+  inputToggleState = glfwGetKey(window, GLFW_KEY_C);
+
+  //Handle toggling input
+  if (lastInputToggleState != inputToggleState) {
+    if (lastInputToggleState == GLFW_RELEASE) {
+      inputBound = !inputBound;
+    }
+    lastInputToggleState = inputToggleState;
+  }
+
+  if (inputBound == true) {
+    //Get cursor position and reset for next frame
+    glfwGetCursorPos(window, &xpos, &ypos);
+    glfwSetCursorPos(window, width / 2, height / 2);
+
+    //Compute new orientation
+    horizontalAngle += mouseSpeed * float(width / 2 - xpos);
+    verticalAngle += mouseSpeed * float(height / 2 - ypos);
+  }
+
 
   //Direction, Spherical coordinates to Cartesian coordinates conversion
   glm::vec3 direction(
