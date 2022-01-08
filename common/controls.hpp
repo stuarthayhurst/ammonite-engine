@@ -44,8 +44,17 @@ void scroll_callback(GLFWwindow*, double, double yoffset) {
   }
 }
 
+//Reset FoV on middle click, (modifier bits are unused)
+void mouse_button_callback(GLFWwindow*, int button, int action, int) {
+  if (button == GLFW_MOUSE_BUTTON_MIDDLE and action == GLFW_PRESS) {
+    fov = 45;
+  }
+}
+
 void setupControls() {
+  //Set mouse callbacks
   glfwSetScrollCallback(window, scroll_callback);
+  glfwSetMouseButtonCallback(window, mouse_button_callback);
 }
 
 void computeMatricesFromInputs() {
