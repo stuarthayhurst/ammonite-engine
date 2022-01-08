@@ -14,6 +14,7 @@ using namespace glm;
 //Window and view settings
 float width = 1024.0f;
 float height = 768.0f;
+float aspectRatio = width / height;
 float fov = 45;
 
 //OpenGL settings
@@ -28,6 +29,7 @@ GLFWwindow* window;
 void window_size_callback(GLFWwindow*, int newWidth, int newHeight) {
   width = newWidth;
   height = newHeight;
+  aspectRatio = width / height;
   glViewport(0, 0, width, height);
 }
 

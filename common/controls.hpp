@@ -24,6 +24,7 @@ float verticalAngle = 0.0f;
 //Get fov, height, width and the window
 extern float fov;
 extern float height, width;
+extern float aspectRatio;
 extern GLFWwindow* window;
 
 //Set movement and mouse speed
@@ -118,7 +119,7 @@ void computeMatricesFromInputs() {
   }
 
   //Projection matrix : 45&deg; Field of View, ratio, display range : 0.1 unit <-> 100 units
-  ProjectionMatrix = glm::perspective(glm::radians(fov), width / height, 0.1f, 100.0f);
+  ProjectionMatrix = glm::perspective(glm::radians(fov), aspectRatio, 0.1f, 100.0f);
   //Camera matrix
   ViewMatrix = glm::lookAt(
     position,           //Camera is here
