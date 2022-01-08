@@ -72,6 +72,9 @@ int main() {
   glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
   glfwPollEvents();
 
+  //Initialise controls
+  setupControls();
+
   //Enable culling triangles
   glEnable(GL_CULL_FACE);
   //Enable depth test and only show fragments closer than the previous

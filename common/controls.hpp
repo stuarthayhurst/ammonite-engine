@@ -36,6 +36,18 @@ const float mouseSpeed = baseMouseSpeed * mouseSpeedMultiplier;
 //Points upwards, regardless of direction
 const glm::vec3 absoluteUp = glm::vec3(0, 1, 0);
 
+//Increase / decrease FoV on scroll (xoffset is unused)
+void scroll_callback(GLFWwindow*, double, double yoffset) {
+  //Only zoom if FoV will be between 1 and 90
+  if (fov - yoffset > 0 and fov - yoffset < 91) {
+    fov -= yoffset;
+  }
+}
+
+void setupControls() {
+  glfwSetScrollCallback(window, scroll_callback);
+}
+
 void computeMatricesFromInputs() {
   //glfwGetTime is called only once, the first time this function is called
   static double lastTime = glfwGetTime();
