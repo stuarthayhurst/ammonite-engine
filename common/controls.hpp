@@ -32,6 +32,9 @@ const float baseMouseSpeed = 0.005f;
 const float mouseSpeedMultiplier = 1.0f;
 const float mouseSpeed = baseMouseSpeed * mouseSpeedMultiplier;
 
+//Points upwards, regardless of direction
+const glm::vec3 absoluteUp = glm::vec3(0, 1, 0);
+
 void computeMatricesFromInputs() {
   //glfwGetTime is called only once, the first time this function is called
   static double lastTime = glfwGetTime();
@@ -91,9 +94,6 @@ void computeMatricesFromInputs() {
 
   //Up vector, perpendicular to both direction and right
   glm::vec3 up = glm::cross(right, direction);
-
-  //Points upwards, regardless of direction
-  glm::vec3 absoluteUp = glm::vec3(0, 1, 0);
 
   //Movement
   if (inputBound == true) {
