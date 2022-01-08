@@ -24,6 +24,13 @@ const int openglMinorVersion = 3;
 const char title[] = "OpenGL Experiments";
 GLFWwindow* window;
 
+//Callback to update height and width and viewport size on window resize
+void window_size_callback(GLFWwindow*, int newWidth, int newHeight) {
+  width = newWidth;
+  height = newHeight;
+  glViewport(0, 0, width, height);
+}
+
 int main() {
   //Setup GLFW
   if (!glfwInit()) {
@@ -53,6 +60,9 @@ int main() {
     fprintf(stderr, "Failed to initialize GLEW");
     return -1;
   }
+
+  //Update values when resized
+  glfwSetWindowSizeCallback(window, window_size_callback);
 
   //Allow catching escape, hide cursor and enable unlimited movement
   glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
