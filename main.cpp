@@ -64,13 +64,10 @@ int main() {
   //Update values when resized
   glfwSetWindowSizeCallback(window, window_size_callback);
 
-  //Allow catching escape, hide cursor and enable unlimited movement
+  //Ensure inputs are handled and setup cursor
   glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
   glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-
-  //Move cursor to middle
   glfwPollEvents();
-  glfwSetCursorPos(window, width / 2, height / 2);
 
   //Enable culling triangles
   glEnable(GL_CULL_FACE);

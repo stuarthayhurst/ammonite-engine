@@ -60,7 +60,7 @@ void computeMatricesFromInputs() {
 
     //Hide and unhide cursor as necessary
     if (inputBound == true) {
-      glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+      glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     } else {
       glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
     }
@@ -71,11 +71,10 @@ void computeMatricesFromInputs() {
   if (inputBound == true) {
     //Get cursor position and reset for next frame
     glfwGetCursorPos(window, &xpos, &ypos);
-    glfwSetCursorPos(window, width / 2, height / 2);
 
     //Compute new orientation
-    horizontalAngle += mouseSpeed * float(width / 2 - xpos);
-    verticalAngle += mouseSpeed * float(height / 2 - ypos);
+    horizontalAngle = mouseSpeed * float(width / 2 - xpos);
+    verticalAngle = mouseSpeed * float(height / 2 - ypos);
   }
 
   //Direction, Spherical coordinates to Cartesian coordinates conversion
