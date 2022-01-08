@@ -60,7 +60,7 @@ void computeMatricesFromInputs() {
     }
 
     //Hide and unhide cursor as necessary
-    if (inputBound == true) {
+    if (inputBound) {
       glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     } else {
       glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
@@ -69,7 +69,7 @@ void computeMatricesFromInputs() {
     lastInputToggleState = inputToggleState;
   }
 
-  if (inputBound == true) {
+  if (inputBound) {
     //Get cursor position and reset for next frame
     glfwGetCursorPos(window, &xpos, &ypos);
 
