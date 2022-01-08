@@ -31,7 +31,7 @@ extern GLFWwindow* window;
 const float baseSpeed = 3.0f;
 const float baseMouseSpeed = 0.005f;
 
-//Sensitivity multipliers
+//Sensitivity multipliers (using a negative value will invert movement)
 const float movementSpeedMultiplier = 1.0f;
 const float mouseSpeedMultiplier = 1.0f;
 const float zoomMultiplier = 1.0f;
