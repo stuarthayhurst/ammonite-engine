@@ -27,13 +27,17 @@ extern float height, width;
 extern float aspectRatio;
 extern GLFWwindow* window;
 
-//Set movement and mouse speed
-float speed = 3.0f; //3 units per second
+//Base sensitivities
+const float baseSpeed = 3.0f;
 const float baseMouseSpeed = 0.005f;
-const float mouseSpeedMultiplier = 1.0f;
-const float mouseSpeed = baseMouseSpeed * mouseSpeedMultiplier;
 
+//Sensitivity multipliers
+const float movementSpeedMultiplier = 1.0f;
+const float mouseSpeedMultiplier = 1.0f;
 const float zoomMultiplier = 1.0f;
+
+const float movementSpeed = baseSpeed * movementSpeedMultiplier;
+const float mouseSpeed = baseMouseSpeed * mouseSpeedMultiplier;
 
 //Points upwards, regardless of direction
 const glm::vec3 absoluteUp = glm::vec3(0, 1, 0);
@@ -122,23 +126,23 @@ void computeMatricesFromInputs() {
   //Movement
   if (inputBound == true) {
     if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) { //Move forward
-      position += direction * deltaTime * speed;
+      position += direction * deltaTime * movementSpeed;
     }
     if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) { //Move back
-      position -= direction * deltaTime * speed;
+      position -= direction * deltaTime * movementSpeed;
     }
     if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) { //Move right
-      position += right * deltaTime * speed;
+      position += right * deltaTime * movementSpeed;
     }
     if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) { //Move left
-      position -= right * deltaTime * speed;
+      position -= right * deltaTime * movementSpeed;
     }
 
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) { //Move up
-      position += absoluteUp * deltaTime * speed;
+      position += absoluteUp * deltaTime * movementSpeed;
     }
     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) { //Move down
-      position -= absoluteUp * deltaTime * speed;
+      position -= absoluteUp * deltaTime * movementSpeed;
     }
   }
 
