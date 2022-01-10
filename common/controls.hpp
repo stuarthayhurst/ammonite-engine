@@ -4,6 +4,13 @@
 #include <glm/gtc/matrix_transform.hpp>
 using namespace glm;
 
+#include <chrono>
+#include <future>
+#include <thread>
+
+using std::chrono::milliseconds;
+using std::this_thread::sleep_for;
+
 glm::mat4 ViewMatrix;
 glm::mat4 ProjectionMatrix;
 
@@ -56,12 +63,6 @@ void mouse_button_callback(GLFWwindow*, int button, int action, int) {
   if (button == GLFW_MOUSE_BUTTON_MIDDLE and action == GLFW_PRESS) {
     fov = 45;
   }
-}
-
-void setupControls() {
-  //Set mouse callbacks
-  glfwSetScrollCallback(window, scroll_callback);
-  glfwSetMouseButtonCallback(window, mouse_button_callback);
 }
 
 void computeMatricesFromInputs() {
@@ -157,4 +158,29 @@ void computeMatricesFromInputs() {
 
   //Update lastTime
   lastTime = currentTime;
+}
+
+bool runInputLoop = false;
+void computeMatrixLoop() {
+  while (runInputLoop) {
+    computeMatricesFromInputs();
+    glfwPollEvents();
+    sleep_for(milliseconds(10));
+  }
+}
+
+std::future<void> computeMatrixFuture;
+void setupControls() {
+  //Set mouse callbacks
+  glfwSetScrollCallback(window, scroll_callback);
+  glfwSetMouseButtonCallback(window, mouse_button_callback);
+
+  //Begin running mouse and keyboard loop
+  runInputLoop = true;
+  computeMatrixFuture = std::async(std::launch::async, computeMatrixLoop);
+}
+
+//Break input loop
+void stopControls() {
+  runInputLoop = false;
 }

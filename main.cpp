@@ -192,9 +192,7 @@ int main() {
     //Use the shaders
     glUseProgram(programID);
 
-    //Compute the MVP matrix from keyboard and mouse input
-    //Also get the time for the last frame, as it's convenient
-    computeMatricesFromInputs();
+    //Get current model, view and projection matrices, and compute the MVP matrix
     glm::mat4 ProjectionMatrix = getProjectionMatrix();
     glm::mat4 ViewMatrix = getViewMatrix();
     glm::mat4 ModelMatrix = glm::mat4(1.0);
@@ -234,8 +232,10 @@ int main() {
 
     //Swap buffers
     glfwSwapBuffers(window);
-    glfwPollEvents();
   }
+
+  //Stop control loop
+  stopControls();
 
   //Cleanup VBO, shader and window
   glDeleteBuffers(1, &vertexbuffer);
