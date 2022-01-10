@@ -151,9 +151,9 @@ void computeMatricesFromInputs() {
   ProjectionMatrix = glm::perspective(glm::radians(fov), aspectRatio, 0.1f, 100.0f);
   //Camera matrix
   ViewMatrix = glm::lookAt(
-    position,           //Camera is here
-    position+direction, //Looks here (at the same position, plus "direction")
-    up                  //Up
+    position,             //Camera is here
+    position + direction, //Looks here (at the same position, plus "direction")
+    up                    //Up
   );
 
   //Update lastTime
