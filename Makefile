@@ -6,7 +6,7 @@ BUILD_DIR=build
 
 CFLAGS:=$(shell pkg-config --cflags $(LIBS))
 CFLAGS+=-Wall -Wextra -O3 -flto
-LDFLAGS:=$(shell pkg-config --libs $(LIBS))
+LDFLAGS:=$(shell pkg-config --libs $(LIBS)) -pthread
 
 $(BUILD_DIR)/main:
 	mkdir -p "$(BUILD_DIR)"
