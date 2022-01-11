@@ -3,9 +3,6 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include <future>
-#include "common.hpp"
-
 glm::mat4 ViewMatrix;
 glm::mat4 ProjectionMatrix;
 
@@ -60,7 +57,13 @@ void zoom_reset_callback(GLFWwindow*, int button, int action, int) {
   }
 }
 
-void computeMatricesFromInputs(bool inputBound) {
+void setupControls() {
+  //Set mouse callbacks
+  glfwSetScrollCallback(window, scroll_callback);
+  glfwSetMouseButtonCallback(window, zoom_reset_callback);
+}
+
+void processInput() {
   //glfwGetTime is called only once, the first time this function is called
   static double lastTime = glfwGetTime();
 
@@ -69,6 +72,28 @@ void computeMatricesFromInputs(bool inputBound) {
   float deltaTime = float(currentTime - lastTime);
 
   double xpos, ypos;
+
+  //Save last input toggle key state and current input state
+  static bool inputBound = true;
+  static int lastInputToggleState = GLFW_RELEASE;
+  int inputToggleState;
+
+  //Handle toggling input
+  inputToggleState = glfwGetKey(window, GLFW_KEY_C);
+  if (lastInputToggleState != inputToggleState) {
+    if (lastInputToggleState == GLFW_RELEASE) {
+      inputBound = !inputBound;
+    }
+
+    //Hide and unhide cursor as necessary
+     if (inputBound) {
+      glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    } else {
+      glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    }
+
+    lastInputToggleState = inputToggleState;
+  }
 
   if (inputBound) {
     //Get cursor position and reset for next frame
@@ -130,51 +155,4 @@ void computeMatricesFromInputs(bool inputBound) {
 
   //Update lastTime
   lastTime = currentTime;
-}
-
-bool runInputLoop = false;
-void computeMatrixLoop() {
-  //Save last input toggle key state and current input state
-  static bool inputBound = true;
-  static int lastInputToggleState = GLFW_RELEASE;
-  int inputToggleState;
-
-  while (runInputLoop) {
-    //Handle toggling input
-    inputToggleState = glfwGetKey(window, GLFW_KEY_C);
-    if (lastInputToggleState != inputToggleState) {
-      if (lastInputToggleState == GLFW_RELEASE) {
-        inputBound = !inputBound;
-      }
-
-      //Hide and unhide cursor as necessary
-      if (inputBound) {
-        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-      } else {
-        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-      }
-
-      lastInputToggleState = inputToggleState;
-    }
-
-    computeMatricesFromInputs(inputBound);
-    glfwPollEvents();
-    millisleep(10);
-  }
-}
-
-std::future<void> computeMatrixFuture;
-void setupControls() {
-  //Set mouse callbacks
-  glfwSetScrollCallback(window, scroll_callback);
-  glfwSetMouseButtonCallback(window, zoom_reset_callback);
-
-  //Begin running mouse and keyboard loop
-  runInputLoop = true;
-  computeMatrixFuture = std::async(std::launch::async, computeMatrixLoop);
-}
-
-//Break input loop
-void stopControls() {
-  runInputLoop = false;
 }

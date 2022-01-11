@@ -177,6 +177,9 @@ int main() {
     //Use the shaders
     glUseProgram(programID);
 
+    //Process new input since last frame
+    processInput();
+
     //Get current model, view and projection matrices, and compute the MVP matrix
     glm::mat4 ProjectionMatrix = getProjectionMatrix();
     glm::mat4 ViewMatrix = getViewMatrix();
@@ -217,10 +220,8 @@ int main() {
 
     //Swap buffers
     glfwSwapBuffers(window);
+    glfwPollEvents();
   }
-
-  //Stop control loop
-  stopControls();
 
   //Cleanup VBO, shader and window
   glDeleteBuffers(1, &vertexbuffer);
