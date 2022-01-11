@@ -40,12 +40,12 @@ int main() {
   //Create a window and an OpenGL context
   window = createWindow(width, height, title);
   if (window == NULL) {
-    return -1;
+    return EXIT_FAILURE;
   }
 
   //Setup GLEW
   if (setupGlew() == -1) {
-    return -1;
+    return EXIT_FAILURE;
   }
 
   //Update values when resized
@@ -227,5 +227,5 @@ int main() {
   glDeleteVertexArrays(1, &VertexArrayID);
   glfwTerminate();
 
-  return 0;
+  return EXIT_SUCCESS;
 }
