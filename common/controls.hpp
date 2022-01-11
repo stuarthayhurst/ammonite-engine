@@ -138,8 +138,8 @@ void computeMatrixLoop() {
   static bool inputBound = true;
   static int lastInputToggleState = GLFW_RELEASE;
   int inputToggleState;
-  while (runInputLoop) {
 
+  while (runInputLoop) {
     //Handle toggling input
     inputToggleState = glfwGetKey(window, GLFW_KEY_C);
     if (lastInputToggleState != inputToggleState) {
