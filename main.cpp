@@ -35,7 +35,9 @@ void window_size_callback(GLFWwindow*, int newWidth, int newHeight) {
 
 int main() {
   //Setup GLFW and OpenGL version / antialiasing
-  setupGlfw(antialiasingLevel, openglMajorVersion, openglMinorVersion);
+  if (setupGlfw(antialiasingLevel, openglMajorVersion, openglMinorVersion) == -1) {
+    return EXIT_FAILURE;
+  }
 
   //Create a window and an OpenGL context
   window = createWindow(width, height, title);
