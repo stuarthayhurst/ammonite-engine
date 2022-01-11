@@ -10,6 +10,7 @@ using namespace glm;
 
 #include "common/loadShader.hpp"
 #include "common/controls.hpp"
+#include "common/window.hpp"
 
 //Window and view settings
 float width = 1024.0f;
@@ -34,32 +35,17 @@ void window_size_callback(GLFWwindow*, int newWidth, int newHeight) {
 }
 
 int main() {
-  //Setup GLFW
-  if (!glfwInit()) {
-    fprintf(stderr, "Failed to initialize GLFW");
-    return -1;
-  }
-
-  //Setup OpenGL version and antialiasing
-  glfwWindowHint(GLFW_SAMPLES, antialiasingLevel);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, openglMajorVersion);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, openglMinorVersion);
-  //Disable older OpenGL
-  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+  //Setup GLFW and OpenGL version / antialiasing
+  setupGlfw(antialiasingLevel, openglMajorVersion, openglMinorVersion);
 
   //Create a window and an OpenGL context
-  window = glfwCreateWindow(width, height, title, NULL, NULL);
+  window = createWindow(width, height, title);
   if (window == NULL) {
-    fprintf(stderr, "Failed to open window");
-    glfwTerminate();
     return -1;
   }
-  glfwMakeContextCurrent(window);
 
   //Setup GLEW
-  glewExperimental = true;
-  if (glewInit() != GLEW_OK) {
-    fprintf(stderr, "Failed to initialize GLEW");
+  if (setupGlew() == -1) {
     return -1;
   }
 
@@ -67,9 +53,7 @@ int main() {
   glfwSetWindowSizeCallback(window, window_size_callback);
 
   //Ensure inputs are handled and setup cursor
-  glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
-  glfwSetInputMode(window, GLFW_STICKY_MOUSE_BUTTONS, GL_TRUE);
-  glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+  setupGlfwInput(window);
   glfwPollEvents();
 
   //Initialise controls
