@@ -65,7 +65,7 @@ void mouse_button_callback(GLFWwindow*, int button, int action, int) {
   }
 }
 
-void computeMatricesFromInputs() {
+void computeMatricesFromInputs(bool inputBound) {
   //glfwGetTime is called only once, the first time this function is called
   static double lastTime = glfwGetTime();
 
@@ -74,29 +74,6 @@ void computeMatricesFromInputs() {
   float deltaTime = float(currentTime - lastTime);
 
   double xpos, ypos;
-
-  //Save last input toggle key state and current input state
-  static bool inputBound = true;
-  static int lastInputToggleState = GLFW_RELEASE;
-  int inputToggleState;
-
-  inputToggleState = glfwGetKey(window, GLFW_KEY_C);
-
-  //Handle toggling input
-  if (lastInputToggleState != inputToggleState) {
-    if (lastInputToggleState == GLFW_RELEASE) {
-      inputBound = !inputBound;
-    }
-
-    //Hide and unhide cursor as necessary
-    if (inputBound) {
-      glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    } else {
-      glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-    }
-
-    lastInputToggleState = inputToggleState;
-  }
 
   if (inputBound) {
     //Get cursor position and reset for next frame
@@ -162,8 +139,30 @@ void computeMatricesFromInputs() {
 
 bool runInputLoop = false;
 void computeMatrixLoop() {
+  //Save last input toggle key state and current input state
+  static bool inputBound = true;
+  static int lastInputToggleState = GLFW_RELEASE;
+  int inputToggleState;
   while (runInputLoop) {
-    computeMatricesFromInputs();
+
+    //Handle toggling input
+    inputToggleState = glfwGetKey(window, GLFW_KEY_C);
+    if (lastInputToggleState != inputToggleState) {
+      if (lastInputToggleState == GLFW_RELEASE) {
+        inputBound = !inputBound;
+      }
+
+      //Hide and unhide cursor as necessary
+      if (inputBound) {
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+      } else {
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+      }
+
+      lastInputToggleState = inputToggleState;
+    }
+
+    computeMatricesFromInputs(inputBound);
     glfwPollEvents();
     sleep_for(milliseconds(10));
   }
