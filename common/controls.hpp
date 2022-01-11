@@ -3,12 +3,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include <chrono>
 #include <future>
-#include <thread>
-
-using std::chrono::milliseconds;
-using std::this_thread::sleep_for;
+#include "common.hpp"
 
 glm::mat4 ViewMatrix;
 glm::mat4 ProjectionMatrix;
@@ -163,7 +159,7 @@ void computeMatrixLoop() {
 
     computeMatricesFromInputs(inputBound);
     glfwPollEvents();
-    sleep_for(milliseconds(10));
+    millisleep(10);
   }
 }
 
