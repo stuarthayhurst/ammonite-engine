@@ -1,5 +1,5 @@
-#include <GLFW/glfw3.h>
 #include <GL/glew.h>
+#include <GLFW/glfw3.h>
 
 //Initialise glfw, setup antialiasing and OpenGL version
 int setupGlfw(int antialiasing, int openglMajor, int openglMinor) {
@@ -21,7 +21,6 @@ int setupGlfw(int antialiasing, int openglMajor, int openglMinor) {
 
 //Initialise GLEW
 int setupGlew() {
-  //Setup GLEW
   glewExperimental = true;
   if (glewInit() != GLEW_OK) {
     fprintf(stderr, "Failed to initialize GLEW\n");
