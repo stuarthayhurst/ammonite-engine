@@ -181,8 +181,8 @@ int main() {
     controls::processInput();
 
     //Get current model, view and projection matrices, and compute the MVP matrix
-    glm::mat4 ProjectionMatrix = controls::getProjectionMatrix();
-    glm::mat4 ViewMatrix = controls::getViewMatrix();
+    glm::mat4 ProjectionMatrix = controls::matrix::getProjectionMatrix();
+    glm::mat4 ViewMatrix = controls::matrix::getViewMatrix();
     glm::mat4 ModelMatrix = glm::mat4(1.0);
     glm::mat4 mvp = ProjectionMatrix * ViewMatrix * ModelMatrix;
 
