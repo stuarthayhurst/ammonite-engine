@@ -1,5 +1,5 @@
 ## opengl-experiments
-  - A repository to experiment with an OpenGL based renderer for dataset
+  - A repository to experiment with an OpenGL based renderer for generated data
 
 ## Running:
   - `make clean build` will clean the build area and build the demo from fresh
