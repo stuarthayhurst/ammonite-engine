@@ -58,7 +58,7 @@ int main() {
   glfwPollEvents();
 
   //Initialise controls
-  setupControls();
+  controls::setupControls();
 
   //Enable culling triangles
   glEnable(GL_CULL_FACE);
@@ -178,11 +178,11 @@ int main() {
     glUseProgram(programID);
 
     //Process new input since last frame
-    processInput();
+    controls::processInput();
 
     //Get current model, view and projection matrices, and compute the MVP matrix
-    glm::mat4 ProjectionMatrix = getProjectionMatrix();
-    glm::mat4 ViewMatrix = getViewMatrix();
+    glm::mat4 ProjectionMatrix = controls::getProjectionMatrix();
+    glm::mat4 ViewMatrix = controls::getViewMatrix();
     glm::mat4 ModelMatrix = glm::mat4(1.0);
     glm::mat4 mvp = ProjectionMatrix * ViewMatrix * ModelMatrix;
 
