@@ -10,7 +10,7 @@ LDFLAGS:=$(shell pkg-config --libs $(LIBS)) -pthread
 
 $(BUILD_DIR)/main:
 	mkdir -p "$(BUILD_DIR)"
-	$(CC) main.cpp common/controls.cpp $(CFLAGS) $(LDFLAGS) -o $@
+	$(CC) main.cpp common/*.cpp $(CFLAGS) $(LDFLAGS) -o $@
 
 .PHONY: build clean
 
