@@ -1,3 +1,6 @@
+#ifndef CONTROLS
+#define CONTROLS
+
 namespace controls {
   namespace matrix {
     glm::mat4 getViewMatrix();
@@ -17,3 +20,5 @@ namespace controls {
   void setupControls();
   void processInput();
 }
+
+#endif
