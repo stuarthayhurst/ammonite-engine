@@ -13,6 +13,18 @@ namespace controls {
   namespace {
     glm::mat4 ViewMatrix;
     glm::mat4 ProjectionMatrix;
+
+    //Base sensitivities
+    const float baseMovementSpeed = 3.0f;
+    const float baseMouseSpeed = 0.005f;
+
+    //Sensitivity multipliers (using a negative value will invert movement)
+    float movementSpeedMultiplier = 1.0f;
+    float mouseSpeedMultiplier = 1.0f;
+    float zoomMultiplier = 1.0f;
+
+    float movementSpeed = baseMovementSpeed * movementSpeedMultiplier;
+    float mouseSpeed = baseMouseSpeed * mouseSpeedMultiplier;
   }
 
   namespace matrix {
@@ -25,24 +37,41 @@ namespace controls {
     }
   }
 
+  //Using negative values for movement will invert the axis
+  namespace settings {
+    void setMovementSpeed(float newMovementSpeed) {
+      movementSpeedMultiplier = newMovementSpeed;
+      movementSpeed = baseMovementSpeed * movementSpeedMultiplier;
+    }
+
+    void setMouseSpeed(float newMouseSpeed) {
+      mouseSpeedMultiplier = newMouseSpeed;
+      mouseSpeed = baseMouseSpeed * mouseSpeedMultiplier;
+    }
+
+    void setZoomSpeed(float newZoomMultiplier) {
+      zoomMultiplier = newZoomMultiplier;
+    }
+
+    float getMovementSpeed() {
+      return movementSpeedMultiplier;
+    }
+
+    float getMouseSpeed() {
+      return mouseSpeedMultiplier;
+    }
+
+    float getZoomSpeed() {
+      return zoomMultiplier;
+    }
+  }
+
   //Starting position
   glm::vec3 position = glm::vec3(0, 0, 5);
   //Horizontal angle, toward -Z
   float horizontalAngle = 3.14f;
   //Vertical angle, 0, look at the horizon
   float verticalAngle = 0.0f;
-
-  //Base sensitivities
-  const float baseSpeed = 3.0f;
-  const float baseMouseSpeed = 0.005f;
-
-  //Sensitivity multipliers (using a negative value will invert movement)
-  const float movementSpeedMultiplier = 1.0f;
-  const float mouseSpeedMultiplier = 1.0f;
-  const float zoomMultiplier = 1.0f;
-
-  const float movementSpeed = baseSpeed * movementSpeedMultiplier;
-  const float mouseSpeed = baseMouseSpeed * mouseSpeedMultiplier;
 
   //Points upwards, regardless of direction
   const glm::vec3 absoluteUp = glm::vec3(0, 1, 0);
