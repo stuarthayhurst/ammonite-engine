@@ -137,6 +137,8 @@ namespace controls {
       //Compute new orientation
       horizontalAngle = mouseSpeed * float(width / 2 - xpos);
       verticalAngle = mouseSpeed * float(height / 2 - ypos);
+    } else {
+      return;
     }
 
     //Direction, Spherical coordinates to Cartesian coordinates conversion
@@ -157,26 +159,24 @@ namespace controls {
     glm::vec3 up = glm::cross(right, direction);
 
     //Movement
-    if (inputBound) {
-      if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) { //Move forward
-        position += direction * deltaTime * movementSpeed;
-      }
-      if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) { //Move back
-        position -= direction * deltaTime * movementSpeed;
-      }
-      if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) { //Move right
-        position += right * deltaTime * movementSpeed;
-      }
-      if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) { //Move left
-        position -= right * deltaTime * movementSpeed;
-      }
+    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) { //Move forward
+      position += direction * deltaTime * movementSpeed;
+    }
+    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) { //Move back
+      position -= direction * deltaTime * movementSpeed;
+    }
+    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) { //Move right
+      position += right * deltaTime * movementSpeed;
+    }
+    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) { //Move left
+      position -= right * deltaTime * movementSpeed;
+    }
 
-      if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) { //Move up
-        position += absoluteUp * deltaTime * movementSpeed;
-      }
-      if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) { //Move down
-        position -= absoluteUp * deltaTime * movementSpeed;
-      }
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) { //Move up
+      position += absoluteUp * deltaTime * movementSpeed;
+    }
+    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) { //Move down
+      position -= absoluteUp * deltaTime * movementSpeed;
     }
 
     //Projection matrix : 45&deg; Field of View, ratio, display range : 0.1 unit <-> 100 units
