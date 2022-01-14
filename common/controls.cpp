@@ -157,7 +157,7 @@ namespace controls {
     glm::vec3 up = glm::cross(right, direction);
 
     //Movement
-    if (inputBound == true) {
+    if (inputBound) {
       if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) { //Move forward
         position += direction * deltaTime * movementSpeed;
       }
