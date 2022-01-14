@@ -11,6 +11,7 @@ extern GLFWwindow* window;
 
 namespace controls {
   namespace {
+    //Matrices returned
     glm::mat4 ViewMatrix;
     glm::mat4 ProjectionMatrix;
 
@@ -23,8 +24,33 @@ namespace controls {
     float mouseSpeedMultiplier = 1.0f;
     float zoomMultiplier = 1.0f;
 
+    //Final sensitivites (zoom only uses the multiplier)
     float movementSpeed = baseMovementSpeed * movementSpeedMultiplier;
     float mouseSpeed = baseMouseSpeed * mouseSpeedMultiplier;
+
+    //Position, start looking towards the horizon at -Z
+    glm::vec3 position = glm::vec3(0, 0, 5);
+    float horizontalAngle = 3.14f;
+    float verticalAngle = 0.0f;
+
+    //Points upwards, regardless of direction
+    const glm::vec3 absoluteUp = glm::vec3(0, 1, 0);
+
+    //Increase / decrease FoV on scroll (xoffset is unused)
+    void scroll_callback(GLFWwindow*, double, double yoffset) {
+      //Only zoom if FoV will be between 1 and 90
+      float newFov = fov - (yoffset * zoomMultiplier);
+      if (newFov > 0 and newFov < 91) {
+        fov = newFov;
+      }
+    }
+
+    //Reset FoV on middle click, (modifier bits are unused)
+    void zoom_reset_callback(GLFWwindow*, int button, int action, int) {
+      if (button == GLFW_MOUSE_BUTTON_MIDDLE and action == GLFW_PRESS) {
+        fov = 45;
+      }
+    }
   }
 
   namespace matrix {
@@ -66,38 +92,13 @@ namespace controls {
     }
   }
 
-  //Starting position
-  glm::vec3 position = glm::vec3(0, 0, 5);
-  //Horizontal angle, toward -Z
-  float horizontalAngle = 3.14f;
-  //Vertical angle, 0, look at the horizon
-  float verticalAngle = 0.0f;
-
-  //Points upwards, regardless of direction
-  const glm::vec3 absoluteUp = glm::vec3(0, 1, 0);
-
-  //Increase / decrease FoV on scroll (xoffset is unused)
-  void scroll_callback(GLFWwindow*, double, double yoffset) {
-    //Only zoom if FoV will be between 1 and 90
-    float newFov = fov - (yoffset * zoomMultiplier);
-    if (newFov > 0 and newFov < 91) {
-      fov = newFov;
-    }
-  }
-
-  //Reset FoV on middle click, (modifier bits are unused)
-  void zoom_reset_callback(GLFWwindow*, int button, int action, int) {
-    if (button == GLFW_MOUSE_BUTTON_MIDDLE and action == GLFW_PRESS) {
-      fov = 45;
-    }
-  }
-
   void setupControls() {
     //Set mouse callbacks
     glfwSetScrollCallback(window, scroll_callback);
     glfwSetMouseButtonCallback(window, zoom_reset_callback);
   }
 
+  //Handle keyboard and mouse movements, calculate matrices
   void processInput() {
     //glfwGetTime is called only once, the first time this function is called
     static double lastTime = glfwGetTime();
