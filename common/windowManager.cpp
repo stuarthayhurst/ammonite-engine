@@ -7,6 +7,8 @@
 
 namespace windowManager {
   namespace {
+    //Window and info
+    GLFWwindow* window;
     int width, height;
     float aspectRatio;
 
@@ -71,7 +73,7 @@ namespace windowManager {
     height = newHeight;
     aspectRatio = float(width) / float(height);
 
-    static GLFWwindow* window = glfwCreateWindow(width, height, title, NULL, NULL);
+    window = glfwCreateWindow(width, height, title, NULL, NULL);
     if (window == NULL) {
       fprintf(stderr, "Failed to open window\n");
       glfwTerminate();
