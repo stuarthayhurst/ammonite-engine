@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <cmath>
+#include <iostream>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -6,12 +8,16 @@
 namespace windowManager {
   namespace setup {
     //Initialise glfw, setup antialiasing and OpenGL version
-    int setupGlfw(int antialiasing, int openglMajor, int openglMinor) {
+    int setupGlfw(int antialiasing, float openglVersion) {
       //Setup GLFW
       if (!glfwInit()) {
         fprintf(stderr, "Failed to initialize GLFW");
         return -1;
       }
+
+      //Split openglVersion into major and minor components
+      const int openglMajor = std::floor(openglVersion);
+      const int openglMinor = std::ceil((openglVersion - openglMajor) * 10);
 
       //Setup OpenGL version and antialiasing
       glfwWindowHint(GLFW_SAMPLES, antialiasing);

@@ -17,8 +17,7 @@ float aspectRatio = width / height;
 
 //OpenGL settings
 const int antialiasingLevel = 4;
-const int openglMajorVersion = 3;
-const int openglMinorVersion = 3;
+const float openglVersion = 3.3f;
 
 const char title[] = "OpenGL Experiments";
 GLFWwindow* window;
@@ -33,7 +32,7 @@ void window_size_callback(GLFWwindow*, int newWidth, int newHeight) {
 
 int main() {
   //Setup GLFW and OpenGL version / antialiasing
-  if (windowManager::setup::setupGlfw(antialiasingLevel, openglMajorVersion, openglMinorVersion) == -1) {
+  if (windowManager::setup::setupGlfw(antialiasingLevel, openglVersion) == -1) {
     return EXIT_FAILURE;
   }
 

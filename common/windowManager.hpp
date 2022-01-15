@@ -3,7 +3,7 @@
 
 namespace windowManager {
   namespace setup {
-    int setupGlfw(int antialiasing, int openglMajor, int openglMinor);
+    int setupGlfw(int antialiasing, float openglVersion);
     int setupGlew();
     void setupGlfwInput(GLFWwindow* window);
   }
