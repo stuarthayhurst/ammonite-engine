@@ -21,7 +21,6 @@ const unsigned short int width = 1024;
 const unsigned short int height = 768;
 
 const char title[] = "OpenGL Experiments";
-GLFWwindow* window;
 
 int main() {
   //Setup GLFW and OpenGL version / antialiasing
