@@ -1,6 +1,10 @@
 ## opengl-experiments
   - A repository to experiment with an OpenGL based renderer for generated data
 
+## Requirements:
+  - A `c++17` compatible compiler (`g++ 8.x+`)
+  - An OpenGL 3.3+ compatible driver
+
 ## Running:
   - `make clean build` will clean the build area and build the demo from fresh
   - `./build/main` will run the built demo
