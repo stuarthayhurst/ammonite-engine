@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <stdlib.h>
 
 #include <GL/glew.h>
@@ -9,7 +8,7 @@
 
 #include "common/loadShader.hpp"
 #include "common/controls.hpp"
-#include "common/window.hpp"
+#include "common/windowManager.hpp"
 
 //Window and view settings
 float width = 1024.0f;
@@ -35,18 +34,18 @@ void window_size_callback(GLFWwindow*, int newWidth, int newHeight) {
 
 int main() {
   //Setup GLFW and OpenGL version / antialiasing
-  if (setupGlfw(antialiasingLevel, openglMajorVersion, openglMinorVersion) == -1) {
+  if (windowManager::setupGlfw(antialiasingLevel, openglMajorVersion, openglMinorVersion) == -1) {
     return EXIT_FAILURE;
   }
 
   //Create a window and an OpenGL context
-  window = createWindow(width, height, title);
+  window = windowManager::createWindow(width, height, title);
   if (window == NULL) {
     return EXIT_FAILURE;
   }
 
   //Setup GLEW
-  if (setupGlew() == -1) {
+  if (windowManager::setupGlew() == -1) {
     return EXIT_FAILURE;
   }
 
@@ -54,7 +53,7 @@ int main() {
   glfwSetWindowSizeCallback(window, window_size_callback);
 
   //Ensure inputs are handled and setup cursor
-  setupGlfwInput(window);
+  windowManager::setupGlfwInput(window);
   glfwPollEvents();
 
   //Initialise controls
