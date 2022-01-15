@@ -14,7 +14,6 @@
 float width = 1024.0f;
 float height = 768.0f;
 float aspectRatio = width / height;
-float fov = 45;
 
 //OpenGL settings
 const int antialiasingLevel = 4;

@@ -3,8 +3,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-//Get fov, height, width and the window
-extern float fov;
+//Get height, width and the window externally
 extern float height, width;
 extern float aspectRatio;
 extern GLFWwindow* window;
@@ -15,9 +14,10 @@ namespace controls {
     glm::mat4 ViewMatrix;
     glm::mat4 ProjectionMatrix;
 
-    //Base sensitivities
+    //Base sensitivities and zoom
     const float baseMovementSpeed = 3.0f;
     const float baseMouseSpeed = 0.005f;
+    float fov = 45;
 
     //Sensitivity multipliers (using a negative value will invert movement)
     float movementSpeedMultiplier = 1.0f;
