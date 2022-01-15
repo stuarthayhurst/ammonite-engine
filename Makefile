@@ -1,16 +1,16 @@
-CC=g++
-SHELL=bash
+CXX ?= $(shell command -v g++)
+SHELL = bash
 
-LIBS=glm glfw3 glew
-BUILD_DIR=build
+LIBS = glm glfw3 glew
+BUILD_DIR = build
 
-CFLAGS:=$(shell pkg-config --cflags $(LIBS))
-CFLAGS+=-Wall -Wextra -O3 -flto -std=c++17
-LDFLAGS:=$(shell pkg-config --libs $(LIBS)) -pthread
+CXXFLAGS := $(shell pkg-config --cflags $(LIBS))
+CXXFLAGS += -Wall -Wextra -O3 -flto -std=c++17
+LDFLAGS := $(shell pkg-config --libs $(LIBS)) -pthread
 
 $(BUILD_DIR)/main:
 	mkdir -p "$(BUILD_DIR)"
-	$(CC) main.cpp common/*.cpp $(CFLAGS) $(LDFLAGS) -o $@
+	$(CXX) main.cpp common/*.cpp $(CXXFLAGS) $(LDFLAGS) -o $@
 
 .PHONY: build clean
 
