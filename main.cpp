@@ -1,4 +1,5 @@
 #include <cstdlib>
+#include <cstdio>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -69,7 +70,7 @@ int main() {
   glBindVertexArray(VertexArrayID);
 
   //Create and compile shaders
-  GLuint programID = LoadShaders("shaders/SimpleVertexShader.vert", "shaders/SimpleFragmentShader.frag");
+  GLuint programID = renderer::shaders::loadShaders("shaders/SimpleVertexShader.vert", "shaders/SimpleFragmentShader.frag");
   //Get an ID for the model view projection
   GLuint MatrixID = glGetUniformLocation(programID, "MVP");
 
