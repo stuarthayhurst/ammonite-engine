@@ -16,8 +16,8 @@ namespace windowManager {
       }
 
       //Split openglVersion into major and minor components
-      const int openglMajor = std::floor(openglVersion);
-      const int openglMinor = std::ceil((openglVersion - openglMajor) * 10);
+      const unsigned short int openglMajor = std::floor(openglVersion);
+      const unsigned short int openglMinor = std::ceil((openglVersion - openglMajor) * 10);
 
       //Setup OpenGL version and antialiasing
       glfwWindowHint(GLFW_SAMPLES, antialiasing);
