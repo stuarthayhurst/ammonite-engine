@@ -34,7 +34,7 @@ void window_size_callback(GLFWwindow*, int newWidth, int newHeight) {
 
 int main() {
   //Setup GLFW and OpenGL version / antialiasing
-  if (windowManager::setupGlfw(antialiasingLevel, openglMajorVersion, openglMinorVersion) == -1) {
+  if (windowManager::setup::setupGlfw(antialiasingLevel, openglMajorVersion, openglMinorVersion) == -1) {
     return EXIT_FAILURE;
   }
 
@@ -45,7 +45,7 @@ int main() {
   }
 
   //Setup GLEW
-  if (windowManager::setupGlew() == -1) {
+  if (windowManager::setup::setupGlew() == -1) {
     return EXIT_FAILURE;
   }
 
@@ -53,7 +53,7 @@ int main() {
   glfwSetWindowSizeCallback(window, window_size_callback);
 
   //Ensure inputs are handled and setup cursor
-  windowManager::setupGlfwInput(window);
+  windowManager::setup::setupGlfwInput(window);
   glfwPollEvents();
 
   //Initialise controls
