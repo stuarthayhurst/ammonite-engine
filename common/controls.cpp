@@ -40,7 +40,7 @@ namespace controls {
     void scroll_callback(GLFWwindow*, double, double yoffset) {
       //Only zoom if FoV will be between 1 and 90
       float newFov = fov - (yoffset * zoomMultiplier);
-      if (newFov > 0 and newFov < 91) {
+      if (newFov > 0 and newFov <= 90) {
         fov = newFov;
       }
     }
