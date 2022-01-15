@@ -1,4 +1,4 @@
-#include <cstdio>
+#include <iostream>
 #include <cmath>
 #include <tuple>
 
@@ -26,7 +26,7 @@ namespace windowManager {
     int setupGlfw(int antialiasing, float openglVersion) {
       //Setup GLFW
       if (!glfwInit()) {
-        fprintf(stderr, "Failed to initialize GLFW");
+        std::cerr << "Failed to initialize GLFW" << std::endl;
         return -1;
       }
 
@@ -48,7 +48,7 @@ namespace windowManager {
     int setupGlew(GLFWwindow* window) {
       glewExperimental = true;
       if (glewInit() != GLEW_OK) {
-        fprintf(stderr, "Failed to initialize GLEW\n");
+        std::cerr << "Failed to initialize GLEW" << std::endl;
         return -1;
       }
 
@@ -75,7 +75,7 @@ namespace windowManager {
 
     window = glfwCreateWindow(width, height, title, NULL, NULL);
     if (window == NULL) {
-      fprintf(stderr, "Failed to open window\n");
+      std::cerr << "Failed to open window" << std::endl;
       glfwTerminate();
       return {NULL, nullptr, nullptr, nullptr};
     }

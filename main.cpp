@@ -1,5 +1,5 @@
+#include <iostream>
 #include <cstdlib>
-#include <cstdio>
 #include <tuple>
 
 #include <GL/glew.h>
