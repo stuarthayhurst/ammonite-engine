@@ -17,7 +17,7 @@ namespace controls {
     float getZoomSpeed();
   }
 
-  void setupControls();
+  void setupControls(GLFWwindow* newWindow, int* widthAddr, int* heightAddr, float* aspectRatioAddr);
   void processInput();
 }
 

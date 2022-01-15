@@ -1,5 +1,6 @@
 #include <cstdlib>
 #include <cstdio>
+#include <tuple>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -11,25 +12,16 @@
 #include "common/controls.hpp"
 #include "common/windowManager.hpp"
 
-//Window and view settings
-float width = 1024.0f;
-float height = 768.0f;
-float aspectRatio = width / height;
-
 //OpenGL settings
 const int antialiasingLevel = 4;
 const float openglVersion = 3.3f;
 
+//Initial width and height
+const int width = 1024;
+const int height = 768;
+
 const char title[] = "OpenGL Experiments";
 GLFWwindow* window;
-
-//Callback to update height and width and viewport size on window resize
-void window_size_callback(GLFWwindow*, int newWidth, int newHeight) {
-  width = newWidth;
-  height = newHeight;
-  aspectRatio = width / height;
-  glViewport(0, 0, width, height);
-}
 
 int main() {
   //Setup GLFW and OpenGL version / antialiasing
@@ -38,25 +30,22 @@ int main() {
   }
 
   //Create a window and an OpenGL context
-  window = windowManager::createWindow(width, height, title);
+  auto [window, widthPtr, heightPtr, aspectRatioPtr] = windowManager::createWindow(width, height, title);
   if (window == NULL) {
     return EXIT_FAILURE;
   }
 
   //Setup GLEW
-  if (windowManager::setup::setupGlew() == -1) {
+  if (windowManager::setup::setupGlew(window) == -1) {
     return EXIT_FAILURE;
   }
-
-  //Update values when resized
-  glfwSetWindowSizeCallback(window, window_size_callback);
 
   //Ensure inputs are handled and setup cursor
   windowManager::setup::setupGlfwInput(window);
   glfwPollEvents();
 
   //Initialise controls
-  controls::setupControls();
+  controls::setupControls(window, widthPtr, heightPtr, aspectRatioPtr);
 
   //Enable culling triangles
   glEnable(GL_CULL_FACE);

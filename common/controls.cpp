@@ -3,16 +3,16 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-//Get height, width and the window externally
-extern float height, width;
-extern float aspectRatio;
-extern GLFWwindow* window;
-
 namespace controls {
   namespace {
     //Matrices returned
     glm::mat4 ViewMatrix;
     glm::mat4 ProjectionMatrix;
+
+    //Pointers for window and info
+    GLFWwindow* window;
+    int *width, *height;
+    float* aspectRatio;
 
     //Base sensitivities and zoom
     const float baseMovementSpeed = 3.0f;
@@ -92,7 +92,13 @@ namespace controls {
     }
   }
 
-  void setupControls() {
+  void setupControls(GLFWwindow* newWindow, int* widthAddr, int* heightAddr, float* aspectRatioAddr) {
+    //Connect window, width, height and aspect ratio pointers
+    window = newWindow;
+    width = widthAddr;
+    height = heightAddr;
+    aspectRatio = aspectRatioAddr;
+
     //Set mouse callbacks
     glfwSetScrollCallback(window, scroll_callback);
     glfwSetMouseButtonCallback(window, zoom_reset_callback);
@@ -136,8 +142,8 @@ namespace controls {
       glfwGetCursorPos(window, &xpos, &ypos);
 
       //Compute new orientation
-      horizontalAngle = mouseSpeed * float(width / 2 - xpos);
-      verticalAngle = mouseSpeed * float(height / 2 - ypos);
+      horizontalAngle = mouseSpeed * float(*width / 2 - xpos);
+      verticalAngle = mouseSpeed * float(*height / 2 - ypos);
     }
 
     //Direction, Spherical coordinates to Cartesian coordinates conversion
@@ -180,8 +186,8 @@ namespace controls {
       }
     }
 
-    //Projection matrix : 45&deg; Field of View, ratio, display range : 0.1 unit <-> 100 units
-    ProjectionMatrix = glm::perspective(glm::radians(fov), aspectRatio, 0.1f, 100.0f);
+    //Projection matrix: Field of view, aspect ratio, display range
+    ProjectionMatrix = glm::perspective(glm::radians(fov), *aspectRatio, 0.1f, 100.0f);
     //Camera matrix
     ViewMatrix = glm::lookAt(
       position,             //Camera is here

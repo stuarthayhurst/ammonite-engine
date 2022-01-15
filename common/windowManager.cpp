@@ -1,10 +1,24 @@
 #include <cstdio>
 #include <cmath>
+#include <tuple>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
 namespace windowManager {
+  namespace {
+    int width, height;
+    float aspectRatio;
+
+    //Callback to update height and width and viewport size on window resize
+    void window_size_callback(GLFWwindow*, int newWidth, int newHeight) {
+      width = newWidth;
+      height = newHeight;
+      aspectRatio = float(width) / float(height);
+      glViewport(0, 0, width, height);
+    }
+  }
+
   namespace setup {
     //Initialise glfw, setup antialiasing and OpenGL version
     int setupGlfw(int antialiasing, float openglVersion) {
@@ -29,12 +43,15 @@ namespace windowManager {
     }
 
     //Initialise GLEW
-    int setupGlew() {
+    int setupGlew(GLFWwindow* window) {
       glewExperimental = true;
       if (glewInit() != GLEW_OK) {
         fprintf(stderr, "Failed to initialize GLEW\n");
         return -1;
       }
+
+      //Update values when resized
+      glfwSetWindowSizeCallback(window, window_size_callback);
 
       return 0;
     }
@@ -47,17 +64,23 @@ namespace windowManager {
     }
   }
 
-  //Create the glfw window
-  GLFWwindow* createWindow(int width, int height, const char title[]) {
+  //Create a window and return pointers to the width, height and aspect ratio
+  std::tuple<GLFWwindow*, int*, int*, float*> createWindow(int newWidth, int newHeight, const char title[]) {
+    //Set initial size and aspect ratio values
+    width = newWidth;
+    height = newHeight;
+    aspectRatio = float(width) / float(height);
+
     static GLFWwindow* window = glfwCreateWindow(width, height, title, NULL, NULL);
     if (window == NULL) {
       fprintf(stderr, "Failed to open window\n");
       glfwTerminate();
-      return NULL;
+      return {NULL, nullptr, nullptr, nullptr};
     }
 
     glfwMakeContextCurrent(window);
 
-    return window;
+    //Return the pointers
+    return {window, &width, &height, &aspectRatio};
   }
 }
