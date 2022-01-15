@@ -169,7 +169,8 @@ int main() {
     frameCount++;
 
     if (deltaTime >= 1.0) {
-      printf("%f fps\n", frameCount / deltaTime);
+      printf("%f fps", frameCount / deltaTime);
+      printf(" (%fms)\n", (deltaTime * 1000) / frameCount);
       lastTime = currentTime;
       frameCount = 0;
     }
