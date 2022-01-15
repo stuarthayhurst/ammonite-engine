@@ -2,7 +2,7 @@
   - A repository to experiment with an OpenGL based renderer for generated data
 
 ## Requirements:
-  - A `c++17` compatible compiler (`g++ 8.x+`)
+  - A `c++17` compatible compiler (`g++ 8+`)
   - An OpenGL 3.3+ compatible driver
 
 ## Running:
