@@ -5,7 +5,7 @@ LIBS=glm glfw3 glew
 BUILD_DIR=build
 
 CFLAGS:=$(shell pkg-config --cflags $(LIBS))
-CFLAGS+=-Wall -Wextra -O3 -flto
+CFLAGS+=-Wall -Wextra -O3 -flto -std=c++17
 LDFLAGS:=$(shell pkg-config --libs $(LIBS)) -pthread
 
 $(BUILD_DIR)/main:
