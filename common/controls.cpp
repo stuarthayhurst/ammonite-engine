@@ -33,6 +33,9 @@ namespace controls {
     float horizontalAngle = 3.14f;
     float verticalAngle = 0.0f;
 
+    //Used to find x and y mouse offsets
+    double xposLast, yposLast;
+
     //Points upwards, regardless of direction
     const glm::vec3 absoluteUp = glm::vec3(0, 1, 0);
 
@@ -50,6 +53,20 @@ namespace controls {
       if (button == GLFW_MOUSE_BUTTON_MIDDLE and action == GLFW_PRESS) {
         fov = 45;
       }
+    }
+
+    void cursor_position_callback(GLFWwindow*, double xpos, double ypos) {
+      //Work out distance moved since last movement
+      double xoffset = xpos - xposLast;
+      double yoffset = ypos - yposLast;
+
+      //Update saved cursor positions
+      xposLast = xpos;
+      yposLast = ypos;
+
+      //Update viewing angles, - corrects camera inversion
+      horizontalAngle += -mouseSpeed * float(xoffset);
+      verticalAngle += -mouseSpeed * float(yoffset);
     }
   }
 
@@ -102,6 +119,11 @@ namespace controls {
     //Set mouse callbacks
     glfwSetScrollCallback(window, scroll_callback);
     glfwSetMouseButtonCallback(window, zoom_reset_callback);
+    glfwSetCursorPosCallback(window, cursor_position_callback);
+
+    //Setup initial cursor position
+    glfwGetCursorPos(window, &xposLast, &yposLast);
+
   }
 
   //Handle keyboard and mouse movements, calculate matrices
@@ -112,8 +134,6 @@ namespace controls {
     //Time difference between first and last frame
     double currentTime = glfwGetTime();
     float deltaTime = float(currentTime - lastTime);
-
-    double xpos, ypos;
 
     //Save last input toggle key state and current input state
     static bool inputBound = true;
@@ -129,21 +149,18 @@ namespace controls {
 
       //Hide and unhide cursor as necessary
       if (inputBound) {
+        //Hide cursor and start taking mouse input
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        glfwSetCursorPosCallback(window, cursor_position_callback);
+        //Reset saved cursor position to avoid a large jump
+        glfwGetCursorPos(window, &xposLast, &yposLast);
       } else {
+        //Remove callback and restore cursor
+        glfwSetCursorPosCallback(window, NULL);
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
       }
 
       lastInputToggleState = inputToggleState;
-    }
-
-    if (inputBound) {
-      //Get cursor position and reset for next frame
-      glfwGetCursorPos(window, &xpos, &ypos);
-
-      //Compute new orientation
-      horizontalAngle = mouseSpeed * float(*width / 2 - xpos);
-      verticalAngle = mouseSpeed * float(*height / 2 - ypos);
     }
 
     //Direction, Spherical coordinates to Cartesian coordinates conversion
