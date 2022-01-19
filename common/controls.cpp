@@ -133,7 +133,6 @@ namespace controls {
 
     //Setup initial cursor position
     glfwGetCursorPos(window, &xposLast, &yposLast);
-
   }
 
   //Handle keyboard and mouse movements, calculate matrices
