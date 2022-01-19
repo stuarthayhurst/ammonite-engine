@@ -2,6 +2,10 @@
 #define WINDOW
 
 namespace windowManager {
+  namespace settings {
+    void useVsync(bool enabled);
+  }
+
   namespace setup {
     int setupGlfw(int antialiasing, float openglVersion);
     int setupGlew(GLFWwindow* window);

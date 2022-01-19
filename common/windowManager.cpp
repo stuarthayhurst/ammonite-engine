@@ -21,6 +21,12 @@ namespace windowManager {
     }
   }
 
+  namespace settings {
+    void useVsync(bool enabled) {
+      glfwSwapInterval(int(enabled));
+    }
+  }
+
   namespace setup {
     //Initialise glfw, setup antialiasing and OpenGL version
     int setupGlfw(int antialiasing, float openglVersion) {
