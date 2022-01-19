@@ -36,8 +36,9 @@ namespace controls {
     //Used to find x and y mouse offsets
     double xposLast, yposLast;
 
-    //Points upwards, regardless of direction
+    //Vectors to ignore certain axis (absoluteUp -> only y-axis, forward -> ignore y-axis)
     const glm::vec3 absoluteUp = glm::vec3(0, 1, 0);
+    const glm::vec3 forward = glm::vec3(1, 0, 1);
 
     //Increase / decrease FoV on scroll (xoffset is unused)
     void scroll_callback(GLFWwindow*, double, double yoffset) {
@@ -192,10 +193,10 @@ namespace controls {
     //Movement
     if (inputBound) {
       if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) { //Move forward
-        position += direction * deltaTime * movementSpeed;
+        position += direction * forward * deltaTime * movementSpeed;
       }
       if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) { //Move back
-        position -= direction * deltaTime * movementSpeed;
+        position -= direction * forward * deltaTime * movementSpeed;
       }
       if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) { //Move right
         position += right * deltaTime * movementSpeed;
