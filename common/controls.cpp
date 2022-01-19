@@ -57,25 +57,25 @@ namespace controls {
 
     void cursor_position_callback(GLFWwindow*, double xpos, double ypos) {
       //Work out distance moved since last movement
-      double xoffset = xpos - xposLast;
-      double yoffset = ypos - yposLast;
+      float xoffset = xpos - xposLast;
+      float yoffset = ypos - yposLast;
 
       //Update saved cursor positions
       xposLast = xpos;
       yposLast = ypos;
 
       //Update viewing angles, - corrects camera inversion
-      horizontalAngle += -mouseSpeed * float(xoffset);
+      horizontalAngle += -mouseSpeed * xoffset;
 
       //Only accept vertical angle if it won't create an impossible movement
-      float newAngle = verticalAngle + (-mouseSpeed * float(yoffset));
+      float newAngle = verticalAngle + (-mouseSpeed * yoffset);
       float limit = glm::radians(90.0f);
       if (newAngle > limit) { //Vertical max
         verticalAngle = limit;
       } else if (newAngle < -limit) { //Vertical min
         verticalAngle = -limit;
       } else {
-        verticalAngle += -mouseSpeed * float(yoffset);
+        verticalAngle += -mouseSpeed * yoffset;
       }
     }
   }
