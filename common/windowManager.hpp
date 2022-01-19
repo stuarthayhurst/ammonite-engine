@@ -4,6 +4,7 @@
 namespace windowManager {
   namespace settings {
     void useVsync(bool enabled);
+    bool isVsyncEnabled();
   }
 
   namespace setup {

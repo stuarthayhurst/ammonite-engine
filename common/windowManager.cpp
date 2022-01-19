@@ -12,6 +12,8 @@ namespace windowManager {
     int width, height;
     float aspectRatio;
 
+    bool vsyncEnabled = true;
+
     //Callback to update height and width and viewport size on window resize
     void window_size_callback(GLFWwindow*, int newWidth, int newHeight) {
       width = newWidth;
@@ -24,6 +26,11 @@ namespace windowManager {
   namespace settings {
     void useVsync(bool enabled) {
       glfwSwapInterval(int(enabled));
+      vsyncEnabled = enabled;
+    }
+
+    bool isVsyncEnabled() {
+      return vsyncEnabled;
     }
   }
 
