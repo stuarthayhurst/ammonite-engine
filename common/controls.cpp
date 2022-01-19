@@ -66,7 +66,17 @@ namespace controls {
 
       //Update viewing angles, - corrects camera inversion
       horizontalAngle += -mouseSpeed * float(xoffset);
-      verticalAngle += -mouseSpeed * float(yoffset);
+
+      //Only accept vertical angle if it won't create an impossible movement
+      float newAngle = verticalAngle + (-mouseSpeed * float(yoffset));
+      float limit = glm::radians(90.0f);
+      if (newAngle > limit) { //Vertical max
+        verticalAngle = limit;
+      } else if (newAngle < -limit) { //Vertical min
+        verticalAngle = -limit;
+      } else {
+        verticalAngle += -mouseSpeed * float(yoffset);
+      }
     }
   }
 
