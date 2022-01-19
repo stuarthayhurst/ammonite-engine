@@ -70,7 +70,7 @@ namespace controls {
 
       //Only accept vertical angle if it won't create an impossible movement
       float newAngle = verticalAngle + (-mouseSpeed * yoffset);
-      float limit = glm::radians(90.0f);
+      static const float limit = glm::radians(90.0f);
       if (newAngle > limit) { //Vertical max
         verticalAngle = limit;
       } else if (newAngle < -limit) { //Vertical min
