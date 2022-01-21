@@ -14,6 +14,7 @@ namespace windowManager {
   }
 
   std::tuple<GLFWwindow*, int*, int*, float*> createWindow(int width, int height);
+  void setTitle(GLFWwindow* window, const char title[]);
 }
 
 #endif

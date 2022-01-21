@@ -98,4 +98,8 @@ namespace windowManager {
     //Return the pointers
     return {window, &width, &height, &aspectRatio};
   }
+
+  void setTitle(GLFWwindow* window, const char title[]) {
+    glfwSetWindowTitle(window, title);
+  }
 }

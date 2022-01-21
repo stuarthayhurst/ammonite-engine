@@ -20,8 +20,6 @@ const float openglVersion = 3.3f;
 const unsigned short int width = 1024;
 const unsigned short int height = 768;
 
-const char title[] = "OpenGL Experiments";
-
 int main() {
   //Setup GLFW and OpenGL version / antialiasing
   if (windowManager::setup::setupGlfw(antialiasingLevel, openglVersion) == -1) {
@@ -33,6 +31,7 @@ int main() {
   if (window == NULL) {
     return EXIT_FAILURE;
   }
+  windowManager::setTitle(window, "OpenGL Experiments");
 
   //Setup GLEW
   if (windowManager::setup::setupGlew(window) == -1) {
