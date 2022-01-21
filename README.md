@@ -1,5 +1,5 @@
-## opengl-experiments
-  - A repository to experiment with an OpenGL based renderer for generated data
+## Ammonite Renderer
+  - A repository to experiment with an OpenGL based renderer for generated data and models
 
 ## Requirements:
   - A `c++17` compatible compiler (`g++ 8+`)
