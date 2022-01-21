@@ -40,9 +40,8 @@ namespace controls {
     //Used to find x and y mouse offsets
     double xposLast, yposLast;
 
-    //Vectors to ignore certain axis (absoluteUp -> only y-axis, forward -> ignore y-axis)
+    //Vectors to ignore certain axis (absoluteUp -> only y-axis)
     const glm::vec3 absoluteUp = glm::vec3(0, 1, 0);
-    const glm::vec3 forward = glm::vec3(1, 0, 1);
 
     //Increase / decrease FoV on scroll (xoffset is unused)
     void scroll_callback(GLFWwindow*, double, double yoffset) {
@@ -177,30 +176,27 @@ namespace controls {
       lastInputToggleState = inputToggleState;
     }
 
-    //Direction, Spherical coordinates to Cartesian coordinates conversion
-    glm::vec3 direction(
-      cos(verticalAngle) * sin(horizontalAngle),
-      sin(verticalAngle),
-      cos(verticalAngle) * cos(horizontalAngle)
+    //Vector for current direction, without vertical component
+    glm::vec3 horizontalDirection(
+      sin(horizontalAngle),
+      0,
+      cos(horizontalAngle)
     );
 
-    //Right vector
+    //Right vector, relative to the camera
     glm::vec3 right = glm::vec3(
       sin(horizontalAngle - 3.14f / 2.0f),
       0,
       cos(horizontalAngle - 3.14f / 2.0f)
     );
 
-    //Up vector, perpendicular to both direction and right
-    glm::vec3 up = glm::cross(right, direction);
-
-    //Movement
+    //Apply movement from inputs
     if (inputBound) {
       if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) { //Move forward
-        position += direction * forward * deltaTime * movementSpeed;
+        position += horizontalDirection * deltaTime * movementSpeed;
       }
       if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) { //Move back
-        position -= direction * forward * deltaTime * movementSpeed;
+        position -= horizontalDirection * deltaTime * movementSpeed;
       }
       if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) { //Move right
         position += right * deltaTime * movementSpeed;
@@ -216,6 +212,16 @@ namespace controls {
         position -= absoluteUp * deltaTime * movementSpeed;
       }
     }
+
+    //Vector for current direction faced
+    glm::vec3 direction(
+      cos(verticalAngle) * sin(horizontalAngle),
+      sin(verticalAngle),
+      cos(verticalAngle) * cos(horizontalAngle)
+    );
+
+    //Up vector, relative to the camera
+    glm::vec3 up = glm::cross(right, direction);
 
     //Projection matrix: Field of view, aspect ratio, display range
     ProjectionMatrix = glm::perspective(glm::radians(fov), *aspectRatio, 0.1f, 100.0f);
