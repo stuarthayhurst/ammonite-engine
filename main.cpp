@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <tuple>
+#include <string>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -12,6 +13,9 @@
 #include "common/controls.hpp"
 #include "common/windowManager.hpp"
 
+//Program helpers
+#include "common/argHandler.hpp"
+
 //OpenGL settings
 const int antialiasingLevel = 4;
 const float openglVersion = 3.3f;
@@ -20,7 +24,24 @@ const float openglVersion = 3.3f;
 const unsigned short int width = 1024;
 const unsigned short int height = 768;
 
-int main() {
+int main(int argc, char* argv[]) {
+  //Handle arguments
+  int showHelp = arguments::searchArgument(argc, argv, "--help", true, nullptr);
+  if (showHelp == 1) {
+    std::cout << "Program help: \n"
+    " --help:  Display this help page\n"
+    " --vsync: Enable / disable vsync (true / false)" << std::endl;
+    return EXIT_SUCCESS;
+  } else if (showHelp == -1) {
+    return EXIT_FAILURE;
+  }
+
+  std::string useVsync;
+  if (arguments::searchArgument(argc, argv, "--vsync", false, &useVsync) == -1) {
+    std::cout << "--vsync requires a value" << std::endl;
+    return EXIT_FAILURE;
+  }
+
   //Setup GLFW and OpenGL version / antialiasing
   if (windowManager::setup::setupGlfw(antialiasingLevel, openglVersion) == -1) {
     return EXIT_FAILURE;
@@ -44,6 +65,13 @@ int main() {
 
   //Initialise controls
   controls::setupControls(window, widthPtr, heightPtr, aspectRatioPtr);
+
+  //Set vsync
+  if (useVsync == "true") {
+    windowManager::settings::useVsync(true);
+  } else if (useVsync == "false") {
+    windowManager::settings::useVsync(false);
+  }
 
   //Enable culling triangles
   glEnable(GL_CULL_FACE);
