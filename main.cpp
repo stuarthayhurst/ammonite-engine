@@ -29,7 +29,7 @@ int main() {
   }
 
   //Create a window and an OpenGL context
-  auto [window, widthPtr, heightPtr, aspectRatioPtr] = windowManager::createWindow(width, height, title);
+  auto [window, widthPtr, heightPtr, aspectRatioPtr] = windowManager::createWindow(width, height);
   if (window == NULL) {
     return EXIT_FAILURE;
   }

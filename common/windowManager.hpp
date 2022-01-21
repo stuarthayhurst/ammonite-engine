@@ -13,7 +13,7 @@ namespace windowManager {
     void setupGlfwInput(GLFWwindow* window);
   }
 
-  std::tuple<GLFWwindow*, int*, int*, float*> createWindow(int width, int height, const char title[]);
+  std::tuple<GLFWwindow*, int*, int*, float*> createWindow(int width, int height);
 }
 
 #endif

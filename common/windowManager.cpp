@@ -80,13 +80,13 @@ namespace windowManager {
   }
 
   //Create a window and return pointers to the width, height and aspect ratio
-  std::tuple<GLFWwindow*, int*, int*, float*> createWindow(int newWidth, int newHeight, const char title[]) {
+  std::tuple<GLFWwindow*, int*, int*, float*> createWindow(int newWidth, int newHeight) {
     //Set initial size and aspect ratio values
     width = newWidth;
     height = newHeight;
     aspectRatio = float(width) / float(height);
 
-    window = glfwCreateWindow(width, height, title, NULL, NULL);
+    window = glfwCreateWindow(width, height, "Ammonite Window", NULL, NULL);
     if (window == NULL) {
       std::cerr << "Failed to open window" << std::endl;
       glfwTerminate();
