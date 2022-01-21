@@ -3,6 +3,10 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#ifdef DEBUG
+  #include <iostream>
+#endif
+
 namespace controls {
   namespace {
     //Matrices returned

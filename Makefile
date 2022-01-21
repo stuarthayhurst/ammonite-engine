@@ -8,6 +8,10 @@ CXXFLAGS := $(shell pkg-config --cflags $(LIBS))
 CXXFLAGS += -Wall -Wextra -O3 -flto -std=c++17
 LDFLAGS := $(shell pkg-config --libs $(LIBS)) -pthread
 
+ifeq ($(DEBUG),true)
+  CXXFLAGS += -DDEBUG
+endif
+
 $(BUILD_DIR)/main:
 	mkdir -p "$(BUILD_DIR)"
 	$(CXX) main.cpp common/*.cpp $(CXXFLAGS) $(LDFLAGS) -o $@
