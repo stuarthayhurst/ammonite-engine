@@ -30,7 +30,7 @@ int main(int argc, char* argv[]) {
   if (showHelp == 1) {
     std::cout << "Program help: \n"
     " --help:  Display this help page\n"
-    " --vsync: Enable / disable vsync (true / false)" << std::endl;
+    " --vsync: Enable / disable VSync (true / false)" << std::endl;
     return EXIT_SUCCESS;
   } else if (showHelp == -1) {
     return EXIT_FAILURE;

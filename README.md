@@ -11,6 +11,11 @@
   - To compile in debug mode, use `DEBUG=true make ...`
     - This will compile some extras in the code to help with debugging (every header gets `iostream`)
 
+## Options:
+  - Compiled demos have a few arguments supported:
+    - `--help`: Displays a help menu
+    - `--vsync`: Enable / disable VSync (`true` / `false`)
+
 ## Build system:
   - `make build` - Builds demo binary, a working demonstration of the renderer
   - `make clean` - Cleans the build area (`build/`)
