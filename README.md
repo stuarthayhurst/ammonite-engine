@@ -7,7 +7,7 @@
 
 ## Running:
   - `make clean build` will clean the build area and build the demo from fresh
-  - `./build/main` will run the built demo
+  - `./build/demo` will run the built demo
   - To compile in debug mode, use `DEBUG=true make ...`
     - This will compile some extras in the code to help with debugging (every header gets `iostream`)
 

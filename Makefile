@@ -12,13 +12,13 @@ ifeq ($(DEBUG),true)
   CXXFLAGS += -DDEBUG
 endif
 
-$(BUILD_DIR)/main:
+$(BUILD_DIR)/demo:
 	mkdir -p "$(BUILD_DIR)"
-	$(CXX) src/main.cpp src/*/*.cpp $(CXXFLAGS) $(LDFLAGS) -o $@
+	$(CXX) src/demo.cpp src/*/*.cpp $(CXXFLAGS) $(LDFLAGS) -o $@
 
 .PHONY: build clean
 
 build:
-	$(MAKE) "$(BUILD_DIR)/main"
+	$(MAKE) "$(BUILD_DIR)/demo"
 clean:
 	rm -rfv "$(BUILD_DIR)"
