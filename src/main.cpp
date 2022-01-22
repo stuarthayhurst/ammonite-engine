@@ -9,11 +9,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "ammonite/loadShader.hpp"
-#include "ammonite/controls.hpp"
-#include "ammonite/windowManager.hpp"
-
-//Program helpers
+#include "ammonite/ammonite.hpp"
 #include "common/argHandler.hpp"
 
 //OpenGL settings
@@ -42,19 +38,19 @@ int main(int argc, char* argv[]) {
     return EXIT_FAILURE;
   }
 
-  auto [window, widthPtr, heightPtr, aspectRatioPtr] = windowManager::setupWindow(width, height, antialiasingLevel, openglVersion, "OpenGL Experiments");
+  auto [window, widthPtr, heightPtr, aspectRatioPtr] = ammonite::windowManager::setupWindow(width, height, antialiasingLevel, openglVersion, "OpenGL Experiments");
   if (window == NULL) {
     return EXIT_FAILURE;
   }
 
   //Initialise controls
-  controls::setupControls(window, widthPtr, heightPtr, aspectRatioPtr);
+  ammonite::controls::setupControls(window, widthPtr, heightPtr, aspectRatioPtr);
 
   //Set vsync
   if (useVsync == "true") {
-    windowManager::settings::useVsync(true);
+    ammonite::windowManager::settings::useVsync(true);
   } else if (useVsync == "false") {
-    windowManager::settings::useVsync(false);
+    ammonite::windowManager::settings::useVsync(false);
   }
 
   //Enable culling triangles
@@ -69,7 +65,7 @@ int main(int argc, char* argv[]) {
   glBindVertexArray(VertexArrayID);
 
   //Create and compile shaders
-  GLuint programID = renderer::shaders::loadShaders("shaders/SimpleVertexShader.vert", "shaders/SimpleFragmentShader.frag");
+  GLuint programID = ammonite::shaders::loadShaders("shaders/SimpleVertexShader.vert", "shaders/SimpleFragmentShader.frag");
   //Get an ID for the model view projection
   GLuint MatrixID = glGetUniformLocation(programID, "MVP");
 
@@ -176,11 +172,11 @@ int main(int argc, char* argv[]) {
     glUseProgram(programID);
 
     //Process new input since last frame
-    controls::processInput();
+    ammonite::controls::processInput();
 
     //Get current model, view and projection matrices, and compute the MVP matrix
-    glm::mat4 ProjectionMatrix = controls::matrix::getProjectionMatrix();
-    glm::mat4 ViewMatrix = controls::matrix::getViewMatrix();
+    glm::mat4 ProjectionMatrix = ammonite::controls::matrix::getProjectionMatrix();
+    glm::mat4 ViewMatrix = ammonite::controls::matrix::getViewMatrix();
     glm::mat4 ModelMatrix = glm::mat4(1.0);
     glm::mat4 mvp = ProjectionMatrix * ViewMatrix * ModelMatrix;
 
