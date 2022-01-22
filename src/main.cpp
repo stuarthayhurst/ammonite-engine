@@ -9,9 +9,9 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "common/loadShader.hpp"
-#include "common/controls.hpp"
-#include "common/windowManager.hpp"
+#include "ammonite/loadShader.hpp"
+#include "ammonite/controls.hpp"
+#include "ammonite/windowManager.hpp"
 
 //Program helpers
 #include "common/argHandler.hpp"

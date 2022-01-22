@@ -14,7 +14,7 @@ endif
 
 $(BUILD_DIR)/main:
 	mkdir -p "$(BUILD_DIR)"
-	$(CXX) main.cpp common/*.cpp $(CXXFLAGS) $(LDFLAGS) -o $@
+	$(CXX) src/main.cpp src/*/*.cpp $(CXXFLAGS) $(LDFLAGS) -o $@
 
 .PHONY: build clean
 
