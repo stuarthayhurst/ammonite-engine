@@ -76,6 +76,11 @@ namespace windowManager {
       glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
       glfwSetInputMode(window, GLFW_STICKY_MOUSE_BUTTONS, GL_TRUE);
       glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+      //Enable raw mouse mption if supported
+      if (glfwRawMouseMotionSupported()) {
+        glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+      }
     }
   }
 
