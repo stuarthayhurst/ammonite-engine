@@ -42,26 +42,10 @@ int main(int argc, char* argv[]) {
     return EXIT_FAILURE;
   }
 
-  //Setup GLFW and OpenGL version / antialiasing
-  if (windowManager::setup::setupGlfw(antialiasingLevel, openglVersion) == -1) {
-    return EXIT_FAILURE;
-  }
-
-  //Create a window and an OpenGL context
-  auto [window, widthPtr, heightPtr, aspectRatioPtr] = windowManager::createWindow(width, height);
+  auto [window, widthPtr, heightPtr, aspectRatioPtr] = windowManager::setupWindow(width, height, antialiasingLevel, openglVersion, "OpenGL Experiments");
   if (window == NULL) {
     return EXIT_FAILURE;
   }
-  windowManager::setTitle(window, "OpenGL Experiments");
-
-  //Setup GLEW
-  if (windowManager::setup::setupGlew(window) == -1) {
-    return EXIT_FAILURE;
-  }
-
-  //Ensure inputs are handled and setup cursor
-  windowManager::setup::setupGlfwInput(window);
-  glfwPollEvents();
 
   //Initialise controls
   controls::setupControls(window, widthPtr, heightPtr, aspectRatioPtr);

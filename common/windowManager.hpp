@@ -15,6 +15,9 @@ namespace windowManager {
 
   std::tuple<GLFWwindow*, int*, int*, float*> createWindow(int width, int height);
   void setTitle(GLFWwindow* window, const char title[]);
+
+  //Wrapper for setup methods and createWindow()
+  std::tuple<GLFWwindow*, int*, int*, float*> setupWindow(int newWidth, int newHeight, int antialiasing, float openglVersion, const char title[]);
 }
 
 #endif

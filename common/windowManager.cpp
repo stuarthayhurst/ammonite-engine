@@ -81,6 +81,9 @@ namespace windowManager {
       if (glfwRawMouseMotionSupported()) {
         glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
       }
+
+      //Start polling inputs
+      glfwPollEvents();
     }
   }
 
@@ -106,5 +109,32 @@ namespace windowManager {
 
   void setTitle(GLFWwindow* window, const char title[]) {
     glfwSetWindowTitle(window, title);
+  }
+
+  //Wrapper to create and setup window
+  std::tuple<GLFWwindow*, int*, int*, float*> setupWindow(int newWidth, int newHeight, int antialiasing, float openglVersion, const char title[]) {
+    //Setup GLFW and OpenGL version / antialiasing
+    if (windowManager::setup::setupGlfw(antialiasing, openglVersion) == -1) {
+      return {NULL, nullptr, nullptr, nullptr};
+    }
+
+    auto [window, widthPtr, heightPtr, aspectRatioPtr] = windowManager::createWindow(newWidth, newHeight);
+    if (window == NULL) {
+      return {NULL, nullptr, nullptr, nullptr};
+    }
+
+    //Set window title
+    windowManager::setTitle(window, title);
+
+    //Setup GLEW
+    if (windowManager::setup::setupGlew(window) == -1) {
+      return {NULL, nullptr, nullptr, nullptr};
+    }
+
+    //Setup input for window
+    windowManager::setup::setupGlfwInput(window);
+
+    //Return same values as createWindow()
+    return {window, &width, &height, &aspectRatio};
   }
 }
