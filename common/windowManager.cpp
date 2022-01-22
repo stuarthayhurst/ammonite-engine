@@ -108,7 +108,11 @@ namespace windowManager {
   }
 
   void setTitle(GLFWwindow* window, const char title[]) {
-    glfwSetWindowTitle(window, title);
+    if (title != NULL) {
+      glfwSetWindowTitle(window, title);
+    } else {
+      glfwSetWindowTitle(window, "Ammonite Window");
+    }
   }
 
   //Wrapper to create and setup window
