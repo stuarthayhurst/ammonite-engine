@@ -1,5 +1,5 @@
 ## Ammonite Renderer
-  - A repository to experiment with an OpenGL based renderer for generated data and models
+  - An OpenGL based renderer to display models and generated datasets, focused on ease of use
 
 ## Requirements:
   - A `c++17` compatible compiler (`g++ 8+`)
