@@ -3,7 +3,8 @@
 
 namespace ammonite {
   namespace shaders {
-    GLuint loadShaders(const char* vertex_file_path, const char* fragment_file_path);
+    GLuint createProgram(const GLuint shaderIds[], const int shaderCount);
+    GLuint loadShader(const char* shaderPath, const GLenum shaderType);
   }
 }
 

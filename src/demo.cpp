@@ -65,9 +65,17 @@ int main(int argc, char* argv[]) {
   glBindVertexArray(VertexArrayID);
 
   //Create and compile shaders
-  GLuint programID = ammonite::shaders::loadShaders("shaders/SimpleVertexShader.vert", "shaders/SimpleFragmentShader.frag");
+  const GLuint shaderIds[] = {
+    ammonite::shaders::loadShader("shaders/SimpleVertexShader.vert", GL_VERTEX_SHADER),
+    ammonite::shaders::loadShader("shaders/SimpleFragmentShader.frag", GL_FRAGMENT_SHADER)
+  };
+  int shaderCount = sizeof(shaderIds) / sizeof(shaderIds[0]);
+
+  //Create program (link shaders)
+  GLuint programId = ammonite::shaders::createProgram(shaderIds, shaderCount);
+
   //Get an ID for the model view projection
-  GLuint MatrixID = glGetUniformLocation(programID, "MVP");
+  GLuint MatrixID = glGetUniformLocation(programId, "MVP");
 
   //An array of verticies to draw
   static const GLfloat g_vertex_buffer_data[] = {
@@ -169,7 +177,7 @@ int main(int argc, char* argv[]) {
     }
 
     //Use the shaders
-    glUseProgram(programID);
+    glUseProgram(programId);
 
     //Process new input since last frame
     ammonite::controls::processInput();
@@ -220,7 +228,7 @@ int main(int argc, char* argv[]) {
   //Cleanup VBO, shader and window
   glDeleteBuffers(1, &vertexbuffer);
   glDeleteBuffers(1, &colourbuffer);
-  glDeleteProgram(programID);
+  glDeleteProgram(programId);
   glDeleteVertexArrays(1, &VertexArrayID);
   glfwTerminate();
 
