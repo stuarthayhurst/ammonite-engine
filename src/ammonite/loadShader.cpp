@@ -27,7 +27,6 @@ namespace ammonite {
     //Delete every remaining shader
     void eraseShaders() {
       while (shaderIds.size() != 0) {
-        std::cout << "Deleting " << shaderIds[0] << std::endl;
         deleteShader(shaderIds[0]);
       }
     }
@@ -98,7 +97,7 @@ namespace ammonite {
       return shaderId;
     }
 
-    GLuint createProgram(const GLuint shaderIds[], const int shaderCount) {
+    GLuint createProgram(const GLuint shaderIds[], const int shaderCount, bool* externalSuccess) {
       //Create the program
       GLuint programId = glCreateProgram();
 
@@ -122,6 +121,7 @@ namespace ammonite {
         glGetProgramInfoLog(programId, maxLength, &maxLength, &errorLog[0]);
         std::cout << &errorLog[0] << std::endl;
 
+        *externalSuccess = false;
         return -1;
       }
 

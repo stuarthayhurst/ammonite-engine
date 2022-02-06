@@ -76,7 +76,12 @@ int main(int argc, char* argv[]) {
   }
 
   //Create program (link shaders)
-  GLuint programId = ammonite::shaders::createProgram(shaderIds, shaderCount);
+  GLuint programId = ammonite::shaders::createProgram(shaderIds, shaderCount, &success);
+  if (!success) {
+    std::cout << "Program linking failed" << std::endl;
+    ammonite::shaders::eraseShaders();
+    return EXIT_FAILURE;
+  }
 
   //Get an ID for the model view projection
   GLuint MatrixID = glGetUniformLocation(programId, "MVP");
