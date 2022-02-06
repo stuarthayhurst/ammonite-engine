@@ -44,16 +44,22 @@ namespace ammonite {
           return -1;
         }
 
-        //Split openglVersion into major and minor components
-        const unsigned short int openglMajor = std::floor(openglVersion);
-        const unsigned short int openglMinor = std::ceil((openglVersion - openglMajor) * 10);
+        //If provided, split openglVersion into major and minor components and set version
+        if (openglVersion != 0) {
+          std::cout << "a" << std::endl;
+          const short int openglMajor = std::floor(openglVersion);
+          const short int openglMinor = std::ceil((openglVersion - openglMajor) * 10);
 
-        //Setup OpenGL version and antialiasing
+          //Set the requested version
+          glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, openglMajor);
+          glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, openglMinor);
+
+          //Disable older OpenGL versions
+          glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+        }
+
+        //Setup antialiasing
         glfwWindowHint(GLFW_SAMPLES, antialiasing);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, openglMajor);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, openglMinor);
-        //Disable older OpenGL
-        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
         return 0;
       }

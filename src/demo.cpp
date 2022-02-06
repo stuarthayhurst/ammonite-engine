@@ -14,7 +14,6 @@
 
 //OpenGL settings
 const int antialiasingLevel = 4;
-const float openglVersion = 3.3f;
 
 //Initial width and height
 const unsigned short int width = 1024;
@@ -38,7 +37,7 @@ int main(int argc, char* argv[]) {
     return EXIT_FAILURE;
   }
 
-  auto [window, widthPtr, heightPtr, aspectRatioPtr] = ammonite::windowManager::setupWindow(width, height, antialiasingLevel, openglVersion, "OpenGL Experiments");
+  auto [window, widthPtr, heightPtr, aspectRatioPtr] = ammonite::windowManager::setupWindow(width, height, antialiasingLevel, 0, "OpenGL Experiments");
   if (window == NULL) {
     return EXIT_FAILURE;
   }
