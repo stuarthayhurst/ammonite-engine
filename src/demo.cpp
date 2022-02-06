@@ -61,11 +61,17 @@ int main(int argc, char* argv[]) {
   glBindVertexArray(VertexArrayID);
 
   //Create and compile shaders
+  bool success = true;
   const GLuint shaderIds[] = {
-    ammonite::shaders::loadShader("shaders/SimpleVertexShader.vert", GL_VERTEX_SHADER),
-    ammonite::shaders::loadShader("shaders/SimpleFragmentShader.frag", GL_FRAGMENT_SHADER)
+    ammonite::shaders::loadShader("shaders/SimpleVertexShader.vert", GL_VERTEX_SHADER, &success),
+    ammonite::shaders::loadShader("shaders/SimpleFragmentShader.frag", GL_FRAGMENT_SHADER, &success)
   };
   int shaderCount = sizeof(shaderIds) / sizeof(shaderIds[0]);
+
+  if (!success) {
+    std::cout << "Shader loading failed" << std::endl;
+    return EXIT_FAILURE;
+  }
 
   //Create program (link shaders)
   GLuint programId = ammonite::shaders::createProgram(shaderIds, shaderCount);

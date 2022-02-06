@@ -8,11 +8,12 @@
 
 namespace ammonite {
   namespace shaders {
-    GLuint loadShader(const char* shaderPath, const GLenum shaderType) {
+    GLuint loadShader(const char* shaderPath, const GLenum shaderType, bool* externalSuccess) {
       //Check for compute shader support if needed
       if (shaderType == GL_COMPUTE_SHADER) {
         if (!glewIsSupported("GL_VERSION_4_3") and !GLEW_ARB_compute_shader) {
           std::cout << "Compute shaders unsupported" << std::endl;
+          *externalSuccess = false;
           return -1;
         }
       }
@@ -21,6 +22,7 @@ namespace ammonite {
       if (shaderType == GL_TESS_CONTROL_SHADER or shaderType == GL_TESS_EVALUATION_SHADER) {
         if (!glewIsSupported("GL_VERSION_4_0") and !GLEW_ARB_tessellation_shader) {
           std::cout << "Tessellation shaders unsupported" << std::endl;
+          *externalSuccess = false;
           return -1;
         }
       }
@@ -39,6 +41,7 @@ namespace ammonite {
         shaderCodeStream.close();
       } else {
         std::cout << "Failed to open " << shaderPath << std::endl;
+        *externalSuccess = false;
         return -1;
       }
 
@@ -62,6 +65,7 @@ namespace ammonite {
 
         //Clean up and exit
         glDeleteShader(shaderId);
+        *externalSuccess = false;
         return -1;
       }
 
