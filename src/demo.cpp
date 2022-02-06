@@ -68,8 +68,10 @@ int main(int argc, char* argv[]) {
   };
   int shaderCount = sizeof(shaderIds) / sizeof(shaderIds[0]);
 
+  //If a shader failed to load, delete them and exit
   if (!success) {
     std::cout << "Shader loading failed" << std::endl;
+    ammonite::shaders::eraseShaders();
     return EXIT_FAILURE;
   }
 
@@ -227,9 +229,10 @@ int main(int argc, char* argv[]) {
     glfwPollEvents();
   }
 
-  //Cleanup VBO, shader and window
+  //Cleanup VBO, shaders and window
   glDeleteBuffers(1, &vertexbuffer);
   glDeleteBuffers(1, &colourbuffer);
+  ammonite::shaders::eraseShaders();
   glDeleteProgram(programId);
   glDeleteVertexArrays(1, &VertexArrayID);
   glfwTerminate();

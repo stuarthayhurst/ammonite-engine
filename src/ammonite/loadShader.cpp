@@ -1,5 +1,6 @@
 #include <string>
 #include <vector>
+#include <algorithm>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -7,7 +8,30 @@
 #include <GL/glew.h>
 
 namespace ammonite {
+  namespace {
+    //Vector to store all existing shaders
+    std::vector<int> shaderIds(0);
+  }
+
   namespace shaders {
+    void deleteShader(const GLuint shaderId) {
+      //Search for and delete shaderId
+      auto shaderPosition = std::find(shaderIds.begin(), shaderIds.end(), shaderId);
+      if (shaderPosition != shaderIds.end()) {
+        const int intShaderPosition = std::distance(shaderIds.begin(), shaderPosition);
+        glDeleteShader(shaderIds[intShaderPosition]);
+        shaderIds.erase(shaderPosition);
+      }
+    }
+
+    //Delete every remaining shader
+    void eraseShaders() {
+      while (shaderIds.size() != 0) {
+        std::cout << "Deleting " << shaderIds[0] << std::endl;
+        deleteShader(shaderIds[0]);
+      }
+    }
+
     GLuint loadShader(const char* shaderPath, const GLenum shaderType, bool* externalSuccess) {
       //Check for compute shader support if needed
       if (shaderType == GL_COMPUTE_SHADER) {
@@ -64,11 +88,13 @@ namespace ammonite {
         std::cout << &errorLog[0] << std::endl;
 
         //Clean up and exit
-        glDeleteShader(shaderId);
+        glDeleteShader(shaderId); //Use glDeleteShader, as the shader never made it to shaderIds
         *externalSuccess = false;
         return -1;
       }
 
+      //Add the shader to the shader id store
+      shaderIds.push_back(shaderId);
       return shaderId;
     }
 
@@ -102,7 +128,7 @@ namespace ammonite {
       //Detach and remove all passed shader ids
       for (int i = 0; i < shaderCount; i++) {
         glDetachShader(programId, shaderIds[i]);
-        glDeleteShader(shaderIds[i]);
+        deleteShader(shaderIds[i]);
       }
 
       return programId;
