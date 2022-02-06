@@ -12,9 +12,6 @@
 #include "ammonite/ammonite.hpp"
 #include "common/argHandler.hpp"
 
-//OpenGL settings
-const int antialiasingLevel = 4;
-
 //Initial width and height
 const unsigned short int width = 1024;
 const unsigned short int height = 768;
@@ -37,7 +34,7 @@ int main(int argc, char* argv[]) {
     return EXIT_FAILURE;
   }
 
-  auto [window, widthPtr, heightPtr, aspectRatioPtr] = ammonite::windowManager::setupWindow(width, height, antialiasingLevel, 0, "OpenGL Experiments");
+  auto [window, widthPtr, heightPtr, aspectRatioPtr] = ammonite::windowManager::setupWindow(width, height, 4, 0, "OpenGL Experiments");
   if (window == NULL) {
     return EXIT_FAILURE;
   }

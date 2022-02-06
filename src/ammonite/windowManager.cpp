@@ -58,8 +58,11 @@ namespace ammonite {
           glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         }
 
-        //Setup antialiasing
-        glfwWindowHint(GLFW_SAMPLES, antialiasing);
+        //Set antialiasing level if requested
+        if (antialiasing != 0) {
+          glfwWindowHint(GLFW_SAMPLES, antialiasing);
+          glEnable(GL_MULTISAMPLE);
+        }
 
         return 0;
       }
