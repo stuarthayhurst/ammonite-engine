@@ -9,6 +9,22 @@
 namespace ammonite {
   namespace shaders {
     GLuint loadShader(const char* shaderPath, const GLenum shaderType) {
+      //Check for compute shader support if needed
+      if (shaderType == GL_COMPUTE_SHADER) {
+        if (!glewIsSupported("GL_VERSION_4_3") and !GLEW_ARB_compute_shader) {
+          std::cout << "Compute shaders unsupported" << std::endl;
+          return -1;
+        }
+      }
+
+      //Check for tessellation shader support if needed
+      if (shaderType == GL_TESS_CONTROL_SHADER or shaderType == GL_TESS_EVALUATION_SHADER) {
+        if (!glewIsSupported("GL_VERSION_4_0") and !GLEW_ARB_tessellation_shader) {
+          std::cout << "Tessellation shaders unsupported" << std::endl;
+          return -1;
+        }
+      }
+
       //Create the shader
       GLuint shaderId = glCreateShader(shaderType);
 
