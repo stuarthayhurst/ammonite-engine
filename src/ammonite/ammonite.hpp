@@ -1,7 +1,7 @@
 #ifndef AMMONITE
 #define AMMONITE
 
-#include "loadShader.hpp"
+#include "shaders.hpp"
 #include "controls.hpp"
 #include "windowManager.hpp"
 
