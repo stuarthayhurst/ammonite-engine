@@ -169,6 +169,9 @@ int main(int argc, char* argv[]) {
   double lastTime = glfwGetTime();
   int frameCount = 0;
 
+  //Use the shaders
+  glUseProgram(programId);
+
   //Loop until window closed
   while(glfwGetKey(window, GLFW_KEY_ESCAPE ) != GLFW_PRESS && glfwWindowShouldClose(window) == 0) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -184,9 +187,6 @@ int main(int argc, char* argv[]) {
       lastTime = currentTime;
       frameCount = 0;
     }
-
-    //Use the shaders
-    glUseProgram(programId);
 
     //Process new input since last frame
     ammonite::controls::processInput();
