@@ -50,7 +50,7 @@ namespace ammonite {
 
       std::vector<GLchar> errorLog(maxLength);
       glGetProgramInfoLog(programId, maxLength, &maxLength, &errorLog[0]);
-      std::cout << &errorLog[0] << std::endl;
+      std::cerr << &errorLog[0] << std::endl;
 
       return false;
     }
@@ -106,7 +106,7 @@ namespace ammonite {
       //Check for compute shader support if needed
       if (shaderType == GL_COMPUTE_SHADER) {
         if (!glewIsSupported("GL_VERSION_4_3") and !GLEW_ARB_compute_shader) {
-          std::cout << "Compute shaders unsupported" << std::endl;
+          std::cerr << "Compute shaders unsupported" << std::endl;
           *externalSuccess = false;
           return -1;
         }
@@ -115,7 +115,7 @@ namespace ammonite {
       //Check for tessellation shader support if needed
       if (shaderType == GL_TESS_CONTROL_SHADER or shaderType == GL_TESS_EVALUATION_SHADER) {
         if (!glewIsSupported("GL_VERSION_4_0") and !GLEW_ARB_tessellation_shader) {
-          std::cout << "Tessellation shaders unsupported" << std::endl;
+          std::cerr << "Tessellation shaders unsupported" << std::endl;
           *externalSuccess = false;
           return -1;
         }
@@ -134,7 +134,7 @@ namespace ammonite {
         shaderCode = sstr.str();
         shaderCodeStream.close();
       } else {
-        std::cout << "Failed to open " << shaderPath << std::endl;
+        std::cerr << "Failed to open " << shaderPath << std::endl;
         *externalSuccess = false;
         return -1;
       }
@@ -155,7 +155,7 @@ namespace ammonite {
 
         std::vector<GLchar> errorLog(maxLength);
         glGetShaderInfoLog(shaderId, maxLength, &maxLength, &errorLog[0]);
-        std::cout << &errorLog[0] << std::endl;
+        std::cerr << &errorLog[0] << std::endl;
 
         //Clean up and exit
         glDeleteShader(shaderId); //Use glDeleteShader, as the shader never made it to shaderIds
