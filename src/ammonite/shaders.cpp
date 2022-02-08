@@ -57,34 +57,6 @@ namespace ammonite {
   }
 
   namespace shaders {
-    int useProgramCache(const char* programCachePath) {
-      //Attempt to create a cache directory
-      try {
-        std::filesystem::create_directory(programCachePath);
-      } catch (const std::filesystem::filesystem_error&) {
-        std::cerr << "Failed to create cache directory: '" << programCachePath << "'" << std::endl;
-        cacheBinaries = false;
-        return -1;
-      }
-
-      //If the cache directory doesn't exist, disable caching and exit 
-      if (!std::filesystem::is_directory(programCachePath)) {
-        std::cerr << "Couldn't find cache directory: '" << programCachePath << "'" << std::endl;
-        cacheBinaries = false;
-        return -1;
-      }
-
-      //Enable cache and ensure path has a trailing slash
-      cacheBinaries = true;
-      programCacheDir = programCachePath;
-      if (programCacheDir.back() != '/') {
-        programCacheDir.push_back('/');
-      }
-
-      std::cout << "Binary caching enabled ('" << programCacheDir << "')" << std::endl;
-      return 0;
-    }
-
     void deleteShader(const GLuint shaderId) {
       //Search for and delete shaderId
       auto shaderPosition = std::find(shaderIds.begin(), shaderIds.end(), shaderId);
@@ -192,6 +164,38 @@ namespace ammonite {
 
       return programId;
     }
+  }
+
+  //Binary caching related code
+  namespace shaders {
+    int useProgramCache(const char* programCachePath) {
+      //Attempt to create a cache directory
+      try {
+        std::filesystem::create_directory(programCachePath);
+      } catch (const std::filesystem::filesystem_error&) {
+        std::cerr << "Failed to create cache directory: '" << programCachePath << "'" << std::endl;
+        cacheBinaries = false;
+        return -1;
+      }
+
+      //If the cache directory doesn't exist, disable caching and exit
+      if (!std::filesystem::is_directory(programCachePath)) {
+        std::cerr << "Couldn't find cache directory: '" << programCachePath << "'" << std::endl;
+        cacheBinaries = false;
+        return -1;
+      }
+
+      //Enable cache and ensure path has a trailing slash
+      cacheBinaries = true;
+      programCacheDir = programCachePath;
+      if (programCacheDir.back() != '/') {
+        programCacheDir.push_back('/');
+      }
+
+      std::cout << "Binary caching enabled ('" << programCacheDir << "')" << std::endl;
+      return 0;
+    }
+
 
     GLuint createProgram(const GLuint shaderIds[], const int shaderCount, bool* externalSuccess, const char* programName) {
       //Get an id for the program to return
