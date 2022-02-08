@@ -8,6 +8,9 @@
 namespace ammonite {
   namespace windowManager {
     namespace {
+      //Constants
+      const float MIN_OPENGL = 3.2;
+
       //Window and info
       GLFWwindow* window;
       int width, height;
@@ -45,8 +48,7 @@ namespace ammonite {
         }
 
         //If provided, split openglVersion into major and minor components and set version
-        if (openglVersion != 0) {
-          std::cout << "a" << std::endl;
+        if (openglVersion >= MIN_OPENGL) {
           const short int openglMajor = std::floor(openglVersion);
           const short int openglMinor = std::ceil((openglVersion - openglMajor) * 10);
 
@@ -56,6 +58,8 @@ namespace ammonite {
 
           //Disable older OpenGL versions
           glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+        } else if (openglVersion != 0) {
+          std::cout << "Minimum OpenGL version is " << MIN_OPENGL << ", version " << openglVersion << " is unsupported" << std::endl;
         }
 
         //Set antialiasing level if requested
