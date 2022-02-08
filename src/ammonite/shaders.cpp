@@ -209,7 +209,6 @@ namespace ammonite {
         for (int i = 0; i < 2; i++) {
           if (!std::filesystem::exists(targetFiles[i])) {
             //File(s) missing, cache can't be used
-            std::cout << targetFiles[i] << " not found" << std::endl;
             filesExist = false;
             i = 1; //Break the loop early
           }
@@ -253,7 +252,7 @@ namespace ammonite {
 
       //If caching is enabled, cache the binary
       if (cacheBinaries) {
-        std::cout << "Caching '" << programName << "'" << std::endl;
+        std::cout << "Caching '" << targetFiles[0] << "'" << std::endl;
         int binaryLength;
         GLenum binaryFormat;
 
