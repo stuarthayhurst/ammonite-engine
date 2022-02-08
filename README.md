@@ -24,8 +24,9 @@
 ## Dependencies:
   - `make`
   - `g++`
+  - `pkg-config`
   - ### Libraries:
-    - `libx11-dev libxi-dev libglm-dev libglfw3-dev libglew-dev libgl1-mesa-dev libglu1-mesa-dev libxrandr-dev libxext-dev libxcursor-dev libxinerama-dev libxi-dev`
+    - `libglm-dev libglfw3-dev libglew-dev`
 
 ## Notes:
   - All targets are compiled with `-Wall` and `-Wextra`
