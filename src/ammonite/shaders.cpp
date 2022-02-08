@@ -27,7 +27,7 @@ namespace ammonite {
       };
 
       //Delete the cache and cachinfo files
-      std::cout << "Clearing cache for '" << cacheName << "'" << std::endl;
+      std::cout << "Clearing '" << targetFiles[0] << "'" << std::endl;
       for (int i = 0; i < 2; i++) {
         if (targetFiles[i] != "/") {
           std::remove(targetFiles[i].c_str());
@@ -252,7 +252,7 @@ namespace ammonite {
           if (checkProgram(programId)) {
             return programId;
           } else {
-            std::cerr << "Failed to read cache" << std::endl;
+            std::cerr << "Failed to process '" << targetFiles[0] << "'" << std::endl;
             deleteCacheFile(programName);
           }
         }
