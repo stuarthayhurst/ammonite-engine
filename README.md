@@ -19,6 +19,7 @@
 ## Build system:
   - `make build` - Builds demo binary, a working demonstration of the renderer
   - `make clean` - Cleans the build area (`build/`)
+  - `make cache` - Clears the default runtime binary cache, useful if running into issues with caching
 
 ## Dependencies:
   - `make`
