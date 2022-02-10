@@ -183,12 +183,12 @@ namespace ammonite {
 
   //Binary caching related code
   namespace shaders {
-    int useProgramCache(const char* programCachePath) {
+    bool useProgramCache(const char* programCachePath) {
       //Check binary cache support
       if (!glewIsSupported("GL_VERSION_4_1") and !GLEW_ARB_get_program_binary) {
         std::cerr << "Binary caching unsupported" << std::endl;
         cacheBinaries = false;
-        return -1;
+        return false;
       }
 
       //Attempt to create a cache directory
@@ -197,14 +197,14 @@ namespace ammonite {
       } catch (const std::filesystem::filesystem_error&) {
         std::cerr << "Failed to create cache directory: '" << programCachePath << "'" << std::endl;
         cacheBinaries = false;
-        return -1;
+        return false;
       }
 
       //If the cache directory doesn't exist, disable caching and exit
       if (!std::filesystem::is_directory(programCachePath)) {
         std::cerr << "Couldn't find cache directory: '" << programCachePath << "'" << std::endl;
         cacheBinaries = false;
-        return -1;
+        return false;
       }
 
       //Enable cache and ensure path has a trailing slash
@@ -215,7 +215,7 @@ namespace ammonite {
       }
 
       std::cout << "Binary caching enabled ('" << programCacheDir << "')" << std::endl;
-      return 0;
+      return true;
     }
 
     GLuint createProgram(const std::string shaderPaths[], const int shaderTypes[], const int shaderCount, bool* externalSuccess, const char* programName) {

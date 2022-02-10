@@ -9,7 +9,7 @@ namespace ammonite {
     void deleteShader(GLuint shaderId);
     void eraseShaders();
 
-    int useProgramCache(const char* programCachePath);
+    bool useProgramCache(const char* programCachePath);
   }
 }
 
