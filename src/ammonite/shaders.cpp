@@ -219,8 +219,8 @@ namespace ammonite {
     }
 
     GLuint createProgram(const std::string shaderPaths[], const int shaderTypes[], const int shaderCount, bool* externalSuccess, const char* programName) {
-      //Get an id for the program to return
-      GLuint programId = glCreateProgram();
+      //Used later as the return value
+      GLuint programId;
 
       const std::string targetFiles[2] = {
         programCacheDir + programName + ".cache",
@@ -299,6 +299,7 @@ namespace ammonite {
             input.read(&cachedBinaryData[0], cachedBinaryLength);
 
             //Load the cached binary data
+            programId = glCreateProgram();
             glProgramBinary(programId, cachedBinaryFormat, cachedBinaryData, cachedBinaryLength);
 
             //Return the program ID, unless the cache was faulty, then delete and carry on
