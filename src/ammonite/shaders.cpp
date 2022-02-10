@@ -235,7 +235,7 @@ namespace ammonite {
           if (!std::filesystem::exists(targetFiles[i])) {
             //File(s) missing, cache can't be used
             filesExist = false;
-            i = 1; //Break the loop early
+            i = 1;
           }
         }
 
