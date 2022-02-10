@@ -339,13 +339,10 @@ namespace ammonite {
         char binaryData[binaryLength];
         glGetProgramBinary(programId, binaryLength, NULL, &binaryFormat, &binaryData);
 
-        //Write the binary to cache directory as programName.cache
-        std::ofstream binarySave(targetFiles[0]);
+        //Write the binary to cache directory
+        std::ofstream binarySave(targetFiles[0], std::ios::binary);
         if (binarySave.is_open()) {
-          for (int i = 0; i < binaryLength; i++) {
-            binarySave << binaryData[i];
-          }
-          binarySave.close();
+          binarySave.write(&binaryData[0], binaryLength);
         } else {
           std::cerr << "Failed to cache program" << std::endl;
           deleteCacheFile(programName);
