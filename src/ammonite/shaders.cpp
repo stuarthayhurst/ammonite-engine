@@ -95,7 +95,7 @@ namespace ammonite {
         if (!glewIsSupported("GL_VERSION_4_3") and !GLEW_ARB_compute_shader) {
           std::cerr << "Compute shaders unsupported" << std::endl;
           *externalSuccess = false;
-          return -1;
+          return 0;
         }
       }
 
@@ -104,7 +104,7 @@ namespace ammonite {
         if (!glewIsSupported("GL_VERSION_4_0") and !GLEW_ARB_tessellation_shader) {
           std::cerr << "Tessellation shaders unsupported" << std::endl;
           *externalSuccess = false;
-          return -1;
+          return 0;
         }
       }
 
@@ -123,7 +123,7 @@ namespace ammonite {
       } else {
         std::cerr << "Failed to open '" << shaderPath << "'" << std::endl;
         *externalSuccess = false;
-        return -1;
+        return 0;
       }
 
       //Provide a shader source and compile the shader
@@ -147,7 +147,7 @@ namespace ammonite {
         //Clean up and exit
         glDeleteShader(shaderId); //Use glDeleteShader, as the shader never made it to shaderIds
         *externalSuccess = false;
-        return -1;
+        return 0;
       }
 
       //Add the shader to the shader id store
@@ -168,7 +168,7 @@ namespace ammonite {
 
       if (!checkProgram(programId)) {
         *externalSuccess = false;
-        return -1;
+        return 0;
       }
 
       //Detach and remove all passed shader ids
@@ -325,7 +325,7 @@ namespace ammonite {
 
       if (!*externalSuccess) {
         ammonite::shaders::eraseShaders();
-        return -1;
+        return 0;
       }
 
       //If caching is enabled, cache the binary
