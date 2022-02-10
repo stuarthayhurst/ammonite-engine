@@ -60,28 +60,30 @@ int main(int argc, char* argv[]) {
   glGenVertexArrays(1, &VertexArrayID);
   glBindVertexArray(VertexArrayID);
 
-  //Create and compile shaders
-  bool success = true;
-  const GLuint shaderIds[] = {
-    ammonite::shaders::loadShader("shaders/SimpleVertexShader.vert", GL_VERTEX_SHADER, &success),
-    ammonite::shaders::loadShader("shaders/SimpleFragmentShader.frag", GL_FRAGMENT_SHADER, &success)
+  //Shader paths and types to create program
+  const std::string shaderPaths[2] = {
+    "shaders/SimpleVertexShader.vert",
+    "shaders/SimpleFragmentShader.frag"
   };
-  int shaderCount = sizeof(shaderIds) / sizeof(shaderIds[0]);
+  const int shaderTypes[2] = {
+    GL_VERTEX_SHADER,
+    GL_FRAGMENT_SHADER
+  };
+  int shaderCount = sizeof(shaderPaths) / sizeof(shaderPaths[0]);
 
-  //If a shader failed to load, delete them and exit
+  //Enable binary caching
+  ammonite::shaders::useProgramCache("cache");
+
+  //Create program from shaders
+  bool success = true;
+  double shaderStart = glfwGetTime();
+  GLuint programId = ammonite::shaders::createProgram(shaderPaths, shaderTypes, shaderCount, &success, "program");
   if (!success) {
-    std::cout << "Shader loading failed" << std::endl;
-    ammonite::shaders::eraseShaders();
+    std::cerr << "Program creation failed" << std::endl;
     return EXIT_FAILURE;
   }
 
-  //Create program (link shaders)
-  GLuint programId = ammonite::shaders::createProgram(shaderIds, shaderCount, &success);
-  if (!success) {
-    std::cout << "Program linking failed" << std::endl;
-    ammonite::shaders::eraseShaders();
-    return EXIT_FAILURE;
-  }
+  std::cout << "Loaded shaders in: " << glfwGetTime() - shaderStart << "s" << std::endl;
 
   //Get an ID for the model view projection
   GLuint MatrixID = glGetUniformLocation(programId, "MVP");
