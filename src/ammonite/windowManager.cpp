@@ -40,11 +40,11 @@ namespace ammonite {
 
     namespace setup {
       //Initialise glfw, setup antialiasing and OpenGL version
-      int setupGlfw(int antialiasing, float openglVersion) {
+      bool setupGlfw(int antialiasing, float openglVersion) {
         //Setup GLFW
         if (!glfwInit()) {
           std::cerr << "Failed to initialize GLFW" << std::endl;
-          return -1;
+          return false;
         }
 
         //If provided, split openglVersion into major and minor components and set version
@@ -68,21 +68,21 @@ namespace ammonite {
           glEnable(GL_MULTISAMPLE);
         }
 
-        return 0;
+        return true;
       }
 
       //Initialise GLEW
-      int setupGlew(GLFWwindow* window) {
+      bool setupGlew(GLFWwindow* window) {
         glewExperimental = true;
         if (glewInit() != GLEW_OK) {
           std::cerr << "Failed to initialize GLEW" << std::endl;
-          return -1;
+          return false;
         }
 
         //Update values when resized
         glfwSetWindowSizeCallback(window, window_size_callback);
 
-        return 0;
+        return true;
       }
 
       //Set input and cursor modes for window
@@ -132,7 +132,7 @@ namespace ammonite {
     //Wrapper to create and setup window
     std::tuple<GLFWwindow*, int*, int*, float*> setupWindow(int newWidth, int newHeight, int antialiasing, float openglVersion, const char title[]) {
       //Setup GLFW and OpenGL version / antialiasing
-      if (windowManager::setup::setupGlfw(antialiasing, openglVersion) == -1) {
+      if (windowManager::setup::setupGlfw(antialiasing, openglVersion) == false) {
         return {NULL, nullptr, nullptr, nullptr};
       }
 
@@ -145,7 +145,7 @@ namespace ammonite {
       windowManager::setTitle(window, title);
 
       //Setup GLEW
-      if (windowManager::setup::setupGlew(window) == -1) {
+      if (windowManager::setup::setupGlew(window) == false) {
         return {NULL, nullptr, nullptr, nullptr};
       }
 

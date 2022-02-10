@@ -9,8 +9,8 @@ namespace ammonite {
     }
 
     namespace setup {
-      int setupGlfw(int antialiasing, float openglVersion);
-      int setupGlew(GLFWwindow* window);
+      bool setupGlfw(int antialiasing, float openglVersion);
+      bool setupGlew(GLFWwindow* window);
       void setupGlfwInput(GLFWwindow* window);
     }
 
