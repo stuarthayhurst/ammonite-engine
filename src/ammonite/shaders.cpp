@@ -51,7 +51,8 @@ namespace ammonite {
 
       std::vector<GLchar> errorLog(maxLength);
       glGetProgramInfoLog(programId, maxLength, &maxLength, &errorLog[0]);
-      std::cerr << &errorLog[0] << std::endl;
+      //Extra std::endl used to work around Intel driver bug
+      std::cerr << &errorLog[0] << std::endl << std::endl;
 
       return false;
     }
