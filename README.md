@@ -31,6 +31,7 @@
 ## Notes:
   - All targets are compiled with `-Wall` and `-Wextra`
   - Targets are also compiled with `-O3` and `-flto`, which may cause some systems to struggle to compile, or produce unstable results
+    - These can be changed by modifying `CXXFLAGS` in `Makefile`
 
 ## License
   - This project is available under the terms of the GNU Lesser General Public License (v3.0)
