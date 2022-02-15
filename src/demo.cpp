@@ -202,7 +202,7 @@ int main(int argc, char* argv[]) {
     //Get current model, view and projection matrices, and compute the MVP matrix
     glm::mat4 ProjectionMatrix = ammonite::controls::matrix::getProjectionMatrix();
     glm::mat4 ViewMatrix = ammonite::controls::matrix::getViewMatrix();
-    glm::mat4 ModelMatrix = glm::mat4(1.0);
+    static const glm::mat4 ModelMatrix = glm::mat4(1.0);
     glm::mat4 mvp = ProjectionMatrix * ViewMatrix * ModelMatrix;
 
     //Send the transformation to the current shader in "MVP" uniform
