@@ -14,6 +14,7 @@
 ## Options:
   - Compiled demos have a few arguments supported:
     - `--help`: Displays a help menu
+    - `--benchmark`: Start a benchmark
     - `--vsync`: Enable / disable VSync (`true` / `false`)
 
 ## Build system:

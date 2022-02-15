@@ -16,20 +16,20 @@
 const unsigned short int width = 1024;
 const unsigned short int height = 768;
 
-//Toggle benchmark, replace with command line option later
-const bool useBenchmark = true;
-
 int main(int argc, char* argv[]) {
   //Handle arguments
   int showHelp = arguments::searchArgument(argc, argv, "--help", true, nullptr);
   if (showHelp == 1) {
     std::cout << "Program help: \n"
-    " --help:  Display this help page\n"
-    " --vsync: Enable / disable VSync (true / false)" << std::endl;
+    " --help:       Display this help page\n"
+    " --benchmark:  Start a benchmark\n"
+    " --vsync:      Enable / disable VSync (true / false)" << std::endl;
     return EXIT_SUCCESS;
   } else if (showHelp == -1) {
     return EXIT_FAILURE;
   }
+
+  useBenchmark = bool(arguments::searchArgument(argc, argv, "--benchmark", true, nullptr));
 
   std::string useVsync;
   if (arguments::searchArgument(argc, argv, "--vsync", false, &useVsync) == -1) {
