@@ -45,7 +45,7 @@ namespace ammonite {
       const glm::vec3 absoluteUp = glm::vec3(0, 1, 0);
 
       //Increase / decrease FoV on scroll (xoffset is unused)
-      void scroll_callback(GLFWwindow*, double, double yoffset) {
+      static void scroll_callback(GLFWwindow*, double, double yoffset) {
         //Only zoom if FoV will be between 1 and 90
         float newFov = fov - (yoffset * zoomMultiplier);
         if (newFov > 0 and newFov <= 90) {
@@ -54,13 +54,13 @@ namespace ammonite {
       }
 
       //Reset FoV on middle click, (modifier bits are unused)
-      void zoom_reset_callback(GLFWwindow*, int button, int action, int) {
+      static void zoom_reset_callback(GLFWwindow*, int button, int action, int) {
         if (button == GLFW_MOUSE_BUTTON_MIDDLE and action == GLFW_PRESS) {
           fov = 45;
         }
       }
 
-      void cursor_position_callback(GLFWwindow*, double xpos, double ypos) {
+      static void cursor_position_callback(GLFWwindow*, double xpos, double ypos) {
         //Work out distance moved since last movement
         float xoffset = xpos - xposLast;
         float yoffset = ypos - yposLast;

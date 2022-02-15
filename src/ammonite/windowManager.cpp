@@ -19,7 +19,7 @@ namespace ammonite {
       bool vsyncEnabled = true;
 
       //Callback to update height and width and viewport size on window resize
-      void window_size_callback(GLFWwindow*, int newWidth, int newHeight) {
+      static void window_size_callback(GLFWwindow*, int newWidth, int newHeight) {
         width = newWidth;
         height = newHeight;
         aspectRatio = float(width) / float(height);
