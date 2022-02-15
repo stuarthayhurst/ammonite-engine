@@ -16,6 +16,9 @@
 const unsigned short int width = 1024;
 const unsigned short int height = 768;
 
+//Toggle benchmark, replace with command line option later
+const bool useBenchmark = true;
+
 int main(int argc, char* argv[]) {
   //Handle arguments
   int showHelp = arguments::searchArgument(argc, argv, "--help", true, nullptr);
@@ -42,11 +45,11 @@ int main(int argc, char* argv[]) {
   //Initialise controls
   ammonite::controls::setupControls(window, widthPtr, heightPtr, aspectRatioPtr);
 
-  //Set vsync
-  if (useVsync == "true") {
-    ammonite::windowManager::settings::useVsync(true);
-  } else if (useVsync == "false") {
+  //Set vsync (disable if benchmarking)
+  if (useVsync == "false" or useBenchmark == true) {
     ammonite::windowManager::settings::useVsync(false);
+  } else if (useVsync == "true") {
+    ammonite::windowManager::settings::useVsync(true);
   }
 
   //Enable culling triangles
@@ -167,8 +170,10 @@ int main(int argc, char* argv[]) {
   glBufferData(GL_ARRAY_BUFFER, sizeof(g_colour_buffer_data), g_colour_buffer_data, GL_STATIC_DRAW);
 
   //Framerate variables
-  double deltaTime, currentTime;
-  double lastTime = glfwGetTime();
+  double lastTime, deltaTime, currentTime;
+  const double startTime = glfwGetTime();
+  lastTime = startTime;
+  long totalFrames = 0;
   int frameCount = 0;
 
   //Use the shaders
@@ -179,9 +184,10 @@ int main(int argc, char* argv[]) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     //Every second, output the framerate
+    frameCount++;
+    totalFrames++;
     currentTime = glfwGetTime();
     deltaTime = currentTime - lastTime;
-    frameCount++;
 
     if (deltaTime >= 1.0) {
       printf("%f fps", frameCount / deltaTime);
@@ -234,6 +240,13 @@ int main(int argc, char* argv[]) {
     //Swap buffers
     glfwSwapBuffers(window);
     glfwPollEvents();
+  }
+
+  //Output benchmark score
+  if (useBenchmark) {
+    deltaTime = glfwGetTime() - startTime;
+    std::cout << "\nBenchmark complete:" << std::endl;
+    std::cout << "  Average fps: " << int(totalFrames / deltaTime) << " fps" << std::endl;
   }
 
   //Cleanup VBO, shaders and window
