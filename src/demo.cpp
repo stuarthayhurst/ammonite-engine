@@ -18,7 +18,7 @@ const unsigned short int height = 768;
 
 int main(int argc, char* argv[]) {
   //Handle arguments
-  int showHelp = arguments::searchArgument(argc, argv, "--help", true, nullptr);
+  const int showHelp = arguments::searchArgument(argc, argv, "--help", true, nullptr);
   if (showHelp == 1) {
     std::cout << "Program help: \n"
     " --help:       Display this help page\n"
@@ -29,7 +29,7 @@ int main(int argc, char* argv[]) {
     return EXIT_FAILURE;
   }
 
-  useBenchmark = bool(arguments::searchArgument(argc, argv, "--benchmark", true, nullptr));
+  const bool useBenchmark = arguments::searchArgument(argc, argv, "--benchmark", true, nullptr);
 
   std::string useVsync;
   if (arguments::searchArgument(argc, argv, "--vsync", false, &useVsync) == -1) {
