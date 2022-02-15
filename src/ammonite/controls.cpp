@@ -41,6 +41,9 @@ namespace ammonite {
       //Used to find x and y mouse offsets
       double xposLast, yposLast;
 
+      //Current input bind state
+      bool inputBound = true;
+
       //Vectors to ignore certain axis (absoluteUp -> only y-axis)
       const glm::vec3 absoluteUp = glm::vec3(0, 1, 0);
 
@@ -81,6 +84,26 @@ namespace ammonite {
           verticalAngle = -limit;
         } else {
           verticalAngle += -mouseSpeed * yoffset;
+        }
+      }
+    }
+
+    //Helper functions
+    namespace {
+      static void setInputBound(bool newInputBound) {
+        inputBound = newInputBound;
+
+        //Hide and unhide cursor as necessary
+        if (inputBound) {
+          //Hide cursor and start taking mouse input
+          glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+          glfwSetCursorPosCallback(window, cursor_position_callback);
+          //Reset saved cursor position to avoid a large jump
+          glfwGetCursorPos(window, &xposLast, &yposLast);
+        } else {
+          //Remove callback and restore cursor
+          glfwSetCursorPosCallback(window, NULL);
+          glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         }
       }
     }
@@ -150,7 +173,6 @@ namespace ammonite {
       float deltaTime = float(currentTime - lastTime);
 
       //Save last input toggle key state and current input state
-      static bool inputBound = true;
       static int lastInputToggleState = GLFW_RELEASE;
       int inputToggleState;
 
@@ -161,18 +183,8 @@ namespace ammonite {
           inputBound = !inputBound;
         }
 
-        //Hide and unhide cursor as necessary
-        if (inputBound) {
-          //Hide cursor and start taking mouse input
-          glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-          glfwSetCursorPosCallback(window, cursor_position_callback);
-          //Reset saved cursor position to avoid a large jump
-          glfwGetCursorPos(window, &xposLast, &yposLast);
-        } else {
-          //Remove callback and restore cursor
-          glfwSetCursorPosCallback(window, NULL);
-          glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-        }
+        //Update input state
+        setInputBound(inputBound);
 
         lastInputToggleState = inputToggleState;
       }
