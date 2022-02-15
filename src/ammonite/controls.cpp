@@ -86,10 +86,8 @@ namespace ammonite {
           verticalAngle += -mouseSpeed * yoffset;
         }
       }
-    }
 
-    //Helper functions
-    namespace {
+      //Helper function to set input state
       static void setInputBound(bool newInputBound) {
         inputBound = newInputBound;
 
@@ -105,6 +103,11 @@ namespace ammonite {
           glfwSetCursorPosCallback(window, NULL);
           glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         }
+      }
+
+      static void window_focus_callback(GLFWwindow*, int focused) {
+        //Bind / unbind input with window focus (fixes missing mouse)
+        setInputBound(focused);
       }
     }
 
@@ -159,6 +162,9 @@ namespace ammonite {
       glfwSetMouseButtonCallback(window, zoom_reset_callback);
       glfwSetCursorPosCallback(window, cursor_position_callback);
 
+      //Set callback to update input state on window focus
+      glfwSetWindowFocusCallback(window, window_focus_callback);
+
       //Setup initial cursor position
       glfwGetCursorPos(window, &xposLast, &yposLast);
     }
@@ -180,11 +186,8 @@ namespace ammonite {
       inputToggleState = glfwGetKey(window, GLFW_KEY_C);
       if (lastInputToggleState != inputToggleState) {
         if (lastInputToggleState == GLFW_RELEASE) {
-          inputBound = !inputBound;
+          setInputBound(!inputBound);
         }
-
-        //Update input state
-        setInputBound(inputBound);
 
         lastInputToggleState = inputToggleState;
       }
