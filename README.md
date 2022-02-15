@@ -3,7 +3,7 @@
 
 ## Requirements:
   - A `c++17` compatible compiler (`g++ 8+`)
-  - An OpenGL 3.3+ compatible driver
+  - An OpenGL 3.2+ compatible driver
 
 ## Running:
   - `make clean build` will clean the build area and build the demo from fresh
