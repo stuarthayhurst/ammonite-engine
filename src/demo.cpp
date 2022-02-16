@@ -246,7 +246,8 @@ int main(int argc, char* argv[]) {
   if (useBenchmark) {
     deltaTime = glfwGetTime() - startTime;
     std::cout << "\nBenchmark complete:" << std::endl;
-    std::cout << "  Average fps: " << int(totalFrames / deltaTime) << " fps" << std::endl;
+    std::cout << "  Average fps: " << int(totalFrames / deltaTime) << " fps";
+    std::cout << " (" << (deltaTime * 1000) / totalFrames << "ms)" << std::endl;
   }
 
   //Cleanup VBO, shaders and window
