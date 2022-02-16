@@ -16,6 +16,11 @@
 const unsigned short int width = 1024;
 const unsigned short int height = 768;
 
+void printMetrics(int frameCount, double deltaTime) {
+  printf("%.2f fps", frameCount / deltaTime);
+  printf(" (%fms)\n", (deltaTime * 1000) / frameCount);
+}
+
 int main(int argc, char* argv[]) {
   //Handle arguments
   const int showHelp = arguments::searchArgument(argc, argv, "--help", true, nullptr);
@@ -183,15 +188,15 @@ int main(int argc, char* argv[]) {
   while(glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS and !glfwWindowShouldClose(window)) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    //Every second, output the framerate
+    //Update time and frame counters every frame
     frameCount++;
     totalFrames++;
     currentTime = glfwGetTime();
     deltaTime = currentTime - lastTime;
 
+    //Every second, output the framerate
     if (deltaTime >= 1.0) {
-      printf("%f fps", frameCount / deltaTime);
-      printf(" (%fms)\n", (deltaTime * 1000) / frameCount);
+      printMetrics(frameCount, deltaTime);
       lastTime = currentTime;
       frameCount = 0;
     }
@@ -244,10 +249,9 @@ int main(int argc, char* argv[]) {
 
   //Output benchmark score
   if (useBenchmark) {
-    deltaTime = glfwGetTime() - startTime;
     std::cout << "\nBenchmark complete:" << std::endl;
-    std::cout << "  Average fps: " << int(totalFrames / deltaTime) << " fps";
-    std::cout << " (" << (deltaTime * 1000) / totalFrames << "ms)" << std::endl;
+    std::cout << "  Average fps: ";
+    printMetrics(totalFrames, glfwGetTime() - startTime);
   }
 
   //Cleanup VBO, shaders and window
