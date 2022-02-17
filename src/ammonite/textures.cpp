@@ -5,12 +5,18 @@
 
 namespace ammonite {
   namespace textures {
-    GLuint loadTexture(const char* texturePath) {
+    GLuint loadTexture(const char* texturePath, bool* externalSuccess) {
       int width, height;
       unsigned char* data;
 
       //Read image data
       data = stbi_load(texturePath, &width, &height, nullptr, 3);
+
+      if (!data) {
+        std::cerr << "Failed to load texture" << std::endl;
+        *externalSuccess = false;
+        return 0;
+      }
 
       //Create a texture
       GLuint textureId;

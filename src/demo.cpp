@@ -183,7 +183,12 @@ int main(int argc, char* argv[]) {
   };
 
   //Load the texture
-  GLuint textureId = ammonite::textures::loadTexture("assets/texture.bmp");
+  GLuint textureId = ammonite::textures::loadTexture("assets/texture.bmp", &success);
+  if (!success) {
+    ammonite::shaders::eraseShaders();
+    glDeleteProgram(programId);
+    return EXIT_FAILURE;
+  }
 
   //Create a texture buffer
   GLuint textureBuffer;
