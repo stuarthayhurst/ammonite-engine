@@ -70,8 +70,8 @@ int main(int argc, char* argv[]) {
 
   //Shader paths and types to create program
   const std::string shaderPaths[2] = {
-    "shaders/SimpleVertexShader.vert",
-    "shaders/SimpleFragmentShader.frag"
+    "shaders/TextureVertexShader.vert",
+    "shaders/TextureFragmentShader.frag"
   };
   const int shaderTypes[2] = {
     GL_VERTEX_SHADER,
@@ -143,36 +143,53 @@ int main(int argc, char* argv[]) {
   //Give vertices to OpenGL
   glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
 
-  static float colourVal[12][3] = {
-    {0.1, 1.0, 1},
-    {0.2, 0.9, 1},
-    {0.3, 0.8, 1},
-    {0.4, 0.7, 1},
-    {0.5, 0.6, 1},
-    {0.6, 0.5, 1},
-    {0.7, 0.4, 1},
-    {0.8, 0.3, 1},
-    {0.9, 0.2, 1},
-    {1.0, 0.1, 1},
-    {0.1, 1.0, 1},
-    {0.2, 0.9, 1}
+  static const GLfloat g_uv_buffer_data[] = {
+    0.000059f, 1.0f-0.000004f,
+    0.000103f, 1.0f-0.336048f,
+    0.335973f, 1.0f-0.335903f,
+    1.000023f, 1.0f-0.000013f,
+    0.667979f, 1.0f-0.335851f,
+    0.999958f, 1.0f-0.336064f,
+    0.667979f, 1.0f-0.335851f,
+    0.336024f, 1.0f-0.671877f,
+    0.667969f, 1.0f-0.671889f,
+    1.000023f, 1.0f-0.000013f,
+    0.668104f, 1.0f-0.000013f,
+    0.667979f, 1.0f-0.335851f,
+    0.000059f, 1.0f-0.000004f,
+    0.335973f, 1.0f-0.335903f,
+    0.336098f, 1.0f-0.000071f,
+    0.667979f, 1.0f-0.335851f,
+    0.335973f, 1.0f-0.335903f,
+    0.336024f, 1.0f-0.671877f,
+    1.000004f, 1.0f-0.671847f,
+    0.999958f, 1.0f-0.336064f,
+    0.667979f, 1.0f-0.335851f,
+    0.668104f, 1.0f-0.000013f,
+    0.335973f, 1.0f-0.335903f,
+    0.667979f, 1.0f-0.335851f,
+    0.335973f, 1.0f-0.335903f,
+    0.668104f, 1.0f-0.000013f,
+    0.336098f, 1.0f-0.000071f,
+    0.000103f, 1.0f-0.336048f,
+    0.000004f, 1.0f-0.671870f,
+    0.336024f, 1.0f-0.671877f,
+    0.000103f, 1.0f-0.336048f,
+    0.336024f, 1.0f-0.671877f,
+    0.335973f, 1.0f-0.335903f,
+    0.667969f, 1.0f-0.671889f,
+    1.000004f, 1.0f-0.671847f,
+    0.667979f, 1.0f-0.335851f
   };
 
-  //Fill faces of cube with colours
-  static GLfloat g_colour_buffer_data[12*3*3];
-  for (int triangle = 0; triangle < 12; triangle++) {
-    for (int v = 0; v < 3; v++) {
-      for (int colour = 0; colour < 3; colour++) {
-        g_colour_buffer_data[triangle * 9 + (v * 3 + colour)] = colourVal[triangle][colour];
-      }
-    }
-  }
+  //Load the texture
+  GLuint textureId = ammonite::textures::loadTexture("assets/texture.bmp");
 
-  //Create a colour buffer
-  GLuint colourbuffer;
-  glGenBuffers(1, &colourbuffer);
-  glBindBuffer(GL_ARRAY_BUFFER, colourbuffer);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(g_colour_buffer_data), g_colour_buffer_data, GL_STATIC_DRAW);
+  //Create a texture buffer
+  GLuint textureBuffer;
+  glGenBuffers(1, &textureBuffer);
+  glBindBuffer(GL_ARRAY_BUFFER, textureBuffer);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(g_uv_buffer_data), g_uv_buffer_data, GL_STATIC_DRAW);
 
   //Framerate variables
   double lastTime, deltaTime, currentTime;
@@ -227,10 +244,10 @@ int main(int argc, char* argv[]) {
 
     //Colour attribute buffer
     glEnableVertexAttribArray(1);
-    glBindBuffer(GL_ARRAY_BUFFER, colourbuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, textureBuffer);
     glVertexAttribPointer(
       1,
-      3,
+      2,
       GL_FLOAT,
       GL_FALSE,
       0,
@@ -256,9 +273,10 @@ int main(int argc, char* argv[]) {
 
   //Cleanup VBO, shaders and window
   glDeleteBuffers(1, &vertexbuffer);
-  glDeleteBuffers(1, &colourbuffer);
+  glDeleteBuffers(1, &textureBuffer);
   ammonite::shaders::eraseShaders();
   glDeleteProgram(programId);
+  glDeleteTextures(1, &textureId);
   glDeleteVertexArrays(1, &VertexArrayID);
   glfwTerminate();
 
