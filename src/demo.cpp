@@ -64,9 +64,9 @@ int main(int argc, char* argv[]) {
   glDepthFunc(GL_LESS);
 
   //Create the VAO
-  GLuint VertexArrayID;
-  glGenVertexArrays(1, &VertexArrayID);
-  glBindVertexArray(VertexArrayID);
+  GLuint vertexArrayId;
+  glGenVertexArrays(1, &vertexArrayId);
+  glBindVertexArray(vertexArrayId);
 
   //Shader paths and types to create program
   const std::string shaderPaths[2] = {
@@ -94,7 +94,7 @@ int main(int argc, char* argv[]) {
   std::cout << "Loaded shaders in: " << glfwGetTime() - shaderStart << "s" << std::endl;
 
   //Get an ID for the model view projection
-  GLuint MatrixID = glGetUniformLocation(programId, "MVP");
+  GLuint matrixId = glGetUniformLocation(programId, "MVP");
 
   //An array of verticies to draw
   static const GLfloat g_vertex_buffer_data[] = {
@@ -137,9 +137,9 @@ int main(int argc, char* argv[]) {
   };
 
   //Create a vertex buffer
-  GLuint vertexbuffer;
-  glGenBuffers(1, &vertexbuffer);
-  glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+  GLuint vertexBuffer;
+  glGenBuffers(1, &vertexBuffer);
+  glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
   //Give vertices to OpenGL
   glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
 
@@ -222,17 +222,17 @@ int main(int argc, char* argv[]) {
     ammonite::controls::processInput();
 
     //Get current model, view and projection matrices, and compute the MVP matrix
-    glm::mat4 ProjectionMatrix = ammonite::controls::matrix::getProjectionMatrix();
-    glm::mat4 ViewMatrix = ammonite::controls::matrix::getViewMatrix();
-    static const glm::mat4 ModelMatrix = glm::mat4(1.0);
-    glm::mat4 mvp = ProjectionMatrix * ViewMatrix * ModelMatrix;
+    glm::mat4 projectionMatrix = ammonite::controls::matrix::getProjectionMatrix();
+    glm::mat4 viewMatrix = ammonite::controls::matrix::getViewMatrix();
+    static const glm::mat4 modelMatrix = glm::mat4(1.0);
+    glm::mat4 mvp = projectionMatrix * viewMatrix * modelMatrix;
 
     //Send the transformation to the current shader in "MVP" uniform
-    glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &mvp[0][0]);
+    glUniformMatrix4fv(matrixId, 1, GL_FALSE, &mvp[0][0]);
 
     //Vertex attribute buffer
     glEnableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
     glVertexAttribPointer(
       0,        //shader location
       3,        //size
@@ -272,12 +272,12 @@ int main(int argc, char* argv[]) {
   }
 
   //Cleanup VBO, shaders and window
-  glDeleteBuffers(1, &vertexbuffer);
+  glDeleteBuffers(1, &vertexBuffer);
   glDeleteBuffers(1, &textureBuffer);
   ammonite::shaders::eraseShaders();
   glDeleteProgram(programId);
   glDeleteTextures(1, &textureId);
-  glDeleteVertexArrays(1, &VertexArrayID);
+  glDeleteVertexArrays(1, &vertexArrayId);
   glfwTerminate();
 
   return EXIT_SUCCESS;
