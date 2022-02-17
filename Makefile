@@ -3,12 +3,11 @@ SHELL = bash
 
 LIBS = glm glfw3 glew
 BUILD_DIR = build
+CACHE_DIR = cache
 
 CXXFLAGS := $(shell pkg-config --cflags $(LIBS))
 CXXFLAGS += -Wall -Wextra -O3 -flto -std=c++17
 LDFLAGS := $(shell pkg-config --libs $(LIBS)) -pthread
-
-CACHE_DIR=cache
 
 ifeq ($(DEBUG),true)
   CXXFLAGS += -DDEBUG
