@@ -1,7 +1,7 @@
 CXX ?= $(shell command -v g++)
 SHELL = bash
 
-LIBS = glm glfw3 glew
+LIBS = glm glfw3 glew stb
 BUILD_DIR = build
 CACHE_DIR = cache
 

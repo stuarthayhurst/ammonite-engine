@@ -27,7 +27,7 @@
   - `g++`
   - `pkg-config`
   - ### Libraries:
-    - `libglm-dev libglfw3-dev libglew-dev`
+    - `libglm-dev libglfw3-dev libglew-dev libstb-dev`
 
 ## Notes:
   - All targets are compiled with `-Wall` and `-Wextra`
