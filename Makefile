@@ -18,16 +18,15 @@ ifeq ($(DEBUG),true)
 endif
 
 $(BUILD_DIR)/demo: $(AMMONITE_OBJECTS) $(OBJECT_DIR)/demo.o
-	mkdir -p "$(BUILD_DIR)"
+	@mkdir -p "$(BUILD_DIR)"
 	$(CXX) -o "$(BUILD_DIR)/demo" $(OBJECT_DIR)/*.o src/common/*.cpp $(CXXFLAGS) $(LDFLAGS)
 
 $(AMMONITE_OBJECTS): $(AMMONITE_OBJECTS_SOURCE)
-	mkdir -p "$(OBJECT_DIR)"
-	SOURCE_FILE="$(subst $(OBJECT_DIR),src/ammonite,$(subst .o,.cpp,$(@)))"; \
-	$(CXX) $$SOURCE_FILE -c $(CXXFLAGS) -o "$@"
+	@mkdir -p "$(OBJECT_DIR)"
+	$(CXX) $(subst $(OBJECT_DIR),src/ammonite,$(subst .o,.cpp,$(@))) -c $(CXXFLAGS) -o "$@"
 
 $(OBJECT_DIR)/demo.o: ./src/demo.cpp
-	mkdir -p "$(OBJECT_DIR)"
+	@mkdir -p "$(OBJECT_DIR)"
 	$(CXX) ./src/demo.cpp -c $(CXXFLAGS) -o "$@"
 
 .PHONY: build clean cache
