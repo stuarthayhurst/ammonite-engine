@@ -187,7 +187,7 @@ int main(int argc, char* argv[]) {
     );
 
     //Draw the triangles
-    glDrawArrays(GL_TRIANGLES, 0, 12*3); //12*3 indicies starting at 0 (12 triangles, 6 squares)
+    glDrawArrays(GL_TRIANGLES, 0, vertices.size());
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(1);
 
