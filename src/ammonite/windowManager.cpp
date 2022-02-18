@@ -122,7 +122,7 @@ namespace ammonite {
       return {window, &width, &height, &aspectRatio};
     }
 
-    void setTitle(GLFWwindow* window, const char title[]) {
+    void setTitle(GLFWwindow* window, const char* title) {
       if (title != NULL) {
         glfwSetWindowTitle(window, title);
       } else {
@@ -140,7 +140,7 @@ namespace ammonite {
     }
 
     //Wrapper to create and setup window
-    std::tuple<GLFWwindow*, int*, int*, float*> setupWindow(int newWidth, int newHeight, int antialiasing, float openglVersion, const char title[]) {
+    std::tuple<GLFWwindow*, int*, int*, float*> setupWindow(int newWidth, int newHeight, int antialiasing, float openglVersion, const char* title) {
       //Setup GLFW and OpenGL version / antialiasing
       if (windowManager::setup::setupGlfw(antialiasing, openglVersion) == false) {
         return {NULL, nullptr, nullptr, nullptr};
