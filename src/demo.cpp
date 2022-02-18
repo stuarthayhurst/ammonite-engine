@@ -123,15 +123,15 @@ int main(int argc, char* argv[]) {
   glBindBuffer(GL_ARRAY_BUFFER, textureBuffer);
   glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(glm::vec2), &uvs[0], GL_STATIC_DRAW);
 
+  //Use the shaders
+  glUseProgram(programId);
+
   //Framerate variables
   double lastTime, deltaTime, currentTime;
   const double startTime = glfwGetTime();
   lastTime = startTime;
   long totalFrames = 0;
   int frameCount = 0;
-
-  //Use the shaders
-  glUseProgram(programId);
 
   //Loop until window closed
   while(glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS and !glfwWindowShouldClose(window)) {
