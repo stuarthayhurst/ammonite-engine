@@ -2,6 +2,7 @@
 #include <cmath>
 #include <tuple>
 
+#include <stb/stb_image.h>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
@@ -127,6 +128,15 @@ namespace ammonite {
       } else {
         glfwSetWindowTitle(window, "Ammonite Window");
       }
+    }
+
+    void setIcon(GLFWwindow* window, const char* iconPath) {
+      GLFWimage images[1];
+      //Read image data
+      images[0].pixels = stbi_load(iconPath, &images[0].width, &images[0].height, nullptr, 4);
+      //Set the icon
+      glfwSetWindowIcon(window, 1, images);
+      stbi_image_free(images[0].pixels);
     }
 
     //Wrapper to create and setup window

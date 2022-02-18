@@ -43,10 +43,14 @@ int main(int argc, char* argv[]) {
     return EXIT_FAILURE;
   }
 
+  //Create the window
   auto [window, widthPtr, heightPtr, aspectRatioPtr] = ammonite::windowManager::setupWindow(width, height, 4, 0, "OpenGL Experiments");
   if (window == NULL) {
     return EXIT_FAILURE;
   }
+
+  //Set an icon
+  ammonite::windowManager::setIcon(window, "assets/icon.png");
 
   //Initialise controls
   ammonite::controls::setupControls(window, widthPtr, heightPtr, aspectRatioPtr);
