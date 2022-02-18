@@ -97,20 +97,20 @@ int main(int argc, char* argv[]) {
   //Get an ID for the model view projection
   GLuint matrixId = glGetUniformLocation(programId, "MVP");
 
-//Each model needs the following:
-// - Vertices, normals, uvs
-// - Textures
-// - Model matrix (Generated from translation, rotation and scale)
-// - An id to pass to the renderer
+//Each model object needs the following:
+// - Vertices, normals, texture points
+// - Textures (todo)
+// - Model matrix (Generated from translation, rotation and scale), (todo)
+// - An id to pass to the renderer (todo)
 
   //Load model
   performanceTimer.reset();
-  ammonite::models::internalModel modelStruct;
-  success = ammonite::models::loadObject("assets/viking_room.obj", modelStruct);
+  ammonite::models::internalModel modelObject;
+  success = ammonite::models::loadObject("assets/viking_room.obj", modelObject);
   //Create vertex buffer
-  ammonite::models::createBuffer(modelStruct);
+  ammonite::models::createBuffer(modelObject);
 
-  std::cout << "Loaded models in: " << performanceTimer.getTime() << "s (" << modelStruct.vertices.size() << " vertices)" << std::endl;
+  std::cout << "Loaded models in: " << performanceTimer.getTime() << "s (" << modelObject.vertices.size() << " vertices)" << std::endl;
 
   //Load the texture
   GLuint textureId = ammonite::textures::loadTexture("assets/viking_room.png", &success);
@@ -124,7 +124,7 @@ int main(int argc, char* argv[]) {
   GLuint textureBuffer;
   glGenBuffers(1, &textureBuffer);
   glBindBuffer(GL_ARRAY_BUFFER, textureBuffer);
-  glBufferData(GL_ARRAY_BUFFER, modelStruct.uvs.size() * sizeof(glm::vec2), &modelStruct.uvs[0], GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, modelObject.texturePoints.size() * sizeof(glm::vec2), &modelObject.texturePoints[0], GL_STATIC_DRAW);
 
   //Use the shaders
   glUseProgram(programId);
@@ -166,7 +166,7 @@ int main(int argc, char* argv[]) {
 
     //Vertex attribute buffer
     glEnableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, modelStruct.vertexBufferId);
+    glBindBuffer(GL_ARRAY_BUFFER, modelObject.vertexBufferId);
     glVertexAttribPointer(
       0,        //shader location
       3,        //size
@@ -189,7 +189,7 @@ int main(int argc, char* argv[]) {
     );
 
     //Draw the triangles
-    glDrawArrays(GL_TRIANGLES, 0, modelStruct.vertices.size());
+    glDrawArrays(GL_TRIANGLES, 0, modelObject.vertices.size());
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(1);
 
@@ -206,7 +206,7 @@ int main(int argc, char* argv[]) {
   }
 
   //Cleanup VBO, shaders and window
-  glDeleteBuffers(1, &modelStruct.vertexBufferId);
+  glDeleteBuffers(1, &modelObject.vertexBufferId);
   glDeleteBuffers(1, &textureBuffer);
   ammonite::shaders::eraseShaders();
   glDeleteProgram(programId);

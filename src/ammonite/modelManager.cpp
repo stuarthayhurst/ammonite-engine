@@ -9,7 +9,7 @@ namespace ammonite {
   namespace models {
     struct internalModel {
       std::vector<glm::vec3> vertices, normals;
-      std::vector<glm::vec2> uvs;
+      std::vector<glm::vec2> texturePoints;
       GLuint vertexBufferId;
     };
   }
@@ -73,7 +73,7 @@ namespace ammonite {
               tinyobj::real_t ty = 1.0f - attrib.texcoords[2 * size_t(idx.texcoord_index) + 1];
 
               glm::vec2 texturePoint = glm::vec2(tx, ty);
-              modelObject.uvs.push_back(texturePoint);
+              modelObject.texturePoints.push_back(texturePoint);
             }
           }
           index_offset += fv;

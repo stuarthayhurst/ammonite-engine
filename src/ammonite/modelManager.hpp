@@ -5,7 +5,7 @@ namespace ammonite {
   namespace models {
     struct internalModel {
       std::vector<glm::vec3> vertices, normals;
-      std::vector<glm::vec2> uvs;
+      std::vector<glm::vec2> texturePoints;
       GLuint vertexBufferId;
     };
 
