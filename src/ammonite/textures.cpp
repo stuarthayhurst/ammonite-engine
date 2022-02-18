@@ -6,11 +6,11 @@
 namespace ammonite {
   namespace textures {
     GLuint loadTexture(const char* texturePath, bool* externalSuccess) {
-      int width, height;
+      int width, height, bpp;
       unsigned char* data;
 
       //Read image data
-      data = stbi_load(texturePath, &width, &height, nullptr, 3);
+      data = stbi_load(texturePath, &width, &height, &bpp, 3);
 
       if (!data) {
         std::cerr << "Failed to load texture" << std::endl;
@@ -24,7 +24,16 @@ namespace ammonite {
 
       //Select and pass texture to OpenGL
       glBindTexture(GL_TEXTURE_2D, textureId);
-      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_BGR, GL_UNSIGNED_BYTE, data);
+      if (bpp == 3) {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+      } else if (bpp == 4) {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+      } else {
+        std::cerr << "Failed to load texture" << std::endl;
+        glDeleteTextures(1, &textureId);
+        *externalSuccess = false;
+        return 0;
+      }
 
       //Release the image data
       stbi_image_free(data);
