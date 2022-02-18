@@ -42,3 +42,7 @@ clean:
 	rm -rfv "$(BUILD_DIR)"
 cache:
 	rm -rfv "$(CACHE_DIR)"
+icons:
+	./scripts/clean-svgs.py
+	inkscape "--export-filename=./assets/icons/icon.png" -w "64" -h "64" "./assets/icons/icon.svg" > /dev/null 2>&1
+	optipng -o7 -strip all --quiet "./assets/icons/icon.png"
