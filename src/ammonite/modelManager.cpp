@@ -12,8 +12,6 @@ namespace ammonite {
          std::vector<glm::vec3> &out_normals) {
 
       tinyobj::ObjReaderConfig reader_config;
-      reader_config.mtl_search_path = "./";
-
       tinyobj::ObjReader reader;
 
       //Atempt to parse the object
