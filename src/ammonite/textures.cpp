@@ -26,6 +26,9 @@ namespace ammonite {
       glBindTexture(GL_TEXTURE_2D, textureId);
       glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_BGR, GL_UNSIGNED_BYTE, data);
 
+      //Release the image data
+      stbi_image_free(data);
+
       //When magnifying the image, use linear filtering
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       //When minifying the image, use a linear blend of two mipmaps
