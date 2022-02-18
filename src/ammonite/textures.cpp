@@ -13,7 +13,7 @@ namespace ammonite {
       data = stbi_load(texturePath, &width, &height, &bpp, 3);
 
       if (!data) {
-        std::cerr << "Failed to load texture" << std::endl;
+        std::cerr << "Failed to load texture '" << texturePath << "'" << std::endl;
         *externalSuccess = false;
         return 0;
       }
@@ -29,7 +29,7 @@ namespace ammonite {
       } else if (bpp == 4) {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
       } else {
-        std::cerr << "Failed to load texture" << std::endl;
+        std::cerr << "Failed to load texture '" << texturePath << "'" << std::endl;
         glDeleteTextures(1, &textureId);
         *externalSuccess = false;
         return 0;
