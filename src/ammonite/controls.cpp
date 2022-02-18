@@ -3,6 +3,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "timer.hpp"
+
 #ifdef DEBUG
   #include <iostream>
 #endif
@@ -171,12 +173,9 @@ namespace ammonite {
 
     //Handle keyboard and mouse movements, calculate matrices
     void processInput() {
-      //glfwGetTime is called only once, the first time this function is called
-      static double lastTime = glfwGetTime();
-
-      //Time difference between first and last frame
-      double currentTime = glfwGetTime();
-      float deltaTime = float(currentTime - lastTime);
+      //Time difference between 2 inputs
+      static ammonite::utils::timer controlTimer;
+      float deltaTime = controlTimer.getTime();
 
       //Save last input toggle key state and current input state
       static int lastInputToggleState = GLFW_RELEASE;
@@ -248,8 +247,8 @@ namespace ammonite {
         up                    //Up
       );
 
-      //Update lastTime
-      lastTime = currentTime;
+      //Reset time between inputs
+      controlTimer.reset();
     }
   }
 }
