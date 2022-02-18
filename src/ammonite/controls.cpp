@@ -13,8 +13,8 @@ namespace ammonite {
   namespace controls {
     namespace {
       //Matrices returned
-      glm::mat4 ViewMatrix;
-      glm::mat4 ProjectionMatrix;
+      glm::mat4 viewMatrix;
+      glm::mat4 projectionMatrix;
 
       //Pointers for window and info
       GLFWwindow* window;
@@ -115,11 +115,11 @@ namespace ammonite {
 
     namespace matrix {
       glm::mat4 getViewMatrix() {
-        return ViewMatrix;
+        return viewMatrix;
       }
 
       glm::mat4 getProjectionMatrix() {
-        return ProjectionMatrix;
+        return projectionMatrix;
       }
     }
 
@@ -239,9 +239,9 @@ namespace ammonite {
       glm::vec3 up = glm::cross(right, direction);
 
       //Projection matrix: Field of view, aspect ratio, display range
-      ProjectionMatrix = glm::perspective(glm::radians(fov), *aspectRatio, 0.1f, 100.0f);
+      projectionMatrix = glm::perspective(glm::radians(fov), *aspectRatio, 0.1f, 100.0f);
       //Camera matrix
-      ViewMatrix = glm::lookAt(
+      viewMatrix = glm::lookAt(
         position,             //Camera is here
         position + direction, //Looks here (at the same position, plus "direction")
         up                    //Up
