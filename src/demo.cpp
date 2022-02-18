@@ -50,7 +50,7 @@ int main(int argc, char* argv[]) {
   }
 
   //Set an icon
-  ammonite::windowManager::setIcon(window, "assets/icon.png");
+  ammonite::windowManager::setIcon(window, "assets/icons/icon.png");
 
   //Initialise controls
   ammonite::controls::setupControls(window, widthPtr, heightPtr, aspectRatioPtr);
