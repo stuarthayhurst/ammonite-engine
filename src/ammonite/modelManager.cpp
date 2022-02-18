@@ -16,6 +16,7 @@ namespace ammonite {
 
       tinyobj::ObjReader reader;
 
+      //Atempt to parse the object
       if (!reader.ParseFromFile(objectPath, reader_config)) {
         if (!reader.Error().empty()) {
           std::cerr << reader.Error();
@@ -26,16 +27,16 @@ namespace ammonite {
       auto& attrib = reader.GetAttrib();
       auto& shapes = reader.GetShapes();
 
-      // Loop over shapes
+      //Loop over shapes
       for (size_t s = 0; s < shapes.size(); s++) {
-        // Loop over faces(polygon)
+        //Loop over faces
         size_t index_offset = 0;
         for (size_t f = 0; f < shapes[s].mesh.num_face_vertices.size(); f++) {
           size_t fv = size_t(shapes[s].mesh.num_face_vertices[f]);
 
-          // Loop over vertices in the face.
+          //Loop each vertex
           for (size_t v = 0; v < fv; v++) {
-            //Access vertex
+            //Vertex
             tinyobj::index_t idx = shapes[s].mesh.indices[index_offset + v];
             tinyobj::real_t vx = attrib.vertices[3 * size_t(idx.vertex_index) + 0];
             tinyobj::real_t vy = attrib.vertices[3 * size_t(idx.vertex_index) + 1];
@@ -44,7 +45,7 @@ namespace ammonite {
             glm::vec3 vertex = glm::vec3(vx, vy, vz);
             out_vertices.push_back(vertex);
 
-            // Check if `normal_index` is zero or positive. negative = no normal data
+            //Normals
             if (idx.normal_index >= 0) {
               tinyobj::real_t nx = attrib.normals[3 * size_t(idx.normal_index) + 0];
               tinyobj::real_t ny = attrib.normals[3 * size_t(idx.normal_index) + 1];
@@ -54,7 +55,7 @@ namespace ammonite {
               out_normals.push_back(normal);
             }
 
-            // Check if `texcoord_index` is zero or positive. negative = no texcoord data
+            //Texture points
             if (idx.texcoord_index >= 0) {
               tinyobj::real_t tx = attrib.texcoords[2 * size_t(idx.texcoord_index) + 0];
               tinyobj::real_t ty = 1.0f - attrib.texcoords[2 * size_t(idx.texcoord_index) + 1];
