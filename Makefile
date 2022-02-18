@@ -8,6 +8,8 @@ CACHE_DIR = cache
 OBJECT_DIR = $(BUILD_DIR)/objects
 AMMONITE_OBJECTS_SOURCE = $(wildcard ./src/ammonite/*.cpp)
 AMMONITE_OBJECTS = $(subst ./src/ammonite,$(OBJECT_DIR),$(subst .cpp,.o,$(AMMONITE_OBJECTS_SOURCE)))
+COMMON_OBJECTS_SOURCE = $(wildcard ./src/common/*.cpp)
+COMMON_OBJECTS = $(subst ./src/common,$(OBJECT_DIR),$(subst .cpp,.o,$(COMMON_OBJECTS_SOURCE)))
 
 CXXFLAGS := $(shell pkg-config --cflags $(LIBS))
 CXXFLAGS += -Wall -Wextra -O3 -flto -std=c++17
@@ -17,13 +19,17 @@ ifeq ($(DEBUG),true)
   CXXFLAGS += -DDEBUG
 endif
 
-$(BUILD_DIR)/demo: $(AMMONITE_OBJECTS) $(OBJECT_DIR)/demo.o
+$(BUILD_DIR)/demo: $(AMMONITE_OBJECTS) $(COMMON_OBJECTS) $(OBJECT_DIR)/demo.o
 	@mkdir -p "$(BUILD_DIR)"
-	$(CXX) -o "$(BUILD_DIR)/demo" $(OBJECT_DIR)/*.o src/common/*.cpp $(CXXFLAGS) $(LDFLAGS)
+	$(CXX) -o "$(BUILD_DIR)/demo" $(OBJECT_DIR)/*.o $(CXXFLAGS) $(LDFLAGS)
 
 $(AMMONITE_OBJECTS): $(AMMONITE_OBJECTS_SOURCE)
 	@mkdir -p "$(OBJECT_DIR)"
 	$(CXX) $(subst $(OBJECT_DIR),src/ammonite,$(subst .o,.cpp,$(@))) -c $(CXXFLAGS) -o "$@"
+
+$(COMMON_OBJECTS): $(COMMON_OBJECTS_SOURCE)
+	@mkdir -p "$(OBJECT_DIR)"
+	$(CXX) $(subst $(OBJECT_DIR),src/common,$(subst .o,.cpp,$(@))) -c $(CXXFLAGS) -o "$@"
 
 $(OBJECT_DIR)/demo.o: ./src/demo.cpp
 	@mkdir -p "$(OBJECT_DIR)"
