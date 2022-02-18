@@ -12,6 +12,7 @@
 
 #include "ammonite/ammonite.hpp"
 #include "common/argHandler.hpp"
+#include "common/timer.hpp"
 
 //Initial width and height
 const unsigned short int width = 1024;
@@ -85,26 +86,25 @@ int main(int argc, char* argv[]) {
 
   //Create program from shaders
   bool success = true;
-  double shaderStart = glfwGetTime();
+  timer::timer performanceTimer;
   GLuint programId = ammonite::shaders::createProgram(shaderPaths, shaderTypes, shaderCount, &success, "program");
   if (!success) {
     std::cerr << "Program creation failed" << std::endl;
     return EXIT_FAILURE;
   }
 
-  std::cout << "Loaded shaders in: " << glfwGetTime() - shaderStart << "s" << std::endl;
+  std::cout << "Loaded shaders in: " << performanceTimer.getTime() << "s" << std::endl;
 
   //Get an ID for the model view projection
   GLuint matrixId = glGetUniformLocation(programId, "MVP");
 
-  double modelStart = glfwGetTime();
-
   //Load model
+  performanceTimer.reset();
   std::vector<glm::vec3> vertices, normals;
   std::vector<glm::vec2> uvs;
   success = ammonite::models::loadObject("assets/viking_room.obj", vertices, uvs, normals);
 
-  std::cout << "Loaded models in: " << glfwGetTime() - modelStart << "s (" << vertices.size() << " vertices)" << std::endl;
+  std::cout << "Loaded models in: " << performanceTimer.getTime() << "s (" << vertices.size() << " vertices)" << std::endl;
 
   //Create a vertex buffer
   GLuint vertexBuffer;
@@ -130,10 +130,10 @@ int main(int argc, char* argv[]) {
   //Use the shaders
   glUseProgram(programId);
 
-  //Framerate variables
-  double lastTime, deltaTime, currentTime;
-  const double startTime = glfwGetTime();
-  lastTime = startTime;
+  //Performance metrics setup
+  timer::timer benchmarkTimer;
+  performanceTimer.reset();
+  double deltaTime;
   long totalFrames = 0;
   int frameCount = 0;
 
@@ -144,13 +144,12 @@ int main(int argc, char* argv[]) {
     //Update time and frame counters every frame
     frameCount++;
     totalFrames++;
-    currentTime = glfwGetTime();
-    deltaTime = currentTime - lastTime;
+    deltaTime = performanceTimer.getTime();
 
     //Every second, output the framerate
     if (deltaTime >= 1.0) {
       printMetrics(frameCount, deltaTime);
-      lastTime = currentTime;
+      performanceTimer.reset();
       frameCount = 0;
     }
 
@@ -204,7 +203,7 @@ int main(int argc, char* argv[]) {
   if (useBenchmark) {
     std::cout << "\nBenchmark complete:" << std::endl;
     std::cout << "  Average fps: ";
-    printMetrics(totalFrames, glfwGetTime() - startTime);
+    printMetrics(totalFrames, benchmarkTimer.getTime());
   }
 
   //Cleanup VBO, shaders and window
