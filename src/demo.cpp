@@ -97,10 +97,14 @@ int main(int argc, char* argv[]) {
   //Get an ID for the model view projection
   GLuint matrixId = glGetUniformLocation(programId, "MVP");
 
+  double modelStart = glfwGetTime();
+
   //Load model
   std::vector<glm::vec3> vertices, normals;
   std::vector<glm::vec2> uvs;
-  success = ammonite::models::loadObject("cube.obj", vertices, uvs, normals);
+  success = ammonite::models::loadObject("assets/viking_room.obj", vertices, uvs, normals);
+
+  std::cout << "Loaded models in: " << glfwGetTime() - modelStart << "s (" << vertices.size() << " vertices)" << std::endl;
 
   //Create a vertex buffer
   GLuint vertexBuffer;
@@ -110,7 +114,7 @@ int main(int argc, char* argv[]) {
   glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
 
   //Load the texture
-  GLuint textureId = ammonite::textures::loadTexture("assets/texture.bmp", &success);
+  GLuint textureId = ammonite::textures::loadTexture("assets/viking_room.png", &success);
   if (!success) {
     ammonite::shaders::eraseShaders();
     glDeleteProgram(programId);
