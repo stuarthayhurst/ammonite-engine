@@ -12,7 +12,6 @@
 
 #include "ammonite/ammonite.hpp"
 #include "common/argHandler.hpp"
-#include "common/timer.hpp"
 
 //Initial width and height
 const unsigned short int width = 1024;
@@ -86,7 +85,7 @@ int main(int argc, char* argv[]) {
 
   //Create program from shaders
   bool success = true;
-  utils::timer performanceTimer;
+  ammonite::utils::timer performanceTimer;
   GLuint programId = ammonite::shaders::createProgram(shaderPaths, shaderTypes, shaderCount, &success, "program");
   if (!success) {
     std::cerr << "Program creation failed" << std::endl;
@@ -131,7 +130,7 @@ int main(int argc, char* argv[]) {
   glUseProgram(programId);
 
   //Performance metrics setup
-  utils::timer benchmarkTimer;
+  ammonite::utils::timer benchmarkTimer;
   performanceTimer.reset();
   double deltaTime;
   long totalFrames = 0;
