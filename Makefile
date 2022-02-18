@@ -38,7 +38,7 @@ $(OBJECT_DIR)/demo.o: ./src/demo.cpp
 .PHONY: build clean cache
 build:
 	$(MAKE) "$(BUILD_DIR)/demo"
-clean:
+clean: cache
 	rm -rfv "$(BUILD_DIR)"
 cache:
 	rm -rfv "$(CACHE_DIR)"
