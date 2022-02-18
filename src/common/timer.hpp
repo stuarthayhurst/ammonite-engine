@@ -3,13 +3,14 @@
 
 #include <GLFW/glfw3.h>
 
-namespace timer {
+namespace utils {
   class timer {
     public:
       double getTime() {
         if (running) {
           return glfwGetTime() - start - offset;
         } else {
+          //If the timer hasn't been unpaused yet, correct for the time
           return glfwGetTime() - start - offset - (glfwGetTime() - stopTime);
         }
       }
