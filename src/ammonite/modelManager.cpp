@@ -6,6 +6,13 @@
 
 namespace ammonite {
   namespace models {
+    struct internalModel {
+      std::vector<glm::vec3> vertices, normals;
+      std::vector<glm::vec2> uvs;
+    };
+  }
+
+  namespace models {
     bool loadObject(const char* objectPath,
          std::vector<glm::vec3> &out_vertices,
          std::vector<glm::vec2> &out_uvs,
