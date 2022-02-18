@@ -97,12 +97,6 @@ int main(int argc, char* argv[]) {
   //Get an ID for the model view projection
   GLuint matrixId = glGetUniformLocation(programId, "MVP");
 
-//Each model object needs the following:
-// - Vertices, normals, texture points
-// - Textures (todo)
-// - Model matrix (Generated from translation, rotation and scale), (todo)
-// - An id to pass to the renderer (todo)
-
   //Load model
   performanceTimer.reset();
   ammonite::models::internalModel modelObject;
