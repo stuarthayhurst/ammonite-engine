@@ -13,11 +13,7 @@ namespace ammonite {
   }
 
   namespace models {
-    bool loadObject(const char* objectPath,
-         std::vector<glm::vec3> &out_vertices,
-         std::vector<glm::vec2> &out_uvs,
-         std::vector<glm::vec3> &out_normals) {
-
+    bool loadObject(const char* objectPath, internalModel &modelObject) {
       tinyobj::ObjReaderConfig reader_config;
       tinyobj::ObjReader reader;
 
@@ -48,7 +44,7 @@ namespace ammonite {
             tinyobj::real_t vz = attrib.vertices[3 * size_t(idx.vertex_index) + 2];
 
             glm::vec3 vertex = glm::vec3(vx, vy, vz);
-            out_vertices.push_back(vertex);
+            modelObject.vertices.push_back(vertex);
 
             //Normals
             if (idx.normal_index >= 0) {
@@ -57,7 +53,7 @@ namespace ammonite {
               tinyobj::real_t nz = attrib.normals[3 * size_t(idx.normal_index) + 2];
 
               glm::vec3 normal = glm::vec3(nx, ny, nz);
-              out_normals.push_back(normal);
+              modelObject.normals.push_back(normal);
             }
 
             //Texture points
@@ -66,7 +62,7 @@ namespace ammonite {
               tinyobj::real_t ty = 1.0f - attrib.texcoords[2 * size_t(idx.texcoord_index) + 1];
 
               glm::vec2 texturePoint = glm::vec2(tx, ty);
-              out_uvs.push_back(texturePoint);
+              modelObject.uvs.push_back(texturePoint);
             }
           }
           index_offset += fv;

@@ -107,10 +107,7 @@ int main(int argc, char* argv[]) {
 
   //Load model
   performanceTimer.reset();
-  success = ammonite::models::loadObject("assets/viking_room.obj",
-                              modelStruct.vertices,
-                              modelStruct.uvs,
-                              modelStruct.normals);
+  success = ammonite::models::loadObject("assets/viking_room.obj", modelStruct);
 
   std::cout << "Loaded models in: " << performanceTimer.getTime() << "s (" << modelStruct.vertices.size() << " vertices)" << std::endl;
 
