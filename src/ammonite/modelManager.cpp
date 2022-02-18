@@ -2,6 +2,7 @@
 #include <vector>
 
 #include <tiny_obj_loader.h>
+#include <GL/glew.h>
 #include <glm/glm.hpp>
 
 namespace ammonite {
@@ -9,10 +10,20 @@ namespace ammonite {
     struct internalModel {
       std::vector<glm::vec3> vertices, normals;
       std::vector<glm::vec2> uvs;
+      GLuint vertexBufferId;
     };
   }
 
   namespace models {
+    void createBuffer(internalModel &modelObject) {
+      //Create a vertex buffer
+      glGenBuffers(1, &modelObject.vertexBufferId);
+      glBindBuffer(GL_ARRAY_BUFFER, modelObject.vertexBufferId);
+
+      //Give vertices to OpenGL
+      glBufferData(GL_ARRAY_BUFFER, modelObject.vertices.size() * sizeof(glm::vec3), &modelObject.vertices[0], GL_STATIC_DRAW);
+    }
+
     bool loadObject(const char* objectPath, internalModel &modelObject) {
       tinyobj::ObjReaderConfig reader_config;
       tinyobj::ObjReader reader;

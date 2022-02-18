@@ -103,20 +103,14 @@ int main(int argc, char* argv[]) {
 // - Model matrix (Generated from translation, rotation and scale)
 // - An id to pass to the renderer
 
-  ammonite::models::internalModel modelStruct;
-
   //Load model
   performanceTimer.reset();
+  ammonite::models::internalModel modelStruct;
   success = ammonite::models::loadObject("assets/viking_room.obj", modelStruct);
+  //Create vertex buffer
+  ammonite::models::createBuffer(modelStruct);
 
   std::cout << "Loaded models in: " << performanceTimer.getTime() << "s (" << modelStruct.vertices.size() << " vertices)" << std::endl;
-
-  //Create a vertex buffer
-  GLuint vertexBuffer;
-  glGenBuffers(1, &vertexBuffer);
-  glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-  //Give vertices to OpenGL
-  glBufferData(GL_ARRAY_BUFFER, modelStruct.vertices.size() * sizeof(glm::vec3), &modelStruct.vertices[0], GL_STATIC_DRAW);
 
   //Load the texture
   GLuint textureId = ammonite::textures::loadTexture("assets/viking_room.png", &success);
@@ -172,7 +166,7 @@ int main(int argc, char* argv[]) {
 
     //Vertex attribute buffer
     glEnableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, modelStruct.vertexBufferId);
     glVertexAttribPointer(
       0,        //shader location
       3,        //size
@@ -212,7 +206,7 @@ int main(int argc, char* argv[]) {
   }
 
   //Cleanup VBO, shaders and window
-  glDeleteBuffers(1, &vertexBuffer);
+  glDeleteBuffers(1, &modelStruct.vertexBufferId);
   glDeleteBuffers(1, &textureBuffer);
   ammonite::shaders::eraseShaders();
   glDeleteProgram(programId);

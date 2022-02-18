@@ -6,8 +6,10 @@ namespace ammonite {
     struct internalModel {
       std::vector<glm::vec3> vertices, normals;
       std::vector<glm::vec2> uvs;
+      GLuint vertexBufferId;
     };
 
+    void createBuffer(internalModel &modelObject);
     bool loadObject(const char* objectPath, internalModel &modelObject);
   }
 }
