@@ -1,6 +1,8 @@
 ## Ammonite Renderer
   - An OpenGL based renderer to display models and generated datasets, focused on ease of use
 
+![Icon](assets/icons/icon.png)
+
 ## Requirements:
   - A `c++17` compatible compiler (`g++ 8+`)
   - An OpenGL 3.2+ compatible driver
