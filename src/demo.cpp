@@ -104,14 +104,14 @@ int main(int argc, char* argv[]) {
   //Load model
   performanceTimer.reset();
   ammonite::models::internalModel modelObject;
-  success = ammonite::models::loadObject("assets/viking_room.obj", modelObject);
+  success = ammonite::models::loadObject("assets/cube.obj", modelObject);
   //Create vertex buffer
   ammonite::models::createBuffer(modelObject);
 
   std::cout << "Loaded models in: " << performanceTimer.getTime() << "s (" << modelObject.vertices.size() << " vertices)" << std::endl;
 
   //Load the texture
-  GLuint textureId = ammonite::textures::loadTexture("assets/viking_room.png", &success);
+  GLuint textureId = ammonite::textures::loadTexture("assets/texture.bmp", &success);
   if (!success) {
     ammonite::shaders::eraseShaders();
     glDeleteProgram(programId);
