@@ -168,7 +168,7 @@ int main(int argc, char* argv[]) {
     glUniformMatrix4fv(modelMatrixId, 1, GL_FALSE, &modelMatrix[0][0]);
     glUniformMatrix4fv(viewMatrixId, 1, GL_FALSE, &viewMatrix[0][0]);
 
-    glm::vec3 lightPos = glm::vec3(4,4,4);
+    glm::vec3 lightPos = glm::vec3(4, 4, 4);
     glUniform3f(lightId, lightPos.x, lightPos.y, lightPos.z);
 
     //Bind texture in Texture Unit 0
