@@ -75,8 +75,8 @@ int main(int argc, char* argv[]) {
 
   //Shader paths and types to create program
   const std::string shaderPaths[2] = {
-    "shaders/TextureVertexShader.vert",
-    "shaders/TextureFragmentShader.frag"
+    "shaders/BasicShader.vert",
+    "shaders/BasicShader.frag"
   };
   const int shaderTypes[2] = {
     GL_VERTEX_SHADER,
@@ -98,20 +98,17 @@ int main(int argc, char* argv[]) {
 
   std::cout << "Loaded shaders in: " << performanceTimer.getTime() << "s" << std::endl;
 
-  //Get an ID for the model view projection
-  GLuint matrixId = glGetUniformLocation(programId, "MVP");
-
   //Load model
   performanceTimer.reset();
   ammonite::models::internalModel modelObject;
-  success = ammonite::models::loadObject("assets/cube.obj", modelObject);
+  success = ammonite::models::loadObject("assets/suzanne.obj", modelObject);
   //Create vertex buffer
-  ammonite::models::createBuffer(modelObject);
+  ammonite::models::createBuffers(modelObject);
 
   std::cout << "Loaded models in: " << performanceTimer.getTime() << "s (" << modelObject.vertices.size() << " vertices)" << std::endl;
 
   //Load the texture
-  GLuint textureId = ammonite::textures::loadTexture("assets/texture.bmp", &success);
+  GLuint textureId = ammonite::textures::loadTexture("assets/gradient.png", &success);
   if (!success) {
     ammonite::shaders::eraseShaders();
     glDeleteProgram(programId);
@@ -123,6 +120,13 @@ int main(int argc, char* argv[]) {
   glGenBuffers(1, &textureBuffer);
   glBindBuffer(GL_ARRAY_BUFFER, textureBuffer);
   glBufferData(GL_ARRAY_BUFFER, modelObject.texturePoints.size() * sizeof(glm::vec2), &modelObject.texturePoints[0], GL_STATIC_DRAW);
+
+  //Get an IDs for shader uniforms
+  GLuint matrixId = glGetUniformLocation(programId, "MVP");
+  GLuint modelMatrixId = glGetUniformLocation(programId, "M");
+  GLuint viewMatrixId = glGetUniformLocation(programId, "V");
+  GLuint textureSamplerId  = glGetUniformLocation(programId, "textureSampler");
+  GLuint lightId = glGetUniformLocation(programId, "LightPosition_worldspace");
 
   //Use the shaders
   glUseProgram(programId);
@@ -159,8 +163,19 @@ int main(int argc, char* argv[]) {
     static const glm::mat4 modelMatrix = glm::mat4(1.0);
     glm::mat4 mvp = projectionMatrix * viewMatrix * modelMatrix;
 
-    //Send the transformation to the current shader in "MVP" uniform
+    //Send matrices to the shaders
     glUniformMatrix4fv(matrixId, 1, GL_FALSE, &mvp[0][0]);
+    glUniformMatrix4fv(modelMatrixId, 1, GL_FALSE, &modelMatrix[0][0]);
+    glUniformMatrix4fv(viewMatrixId, 1, GL_FALSE, &viewMatrix[0][0]);
+
+    glm::vec3 lightPos = glm::vec3(4,4,4);
+    glUniform3f(lightId, lightPos.x, lightPos.y, lightPos.z);
+
+    //Bind texture in Texture Unit 0
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, textureId);
+    //Set texture sampler to use Texture Unit 0
+    glUniform1i(textureSamplerId, 0);
 
     //Vertex attribute buffer
     glEnableVertexAttribArray(0);
@@ -174,12 +189,24 @@ int main(int argc, char* argv[]) {
       (void*)0  //array buffer offset
     );
 
-    //Colour attribute buffer
+    //Texture attribute buffer
     glEnableVertexAttribArray(1);
     glBindBuffer(GL_ARRAY_BUFFER, textureBuffer);
     glVertexAttribPointer(
       1,
       2,
+      GL_FLOAT,
+      GL_FALSE,
+      0,
+      (void*)0
+    );
+
+    //Normal attribute buffer
+    glEnableVertexAttribArray(2);
+    glBindBuffer(GL_ARRAY_BUFFER, modelObject.normalBufferId);
+    glVertexAttribPointer(
+      2,
+      3,
       GL_FLOAT,
       GL_FALSE,
       0,
