@@ -348,7 +348,7 @@ namespace ammonite {
         glGetProgramBinary(programId, binaryLength, NULL, &binaryFormat, &binaryData);
 
         if (binaryLength == 0) {
-          std::cerr << "Failed to cache program" << std::endl;
+          std::cerr << "Failed to cache '" << targetFiles[0] << "'" << std::endl;
           return programId;
         }
 
@@ -357,7 +357,7 @@ namespace ammonite {
         if (binarySave.is_open()) {
           binarySave.write(&binaryData[0], binaryLength);
         } else {
-          std::cerr << "Failed to cache program" << std::endl;
+          std::cerr << "Failed to cache '" << targetFiles[0] << "'" << std::endl;
           deleteCacheFile(programName);
           return programId;
         }
@@ -377,7 +377,7 @@ namespace ammonite {
 
           binaryInfo.close();
         } else {
-          std::cerr << "Failed to cache program" << std::endl;
+          std::cerr << "Failed to cache '" << targetFiles[0] << "'" << std::endl;
           deleteCacheFile(programName);
           return programId;
         }
