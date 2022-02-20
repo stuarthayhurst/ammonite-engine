@@ -3,7 +3,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "timer.hpp"
+#include "utils/timer.hpp"
 
 #ifdef DEBUG
   #include <iostream>
