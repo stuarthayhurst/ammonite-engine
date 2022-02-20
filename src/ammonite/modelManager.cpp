@@ -12,6 +12,7 @@ namespace ammonite {
       std::vector<glm::vec2> texturePoints;
       GLuint vertexBufferId;
       GLuint normalBufferId;
+      GLuint textureId;
     };
   }
 

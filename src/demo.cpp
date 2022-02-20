@@ -123,7 +123,7 @@ int main(int argc, char* argv[]) {
   std::cout << "Loaded models in: " << performanceTimer.getTime() << "s (" << modelObject.vertices.size() << " vertices)" << std::endl;
 
   //Load the texture
-  GLuint textureId = ammonite::textures::loadTexture("assets/gradient.png", &success);
+  modelObject.textureId = ammonite::textures::loadTexture("assets/gradient.png", &success);
   if (!success) {
     ammonite::shaders::eraseShaders();
     glDeleteProgram(programId);
@@ -188,7 +188,7 @@ int main(int argc, char* argv[]) {
 
     //Bind texture in Texture Unit 0
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, textureId);
+    glBindTexture(GL_TEXTURE_2D, modelObject.textureId);
     //Set texture sampler to use Texture Unit 0
     glUniform1i(textureSamplerId, 0);
 
@@ -250,7 +250,7 @@ int main(int argc, char* argv[]) {
   glDeleteBuffers(1, &textureBuffer);
   ammonite::shaders::eraseShaders();
   glDeleteProgram(programId);
-  glDeleteTextures(1, &textureId);
+  glDeleteTextures(1, &modelObject.textureId);
   glDeleteVertexArrays(1, &vertexArrayId);
   glfwTerminate();
 
