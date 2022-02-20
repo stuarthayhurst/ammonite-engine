@@ -252,10 +252,10 @@ namespace ammonite {
             try {
               //Get the binary format
               getline(cachedBinaryInfoFile, line);
-              cachedBinaryFormat = stoi(line);
+              cachedBinaryFormat = std::stoi(line);
               //Get the length of the binary
               getline(cachedBinaryInfoFile, line);
-              cachedBinaryLength = stoi(line);
+              cachedBinaryLength = std::stoi(line);
             } catch (const std::out_of_range&) {
               cacheValid = false;
             }
@@ -283,7 +283,7 @@ namespace ammonite {
                   long filesize, modificationTime;
                   getFileMetadata(shaderPaths[i], &filesize, &modificationTime);
 
-                  if (stoi(strings[1]) != filesize or stoi(strings[2]) != modificationTime) {
+                  if (std::stoi(strings[1]) != filesize or std::stoi(strings[2]) != modificationTime) {
                     //Shader source code has changed, invalidate
                     cacheValid = false;
                     i = shaderCount;
