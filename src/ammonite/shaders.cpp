@@ -249,48 +249,54 @@ namespace ammonite {
           std::string line;
           std::ifstream cachedBinaryInfoFile(targetFiles[1]);
           if (cachedBinaryInfoFile.is_open()) {
-            //Get the binary format
-            getline(cachedBinaryInfoFile, line);
-            cachedBinaryFormat = stoi(line);
-            //Get the length of the binary
-            getline(cachedBinaryInfoFile, line);
-            cachedBinaryLength = stoi(line);
-
-            //Validate filesize and access times of shaders used
-            for (int i = 0; i < shaderCount; i++) {
-              //Get expected filename, filesize and timestamp
-              std::vector<std::string> strings;
+            try {
+              //Get the binary format
               getline(cachedBinaryInfoFile, line);
-              std::stringstream rawLine(line);
-
-              while (getline(rawLine, line, ';')) {
-                strings.push_back(line);
-              }
-
-              if (strings.size() == 3) {
-                if (strings[0] != shaderPaths[i]) {
-                  //Program made from different shaders, invalidate
-                  cacheValid = false;
-                  i = shaderCount;
-                }
-
-                //Get filesize and time of last modification of the shader source
-                long filesize, modificationTime;
-                getFileMetadata(shaderPaths[i], &filesize, &modificationTime);
-
-                if (stoi(strings[1]) != filesize or stoi(strings[2]) != modificationTime) {
-                  //Shader source code has changed, invalidate
-                  cacheValid = false;
-                  i = shaderCount;
-                }
-              } else {
-                //Cache info file broken, invalidate
-                cacheValid = false;
-                i = shaderCount;
-              }
+              cachedBinaryFormat = stoi(line);
+              //Get the length of the binary
+              getline(cachedBinaryInfoFile, line);
+              cachedBinaryLength = stoi(line);
+            } catch (const std::out_of_range&) {
+              cacheValid = false;
             }
 
-            cachedBinaryInfoFile.close();
+            //Validate filesize and access times of shaders used
+            if (cacheValid) {
+              for (int i = 0; i < shaderCount; i++) {
+                //Get expected filename, filesize and timestamp
+                std::vector<std::string> strings;
+                getline(cachedBinaryInfoFile, line);
+                std::stringstream rawLine(line);
+
+                while (getline(rawLine, line, ';')) {
+                  strings.push_back(line);
+                }
+
+                if (strings.size() == 3) {
+                  if (strings[0] != shaderPaths[i]) {
+                    //Program made from different shaders, invalidate
+                    cacheValid = false;
+                    i = shaderCount;
+                  }
+
+                  //Get filesize and time of last modification of the shader source
+                  long filesize, modificationTime;
+                  getFileMetadata(shaderPaths[i], &filesize, &modificationTime);
+
+                  if (stoi(strings[1]) != filesize or stoi(strings[2]) != modificationTime) {
+                    //Shader source code has changed, invalidate
+                    cacheValid = false;
+                    i = shaderCount;
+                  }
+                } else {
+                  //Cache info file broken, invalidate
+                  cacheValid = false;
+                  i = shaderCount;
+                }
+              }
+
+              cachedBinaryInfoFile.close();
+            }
           }
 
           if (cacheValid) {
