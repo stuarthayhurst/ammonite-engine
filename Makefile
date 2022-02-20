@@ -10,6 +10,8 @@ AMMONITE_OBJECTS_SOURCE = $(wildcard ./src/ammonite/*.cpp)
 AMMONITE_OBJECTS = $(subst ./src/ammonite,$(OBJECT_DIR),$(subst .cpp,.o,$(AMMONITE_OBJECTS_SOURCE)))
 COMMON_OBJECTS_SOURCE = $(wildcard ./src/common/*.cpp)
 COMMON_OBJECTS = $(subst ./src/common,$(OBJECT_DIR),$(subst .cpp,.o,$(COMMON_OBJECTS_SOURCE)))
+AMMONITE_HEADER_SOURCE = $(wildcard ./src/ammonite/*.hpp)
+COMMON_HEADER_SOURCE = $(wildcard ./src/common/*.hpp)
 
 CXXFLAGS := $(shell pkg-config --cflags $(LIBS))
 CXXFLAGS += -Wall -Wextra -O3 -flto -std=c++17
@@ -31,7 +33,7 @@ $(COMMON_OBJECTS): $(COMMON_OBJECTS_SOURCE)
 	@mkdir -p "$(OBJECT_DIR)"
 	$(CXX) $(subst $(OBJECT_DIR),src/common,$(subst .o,.cpp,$(@))) -c $(CXXFLAGS) -o "$@"
 
-$(OBJECT_DIR)/demo.o: ./src/demo.cpp
+$(OBJECT_DIR)/demo.o: ./src/demo.cpp $(AMMONITE_HEADER_SOURCE) $(COMMON_HEADER_SOURCE)
 	@mkdir -p "$(OBJECT_DIR)"
 	$(CXX) ./src/demo.cpp -c $(CXXFLAGS) -o "$@"
 
