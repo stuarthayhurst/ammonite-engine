@@ -25,11 +25,11 @@ $(BUILD_DIR)/demo: $(AMMONITE_OBJECTS) $(COMMON_OBJECTS) $(OBJECT_DIR)/demo.o
 	@mkdir -p "$(BUILD_DIR)"
 	$(CXX) -o "$(BUILD_DIR)/demo" $(OBJECT_DIR)/*.o $(CXXFLAGS) $(LDFLAGS)
 
-$(AMMONITE_OBJECTS): $(AMMONITE_OBJECTS_SOURCE)
+$(AMMONITE_OBJECTS): $(AMMONITE_OBJECTS_SOURCE) $(AMMONITE_HEADER_SOURCE)
 	@mkdir -p "$(OBJECT_DIR)"
 	$(CXX) $(subst $(OBJECT_DIR),src/ammonite,$(subst .o,.cpp,$(@))) -c $(CXXFLAGS) -o "$@"
 
-$(COMMON_OBJECTS): $(COMMON_OBJECTS_SOURCE)
+$(COMMON_OBJECTS): $(COMMON_OBJECTS_SOURCE) $(COMMON_HEADER_SOURCE)
 	@mkdir -p "$(OBJECT_DIR)"
 	$(CXX) $(subst $(OBJECT_DIR),src/common,$(subst .o,.cpp,$(@))) -c $(CXXFLAGS) -o "$@"
 
