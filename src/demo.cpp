@@ -121,7 +121,7 @@ int main(int argc, char* argv[]) {
   glBindBuffer(GL_ARRAY_BUFFER, textureBuffer);
   glBufferData(GL_ARRAY_BUFFER, modelObject.texturePoints.size() * sizeof(glm::vec2), &modelObject.texturePoints[0], GL_STATIC_DRAW);
 
-  //Get an IDs for shader uniforms
+  //Get IDs for shader uniforms
   GLuint matrixId = glGetUniformLocation(programId, "MVP");
   GLuint modelMatrixId = glGetUniformLocation(programId, "M");
   GLuint viewMatrixId = glGetUniformLocation(programId, "V");
