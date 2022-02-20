@@ -245,10 +245,8 @@ int main(int argc, char* argv[]) {
     printMetrics(totalFrames, benchmarkTimer.getTime());
   }
 
-  //Cleanup VBO, shaders and window
-  glDeleteBuffers(1, &modelObject.vertexBufferId);
-  glDeleteBuffers(1, &modelObject.textureBufferId);
-  glDeleteBuffers(1, &modelObject.normalBufferId);
+  //Cleanup
+  ammonite::models::deleteBuffers(modelObject);
   ammonite::shaders::eraseShaders();
   glDeleteProgram(programId);
   glDeleteTextures(1, &modelObject.textureId);

@@ -33,7 +33,13 @@ namespace ammonite {
       glGenBuffers(1, &modelObject.textureBufferId);
       glBindBuffer(GL_ARRAY_BUFFER, modelObject.textureBufferId);
       glBufferData(GL_ARRAY_BUFFER, modelObject.texturePoints.size() * sizeof(glm::vec2), &modelObject.texturePoints[0], GL_STATIC_DRAW);
+    }
 
+    void deleteBuffers(internalModel &modelObject) {
+      //Delete created buffers
+      glDeleteBuffers(1, &modelObject.vertexBufferId);
+      glDeleteBuffers(1, &modelObject.textureBufferId);
+      glDeleteBuffers(1, &modelObject.normalBufferId);
     }
 
     bool loadObject(const char* objectPath, internalModel &modelObject) {
