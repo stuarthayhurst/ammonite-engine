@@ -45,7 +45,7 @@ namespace ammonite {
       //Generate mipmaps
       glGenerateMipmap(GL_TEXTURE_2D);
 
-      //glBindTexture(GL_TEXTURE_2D, 0);
+      glBindTexture(GL_TEXTURE_2D, 0);
       return textureId;
     }
   }
