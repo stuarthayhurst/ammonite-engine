@@ -31,6 +31,58 @@ void GLAPIENTRY debugMessageCallback(GLenum, GLenum type, GLuint, GLenum severit
 }
 #endif
 
+void drawFrame(ammonite::models::internalModel &drawObject, GLuint textureSamplerId) {
+  //Reset the canvas
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+  //Bind texture in Texture Unit 0
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, drawObject.textureId);
+  //Set texture sampler to use Texture Unit 0
+  glUniform1i(textureSamplerId, 0);
+
+  //Vertex attribute buffer
+  glEnableVertexAttribArray(0);
+  glBindBuffer(GL_ARRAY_BUFFER, drawObject.vertexBufferId);
+  glVertexAttribPointer(
+    0,        //shader location
+    3,        //size
+    GL_FLOAT, //type
+    GL_FALSE, //normalized
+    0,        //stride
+    (void*)0  //array buffer offset
+  );
+
+  //Texture attribute buffer
+  glEnableVertexAttribArray(1);
+  glBindBuffer(GL_ARRAY_BUFFER, drawObject.textureBufferId);
+  glVertexAttribPointer(
+    1,
+    2,
+    GL_FLOAT,
+    GL_FALSE,
+    0,
+    (void*)0
+  );
+
+  //Normal attribute buffer
+  glEnableVertexAttribArray(2);
+  glBindBuffer(GL_ARRAY_BUFFER, drawObject.normalBufferId);
+  glVertexAttribPointer(
+    2,
+    3,
+    GL_FLOAT,
+    GL_FALSE,
+    0,
+    (void*)0
+  );
+  //Draw the triangles
+  glDrawArrays(GL_TRIANGLES, 0, drawObject.vertices.size());
+  glDisableVertexAttribArray(0);
+  glDisableVertexAttribArray(1);
+  glDisableVertexAttribArray(2);
+}
+
 int main(int argc, char* argv[]) {
   //Handle arguments
   const int showHelp = arguments::searchArgument(argc, argv, "--help", true, nullptr);
@@ -134,7 +186,7 @@ int main(int argc, char* argv[]) {
   GLuint matrixId = glGetUniformLocation(programId, "MVP");
   GLuint modelMatrixId = glGetUniformLocation(programId, "M");
   GLuint viewMatrixId = glGetUniformLocation(programId, "V");
-  GLuint textureSamplerId  = glGetUniformLocation(programId, "textureSampler");
+  GLuint textureSamplerId = glGetUniformLocation(programId, "textureSampler");
   GLuint lightId = glGetUniformLocation(programId, "LightPosition_worldspace");
 
   //Use the shaders
@@ -149,8 +201,6 @@ int main(int argc, char* argv[]) {
 
   //Loop until window closed
   while(glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS and !glfwWindowShouldClose(window)) {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
     //Update time and frame counters every frame
     frameCount++;
     totalFrames++;
@@ -180,52 +230,8 @@ int main(int argc, char* argv[]) {
     glm::vec3 lightPos = glm::vec3(4, 4, 4);
     glUniform3f(lightId, lightPos.x, lightPos.y, lightPos.z);
 
-    //Bind texture in Texture Unit 0
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, modelObject.textureId);
-    //Set texture sampler to use Texture Unit 0
-    glUniform1i(textureSamplerId, 0);
-
-    //Vertex attribute buffer
-    glEnableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, modelObject.vertexBufferId);
-    glVertexAttribPointer(
-      0,        //shader location
-      3,        //size
-      GL_FLOAT, //type
-      GL_FALSE, //normalized
-      0,        //stride
-      (void*)0  //array buffer offset
-    );
-
-    //Texture attribute buffer
-    glEnableVertexAttribArray(1);
-    glBindBuffer(GL_ARRAY_BUFFER, modelObject.textureBufferId);
-    glVertexAttribPointer(
-      1,
-      2,
-      GL_FLOAT,
-      GL_FALSE,
-      0,
-      (void*)0
-    );
-
-    //Normal attribute buffer
-    glEnableVertexAttribArray(2);
-    glBindBuffer(GL_ARRAY_BUFFER, modelObject.normalBufferId);
-    glVertexAttribPointer(
-      2,
-      3,
-      GL_FLOAT,
-      GL_FALSE,
-      0,
-      (void*)0
-    );
-
-    //Draw the triangles
-    glDrawArrays(GL_TRIANGLES, 0, modelObject.vertices.size());
-    glDisableVertexAttribArray(0);
-    glDisableVertexAttribArray(1);
+    //Draw given model
+    drawFrame(modelObject, textureSamplerId);
 
     //Swap buffers
     glfwSwapBuffers(window);
