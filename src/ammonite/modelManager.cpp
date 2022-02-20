@@ -12,25 +12,28 @@ namespace ammonite {
       std::vector<glm::vec2> texturePoints;
       GLuint vertexBufferId;
       GLuint normalBufferId;
+      GLuint textureBufferId;
       GLuint textureId;
     };
   }
 
   namespace models {
     void createBuffers(internalModel &modelObject) {
-      //Create a vertex buffer
+      //Create and fill a vertex buffer
       glGenBuffers(1, &modelObject.vertexBufferId);
       glBindBuffer(GL_ARRAY_BUFFER, modelObject.vertexBufferId);
-
-      //Fill buffer with vertices
       glBufferData(GL_ARRAY_BUFFER, modelObject.vertices.size() * sizeof(glm::vec3), &modelObject.vertices[0], GL_STATIC_DRAW);
 
-
+      //Create and fill a normal buffer
       glGenBuffers(1, &modelObject.normalBufferId);
       glBindBuffer(GL_ARRAY_BUFFER, modelObject.normalBufferId);
-
-      //Fill buffer with normals
       glBufferData(GL_ARRAY_BUFFER, modelObject.normals.size() * sizeof(glm::vec3), &modelObject.normals[0], GL_STATIC_DRAW);
+
+      //Create and fill a texture buffer
+      glGenBuffers(1, &modelObject.textureBufferId);
+      glBindBuffer(GL_ARRAY_BUFFER, modelObject.textureBufferId);
+      glBufferData(GL_ARRAY_BUFFER, modelObject.texturePoints.size() * sizeof(glm::vec2), &modelObject.texturePoints[0], GL_STATIC_DRAW);
+
     }
 
     bool loadObject(const char* objectPath, internalModel &modelObject) {

@@ -130,12 +130,6 @@ int main(int argc, char* argv[]) {
     return EXIT_FAILURE;
   }
 
-  //Create a texture buffer
-  GLuint textureBuffer;
-  glGenBuffers(1, &textureBuffer);
-  glBindBuffer(GL_ARRAY_BUFFER, textureBuffer);
-  glBufferData(GL_ARRAY_BUFFER, modelObject.texturePoints.size() * sizeof(glm::vec2), &modelObject.texturePoints[0], GL_STATIC_DRAW);
-
   //Get IDs for shader uniforms
   GLuint matrixId = glGetUniformLocation(programId, "MVP");
   GLuint modelMatrixId = glGetUniformLocation(programId, "M");
@@ -206,7 +200,7 @@ int main(int argc, char* argv[]) {
 
     //Texture attribute buffer
     glEnableVertexAttribArray(1);
-    glBindBuffer(GL_ARRAY_BUFFER, textureBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, modelObject.textureBufferId);
     glVertexAttribPointer(
       1,
       2,
@@ -247,7 +241,7 @@ int main(int argc, char* argv[]) {
 
   //Cleanup VBO, shaders and window
   glDeleteBuffers(1, &modelObject.vertexBufferId);
-  glDeleteBuffers(1, &textureBuffer);
+  glDeleteBuffers(1, &modelObject.textureBufferId);
   ammonite::shaders::eraseShaders();
   glDeleteProgram(programId);
   glDeleteTextures(1, &modelObject.textureId);
