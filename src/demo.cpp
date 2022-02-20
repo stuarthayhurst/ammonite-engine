@@ -32,9 +32,6 @@ void GLAPIENTRY debugMessageCallback(GLenum, GLenum type, GLuint, GLenum severit
 #endif
 
 void drawFrame(ammonite::models::internalModel &drawObject, GLuint textureSamplerId) {
-  //Reset the canvas
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
   //Bind texture in Texture Unit 0
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, drawObject.textureId);
@@ -78,6 +75,7 @@ void drawFrame(ammonite::models::internalModel &drawObject, GLuint textureSample
   );
   //Draw the triangles
   glDrawArrays(GL_TRIANGLES, 0, drawObject.vertices.size());
+  glBindTexture(GL_TEXTURE_2D, 0);
   glDisableVertexAttribArray(0);
   glDisableVertexAttribArray(1);
   glDisableVertexAttribArray(2);
@@ -201,6 +199,9 @@ int main(int argc, char* argv[]) {
 
   //Loop until window closed
   while(glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS and !glfwWindowShouldClose(window)) {
+    //Reset the canvas
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
     //Update time and frame counters every frame
     frameCount++;
     totalFrames++;
