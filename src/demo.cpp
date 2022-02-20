@@ -163,22 +163,38 @@ int main(int argc, char* argv[]) {
 
   std::cout << "Loaded shaders in: " << performanceTimer.getTime() << "s" << std::endl;
 
-  //Load model
+  //Load models from a set of objects and textures
+  const char* models[][2] = {
+    {"assets/suzanne.obj", "assets/gradient.png"},
+    {"assets/cube.obj", "assets/texture.bmp"}
+  };
+  int modelCount = sizeof(models) / sizeof(models[0]);
+  ammonite::models::internalModel loadedModels[modelCount];
+
+  long int vertexCount = 0;
   performanceTimer.reset();
-  ammonite::models::internalModel modelObject;
-  success = ammonite::models::loadObject("assets/suzanne.obj", modelObject);
-  //Create vertex buffer
-  ammonite::models::createBuffers(modelObject);
+  for (int i = 0; i < modelCount; i++) {
+    //Load model
+    ammonite::models::loadObject(models[i][0], loadedModels[i], &success);
+    //Create buffers and count vertices
+    ammonite::models::createBuffers(loadedModels[i]);
+    vertexCount += loadedModels[i].vertices.size();
+    //Load texture
+    loadedModels[i].textureId = ammonite::textures::loadTexture(models[i][1], &success);
+  }
 
-  std::cout << "Loaded models in: " << performanceTimer.getTime() << "s (" << modelObject.vertices.size() << " vertices)" << std::endl;
-
-  //Load the texture
-  modelObject.textureId = ammonite::textures::loadTexture("assets/gradient.png", &success);
+  //Destroy all models, textures and shaders
   if (!success) {
+    for (int i = 0; i < modelCount; i++) {
+      ammonite::models::deleteBuffers(loadedModels[i]);
+      glDeleteTextures(1, &loadedModels[i].textureId);
+    }
     ammonite::shaders::eraseShaders();
     glDeleteProgram(programId);
     return EXIT_FAILURE;
   }
+
+  std::cout << "Loaded models in: " << performanceTimer.getTime() << "s (" << vertexCount << " vertices)" << std::endl;
 
   //Get IDs for shader uniforms
   GLuint matrixId = glGetUniformLocation(programId, "MVP");
@@ -232,7 +248,9 @@ int main(int argc, char* argv[]) {
     glUniform3f(lightId, lightPos.x, lightPos.y, lightPos.z);
 
     //Draw given model
-    drawFrame(modelObject, textureSamplerId);
+    for (int i = 0; i < modelCount; i++) {
+      drawFrame(loadedModels[i], textureSamplerId);
+    }
 
     //Swap buffers
     glfwSwapBuffers(window);
@@ -247,10 +265,12 @@ int main(int argc, char* argv[]) {
   }
 
   //Cleanup
-  ammonite::models::deleteBuffers(modelObject);
+  for (int i = 0; i < modelCount; i++) {
+    ammonite::models::deleteBuffers(loadedModels[i]);
+    glDeleteTextures(1, &loadedModels[i].textureId);
+  }
   ammonite::shaders::eraseShaders();
   glDeleteProgram(programId);
-  glDeleteTextures(1, &modelObject.textureId);
   glDeleteVertexArrays(1, &vertexArrayId);
   glfwTerminate();
 

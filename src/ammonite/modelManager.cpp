@@ -42,7 +42,7 @@ namespace ammonite {
       glDeleteBuffers(1, &modelObject.normalBufferId);
     }
 
-    bool loadObject(const char* objectPath, internalModel &modelObject) {
+    bool loadObject(const char* objectPath, internalModel &modelObject, bool* externalSuccess) {
       tinyobj::ObjReaderConfig reader_config;
       tinyobj::ObjReader reader;
 
