@@ -42,7 +42,7 @@ namespace ammonite {
       glDeleteBuffers(1, &modelObject.normalBufferId);
     }
 
-    bool loadObject(const char* objectPath, internalModel &modelObject, bool* externalSuccess) {
+    void loadObject(const char* objectPath, internalModel &modelObject, bool* externalSuccess) {
       tinyobj::ObjReaderConfig reader_config;
       tinyobj::ObjReader reader;
 
@@ -51,7 +51,8 @@ namespace ammonite {
         if (!reader.Error().empty()) {
           std::cerr << reader.Error();
         }
-        return false;
+        *externalSuccess = false;
+        return;
       }
 
       auto& attrib = reader.GetAttrib();
@@ -97,7 +98,7 @@ namespace ammonite {
           index_offset += fv;
         }
       }
-      return true;
+      return;
     }
   }
 }

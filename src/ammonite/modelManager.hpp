@@ -14,7 +14,7 @@ namespace ammonite {
 
     void createBuffers(internalModel &modelObject);
     void deleteBuffers(internalModel &modelObject);
-    bool loadObject(const char* objectPath, internalModel &modelObject, bool* externalSuccess);
+    void loadObject(const char* objectPath, internalModel &modelObject, bool* externalSuccess);
   }
 }
 
