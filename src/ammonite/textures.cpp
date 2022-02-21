@@ -1,13 +1,32 @@
 #include <iostream>
+#include <vector>
+#include <string>
 
 #include <stb/stb_image.h>
 #include <GL/glew.h>
 
 namespace ammonite {
+
+  namespace textures {
+    struct textureInfo {
+      int textureId;
+      std::string textureName;
+    };
+
+    std::vector<textureInfo> textureTracker(0);
+  }
+
   namespace textures {
     GLuint loadTexture(const char* texturePath, bool* externalSuccess) {
       int width, height, bpp;
       unsigned char* data;
+
+      //Check if texture is already loaded (Ridiculous datatype to match textureTracker.size())
+      for (long unsigned int i = 0; i < textureTracker.size(); i++) {
+        if (textureTracker[i].textureName == std::string(texturePath)) {
+          return textureTracker[i].textureId;
+        }
+      }
 
       //Read image data
       data = stbi_load(texturePath, &width, &height, &bpp, 3);
@@ -44,6 +63,12 @@ namespace ammonite {
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
       //Generate mipmaps
       glGenerateMipmap(GL_TEXTURE_2D);
+
+      //Save texture's info to textureTracker
+      textureInfo currentTexture;
+      currentTexture.textureId = textureId;
+      currentTexture.textureName = std::string(texturePath);
+      textureTracker.push_back(currentTexture);
 
       glBindTexture(GL_TEXTURE_2D, 0);
       return textureId;
