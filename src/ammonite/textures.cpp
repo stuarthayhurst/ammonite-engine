@@ -6,7 +6,7 @@
 #include <GL/glew.h>
 
 namespace ammonite {
-  namespace textures {
+  namespace {
     struct textureInfo {
       GLuint textureId;
       std::string textureName;
@@ -30,6 +30,7 @@ namespace ammonite {
             textureTracker.erase(std::next(textureTracker.begin(), i));
           }
 
+          //Exit early
           return;
         }
       }
