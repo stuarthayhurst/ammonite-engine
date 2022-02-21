@@ -6,17 +6,35 @@
 #include <GL/glew.h>
 
 namespace ammonite {
-
   namespace textures {
     struct textureInfo {
-      int textureId;
+      GLuint textureId;
       std::string textureName;
+      int refCount = 1;
     };
 
     std::vector<textureInfo> textureTracker(0);
   }
 
   namespace textures {
+    void deleteTexture(GLuint textureId) {
+      //Find the textureInfo in textureTracker
+      for (long unsigned int i = 0; i < textureTracker.size(); i++) {
+        if (textureTracker[i].textureId == textureId) {
+          //Decrease the reference count
+          textureTracker[i].refCount -= 1;
+
+          //If nothing is using the texture, delete it
+          if (textureTracker[i].refCount < 1) {
+            glDeleteTextures(1, &textureId);
+            textureTracker.erase(std::next(textureTracker.begin(), i));
+          }
+
+          return;
+        }
+      }
+    }
+
     GLuint loadTexture(const char* texturePath, bool* externalSuccess) {
       int width, height, bpp;
       unsigned char* data;
@@ -24,6 +42,7 @@ namespace ammonite {
       //Check if texture is already loaded (Ridiculous datatype to match textureTracker.size())
       for (long unsigned int i = 0; i < textureTracker.size(); i++) {
         if (textureTracker[i].textureName == std::string(texturePath)) {
+          textureTracker[i].refCount += 1;
           return textureTracker[i].textureId;
         }
       }

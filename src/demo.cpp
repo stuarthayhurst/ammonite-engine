@@ -187,7 +187,7 @@ int main(int argc, char* argv[]) {
   if (!success) {
     for (int i = 0; i < modelCount; i++) {
       ammonite::models::deleteBuffers(loadedModels[i]);
-      glDeleteTextures(1, &loadedModels[i].textureId);
+      ammonite::textures::deleteTexture(loadedModels[i].textureId);
     }
     ammonite::shaders::eraseShaders();
     glDeleteProgram(programId);
@@ -267,7 +267,7 @@ int main(int argc, char* argv[]) {
   //Cleanup
   for (int i = 0; i < modelCount; i++) {
     ammonite::models::deleteBuffers(loadedModels[i]);
-    glDeleteTextures(1, &loadedModels[i].textureId);
+    ammonite::textures::deleteTexture(loadedModels[i].textureId);
   }
   ammonite::shaders::eraseShaders();
   glDeleteProgram(programId);
