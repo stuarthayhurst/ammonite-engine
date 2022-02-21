@@ -191,6 +191,7 @@ int main(int argc, char* argv[]) {
     }
     ammonite::shaders::eraseShaders();
     glDeleteProgram(programId);
+    glfwTerminate();
     return EXIT_FAILURE;
   }
 
