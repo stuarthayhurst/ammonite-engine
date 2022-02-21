@@ -37,6 +37,7 @@
   - All targets are compiled with `-Wall` and `-Wextra`
   - Targets are also compiled with `-O3` and `-flto`, which may cause some systems to struggle to compile, or produce unstable results
     - These can be changed by modifying `CXXFLAGS` in `Makefile`
+    - `-flto` is strongly recommended, otherwise the build results can be very large
 
 ## Credits:
  - Some models in `assets/` may have been created by third parties, attribution can be found in `docs/CREDITS.md`
