@@ -31,16 +31,16 @@ void GLAPIENTRY debugMessageCallback(GLenum, GLenum type, GLuint, GLenum severit
 }
 #endif
 
-void drawFrame(ammonite::models::internalModel &drawObject, GLuint textureSamplerId) {
+void drawFrame(ammonite::models::internalModel *drawObject, GLuint textureSamplerId) {
   //Bind texture in Texture Unit 0
   glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, drawObject.textureId);
+  glBindTexture(GL_TEXTURE_2D, drawObject->textureId);
   //Set texture sampler to use Texture Unit 0
   glUniform1i(textureSamplerId, 0);
 
   //Vertex attribute buffer
   glEnableVertexAttribArray(0);
-  glBindBuffer(GL_ARRAY_BUFFER, drawObject.vertexBufferId);
+  glBindBuffer(GL_ARRAY_BUFFER, drawObject->vertexBufferId);
   glVertexAttribPointer(
     0,        //shader location
     3,        //size
@@ -52,7 +52,7 @@ void drawFrame(ammonite::models::internalModel &drawObject, GLuint textureSample
 
   //Texture attribute buffer
   glEnableVertexAttribArray(1);
-  glBindBuffer(GL_ARRAY_BUFFER, drawObject.textureBufferId);
+  glBindBuffer(GL_ARRAY_BUFFER, drawObject->textureBufferId);
   glVertexAttribPointer(
     1,
     2,
@@ -64,7 +64,7 @@ void drawFrame(ammonite::models::internalModel &drawObject, GLuint textureSample
 
   //Normal attribute buffer
   glEnableVertexAttribArray(2);
-  glBindBuffer(GL_ARRAY_BUFFER, drawObject.normalBufferId);
+  glBindBuffer(GL_ARRAY_BUFFER, drawObject->normalBufferId);
   glVertexAttribPointer(
     2,
     3,
@@ -74,7 +74,7 @@ void drawFrame(ammonite::models::internalModel &drawObject, GLuint textureSample
     (void*)0
   );
   //Draw the triangles
-  glDrawArrays(GL_TRIANGLES, 0, drawObject.vertices.size());
+  glDrawArrays(GL_TRIANGLES, 0, drawObject->vertices.size());
   glBindTexture(GL_TEXTURE_2D, 0);
   glDisableVertexAttribArray(0);
   glDisableVertexAttribArray(1);
@@ -169,25 +169,23 @@ int main(int argc, char* argv[]) {
     {"assets/cube.obj", "assets/texture.bmp"}
   };
   int modelCount = sizeof(models) / sizeof(models[0]);
-  ammonite::models::internalModel loadedModels[modelCount];
+  int loadedModelIds[modelCount];
 
   long int vertexCount = 0;
   performanceTimer.reset();
   for (int i = 0; i < modelCount; i++) {
     //Load model
-    ammonite::models::loadObject(models[i][0], loadedModels[i], &success);
-    //Create buffers and count vertices
-    ammonite::models::createBuffers(loadedModels[i]);
-    vertexCount += loadedModels[i].vertices.size();
+    loadedModelIds[i] = ammonite::models::createModel(models[i][0], &success);
+    //Count vertices
+    vertexCount += ammonite::models::getModelPtr(loadedModelIds[i])->vertices.size();
     //Load texture
-    loadedModels[i].textureId = ammonite::textures::loadTexture(models[i][1], &success);
+    ammonite::models::getModelPtr(loadedModelIds[i])->textureId = ammonite::textures::loadTexture(models[i][1], &success);
   }
 
   //Destroy all models, textures and shaders
   if (!success) {
     for (int i = 0; i < modelCount; i++) {
-      ammonite::models::deleteBuffers(loadedModels[i]);
-      ammonite::textures::deleteTexture(loadedModels[i].textureId);
+      ammonite::models::deleteModel(loadedModelIds[i]);
     }
     ammonite::shaders::eraseShaders();
     glDeleteProgram(programId);
@@ -250,7 +248,7 @@ int main(int argc, char* argv[]) {
 
     //Draw given model
     for (int i = 0; i < modelCount; i++) {
-      drawFrame(loadedModels[i], textureSamplerId);
+      drawFrame(ammonite::models::getModelPtr(loadedModelIds[i]), textureSamplerId);
     }
 
     //Swap buffers
@@ -267,8 +265,7 @@ int main(int argc, char* argv[]) {
 
   //Cleanup
   for (int i = 0; i < modelCount; i++) {
-    ammonite::models::deleteBuffers(loadedModels[i]);
-    ammonite::textures::deleteTexture(loadedModels[i].textureId);
+    ammonite::models::deleteModel(loadedModelIds[i]);
   }
   ammonite::shaders::eraseShaders();
   glDeleteProgram(programId);

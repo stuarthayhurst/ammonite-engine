@@ -1,5 +1,5 @@
-#ifndef OBJECT
-#define OBJECT
+#ifndef MODELS
+#define MODELS
 
 namespace ammonite {
   namespace models {
@@ -10,11 +10,13 @@ namespace ammonite {
       GLuint normalBufferId;
       GLuint textureBufferId;
       GLuint textureId;
+      int modelId = 0;
     };
 
-    void createBuffers(internalModel &modelObject);
-    void deleteBuffers(internalModel &modelObject);
-    void loadObject(const char* objectPath, internalModel &modelObject, bool* externalSuccess);
+    int createModel(const char* objectPath, bool* externalSuccess);
+    internalModel* getModelPtr(int modelId);
+    void deleteModel(int modelId);
+
   }
 }
 

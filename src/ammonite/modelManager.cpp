@@ -5,6 +5,8 @@
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 
+#include "textures.hpp"
+
 namespace ammonite {
   namespace models {
     struct internalModel {
@@ -14,9 +16,14 @@ namespace ammonite {
       GLuint normalBufferId;
       GLuint textureBufferId;
       GLuint textureId;
+      int modelId = 0;
     };
+
+    //Track all loaded models
+    std::vector<models::internalModel> modelTracker(0);
   }
 
+  //Methods to load and create models
   namespace models {
     void createBuffers(internalModel &modelObject) {
       //Create and fill a vertex buffer
@@ -99,6 +106,47 @@ namespace ammonite {
         }
       }
       return;
+    }
+  }
+
+  //Exposed model methods
+  namespace models {
+    int createModel(const char* objectPath, bool* externalSuccess) {
+      //Create the model
+      internalModel modelObject;
+      loadObject(objectPath, modelObject, externalSuccess);
+      createBuffers(modelObject);
+
+      //Add model to the tracker and return the ID
+      modelObject.modelId = modelTracker.size() + 1;
+      modelTracker.push_back(modelObject);
+      return modelObject.modelId;
+    }
+
+    internalModel* getModelPtr(int modelId) {
+      for (long unsigned int i = 0; i < modelTracker.size(); i++) {
+        if (modelTracker[i].modelId == modelId) {
+          return &modelTracker[i];
+        }
+      }
+      return nullptr;
+    }
+
+    void deleteModel(int modelId) {
+      //Find the model in modelTracker
+      for (long unsigned int i = 0; i < modelTracker.size(); i++) {
+        if (modelTracker[i].modelId == modelId) {
+          //Destroy the model's buffers and texture
+          deleteBuffers(modelTracker[i]);
+          ammonite::textures::deleteTexture(modelTracker[i].textureId);
+
+          //Remove the model from the tracker
+          modelTracker.erase(std::next(modelTracker.begin(), i));
+
+          //Exit early
+          return;
+        }
+      }
     }
   }
 }
