@@ -14,7 +14,7 @@ AMMONITE_HEADER_SOURCE = $(wildcard ./src/ammonite/*.hpp)
 COMMON_HEADER_SOURCE = $(wildcard ./src/common/*.hpp)
 
 CXXFLAGS := $(shell pkg-config --cflags $(LIBS))
-CXXFLAGS += -Wall -Wextra -O3 -flto -std=c++17
+CXXFLAGS += -Wall -Wextra -Werror -O3 -flto -std=c++17
 LDFLAGS := $(shell pkg-config --libs $(LIBS)) -pthread
 
 ifeq ($(DEBUG),true)
