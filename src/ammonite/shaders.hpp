@@ -1,6 +1,8 @@
 #ifndef SHADER
 #define SHADER
 
+#include <string>
+
 namespace ammonite {
   namespace shaders {
     GLuint createProgram(const GLuint shaderIds[], const int shaderCount, bool* externalSuccess);

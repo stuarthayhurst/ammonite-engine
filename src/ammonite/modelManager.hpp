@@ -2,6 +2,7 @@
 #define MODELS
 
 #include <vector>
+#include <glm/glm.hpp>
 
 namespace ammonite {
   namespace models {
