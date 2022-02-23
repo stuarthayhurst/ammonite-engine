@@ -71,12 +71,9 @@ void drawFrame(ammonite::models::internalModel *drawObject, GLuint textureSample
     0,
     (void*)0
   );
+
   //Draw the triangles
   glDrawArrays(GL_TRIANGLES, 0, drawObject->vertices.size());
-  glBindTexture(GL_TEXTURE_2D, 0);
-  glDisableVertexAttribArray(0);
-  glDisableVertexAttribArray(1);
-  glDisableVertexAttribArray(2);
 }
 
 int main(int argc, char* argv[]) {
