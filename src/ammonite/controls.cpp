@@ -1,3 +1,5 @@
+#include <cmath>
+
 #include <GLFW/glfw3.h>
 
 #include <glm/glm.hpp>
@@ -193,16 +195,16 @@ namespace ammonite {
 
       //Vector for current direction, without vertical component
       glm::vec3 horizontalDirection(
-        sin(horizontalAngle),
+        std::sin(horizontalAngle),
         0,
-        cos(horizontalAngle)
+        std::cos(horizontalAngle)
       );
 
       //Right vector, relative to the camera
       glm::vec3 right = glm::vec3(
-        sin(horizontalAngle - 3.14f / 2.0f),
+        std::sin(horizontalAngle - 3.14f / 2.0f),
         0,
-        cos(horizontalAngle - 3.14f / 2.0f)
+        std::cos(horizontalAngle - 3.14f / 2.0f)
       );
 
       //Apply movement from inputs
@@ -230,9 +232,9 @@ namespace ammonite {
 
     //Vector for current direction faced
       glm::vec3 direction(
-        cos(verticalAngle) * sin(horizontalAngle),
-        sin(verticalAngle),
-        cos(verticalAngle) * cos(horizontalAngle)
+        std::cos(verticalAngle) * std::sin(horizontalAngle),
+        std::sin(verticalAngle),
+        std::cos(verticalAngle) * std::cos(horizontalAngle)
       );
 
       //Up vector, relative to the camera
