@@ -1,6 +1,8 @@
 #ifndef MODELS
 #define MODELS
 
+#include <vector>
+
 namespace ammonite {
   namespace models {
     struct internalModel {

@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cmath>
 #include <tuple>
+#include <vector>
 
 #include <stb/stb_image.h>
 #include <GL/glew.h>
