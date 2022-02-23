@@ -16,8 +16,8 @@ const unsigned short int width = 1024;
 const unsigned short int height = 768;
 
 void printMetrics(int frameCount, double deltaTime) {
-  printf("%.2f fps", frameCount / deltaTime);
-  printf(" (%fms)\n", (deltaTime * 1000) / frameCount);
+  std::printf("%.2f fps", frameCount / deltaTime);
+  std::printf(" (%fms)\n", (deltaTime * 1000) / frameCount);
 }
 
 #ifdef DEBUG
