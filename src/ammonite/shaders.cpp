@@ -58,9 +58,9 @@ namespace ammonite {
     }
 
     //In C++ 20, the filesystem library can do this
-    void getFileMetadata(std::string filePath, long* filesize, long* timestamp) {
+    void getFileMetadata(const char* filePath, long* filesize, long* timestamp) {
       struct stat fileInfo;
-      if (stat(filePath.c_str(), &fileInfo) != 0) {
+      if (stat(filePath, &fileInfo) != 0) {
         //Failed to open file, fail the shader
         *filesize = 0;
         *timestamp = 0;
@@ -219,7 +219,7 @@ namespace ammonite {
       return true;
     }
 
-    GLuint createProgram(const std::string shaderPaths[], const int shaderTypes[], const int shaderCount, bool* externalSuccess, const char* programName) {
+    GLuint createProgram(const char* shaderPaths[], const int shaderTypes[], const int shaderCount, bool* externalSuccess, const char* programName) {
       //Used later as the return value
       GLuint programId;
 
@@ -325,7 +325,7 @@ namespace ammonite {
 
       GLuint shaderIds[shaderCount];
       for (int i = 0; i < shaderCount; i++) {
-        shaderIds[i] = loadShader(shaderPaths[i].c_str(), shaderTypes[i], externalSuccess);
+        shaderIds[i] = loadShader(shaderPaths[i], shaderTypes[i], externalSuccess);
       }
 
       //Create the program like normal, as a valid cache wasn't found

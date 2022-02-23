@@ -137,7 +137,7 @@ int main(int argc, char* argv[]) {
   glBindVertexArray(vertexArrayId);
 
   //Shader paths and types to create program
-  const std::string shaderPaths[2] = {
+  const char* shaderPaths[2] = {
     "shaders/BasicShader.vert",
     "shaders/BasicShader.frag"
   };
