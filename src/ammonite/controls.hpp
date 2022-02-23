@@ -1,6 +1,9 @@
 #ifndef CONTROLS
 #define CONTROLS
 
+#include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+
 namespace ammonite {
   namespace controls {
     namespace matrix {

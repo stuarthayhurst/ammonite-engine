@@ -1,6 +1,9 @@
 #ifndef WINDOW
 #define WINDOW
 
+#include <tuple>
+#include <GLFW/glfw3.h>
+
 namespace ammonite {
   namespace windowManager {
     namespace settings {

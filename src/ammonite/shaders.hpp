@@ -2,6 +2,7 @@
 #define SHADER
 
 #include <string>
+#include <GL/glew.h>
 
 namespace ammonite {
   namespace shaders {
