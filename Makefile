@@ -21,9 +21,13 @@ ifeq ($(DEBUG),true)
   CXXFLAGS += -DDEBUG
 endif
 
-$(BUILD_DIR)/demo: $(AMMONITE_OBJECTS) $(COMMON_OBJECTS) $(OBJECT_DIR)/demo.o
+$(BUILD_DIR)/demo: $(BUILD_DIR)/libammonite.so $(COMMON_OBJECTS) $(OBJECT_DIR)/demo.o
 	@mkdir -p "$(BUILD_DIR)"
-	$(CXX) -o "$(BUILD_DIR)/demo" $(OBJECT_DIR)/*.o $(CXXFLAGS) $(LDFLAGS)
+	$(CXX) -o "$(BUILD_DIR)/demo" $(COMMON_OBJECTS) $(OBJECT_DIR)/demo.o $(CXXFLAGS) -L$$(pwd)/$(OBJECT_DIR) $(LDFLAGS) -lammonite
+
+$(BUILD_DIR)/libammonite.so: $(AMMONITE_OBJECTS)
+	@mkdir -p "$(OBJECT_DIR)"
+	$(CXX) -shared -o "$@" $(AMMONITE_OBJECTS) $(CXXFLAGS)
 
 $(AMMONITE_OBJECTS): $(AMMONITE_OBJECTS_SOURCE) $(AMMONITE_HEADER_SOURCE)
 	@mkdir -p "$(OBJECT_DIR)"
