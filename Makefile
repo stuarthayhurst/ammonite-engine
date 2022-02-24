@@ -23,7 +23,7 @@ endif
 
 $(BUILD_DIR)/demo: $(BUILD_DIR)/libammonite.so $(COMMON_OBJECTS) $(OBJECT_DIR)/demo.o
 	@mkdir -p "$(BUILD_DIR)"
-	$(CXX) -o "$(BUILD_DIR)/demo" $(COMMON_OBJECTS) $(OBJECT_DIR)/demo.o $(CXXFLAGS) -L$$(pwd)/$(OBJECT_DIR) $(LDFLAGS) -lammonite
+	$(CXX) -o "$(BUILD_DIR)/demo" $(COMMON_OBJECTS) $(OBJECT_DIR)/demo.o $(CXXFLAGS) "-L$(BUILD_DIR)" $(LDFLAGS) -lammonite $(RPATH)
 
 $(BUILD_DIR)/libammonite.so: $(AMMONITE_OBJECTS)
 	@mkdir -p "$(OBJECT_DIR)"
@@ -41,9 +41,11 @@ $(OBJECT_DIR)/demo.o: ./src/demo.cpp $(AMMONITE_HEADER_SOURCE) $(COMMON_HEADER_S
 	@mkdir -p "$(OBJECT_DIR)"
 	$(CXX) ./src/demo.cpp -c $(CXXFLAGS) -o "$@"
 
-.PHONY: build clean cache
+.PHONY: build local-build clean cache
 build:
 	$(MAKE) "$(BUILD_DIR)/demo"
+local-build:
+	RPATH="-Wl,-rpath=$(BUILD_DIR)" $(MAKE) build
 clean: cache
 	rm -rfv "$(BUILD_DIR)"
 cache:
