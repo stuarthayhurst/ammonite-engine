@@ -4,6 +4,7 @@ SHELL = bash
 LIBS = glm glfw3 glew stb tinyobjloader
 BUILD_DIR = build
 CACHE_DIR = cache
+INSTALL_DIR = /usr/lib
 
 OBJECT_DIR = $(BUILD_DIR)/objects
 AMMONITE_OBJECTS_SOURCE = $(wildcard ./src/ammonite/*.cpp)
@@ -41,11 +42,16 @@ $(OBJECT_DIR)/demo.o: ./src/demo.cpp $(AMMONITE_HEADER_SOURCE) $(COMMON_HEADER_S
 	@mkdir -p "$(OBJECT_DIR)"
 	$(CXX) ./src/demo.cpp -c $(CXXFLAGS) -o "$@"
 
-.PHONY: build local-build clean cache
+.PHONY: build local-build install uninstall clean cache
 build:
 	$(MAKE) "$(BUILD_DIR)/demo"
 local-build:
 	RPATH="-Wl,-rpath=$(BUILD_DIR)" $(MAKE) build
+install:
+	@mkdir -p "$(INSTALL_DIR)"
+	install "$(BUILD_DIR)/libammonite.so" "$(INSTALL_DIR)/libammonite.so"
+uninstall:
+	rm -rf "$(INSTALL_DIR)/libammonite.so"*
 clean: cache
 	rm -rfv "$(BUILD_DIR)"
 cache:
