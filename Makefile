@@ -22,7 +22,7 @@ ifeq ($(DEBUG),true)
   CXXFLAGS += -DDEBUG
 endif
 
-$(BUILD_DIR)/demo: $(BUILD_DIR)/libammonite.so $(COMMON_OBJECTS) $(OBJECT_DIR)/demo.o
+$(BUILD_DIR)/demo: library $(COMMON_OBJECTS) $(OBJECT_DIR)/demo.o
 	@mkdir -p "$(BUILD_DIR)"
 	$(CXX) -o "$(BUILD_DIR)/demo" $(COMMON_OBJECTS) $(OBJECT_DIR)/demo.o $(CXXFLAGS) "-L$(BUILD_DIR)" $(LDFLAGS) -lammonite $(RPATH)
 
@@ -42,11 +42,12 @@ $(OBJECT_DIR)/demo.o: ./src/demo.cpp $(AMMONITE_HEADER_SOURCE) $(COMMON_HEADER_S
 	@mkdir -p "$(OBJECT_DIR)"
 	$(CXX) ./src/demo.cpp -c $(CXXFLAGS) -o "$@"
 
-.PHONY: build local-build install uninstall clean cache
+.PHONY: build local-build library install uninstall clean cache
 build:
 	$(MAKE) "$(BUILD_DIR)/demo"
 local-build:
 	RPATH="-Wl,-rpath=$(BUILD_DIR)" $(MAKE) build
+library: $(BUILD_DIR)/libammonite.so
 install:
 	@mkdir -p "$(INSTALL_DIR)"
 	install "$(BUILD_DIR)/libammonite.so" "$(INSTALL_DIR)/libammonite.so"
