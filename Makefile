@@ -42,7 +42,7 @@ $(OBJECT_DIR)/demo.o: ./src/demo.cpp $(AMMONITE_HEADER_SOURCE) $(COMMON_HEADER_S
 	@mkdir -p "$(OBJECT_DIR)"
 	$(CXX) ./src/demo.cpp -c $(CXXFLAGS) -o "$@"
 
-.PHONY: build local-build library install uninstall clean cache
+.PHONY: build local-build library install uninstall clean cache icons
 build:
 	$(MAKE) "$(BUILD_DIR)/demo"
 local-build:
