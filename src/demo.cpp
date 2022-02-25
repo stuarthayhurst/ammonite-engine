@@ -161,8 +161,8 @@ int main(int argc, char* argv[]) {
 
   //Load models from a set of objects and textures
   const char* models[][2] = {
-    //{"assets/suzanne.obj", "assets/gradient.png"},
-    {"assets-experimental/street.obj", "assets/gradient.png"}
+    {"assets/suzanne.obj", "assets/gradient.png"},
+    {"assets/cube.obj", "assets/texture.bmp"}
   };
   int modelCount = sizeof(models) / sizeof(models[0]);
   int loadedModelIds[modelCount];

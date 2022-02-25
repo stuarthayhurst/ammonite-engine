@@ -42,7 +42,7 @@ namespace ammonite {
     };
 
     //Track all loaded models
-    std::vector<models::InternalModel> modelTracker(0);
+    std::map<int, models::InternalModel> modelTrackerMap;
   }
 
   namespace {
@@ -195,34 +195,29 @@ namespace ammonite {
       createBuffers(&modelObject);
 
       //Add model to the tracker and return the ID
-      modelObject.modelId = modelTracker.size() + 1;
-      modelTracker.push_back(modelObject);
+      modelObject.modelId = modelTrackerMap.size() + 1;
+      modelTrackerMap[modelObject.modelId] = modelObject;
       return modelObject.modelId;
     }
 
     InternalModel* getModelPtr(int modelId) {
-      for (long unsigned int i = 0; i < modelTracker.size(); i++) {
-        if (modelTracker[i].modelId == modelId) {
-          return &modelTracker[i];
-        }
+      //Check the model exists, and return a pointer
+      if (modelTrackerMap.find(modelId) != modelTrackerMap.end()) {
+        return &modelTrackerMap[modelId];
+      } else {
+        return nullptr;
       }
-      return nullptr;
     }
 
     void deleteModel(int modelId) {
-      //Find the model in modelTracker
-      for (long unsigned int i = 0; i < modelTracker.size(); i++) {
-        if (modelTracker[i].modelId == modelId) {
-          //Destroy the model's buffers and texture
-          deleteBuffers(&modelTracker[i]);
-          ammonite::textures::deleteTexture(modelTracker[i].textureId);
+      //Check the model actually exists
+      if (modelTrackerMap.find(modelId) != modelTrackerMap.end()) {
+        //Destroy the model's buffers and texture
+        deleteBuffers(&modelTrackerMap[modelId]);
+        ammonite::textures::deleteTexture(modelTrackerMap[modelId].textureId);
 
-          //Remove the model from the tracker
-          modelTracker.erase(std::next(modelTracker.begin(), i));
-
-          //Exit early
-          return;
-        }
+        //Remove the model from the tracker
+        modelTrackerMap.erase(modelId);
       }
     }
   }
