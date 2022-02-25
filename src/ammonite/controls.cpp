@@ -110,7 +110,9 @@ namespace ammonite {
 
       static void window_focus_callback(GLFWwindow*, int focused) {
         //Bind / unbind input with window focus (fixes missing mouse)
-        setInputBound(focused);
+        if (!focused) {
+          setInputBound(focused);
+        }
       }
     }
 
