@@ -7,7 +7,7 @@
 
 namespace ammonite {
   namespace models {
-    struct internalModel {
+    struct InternalModel {
       std::vector<glm::vec3> vertices, normals;
       std::vector<glm::vec2> texturePoints;
       std::vector<unsigned int> indices;
@@ -21,7 +21,7 @@ namespace ammonite {
     };
 
     int createModel(const char* objectPath, bool* externalSuccess);
-    internalModel* getModelPtr(int modelId);
+    InternalModel* getModelPtr(int modelId);
     void deleteModel(int modelId);
 
   }

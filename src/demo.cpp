@@ -29,7 +29,7 @@ void GLAPIENTRY debugMessageCallback(GLenum, GLenum type, GLuint, GLenum severit
 }
 #endif
 
-void drawFrame(ammonite::models::internalModel *drawObject, GLuint textureSamplerId) {
+void drawFrame(ammonite::models::InternalModel *drawObject, GLuint textureSamplerId) {
   //Bind texture in Texture Unit 0
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, drawObject->textureId);
@@ -150,7 +150,7 @@ int main(int argc, char* argv[]) {
 
   //Create program from shaders
   bool success = true;
-  ammonite::utils::timer performanceTimer;
+  ammonite::utils::Timer performanceTimer;
   GLuint programId = ammonite::shaders::createProgram(shaderPaths, shaderTypes, shaderCount, &success, "program");
   if (!success) {
     std::cerr << "Program creation failed" << std::endl;
@@ -202,7 +202,7 @@ int main(int argc, char* argv[]) {
   glUseProgram(programId);
 
   //Performance metrics setup
-  ammonite::utils::timer benchmarkTimer;
+  ammonite::utils::Timer benchmarkTimer;
   performanceTimer.reset();
   double deltaTime;
   long totalFrames = 0;

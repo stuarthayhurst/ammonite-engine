@@ -7,18 +7,18 @@
 
 namespace ammonite {
   namespace {
-    struct textureInfo {
+    struct TextureInfo {
       GLuint textureId;
       std::string textureName;
       int refCount = 1;
     };
 
-    std::vector<textureInfo> textureTracker(0);
+    std::vector<TextureInfo> textureTracker(0);
   }
 
   namespace textures {
     void deleteTexture(GLuint textureId) {
-      //Find the textureInfo in textureTracker
+      //Find the TextureInfo in textureTracker
       for (long unsigned int i = 0; i < textureTracker.size(); i++) {
         if (textureTracker[i].textureId == textureId) {
           //Decrease the reference count
@@ -85,7 +85,7 @@ namespace ammonite {
       glGenerateMipmap(GL_TEXTURE_2D);
 
       //Save texture's info to textureTracker
-      textureInfo currentTexture;
+      TextureInfo currentTexture;
       currentTexture.textureId = textureId;
       currentTexture.textureName = std::string(texturePath);
       textureTracker.push_back(currentTexture);

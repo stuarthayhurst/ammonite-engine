@@ -177,7 +177,7 @@ namespace ammonite {
     //Handle keyboard and mouse movements, calculate matrices
     void processInput() {
       //Time difference between 2 inputs
-      static ammonite::utils::timer controlTimer;
+      static ammonite::utils::Timer controlTimer;
       float deltaTime = controlTimer.getTime();
 
       //Save last input toggle key state and current input state

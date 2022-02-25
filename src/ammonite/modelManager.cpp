@@ -11,7 +11,7 @@
 
 namespace ammonite {
   namespace models {
-    struct internalModel {
+    struct InternalModel {
       std::vector<glm::vec3> vertices, normals;
       std::vector<glm::vec2> texturePoints;
       std::vector<unsigned short> indices;
@@ -42,7 +42,7 @@ namespace ammonite {
     };
 
     //Track all loaded models
-    std::vector<models::internalModel> modelTracker(0);
+    std::vector<models::InternalModel> modelTracker(0);
   }
 
   namespace {
@@ -60,7 +60,7 @@ namespace ammonite {
       }
     }
 
-    static void createBuffers(models::internalModel* modelObject) {
+    static void createBuffers(models::InternalModel* modelObject) {
       //Create and fill a vertex buffer
       glGenBuffers(1, &modelObject->vertexBufferId);
       glBindBuffer(GL_ARRAY_BUFFER, modelObject->vertexBufferId);
@@ -82,7 +82,7 @@ namespace ammonite {
       glBufferData(GL_ELEMENT_ARRAY_BUFFER, modelObject->indices.size() * sizeof(unsigned short), &modelObject->indices[0], GL_STATIC_DRAW);
     }
 
-    static void deleteBuffers(models::internalModel* modelObject) {
+    static void deleteBuffers(models::InternalModel* modelObject) {
       //Delete created buffers
       glDeleteBuffers(1, &modelObject->vertexBufferId);
       glDeleteBuffers(1, &modelObject->normalBufferId);
@@ -90,9 +90,9 @@ namespace ammonite {
       glDeleteBuffers(1, &modelObject->elementBufferId);
     }
 
-    static void indexModel(models::internalModel* modelObject, modelData* rawModelData) {
+    static void indexModel(models::InternalModel* modelObject, modelData* rawModelData) {
       //Map of known vertices
-      std::map<PackedVertexInfo,unsigned short> vertexIndexMap;
+      std::map<PackedVertexInfo, unsigned short> vertexIndexMap;
 
       //Iterate over every vertex, and index them
       for (unsigned int i = 0; i < rawModelData->vertices.size(); i++) {
@@ -118,7 +118,7 @@ namespace ammonite {
       }
     }
 
-    static void loadObject(const char* objectPath, models::internalModel* modelObject, bool* externalSuccess) {
+    static void loadObject(const char* objectPath, models::InternalModel* modelObject, bool* externalSuccess) {
       tinyobj::ObjReaderConfig reader_config;
       tinyobj::ObjReader reader;
 
@@ -190,7 +190,7 @@ namespace ammonite {
   namespace models {
     int createModel(const char* objectPath, bool* externalSuccess) {
       //Create the model
-      internalModel modelObject;
+      InternalModel modelObject;
       loadObject(objectPath, &modelObject, externalSuccess);
       createBuffers(&modelObject);
 
@@ -200,7 +200,7 @@ namespace ammonite {
       return modelObject.modelId;
     }
 
-    internalModel* getModelPtr(int modelId) {
+    InternalModel* getModelPtr(int modelId) {
       for (long unsigned int i = 0; i < modelTracker.size(); i++) {
         if (modelTracker[i].modelId == modelId) {
           return &modelTracker[i];

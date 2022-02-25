@@ -5,7 +5,7 @@
 
 namespace ammonite {
   namespace utils {
-    class timer {
+    class Timer {
       public:
         double getTime() {
           if (running) {
