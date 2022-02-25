@@ -14,7 +14,7 @@ namespace ammonite {
     struct InternalModel {
       std::vector<glm::vec3> vertices, normals;
       std::vector<glm::vec2> texturePoints;
-      std::vector<unsigned short> indices;
+      std::vector<unsigned int> indices;
       GLuint vertexBufferId;
       GLuint normalBufferId;
       GLuint textureBufferId;
@@ -29,7 +29,7 @@ namespace ammonite {
     struct modelData {
       std::vector<glm::vec3> vertices, normals;
       std::vector<glm::vec2> texturePoints;
-      std::vector<unsigned short> indices;
+      std::vector<unsigned int> indices;
     };
 
     struct PackedVertexInfo {
@@ -46,9 +46,9 @@ namespace ammonite {
   }
 
   namespace {
-    static unsigned short getIdenticalVertexIndex(PackedVertexInfo* packed, std::map<PackedVertexInfo, unsigned short>* vertexIndexMap, bool* found) {
+    static unsigned int getIdenticalVertexIndex(PackedVertexInfo* packed, std::map<PackedVertexInfo, unsigned int>* vertexIndexMap, bool* found) {
       //Look for an identical vertex
-      std::map<PackedVertexInfo, unsigned short>::iterator it = vertexIndexMap->find(*packed);
+      std::map<PackedVertexInfo, unsigned int>::iterator it = vertexIndexMap->find(*packed);
       if (it == vertexIndexMap->end()) {
         //No vertex was found
         *found = false;
@@ -79,7 +79,7 @@ namespace ammonite {
       //Create and fill an indices buffer
       glGenBuffers(1, &modelObject->elementBufferId);
       glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelObject->elementBufferId);
-      glBufferData(GL_ELEMENT_ARRAY_BUFFER, modelObject->indices.size() * sizeof(unsigned short), &modelObject->indices[0], GL_STATIC_DRAW);
+      glBufferData(GL_ELEMENT_ARRAY_BUFFER, modelObject->indices.size() * sizeof(unsigned int), &modelObject->indices[0], GL_STATIC_DRAW);
     }
 
     static void deleteBuffers(models::InternalModel* modelObject) {
@@ -92,7 +92,7 @@ namespace ammonite {
 
     static void indexModel(models::InternalModel* modelObject, modelData* rawModelData) {
       //Map of known vertices
-      std::map<PackedVertexInfo, unsigned short> vertexIndexMap;
+      std::map<PackedVertexInfo, unsigned int> vertexIndexMap;
 
       //Iterate over every vertex, and index them
       for (unsigned int i = 0; i < rawModelData->vertices.size(); i++) {
@@ -101,7 +101,7 @@ namespace ammonite {
 
         //Search for an identical vertex
         bool found;
-        unsigned short index = getIdenticalVertexIndex(&packedVertex, &vertexIndexMap, &found);
+        unsigned int index = getIdenticalVertexIndex(&packedVertex, &vertexIndexMap, &found);
 
         //If the vertex has already been used, reuse the index
         if (found) {
@@ -111,7 +111,7 @@ namespace ammonite {
           modelObject->texturePoints.push_back(rawModelData->texturePoints[i]);
           modelObject->normals.push_back(rawModelData->normals[i]);
 
-          index = (unsigned short)modelObject->vertices.size() - 1;
+          index = (unsigned int)modelObject->vertices.size() - 1;
           modelObject->indices.push_back(index);
           vertexIndexMap[packedVertex] = index;
         }

@@ -74,7 +74,7 @@ void drawFrame(ammonite::models::InternalModel *drawObject, GLuint textureSample
 
   //Draw the triangles
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, drawObject->elementBufferId);
-  glDrawElements(GL_TRIANGLES, drawObject->vertexCount, GL_UNSIGNED_SHORT, (void*)0);
+  glDrawElements(GL_TRIANGLES, drawObject->vertexCount, GL_UNSIGNED_INT, (void*)0);
 }
 
 int main(int argc, char* argv[]) {
@@ -161,8 +161,8 @@ int main(int argc, char* argv[]) {
 
   //Load models from a set of objects and textures
   const char* models[][2] = {
-    {"assets/suzanne.obj", "assets/gradient.png"},
-    {"assets/cube.obj", "assets/texture.bmp"}
+    //{"assets/suzanne.obj", "assets/gradient.png"},
+    {"assets-experimental/street.obj", "assets/gradient.png"}
   };
   int modelCount = sizeof(models) / sizeof(models[0]);
   int loadedModelIds[modelCount];
