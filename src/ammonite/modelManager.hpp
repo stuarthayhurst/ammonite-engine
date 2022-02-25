@@ -16,6 +16,7 @@ namespace ammonite {
       GLuint textureBufferId;
       GLuint elementBufferId;
       GLuint textureId;
+      int vertexCount = 0;
       int modelId = 0;
     };
 

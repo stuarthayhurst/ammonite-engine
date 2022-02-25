@@ -20,6 +20,7 @@ namespace ammonite {
       GLuint textureBufferId;
       GLuint elementBufferId;
       GLuint textureId;
+      int vertexCount = 0;
       int modelId = 0;
     };
   }
@@ -47,7 +48,7 @@ namespace ammonite {
   namespace {
     static unsigned short getIdenticalVertexIndex(PackedVertexInfo* packed, std::map<PackedVertexInfo, unsigned short>* vertexIndexMap, bool* found) {
       //Look for an identical vertex
-      std::map<PackedVertexInfo, unsigned short>::iterator it = (*vertexIndexMap).find(*packed);
+      std::map<PackedVertexInfo, unsigned short>::iterator it = vertexIndexMap->find(*packed);
       if (it == vertexIndexMap->end()) {
         //No vertex was found
         *found = false;
@@ -178,6 +179,7 @@ namespace ammonite {
       }
 
       //Fill the index buffer
+      modelObject->vertexCount = rawModelData.vertices.size();
       indexModel(modelObject, &rawModelData);
 
       return;

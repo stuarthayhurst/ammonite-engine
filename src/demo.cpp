@@ -74,7 +74,7 @@ void drawFrame(ammonite::models::internalModel *drawObject, GLuint textureSample
 
   //Draw the triangles
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, drawObject->elementBufferId);
-  glDrawElements(GL_TRIANGLES, drawObject->indices.size(), GL_UNSIGNED_SHORT, (void*)0);
+  glDrawElements(GL_TRIANGLES, drawObject->vertexCount, GL_UNSIGNED_SHORT, (void*)0);
 }
 
 int main(int argc, char* argv[]) {
@@ -173,7 +173,7 @@ int main(int argc, char* argv[]) {
     //Load model
     loadedModelIds[i] = ammonite::models::createModel(models[i][0], &success);
     //Count vertices
-    vertexCount += ammonite::models::getModelPtr(loadedModelIds[i])->vertices.size();
+    vertexCount += ammonite::models::getModelPtr(loadedModelIds[i])->vertexCount;
     //Load texture
     ammonite::models::getModelPtr(loadedModelIds[i])->textureId = ammonite::textures::loadTexture(models[i][1], &success);
   }
