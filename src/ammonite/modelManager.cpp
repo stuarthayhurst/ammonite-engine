@@ -1,5 +1,7 @@
 #include <iostream>
 #include <vector>
+#include <map>
+#include <cstring>
 
 #include <tiny_obj_loader.h>
 #include <GL/glew.h>
@@ -12,18 +14,53 @@ namespace ammonite {
     struct internalModel {
       std::vector<glm::vec3> vertices, normals;
       std::vector<glm::vec2> texturePoints;
+      std::vector<unsigned short> indices;
       GLuint vertexBufferId;
       GLuint normalBufferId;
       GLuint textureBufferId;
+      GLuint elementBufferId;
       GLuint textureId;
       int modelId = 0;
+    };
+  }
+
+  namespace {
+    struct modelData {
+      std::vector<glm::vec3> vertices, normals;
+      std::vector<glm::vec2> texturePoints;
+      std::vector<unsigned short> indices;
+    };
+
+    struct PackedVertexInfo {
+      glm::vec3 position;
+      glm::vec2 uv;
+      glm::vec3 normal;
+      bool operator<(const PackedVertexInfo that) const{
+        return std::memcmp((void*)this, (void*)&that, sizeof(PackedVertexInfo))>0;
+      };
     };
 
     //Track all loaded models
     std::vector<models::internalModel> modelTracker(0);
   }
 
-  //Methods to load and create models
+  namespace {
+    unsigned short getIdenticalVertexIndex(PackedVertexInfo* packed, std::map<PackedVertexInfo, unsigned short>* vertexIndexMap, bool* found) {
+      //Look for an identical vertex
+      std::map<PackedVertexInfo, unsigned short>::iterator it = (*vertexIndexMap).find(*packed);
+      if (it == vertexIndexMap->end()) {
+        //No vertex was found
+        *found = false;
+        return 0;
+      } else {
+        //A vertex was found, return its index
+        *found = true;
+        return it->second;
+      }
+    }
+  }
+
+  //Methods to load, create and index models
   namespace models {
     void createBuffers(internalModel &modelObject) {
       //Create and fill a vertex buffer
@@ -40,13 +77,47 @@ namespace ammonite {
       glGenBuffers(1, &modelObject.textureBufferId);
       glBindBuffer(GL_ARRAY_BUFFER, modelObject.textureBufferId);
       glBufferData(GL_ARRAY_BUFFER, modelObject.texturePoints.size() * sizeof(glm::vec2), &modelObject.texturePoints[0], GL_STATIC_DRAW);
+
+      //Create and fill an indices buffer
+      glGenBuffers(1, &modelObject.elementBufferId);
+      glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelObject.elementBufferId);
+      glBufferData(GL_ELEMENT_ARRAY_BUFFER, modelObject.indices.size() * sizeof(unsigned short), &modelObject.indices[0], GL_STATIC_DRAW);
     }
 
     void deleteBuffers(internalModel &modelObject) {
       //Delete created buffers
       glDeleteBuffers(1, &modelObject.vertexBufferId);
-      glDeleteBuffers(1, &modelObject.textureBufferId);
       glDeleteBuffers(1, &modelObject.normalBufferId);
+      glDeleteBuffers(1, &modelObject.textureBufferId);
+      glDeleteBuffers(1, &modelObject.elementBufferId);
+    }
+
+    void indexModel(internalModel* modelObject, modelData* rawModelData) {
+      //Map of known vertices
+      std::map<PackedVertexInfo,unsigned short> vertexIndexMap;
+
+      //Iterate over every vertex, and index them
+      for (unsigned int i = 0; i < rawModelData->vertices.size(); i++) {
+        //Pack vertex information into a struct
+        PackedVertexInfo packedVertex = {rawModelData->vertices[i], rawModelData->texturePoints[i], rawModelData->normals[i]};
+
+        //Search for an identical vertex
+        bool found;
+        unsigned short index = getIdenticalVertexIndex(&packedVertex, &vertexIndexMap, &found);
+
+        //If the vertex has already been used, reuse the index
+        if (found) {
+          modelObject->indices.push_back(index);
+        } else { //Otherwise, add the new vertex to buffer
+          modelObject->vertices.push_back(rawModelData->vertices[i]);
+          modelObject->texturePoints.push_back(rawModelData->texturePoints[i]);
+          modelObject->normals.push_back(rawModelData->normals[i]);
+
+          index = (unsigned short)modelObject->vertices.size() - 1;
+          modelObject->indices.push_back(index);
+          vertexIndexMap[packedVertex] = index;
+        }
+      }
     }
 
     void loadObject(const char* objectPath, internalModel &modelObject, bool* externalSuccess) {
@@ -65,6 +136,9 @@ namespace ammonite {
       auto& attrib = reader.GetAttrib();
       auto& shapes = reader.GetShapes();
 
+      //Temporary storage for unindexed model data
+      modelData rawModelData;
+
       //Loop over shapes
       for (size_t s = 0; s < shapes.size(); s++) {
         //Loop over faces
@@ -81,7 +155,7 @@ namespace ammonite {
             tinyobj::real_t vz = attrib.vertices[3 * size_t(idx.vertex_index) + 2];
 
             glm::vec3 vertex = glm::vec3(vx, vy, vz);
-            modelObject.vertices.push_back(vertex);
+            rawModelData.vertices.push_back(vertex);
 
             //Normals
             if (idx.normal_index >= 0) {
@@ -90,7 +164,7 @@ namespace ammonite {
               tinyobj::real_t nz = attrib.normals[3 * size_t(idx.normal_index) + 2];
 
               glm::vec3 normal = glm::vec3(nx, ny, nz);
-              modelObject.normals.push_back(normal);
+              rawModelData.normals.push_back(normal);
             }
 
             //Texture points
@@ -99,12 +173,16 @@ namespace ammonite {
               tinyobj::real_t ty = 1.0f - attrib.texcoords[2 * size_t(idx.texcoord_index) + 1];
 
               glm::vec2 texturePoint = glm::vec2(tx, ty);
-              modelObject.texturePoints.push_back(texturePoint);
+              rawModelData.texturePoints.push_back(texturePoint);
             }
           }
           index_offset += fv;
         }
       }
+
+      //Fill the index buffer
+      indexModel(&modelObject, &rawModelData);
+
       return;
     }
   }

@@ -73,7 +73,8 @@ void drawFrame(ammonite::models::internalModel *drawObject, GLuint textureSample
   );
 
   //Draw the triangles
-  glDrawArrays(GL_TRIANGLES, 0, drawObject->vertices.size());
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, drawObject->elementBufferId);
+  glDrawElements(GL_TRIANGLES, drawObject->indices.size(), GL_UNSIGNED_SHORT, (void*)0);
 }
 
 int main(int argc, char* argv[]) {
