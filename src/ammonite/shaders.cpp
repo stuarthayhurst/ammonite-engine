@@ -57,8 +57,8 @@ namespace ammonite {
       return false;
     }
 
-    //In C++ 20, the filesystem library can do this
-    void getFileMetadata(const char* filePath, long* filesize, long* timestamp) {
+    //In C++ 20, the std::filesystem can do this
+    static void getFileMetadata(const char* filePath, long* filesize, long* timestamp) {
       struct stat fileInfo;
       if (stat(filePath, &fileInfo) != 0) {
         //Failed to open file, fail the shader
