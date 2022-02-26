@@ -2,6 +2,7 @@
 #define MODELS
 
 #include <vector>
+#include <string>
 #include <glm/glm.hpp>
 #include <GL/glew.h>
 
