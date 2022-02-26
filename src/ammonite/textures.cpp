@@ -1,6 +1,6 @@
 #include <iostream>
-#include <vector>
 #include <string>
+#include <map>
 
 #include <stb/stb_image.h>
 #include <GL/glew.h>
@@ -9,30 +9,31 @@ namespace ammonite {
   namespace {
     struct TextureInfo {
       GLuint textureId;
-      std::string textureName;
       int refCount = 1;
     };
 
-    std::vector<TextureInfo> textureTracker(0);
+    std::map<std::string, TextureInfo> textureTrackerMap;
+    std::map<GLuint, std::string> idToNameMap;
   }
 
   namespace textures {
     void deleteTexture(GLuint textureId) {
-      //Find the TextureInfo in textureTracker
-      for (long unsigned int i = 0; i < textureTracker.size(); i++) {
-        if (textureTracker[i].textureId == textureId) {
-          //Decrease the reference count
-          textureTracker[i].refCount -= 1;
+      std::string textureName;
+      //Check the texture has been loaded, and get a textureName
+      if (idToNameMap.find(textureId) != idToNameMap.end()) {
+        textureName = idToNameMap[textureId];
+      } else {
+        return;
+      }
 
-          //If nothing is using the texture, delete it
-          if (textureTracker[i].refCount < 1) {
-            glDeleteTextures(1, &textureId);
-            textureTracker.erase(std::next(textureTracker.begin(), i));
-          }
+      //Decrease the reference counter
+      textureTrackerMap[textureName].refCount -= 1;
 
-          //Exit early
-          return;
-        }
+      //If texture is now unused, delete the buffer and tracker elements
+      if (textureTrackerMap[textureName].refCount < 1) {
+        glDeleteTextures(1, &textureId);
+        textureTrackerMap.erase(textureName);
+        idToNameMap.erase(textureId);
       }
     }
 
@@ -40,12 +41,12 @@ namespace ammonite {
       int width, height, bpp;
       unsigned char* data;
 
-      //Check if texture is already loaded (Ridiculous datatype to match textureTracker.size())
-      for (long unsigned int i = 0; i < textureTracker.size(); i++) {
-        if (textureTracker[i].textureName == std::string(texturePath)) {
-          textureTracker[i].refCount += 1;
-          return textureTracker[i].textureId;
-        }
+      std::string textureString = std::string(texturePath);
+
+      //Check if texture has already been loaded
+      if (textureTrackerMap.find(textureString) != textureTrackerMap.end()) {
+        textureTrackerMap[textureString].refCount += 1;
+        return textureTrackerMap[textureString].textureId;
       }
 
       //Read image data
@@ -87,8 +88,9 @@ namespace ammonite {
       //Save texture's info to textureTracker
       TextureInfo currentTexture;
       currentTexture.textureId = textureId;
-      currentTexture.textureName = std::string(texturePath);
-      textureTracker.push_back(currentTexture);
+      textureTrackerMap[textureString] = currentTexture;
+
+      idToNameMap[textureId] = textureString;
 
       glBindTexture(GL_TEXTURE_2D, 0);
       return textureId;
