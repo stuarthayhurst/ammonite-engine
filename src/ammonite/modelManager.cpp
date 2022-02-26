@@ -202,8 +202,9 @@ namespace ammonite {
 
     InternalModel* getModelPtr(int modelId) {
       //Check the model exists, and return a pointer
-      if (modelTrackerMap.find(modelId) != modelTrackerMap.end()) {
-        return &modelTrackerMap[modelId];
+      auto it = modelTrackerMap.find(modelId);
+      if (it != modelTrackerMap.end()) {
+        return &it->second;
       } else {
         return nullptr;
       }
@@ -211,10 +212,11 @@ namespace ammonite {
 
     void deleteModel(int modelId) {
       //Check the model actually exists
-      if (modelTrackerMap.find(modelId) != modelTrackerMap.end()) {
+      auto it = modelTrackerMap.find(modelId);
+      if (it != modelTrackerMap.end()) {
         //Destroy the model's buffers and texture
-        deleteBuffers(&modelTrackerMap[modelId]);
-        ammonite::textures::deleteTexture(modelTrackerMap[modelId].textureId);
+        deleteBuffers(&it->second);
+        ammonite::textures::deleteTexture(it->second.textureId);
 
         //Remove the model from the tracker
         modelTrackerMap.erase(modelId);
