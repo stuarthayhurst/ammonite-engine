@@ -2,6 +2,7 @@
 #include <vector>
 #include <map>
 #include <cstring>
+#include <string>
 
 #include <tiny_obj_loader.h>
 #include <GL/glew.h>
@@ -20,12 +21,14 @@ namespace ammonite {
       GLuint textureBufferId;
       GLuint elementBufferId;
       GLuint textureId;
+      int vertexCount;
+      int refCount = 1;
     };
 
     struct InternalModel {
-      InternalModelData data;
-      int vertexCount = 0;
-      int modelId = 0;
+      InternalModelData* data;
+      std::string modelName;
+      int modelId;
     };
   }
 
@@ -47,6 +50,7 @@ namespace ammonite {
 
     //Track all loaded models
     std::map<int, models::InternalModel> modelTrackerMap;
+    std::map<std::string, models::InternalModelData> modelDataMap;
   }
 
   namespace {
@@ -122,7 +126,7 @@ namespace ammonite {
       }
     }
 
-    static int loadObject(const char* objectPath, models::InternalModelData* modelObjectData, bool* externalSuccess) {
+    static void loadObject(const char* objectPath, models::InternalModelData* modelObjectData, bool* externalSuccess) {
       tinyobj::ObjReaderConfig reader_config;
       tinyobj::ObjReader reader;
 
@@ -132,7 +136,7 @@ namespace ammonite {
           std::cerr << reader.Error();
         }
         *externalSuccess = false;
-        return 0;
+        return;
       }
 
       auto& attrib = reader.GetAttrib();
@@ -183,9 +187,10 @@ namespace ammonite {
       }
 
       //Fill the index buffer
+      modelObjectData->vertexCount = rawModelData.vertices.size();
       indexModel(modelObjectData, &rawModelData);
 
-      return rawModelData.vertices.size();;
+      return;
     }
   }
 
@@ -194,8 +199,23 @@ namespace ammonite {
     int createModel(const char* objectPath, bool* externalSuccess) {
       //Create the model
       InternalModel modelObject;
-      modelObject.vertexCount = loadObject(objectPath, &modelObject.data, externalSuccess);
-      createBuffers(&modelObject.data);
+      modelObject.modelName = std::string(objectPath);
+
+      //Reuse model data if it has already been loaded
+      auto it = modelDataMap.find(modelObject.modelName);
+      if (it != modelDataMap.end()) {
+        modelObject.data = &it->second;
+        modelObject.data->refCount += 1;
+      } else {
+        //Create empty InternalModelData object and add to tracker
+        InternalModelData newModelData;
+        modelDataMap[modelObject.modelName] = newModelData;
+        modelObject.data = &modelDataMap[modelObject.modelName];
+
+        //Fill the model data
+        loadObject(objectPath, modelObject.data, externalSuccess);
+        createBuffers(modelObject.data);
+      }
 
       //Add model to the tracker and return the ID
       modelObject.modelId = modelTrackerMap.size() + 1;
@@ -217,9 +237,17 @@ namespace ammonite {
       //Check the model actually exists
       auto it = modelTrackerMap.find(modelId);
       if (it != modelTrackerMap.end()) {
-        //Destroy the model's buffers and texture
-        deleteBuffers(&it->second.data);
-        ammonite::textures::deleteTexture(it->second.data.textureId);
+        InternalModelData* modelObjectData = it->second.data;
+        //Decrease the reference count of the model data
+        modelObjectData->refCount -= 1;
+
+        //If the model's data is now unused, destroy it
+        if (modelObjectData->refCount < 1) {
+          //Destroy the model's buffers, texture and position in second tracker layer
+          deleteBuffers(modelObjectData);
+          ammonite::textures::deleteTexture(modelObjectData->textureId);
+          modelDataMap.erase(it->second.modelName);
+        }
 
         //Remove the model from the tracker
         modelTrackerMap.erase(modelId);

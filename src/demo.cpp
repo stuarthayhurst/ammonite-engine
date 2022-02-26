@@ -30,7 +30,7 @@ void GLAPIENTRY debugMessageCallback(GLenum, GLenum type, GLuint, GLenum severit
 #endif
 
 void drawFrame(ammonite::models::InternalModel *drawObject, GLuint textureSamplerId) {
-  ammonite::models::InternalModelData* drawObjectData = &drawObject->data;
+  ammonite::models::InternalModelData* drawObjectData = drawObject->data;
   //Bind texture in Texture Unit 0
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, drawObjectData->textureId);
@@ -75,7 +75,7 @@ void drawFrame(ammonite::models::InternalModel *drawObject, GLuint textureSample
 
   //Draw the triangles
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, drawObjectData->elementBufferId);
-  glDrawElements(GL_TRIANGLES, drawObject->vertexCount, GL_UNSIGNED_INT, (void*)0);
+  glDrawElements(GL_TRIANGLES, drawObjectData->vertexCount, GL_UNSIGNED_INT, (void*)0);
 }
 
 int main(int argc, char* argv[]) {
@@ -174,9 +174,9 @@ int main(int argc, char* argv[]) {
     //Load model
     loadedModelIds[i] = ammonite::models::createModel(models[i][0], &success);
     //Count vertices
-    vertexCount += ammonite::models::getModelPtr(loadedModelIds[i])->vertexCount;
+    vertexCount += ammonite::models::getModelPtr(loadedModelIds[i])->data->vertexCount;
     //Load texture
-    ammonite::models::getModelPtr(loadedModelIds[i])->data.textureId = ammonite::textures::loadTexture(models[i][1], &success);
+    ammonite::models::getModelPtr(loadedModelIds[i])->data->textureId = ammonite::textures::loadTexture(models[i][1], &success);
   }
 
   //Destroy all models, textures and shaders

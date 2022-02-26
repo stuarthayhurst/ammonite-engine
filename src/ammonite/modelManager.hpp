@@ -16,12 +16,14 @@ namespace ammonite {
       GLuint textureBufferId;
       GLuint elementBufferId;
       GLuint textureId;
+      int vertexCount;
+      int refCount = 1;
     };
 
     struct InternalModel {
-      InternalModelData data;
-      int vertexCount = 0;
-      int modelId = 0;
+      InternalModelData* data;
+      std::string modelName;
+      int modelId;
     };
 
     int createModel(const char* objectPath, bool* externalSuccess);
