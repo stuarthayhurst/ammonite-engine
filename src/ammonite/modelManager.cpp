@@ -183,10 +183,9 @@ namespace ammonite {
       }
 
       //Fill the index buffer
-      int vertexCount = rawModelData.vertices.size();
       indexModel(modelObjectData, &rawModelData);
 
-      return vertexCount;
+      return rawModelData.vertices.size();;
     }
   }
 
