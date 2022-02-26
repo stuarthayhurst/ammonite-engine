@@ -30,15 +30,16 @@ void GLAPIENTRY debugMessageCallback(GLenum, GLenum type, GLuint, GLenum severit
 #endif
 
 void drawFrame(ammonite::models::InternalModel *drawObject, GLuint textureSamplerId) {
+  ammonite::models::InternalModelData* drawObjectData = &drawObject->data;
   //Bind texture in Texture Unit 0
   glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, drawObject->textureId);
+  glBindTexture(GL_TEXTURE_2D, drawObjectData->textureId);
   //Set texture sampler to use Texture Unit 0
   glUniform1i(textureSamplerId, 0);
 
   //Vertex attribute buffer
   glEnableVertexAttribArray(0);
-  glBindBuffer(GL_ARRAY_BUFFER, drawObject->vertexBufferId);
+  glBindBuffer(GL_ARRAY_BUFFER, drawObjectData->vertexBufferId);
   glVertexAttribPointer(
     0,        //shader location
     3,        //size
@@ -50,7 +51,7 @@ void drawFrame(ammonite::models::InternalModel *drawObject, GLuint textureSample
 
   //Texture attribute buffer
   glEnableVertexAttribArray(1);
-  glBindBuffer(GL_ARRAY_BUFFER, drawObject->textureBufferId);
+  glBindBuffer(GL_ARRAY_BUFFER, drawObjectData->textureBufferId);
   glVertexAttribPointer(
     1,
     2,
@@ -62,7 +63,7 @@ void drawFrame(ammonite::models::InternalModel *drawObject, GLuint textureSample
 
   //Normal attribute buffer
   glEnableVertexAttribArray(2);
-  glBindBuffer(GL_ARRAY_BUFFER, drawObject->normalBufferId);
+  glBindBuffer(GL_ARRAY_BUFFER, drawObjectData->normalBufferId);
   glVertexAttribPointer(
     2,
     3,
@@ -73,7 +74,7 @@ void drawFrame(ammonite::models::InternalModel *drawObject, GLuint textureSample
   );
 
   //Draw the triangles
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, drawObject->elementBufferId);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, drawObjectData->elementBufferId);
   glDrawElements(GL_TRIANGLES, drawObject->vertexCount, GL_UNSIGNED_INT, (void*)0);
 }
 
@@ -175,7 +176,7 @@ int main(int argc, char* argv[]) {
     //Count vertices
     vertexCount += ammonite::models::getModelPtr(loadedModelIds[i])->vertexCount;
     //Load texture
-    ammonite::models::getModelPtr(loadedModelIds[i])->textureId = ammonite::textures::loadTexture(models[i][1], &success);
+    ammonite::models::getModelPtr(loadedModelIds[i])->data.textureId = ammonite::textures::loadTexture(models[i][1], &success);
   }
 
   //Destroy all models, textures and shaders

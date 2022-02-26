@@ -11,7 +11,7 @@
 
 namespace ammonite {
   namespace models {
-    struct InternalModel {
+    struct InternalModelData {
       std::vector<glm::vec3> vertices, normals;
       std::vector<glm::vec2> texturePoints;
       std::vector<unsigned int> indices;
@@ -20,6 +20,10 @@ namespace ammonite {
       GLuint textureBufferId;
       GLuint elementBufferId;
       GLuint textureId;
+    };
+
+    struct InternalModel {
+      InternalModelData data;
       int vertexCount = 0;
       int modelId = 0;
     };
@@ -60,37 +64,37 @@ namespace ammonite {
       }
     }
 
-    static void createBuffers(models::InternalModel* modelObject) {
+    static void createBuffers(models::InternalModelData* modelObjectData) {
       //Create and fill a vertex buffer
-      glGenBuffers(1, &modelObject->vertexBufferId);
-      glBindBuffer(GL_ARRAY_BUFFER, modelObject->vertexBufferId);
-      glBufferData(GL_ARRAY_BUFFER, modelObject->vertices.size() * sizeof(glm::vec3), &modelObject->vertices[0], GL_STATIC_DRAW);
+      glGenBuffers(1, &modelObjectData->vertexBufferId);
+      glBindBuffer(GL_ARRAY_BUFFER, modelObjectData->vertexBufferId);
+      glBufferData(GL_ARRAY_BUFFER, modelObjectData->vertices.size() * sizeof(glm::vec3), &modelObjectData->vertices[0], GL_STATIC_DRAW);
 
       //Create and fill a normal buffer
-      glGenBuffers(1, &modelObject->normalBufferId);
-      glBindBuffer(GL_ARRAY_BUFFER, modelObject->normalBufferId);
-      glBufferData(GL_ARRAY_BUFFER, modelObject->normals.size() * sizeof(glm::vec3), &modelObject->normals[0], GL_STATIC_DRAW);
+      glGenBuffers(1, &modelObjectData->normalBufferId);
+      glBindBuffer(GL_ARRAY_BUFFER, modelObjectData->normalBufferId);
+      glBufferData(GL_ARRAY_BUFFER, modelObjectData->normals.size() * sizeof(glm::vec3), &modelObjectData->normals[0], GL_STATIC_DRAW);
 
       //Create and fill a texture buffer
-      glGenBuffers(1, &modelObject->textureBufferId);
-      glBindBuffer(GL_ARRAY_BUFFER, modelObject->textureBufferId);
-      glBufferData(GL_ARRAY_BUFFER, modelObject->texturePoints.size() * sizeof(glm::vec2), &modelObject->texturePoints[0], GL_STATIC_DRAW);
+      glGenBuffers(1, &modelObjectData->textureBufferId);
+      glBindBuffer(GL_ARRAY_BUFFER, modelObjectData->textureBufferId);
+      glBufferData(GL_ARRAY_BUFFER, modelObjectData->texturePoints.size() * sizeof(glm::vec2), &modelObjectData->texturePoints[0], GL_STATIC_DRAW);
 
       //Create and fill an indices buffer
-      glGenBuffers(1, &modelObject->elementBufferId);
-      glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelObject->elementBufferId);
-      glBufferData(GL_ELEMENT_ARRAY_BUFFER, modelObject->indices.size() * sizeof(unsigned int), &modelObject->indices[0], GL_STATIC_DRAW);
+      glGenBuffers(1, &modelObjectData->elementBufferId);
+      glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelObjectData->elementBufferId);
+      glBufferData(GL_ELEMENT_ARRAY_BUFFER, modelObjectData->indices.size() * sizeof(unsigned int), &modelObjectData->indices[0], GL_STATIC_DRAW);
     }
 
-    static void deleteBuffers(models::InternalModel* modelObject) {
+    static void deleteBuffers(models::InternalModelData* modelObjectData) {
       //Delete created buffers
-      glDeleteBuffers(1, &modelObject->vertexBufferId);
-      glDeleteBuffers(1, &modelObject->normalBufferId);
-      glDeleteBuffers(1, &modelObject->textureBufferId);
-      glDeleteBuffers(1, &modelObject->elementBufferId);
+      glDeleteBuffers(1, &modelObjectData->vertexBufferId);
+      glDeleteBuffers(1, &modelObjectData->normalBufferId);
+      glDeleteBuffers(1, &modelObjectData->textureBufferId);
+      glDeleteBuffers(1, &modelObjectData->elementBufferId);
     }
 
-    static void indexModel(models::InternalModel* modelObject, modelData* rawModelData) {
+    static void indexModel(models::InternalModelData* modelObjectData, modelData* rawModelData) {
       //Map of known vertices
       std::map<PackedVertexInfo, unsigned int> vertexIndexMap;
 
@@ -105,20 +109,20 @@ namespace ammonite {
 
         //If the vertex has already been used, reuse the index
         if (found) {
-          modelObject->indices.push_back(index);
+          modelObjectData->indices.push_back(index);
         } else { //Otherwise, add the new vertex to buffer
-          modelObject->vertices.push_back(rawModelData->vertices[i]);
-          modelObject->texturePoints.push_back(rawModelData->texturePoints[i]);
-          modelObject->normals.push_back(rawModelData->normals[i]);
+          modelObjectData->vertices.push_back(rawModelData->vertices[i]);
+          modelObjectData->texturePoints.push_back(rawModelData->texturePoints[i]);
+          modelObjectData->normals.push_back(rawModelData->normals[i]);
 
-          index = (unsigned int)modelObject->vertices.size() - 1;
-          modelObject->indices.push_back(index);
+          index = (unsigned int)modelObjectData->vertices.size() - 1;
+          modelObjectData->indices.push_back(index);
           vertexIndexMap[packedVertex] = index;
         }
       }
     }
 
-    static void loadObject(const char* objectPath, models::InternalModel* modelObject, bool* externalSuccess) {
+    static int loadObject(const char* objectPath, models::InternalModelData* modelObjectData, bool* externalSuccess) {
       tinyobj::ObjReaderConfig reader_config;
       tinyobj::ObjReader reader;
 
@@ -128,7 +132,7 @@ namespace ammonite {
           std::cerr << reader.Error();
         }
         *externalSuccess = false;
-        return;
+        return 0;
       }
 
       auto& attrib = reader.GetAttrib();
@@ -179,10 +183,10 @@ namespace ammonite {
       }
 
       //Fill the index buffer
-      modelObject->vertexCount = rawModelData.vertices.size();
-      indexModel(modelObject, &rawModelData);
+      int vertexCount = rawModelData.vertices.size();
+      indexModel(modelObjectData, &rawModelData);
 
-      return;
+      return vertexCount;
     }
   }
 
@@ -191,8 +195,8 @@ namespace ammonite {
     int createModel(const char* objectPath, bool* externalSuccess) {
       //Create the model
       InternalModel modelObject;
-      loadObject(objectPath, &modelObject, externalSuccess);
-      createBuffers(&modelObject);
+      modelObject.vertexCount = loadObject(objectPath, &modelObject.data, externalSuccess);
+      createBuffers(&modelObject.data);
 
       //Add model to the tracker and return the ID
       modelObject.modelId = modelTrackerMap.size() + 1;
@@ -215,8 +219,8 @@ namespace ammonite {
       auto it = modelTrackerMap.find(modelId);
       if (it != modelTrackerMap.end()) {
         //Destroy the model's buffers and texture
-        deleteBuffers(&it->second);
-        ammonite::textures::deleteTexture(it->second.textureId);
+        deleteBuffers(&it->second.data);
+        ammonite::textures::deleteTexture(it->second.data.textureId);
 
         //Remove the model from the tracker
         modelTrackerMap.erase(modelId);

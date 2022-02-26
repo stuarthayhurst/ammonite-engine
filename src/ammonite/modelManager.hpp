@@ -7,7 +7,7 @@
 
 namespace ammonite {
   namespace models {
-    struct InternalModel {
+    struct InternalModelData {
       std::vector<glm::vec3> vertices, normals;
       std::vector<glm::vec2> texturePoints;
       std::vector<unsigned int> indices;
@@ -16,6 +16,10 @@ namespace ammonite {
       GLuint textureBufferId;
       GLuint elementBufferId;
       GLuint textureId;
+    };
+
+    struct InternalModel {
+      InternalModelData data;
       int vertexCount = 0;
       int modelId = 0;
     };
