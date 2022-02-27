@@ -56,6 +56,7 @@
 
 ## Credits:
  - Some models in `assets/` may have been created by third parties, attribution can be found in `docs/CREDITS.md`
+ - The [OpenGL Tutorial](http://www.opengl-tutorial.org/) and the [tinyobjloader source](https://github.com/tinyobjloader/tinyobjloader) were both used as reference materials
 
 ## License
   - This project is available under the terms of the GNU Lesser General Public License (v3.0)
