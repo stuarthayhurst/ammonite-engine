@@ -154,7 +154,7 @@ namespace ammonite {
 
       //Pass icons to glfw
       if (pngFiles.size() != 0) {
-        glfwSetWindowIcon(window, 1, images);
+        glfwSetWindowIcon(window, pngFiles.size(), images);
       }
 
       //Free the data
