@@ -29,6 +29,14 @@ void GLAPIENTRY debugMessageCallback(GLenum, GLenum type, GLuint, GLenum severit
 }
 #endif
 
+void enableWireframe(bool enabled) {
+  if (enabled) {
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+  } else {
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+  }
+}
+
 void drawFrame(ammonite::models::InternalModel *drawObject, GLuint textureSamplerId) {
   ammonite::models::InternalModelData* drawObjectData = drawObject->data;
   //Bind texture in Texture Unit 0
@@ -129,6 +137,9 @@ int main(int argc, char* argv[]) {
   //Enable depth test and only show fragments closer than the previous
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LESS);
+
+  //Enable / disable drawing the wireframe
+  enableWireframe(false);
 
   //Create the VAO
   GLuint vertexArrayId;
