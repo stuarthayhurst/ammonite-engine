@@ -3,7 +3,7 @@
   - An OpenGL based renderer to display models and generated datasets, focused on ease of use
   - Any donations are greatly appreciated :)
 
-![Icon](assets/icons/icon.png)
+![Icon](assets/icons/icon.svg)
 
 ## Requirements:
   - A `c++17` compatible compiler (`g++ 8+`)
