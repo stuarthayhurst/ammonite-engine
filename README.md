@@ -1,7 +1,7 @@
 ## Ammonite Renderer
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://paypal.me/stuartahayhurst)
   - An OpenGL based renderer to display models and generated datasets, focused on ease of use
-  - Any donations are greatly appreciated :)
+  - If you found this project interesting, any donations are greatly appreciated :)
 
 ![Icon](assets/icons/icon.svg)
 
