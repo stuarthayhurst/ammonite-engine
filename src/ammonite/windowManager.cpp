@@ -1,7 +1,9 @@
 #include <iostream>
+#include <filesystem>
 #include <cmath>
 #include <tuple>
 #include <vector>
+#include <string>
 
 #include <stb/stb_image.h>
 #include <GL/glew.h>
@@ -131,13 +133,35 @@ namespace ammonite {
       }
     }
 
-    void setIcon(GLFWwindow* window, const char* iconPath) {
-      GLFWimage images[1];
+    void useIconDir(GLFWwindow* window, const char* iconDirPath) {
+      const std::filesystem::path searchDir{iconDirPath};
+      const auto it = std::filesystem::directory_iterator{searchDir};
+
+      //Add all png files to a vector
+      std::vector<std::string> pngFiles(0);
+      for (auto const& fileName : it) {
+        std::filesystem::path filePath{fileName};
+        if (filePath.extension() == ".png") {
+          pngFiles.push_back(std::string(filePath));
+        }
+      }
+
       //Read image data
-      images[0].pixels = stbi_load(iconPath, &images[0].width, &images[0].height, nullptr, 4);
-      //Set the icon
-      glfwSetWindowIcon(window, 1, images);
-      stbi_image_free(images[0].pixels);
+      GLFWimage images[pngFiles.size()];
+      for (unsigned int i = 0; i < pngFiles.size(); i++) {
+        images[i].pixels = stbi_load(pngFiles[i].c_str(), &images[i].width, &images[i].height, nullptr, 4);
+      }
+
+      //Pass icons to glfw
+      if (pngFiles.size() != 0) {
+        glfwSetWindowIcon(window, 1, images);
+      }
+
+      //Free the data
+      for (unsigned int i = 0; i < pngFiles.size(); i++) {
+        stbi_image_free(images[i].pixels);
+      }
+
     }
 
     //Wrapper to create and setup window
