@@ -33,7 +33,7 @@ void drawFrame(ammonite::models::InternalModel *drawObject, GLuint textureSample
   ammonite::models::InternalModelData* drawObjectData = drawObject->data;
   //Bind texture in Texture Unit 0
   glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, drawObjectData->textureId);
+  glBindTexture(GL_TEXTURE_2D, drawObject->textureId);
   //Set texture sampler to use Texture Unit 0
   glUniform1i(textureSamplerId, 0);
 
@@ -176,7 +176,7 @@ int main(int argc, char* argv[]) {
     //Count vertices
     vertexCount += ammonite::models::getModelPtr(loadedModelIds[i])->data->vertexCount;
     //Load texture
-    ammonite::models::getModelPtr(loadedModelIds[i])->data->textureId = ammonite::textures::loadTexture(models[i][1], &success);
+    ammonite::models::getModelPtr(loadedModelIds[i])->textureId = ammonite::textures::loadTexture(models[i][1], &success);
   }
 
   //Destroy all models, textures and shaders

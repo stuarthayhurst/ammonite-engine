@@ -16,13 +16,13 @@ namespace ammonite {
       GLuint normalBufferId;
       GLuint textureBufferId;
       GLuint elementBufferId;
-      GLuint textureId;
       int vertexCount;
       int refCount = 1;
     };
 
     struct InternalModel {
       InternalModelData* data;
+      GLuint textureId;
       std::string modelName;
       int modelId;
     };

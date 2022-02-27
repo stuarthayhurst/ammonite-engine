@@ -20,13 +20,13 @@ namespace ammonite {
       GLuint normalBufferId;
       GLuint textureBufferId;
       GLuint elementBufferId;
-      GLuint textureId;
       int vertexCount;
       int refCount = 1;
     };
 
     struct InternalModel {
       InternalModelData* data;
+      GLuint textureId;
       std::string modelName;
       int modelId;
     };
@@ -237,7 +237,8 @@ namespace ammonite {
       //Check the model actually exists
       auto it = modelTrackerMap.find(modelId);
       if (it != modelTrackerMap.end()) {
-        InternalModelData* modelObjectData = it->second.data;
+        InternalModel* modelObject = &it->second;
+        InternalModelData* modelObjectData = modelObject->data;
         //Decrease the reference count of the model data
         modelObjectData->refCount -= 1;
 
@@ -245,8 +246,8 @@ namespace ammonite {
         if (modelObjectData->refCount < 1) {
           //Destroy the model's buffers, texture and position in second tracker layer
           deleteBuffers(modelObjectData);
-          ammonite::textures::deleteTexture(modelObjectData->textureId);
-          modelDataMap.erase(it->second.modelName);
+          ammonite::textures::deleteTexture(modelObject->textureId);
+          modelDataMap.erase(modelObject->modelName);
         }
 
         //Remove the model from the tracker
