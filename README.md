@@ -36,7 +36,9 @@
   - `make local-build` - Same as `build`, but only allow running from the project's root directory
   - `make library` - Buils `build/libammonite.so`
   - `make install` - Installs `libammonite.so` to system directories
+    - The install path can be configured, by setting the environment variable `INSTALL_DIR`
   - `make uninstall` - Removes installed library
+    - Custom install locations can be removed using the environment variable `INSTALL_DIR`
   - `make icons` - Creates `assets/icons/icon.png` from `assets/icons/icon.svg`
   - `make clean` - Cleans the build area (`build/`) and default runtime cache (`cache/`)
   - `make cache` - Clears the default runtime binary cache, useful if running into issues with caching
