@@ -4,7 +4,7 @@ SHELL = bash
 LIBS = glm glfw3 glew stb tinyobjloader
 BUILD_DIR = build
 CACHE_DIR = cache
-INSTALL_DIR = /usr/lib
+INSTALL_DIR = /usr/local/lib/ammonite
 
 OBJECT_DIR = $(BUILD_DIR)/objects
 AMMONITE_OBJECTS_SOURCE = $(wildcard ./src/ammonite/*.cpp)
@@ -51,6 +51,7 @@ library: $(BUILD_DIR)/libammonite.so
 install:
 	@mkdir -p "$(INSTALL_DIR)"
 	install "$(BUILD_DIR)/libammonite.so" "$(INSTALL_DIR)/libammonite.so"
+	ldconfig "$(INSTALL_DIR)"
 uninstall:
 	rm -rf "$(INSTALL_DIR)/libammonite.so"*
 clean: cache
