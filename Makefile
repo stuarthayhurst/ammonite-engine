@@ -4,7 +4,7 @@ SHELL = bash
 LIBS = glm glfw3 glew stb tinyobjloader
 BUILD_DIR = build
 CACHE_DIR = cache
-INSTALL_DIR = /usr/local/lib/ammonite
+INSTALL_DIR ?= /usr/local/lib/ammonite
 
 OBJECT_DIR = $(BUILD_DIR)/objects
 AMMONITE_OBJECTS_SOURCE = $(wildcard ./src/ammonite/*.cpp)
