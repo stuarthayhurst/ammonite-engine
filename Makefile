@@ -50,6 +50,8 @@ system-build:
 	$(MAKE) "$(BUILD_DIR)/demo"
 	strip --strip-unneeded "$(BUILD_DIR)/libammonite.so" "$(BUILD_DIR)/demo"
 library: $(BUILD_DIR)/libammonite.so
+	rm -f "$(BUILD_DIR)/$(LIBRARY_NAME)"
+	ln -s "libammonite.so" "$(BUILD_DIR)/$(LIBRARY_NAME)"
 install:
 	@mkdir -p "$(INSTALL_DIR)"
 	install "$(BUILD_DIR)/libammonite.so" "$(INSTALL_DIR)/$(LIBRARY_NAME)"
