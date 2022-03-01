@@ -56,7 +56,7 @@ install:
 	ldconfig "$(INSTALL_DIR)"
 uninstall:
 	rm -f "$(INSTALL_DIR)/libammonite.so"*
-	rm -dfi "$(INSTALL_DIR)"
+	if [[ -d "$(INSTALL_DIR)" ]]; then rm -di "$(INSTALL_DIR)"; fi
 clean: cache
 	rm -rfv "$(BUILD_DIR)"
 cache:
