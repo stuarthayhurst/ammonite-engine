@@ -5,6 +5,7 @@ LIBS = glm glfw3 glew stb tinyobjloader
 BUILD_DIR = build
 CACHE_DIR = cache
 INSTALL_DIR ?= /usr/local/lib/ammonite
+LIBRARY_NAME = libammonite.so.1
 
 OBJECT_DIR = $(BUILD_DIR)/objects
 AMMONITE_OBJECTS_SOURCE = $(wildcard ./src/ammonite/*.cpp)
@@ -28,7 +29,7 @@ $(BUILD_DIR)/demo: library $(COMMON_OBJECTS) $(OBJECT_DIR)/demo.o
 
 $(BUILD_DIR)/libammonite.so: $(AMMONITE_OBJECTS)
 	@mkdir -p "$(OBJECT_DIR)"
-	$(CXX) -shared -o "$@" $(AMMONITE_OBJECTS) $(CXXFLAGS)
+	$(CXX) -shared -o "$@" $(AMMONITE_OBJECTS) $(CXXFLAGS) "-Wl,-soname,$(LIBRARY_NAME)"
 
 $(AMMONITE_OBJECTS): $(AMMONITE_OBJECTS_SOURCE) $(AMMONITE_HEADER_SOURCE)
 	@mkdir -p "$(OBJECT_DIR)"
@@ -51,7 +52,7 @@ system-build:
 library: $(BUILD_DIR)/libammonite.so
 install:
 	@mkdir -p "$(INSTALL_DIR)"
-	install "$(BUILD_DIR)/libammonite.so" "$(INSTALL_DIR)/libammonite.so"
+	install "$(BUILD_DIR)/libammonite.so" "$(INSTALL_DIR)/$(LIBRARY_NAME)"
 	ldconfig "$(INSTALL_DIR)"
 uninstall:
 	rm -f "$(INSTALL_DIR)/libammonite.so"*
