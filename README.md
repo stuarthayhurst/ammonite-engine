@@ -23,6 +23,7 @@
   - To compile in debug mode, use `DEBUG=true make ...`
     - This will compile some extras in the code to help with debugging (every header gets `iostream`)
     - It will also enable OpenGL debug warning, messages and errors
+    - It won't trigger a rebuild of the library, so `make clean` should be run before swapping the value
 
 ## Options:
   - Compiled demos have a few arguments supported:
