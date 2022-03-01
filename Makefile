@@ -32,7 +32,7 @@ $(BUILD_DIR)/libammonite.so: $(AMMONITE_OBJECTS)
 
 $(AMMONITE_OBJECTS): $(AMMONITE_OBJECTS_SOURCE) $(AMMONITE_HEADER_SOURCE)
 	@mkdir -p "$(OBJECT_DIR)"
-	$(CXX) $(subst $(OBJECT_DIR),src/ammonite,$(subst .o,.cpp,$(@))) -c $(CXXFLAGS) -o "$@"
+	$(CXX) $(subst $(OBJECT_DIR),src/ammonite,$(subst .o,.cpp,$(@))) -c $(CXXFLAGS) -fpic -o "$@"
 
 $(COMMON_OBJECTS): $(COMMON_OBJECTS_SOURCE) $(COMMON_HEADER_SOURCE)
 	@mkdir -p "$(OBJECT_DIR)"
