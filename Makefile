@@ -53,7 +53,8 @@ install:
 	install "$(BUILD_DIR)/libammonite.so" "$(INSTALL_DIR)/libammonite.so"
 	ldconfig "$(INSTALL_DIR)"
 uninstall:
-	rm -rf "$(INSTALL_DIR)/libammonite.so"*
+	rm -f "$(INSTALL_DIR)/libammonite.so"*
+	rm -dfi "$(INSTALL_DIR)"
 clean: cache
 	rm -rfv "$(BUILD_DIR)"
 cache:
