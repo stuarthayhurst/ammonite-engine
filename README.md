@@ -34,7 +34,7 @@
 ## Build system:
   - `build`, `local-build` and `library` support building on multiple cores with `-jX`
   - `make build` - Builds demo binary, a working demonstration of the renderer
-  - `make local-build` - Same as `build`, but only allow running from the project's root directory
+  - `make system-build` - Same as `build`, but uses the system copy of `libammonite.so`
   - `make library` - Buils `build/libammonite.so`
   - `make install` - Installs `libammonite.so` to system directories
     - The install path can be configured, by setting the environment variable `INSTALL_DIR`

@@ -42,12 +42,12 @@ $(OBJECT_DIR)/demo.o: ./src/demo.cpp $(AMMONITE_HEADER_SOURCE) $(COMMON_HEADER_S
 	@mkdir -p "$(OBJECT_DIR)"
 	$(CXX) ./src/demo.cpp -c $(CXXFLAGS) -o "$@"
 
-.PHONY: build local-build library install uninstall clean cache icons
+.PHONY: build system-build library install uninstall clean cache icons
 build:
+	RPATH="-Wl,-rpath=$(BUILD_DIR)" $(MAKE) system-build
+system-build:
 	$(MAKE) "$(BUILD_DIR)/demo"
 	strip --strip-unneeded "$(BUILD_DIR)/libammonite.so" "$(BUILD_DIR)/demo"
-local-build:
-	RPATH="-Wl,-rpath=$(BUILD_DIR)" $(MAKE) build
 library: $(BUILD_DIR)/libammonite.so
 install:
 	@mkdir -p "$(INSTALL_DIR)"
