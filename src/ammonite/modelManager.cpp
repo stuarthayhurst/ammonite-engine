@@ -6,7 +6,9 @@
 
 #include <tiny_obj_loader.h>
 #include <GL/glew.h>
+
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include "textures.hpp"
 
@@ -24,8 +26,15 @@ namespace ammonite {
       int refCount = 1;
     };
 
+    struct PositionData {
+      glm::mat4 translationMatrix;
+      glm::mat4 rotationMatrix;
+      glm::mat4 scaleMatrix;
+    };
+
     struct InternalModel {
       InternalModelData* data;
+      PositionData positionData;
       GLuint textureId;
       std::string modelName;
       int modelId;
@@ -217,6 +226,12 @@ namespace ammonite {
         createBuffers(modelObject.data);
       }
 
+      PositionData positionData;
+      positionData.translationMatrix = glm::mat4(1.0f);
+      positionData.rotationMatrix = glm::mat4(1.0f);
+      positionData.scaleMatrix = glm::mat4(1.0f);
+      modelObject.positionData = positionData;
+
       //Add model to the tracker and return the ID
       modelObject.modelId = modelTrackerMap.size() + 1;
       modelTrackerMap[modelObject.modelId] = modelObject;
@@ -252,6 +267,24 @@ namespace ammonite {
 
         //Remove the model from the tracker
         modelTrackerMap.erase(modelId);
+      }
+    }
+
+    namespace position {
+      void translateModel(int modelId, glm::vec3 translation) {
+        //Get the model and translate it
+        models::InternalModel* modelObject = models::getModelPtr(modelId);
+        modelObject->positionData.translationMatrix = translate(
+          modelObject->positionData.translationMatrix,
+          translation);
+      }
+
+      void scaleModel(int modelId, glm::vec3 scaleVector) {
+        //Get the model and scale it
+        models::InternalModel* modelObject = models::getModelPtr(modelId);
+        modelObject->positionData.scaleMatrix = scale(
+          modelObject->positionData.scaleMatrix,
+          scaleVector);
       }
     }
   }

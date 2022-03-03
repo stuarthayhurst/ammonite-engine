@@ -20,8 +20,15 @@ namespace ammonite {
       int refCount = 1;
     };
 
+    struct PositionData {
+      glm::mat4 translationMatrix;
+      glm::mat4 rotationMatrix;
+      glm::mat4 scaleMatrix;
+    };
+
     struct InternalModel {
       InternalModelData* data;
+      PositionData positionData;
       GLuint textureId;
       std::string modelName;
       int modelId;
@@ -31,6 +38,10 @@ namespace ammonite {
     InternalModel* getModelPtr(int modelId);
     void deleteModel(int modelId);
 
+    namespace position {
+      void translateModel(int modelId, glm::vec3 translation);
+      void scaleModel(int modelId, glm::vec3 scale);
+    }
   }
 }
 
