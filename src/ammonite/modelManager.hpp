@@ -22,6 +22,9 @@ namespace ammonite {
 
     struct InternalModel {
       InternalModelData* data;
+      glm::mat4 translationMatrix;
+      glm::mat4 rotationMatrix;
+      glm::mat4 scaleMatrix;
       GLuint textureId;
       std::string modelName;
       int modelId;
@@ -30,10 +33,6 @@ namespace ammonite {
     int createModel(const char* objectPath, bool* externalSuccess);
     InternalModel* getModelPtr(int modelId);
     void deleteModel(int modelId);
-
-    namespace position {
-      //
-    }
   }
 }
 

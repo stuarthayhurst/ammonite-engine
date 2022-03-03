@@ -39,7 +39,7 @@ void enableWireframe(bool enabled) {
   }
 }
 
-void drawFrame(ammonite::models::InternalModel *drawObject, GLuint textureSamplerId) {
+void drawFrame(ammonite::models::InternalModel *drawObject, GLuint textureSamplerId, glm::mat4 projectionMatrix, glm::mat4 viewMatrix, GLuint matrixId, GLuint modelMatrixId) {
   ammonite::models::InternalModelData* drawObjectData = drawObject->data;
   //Bind texture in Texture Unit 0
   glActiveTexture(GL_TEXTURE0);
@@ -82,6 +82,17 @@ void drawFrame(ammonite::models::InternalModel *drawObject, GLuint textureSample
     0,
     (void*)0
   );
+
+  /*glm::mat4 translationMatrix = translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+  glm::mat4 rotationMatrix = glm::mat4(1.0f);
+  glm::mat4 scaleMatrix = scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));*/
+
+  glm::mat4 modelMatrix = drawObject->translationMatrix * drawObject->rotationMatrix * drawObject->scaleMatrix;
+  glm::mat4 mvp = projectionMatrix * viewMatrix * modelMatrix;
+
+  //Send matrices to the shaders
+  glUniformMatrix4fv(matrixId, 1, GL_FALSE, &mvp[0][0]);
+  glUniformMatrix4fv(modelMatrixId, 1, GL_FALSE, &modelMatrix[0][0]);
 
   //Draw the triangles
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, drawObjectData->elementBufferId);
@@ -242,28 +253,24 @@ int main(int argc, char* argv[]) {
     //Process new input since last frame
     ammonite::controls::processInput();
 
-    //Get current model, view and projection matrices, and compute the MVP matrix
-    glm::mat4 projectionMatrix = ammonite::controls::matrix::getProjectionMatrix();
-    glm::mat4 viewMatrix = ammonite::controls::matrix::getViewMatrix();
-
-    glm::mat4 translationMatrix = translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
-    glm::mat4 rotationMatrix = glm::mat4(1.0f);
-    glm::mat4 scaleMatrix = scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
-
-    glm::mat4 modelMatrix = translationMatrix * rotationMatrix * scaleMatrix;
-    glm::mat4 mvp = projectionMatrix * viewMatrix * modelMatrix;
-
-    //Send matrices to the shaders
-    glUniformMatrix4fv(matrixId, 1, GL_FALSE, &mvp[0][0]);
-    glUniformMatrix4fv(modelMatrixId, 1, GL_FALSE, &modelMatrix[0][0]);
-    glUniformMatrix4fv(viewMatrixId, 1, GL_FALSE, &viewMatrix[0][0]);
-
     glm::vec3 lightPos = glm::vec3(4, 4, 4);
     glUniform3f(lightId, lightPos.x, lightPos.y, lightPos.z);
 
+    //Get view and projection matrices
+    glm::mat4 projectionMatrix = ammonite::controls::matrix::getProjectionMatrix();
+    glm::mat4 viewMatrix = ammonite::controls::matrix::getViewMatrix();
+
+    //Set view matrix to shader
+    glUniformMatrix4fv(viewMatrixId, 1, GL_FALSE, &viewMatrix[0][0]);
+
     //Draw given model
     for (int i = 0; i < modelCount; i++) {
-      drawFrame(ammonite::models::getModelPtr(loadedModelIds[i]), textureSamplerId);
+      drawFrame(ammonite::models::getModelPtr(loadedModelIds[i]),
+        textureSamplerId,
+        projectionMatrix,
+        viewMatrix,
+        matrixId,
+        modelMatrixId);
     }
 
     //Swap buffers

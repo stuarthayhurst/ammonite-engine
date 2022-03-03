@@ -6,10 +6,9 @@
 
 #include <tiny_obj_loader.h>
 #include <GL/glew.h>
-#include <glm/glm.hpp>
 
-//TODO remove
-//#include <glm/gtc/matrix_transform.hpp>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
@@ -36,6 +35,9 @@ namespace ammonite {
 
     struct InternalModel {
       InternalModelData* data;
+      glm::mat4 translationMatrix;
+      glm::mat4 rotationMatrix;
+      glm::mat4 scaleMatrix;
       GLuint textureId;
       std::string modelName;
       int modelId;
@@ -227,6 +229,10 @@ namespace ammonite {
         createBuffers(modelObject.data);
       }
 
+      modelObject.translationMatrix = glm::mat4(1.0f);
+      modelObject.rotationMatrix = glm::mat4(1.0f);
+      modelObject.scaleMatrix = glm::mat4(1.0f);
+
       //Add model to the tracker and return the ID
       modelObject.modelId = modelTrackerMap.size() + 1;
       modelTrackerMap[modelObject.modelId] = modelObject;
@@ -263,21 +269,6 @@ namespace ammonite {
         //Remove the model from the tracker
         modelTrackerMap.erase(modelId);
       }
-    }
-
-//TODO
-//Remove extra imports
-//Implement methods
-//Use model matrix in renderer
-
-    namespace position {
-//Method to rotate
-//Method to scale
-//Method to translate
-
-//When methods are called, update the components
-//Either store the final model matrix on the object, or calculate at draw time
-
     }
   }
 }
