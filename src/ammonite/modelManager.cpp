@@ -10,9 +10,6 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include <glm/gtc/quaternion.hpp>
-#include <glm/gtx/quaternion.hpp>
-
 #include "textures.hpp"
 
 namespace ammonite {
@@ -280,6 +277,14 @@ namespace ammonite {
         modelObject->positionData.translationMatrix = translate(
           modelObject->positionData.translationMatrix,
           translation);
+      }
+
+      void scaleModel(int modelId, glm::vec3 scaleVector) {
+        //Get the model and scale it
+        models::InternalModel* modelObject = models::getModelPtr(modelId);
+        modelObject->positionData.scaleMatrix = scale(
+          modelObject->positionData.scaleMatrix,
+          scaleVector);
       }
     }
   }
