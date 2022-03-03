@@ -8,6 +8,16 @@
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 
+//TODO remove
+//#include <glm/gtc/matrix_transform.hpp>
+
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/quaternion.hpp>
+
+//TODO remove
+/*#include <glm/gtx/euler_angles.hpp>
+#include <glm/gtx/norm.hpp>*/
+
 #include "textures.hpp"
 
 namespace ammonite {
@@ -253,6 +263,21 @@ namespace ammonite {
         //Remove the model from the tracker
         modelTrackerMap.erase(modelId);
       }
+    }
+
+//TODO
+//Remove extra imports
+//Implement methods
+//Use model matrix in renderer
+
+    namespace position {
+//Method to rotate
+//Method to scale
+//Method to translate
+
+//When methods are called, update the components
+//Either store the final model matrix on the object, or calculate at draw time
+
     }
   }
 }

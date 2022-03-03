@@ -31,6 +31,9 @@ namespace ammonite {
     InternalModel* getModelPtr(int modelId);
     void deleteModel(int modelId);
 
+    namespace position {
+      //
+    }
   }
 }
 
