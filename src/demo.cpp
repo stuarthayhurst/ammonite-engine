@@ -87,7 +87,7 @@ void drawFrame(ammonite::models::InternalModel *drawObject, GLuint textureSample
   glm::mat4 rotationMatrix = glm::mat4(1.0f);
   glm::mat4 scaleMatrix = scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));*/
 
-  glm::mat4 modelMatrix = drawObject->translationMatrix * drawObject->rotationMatrix * drawObject->scaleMatrix;
+  glm::mat4 modelMatrix = drawObject->positionData.translationMatrix * drawObject->positionData.rotationMatrix * drawObject->positionData.scaleMatrix;
   glm::mat4 mvp = projectionMatrix * viewMatrix * modelMatrix;
 
   //Send matrices to the shaders

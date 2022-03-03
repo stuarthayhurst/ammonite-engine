@@ -13,10 +13,6 @@
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
 
-//TODO remove
-/*#include <glm/gtx/euler_angles.hpp>
-#include <glm/gtx/norm.hpp>*/
-
 #include "textures.hpp"
 
 namespace ammonite {
@@ -33,11 +29,15 @@ namespace ammonite {
       int refCount = 1;
     };
 
-    struct InternalModel {
-      InternalModelData* data;
+    struct PositionData {
       glm::mat4 translationMatrix;
       glm::mat4 rotationMatrix;
       glm::mat4 scaleMatrix;
+    };
+
+    struct InternalModel {
+      InternalModelData* data;
+      PositionData positionData;
       GLuint textureId;
       std::string modelName;
       int modelId;
@@ -229,9 +229,11 @@ namespace ammonite {
         createBuffers(modelObject.data);
       }
 
-      modelObject.translationMatrix = glm::mat4(1.0f);
-      modelObject.rotationMatrix = glm::mat4(1.0f);
-      modelObject.scaleMatrix = glm::mat4(1.0f);
+      PositionData positionData;
+      positionData.translationMatrix = glm::mat4(1.0f);
+      positionData.rotationMatrix = glm::mat4(1.0f);
+      positionData.scaleMatrix = glm::mat4(1.0f);
+      modelObject.positionData = positionData;
 
       //Add model to the tracker and return the ID
       modelObject.modelId = modelTrackerMap.size() + 1;

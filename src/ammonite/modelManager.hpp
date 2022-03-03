@@ -20,11 +20,15 @@ namespace ammonite {
       int refCount = 1;
     };
 
-    struct InternalModel {
-      InternalModelData* data;
+    struct PositionData {
       glm::mat4 translationMatrix;
       glm::mat4 rotationMatrix;
       glm::mat4 scaleMatrix;
+    };
+
+    struct InternalModel {
+      InternalModelData* data;
+      PositionData positionData;
       GLuint textureId;
       std::string modelName;
       int modelId;
