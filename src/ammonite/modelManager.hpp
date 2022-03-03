@@ -37,6 +37,10 @@ namespace ammonite {
     int createModel(const char* objectPath, bool* externalSuccess);
     InternalModel* getModelPtr(int modelId);
     void deleteModel(int modelId);
+
+    namespace position {
+      void translateModel(int modelId, glm::vec3 translation);
+    }
   }
 }
 

@@ -272,5 +272,15 @@ namespace ammonite {
         modelTrackerMap.erase(modelId);
       }
     }
+
+    namespace position {
+      void translateModel(int modelId, glm::vec3 translation) {
+        //Get the model and translate it
+        models::InternalModel* modelObject = models::getModelPtr(modelId);
+        modelObject->positionData.translationMatrix = translate(
+          modelObject->positionData.translationMatrix,
+          translation);
+      }
+    }
   }
 }
