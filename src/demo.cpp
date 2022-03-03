@@ -83,10 +83,6 @@ void drawFrame(ammonite::models::InternalModel *drawObject, GLuint textureSample
     (void*)0
   );
 
-  /*glm::mat4 translationMatrix = translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
-  glm::mat4 rotationMatrix = glm::mat4(1.0f);
-  glm::mat4 scaleMatrix = scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));*/
-
   glm::mat4 modelMatrix = drawObject->positionData.translationMatrix * drawObject->positionData.rotationMatrix * drawObject->positionData.scaleMatrix;
   glm::mat4 mvp = projectionMatrix * viewMatrix * modelMatrix;
 
@@ -202,6 +198,9 @@ int main(int argc, char* argv[]) {
     //Load texture
     ammonite::models::getModelPtr(loadedModelIds[i])->textureId = ammonite::textures::loadTexture(models[i][1], &success);
   }
+
+  ammonite::models::position::translateModel(loadedModelIds[0], glm::vec3(-1.0f, 0.0f, 0.0f));
+  ammonite::models::position::scaleModel(loadedModelIds[0], glm::vec3(0.8f, 0.8f, 0.8f));
 
   //Destroy all models, textures and shaders
   if (!success) {
