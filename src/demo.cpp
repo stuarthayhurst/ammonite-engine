@@ -6,7 +6,9 @@
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include "ammonite/ammonite.hpp"
 #include "common/argHandler.hpp"
@@ -243,7 +245,12 @@ int main(int argc, char* argv[]) {
     //Get current model, view and projection matrices, and compute the MVP matrix
     glm::mat4 projectionMatrix = ammonite::controls::matrix::getProjectionMatrix();
     glm::mat4 viewMatrix = ammonite::controls::matrix::getViewMatrix();
-    static const glm::mat4 modelMatrix = glm::mat4(1.0);
+
+    glm::mat4 translationMatrix = translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+    glm::mat4 rotationMatrix = glm::mat4(1.0f);
+    glm::mat4 scaleMatrix = scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+
+    glm::mat4 modelMatrix = translationMatrix * rotationMatrix * scaleMatrix;
     glm::mat4 mvp = projectionMatrix * viewMatrix * modelMatrix;
 
     //Send matrices to the shaders
