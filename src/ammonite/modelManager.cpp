@@ -274,6 +274,12 @@ namespace ammonite {
       void translateModel(int modelId, glm::vec3 translation) {
         //Get the model and translate it
         models::InternalModel* modelObject = models::getModelPtr(modelId);
+
+        //Check the model exists
+        if (modelObject == nullptr) {
+          return;
+        }
+
         modelObject->positionData.translationMatrix = translate(
           modelObject->positionData.translationMatrix,
           translation);
@@ -282,6 +288,12 @@ namespace ammonite {
       void scaleModel(int modelId, glm::vec3 scaleVector) {
         //Get the model and scale it
         models::InternalModel* modelObject = models::getModelPtr(modelId);
+
+        //Check the model exists
+        if (modelObject == nullptr) {
+          return;
+        }
+
         modelObject->positionData.scaleMatrix = scale(
           modelObject->positionData.scaleMatrix,
           scaleVector);
