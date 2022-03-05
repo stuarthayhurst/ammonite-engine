@@ -200,7 +200,7 @@ int main(int argc, char* argv[]) {
   }
 
   ammonite::models::position::translateModel(loadedModelIds[0], glm::vec3(-1.0f, 0.0f, 0.0f));
-  ammonite::models::position::scaleModel(loadedModelIds[0], glm::vec3(0.8f, 0.8f, 0.8f));
+  ammonite::models::position::scaleModel(loadedModelIds[0], 0.8f);
 
   //Destroy all models, textures and shaders
   if (!success) {

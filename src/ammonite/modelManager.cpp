@@ -286,6 +286,10 @@ namespace ammonite {
           modelObject->positionData.scaleMatrix,
           scaleVector);
       }
+
+      void scaleModel(int modelId, float scaleMultiplier) {
+        scaleModel(modelId, glm::vec3(scaleMultiplier, scaleMultiplier, scaleMultiplier));
+      }
     }
   }
 }

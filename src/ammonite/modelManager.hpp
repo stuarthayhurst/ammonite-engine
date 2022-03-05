@@ -41,6 +41,7 @@ namespace ammonite {
     namespace position {
       void translateModel(int modelId, glm::vec3 translation);
       void scaleModel(int modelId, glm::vec3 scale);
+      void scaleModel(int modelId, float scaleMultiplier);
     }
   }
 }
