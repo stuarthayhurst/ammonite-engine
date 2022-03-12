@@ -58,7 +58,7 @@ namespace ammonite {
     }
 
     //In C++ 20, the std::filesystem can do this
-    static void getFileMetadata(const char* filePath, long* filesize, long* timestamp) {
+    static void getFileMetadata(const char* filePath, long long int* filesize, long long int* timestamp) {
       struct stat fileInfo;
       if (stat(filePath, &fileInfo) != 0) {
         //Failed to open file, fail the shader
@@ -280,7 +280,7 @@ namespace ammonite {
                   }
 
                   //Get filesize and time of last modification of the shader source
-                  long filesize, modificationTime;
+                  long long int filesize, modificationTime;
                   getFileMetadata(shaderPaths[i], &filesize, &modificationTime);
 
                   if (std::stoi(strings[1]) != filesize or std::stoi(strings[2]) != modificationTime) {
@@ -369,7 +369,7 @@ namespace ammonite {
           binaryInfo << binaryLength << "\n";
 
           for (int i = 0; i < shaderCount; i++) {
-            long filesize, modificationTime;
+            long long int filesize, modificationTime;
             getFileMetadata(shaderPaths[i], &filesize, &modificationTime);
 
             binaryInfo << shaderPaths[i] << ";" << filesize << ";" << modificationTime << "\n";
