@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <glm/glm.hpp>
+#include <glm/gtx/quaternion.hpp>
 #include <GL/glew.h>
 
 namespace ammonite {
@@ -22,8 +23,8 @@ namespace ammonite {
 
     struct PositionData {
       glm::mat4 translationMatrix;
-      glm::mat4 rotationMatrix;
       glm::mat4 scaleMatrix;
+      glm::quat rotationQuat;
     };
 
     struct InternalModel {
@@ -42,6 +43,7 @@ namespace ammonite {
       void translateModel(int modelId, glm::vec3 translation);
       void scaleModel(int modelId, glm::vec3 scale);
       void scaleModel(int modelId, float scaleMultiplier);
+      void rotateModel(int modelId, glm::vec3 rotation);
     }
   }
 }

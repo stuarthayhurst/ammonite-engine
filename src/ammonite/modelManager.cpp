@@ -10,6 +10,7 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/quaternion.hpp>
 
 #include "textures.hpp"
 
@@ -29,8 +30,8 @@ namespace ammonite {
 
     struct PositionData {
       glm::mat4 translationMatrix;
-      glm::mat4 rotationMatrix;
       glm::mat4 scaleMatrix;
+      glm::quat rotationQuat;
     };
 
     struct InternalModel {
@@ -229,8 +230,9 @@ namespace ammonite {
 
       PositionData positionData;
       positionData.translationMatrix = glm::mat4(1.0f);
-      positionData.rotationMatrix = glm::mat4(1.0f);
       positionData.scaleMatrix = glm::mat4(1.0f);
+      positionData.rotationQuat = glm::quat(glm::vec3(0, 0, 0));
+
       modelObject.positionData = positionData;
 
       //Add model to the tracker and return the ID
@@ -281,7 +283,7 @@ namespace ammonite {
           return;
         }
 
-        modelObject->positionData.translationMatrix = translate(
+        modelObject->positionData.translationMatrix = glm::translate(
           modelObject->positionData.translationMatrix,
           translation);
       }
@@ -295,13 +297,27 @@ namespace ammonite {
           return;
         }
 
-        modelObject->positionData.scaleMatrix = scale(
+        modelObject->positionData.scaleMatrix = glm::scale(
           modelObject->positionData.scaleMatrix,
           scaleVector);
       }
 
       void scaleModel(int modelId, float scaleMultiplier) {
         scaleModel(modelId, glm::vec3(scaleMultiplier, scaleMultiplier, scaleMultiplier));
+      }
+
+      void rotateModel(int modelId, glm::vec3 rotation) {
+        //Get the model and rotate it
+        models::InternalModel* modelObject = models::getModelPtr(modelId);
+
+        //Check the model exists
+        if (modelObject == nullptr) {
+          return;
+        }
+
+        glm::vec3 rotationRadians = glm::vec3(glm::radians(rotation[0]), glm::radians(rotation[1]), glm::radians(rotation[2]));
+
+        modelObject->positionData.rotationQuat = glm::quat(rotationRadians) * modelObject->positionData.rotationQuat;
       }
     }
   }

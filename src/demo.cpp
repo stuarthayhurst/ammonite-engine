@@ -8,7 +8,7 @@
 #include <GLFW/glfw3.h>
 
 #include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/quaternion.hpp>
 
 #include "ammonite/ammonite.hpp"
 #include "common/argHandler.hpp"
@@ -83,7 +83,9 @@ void drawFrame(ammonite::models::InternalModel *drawObject, GLuint textureSample
     (void*)0
   );
 
-  glm::mat4 modelMatrix = drawObject->positionData.translationMatrix * drawObject->positionData.rotationMatrix * drawObject->positionData.scaleMatrix;
+  glm::mat4 rotationMatrix = glm::toMat4(drawObject->positionData.rotationQuat);
+
+  glm::mat4 modelMatrix = drawObject->positionData.translationMatrix * rotationMatrix * drawObject->positionData.scaleMatrix;
   glm::mat4 mvp = projectionMatrix * viewMatrix * modelMatrix;
 
   //Send matrices to the shaders
@@ -199,8 +201,10 @@ int main(int argc, char* argv[]) {
     ammonite::models::getModelPtr(loadedModelIds[i])->textureId = ammonite::textures::loadTexture(models[i][1], &success);
   }
 
+  //Example translation, scale and rotation
   ammonite::models::position::translateModel(loadedModelIds[0], glm::vec3(-1.0f, 0.0f, 0.0f));
   ammonite::models::position::scaleModel(loadedModelIds[0], 0.8f);
+  ammonite::models::position::rotateModel(loadedModelIds[0], glm::vec3(0.0f, 0.0f, 0.0f));
 
   //Destroy all models, textures and shaders
   if (!success) {
