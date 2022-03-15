@@ -2,6 +2,8 @@
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://paypal.me/stuartahayhurst)
   - An OpenGL based renderer to display models and generated datasets, focused on ease of use
   - If you found this project interesting, any donations are greatly appreciated :)
+  - The goal of Ammonite I is to create a functional OpenGL-based renderer
+    - For Ammonite II, I plan to experiment with Vulkan, ray-tracing and mesh shaders, as well as anything else more complex that interests me
 
 ![Icon](assets/icons/icon.svg)
 
