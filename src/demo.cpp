@@ -39,7 +39,7 @@ void enableWireframe(bool enabled) {
   }
 }
 
-void drawFrame(ammonite::models::InternalModel *drawObject, GLuint textureSamplerId, glm::mat4 projectionMatrix, glm::mat4 viewMatrix, GLuint matrixId, GLuint modelMatrixId) {
+void drawFrame(ammonite::models::InternalModel *drawObject, GLuint textureSamplerId, glm::mat4 projectionMatrix, glm::mat4 viewMatrix, GLuint matrixId, GLuint modelMatrixId, GLuint normalMatrixId) {
   ammonite::models::InternalModelData* drawObjectData = drawObject->data;
   //Bind texture in Texture Unit 0
   glActiveTexture(GL_TEXTURE0);
@@ -91,6 +91,9 @@ void drawFrame(ammonite::models::InternalModel *drawObject, GLuint textureSample
   //Send matrices to the shaders
   glUniformMatrix4fv(matrixId, 1, GL_FALSE, &mvp[0][0]);
   glUniformMatrix4fv(modelMatrixId, 1, GL_FALSE, &modelMatrix[0][0]);
+
+  glm::mat3 normalMatrix = glm::transpose(glm::inverse(modelMatrix));
+  glUniformMatrix3fv(normalMatrixId, 1, GL_FALSE, &normalMatrix[0][0]);
 
   //Draw the triangles
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, drawObjectData->elementBufferId);
@@ -223,6 +226,7 @@ int main(int argc, char* argv[]) {
   GLuint matrixId = glGetUniformLocation(programId, "MVP");
   GLuint modelMatrixId = glGetUniformLocation(programId, "M");
   GLuint viewMatrixId = glGetUniformLocation(programId, "V");
+  GLuint normalMatrixId = glGetUniformLocation(programId, "normalMatrix");
   GLuint textureSamplerId = glGetUniformLocation(programId, "textureSampler");
   GLuint lightId = glGetUniformLocation(programId, "LightPosition_worldspace");
 
@@ -263,7 +267,7 @@ int main(int argc, char* argv[]) {
     glm::mat4 projectionMatrix = ammonite::controls::matrix::getProjectionMatrix();
     glm::mat4 viewMatrix = ammonite::controls::matrix::getViewMatrix();
 
-    //Set view matrix to shader
+    //Send view matrix to shader
     glUniformMatrix4fv(viewMatrixId, 1, GL_FALSE, &viewMatrix[0][0]);
 
     //Draw given model
@@ -273,7 +277,8 @@ int main(int argc, char* argv[]) {
         projectionMatrix,
         viewMatrix,
         matrixId,
-        modelMatrixId);
+        modelMatrixId,
+        normalMatrixId);
     }
 
     //Swap buffers
