@@ -4,7 +4,9 @@ SHELL = bash
 LIBS = glm glfw3 glew stb tinyobjloader
 BUILD_DIR = build
 CACHE_DIR = cache
+#These two should always end in ammonite, otherwise filesystem damage is a possibility
 INSTALL_DIR ?= /usr/local/lib/ammonite
+HEADER_DIR ?= /usr/local/include/ammonite
 LIBRARY_NAME = libammonite.so.1
 
 OBJECT_DIR = $(BUILD_DIR)/objects
@@ -43,7 +45,7 @@ $(OBJECT_DIR)/demo.o: ./src/demo.cpp $(AMMONITE_HEADER_SOURCE) $(COMMON_HEADER_S
 	@mkdir -p "$(OBJECT_DIR)"
 	$(CXX) ./src/demo.cpp -c $(CXXFLAGS) -o "$@"
 
-.PHONY: build system-build library install uninstall clean cache icons
+.PHONY: build system-build library headers install uninstall clean cache icons
 build:
 	RPATH="-Wl,-rpath=$(BUILD_DIR)" $(MAKE) system-build
 system-build:
@@ -52,6 +54,8 @@ system-build:
 library: $(BUILD_DIR)/libammonite.so
 	rm -f "$(BUILD_DIR)/$(LIBRARY_NAME)"
 	ln -s "libammonite.so" "$(BUILD_DIR)/$(LIBRARY_NAME)"
+headers:
+	cp -r "./src/ammonite" "$(HEADER_DIR)"
 install:
 	@mkdir -p "$(INSTALL_DIR)"
 	install "$(BUILD_DIR)/libammonite.so" "$(INSTALL_DIR)/$(LIBRARY_NAME)"
@@ -59,6 +63,7 @@ install:
 uninstall:
 	rm -f "$(INSTALL_DIR)/libammonite.so"*
 	if [[ -d "$(INSTALL_DIR)" ]]; then rm -di "$(INSTALL_DIR)"; fi
+	if [[ -d "$(HEADER_DIR)" ]]; then rm -rf "$(HEADER_DIR)"; fi
 clean: cache
 	@rm -rfv "$(BUILD_DIR)"
 cache:
