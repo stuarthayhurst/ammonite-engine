@@ -60,9 +60,9 @@ uninstall:
 	rm -f "$(INSTALL_DIR)/libammonite.so"*
 	if [[ -d "$(INSTALL_DIR)" ]]; then rm -di "$(INSTALL_DIR)"; fi
 clean: cache
-	rm -rfv "$(BUILD_DIR)"
+	@rm -rfv "$(BUILD_DIR)"
 cache:
-	rm -rfv "$(CACHE_DIR)"
+	@rm -rfv "$(CACHE_DIR)"
 icons:
 	./scripts/clean-svgs.py
 	inkscape "--export-filename=./assets/icons/icon.png" -w "64" -h "64" "./assets/icons/icon.svg" > /dev/null 2>&1
