@@ -191,6 +191,8 @@ namespace ammonite {
 
               glm::vec2 texturePoint = glm::vec2(tx, ty);
               rawModelData.texturePoints.push_back(texturePoint);
+            } else {
+              rawModelData.texturePoints.push_back(glm::vec2(0.0f, 0.0f));
             }
           }
           index_offset += fv;
