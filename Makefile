@@ -22,7 +22,7 @@ CXXFLAGS += -Wall -Wextra -Werror -O3 -flto -std=c++17
 LDFLAGS := $(shell pkg-config --libs $(LIBS)) -pthread
 
 ifeq ($(DEBUG),true)
-  CXXFLAGS += -DDEBUG
+  CXXFLAGS += -DDEBUG -g
 endif
 
 $(BUILD_DIR)/demo: library $(COMMON_OBJECTS) $(OBJECT_DIR)/demo.o
@@ -50,7 +50,9 @@ build:
 	RPATH="-Wl,-rpath=$(BUILD_DIR)" $(MAKE) system-build
 system-build:
 	$(MAKE) "$(BUILD_DIR)/demo"
-	strip --strip-unneeded "$(BUILD_DIR)/libammonite.so" "$(BUILD_DIR)/demo"
+	if [[ "$(DEBUG)" != "true" ]]; then \
+	  strip --strip-unneeded "$(BUILD_DIR)/libammonite.so" "$(BUILD_DIR)/demo"; \
+	fi
 library: $(BUILD_DIR)/libammonite.so
 	rm -f "$(BUILD_DIR)/$(LIBRARY_NAME)"
 	ln -s "libammonite.so" "$(BUILD_DIR)/$(LIBRARY_NAME)"
