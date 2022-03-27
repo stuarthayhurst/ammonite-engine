@@ -31,75 +31,6 @@ void GLAPIENTRY debugMessageCallback(GLenum, GLenum type, GLuint, GLenum severit
 }
 #endif
 
-void enableWireframe(bool enabled) {
-  if (enabled) {
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-  } else {
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-  }
-}
-
-void drawFrame(ammonite::models::InternalModel *drawObject, GLuint textureSamplerId, glm::mat4 projectionMatrix, glm::mat4 viewMatrix, GLuint matrixId, GLuint modelMatrixId, GLuint normalMatrixId) {
-  ammonite::models::InternalModelData* drawObjectData = drawObject->data;
-  //Bind texture in Texture Unit 0
-  glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, drawObject->textureId);
-  //Set texture sampler to use Texture Unit 0
-  glUniform1i(textureSamplerId, 0);
-
-  //Vertex attribute buffer
-  glEnableVertexAttribArray(0);
-  glBindBuffer(GL_ARRAY_BUFFER, drawObjectData->vertexBufferId);
-  glVertexAttribPointer(
-    0,        //shader location
-    3,        //size
-    GL_FLOAT, //type
-    GL_FALSE, //normalized
-    0,        //stride
-    (void*)0  //array buffer offset
-  );
-
-  //Texture attribute buffer
-  glEnableVertexAttribArray(1);
-  glBindBuffer(GL_ARRAY_BUFFER, drawObjectData->textureBufferId);
-  glVertexAttribPointer(
-    1,
-    2,
-    GL_FLOAT,
-    GL_FALSE,
-    0,
-    (void*)0
-  );
-
-  //Normal attribute buffer
-  glEnableVertexAttribArray(2);
-  glBindBuffer(GL_ARRAY_BUFFER, drawObjectData->normalBufferId);
-  glVertexAttribPointer(
-    2,
-    3,
-    GL_FLOAT,
-    GL_FALSE,
-    0,
-    (void*)0
-  );
-
-  glm::mat4 rotationMatrix = glm::toMat4(drawObject->positionData.rotationQuat);
-
-  glm::mat4 modelMatrix = drawObject->positionData.translationMatrix * rotationMatrix * drawObject->positionData.scaleMatrix;
-  glm::mat4 mvp = projectionMatrix * viewMatrix * modelMatrix;
-
-  //Send matrices to the shaders
-  glUniformMatrix4fv(matrixId, 1, GL_FALSE, &mvp[0][0]);
-  glUniformMatrix4fv(modelMatrixId, 1, GL_FALSE, &modelMatrix[0][0]);
-
-  glm::mat3 normalMatrix = glm::transpose(glm::inverse(modelMatrix));
-  glUniformMatrix3fv(normalMatrixId, 1, GL_FALSE, &normalMatrix[0][0]);
-
-  //Draw the triangles
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, drawObjectData->elementBufferId);
-  glDrawElements(GL_TRIANGLES, drawObjectData->vertexCount, GL_UNSIGNED_INT, (void*)0);
-}
-
 int main(int argc, char* argv[]) {
   //Handle arguments
   const int showHelp = arguments::searchArgument(argc, argv, "--help", true, nullptr);
@@ -153,7 +84,7 @@ int main(int argc, char* argv[]) {
   glDepthFunc(GL_LESS);
 
   //Enable / disable drawing the wireframe
-  enableWireframe(false);
+  ammonite::renderer::enableWireframe(false);
 
   //Create the VAO
   GLuint vertexArrayId;
@@ -222,14 +153,6 @@ int main(int argc, char* argv[]) {
 
   std::cout << "Loaded models in: " << performanceTimer.getTime() << "s (" << vertexCount << " vertices)" << std::endl;
 
-  //Get IDs for shader uniforms
-  GLuint matrixId = glGetUniformLocation(programId, "MVP");
-  GLuint modelMatrixId = glGetUniformLocation(programId, "M");
-  GLuint viewMatrixId = glGetUniformLocation(programId, "V");
-  GLuint normalMatrixId = glGetUniformLocation(programId, "normalMatrix");
-  GLuint textureSamplerId = glGetUniformLocation(programId, "textureSampler");
-  GLuint lightId = glGetUniformLocation(programId, "LightPosition_worldspace");
-
   //Use the shaders
   glUseProgram(programId);
 
@@ -240,11 +163,10 @@ int main(int argc, char* argv[]) {
   long totalFrames = 0;
   int frameCount = 0;
 
-  //Loop until window closed
-  while(glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS and !glfwWindowShouldClose(window)) {
-    //Reset the canvas
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  ammonite::renderer::setup::setupRenderer(window, programId);
 
+  //Draw frames until window closed
+  while(glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS and !glfwWindowShouldClose(window)) {
     //Update time and frame counters every frame
     frameCount++;
     totalFrames++;
@@ -260,30 +182,11 @@ int main(int argc, char* argv[]) {
     //Process new input since last frame
     ammonite::controls::processInput();
 
-    glm::vec3 lightPos = glm::vec3(4, 4, 4);
-    glUniform3f(lightId, lightPos.x, lightPos.y, lightPos.z);
-
     //Get view and projection matrices
     glm::mat4 projectionMatrix = ammonite::controls::matrix::getProjectionMatrix();
     glm::mat4 viewMatrix = ammonite::controls::matrix::getViewMatrix();
 
-    //Send view matrix to shader
-    glUniformMatrix4fv(viewMatrixId, 1, GL_FALSE, &viewMatrix[0][0]);
-
-    //Draw given model
-    for (int i = 0; i < modelCount; i++) {
-      drawFrame(ammonite::models::getModelPtr(loadedModelIds[i]),
-        textureSamplerId,
-        projectionMatrix,
-        viewMatrix,
-        matrixId,
-        modelMatrixId,
-        normalMatrixId);
-    }
-
-    //Swap buffers
-    glfwSwapBuffers(window);
-    glfwPollEvents();
+    ammonite::renderer::drawFrame(loadedModelIds, modelCount, projectionMatrix, viewMatrix);
   }
 
   //Output benchmark score

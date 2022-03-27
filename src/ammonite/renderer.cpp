@@ -1,0 +1,113 @@
+#include <glm/glm.hpp>
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
+
+#include "modelManager.hpp"
+#include "utils/timer.hpp"
+
+#ifdef DEBUG
+  #include <iostream>
+#endif
+
+namespace ammonite {
+  namespace renderer {
+    namespace {
+      GLFWwindow* window;
+      GLuint programId;
+
+      //Shader uniform IDs
+      GLuint matrixId;
+      GLuint modelMatrixId;
+      GLuint viewMatrixId;
+      GLuint normalMatrixId;
+      GLuint textureSamplerId;
+      GLuint lightId;
+    }
+
+    namespace setup {
+      void setupRenderer(GLFWwindow* targetWindow, GLuint targetProgramId) {
+        window = targetWindow;
+        programId = targetProgramId;
+
+        //Shader uniform locations
+        matrixId = glGetUniformLocation(programId, "MVP");
+        modelMatrixId = glGetUniformLocation(programId, "M");
+        viewMatrixId = glGetUniformLocation(programId, "V");
+        normalMatrixId = glGetUniformLocation(programId, "normalMatrix");
+        textureSamplerId = glGetUniformLocation(programId, "textureSampler");
+        lightId = glGetUniformLocation(programId, "LightPosition_worldspace");
+      }
+    }
+
+    namespace {
+      void drawModel(ammonite::models::InternalModel *drawObject, const glm::mat4 viewProjectionMatrix) {
+        ammonite::models::InternalModelData* drawObjectData = drawObject->data;
+        //Bind texture in Texture Unit 0
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, drawObject->textureId);
+        //Set texture sampler to use Texture Unit 0
+        glUniform1i(textureSamplerId, 0);
+
+        //Vertex attribute buffer
+        glEnableVertexAttribArray(0);
+        glBindBuffer(GL_ARRAY_BUFFER, drawObjectData->vertexBufferId);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+        //Texture attribute buffer
+        glEnableVertexAttribArray(1);
+        glBindBuffer(GL_ARRAY_BUFFER, drawObjectData->textureBufferId);
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+        //Normal attribute buffer
+        glEnableVertexAttribArray(2);
+        glBindBuffer(GL_ARRAY_BUFFER, drawObjectData->normalBufferId);
+        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+        glm::mat4 rotationMatrix = glm::toMat4(drawObject->positionData.rotationQuat);
+
+        glm::mat4 modelMatrix = drawObject->positionData.translationMatrix * rotationMatrix * drawObject->positionData.scaleMatrix;
+        glm::mat4 mvp = viewProjectionMatrix * modelMatrix;
+
+        //Send matrices to the shaders
+        glUniformMatrix4fv(matrixId, 1, GL_FALSE, &mvp[0][0]);
+        glUniformMatrix4fv(modelMatrixId, 1, GL_FALSE, &modelMatrix[0][0]);
+
+        glm::mat3 normalMatrix = glm::transpose(glm::inverse(modelMatrix));
+        glUniformMatrix3fv(normalMatrixId, 1, GL_FALSE, &normalMatrix[0][0]);
+
+        //Draw the triangles
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, drawObjectData->elementBufferId);
+        glDrawElements(GL_TRIANGLES, drawObjectData->vertexCount, GL_UNSIGNED_INT, (void*)0);
+      }
+    }
+
+    void enableWireframe(bool enabled) {
+      if (enabled) {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+      } else {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+      }
+    }
+
+    void drawFrame(const int modelIds[], const int modelCount, glm::mat4 projectionMatrix, glm::mat4 viewMatrix) {
+      //Reset the canvas
+      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+      glm::vec3 lightPos = glm::vec3(4, 4, 4);
+      glUniform3f(lightId, lightPos.x, lightPos.y, lightPos.z);
+
+      //Send view matrix to shader
+      glUniformMatrix4fv(viewMatrixId, 1, GL_FALSE, &viewMatrix[0][0]);
+      const glm::mat4 viewProjectionMatrix = projectionMatrix * viewMatrix;
+
+      //Draw given model
+      for (int i = 0; i < modelCount; i++) {
+        drawModel(ammonite::models::getModelPtr(modelIds[i]), viewProjectionMatrix);
+      }
+
+      //Swap buffers
+      glfwSwapBuffers(window);
+      glfwPollEvents();
+    }
+  }
+}
