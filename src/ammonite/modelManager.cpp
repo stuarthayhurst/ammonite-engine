@@ -39,6 +39,7 @@ namespace ammonite {
       PositionData positionData;
       GLuint textureId;
       bool wireframe = false;
+      bool active = true;
       std::string modelName;
       int modelId;
     };

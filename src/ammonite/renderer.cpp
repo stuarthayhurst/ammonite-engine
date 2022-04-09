@@ -53,6 +53,11 @@ namespace ammonite {
       }
 
       static void drawModel(ammonite::models::InternalModel *drawObject, const glm::mat4 viewProjectionMatrix) {
+        //If the model is disabled, skip it
+        if (!drawObject->active) {
+          return;
+        }
+
         ammonite::models::InternalModelData* drawObjectData = drawObject->data;
         //Bind texture in Texture Unit 0
         glActiveTexture(GL_TEXTURE0);
