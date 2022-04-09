@@ -16,7 +16,6 @@ namespace ammonite {
     long getTotalFrames();
     double getFrameTime();
 
-    void enableWireframe(bool enabled);
     void drawFrame(const int modelIds[], const int modelCount, glm::mat4 projectionMatrix, glm::mat4 viewMatrix);
   }
 }

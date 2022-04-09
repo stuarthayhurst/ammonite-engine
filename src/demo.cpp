@@ -83,9 +83,6 @@ int main(int argc, char* argv[]) {
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LESS);
 
-  //Enable / disable drawing the wireframe
-  ammonite::renderer::enableWireframe(false);
-
   //Create the VAO
   GLuint vertexArrayId;
   glGenVertexArrays(1, &vertexArrayId);

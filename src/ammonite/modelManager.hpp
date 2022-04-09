@@ -31,6 +31,7 @@ namespace ammonite {
       InternalModelData* data;
       PositionData positionData;
       GLuint textureId;
+      bool wireframe = false;
       std::string modelName;
       int modelId;
     };

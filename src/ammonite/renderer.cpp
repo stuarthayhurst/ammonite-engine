@@ -44,6 +44,14 @@ namespace ammonite {
     }
 
     namespace {
+      static void setWireframe(bool enabled) {
+        if (enabled) {
+          glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        } else {
+          glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        }
+      }
+
       static void drawModel(ammonite::models::InternalModel *drawObject, const glm::mat4 viewProjectionMatrix) {
         ammonite::models::InternalModelData* drawObjectData = drawObject->data;
         //Bind texture in Texture Unit 0
@@ -79,17 +87,12 @@ namespace ammonite {
         glm::mat3 normalMatrix = glm::transpose(glm::inverse(modelMatrix));
         glUniformMatrix3fv(normalMatrixId, 1, GL_FALSE, &normalMatrix[0][0]);
 
+        //Use wireframe if requested
+        setWireframe(drawObject->wireframe);
+
         //Draw the triangles
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, drawObjectData->elementBufferId);
         glDrawElements(GL_TRIANGLES, drawObjectData->vertexCount, GL_UNSIGNED_INT, (void*)0);
-      }
-    }
-
-    void enableWireframe(bool enabled) {
-      if (enabled) {
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-      } else {
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
       }
     }
 
