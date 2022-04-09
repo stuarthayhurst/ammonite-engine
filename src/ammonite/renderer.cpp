@@ -22,6 +22,10 @@ namespace ammonite {
       GLuint normalMatrixId;
       GLuint textureSamplerId;
       GLuint lightId;
+
+      long totalFrames = 0;
+      int frameCount = 0;
+      double frameTime = 0.0f;
     }
 
     namespace setup {
@@ -89,9 +93,30 @@ namespace ammonite {
       }
     }
 
+    long getTotalFrames() {
+      return totalFrames;
+    }
+
+    double getFrameTime() {
+      return frameTime;
+    }
+
     void drawFrame(const int modelIds[], const int modelCount, glm::mat4 projectionMatrix, glm::mat4 viewMatrix) {
       //Reset the canvas
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+      //Increase frame counters
+      totalFrames++;
+      frameCount++;
+
+      //Every half second, update the frame time
+      static ammonite::utils::Timer frameTimer;
+      double deltaTime = frameTimer.getTime();
+      if (deltaTime >= 0.5) {
+        frameTime = (deltaTime * 1000) / frameCount;
+        frameTimer.reset();
+        frameCount = 0;
+      }
 
       glm::vec3 lightPos = glm::vec3(4, 4, 4);
       glUniform3f(lightId, lightPos.x, lightPos.y, lightPos.z);

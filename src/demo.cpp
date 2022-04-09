@@ -17,9 +17,9 @@
 const unsigned short int width = 1024;
 const unsigned short int height = 768;
 
-void printMetrics(int frameCount, double deltaTime) {
-  std::printf("%.2f fps", frameCount / deltaTime);
-  std::printf(" (%fms)\n", (deltaTime * 1000) / frameCount);
+void printMetrics(double frameTime) {
+  std::printf("%.2f fps", 1000 / frameTime);
+  std::printf(" (%fms)\n", frameTime);
 }
 
 #ifdef DEBUG
@@ -159,24 +159,15 @@ int main(int argc, char* argv[]) {
   //Performance metrics setup
   ammonite::utils::Timer benchmarkTimer;
   performanceTimer.reset();
-  double deltaTime;
-  long totalFrames = 0;
-  int frameCount = 0;
 
   ammonite::renderer::setup::setupRenderer(window, programId);
 
   //Draw frames until window closed
   while(glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS and !glfwWindowShouldClose(window)) {
-    //Update time and frame counters every frame
-    frameCount++;
-    totalFrames++;
-    deltaTime = performanceTimer.getTime();
-
     //Every second, output the framerate
-    if (deltaTime >= 1.0) {
-      printMetrics(frameCount, deltaTime);
+    if (performanceTimer.getTime() >= 1.0) {
+      printMetrics(ammonite::renderer::getFrameTime());
       performanceTimer.reset();
-      frameCount = 0;
     }
 
     //Process new input since last frame
@@ -193,7 +184,7 @@ int main(int argc, char* argv[]) {
   if (useBenchmark) {
     std::cout << "\nBenchmark complete:" << std::endl;
     std::cout << "  Average fps: ";
-    printMetrics(totalFrames, benchmarkTimer.getTime());
+    printMetrics(benchmarkTimer.getTime() / ammonite::renderer::getTotalFrames());
   }
 
   //Cleanup
