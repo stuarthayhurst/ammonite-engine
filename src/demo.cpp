@@ -18,8 +18,8 @@ const unsigned short int width = 1024;
 const unsigned short int height = 768;
 
 void printMetrics(double frameTime) {
-  std::printf("%.2f fps", 1000 / frameTime);
-  std::printf(" (%fms)\n", frameTime);
+  std::printf("%.2f fps", 1 / frameTime);
+  std::printf(" (%fms)\n", frameTime * 1000);
 }
 
 #ifdef DEBUG
