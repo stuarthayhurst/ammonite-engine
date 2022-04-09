@@ -30,6 +30,7 @@ namespace ammonite {
 
     namespace setup {
       void setupRenderer(GLFWwindow* targetWindow, GLuint targetProgramId) {
+        //Set window and shader to be used
         window = targetWindow;
         programId = targetProgramId;
 
@@ -40,6 +41,14 @@ namespace ammonite {
         normalMatrixId = glGetUniformLocation(programId, "normalMatrix");
         textureSamplerId = glGetUniformLocation(programId, "textureSampler");
         lightId = glGetUniformLocation(programId, "LightPosition_worldspace");
+
+        //Enable culling triangles and depth testing (only show fragments closer than the previous)
+        glEnable(GL_CULL_FACE);
+        glEnable(GL_DEPTH_TEST);
+        glDepthFunc(GL_LESS);
+
+        //Use the shader
+        glUseProgram(programId);
       }
     }
 

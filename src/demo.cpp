@@ -77,12 +77,6 @@ int main(int argc, char* argv[]) {
   glDebugMessageCallback(debugMessageCallback, 0);
 #endif
 
-  //Enable culling triangles
-  glEnable(GL_CULL_FACE);
-  //Enable depth test and only show fragments closer than the previous
-  glEnable(GL_DEPTH_TEST);
-  glDepthFunc(GL_LESS);
-
   //Create the VAO
   GLuint vertexArrayId;
   glGenVertexArrays(1, &vertexArrayId);
@@ -150,14 +144,11 @@ int main(int argc, char* argv[]) {
 
   std::cout << "Loaded models in: " << performanceTimer.getTime() << "s (" << vertexCount << " vertices)" << std::endl;
 
-  //Use the shaders
-  glUseProgram(programId);
+  ammonite::renderer::setup::setupRenderer(window, programId);
 
   //Performance metrics setup
   ammonite::utils::Timer benchmarkTimer;
   performanceTimer.reset();
-
-  ammonite::renderer::setup::setupRenderer(window, programId);
 
   //Draw frames until window closed
   while(glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS and !glfwWindowShouldClose(window)) {
