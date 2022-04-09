@@ -40,7 +40,7 @@ namespace ammonite {
     }
 
     namespace {
-      void drawModel(ammonite::models::InternalModel *drawObject, const glm::mat4 viewProjectionMatrix) {
+      static void drawModel(ammonite::models::InternalModel *drawObject, const glm::mat4 viewProjectionMatrix) {
         ammonite::models::InternalModelData* drawObjectData = drawObject->data;
         //Bind texture in Texture Unit 0
         glActiveTexture(GL_TEXTURE0);
