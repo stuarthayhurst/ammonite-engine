@@ -17,6 +17,7 @@ namespace ammonite {
       GLuint normalBufferId;
       GLuint textureBufferId;
       GLuint elementBufferId;
+      GLuint vertexArrayId;
       int vertexCount;
       int refCount = 1;
     };

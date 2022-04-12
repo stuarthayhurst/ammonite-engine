@@ -77,11 +77,6 @@ int main(int argc, char* argv[]) {
   glDebugMessageCallback(debugMessageCallback, 0);
 #endif
 
-  //Create the VAO
-  GLuint vertexArrayId;
-  glGenVertexArrays(1, &vertexArrayId);
-  glBindVertexArray(vertexArrayId);
-
   //Shader paths and types to create program
   const char* shaderPaths[2] = {
     "shaders/lightShader.vs",
@@ -181,7 +176,6 @@ int main(int argc, char* argv[]) {
   }
   ammonite::shaders::eraseShaders();
   glDeleteProgram(programId);
-  glDeleteVertexArrays(1, &vertexArrayId);
   glfwTerminate();
 
   return EXIT_SUCCESS;

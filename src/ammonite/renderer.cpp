@@ -74,20 +74,8 @@ namespace ammonite {
         //Set texture sampler to use Texture Unit 0
         glUniform1i(textureSamplerId, 0);
 
-        //Vertex attribute buffer
-        glEnableVertexAttribArray(0);
-        glBindBuffer(GL_ARRAY_BUFFER, drawObjectData->vertexBufferId);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-
-        //Texture attribute buffer
-        glEnableVertexAttribArray(1);
-        glBindBuffer(GL_ARRAY_BUFFER, drawObjectData->textureBufferId);
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
-
-        //Normal attribute buffer
-        glEnableVertexAttribArray(2);
-        glBindBuffer(GL_ARRAY_BUFFER, drawObjectData->normalBufferId);
-        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+        //Bind vertex attribute buffer
+        glBindVertexArray(drawObjectData->vertexArrayId);
 
         //Calculate matrices
         glm::mat4 rotationMatrix = glm::toMat4(drawObject->positionData.rotationQuat);

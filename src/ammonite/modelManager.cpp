@@ -24,6 +24,7 @@ namespace ammonite {
       GLuint normalBufferId;
       GLuint textureBufferId;
       GLuint elementBufferId;
+      GLuint vertexArrayId;
       int vertexCount;
       int refCount = 1;
     };
@@ -101,14 +102,34 @@ namespace ammonite {
       glGenBuffers(1, &modelObjectData->elementBufferId);
       glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelObjectData->elementBufferId);
       glBufferData(GL_ELEMENT_ARRAY_BUFFER, modelObjectData->indices.size() * sizeof(unsigned int), &modelObjectData->indices[0], GL_STATIC_DRAW);
+
+      //Create the ertex attribute buffer
+      glGenVertexArrays(1, &modelObjectData->vertexArrayId);
+      glBindVertexArray(modelObjectData->vertexArrayId);
+
+      //Vertex attribute buffer
+      glBindBuffer(GL_ARRAY_BUFFER, modelObjectData->vertexBufferId);
+      glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+      glEnableVertexAttribArray(0);
+
+      //Texture attribute buffer
+      glBindBuffer(GL_ARRAY_BUFFER, modelObjectData->textureBufferId);
+      glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+      glEnableVertexAttribArray(1);
+
+      //Normal attribute buffer
+      glBindBuffer(GL_ARRAY_BUFFER, modelObjectData->normalBufferId);
+      glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+      glEnableVertexAttribArray(2);
     }
 
     static void deleteBuffers(models::InternalModelData* modelObjectData) {
-      //Delete created buffers
+      //Delete created buffers and the VAO
       glDeleteBuffers(1, &modelObjectData->vertexBufferId);
       glDeleteBuffers(1, &modelObjectData->normalBufferId);
       glDeleteBuffers(1, &modelObjectData->textureBufferId);
       glDeleteBuffers(1, &modelObjectData->elementBufferId);
+      glDeleteVertexArrays(1, &modelObjectData->vertexArrayId);
     }
 
     static void indexModel(models::InternalModelData* modelObjectData, modelData* rawModelData) {
