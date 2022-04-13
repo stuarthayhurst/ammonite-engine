@@ -5,46 +5,62 @@ in vec2 texCoord;
 in vec3 Position_worldspace;
 in vec3 Normal_cameraspace;
 in vec3 EyeDirection_cameraspace;
-in vec3 LightDirection_cameraspace;
 
 //Ouput data
 out vec3 colour;
 
-//Constants from C++
+struct PointLight {
+  vec3 position;
+  vec3 colour;
+  float power;
+
+  vec3 ambient;
+  vec3 diffuse;
+  vec3 specular;
+};
+
+//Engine inputs
 uniform sampler2D textureSampler;
-uniform vec3 LightPosition_worldspace;
+uniform PointLight lightSource;
+uniform mat4 V;
 
-//Constants
-uniform vec3 LightColour = vec3(1, 1, 1);
-uniform float LightPower = 50.0f;
+vec3 calcPointLight(PointLight lightSource, vec3 materialDiffuse, vec3 fragPos, vec3 normal, vec3 eyeDirection) {
+  //Vector from vertex to light (camera space)
+  vec3 LightPosition_cameraspace = (V * vec4(lightSource.position, 1)).xyz;
+  vec3 LightDirection_cameraspace = LightPosition_cameraspace + eyeDirection;
 
-void main() {
-  //Material properties
-  vec3 MaterialDiffuseColour = texture(textureSampler, texCoord).rgb;
-  vec3 MaterialAmbientColour = vec3(0.1, 0.1, 0.1) * MaterialDiffuseColour;
-  vec3 MaterialSpecularColour = vec3(0.3, 0.3, 0.3);
+  eyeDirection = normalize(eyeDirection);
 
   //Distance to the light
-  float distance = length(LightPosition_worldspace - Position_worldspace);
+  float lightDistanceSqr = pow(distance(lightSource.position, fragPos), 2);
 
-  //Normal of the computed fragment (camera space)
-  vec3 normal = normalize(Normal_cameraspace);
   //Direction of the light (from the fragment to the light)
   vec3 lightDirection = normalize(LightDirection_cameraspace);
-  //Cosine of the angle between the normal and the light direction
+  //Cosine of the angle between the normal and light direction
   float cosTheta = clamp(dot(normal, lightDirection), 0, 1);
 
-  //Eye vector (towards the camera)
-  vec3 eyeDirection = normalize(EyeDirection_cameraspace);
-  //Direction in which the triangle reflects the light
+  //Direction of refledted light
   vec3 reflectionDirection = reflect(-lightDirection, normal);
-  // Cosine of the angle between the Eye vector and the Reflect vector,
+  //Cosine of the angle between the eye and reflection vectors
   float cosAlpha = clamp(dot(eyeDirection, reflectionDirection), 0, 1);
 
-  //Calculate diffuse and specular components
-  MaterialDiffuseColour = MaterialDiffuseColour * LightColour * LightPower * cosTheta / (distance * distance);
-  MaterialSpecularColour = MaterialSpecularColour * LightColour * LightPower * pow(cosAlpha, 5) / (distance * distance);
+  //Calculate lighting components
+  vec3 ambient = lightSource.ambient * materialDiffuse;
+  vec3 diffuse = lightSource.diffuse * materialDiffuse * lightSource.colour * lightSource.power * cosTheta / lightDistanceSqr;
+  vec3 specular = lightSource.specular * lightSource.colour * lightSource.power * pow(cosAlpha, 5) / lightDistanceSqr;
 
-  //Calculate final colour
-  colour = MaterialAmbientColour + MaterialDiffuseColour + MaterialSpecularColour;
+  return(ambient + diffuse + specular);
+}
+
+void main() {
+  //Base colour of the fragment
+  vec3 materialDiffuseColour = texture(textureSampler, texCoord).rgb;
+
+  //Normal of the fragment (camera space)
+  vec3 normal = normalize(Normal_cameraspace);
+
+  //Eye vector (towards the camera)
+  vec3 eyeDirection = EyeDirection_cameraspace;
+
+  colour = calcPointLight(lightSource, materialDiffuseColour, Position_worldspace, normal, eyeDirection);
 }

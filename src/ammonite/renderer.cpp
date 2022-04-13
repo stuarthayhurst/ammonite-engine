@@ -21,7 +21,6 @@ namespace ammonite {
       GLuint viewMatrixId;
       GLuint normalMatrixId;
       GLuint textureSamplerId;
-      GLuint lightId;
 
       long totalFrames = 0;
       int frameCount = 0;
@@ -40,7 +39,6 @@ namespace ammonite {
         viewMatrixId = glGetUniformLocation(programId, "V");
         normalMatrixId = glGetUniformLocation(programId, "normalMatrix");
         textureSamplerId = glGetUniformLocation(programId, "textureSampler");
-        lightId = glGetUniformLocation(programId, "LightPosition_worldspace");
 
         //Enable culling triangles and depth testing (only show fragments closer than the previous)
         glEnable(GL_CULL_FACE);
@@ -122,8 +120,35 @@ namespace ammonite {
         frameCount = 0;
       }
 
-      glm::vec3 lightPos = glm::vec3(4, 4, 4);
-      glUniform3f(lightId, lightPos.x, lightPos.y, lightPos.z);
+      struct LightSource {
+        glm::vec3 ambient = glm::vec3(0.1f, 0.1f, 0.1f);
+        glm::vec3 diffuse = glm::vec3(1.0f, 1.0f, 1.0f);
+        glm::vec3 specular = glm::vec3(0.3f, 0.3f, 0.3f);
+        glm::vec3 position = glm::vec3(4.0f, 4.0f, 4.0f);
+        glm::vec3 colour = glm::vec3(1.0f, 1.0f, 1.0f);
+        float power = 50.0f;
+      };
+
+      LightSource lightSource;
+      GLuint lightComponentId;
+
+      lightComponentId = glGetUniformLocation(programId, "lightSource.ambient");
+      glUniform3f(lightComponentId, lightSource.ambient.x, lightSource.ambient.y, lightSource.ambient.z);
+
+      lightComponentId = glGetUniformLocation(programId, "lightSource.diffuse");
+      glUniform3f(lightComponentId, lightSource.diffuse.x, lightSource.diffuse.y, lightSource.diffuse.z);
+
+      lightComponentId = glGetUniformLocation(programId, "lightSource.specular");
+      glUniform3f(lightComponentId, lightSource.specular.x, lightSource.specular.y, lightSource.specular.z);
+
+      lightComponentId = glGetUniformLocation(programId, "lightSource.position");
+      glUniform3f(lightComponentId, lightSource.position.x, lightSource.position.y, lightSource.position.z);
+
+      lightComponentId = glGetUniformLocation(programId, "lightSource.colour");
+      glUniform3f(lightComponentId, lightSource.colour.x, lightSource.colour.y, lightSource.colour.z);
+
+      lightComponentId = glGetUniformLocation(programId, "lightSource.power");
+      glUniform1f(lightComponentId, lightSource.power);
 
       //Send view matrix to shader
       glUniformMatrix4fv(viewMatrixId, 1, GL_FALSE, &viewMatrix[0][0]);
