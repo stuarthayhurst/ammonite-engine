@@ -139,7 +139,7 @@ namespace ammonite {
       lightComponentId = glGetUniformLocation(programId, "lightSource.specular");
       glUniform3f(lightComponentId, lightSource.specular.x, lightSource.specular.y, lightSource.specular.z);
 
-      lightComponentId = glGetUniformLocation(programId, "lightSource.position");
+      lightComponentId = glGetUniformLocation(programId, "lightSource.geometry");
       glUniform3f(lightComponentId, lightSource.position.x, lightSource.position.y, lightSource.position.z);
 
       lightComponentId = glGetUniformLocation(programId, "lightSource.colour");
