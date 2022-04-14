@@ -19,6 +19,16 @@ struct PointLight {
   vec3 specular;
 };
 
+struct DirectionalLight {
+  vec3 direction;
+  vec3 colour;
+  float power;
+
+  vec3 ambient;
+  vec3 diffuse;
+  vec3 specular;
+};
+
 //Engine inputs
 uniform sampler2D textureSampler;
 uniform PointLight lightSource;
@@ -48,6 +58,27 @@ vec3 calcPointLight(PointLight lightSource, vec3 materialDiffuse, vec3 fragPos, 
   vec3 ambient = lightSource.ambient * materialDiffuse;
   vec3 diffuse = lightSource.diffuse * materialDiffuse * lightSource.colour * lightSource.power * cosTheta / lightDistanceSqr;
   vec3 specular = lightSource.specular * lightSource.colour * lightSource.power * pow(cosAlpha, 5) / lightDistanceSqr;
+
+  return(ambient + diffuse + specular);
+}
+
+vec3 calcDirectionalLight(DirectionalLight lightSource, vec3 materialDiffuse, vec3 fragPos, vec3 normal, vec3 eyeDirection) {
+  eyeDirection = normalize(eyeDirection);
+
+  //Direction of the light (from the light to the fragment)
+  vec3 lightDirection = normalize(-(V * vec4(lightSource.direction, 0)).xyz);
+  //Cosine of the angle between the normal and light direction
+  float cosTheta = clamp(dot(normal, lightDirection), 0, 1);
+
+  //Direction of refledted light
+  vec3 reflectionDirection = reflect(-lightDirection, normal);
+  //Cosine of the angle between the eye and reflection vectors
+  float cosAlpha = clamp(dot(eyeDirection, reflectionDirection), 0, 1);
+
+  //Calculate lighting components
+  vec3 ambient = lightSource.ambient * materialDiffuse;
+  vec3 diffuse = lightSource.diffuse * materialDiffuse * lightSource.colour * lightSource.power * cosTheta;
+  vec3 specular = lightSource.specular * lightSource.colour * lightSource.power * pow(cosAlpha, 5);
 
   return(ambient + diffuse + specular);
 }
