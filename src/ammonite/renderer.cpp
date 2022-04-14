@@ -121,7 +121,6 @@ namespace ammonite {
       }
 
       struct LightSource {
-        glm::vec3 ambient = glm::vec3(0.1f, 0.1f, 0.1f);
         glm::vec3 diffuse = glm::vec3(1.0f, 1.0f, 1.0f);
         glm::vec3 specular = glm::vec3(0.3f, 0.3f, 0.3f);
         glm::vec3 position = glm::vec3(4.0f, 4.0f, 4.0f);
@@ -129,11 +128,10 @@ namespace ammonite {
         float power = 50.0f;
       };
 
+      glm::vec3 ambientLight = glm::vec3(0.1f, 0.1f, 0.1f);
+
       LightSource lightSource;
       GLuint lightComponentId;
-
-      lightComponentId = glGetUniformLocation(programId, "lightSource.ambient");
-      glUniform3f(lightComponentId, lightSource.ambient.x, lightSource.ambient.y, lightSource.ambient.z);
 
       lightComponentId = glGetUniformLocation(programId, "lightSource.diffuse");
       glUniform3f(lightComponentId, lightSource.diffuse.x, lightSource.diffuse.y, lightSource.diffuse.z);
@@ -149,6 +147,9 @@ namespace ammonite {
 
       lightComponentId = glGetUniformLocation(programId, "lightSource.power");
       glUniform1f(lightComponentId, lightSource.power);
+
+      lightComponentId = glGetUniformLocation(programId, "ambientLight");
+      glUniform3f(lightComponentId, ambientLight.x, ambientLight.y, ambientLight.z);
 
       //Send view matrix to shader
       glUniformMatrix4fv(viewMatrixId, 1, GL_FALSE, &viewMatrix[0][0]);

@@ -14,7 +14,6 @@ struct PointLight {
   vec3 colour;
   float power;
 
-  vec3 ambient;
   vec3 diffuse;
   vec3 specular;
 };
@@ -24,15 +23,15 @@ struct DirectionalLight {
   vec3 colour;
   float power;
 
-  vec3 ambient;
   vec3 diffuse;
   vec3 specular;
 };
 
 //Engine inputs
 uniform sampler2D textureSampler;
-uniform PointLight lightSource;
 uniform mat4 V;
+uniform PointLight lightSource;
+uniform vec3 ambientLight;
 
 vec3 calcPointLight(PointLight lightSource, vec3 materialDiffuse, vec3 fragPos, vec3 normal, vec3 eyeDirection) {
   //Vector from vertex to light (camera space)
@@ -55,11 +54,10 @@ vec3 calcPointLight(PointLight lightSource, vec3 materialDiffuse, vec3 fragPos, 
   float cosAlpha = clamp(dot(eyeDirection, reflectionDirection), 0, 1);
 
   //Calculate lighting components
-  vec3 ambient = lightSource.ambient * materialDiffuse;
   vec3 diffuse = lightSource.diffuse * materialDiffuse * lightSource.colour * lightSource.power * cosTheta / lightDistanceSqr;
   vec3 specular = lightSource.specular * lightSource.colour * lightSource.power * pow(cosAlpha, 5) / lightDistanceSqr;
 
-  return(ambient + diffuse + specular);
+  return(diffuse + specular);
 }
 
 vec3 calcDirectionalLight(DirectionalLight lightSource, vec3 materialDiffuse, vec3 fragPos, vec3 normal, vec3 eyeDirection) {
@@ -76,11 +74,10 @@ vec3 calcDirectionalLight(DirectionalLight lightSource, vec3 materialDiffuse, ve
   float cosAlpha = clamp(dot(eyeDirection, reflectionDirection), 0, 1);
 
   //Calculate lighting components
-  vec3 ambient = lightSource.ambient * materialDiffuse;
   vec3 diffuse = lightSource.diffuse * materialDiffuse * lightSource.colour * lightSource.power * cosTheta;
   vec3 specular = lightSource.specular * lightSource.colour * lightSource.power * pow(cosAlpha, 5);
 
-  return(ambient + diffuse + specular);
+  return(diffuse + specular);
 }
 
 void main() {
@@ -93,5 +90,9 @@ void main() {
   //Eye vector (towards the camera)
   vec3 eyeDirection = EyeDirection_cameraspace;
 
+  //Calculate fragment colour
   colour = calcPointLight(lightSource, materialDiffuseColour, Position_worldspace, normal, eyeDirection);
+
+  //Apply ambient lighting
+  colour += ambientLight * materialDiffuseColour;
 }
