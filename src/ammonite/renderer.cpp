@@ -114,7 +114,7 @@ namespace ammonite {
       //Every half second, update the frame time
       static ammonite::utils::Timer frameTimer;
       double deltaTime = frameTimer.getTime();
-      if (deltaTime >= 0.5) {
+      if (deltaTime >= 0.5f) {
         frameTime = (deltaTime) / frameCount;
         frameTimer.reset();
         frameCount = 0;

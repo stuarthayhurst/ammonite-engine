@@ -25,7 +25,7 @@ namespace ammonite {
       //Base sensitivities and zoom
       const float baseMovementSpeed = 3.0f;
       const float baseMouseSpeed = 0.005f;
-      float fov = 45;
+      float fov = 45.0f;
 
       //Sensitivity multipliers (using a negative value will invert movement)
       float movementSpeedMultiplier = 1.0f;

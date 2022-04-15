@@ -12,14 +12,14 @@ namespace ammonite {
             return glfwGetTime() - start - offset;
           } else {
             //If the timer hasn't been unpaused yet, correct for the time
-            return glfwGetTime() - start - offset - (glfwGetTime() - stopTime);
+            return stopTime - start - offset;
           }
         }
         void reset() {
           running = true;
           start = glfwGetTime();
-          stopTime = 0;
-          offset = 0;
+          stopTime = 0.0f;
+          offset = 0.0f;
         }
 
         void pause() {
@@ -37,8 +37,8 @@ namespace ammonite {
       private:
         bool running = true;
         double start = glfwGetTime();
-        double stopTime = 0;
-        double offset = 0;
+        double stopTime = 0.0f;
+        double offset = 0.0f;
     };
   }
 }
