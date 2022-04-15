@@ -25,6 +25,9 @@ namespace ammonite {
       long totalFrames = 0;
       int frameCount = 0;
       double frameTime = 0.0f;
+
+      glm::mat4* projectionMatrix;
+      glm::mat4* viewMatrix;
     }
 
     namespace setup {
@@ -47,6 +50,12 @@ namespace ammonite {
 
         //Use the shader
         glUseProgram(programId);
+      }
+
+      void setupMatrices(glm::mat4* newProjectionMatrix, glm::mat4* newViewMatrix) {
+        //Accept pointers to the view and projection matrices
+        projectionMatrix = newProjectionMatrix;
+        viewMatrix = newViewMatrix;
       }
     }
 
@@ -103,7 +112,7 @@ namespace ammonite {
       return frameTime;
     }
 
-    void drawFrame(const int modelIds[], const int modelCount, glm::mat4 projectionMatrix, glm::mat4 viewMatrix) {
+    void drawFrame(const int modelIds[], const int modelCount) {
       //Reset the canvas
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -152,8 +161,8 @@ namespace ammonite {
       glUniform3f(lightComponentId, ambientLight.x, ambientLight.y, ambientLight.z);
 
       //Send view matrix to shader
-      glUniformMatrix4fv(viewMatrixId, 1, GL_FALSE, &viewMatrix[0][0]);
-      const glm::mat4 viewProjectionMatrix = projectionMatrix * viewMatrix;
+      glUniformMatrix4fv(viewMatrixId, 1, GL_FALSE, &(*viewMatrix)[0][0]);
+      const glm::mat4 viewProjectionMatrix = *projectionMatrix * *viewMatrix;
 
       //Draw given model
       for (int i = 0; i < modelCount; i++) {

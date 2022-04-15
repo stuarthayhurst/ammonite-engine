@@ -139,7 +139,10 @@ int main(int argc, char* argv[]) {
 
   std::cout << "Loaded models in: " << performanceTimer.getTime() << "s (" << vertexCount << " vertices)" << std::endl;
 
+  //Setup the renderer
+  glm::mat4 projectionMatrix, viewMatrix;
   ammonite::renderer::setup::setupRenderer(window, programId);
+  ammonite::renderer::setup::setupMatrices(&projectionMatrix, &viewMatrix);
 
   //Performance metrics setup
   ammonite::utils::Timer benchmarkTimer;
@@ -157,10 +160,10 @@ int main(int argc, char* argv[]) {
     ammonite::controls::processInput();
 
     //Get view and projection matrices
-    glm::mat4 projectionMatrix = ammonite::controls::matrix::getProjectionMatrix();
-    glm::mat4 viewMatrix = ammonite::controls::matrix::getViewMatrix();
+    projectionMatrix = ammonite::controls::matrix::getProjectionMatrix();
+    viewMatrix = ammonite::controls::matrix::getViewMatrix();
 
-    ammonite::renderer::drawFrame(loadedModelIds, modelCount, projectionMatrix, viewMatrix);
+    ammonite::renderer::drawFrame(loadedModelIds, modelCount);
   }
 
   //Output benchmark score
