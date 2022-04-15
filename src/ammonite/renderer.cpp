@@ -132,7 +132,7 @@ namespace ammonite {
       struct LightSource {
         glm::vec3 diffuse = glm::vec3(1.0f, 1.0f, 1.0f);
         glm::vec3 specular = glm::vec3(0.3f, 0.3f, 0.3f);
-        glm::vec3 position = glm::vec3(4.0f, 4.0f, 4.0f);
+        glm::vec3 geometry = glm::vec3(4.0f, 4.0f, 4.0f);
         glm::vec3 colour = glm::vec3(1.0f, 1.0f, 1.0f);
         float power = 50.0f;
       };
@@ -149,7 +149,7 @@ namespace ammonite {
       glUniform3f(lightComponentId, lightSource.specular.x, lightSource.specular.y, lightSource.specular.z);
 
       lightComponentId = glGetUniformLocation(programId, "lightSource.geometry");
-      glUniform3f(lightComponentId, lightSource.position.x, lightSource.position.y, lightSource.position.z);
+      glUniform3f(lightComponentId, lightSource.geometry.x, lightSource.geometry.y, lightSource.geometry.z);
 
       lightComponentId = glGetUniformLocation(programId, "lightSource.colour");
       glUniform3f(lightComponentId, lightSource.colour.x, lightSource.colour.y, lightSource.colour.z);
