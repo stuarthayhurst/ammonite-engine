@@ -11,6 +11,8 @@ namespace ammonite {
     void deleteShader(GLuint shaderId);
     void eraseShaders();
 
+    GLuint loadDirectory(const char* directoryPath, bool* externalSuccess);
+
     bool useProgramCache(const char* programCachePath);
   }
 }

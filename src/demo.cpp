@@ -77,24 +77,14 @@ int main(int argc, char* argv[]) {
   glDebugMessageCallback(debugMessageCallback, 0);
 #endif
 
-  //Shader paths and types to create program
-  const char* shaderPaths[2] = {
-    "shaders/ammonite/lightShader.vs",
-    "shaders/ammonite/lightShader.fs"
-  };
-  const int shaderTypes[2] = {
-    GL_VERTEX_SHADER,
-    GL_FRAGMENT_SHADER
-  };
-  int shaderCount = sizeof(shaderPaths) / sizeof(shaderPaths[0]);
-
   //Enable binary caching
   ammonite::shaders::useProgramCache("cache");
 
   //Create program from shaders
   bool success = true;
   ammonite::utils::Timer performanceTimer;
-  GLuint programId = ammonite::shaders::createProgram(shaderPaths, shaderTypes, shaderCount, &success, "program");
+  GLuint programId = ammonite::shaders::loadDirectory("shaders/ammonite/", &success);
+
   if (!success) {
     std::cerr << "Program creation failed" << std::endl;
     return EXIT_FAILURE;

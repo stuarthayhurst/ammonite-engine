@@ -219,7 +219,7 @@ namespace ammonite {
       return true;
     }
 
-    GLuint createProgram(const char* shaderPaths[], const int shaderTypes[], const int shaderCount, bool* externalSuccess, const char* programName) {
+    GLuint createProgram(const char* shaderPaths[], const GLenum shaderTypes[], const int shaderCount, bool* externalSuccess, const char* programName) {
       //Used later as the return value
       GLuint programId;
 
@@ -383,6 +383,44 @@ namespace ammonite {
         }
       }
 
+      return programId;
+    }
+
+    GLuint loadDirectory(const char* directoryPath, bool* externalSuccess) {
+      const std::filesystem::path shaderDir{directoryPath};
+      const auto it = std::filesystem::directory_iterator{shaderDir};
+
+      //Find all shaders
+      std::vector<std::string> shaders(0);
+      std::vector<GLenum> types(0);
+      for (auto const& fileName : it) {
+        std::filesystem::path filePath{fileName};
+        std::string extension = filePath.extension();
+
+        if (extension == ".vs" or extension == ".vert") {
+          shaders.push_back(std::string(filePath));
+          types.push_back(GL_VERTEX_SHADER);
+        } else if (extension == ".fs" or extension == ".frag") {
+          shaders.push_back(std::string(filePath));
+          types.push_back(GL_FRAGMENT_SHADER);
+        }
+      }
+
+      //Repack shaders
+      const char* shaderPaths[shaders.size()];
+      GLenum shaderTypes[types.size()];
+      const int shaderCount = sizeof(shaderPaths) / sizeof(shaderPaths[0]);
+
+      for (unsigned int i = 0; i < shaders.size(); i++) {
+        shaderPaths[i] = shaders[i].c_str();
+        shaderTypes[i] = types[i];
+      }
+
+      //Get the final component of the path
+      const char* directoryName = std::string(shaderDir.parent_path().filename()).c_str();
+
+      //Create the program and return the ID
+      GLuint programId = createProgram(shaderPaths, shaderTypes, shaderCount, externalSuccess, directoryName);
       return programId;
     }
   }
