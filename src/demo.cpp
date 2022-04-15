@@ -79,8 +79,8 @@ int main(int argc, char* argv[]) {
 
   //Shader paths and types to create program
   const char* shaderPaths[2] = {
-    "shaders/lightShader.vs",
-    "shaders/lightShader.fs"
+    "shaders/ammonite/lightShader.vs",
+    "shaders/ammonite/lightShader.fs"
   };
   const int shaderTypes[2] = {
     GL_VERTEX_SHADER,
