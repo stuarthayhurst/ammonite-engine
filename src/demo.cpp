@@ -141,7 +141,7 @@ int main(int argc, char* argv[]) {
   //Draw frames until window closed
   while(glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS and !glfwWindowShouldClose(window)) {
     //Every second, output the framerate
-    if (performanceTimer.getTime() >= 1.0) {
+    if (performanceTimer.getTime() >= 1.0f) {
       printMetrics(ammonite::renderer::getFrameTime());
       performanceTimer.reset();
     }
