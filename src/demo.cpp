@@ -129,6 +129,9 @@ int main(int argc, char* argv[]) {
 
   std::cout << "Loaded models in: " << performanceTimer.getTime() << "s (" << vertexCount << " vertices)" << std::endl;
 
+  //Create light sources
+  ammonite::lighting::setAmbientLight(glm::vec3(0.1f, 0.1f, 0.1f));
+
   //Setup the renderer
   glm::mat4 projectionMatrix, viewMatrix;
   ammonite::renderer::setup::setupRenderer(window, programId);

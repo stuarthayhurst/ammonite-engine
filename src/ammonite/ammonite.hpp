@@ -7,6 +7,7 @@
 #include "textures.hpp"
 #include "renderer.hpp"
 #include "modelManager.hpp"
+#include "lightManager.hpp"
 #include "controls.hpp"
 #include "windowManager.hpp"
 

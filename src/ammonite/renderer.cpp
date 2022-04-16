@@ -3,6 +3,7 @@
 #include <GLFW/glfw3.h>
 
 #include "modelManager.hpp"
+#include "lightManager.hpp"
 #include "utils/timer.hpp"
 
 #ifdef DEBUG
@@ -137,11 +138,16 @@ namespace ammonite {
         float power = 50.0f;
       };
 
-      glm::vec3 ambientLight = glm::vec3(0.1f, 0.1f, 0.1f);
-
+      //Setup lighting objects
+      glm::vec3 ambientLight = ammonite::lighting::getAmbientLight();
       LightSource lightSource;
       GLuint lightComponentId;
 
+      //Pass ambient light to shader
+      lightComponentId = glGetUniformLocation(programId, "ambientLight");
+      glUniform3f(lightComponentId, ambientLight.x, ambientLight.y, ambientLight.z);
+
+      //Pass light source to shader
       lightComponentId = glGetUniformLocation(programId, "lightSource.diffuse");
       glUniform3f(lightComponentId, lightSource.diffuse.x, lightSource.diffuse.y, lightSource.diffuse.z);
 
@@ -156,9 +162,6 @@ namespace ammonite {
 
       lightComponentId = glGetUniformLocation(programId, "lightSource.power");
       glUniform1f(lightComponentId, lightSource.power);
-
-      lightComponentId = glGetUniformLocation(programId, "ambientLight");
-      glUniform3f(lightComponentId, ambientLight.x, ambientLight.y, ambientLight.z);
 
       //Send view matrix to shader
       glUniformMatrix4fv(viewMatrixId, 1, GL_FALSE, &(*viewMatrix)[0][0]);
