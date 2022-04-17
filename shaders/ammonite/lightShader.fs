@@ -95,15 +95,23 @@ void main() {
   //Eye vector (towards the camera)
   vec3 eyeDirection = EyeDirection_cameraspace;
 
-  RawLightSource rawLightSource = lightSources[0];
+  RawLightSource rawLightSource;
   LightSource lightSource;
-  lightSource.geometry = rawLightSource.geometry.xyz;
-  lightSource.colour = rawLightSource.colour.xyz;
-  lightSource.diffuse = rawLightSource.diffuse.xyz;
-  lightSource.specular = rawLightSource.specular.xyz;
-  lightSource.power = rawLightSource.power.x;
 
-  //Calculate fragment colour
-  colour = calcPointLight(lightSource, materialColour, Position_worldspace, normal, eyeDirection);
+  //Calculate lighting influence from each light source
+  int lightCount = lightSources.length();
+  for (int i = 0; i < lightCount; i++) {
+    rawLightSource = lightSources[i];
+    lightSource.geometry = rawLightSource.geometry.xyz;
+    lightSource.colour = rawLightSource.colour.xyz;
+    lightSource.diffuse = rawLightSource.diffuse.xyz;
+    lightSource.specular = rawLightSource.specular.xyz;
+    lightSource.power = rawLightSource.power.x;
+
+    //Calculate fragment colour from current light
+    colour += calcPointLight(lightSource, materialColour, Position_worldspace, normal, eyeDirection);
+  }
+
+  //Add ambinent lighting
   colour += ambientLight * materialColour;
 }
