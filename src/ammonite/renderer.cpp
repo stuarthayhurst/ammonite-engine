@@ -23,9 +23,6 @@ namespace ammonite {
       GLuint normalMatrixId;
       GLuint textureSamplerId;
 
-      //Light attribute array ID
-      GLuint* lightDataId;
-
       long totalFrames = 0;
       int frameCount = 0;
       double frameTime = 0.0f;
@@ -46,9 +43,6 @@ namespace ammonite {
         viewMatrixId = glGetUniformLocation(programId, "V");
         normalMatrixId = glGetUniformLocation(programId, "normalMatrix");
         textureSamplerId = glGetUniformLocation(programId, "textureSampler");
-
-        //Set renderer lighting buffer IDs from the lighting manager
-        ammonite::lighting::setup::getBufferIds(&lightDataId);
 
         //Enable culling triangles and depth testing (only show fragments closer than the previous)
         glEnable(GL_CULL_FACE);
@@ -140,9 +134,6 @@ namespace ammonite {
       glm::vec3 ambientLight = ammonite::lighting::getAmbientLight();
       GLuint lightComponentId = glGetUniformLocation(programId, "ambientLight");
       glUniform3f(lightComponentId, ambientLight.x, ambientLight.y, ambientLight.z);
-
-      //Pass light data into shader
-      glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, *lightDataId);
 
       //Send view matrix to shader
       glUniformMatrix4fv(viewMatrixId, 1, GL_FALSE, &(*viewMatrix)[0][0]);

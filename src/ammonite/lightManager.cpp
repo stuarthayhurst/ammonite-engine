@@ -76,16 +76,6 @@ namespace ammonite {
     }
   }
 
-  //Designed for internal usage
-  namespace lighting {
-    namespace setup {
-      void getBufferIds(GLuint** externLightDataId) {
-        //Set external pointer to internal light shader storage buffer
-        *externLightDataId = &lightDataId;
-      }
-    }
-  }
-
   //Exposed light handling methods
   namespace lighting {
 

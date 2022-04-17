@@ -6,10 +6,6 @@
 
 namespace ammonite {
   namespace lighting {
-    namespace setup {
-      void getBufferIds(GLuint** lightDataId);
-    }
-
     struct LightSource {
       glm::vec3 geometry = glm::vec3(0.0f, 0.0f, 0.0f);
       glm::vec3 colour = glm::vec3(1.0f, 1.0f, 1.0f);
