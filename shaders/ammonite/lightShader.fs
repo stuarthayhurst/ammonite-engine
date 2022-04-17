@@ -15,7 +15,7 @@ struct RawLightSource {
   vec4 colour;
   vec4 diffuse;
   vec4 specular;
-  float power;
+  vec4 power;
 };
 
 //Cleaned up data structure
@@ -101,7 +101,7 @@ void main() {
   lightSource.colour = rawLightSource.colour.xyz;
   lightSource.diffuse = rawLightSource.diffuse.xyz;
   lightSource.specular = rawLightSource.specular.xyz;
-  lightSource.power = rawLightSource.power;
+  lightSource.power = rawLightSource.power.x;
 
   //Calculate fragment colour
   colour = calcPointLight(lightSource, materialColour, Position_worldspace, normal, eyeDirection);

@@ -39,18 +39,19 @@ namespace ammonite {
           glm::vec4 colour;
           glm::vec4 diffuse;
           glm::vec4 specular;
-          float power;
+          float power[4];
         } shaderLightData[10];
       } shaderData;
 
-      //Repack light sources into ShaderData, without their ID
+      //Repack light sources into ShaderData as vec4s / float[4], without their ID
+      //Packing them into 4 components is required for shader storage
       int currentLight = 0;
       for (auto const& [key, lightSource] : lightTrackerMap) {
         shaderData.shaderLightData[currentLight].geometry = glm::vec4(lightSource.geometry, 0);
         shaderData.shaderLightData[currentLight].colour = glm::vec4(lightSource.colour, 0);
         shaderData.shaderLightData[currentLight].diffuse = glm::vec4(lightSource.diffuse, 0);
         shaderData.shaderLightData[currentLight].specular = glm::vec4(lightSource.specular, 0);
-        shaderData.shaderLightData[currentLight].power = lightSource.power;
+        shaderData.shaderLightData[currentLight].power[0] = lightSource.power;
 
         currentLight++;
       }
