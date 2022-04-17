@@ -60,6 +60,12 @@ namespace ammonite {
         glDeleteBuffers(1, &lightDataId);
       }
 
+      //If no lights remain, unbind and return early
+      if (lightTrackerMap.size() == 0) {
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, 0);
+        return;
+      }
+
       //Add the shader data to a shader storage buffer object
       glGenBuffers(1, &lightDataId);
       glBindBuffer(GL_SHADER_STORAGE_BUFFER, lightDataId);
