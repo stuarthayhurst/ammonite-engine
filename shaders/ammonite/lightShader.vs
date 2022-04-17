@@ -1,4 +1,4 @@
-#version 330 core
+#version 430 core
 
 //Input vertex data, changes every execution
 layout(location = 0) in vec3 vertexPosition_modelspace;

@@ -1,4 +1,4 @@
-#version 330 core
+#version 430 core
 
 //Input data from vertex shader
 in vec2 texCoord;
@@ -9,19 +9,32 @@ in vec3 EyeDirection_cameraspace;
 //Ouput data
 out vec3 colour;
 
+//Data structure to match input from shader storage buffer object
+struct RawLightSource {
+  vec4 geometry;
+  vec4 colour;
+  vec4 diffuse;
+  vec4 specular;
+  float power;
+};
+
+//Cleaned up data structure
 struct LightSource {
   vec3 geometry;
   vec3 colour;
-  float power;
-
   vec3 diffuse;
   vec3 specular;
+  float power;
+};
+
+//Lighting inputs from shader storage buffer
+layout(std430, binding = 0) buffer lightPropertyInput {
+  RawLightSource lightSources[];
 };
 
 //Engine inputs
 uniform sampler2D textureSampler;
 uniform mat4 V;
-uniform LightSource lightSource;
 uniform vec3 ambientLight;
 
 vec3 calcDiffuseLight(LightSource lightSource, vec3 materialDiffuse, vec3 lightDirection, vec3 normal) {
@@ -81,6 +94,14 @@ void main() {
 
   //Eye vector (towards the camera)
   vec3 eyeDirection = EyeDirection_cameraspace;
+
+  RawLightSource rawLightSource = lightSources[0];
+  LightSource lightSource;
+  lightSource.geometry = rawLightSource.geometry.xyz;
+  lightSource.colour = rawLightSource.colour.xyz;
+  lightSource.diffuse = rawLightSource.diffuse.xyz;
+  lightSource.specular = rawLightSource.specular.xyz;
+  lightSource.power = rawLightSource.power;
 
   //Calculate fragment colour
   colour = calcPointLight(lightSource, materialColour, Position_worldspace, normal, eyeDirection);

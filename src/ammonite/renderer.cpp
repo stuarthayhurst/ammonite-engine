@@ -23,6 +23,9 @@ namespace ammonite {
       GLuint normalMatrixId;
       GLuint textureSamplerId;
 
+      //Light attribute array ID
+      GLuint* lightDataId;
+
       long totalFrames = 0;
       int frameCount = 0;
       double frameTime = 0.0f;
@@ -43,6 +46,9 @@ namespace ammonite {
         viewMatrixId = glGetUniformLocation(programId, "V");
         normalMatrixId = glGetUniformLocation(programId, "normalMatrix");
         textureSamplerId = glGetUniformLocation(programId, "textureSampler");
+
+        //Set renderer lighting buffer IDs from the lighting manager
+        ammonite::lighting::setup::getBufferIds(&lightDataId);
 
         //Enable culling triangles and depth testing (only show fragments closer than the previous)
         glEnable(GL_CULL_FACE);
@@ -130,38 +136,13 @@ namespace ammonite {
         frameCount = 0;
       }
 
-      struct LightSource {
-        glm::vec3 diffuse = glm::vec3(1.0f, 1.0f, 1.0f);
-        glm::vec3 specular = glm::vec3(0.3f, 0.3f, 0.3f);
-        glm::vec3 geometry = glm::vec3(4.0f, 4.0f, 4.0f);
-        glm::vec3 colour = glm::vec3(1.0f, 1.0f, 1.0f);
-        float power = 50.0f;
-      };
-
-      //Setup lighting objects
+      //Setup and pass ambient light to shader
       glm::vec3 ambientLight = ammonite::lighting::getAmbientLight();
-      LightSource lightSource;
-      GLuint lightComponentId;
-
-      //Pass ambient light to shader
-      lightComponentId = glGetUniformLocation(programId, "ambientLight");
+      GLuint lightComponentId = glGetUniformLocation(programId, "ambientLight");
       glUniform3f(lightComponentId, ambientLight.x, ambientLight.y, ambientLight.z);
 
-      //Pass light source to shader
-      lightComponentId = glGetUniformLocation(programId, "lightSource.diffuse");
-      glUniform3f(lightComponentId, lightSource.diffuse.x, lightSource.diffuse.y, lightSource.diffuse.z);
-
-      lightComponentId = glGetUniformLocation(programId, "lightSource.specular");
-      glUniform3f(lightComponentId, lightSource.specular.x, lightSource.specular.y, lightSource.specular.z);
-
-      lightComponentId = glGetUniformLocation(programId, "lightSource.geometry");
-      glUniform3f(lightComponentId, lightSource.geometry.x, lightSource.geometry.y, lightSource.geometry.z);
-
-      lightComponentId = glGetUniformLocation(programId, "lightSource.colour");
-      glUniform3f(lightComponentId, lightSource.colour.x, lightSource.colour.y, lightSource.colour.z);
-
-      lightComponentId = glGetUniformLocation(programId, "lightSource.power");
-      glUniform1f(lightComponentId, lightSource.power);
+      //Pass light data into shader
+      glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, *lightDataId);
 
       //Send view matrix to shader
       glUniformMatrix4fv(viewMatrixId, 1, GL_FALSE, &(*viewMatrix)[0][0]);

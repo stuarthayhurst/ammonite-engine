@@ -131,6 +131,13 @@ int main(int argc, char* argv[]) {
 
   //Create light sources
   ammonite::lighting::setAmbientLight(glm::vec3(0.1f, 0.1f, 0.1f));
+  int lightId = ammonite::lighting::createLightSource();
+
+  //Set light source properties
+  ammonite::lighting::LightSource* lightSource = ammonite::lighting::getLightSourcePtr(lightId);
+  lightSource->geometry = glm::vec3(4.0f, 4.0f, 4.0f);
+  lightSource->power = 50.0f;
+  ammonite::lighting::updateLightSources();
 
   //Setup the renderer
   glm::mat4 projectionMatrix, viewMatrix;
