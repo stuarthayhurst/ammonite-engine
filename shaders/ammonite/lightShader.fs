@@ -88,6 +88,7 @@ vec3 calcDirectionalLight(LightSource lightSource, vec3 materialColour, vec3 fra
 void main() {
   //Base colour of the fragment
   vec3 materialColour = texture(textureSampler, texCoord).rgb;
+  colour = vec3(0.0, 0.0, 0.0);
 
   //Normal of the fragment (camera space)
   vec3 normal = normalize(Normal_cameraspace);
