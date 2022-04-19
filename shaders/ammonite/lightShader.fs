@@ -110,6 +110,6 @@ void main() {
     colour += calcPointLight(lightSource, materialColour, Position_worldspace, normal, eyeDirection);
   }
 
-  //Add ambinent lighting
+  //Add ambient lighting
   colour += ambientLight * materialColour;
 }
