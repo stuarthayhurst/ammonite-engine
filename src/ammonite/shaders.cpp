@@ -185,9 +185,17 @@ namespace ammonite {
   //Binary caching related code
   namespace shaders {
     bool useProgramCache(const char* programCachePath) {
-      //Check binary cache support
+      //Get number of supported formats
+      GLint numBinaryFormats = 0;
+      glGetIntegerv(GL_NUM_PROGRAM_BINARY_FORMATS, &numBinaryFormats);
+
+      //Check support for collecting the program binary
       if (!glewIsSupported("GL_VERSION_4_1") and !GLEW_ARB_get_program_binary) {
         std::cerr << "Binary caching unsupported" << std::endl;
+        cacheBinaries = false;
+        return false;
+      } else if (numBinaryFormats < 1) {
+        std::cerr << "Binary caching unsupported (no supported formats)" << std::endl;
         cacheBinaries = false;
         return false;
       }
