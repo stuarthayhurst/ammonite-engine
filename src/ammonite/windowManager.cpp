@@ -13,7 +13,7 @@ namespace ammonite {
   namespace windowManager {
     namespace {
       //Constants
-      const float MIN_OPENGL = 3.2;
+      const float MIN_OPENGL = 3.2f;
 
       //Window and info
       GLFWwindow* window;
@@ -54,7 +54,7 @@ namespace ammonite {
         //If provided, split openglVersion into major and minor components and set version
         if (openglVersion >= MIN_OPENGL) {
           const short int openglMajor = std::floor(openglVersion);
-          const short int openglMinor = std::ceil((openglVersion - openglMajor) * 10);
+          const short int openglMinor = std::round((openglVersion - openglMajor) * 10);
 
           //Set the requested version
           glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, openglMajor);
