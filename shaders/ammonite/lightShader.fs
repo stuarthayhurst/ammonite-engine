@@ -37,11 +37,11 @@ uniform sampler2D textureSampler;
 uniform mat4 V;
 uniform vec3 ambientLight;
 
-vec3 calcDiffuseLight(LightSource lightSource, vec3 materialDiffuse, vec3 lightDirection, vec3 normal) {
+vec3 calcDiffuseLight(LightSource lightSource, vec3 materialColour, vec3 lightDirection, vec3 normal) {
   //Cosine of the angle between the normal and light direction
   float cosTheta = clamp(dot(normal, lightDirection), 0, 1);
 
-  return(lightSource.diffuse * materialDiffuse * lightSource.colour * lightSource.power * cosTheta);
+  return(lightSource.diffuse * materialColour * lightSource.colour * lightSource.power * cosTheta);
 }
 
 vec3 calcSpecularLight(LightSource lightSource, vec3 lightDirection, vec3 normal, vec3 eyeDirection) {
