@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include <glm/glm.hpp>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -5,10 +7,6 @@
 #include "modelManager.hpp"
 #include "lightManager.hpp"
 #include "utils/timer.hpp"
-
-#ifdef DEBUG
-  #include <iostream>
-#endif
 
 namespace ammonite {
   namespace renderer {
@@ -31,8 +29,32 @@ namespace ammonite {
       glm::mat4* viewMatrix;
     }
 
+    namespace {
+      //Check for essential GPU capabilities
+      static bool checkGPUCapabilities(int* failureCount) {
+        bool success = true;
+
+        //Check SSBOs are supported
+        if (!glewIsSupported("GL_VERSION_4_3") and !GLEW_ARB_shader_storage_buffer_object) {
+          std::cerr << "Shader Storage Buffer Objects (SSBOs) unsupported" << std::endl;
+          success = false;
+          *failureCount += 1;
+        }
+
+        return success;
+      }
+    }
+
     namespace setup {
-      void setupRenderer(GLFWwindow* targetWindow, GLuint targetProgramId) {
+      void setupRenderer(GLFWwindow* targetWindow, GLuint targetProgramId, bool* externalSuccess) {
+        //Check GPU supported required extensions
+        int failureCount = 0;
+        if (!checkGPUCapabilities(&failureCount)) {
+          std::cerr << failureCount << " required extensions are unsupported" << std::endl;
+          *externalSuccess = false;
+          return;
+        }
+
         //Set window and shader to be used
         window = targetWindow;
         programId = targetProgramId;

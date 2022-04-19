@@ -141,8 +141,13 @@ int main(int argc, char* argv[]) {
 
   //Setup the renderer
   glm::mat4 projectionMatrix, viewMatrix;
-  ammonite::renderer::setup::setupRenderer(window, programId);
+  ammonite::renderer::setup::setupRenderer(window, programId, &success);
   ammonite::renderer::setup::setupMatrices(&projectionMatrix, &viewMatrix);
+
+  if (!success) {
+    std::cerr << "Failed to initialise renderer, exiting" << std::endl;
+    return EXIT_FAILURE;
+  }
 
   //Performance metrics setup
   ammonite::utils::Timer benchmarkTimer;
