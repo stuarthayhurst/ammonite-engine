@@ -28,7 +28,7 @@ struct LightSource {
 };
 
 //Lighting inputs from shader storage buffer
-layout(std430, binding = 0) buffer lightPropertyInput {
+layout(std430, binding = 0) buffer LightPropertiesBuffer {
   RawLightSource lightSources[];
 };
 
