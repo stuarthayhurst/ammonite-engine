@@ -44,7 +44,7 @@ vec3 calcDiffuseLight(LightSource lightSource, vec3 materialDiffuse, vec3 lightD
   return(lightSource.diffuse * materialDiffuse * lightSource.colour * lightSource.power * cosTheta);
 }
 
-vec3 calcSpecularLight(LightSource lightSource, vec3 materialDiffuse, vec3 lightDirection, vec3 normal, vec3 eyeDirection) {
+vec3 calcSpecularLight(LightSource lightSource, vec3 lightDirection, vec3 normal, vec3 eyeDirection) {
   //Only keep direction component
   eyeDirection = normalize(eyeDirection);
 
@@ -69,7 +69,7 @@ vec3 calcPointLight(LightSource lightSource, vec3 materialColour, vec3 fragPos, 
 
   //Calculate lighting components
   vec3 diffuse = calcDiffuseLight(lightSource, materialColour, lightDirection, normal);
-  vec3 specular = calcSpecularLight(lightSource, materialColour, lightDirection, normal, eyeDirection);
+  vec3 specular = calcSpecularLight(lightSource, lightDirection, normal, eyeDirection);
 
   return((diffuse + specular) / lightDistanceSqr);
 }
@@ -80,7 +80,7 @@ vec3 calcDirectionalLight(LightSource lightSource, vec3 materialColour, vec3 fra
 
   //Calculate lighting components
   vec3 diffuse = calcDiffuseLight(lightSource, materialColour, lightDirection, normal);
-  vec3 specular = calcSpecularLight(lightSource, materialColour, lightDirection, normal, eyeDirection);
+  vec3 specular = calcSpecularLight(lightSource, lightDirection, normal, eyeDirection);
 
   return(diffuse + specular);
 }
