@@ -22,6 +22,16 @@ void printMetrics(double frameTime) {
   std::printf(" (%fms)\n", frameTime * 1000);
 }
 
+void cleanUp(int programId, int modelCount, int loadedModelIds[]) {
+  //Cleanup
+  for (int i = 0; i < modelCount; i++) {
+    ammonite::models::deleteModel(loadedModelIds[i]);
+  }
+  ammonite::shaders::eraseShaders();
+  glDeleteProgram(programId);
+  glfwTerminate();
+}
+
 #ifdef DEBUG
 void GLAPIENTRY debugMessageCallback(GLenum, GLenum type, GLuint, GLenum severity, GLsizei, const GLchar* message, const void*) {
   std::cerr << "\nGL CALLBACK: " << (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : "") << std::endl;
@@ -116,14 +126,9 @@ int main(int argc, char* argv[]) {
   ammonite::models::position::scaleModel(loadedModelIds[0], 0.8f);
   ammonite::models::position::rotateModel(loadedModelIds[0], glm::vec3(0.0f, 0.0f, 0.0f));
 
-  //Destroy all models, textures and shaders
+  //Destroy all models, textures and shaders then exit
   if (!success) {
-    for (int i = 0; i < modelCount; i++) {
-      ammonite::models::deleteModel(loadedModelIds[i]);
-    }
-    ammonite::shaders::eraseShaders();
-    glDeleteProgram(programId);
-    glfwTerminate();
+    cleanUp(programId, modelCount, loadedModelIds);
     return EXIT_FAILURE;
   }
 
@@ -144,8 +149,10 @@ int main(int argc, char* argv[]) {
   ammonite::renderer::setup::setupRenderer(window, programId, &success);
   ammonite::renderer::setup::setupMatrices(&projectionMatrix, &viewMatrix);
 
+  //Renderer failed to initialise, clean up and exit
   if (!success) {
     std::cerr << "Failed to initialise renderer, exiting" << std::endl;
+    cleanUp(programId, modelCount, loadedModelIds);
     return EXIT_FAILURE;
   }
 
@@ -178,13 +185,7 @@ int main(int argc, char* argv[]) {
     printMetrics(benchmarkTimer.getTime() / ammonite::renderer::getTotalFrames());
   }
 
-  //Cleanup
-  for (int i = 0; i < modelCount; i++) {
-    ammonite::models::deleteModel(loadedModelIds[i]);
-  }
-  ammonite::shaders::eraseShaders();
-  glDeleteProgram(programId);
-  glfwTerminate();
-
+  //Clean up and exit
+  cleanUp(programId, modelCount, loadedModelIds);
   return EXIT_SUCCESS;
 }
