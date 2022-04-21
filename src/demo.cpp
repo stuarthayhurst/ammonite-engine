@@ -32,15 +32,6 @@ void cleanUp(int programId, int modelCount, int loadedModelIds[]) {
   glfwTerminate();
 }
 
-#ifdef DEBUG
-void GLAPIENTRY debugMessageCallback(GLenum, GLenum type, GLuint, GLenum severity, GLsizei, const GLchar* message, const void*) {
-  std::cerr << "\nGL CALLBACK: " << (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : "") << std::endl;
-  std::cerr << "  Type: 0x" << type << std::endl;
-  std::cerr << "  Severity: 0x" << severity << std::endl;
-  std::cerr << "  Message: " << message << "\n" << std::endl;
-}
-#endif
-
 int main(int argc, char* argv[]) {
   //Handle arguments
   const int showHelp = arguments::searchArgument(argc, argv, "--help", true, nullptr);
@@ -81,10 +72,8 @@ int main(int argc, char* argv[]) {
     ammonite::windowManager::settings::useVsync(true);
   }
 
-//Enable OpenGL debug output
 #ifdef DEBUG
-  glEnable(GL_DEBUG_OUTPUT);
-  glDebugMessageCallback(debugMessageCallback, 0);
+  ammonite::debug::enableDebug();
 #endif
 
   //Enable binary caching
