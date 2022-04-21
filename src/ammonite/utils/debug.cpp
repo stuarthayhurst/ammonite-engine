@@ -14,6 +14,12 @@ namespace ammonite {
 
     namespace debug {
       void enableDebug() {
+        //Check support for OpenGL debugging
+        if (!glewIsSupported("GL_VERSION_4_3") and !GLEW_KHR_debug) {
+          std::cerr << "OpenGL debugging unsupported" << std::endl;
+          return;
+        }
+
         //Enable OpenGL debug output
         glEnable(GL_DEBUG_OUTPUT);
         glDebugMessageCallback(debugMessageCallback, 0);
