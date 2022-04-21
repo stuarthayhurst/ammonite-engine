@@ -10,11 +10,11 @@ HEADER_DIR ?= /usr/local/include/ammonite
 LIBRARY_NAME = libammonite.so.1
 
 OBJECT_DIR = $(BUILD_DIR)/objects
-AMMONITE_OBJECTS_SOURCE = $(wildcard ./src/ammonite/*.cpp)
+AMMONITE_OBJECTS_SOURCE = $(wildcard ./src/ammonite/*.cpp) $(wildcard ./src/ammonite/*/*.cpp)
 AMMONITE_OBJECTS = $(subst ./src/ammonite,$(OBJECT_DIR),$(subst .cpp,.o,$(AMMONITE_OBJECTS_SOURCE)))
 COMMON_OBJECTS_SOURCE = $(wildcard ./src/common/*.cpp)
 COMMON_OBJECTS = $(subst ./src/common,$(OBJECT_DIR),$(subst .cpp,.o,$(COMMON_OBJECTS_SOURCE)))
-AMMONITE_HEADER_SOURCE = $(wildcard ./src/ammonite/*.hpp)
+AMMONITE_HEADER_SOURCE = $(wildcard ./src/ammonite/*.hpp) $(wildcard ./src/ammonite/*/*.hpp)
 COMMON_HEADER_SOURCE = $(wildcard ./src/common/*.hpp)
 
 CXXFLAGS := $(shell pkg-config --cflags $(LIBS))
@@ -34,7 +34,7 @@ $(BUILD_DIR)/libammonite.so: $(AMMONITE_OBJECTS)
 	$(CXX) -shared -o "$@" $(AMMONITE_OBJECTS) $(CXXFLAGS) "-Wl,-soname,$(LIBRARY_NAME)"
 
 $(AMMONITE_OBJECTS): $(AMMONITE_OBJECTS_SOURCE) $(AMMONITE_HEADER_SOURCE)
-	@mkdir -p "$(OBJECT_DIR)"
+	@mkdir -p "$$(dirname $@)"
 	$(CXX) $(subst $(OBJECT_DIR),src/ammonite,$(subst .o,.cpp,$(@))) -c $(CXXFLAGS) -fpic -o "$@"
 
 $(COMMON_OBJECTS): $(COMMON_OBJECTS_SOURCE) $(COMMON_HEADER_SOURCE)
