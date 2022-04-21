@@ -1,3 +1,5 @@
+#ifdef DEBUG
+
 #include <iostream>
 #include <GL/glew.h>
 
@@ -27,3 +29,5 @@ namespace ammonite {
     }
   }
 }
+
+#endif
