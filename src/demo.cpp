@@ -73,7 +73,7 @@ int main(int argc, char* argv[]) {
   }
 
 #ifdef DEBUG
-  ammonite::debug::enableDebug();
+  ammonite::utils::debug::enableDebug();
 #endif
 
   //Enable binary caching
