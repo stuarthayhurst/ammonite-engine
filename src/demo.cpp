@@ -8,7 +8,6 @@
 #include <GLFW/glfw3.h>
 
 #include <glm/glm.hpp>
-#include <glm/gtx/quaternion.hpp>
 
 #include "ammonite/ammonite.hpp"
 #include "common/argHandler.hpp"
