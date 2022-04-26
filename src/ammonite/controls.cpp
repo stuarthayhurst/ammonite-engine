@@ -174,6 +174,11 @@ namespace ammonite {
       glfwGetCursorPos(window, &xposLast, &yposLast);
     }
 
+    //Return true if the window should be closed
+    bool shouldWindowClose() {
+      return (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS and !glfwWindowShouldClose(window));
+    }
+
     //Handle keyboard and mouse movements, calculate matrices
     void processInput() {
       //Time difference between 2 inputs

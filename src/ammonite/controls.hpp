@@ -22,6 +22,7 @@ namespace ammonite {
     }
 
     void setupControls(GLFWwindow* newWindow, int* widthAddr, int* heightAddr, float* aspectRatioAddr);
+    bool shouldWindowClose();
     void processInput();
   }
 }
