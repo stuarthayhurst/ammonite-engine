@@ -1,15 +1,17 @@
 ## Ammonite Renderer
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://paypal.me/stuartahayhurst)
-  - An OpenGL based renderer to display models and generated datasets, focused on ease of use
+  - A simple OpenGL based renderer to render loaded data, focused on ease of use
   - If you found this project interesting, any donations are greatly appreciated :)
-  - The goal of Ammonite I is to create a functional OpenGL-based renderer
-    - For Ammonite II, I plan to experiment with Vulkan, ray-tracing and mesh shaders, as well as anything else more complex that interests me
 
 ![Icon](assets/icons/icon.svg)
 
 ## Requirements:
   - A `c++17` compatible compiler (`g++ 8+`)
-  - An OpenGL 3.2+ compatible driver
+  - An OpenGL 4.3+ compatible driver
+  - Alternatively, an OpenGL 3.2+ driver supporting the following extensions can be used
+    - `ARB_shader_storage_buffer_object`
+    - `KHR_debug`, when compiled in debug mode
+  - Program caching is supported with `ARB_get_program_binary`
 
 ## Building + installing libammonite:
   - `make library`
