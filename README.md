@@ -7,6 +7,7 @@
 
 ## Requirements:
   - A `c++17` compatible compiler (`g++ 8+`)
+  - An OpenMP supported compiler
   - An OpenGL 4.3+ compatible driver
   - Alternatively, an OpenGL 3.2+ driver supporting the following extensions can be used
     - `ARB_shader_storage_buffer_object`
