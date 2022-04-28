@@ -17,7 +17,7 @@ COMMON_OBJECTS = $(subst ./src/common,$(OBJECT_DIR),$(subst .cpp,.o,$(COMMON_OBJ
 AMMONITE_HEADER_SOURCE = $(wildcard ./src/ammonite/*.hpp) $(wildcard ./src/ammonite/*/*.hpp)
 COMMON_HEADER_SOURCE = $(wildcard ./src/common/*.hpp)
 
-CXXFLAGS := $(shell pkg-config --cflags $(LIBS))
+CXXFLAGS := $(shell pkg-config --cflags $(LIBS)) -fopenmp
 CXXFLAGS += -Wall -Wextra -Werror -O3 -flto -std=c++17
 LDFLAGS := $(shell pkg-config --libs $(LIBS)) -pthread
 

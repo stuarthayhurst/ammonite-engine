@@ -1,7 +1,11 @@
 #include <map>
+#include <cmath>
 
 #include <GL/glew.h>
 #include <glm/glm.hpp>
+
+#include <omp.h>
+#include <thread>
 
 #ifdef DEBUG
   #include <iostream>
@@ -41,17 +45,27 @@ namespace ammonite {
         float power[4];
       } shaderData[lightTrackerMap.size()];
 
-      //Repack light sources into ShaderData as vec4s / float[4], without their ID
-      //Packing them into 4 components is required for shader storage
-      int currentLight = 0;
-      for (auto const& [key, lightSource] : lightTrackerMap) {
-        shaderData[currentLight].geometry = glm::vec4(lightSource.geometry, 0);
-        shaderData[currentLight].colour = glm::vec4(lightSource.colour, 0);
-        shaderData[currentLight].diffuse = glm::vec4(lightSource.diffuse, 0);
-        shaderData[currentLight].specular = glm::vec4(lightSource.specular, 0);
-        shaderData[currentLight].power[0] = lightSource.power;
+      //Use 1 thread per 25 models, up to hardware maximum
+      unsigned int threadCount = std::ceil(lightTrackerMap.size() / 25);
+      if (threadCount > std::thread::hardware_concurrency()) {
+        threadCount = std::thread::hardware_concurrency();
+      }
+      omp_set_dynamic(0);
+      omp_set_num_threads(threadCount);
 
-        currentLight++;
+      //Repack light sources into ShaderData (uses vec4s for OpenGL)
+      #pragma omp parallel for
+      for(unsigned int i = 0; i < lightTrackerMap.size(); i++) {
+
+        auto lightIt = lightTrackerMap.begin();
+        std::advance(lightIt, i);
+        auto lightSource = lightIt->second;
+
+        shaderData[i].geometry = glm::vec4(lightSource.geometry, 0);
+        shaderData[i].colour = glm::vec4(lightSource.colour, 0);
+        shaderData[i].diffuse = glm::vec4(lightSource.diffuse, 0);
+        shaderData[i].specular = glm::vec4(lightSource.specular, 0);
+        shaderData[i].power[0] = lightSource.power;
       }
 
       //If the buffer already exists, destroy it
@@ -76,7 +90,6 @@ namespace ammonite {
 
   //Exposed light handling methods
   namespace lighting {
-
     int createLightSource() {
       LightSource lightSource;
 
