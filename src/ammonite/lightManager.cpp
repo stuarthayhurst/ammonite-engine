@@ -45,7 +45,7 @@ namespace ammonite {
         float power[4];
       } shaderData[lightTrackerMap.size()];
 
-      //Use 1 thread per 25 models, up to hardware maximum
+      //Use 1 thread per 25 light sources, up to hardware maximum
       unsigned int threadCount = std::ceil(lightTrackerMap.size() / 25);
       if (threadCount > std::thread::hardware_concurrency()) {
         threadCount = std::thread::hardware_concurrency();
@@ -56,7 +56,6 @@ namespace ammonite {
       //Repack light sources into ShaderData (uses vec4s for OpenGL)
       #pragma omp parallel for
       for(unsigned int i = 0; i < lightTrackerMap.size(); i++) {
-
         auto lightIt = lightTrackerMap.begin();
         std::advance(lightIt, i);
         auto lightSource = lightIt->second;
