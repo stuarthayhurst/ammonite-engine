@@ -77,7 +77,7 @@ namespace ammonite {
 
       //Initialise GLEW
       bool setupGlew(GLFWwindow* window) {
-        glewExperimental = true;
+        glewExperimental = GL_TRUE;
         if (glewInit() != GLEW_OK) {
           std::cerr << "Failed to initialize GLEW" << std::endl;
           return false;
