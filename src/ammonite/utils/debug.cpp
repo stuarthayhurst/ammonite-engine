@@ -7,9 +7,27 @@ namespace ammonite {
   namespace utils {
     namespace {
       static void GLAPIENTRY debugMessageCallback(GLenum, GLenum type, GLuint, GLenum severity, GLsizei, const GLchar* message, const void*) {
-        std::cerr << "\nGL CALLBACK: " << (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : "") << std::endl;
-        std::cerr << "  Type: 0x" << type << std::endl;
-        std::cerr << "  Severity: 0x" << severity << std::endl;
+        std::cerr << "\nGL MESSAGE ";
+        switch (severity) {
+          case GL_DEBUG_SEVERITY_HIGH: std::cerr << "(High priority): "; break;
+          case GL_DEBUG_SEVERITY_MEDIUM: std::cerr << "(Medium priority): "; break;
+          case GL_DEBUG_SEVERITY_LOW: std::cerr << "(Low priority): "; break;
+          case GL_DEBUG_SEVERITY_NOTIFICATION: std::cerr << "(Notification): "; break;
+        }
+
+        switch (type) {
+          case GL_DEBUG_TYPE_ERROR: std::cerr << "** ERROR **"; break;
+          case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: std::cerr << "DEPRECATED BEHAVIOUR"; break;
+          case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR: std::cerr << "UNDEFINED BEHAVIOUR"; break;
+          case GL_DEBUG_TYPE_PORTABILITY: std::cerr << "PORTABILITY"; break;
+          case GL_DEBUG_TYPE_PERFORMANCE: std::cerr << "PERFORMANCE"; break;
+          case GL_DEBUG_TYPE_MARKER: std::cerr << "MARKER"; break;
+          case GL_DEBUG_TYPE_PUSH_GROUP: std::cerr << "PUSH GROUP"; break;
+          case GL_DEBUG_TYPE_POP_GROUP: std::cerr << "POP GROUP"; break;
+          case GL_DEBUG_TYPE_OTHER: std::cerr << "OTHER"; break;
+        }
+
+        std::cerr << std::endl;
         std::cerr << "  Message: " << message << "\n" << std::endl;
       }
     }
