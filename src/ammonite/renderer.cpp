@@ -41,6 +41,13 @@ namespace ammonite {
           *failureCount += 1;
         }
 
+        //Check minimum OpenGL version is supported
+        if (!glewIsSupported("GL_VERSION_3_2")) {
+          std::cerr << "OpenGL 3.2 unsupported" << std::endl;
+          success = false;
+          *failureCount += 1;
+        }
+
         return success;
       }
     }
