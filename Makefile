@@ -45,9 +45,11 @@ $(OBJECT_DIR)/demo.o: ./src/demo.cpp $(AMMONITE_HEADER_SOURCE) $(COMMON_HEADER_S
 	@mkdir -p "$(OBJECT_DIR)"
 	$(CXX) ./src/demo.cpp -c $(CXXFLAGS) -o "$@"
 
-.PHONY: build system-build library headers install uninstall clean cache icons
+.PHONY: build debug system-build library headers install uninstall clean cache icons
 build:
 	RPATH="-Wl,-rpath=$(BUILD_DIR)" $(MAKE) system-build
+debug: clean
+	DEBUG="true" $(MAKE) build
 system-build:
 	$(MAKE) "$(BUILD_DIR)/demo"
 	if [[ "$(DEBUG)" != "true" ]]; then \

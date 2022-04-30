@@ -37,8 +37,9 @@
     - `--vsync`: Enable / disable VSync (`true` / `false`)
 
 ## Build system:
-  - `build`, `local-build` and `library` support building on multiple cores with `-jX`
+  - `build`, `debug` `system-build` and `library` support building on multiple cores with `-jX`
   - `make build` - Builds demo binary, a working demonstration of the renderer
+  - `make debug` - Cleans build directory, then runs `make build` in debug mode
   - `make system-build` - Same as `build`, but uses the system copy of `libammonite.so`
   - `make library` - Builds `build/libammonite.so`
   - `make install` - Installs `libammonite.so` to system directories
