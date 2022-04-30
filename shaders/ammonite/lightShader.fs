@@ -74,7 +74,7 @@ vec3 calcPointLight(LightSource lightSource, vec3 materialColour, vec3 fragPos, 
   return((diffuse + specular) / lightDistanceSqr);
 }
 
-vec3 calcDirectionalLight(LightSource lightSource, vec3 materialColour, vec3 fragPos, vec3 normal, vec3 eyeDirection) {
+vec3 calcDirectionalLight(LightSource lightSource, vec3 materialColour, vec3 normal, vec3 eyeDirection) {
   //Direction of the light (from the light to the fragment)
   vec3 lightDirection = normalize(-(V * vec4(lightSource.geometry, 0)).xyz);
 
