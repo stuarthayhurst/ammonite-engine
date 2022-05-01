@@ -3,6 +3,8 @@
 #include <iostream>
 #include <GL/glew.h>
 
+#include "extension.hpp"
+
 namespace ammonite {
   namespace utils {
     namespace {
@@ -35,7 +37,7 @@ namespace ammonite {
     namespace debug {
       void enableDebug() {
         //Check support for OpenGL debugging
-        if (!glewIsSupported("GL_VERSION_4_3") and !GLEW_KHR_debug) {
+        if (!ammonite::utils::checkExtension("GL_KHR_debug", "GL_VERSION_4_3")) {
           std::cerr << "OpenGL debugging unsupported" << std::endl;
           return;
         }

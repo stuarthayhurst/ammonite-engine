@@ -9,6 +9,8 @@
 
 #include <GL/glew.h>
 
+#include "utils/extension.hpp"
+
 namespace ammonite {
   namespace {
     //Vector to store all existing shaders
@@ -93,7 +95,7 @@ namespace ammonite {
     GLuint loadShader(const char* shaderPath, const GLenum shaderType, bool* externalSuccess) {
       //Check for compute shader support if needed
       if (shaderType == GL_COMPUTE_SHADER) {
-        if (!glewIsSupported("GL_VERSION_4_3") and !GLEW_ARB_compute_shader) {
+        if (!ammonite::utils::checkExtension("GL_ARB_compute_shader", "GL_VERSION_4_3")) {
           std::cerr << "Compute shaders unsupported" << std::endl;
           *externalSuccess = false;
           return 0;
@@ -102,7 +104,7 @@ namespace ammonite {
 
       //Check for tessellation shader support if needed
       if (shaderType == GL_TESS_CONTROL_SHADER or shaderType == GL_TESS_EVALUATION_SHADER) {
-        if (!glewIsSupported("GL_VERSION_4_0") and !GLEW_ARB_tessellation_shader) {
+        if (!ammonite::utils::checkExtension("GL_ARB_tessellation_shader", "GL_VERSION_4_0")) {
           std::cerr << "Tessellation shaders unsupported" << std::endl;
           *externalSuccess = false;
           return 0;
@@ -190,7 +192,7 @@ namespace ammonite {
       glGetIntegerv(GL_NUM_PROGRAM_BINARY_FORMATS, &numBinaryFormats);
 
       //Check support for collecting the program binary
-      if (!glewIsSupported("GL_VERSION_4_1") and !GLEW_ARB_get_program_binary) {
+      if (!ammonite::utils::checkExtension("GL_ARB_get_program_binary", "GL_VERSION_4_1")) {
         std::cerr << "Binary caching unsupported" << std::endl;
         cacheBinaries = false;
         return false;

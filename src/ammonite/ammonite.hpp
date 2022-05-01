@@ -2,6 +2,7 @@
 #define AMMONITE
 
 #include "utils/timer.hpp"
+#include "utils/extension.hpp"
 
 #ifdef DEBUG
   #include "utils/debug.hpp"

@@ -7,6 +7,7 @@
 #include "modelManager.hpp"
 #include "lightManager.hpp"
 #include "utils/timer.hpp"
+#include "utils/extension.hpp"
 
 namespace ammonite {
   namespace renderer {
@@ -33,9 +34,8 @@ namespace ammonite {
       //Check for essential GPU capabilities
       static bool checkGPUCapabilities(int* failureCount) {
         bool success = true;
-
         //Check SSBOs are supported
-        if (!glewIsSupported("GL_VERSION_4_3") and !GLEW_ARB_shader_storage_buffer_object) {
+        if (!ammonite::utils::checkExtension("GL_ARB_shader_storage_buffer_object", "GL_VERSION_4_3")) {
           std::cerr << "Shader Storage Buffer Objects (SSBOs) unsupported" << std::endl;
           success = false;
           *failureCount += 1;
