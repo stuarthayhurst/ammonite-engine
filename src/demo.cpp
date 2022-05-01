@@ -53,7 +53,7 @@ int main(int argc, char* argv[]) {
   }
 
   //Create the window
-  auto [window, widthPtr, heightPtr, aspectRatioPtr] = ammonite::windowManager::setupWindow(width, height, 4, 0, "OpenGL Experiments");
+  auto [window, widthPtr, heightPtr, aspectRatioPtr] = ammonite::windowManager::setupWindow(width, height, 4, "OpenGL Experiments");
   if (window == NULL) {
     return EXIT_FAILURE;
   }

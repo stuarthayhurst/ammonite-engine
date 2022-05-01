@@ -12,9 +12,6 @@
 namespace ammonite {
   namespace windowManager {
     namespace {
-      //Constants
-      const float MIN_OPENGL = 3.2f;
-
       //Window and info
       GLFWwindow* window;
       int width, height;
@@ -43,28 +40,20 @@ namespace ammonite {
     }
 
     namespace setup {
-      //Initialise glfw, setup antialiasing and OpenGL version
-      bool setupGlfw(int antialiasing, float openglVersion) {
+      //Initialise GLFW and setup antialiasing
+      bool setupGlfw(int antialiasing) {
         //Setup GLFW
         if (!glfwInit()) {
           std::cerr << "Failed to initialize GLFW" << std::endl;
           return false;
         }
 
-        //If provided, split openglVersion into major and minor components and set version
-        if (openglVersion >= MIN_OPENGL) {
-          const short int openglMajor = std::floor(openglVersion);
-          const short int openglMinor = std::round((openglVersion - openglMajor) * 10);
+        //Set minimum version to OpenGL 3.2+
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
 
-          //Set the requested version
-          glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, openglMajor);
-          glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, openglMinor);
-
-          //Disable older OpenGL versions
-          glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-        } else if (openglVersion != 0) {
-          std::cout << "Minimum OpenGL version is " << MIN_OPENGL << ", version " << openglVersion << " is unsupported" << std::endl;
-        }
+        //Disable compatibility profile
+        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
         //Set antialiasing level if requested
         if (antialiasing != 0) {
@@ -165,9 +154,9 @@ namespace ammonite {
     }
 
     //Wrapper to create and setup window
-    std::tuple<GLFWwindow*, int*, int*, float*> setupWindow(int newWidth, int newHeight, int antialiasing, float openglVersion, const char* title) {
-      //Setup GLFW and OpenGL version / antialiasing
-      if (!windowManager::setup::setupGlfw(antialiasing, openglVersion)) {
+    std::tuple<GLFWwindow*, int*, int*, float*> setupWindow(int newWidth, int newHeight, int antialiasing, const char* title) {
+      //Setup GLFW and antialiasing
+      if (!windowManager::setup::setupGlfw(antialiasing)) {
         return {NULL, nullptr, nullptr, nullptr};
       }
 

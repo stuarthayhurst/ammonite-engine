@@ -12,7 +12,7 @@ namespace ammonite {
     }
 
     namespace setup {
-      bool setupGlfw(int antialiasing, float openglVersion);
+      bool setupGlfw(int antialiasing);
       bool setupGlew(GLFWwindow* window);
       void setupGlfwInput(GLFWwindow* window);
     }
@@ -22,7 +22,7 @@ namespace ammonite {
     void useIconDir(GLFWwindow* window, const char* iconDirPath);
 
     //Wrapper for setup methods and createWindow()
-    std::tuple<GLFWwindow*, int*, int*, float*> setupWindow(int newWidth, int newHeight, int antialiasing, float openglVersion, const char* title);
+    std::tuple<GLFWwindow*, int*, int*, float*> setupWindow(int newWidth, int newHeight, int antialiasing, const char* title);
   }
 }
 
