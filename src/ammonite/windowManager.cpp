@@ -92,6 +92,10 @@ namespace ammonite {
         //Start polling inputs
         glfwPollEvents();
       }
+
+      void destroyGlfw() {
+        glfwTerminate();
+      }
     }
 
     //Create a window and return pointers to the width, height and aspect ratio

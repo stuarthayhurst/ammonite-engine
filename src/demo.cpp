@@ -2,11 +2,9 @@
 #include <cstdlib>
 #include <tuple>
 #include <string>
-#include <vector>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-
 #include <glm/glm.hpp>
 
 #include "ammonite/ammonite.hpp"
@@ -28,7 +26,7 @@ void cleanUp(int programId, int modelCount, int loadedModelIds[]) {
   }
   ammonite::shaders::eraseShaders();
   glDeleteProgram(programId);
-  glfwTerminate();
+  ammonite::windowManager::setup::destroyGlfw();
 }
 
 int main(int argc, char* argv[]) {

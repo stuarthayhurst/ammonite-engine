@@ -15,6 +15,7 @@ namespace ammonite {
       bool setupGlfw(int antialiasing);
       bool setupGlew(GLFWwindow* window);
       void setupGlfwInput(GLFWwindow* window);
+      void destroyGlfw();
     }
 
     std::tuple<GLFWwindow*, int*, int*, float*> createWindow(int width, int height);
