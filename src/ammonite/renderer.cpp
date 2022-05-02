@@ -114,16 +114,14 @@ namespace ammonite {
         //Bind vertex attribute buffer
         glBindVertexArray(drawObjectData->vertexArrayId);
 
-        //Calculate matrices
-        glm::mat4 rotationMatrix = glm::toMat4(drawObject->positionData.rotationQuat);
-        glm::mat4 modelMatrix = drawObject->positionData.translationMatrix * rotationMatrix * drawObject->positionData.scaleMatrix;
+        //Calculate and obtain matrices
+        glm::mat4 modelMatrix = drawObject->positionData.modelMatrix;
         glm::mat4 mvp = viewProjectionMatrix * modelMatrix;
-        glm::mat3 normalMatrix = glm::transpose(glm::inverse(modelMatrix));
 
         //Send matrices to the shaders
         glUniformMatrix4fv(matrixId, 1, GL_FALSE, &mvp[0][0]);
         glUniformMatrix4fv(modelMatrixId, 1, GL_FALSE, &modelMatrix[0][0]);
-        glUniformMatrix3fv(normalMatrixId, 1, GL_FALSE, &normalMatrix[0][0]);
+        glUniformMatrix3fv(normalMatrixId, 1, GL_FALSE, &drawObject->positionData.normalMatrix[0][0]);
 
         //Use wireframe if requested
         setWireframe(drawObject->wireframe);

@@ -23,6 +23,8 @@ namespace ammonite {
     };
 
     struct PositionData {
+      glm::mat4 modelMatrix;
+      glm::mat3 normalMatrix;
       glm::mat4 translationMatrix;
       glm::mat4 scaleMatrix;
       glm::quat rotationQuat;

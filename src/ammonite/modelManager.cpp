@@ -30,6 +30,8 @@ namespace ammonite {
     };
 
     struct PositionData {
+      glm::mat4 modelMatrix;
+      glm::mat3 normalMatrix;
       glm::mat4 translationMatrix;
       glm::mat4 scaleMatrix;
       glm::quat rotationQuat;
@@ -232,6 +234,16 @@ namespace ammonite {
 
   //Exposed model handling methods
   namespace models {
+      namespace {
+        static void calcModelMatrices(models::InternalModel* modelObject) {
+          //Recalculate the model matrix when a component changes
+          modelObject->positionData.modelMatrix = modelObject->positionData.translationMatrix * glm::toMat4(modelObject->positionData.rotationQuat) * modelObject->positionData.scaleMatrix;
+
+          //Normal matrix
+          modelObject->positionData.normalMatrix = glm::transpose(glm::inverse(modelObject->positionData.modelMatrix));
+        }
+      }
+
     int createModel(const char* objectPath, bool* externalSuccess) {
       //Create the model
       InternalModel modelObject;
@@ -259,6 +271,9 @@ namespace ammonite {
       positionData.rotationQuat = glm::quat(glm::vec3(0, 0, 0));
 
       modelObject.positionData = positionData;
+
+      //Calculate model and normal matrices
+      calcModelMatrices(&modelObject);
 
       //Add model to the tracker and return the ID
       modelObject.modelId = modelTrackerMap.size() + 1;
@@ -311,6 +326,9 @@ namespace ammonite {
         modelObject->positionData.translationMatrix = glm::translate(
           modelObject->positionData.translationMatrix,
           translation);
+
+        //Recalculate model and normal matrices
+        calcModelMatrices(modelObject);
       }
 
       void scaleModel(int modelId, glm::vec3 scaleVector) {
@@ -325,6 +343,9 @@ namespace ammonite {
         modelObject->positionData.scaleMatrix = glm::scale(
           modelObject->positionData.scaleMatrix,
           scaleVector);
+
+        //Recalculate model and normal matrices
+        calcModelMatrices(modelObject);
       }
 
       void scaleModel(int modelId, float scaleMultiplier) {
@@ -343,6 +364,9 @@ namespace ammonite {
         glm::vec3 rotationRadians = glm::vec3(glm::radians(rotation[0]), glm::radians(rotation[1]), glm::radians(rotation[2]));
 
         modelObject->positionData.rotationQuat = glm::quat(rotationRadians) * modelObject->positionData.rotationQuat;
+
+        //Recalculate model and normal matrices
+        calcModelMatrices(modelObject);
       }
     }
   }
