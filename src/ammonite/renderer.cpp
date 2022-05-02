@@ -124,7 +124,11 @@ namespace ammonite {
         glUniformMatrix3fv(normalMatrixId, 1, GL_FALSE, &drawObject->positionData.normalMatrix[0][0]);
 
         //Use wireframe if requested
-        setWireframe(drawObject->wireframe);
+        if (drawObject->drawMode == 1) {
+          setWireframe(true);
+        } else {
+          setWireframe(false);
+        }
 
         //Draw the triangles
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, drawObjectData->elementBufferId);

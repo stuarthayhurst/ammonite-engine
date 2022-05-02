@@ -34,7 +34,7 @@ namespace ammonite {
       InternalModelData* data;
       PositionData positionData;
       GLuint textureId;
-      bool wireframe = false;
+      int drawMode = 0;
       bool active = true;
       std::string modelName;
       int modelId;
@@ -43,6 +43,10 @@ namespace ammonite {
     int createModel(const char* objectPath, bool* externalSuccess);
     InternalModel* getModelPtr(int modelId);
     void deleteModel(int modelId);
+
+    namespace draw {
+      void setDrawMode(int modelId, int drawMode);
+    }
 
     namespace position {
       void translateModel(int modelId, glm::vec3 translation);

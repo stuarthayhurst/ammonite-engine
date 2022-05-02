@@ -41,7 +41,7 @@ namespace ammonite {
       InternalModelData* data;
       PositionData positionData;
       GLuint textureId;
-      bool wireframe = false;
+      int drawMode = 0;
       bool active = true;
       std::string modelName;
       int modelId;
@@ -310,6 +310,12 @@ namespace ammonite {
 
         //Remove the model from the tracker
         modelTrackerMap.erase(modelId);
+      }
+    }
+
+    namespace draw {
+      void setDrawMode(int modelId, int drawMode) {
+        models::getModelPtr(modelId)->drawMode = drawMode;
       }
     }
 
