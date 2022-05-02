@@ -189,6 +189,9 @@ namespace ammonite {
       static int lastInputToggleState = GLFW_RELEASE;
       int inputToggleState;
 
+      //Poll GLFW for input
+      glfwPollEvents();
+
       //Handle toggling input
       inputToggleState = glfwGetKey(window, GLFW_KEY_C);
       if (lastInputToggleState != inputToggleState) {

@@ -175,7 +175,6 @@ namespace ammonite {
 
       //Swap buffers
       glfwSwapBuffers(window);
-      glfwPollEvents();
     }
   }
 }
