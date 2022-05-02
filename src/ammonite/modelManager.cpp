@@ -105,7 +105,7 @@ namespace ammonite {
       glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelObjectData->elementBufferId);
       glBufferData(GL_ELEMENT_ARRAY_BUFFER, modelObjectData->indices.size() * sizeof(unsigned int), &modelObjectData->indices[0], GL_STATIC_DRAW);
 
-      //Create the ertex attribute buffer
+      //Create the vertex attribute buffer
       glGenVertexArrays(1, &modelObjectData->vertexArrayId);
       glBindVertexArray(modelObjectData->vertexArrayId);
 

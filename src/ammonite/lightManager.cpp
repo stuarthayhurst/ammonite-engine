@@ -71,7 +71,9 @@ namespace ammonite {
 
       //If no lights remain, unbind and return early
       if (lightTrackerMap.size() == 0) {
+        glDeleteBuffers(1, &lightDataId);
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, 0);
+        lightDataId = 0;
         return;
       }
 
