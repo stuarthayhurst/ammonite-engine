@@ -123,16 +123,22 @@ namespace ammonite {
         glUniformMatrix4fv(modelMatrixId, 1, GL_FALSE, &modelMatrix[0][0]);
         glUniformMatrix3fv(normalMatrixId, 1, GL_FALSE, &drawObject->positionData.normalMatrix[0][0]);
 
-        //Use wireframe if requested
+        //Set the requested draw mode (normal, wireframe, points)
+        GLenum mode = GL_TRIANGLES;
         if (drawObject->drawMode == 1) {
+          //Use wireframe if requested
           setWireframe(true);
         } else {
+          //Draw points if requested
+          if (drawObject->drawMode == 2) {
+            mode = GL_POINTS;
+          }
           setWireframe(false);
         }
 
         //Draw the triangles
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, drawObjectData->elementBufferId);
-        glDrawElements(GL_TRIANGLES, drawObjectData->vertexCount, GL_UNSIGNED_INT, (void*)0);
+        glDrawElements(mode, drawObjectData->vertexCount, GL_UNSIGNED_INT, (void*)0);
       }
     }
 
