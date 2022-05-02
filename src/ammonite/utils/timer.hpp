@@ -1,15 +1,31 @@
 #ifndef TIMER
 #define TIMER
 
-#include <GLFW/glfw3.h>
+#include <chrono>
 
 namespace ammonite {
   namespace utils {
+    namespace {
+      static double getNanoTime() {
+        auto systemTime = std::chrono::system_clock::now().time_since_epoch();
+        auto systemTimeNano = std::chrono::duration_cast<std::chrono::nanoseconds>(systemTime).count();
+        return systemTimeNano;
+      }
+
+      static double getTimeDelta() {
+        static const double initTime = getNanoTime();
+        double systemTime = getNanoTime() - initTime;
+
+        //Convert nanoseconds into seconds
+        return systemTime / 1000000000;
+      }
+    }
+
     class Timer {
       public:
         double getTime() {
           if (running) {
-            return glfwGetTime() - start - offset;
+            return getTimeDelta() - start - offset;
           } else {
             //If the timer hasn't been unpaused yet, correct for the time
             return stopTime - start - offset;
@@ -17,26 +33,26 @@ namespace ammonite {
         }
         void reset() {
           running = true;
-          start = glfwGetTime();
+          start = getTimeDelta();
           stopTime = 0.0f;
           offset = 0.0f;
         }
 
         void pause() {
           if (running) {
-            stopTime = glfwGetTime();
+            stopTime = getTimeDelta();
             running = false;
           }
         }
         void unpause() {
           if (!running) {
-            offset += glfwGetTime() - stopTime;
+            offset += getTimeDelta() - stopTime;
             running = true;
           }
         }
       private:
         bool running = true;
-        double start = glfwGetTime();
+        double start = getTimeDelta();
         double stopTime = 0.0f;
         double offset = 0.0f;
     };
