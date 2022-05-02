@@ -35,8 +35,9 @@ namespace ammonite {
     unsigned int prevLightCount = 0;
   }
 
-  namespace {
-    static void repackLightStorage() {
+  //Exposed light handling methods
+  namespace lighting {
+    void updateLightSources() {
       //Data structure to pass light sources into shader
       struct ShaderLightSource {
         glm::vec4 geometry;
@@ -97,10 +98,7 @@ namespace ammonite {
       //Update previous light count for next run
       prevLightCount = lightTrackerMap.size();
     }
-  }
 
-  //Exposed light handling methods
-  namespace lighting {
     int createLightSource() {
       LightSource lightSource;
 
@@ -108,15 +106,8 @@ namespace ammonite {
       lightSource.lightId = lightTrackerMap.size() + 1;
       lightTrackerMap[lightSource.lightId] = lightSource;
 
-      //Create new lighting buffers
-      repackLightStorage();
-
       //Return the light source's ID
       return lightSource.lightId;
-    }
-
-    void updateLightSources() {
-      repackLightStorage();
     }
 
     LightSource* getLightSourcePtr(int lightId) {
@@ -135,9 +126,6 @@ namespace ammonite {
       if (it != lightTrackerMap.end()) {
         //Remove the light source from the tracker
         lightTrackerMap.erase(lightId);
-
-        //Create new lighting buffers
-        repackLightStorage();
       }
     }
 
