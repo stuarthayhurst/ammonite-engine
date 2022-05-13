@@ -317,6 +317,10 @@ namespace ammonite {
       void setDrawMode(int modelId, int drawMode) {
         models::getModelPtr(modelId)->drawMode = drawMode;
       }
+
+      void setActive(int modelId, bool active) {
+        models::getModelPtr(modelId)->active = active;
+      }
     }
 
     namespace position {
