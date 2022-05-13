@@ -178,7 +178,10 @@ namespace ammonite {
 
       //Draw given model
       for (int i = 0; i < modelCount; i++) {
-        drawModel(ammonite::models::getModelPtr(modelIds[i]), viewProjectionMatrix);
+        ammonite::models::InternalModel* modelPtr = ammonite::models::getModelPtr(modelIds[i]);
+        if (modelPtr != nullptr) {
+          drawModel(modelPtr, viewProjectionMatrix);
+        }
       }
 
       //Swap buffers
