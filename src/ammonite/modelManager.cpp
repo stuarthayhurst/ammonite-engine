@@ -315,11 +315,17 @@ namespace ammonite {
 
     namespace draw {
       void setDrawMode(int modelId, int drawMode) {
-        models::getModelPtr(modelId)->drawMode = drawMode;
+        InternalModel* modelPtr = models::getModelPtr(modelId);
+        if (modelPtr != nullptr) {
+          modelPtr->drawMode = drawMode;
+        }
       }
 
       void setActive(int modelId, bool active) {
-        models::getModelPtr(modelId)->active = active;
+        InternalModel* modelPtr = models::getModelPtr(modelId);
+        if (modelPtr != nullptr) {
+          modelPtr->active = active;
+        }
       }
     }
 
