@@ -4,7 +4,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include "modelManager.hpp"
+#include "internal/modelTracker.hpp"
 #include "lightManager.hpp"
 #include "utils/timer.hpp"
 #include "utils/extension.hpp"
