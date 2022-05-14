@@ -103,7 +103,7 @@ int main(int argc, char* argv[]) {
     loadedModelIds[i] = ammonite::models::createModel(models[i][0], &success);
 
     //Count vertices
-    vertexCount += ammonite::models::getModelPtr(loadedModelIds[i])->data->vertexCount;
+    vertexCount += ammonite::models::getVertexCount(loadedModelIds[i]);
 
     //Load texture
     ammonite::models::applyTexture(loadedModelIds[i], models[i][1], &success);

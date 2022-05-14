@@ -336,6 +336,16 @@ namespace ammonite {
       modelPtr->textureId = textureId;
     }
 
+    //Return the number of vertices on a model
+    int getVertexCount(int modelId) {
+      InternalModel* modelPtr = models::getModelPtr(modelId);
+      if (modelPtr == nullptr) {
+        return 0;
+      }
+
+      return modelPtr->data->vertexCount;
+    }
+
     namespace draw {
       void setDrawMode(int modelId, int drawMode) {
         InternalModel* modelPtr = models::getModelPtr(modelId);

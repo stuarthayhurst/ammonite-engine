@@ -45,6 +45,7 @@ namespace ammonite {
     void deleteModel(int modelId);
 
     void applyTexture(int modelId, const char* texturePath, bool* externalSuccess);
+    int getVertexCount(int modelId);
 
     namespace draw {
       void setDrawMode(int modelId, int drawMode);
