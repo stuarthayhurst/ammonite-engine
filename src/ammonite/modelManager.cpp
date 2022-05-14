@@ -234,15 +234,15 @@ namespace ammonite {
 
   //Exposed model handling methods
   namespace models {
-      namespace {
-        static void calcModelMatrices(models::InternalModel* modelObject) {
-          //Recalculate the model matrix when a component changes
-          modelObject->positionData.modelMatrix = modelObject->positionData.translationMatrix * glm::toMat4(modelObject->positionData.rotationQuat) * modelObject->positionData.scaleMatrix;
+    namespace {
+      static void calcModelMatrices(models::InternalModel* modelObject) {
+        //Recalculate the model matrix when a component changes
+        modelObject->positionData.modelMatrix = modelObject->positionData.translationMatrix * glm::toMat4(modelObject->positionData.rotationQuat) * modelObject->positionData.scaleMatrix;
 
-          //Normal matrix
-          modelObject->positionData.normalMatrix = glm::transpose(glm::inverse(modelObject->positionData.modelMatrix));
-        }
+        //Normal matrix
+        modelObject->positionData.normalMatrix = glm::transpose(glm::inverse(modelObject->positionData.modelMatrix));
       }
+    }
 
     int createModel(const char* objectPath, bool* externalSuccess) {
       //Create the model
