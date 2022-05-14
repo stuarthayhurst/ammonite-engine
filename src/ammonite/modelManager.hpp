@@ -33,7 +33,7 @@ namespace ammonite {
     struct InternalModel {
       InternalModelData* data;
       PositionData positionData;
-      GLuint textureId;
+      GLuint textureId = 0;
       int drawMode = 0;
       bool active = true;
       std::string modelName;
@@ -43,6 +43,8 @@ namespace ammonite {
     int createModel(const char* objectPath, bool* externalSuccess);
     InternalModel* getModelPtr(int modelId);
     void deleteModel(int modelId);
+
+    void applyTexture(int modelId, const char* texturePath, bool* externalSuccess);
 
     namespace draw {
       void setDrawMode(int modelId, int drawMode);

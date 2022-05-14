@@ -101,10 +101,12 @@ int main(int argc, char* argv[]) {
   for (int i = 0; i < modelCount; i++) {
     //Load model
     loadedModelIds[i] = ammonite::models::createModel(models[i][0], &success);
+
     //Count vertices
     vertexCount += ammonite::models::getModelPtr(loadedModelIds[i])->data->vertexCount;
+
     //Load texture
-    ammonite::models::getModelPtr(loadedModelIds[i])->textureId = ammonite::textures::loadTexture(models[i][1], &success);
+    ammonite::models::applyTexture(loadedModelIds[i], models[i][1], &success);
   }
 
   //Example translation, scale and rotation

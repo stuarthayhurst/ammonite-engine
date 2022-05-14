@@ -40,7 +40,7 @@ namespace ammonite {
     struct InternalModel {
       InternalModelData* data;
       PositionData positionData;
-      GLuint textureId;
+      GLuint textureId = 0;
       int drawMode = 0;
       bool active = true;
       std::string modelName;
@@ -300,17 +300,40 @@ namespace ammonite {
         //Decrease the reference count of the model data
         modelObjectData->refCount -= 1;
 
-        //If the model's data is now unused, destroy it
+        //Reduce reference count on texture
+        ammonite::textures::deleteTexture(modelObject->textureId);
+
+        //If the model data is now unused, destroy it
         if (modelObjectData->refCount < 1) {
-          //Destroy the model's buffers, texture and position in second tracker layer
+          //Destroy the model buffers and position in second tracker layer
           deleteBuffers(modelObjectData);
-          ammonite::textures::deleteTexture(modelObject->textureId);
           modelDataMap.erase(modelObject->modelName);
         }
 
         //Remove the model from the tracker
         modelTrackerMap.erase(modelId);
       }
+    }
+
+    void applyTexture(int modelId, const char* texturePath, bool* externalSuccess) {
+      InternalModel* modelPtr = models::getModelPtr(modelId);
+      if (modelPtr == nullptr) {
+        *externalSuccess = false;
+        return;
+      }
+
+      //If a texture is already applied, remove it
+      if (modelPtr->textureId != 0) {
+        ammonite::textures::deleteTexture(modelPtr->textureId);
+        modelPtr->textureId = 0;
+      }
+
+      //Create new texture and apply to the model
+      int textureId = ammonite::textures::loadTexture(texturePath, externalSuccess);
+      if (!*externalSuccess) {
+        return;
+      }
+      modelPtr->textureId = textureId;
     }
 
     namespace draw {
