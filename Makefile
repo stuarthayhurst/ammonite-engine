@@ -27,7 +27,7 @@ endif
 
 $(BUILD_DIR)/demo: library $(COMMON_OBJECTS) $(OBJECT_DIR)/demo.o
 	@mkdir -p "$(BUILD_DIR)"
-	$(CXX) -o "$(BUILD_DIR)/demo" $(COMMON_OBJECTS) $(OBJECT_DIR)/demo.o $(CXXFLAGS) "-L$(BUILD_DIR)" $(LDFLAGS) -lammonite $(RPATH)
+	$(CXX) -o "$(BUILD_DIR)/demo" $(COMMON_OBJECTS) $(OBJECT_DIR)/demo.o $(CXXFLAGS) "-L$(BUILD_DIR)" -lammonite $(LDFLAGS) $(RPATH)
 
 $(BUILD_DIR)/libammonite.so: $(AMMONITE_OBJECTS)
 	@mkdir -p "$(OBJECT_DIR)"
