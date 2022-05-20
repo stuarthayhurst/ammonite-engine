@@ -60,6 +60,8 @@
   - `pkg-config`
   - ### Libraries:
     - `libgomp1 libglm-dev libglfw3-dev libglew-dev libstb-dev libtinyobjloader-dev`
+  - ### Icons:
+    - `inkscape optipng`
 
 ## Notes:
   - All targets are compiled with `-Wall` and `-Wextra`
