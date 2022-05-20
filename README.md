@@ -59,7 +59,7 @@
   - `g++`
   - `pkg-config`
   - ### Libraries:
-    - `libgomp1 libgomplibglm-dev libglfw3-dev libglew-dev libstb-dev libtinyobjloader-dev`
+    - `libgomp1 libglm-dev libglfw3-dev libglew-dev libstb-dev libtinyobjloader-dev`
 
 ## Notes:
   - All targets are compiled with `-Wall` and `-Wextra`
