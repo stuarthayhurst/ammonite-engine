@@ -37,8 +37,12 @@ jobs:
 
     - name: Test built library installs
       run: |
-        make install
+        ls build/demo build/libammonite.so
+
+    - name: Test built library installs
+      run: |
+        sudo make install
 
     - name: Test library headers install
       run: |
-        make headers
+        sudo make headers
