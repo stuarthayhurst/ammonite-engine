@@ -25,7 +25,7 @@
     - `local-build` will only allow running from this project's root directory (recommended, as the code is only a demo)
     - `build` + `install` will build the demo, but use the system copy of `libammonite.so`
   - `./build/demo` will run the built demo
-  - To compile in debug mode, use `DEBUG=true make ...`
+  - To compile in debug mode, use `DEBUG=true make ...`, or `make debug`
     - This will compile some extras in the code to help with debugging (every header gets `iostream`)
     - It will also enable OpenGL debug warning, messages and errors
     - It won't trigger a rebuild of the library, so `make clean` should be run before swapping the value
