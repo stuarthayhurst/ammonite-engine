@@ -25,7 +25,7 @@ namespace ammonite {
 
     void getLightEmitters(int* lightCount, std::vector<int>* lightData);
     void linkModel(int lightId, int modelId);
-    void unlinkModel(int lightId, int modelId);
+    void unlinkModel(int lightId);
 
     void setAmbientLight(glm::vec3 newAmbientLight);
     glm::vec3 getAmbientLight();

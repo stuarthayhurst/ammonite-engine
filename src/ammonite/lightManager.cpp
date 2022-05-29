@@ -186,13 +186,11 @@ namespace ammonite {
       ammonite::models::setLightEmitting(modelId, true);
     }
 
-    void unlinkModel(int lightId, int modelId) {
-      //Check the model and light were actually linked, and unlink
+    void unlinkModel(int lightId) {
+      //Unlink the attached model from the light source
       ammonite::lighting::LightSource* lightSource = ammonite::lighting::getLightSourcePtr(lightId);
-      if (lightSource->modelId == modelId) {
-        lightSource->modelId = -1;
-        ammonite::models::setLightEmitting(modelId, false);
-      }
+      ammonite::models::setLightEmitting(lightSource->modelId, false);
+      lightSource->modelId = -1;
     }
 
     void setAmbientLight(glm::vec3 newAmbientLight) {
