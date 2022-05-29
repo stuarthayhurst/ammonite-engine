@@ -37,25 +37,19 @@ namespace ammonite {
     //Track light sources
     std::map<int, lighting::LightSource> lightTrackerMap;
     unsigned int prevLightCount = 0;
+
+    //Track light emitting models
+    std::vector<int> lightEmitterData;
   }
 
   namespace lighting {
     //Return data on light emitting models
     void getLightEmitters(int* lightCount, std::vector<int>* lightData) {
-      *lightCount = 0;
+      *lightCount = lightEmitterData.size() / 2;
 
-      auto lightIt = lightTrackerMap.begin();
-      for(unsigned int i = 0; i < lightTrackerMap.size(); i++) {
-        auto lightSource = lightIt->second;
-
-        if (lightSource.modelId != -1) {
-          *lightCount += 1;
-
-          lightData->push_back(lightSource.modelId);
-          lightData->push_back(i);
-        }
-
-        lightIt++;
+      //Fill passed vector with data
+      for (unsigned int i = 0; i < lightEmitterData.size(); i++) {
+        lightData->push_back(lightEmitterData[i]);
       }
     }
   }
@@ -80,9 +74,13 @@ namespace ammonite {
       omp_set_dynamic(0);
       omp_set_num_threads(threadCount);
 
+      //Clear saved data on light emitting models
+      lightEmitterData.clear();
+
       //Repack light sources into ShaderData (uses vec4s for OpenGL)
       #pragma omp parallel for
       for(unsigned int i = 0; i < lightTrackerMap.size(); i++) {
+        //Repacking light sources
         auto lightIt = lightTrackerMap.begin();
         std::advance(lightIt, i);
         auto lightSource = lightIt->second;
@@ -92,6 +90,12 @@ namespace ammonite {
         shaderData[i].diffuse = glm::vec4(lightSource.diffuse, 0);
         shaderData[i].specular = glm::vec4(lightSource.specular, 0);
         shaderData[i].power[0] = lightSource.power;
+
+        //Track all light emitting models
+        if (lightSource.modelId != -1) {
+          lightEmitterData.push_back(lightSource.modelId);
+          lightEmitterData.push_back(i);
+        }
       }
 
       //If no lights remain, unbind and return early
