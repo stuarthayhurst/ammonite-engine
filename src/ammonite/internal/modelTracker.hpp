@@ -36,11 +36,14 @@ namespace ammonite {
       GLuint textureId = 0;
       int drawMode = 0;
       bool active = true;
+      bool lightEmitting = false;
       std::string modelName;
       int modelId;
     };
 
     InternalModel* getModelPtr(int modelId);
+    void setLightEmitting(int modelId, bool lightEmitting);
+    bool setLightEmitting(int modelId);
   }
 }
 

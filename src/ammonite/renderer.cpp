@@ -1,4 +1,5 @@
 #include <iostream>
+#include <vector>
 
 #include <glm/glm.hpp>
 #include <GL/glew.h>
@@ -14,6 +15,7 @@ namespace ammonite {
     namespace {
       GLFWwindow* window;
       GLuint programId;
+      GLuint lightShaderId;
 
       //Shader uniform IDs
       GLuint matrixId;
@@ -21,6 +23,9 @@ namespace ammonite {
       GLuint viewMatrixId;
       GLuint normalMatrixId;
       GLuint textureSamplerId;
+
+      GLuint lightMatrixId;
+      GLuint lightIndexId;
 
       long totalFrames = 0;
       int frameCount = 0;
@@ -53,7 +58,7 @@ namespace ammonite {
     }
 
     namespace setup {
-      void setupRenderer(GLFWwindow* targetWindow, GLuint targetProgramId, bool* externalSuccess) {
+      void setupRenderer(GLFWwindow* targetWindow, GLuint targetProgramId, GLuint targetLightId, bool* externalSuccess) {
         //Check GPU supported required extensions
         int failureCount = 0;
         if (!checkGPUCapabilities(&failureCount)) {
@@ -65,6 +70,7 @@ namespace ammonite {
         //Set window and shader to be used
         window = targetWindow;
         programId = targetProgramId;
+        lightShaderId = targetLightId;
 
         //Shader uniform locations
         matrixId = glGetUniformLocation(programId, "MVP");
@@ -72,6 +78,9 @@ namespace ammonite {
         viewMatrixId = glGetUniformLocation(programId, "V");
         normalMatrixId = glGetUniformLocation(programId, "normalMatrix");
         textureSamplerId = glGetUniformLocation(programId, "textureSampler");
+
+        lightMatrixId = glGetUniformLocation(lightShaderId, "MVP");
+        lightIndexId = glGetUniformLocation(lightShaderId, "lightIndex");
 
         //Enable culling triangles and depth testing (only show fragments closer than the previous)
         glEnable(GL_CULL_FACE);
@@ -142,6 +151,42 @@ namespace ammonite {
       }
     }
 
+      static void drawLightModel(ammonite::models::InternalModel *drawObject, const glm::mat4 viewProjectionMatrix, int lightId) {
+        //If the model is disabled, skip it
+        if (!drawObject->active) {
+          return;
+        }
+        ammonite::models::InternalModelData* drawObjectData = drawObject->data;
+
+        //Bind vertex attribute buffer
+        glBindVertexArray(drawObjectData->vertexArrayId);
+
+        //Calculate and obtain matrices
+        glm::mat4 modelMatrix = drawObject->positionData.modelMatrix;
+        glm::mat4 mvp = viewProjectionMatrix * modelMatrix;
+
+        //Send uniforms to the shaders
+        glUniformMatrix4fv(lightMatrixId, 1, GL_FALSE, &mvp[0][0]);
+        glUniform1i(lightIndexId, lightId);
+
+        //Set the requested draw mode (normal, wireframe, points)
+        GLenum mode = GL_TRIANGLES;
+        if (drawObject->drawMode == 1) {
+          //Use wireframe if requested
+          setWireframe(true);
+        } else {
+          //Draw points if requested
+          if (drawObject->drawMode == 2) {
+            mode = GL_POINTS;
+          }
+          setWireframe(false);
+        }
+
+        //Draw the triangles
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, drawObjectData->elementBufferId);
+        glDrawElements(mode, drawObjectData->vertexCount, GL_UNSIGNED_INT, (void*)0);
+      }
+
     long getTotalFrames() {
       return totalFrames;
     }
@@ -176,11 +221,38 @@ namespace ammonite {
       glUniformMatrix4fv(viewMatrixId, 1, GL_FALSE, &(*viewMatrix)[0][0]);
       const glm::mat4 viewProjectionMatrix = *projectionMatrix * *viewMatrix;
 
-      //Draw given model
+      //Swap to the model shader
+      glUseProgram(programId);
+
+      //Draw given models
       for (int i = 0; i < modelCount; i++) {
         ammonite::models::InternalModel* modelPtr = ammonite::models::getModelPtr(modelIds[i]);
+        //Only draw non-light emitting models that exist
         if (modelPtr != nullptr) {
-          drawModel(modelPtr, viewProjectionMatrix);
+          if (!modelPtr->lightEmitting) {
+            drawModel(modelPtr, viewProjectionMatrix);
+          }
+        }
+      }
+
+      //Get information about light sources to be rendered
+      int lightCount;
+      std::vector<int> lightData;
+      ammonite::lighting::getLightEmitters(&lightCount, &lightData);
+
+      //Swap to the light emitting model shader
+      if (lightCount > 0) {
+        glUseProgram(lightShaderId);
+      }
+
+      //Draw light sources with models attached
+      for (int i = 0; i < lightCount; i++) {
+        int modelId = lightData[(i * 2)];
+        int lightId = lightData[(i * 2) + 1];
+        ammonite::models::InternalModel* modelPtr = ammonite::models::getModelPtr(modelId);
+
+        if (modelPtr != nullptr) {
+          drawLightModel(modelPtr, viewProjectionMatrix, lightId);
         }
       }
 

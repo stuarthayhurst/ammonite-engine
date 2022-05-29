@@ -1,11 +1,14 @@
 #include <map>
 #include <cmath>
+#include <vector>
 
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 
 #include <omp.h>
 #include <thread>
+
+#include "internal/modelTracker.hpp"
 
 #ifdef DEBUG
   #include <iostream>
@@ -20,6 +23,7 @@ namespace ammonite {
       glm::vec3 specular = glm::vec3(0.3f, 0.3f, 0.3f);
       float power = 1.0f;
       int lightId;
+      int modelId = -1;
     };
   }
 
@@ -33,6 +37,27 @@ namespace ammonite {
     //Track light sources
     std::map<int, lighting::LightSource> lightTrackerMap;
     unsigned int prevLightCount = 0;
+  }
+
+  namespace lighting {
+    //Return data on light emitting models
+    void getLightEmitters(int* lightCount, std::vector<int>* lightData) {
+      *lightCount = 0;
+
+      auto lightIt = lightTrackerMap.begin();
+      for(unsigned int i = 0; i < lightTrackerMap.size(); i++) {
+        auto lightSource = lightIt->second;
+
+        if (lightSource.modelId != -1) {
+          *lightCount += 1;
+
+          lightData->push_back(lightSource.modelId);
+          lightData->push_back(i);
+        }
+
+        lightIt++;
+      }
+    }
   }
 
   //Exposed light handling methods
@@ -129,6 +154,18 @@ namespace ammonite {
         //Remove the light source from the tracker
         lightTrackerMap.erase(lightId);
       }
+    }
+
+    void linkModel(int lightId, int modelId) {
+      ammonite::lighting::LightSource* lightSource = ammonite::lighting::getLightSourcePtr(lightId);
+      lightSource->modelId = modelId;
+      ammonite::models::setLightEmitting(modelId, true);
+    }
+
+    void unlinkModel(int lightId, int modelId) {
+      ammonite::lighting::LightSource* lightSource = ammonite::lighting::getLightSourcePtr(lightId);
+      lightSource->modelId = -1;
+      ammonite::models::setLightEmitting(modelId, false);
     }
 
     void setAmbientLight(glm::vec3 newAmbientLight) {
