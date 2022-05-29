@@ -23,6 +23,7 @@ namespace ammonite {
       GLuint viewMatrixId;
       GLuint normalMatrixId;
       GLuint textureSamplerId;
+      GLuint ambientLightId;
 
       GLuint lightMatrixId;
       GLuint lightIndexId;
@@ -78,6 +79,7 @@ namespace ammonite {
         viewMatrixId = glGetUniformLocation(programId, "V");
         normalMatrixId = glGetUniformLocation(programId, "normalMatrix");
         textureSamplerId = glGetUniformLocation(programId, "textureSampler");
+        ambientLightId = glGetUniformLocation(programId, "ambientLight");
 
         lightMatrixId = glGetUniformLocation(lightShaderId, "MVP");
         lightIndexId = glGetUniformLocation(lightShaderId, "lightIndex");
@@ -214,8 +216,7 @@ namespace ammonite {
 
       //Setup and pass ambient light to shader
       glm::vec3 ambientLight = ammonite::lighting::getAmbientLight();
-      GLuint lightComponentId = glGetUniformLocation(programId, "ambientLight");
-      glUniform3f(lightComponentId, ambientLight.x, ambientLight.y, ambientLight.z);
+      glUniform3f(ambientLightId, ambientLight.x, ambientLight.y, ambientLight.z);
 
       //Send view matrix to shader
       glUniformMatrix4fv(viewMatrixId, 1, GL_FALSE, &(*viewMatrix)[0][0]);
