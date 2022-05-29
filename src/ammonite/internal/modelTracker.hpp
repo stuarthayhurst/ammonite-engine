@@ -43,7 +43,7 @@ namespace ammonite {
 
     InternalModel* getModelPtr(int modelId);
     void setLightEmitting(int modelId, bool lightEmitting);
-    bool setLightEmitting(int modelId);
+    bool getLightEmitting(int modelId);
   }
 }
 

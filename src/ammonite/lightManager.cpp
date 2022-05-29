@@ -161,15 +161,38 @@ namespace ammonite {
     }
 
     void linkModel(int lightId, int modelId) {
+      //Check if the model has already been linked to
+      if (ammonite::models::getLightEmitting(modelId)) {
+        //Find the light source responsible and unlink
+        auto lightIt = lightTrackerMap.begin();
+        for(unsigned int i = 0; i < lightTrackerMap.size(); i++) {
+          //Reset the modelId on the previously linked light source
+          if (lightIt->second.modelId == modelId) {
+            lightIt->second.modelId = -1;
+          }
+
+          lightIt++;
+        }
+      }
+
+      //If the light source is already linked to another model, reset the linked model
       ammonite::lighting::LightSource* lightSource = ammonite::lighting::getLightSourcePtr(lightId);
+      if (lightSource->modelId != -1) {
+        ammonite::models::setLightEmitting(lightSource->modelId, false);
+      }
+
+      //Link the light source and model together
       lightSource->modelId = modelId;
       ammonite::models::setLightEmitting(modelId, true);
     }
 
     void unlinkModel(int lightId, int modelId) {
+      //Check the model and light were actually linked, and unlink
       ammonite::lighting::LightSource* lightSource = ammonite::lighting::getLightSourcePtr(lightId);
-      lightSource->modelId = -1;
-      ammonite::models::setLightEmitting(modelId, false);
+      if (lightSource->modelId == modelId) {
+        lightSource->modelId = -1;
+        ammonite::models::setLightEmitting(modelId, false);
+      }
     }
 
     void setAmbientLight(glm::vec3 newAmbientLight) {
