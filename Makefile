@@ -52,7 +52,7 @@ debug: clean
 	DEBUG="true" $(MAKE) build
 system-build:
 	$(MAKE) "$(BUILD_DIR)/demo"
-	if [[ "$(DEBUG)" != "true" ]]; then \
+	@if [[ "$(DEBUG)" != "true" ]]; then \
 	  strip --strip-unneeded "$(BUILD_DIR)/libammonite.so" "$(BUILD_DIR)/demo"; \
 	fi
 library: $(BUILD_DIR)/libammonite.so
