@@ -349,6 +349,16 @@ namespace ammonite {
     }
 
     namespace position {
+      glm::vec3 getModelPosition(int modelId) {
+        //Check the model exists
+        models::InternalModel* modelObject = models::getModelPtr(modelId);
+        if (modelObject == nullptr) {
+          return glm::vec3(0.0f);
+        }
+
+        return glm::vec3(modelObject->positionData.translationMatrix * glm::vec4(glm::vec3(0, 0, 0), 1));
+      }
+
       void translateModel(int modelId, glm::vec3 translation) {
         //Get the model and translate it
         models::InternalModel* modelObject = models::getModelPtr(modelId);

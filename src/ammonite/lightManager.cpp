@@ -9,6 +9,7 @@
 #include <thread>
 
 #include "internal/modelTracker.hpp"
+#include "modelManager.hpp"
 
 #ifdef DEBUG
   #include <iostream>
@@ -85,16 +86,22 @@ namespace ammonite {
         std::advance(lightIt, i);
         auto lightSource = lightIt->second;
 
-        shaderData[i].geometry = glm::vec4(lightSource.geometry, 0);
         shaderData[i].colour = glm::vec4(lightSource.colour, 0);
         shaderData[i].diffuse = glm::vec4(lightSource.diffuse, 0);
         shaderData[i].specular = glm::vec4(lightSource.specular, 0);
         shaderData[i].power[0] = lightSource.power;
 
-        //Track all light emitting models
+        //Override position for light emitting models, and add to tracker
         if (lightSource.modelId != -1) {
+          //Override light position
+          glm::vec3 modelPosition = ammonite::models::position::getModelPosition(lightSource.modelId);
+          shaderData[i].geometry = glm::vec4(modelPosition, 0);
+
+          //Add to tracker
           lightEmitterData.push_back(lightSource.modelId);
           lightEmitterData.push_back(i);
+        } else {
+          shaderData[i].geometry = glm::vec4(lightSource.geometry, 0);
         }
       }
 
