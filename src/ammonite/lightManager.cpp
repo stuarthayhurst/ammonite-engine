@@ -8,6 +8,7 @@
 #include <omp.h>
 #include <thread>
 
+#include "internal/lightTracker.hpp"
 #include "internal/modelTracker.hpp"
 #include "modelManager.hpp"
 
@@ -16,18 +17,6 @@
 #endif
 
 namespace ammonite {
-  namespace lighting {
-    struct LightSource {
-      glm::vec3 geometry = glm::vec3(0.0f, 0.0f, 0.0f);
-      glm::vec3 colour = glm::vec3(1.0f, 1.0f, 1.0f);
-      glm::vec3 diffuse = glm::vec3(1.0f, 1.0f, 1.0f);
-      glm::vec3 specular = glm::vec3(0.3f, 0.3f, 0.3f);
-      float power = 1.0f;
-      int lightId;
-      int modelId = -1;
-    };
-  }
-
   namespace {
     //Lighting shader storage buffer IDs
     GLuint lightDataId = 0;
@@ -43,6 +32,7 @@ namespace ammonite {
     std::vector<int> lightEmitterData;
   }
 
+  //Internally exposed light handling methods
   namespace lighting {
     //Return data on light emitting models
     void getLightEmitters(int* lightCount, std::vector<int>* lightData) {

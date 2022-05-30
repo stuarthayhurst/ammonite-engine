@@ -6,6 +6,7 @@
 #include <GLFW/glfw3.h>
 
 #include "internal/modelTracker.hpp"
+#include "internal/lightTracker.hpp"
 #include "lightManager.hpp"
 #include "utils/timer.hpp"
 #include "utils/extension.hpp"
