@@ -109,18 +109,20 @@ namespace ammonite {
         }
       }
 
-      static void drawModel(ammonite::models::InternalModel *drawObject, const glm::mat4 viewProjectionMatrix) {
+      static void drawModel(ammonite::models::InternalModel *drawObject, const glm::mat4 viewProjectionMatrix, int lightIndex) {
         //If the model is disabled, skip it
         if (!drawObject->active) {
           return;
         }
 
         ammonite::models::InternalModelData* drawObjectData = drawObject->data;
-        //Bind texture in Texture Unit 0
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, drawObject->textureId);
-        //Set texture sampler to use Texture Unit 0
-        glUniform1i(textureSamplerId, 0);
+        if (lightIndex == -1) {
+          //Bind texture in Texture Unit 0
+          glActiveTexture(GL_TEXTURE0);
+          glBindTexture(GL_TEXTURE_2D, drawObject->textureId);
+          //Set texture sampler to use Texture Unit 0
+          glUniform1i(textureSamplerId, 0);
+        }
 
         //Bind vertex attribute buffer
         glBindVertexArray(drawObjectData->vertexArrayId);
@@ -129,10 +131,15 @@ namespace ammonite {
         glm::mat4 modelMatrix = drawObject->positionData.modelMatrix;
         glm::mat4 mvp = viewProjectionMatrix * modelMatrix;
 
-        //Send matrices to the shaders
-        glUniformMatrix4fv(matrixId, 1, GL_FALSE, &mvp[0][0]);
-        glUniformMatrix4fv(modelMatrixId, 1, GL_FALSE, &modelMatrix[0][0]);
-        glUniformMatrix3fv(normalMatrixId, 1, GL_FALSE, &drawObject->positionData.normalMatrix[0][0]);
+        //Send uniforms to the shaders
+        if (lightIndex == -1) {
+          glUniformMatrix4fv(matrixId, 1, GL_FALSE, &mvp[0][0]);
+          glUniformMatrix4fv(modelMatrixId, 1, GL_FALSE, &modelMatrix[0][0]);
+          glUniformMatrix3fv(normalMatrixId, 1, GL_FALSE, &drawObject->positionData.normalMatrix[0][0]);
+        } else {
+          glUniformMatrix4fv(lightMatrixId, 1, GL_FALSE, &mvp[0][0]);
+          glUniform1i(lightIndexId, lightIndex);
+        }
 
         //Set the requested draw mode (normal, wireframe, points)
         GLenum mode = GL_TRIANGLES;
@@ -152,42 +159,6 @@ namespace ammonite {
         glDrawElements(mode, drawObjectData->vertexCount, GL_UNSIGNED_INT, (void*)0);
       }
     }
-
-      static void drawLightModel(ammonite::models::InternalModel *drawObject, const glm::mat4 viewProjectionMatrix, int lightId) {
-        //If the model is disabled, skip it
-        if (!drawObject->active) {
-          return;
-        }
-        ammonite::models::InternalModelData* drawObjectData = drawObject->data;
-
-        //Bind vertex attribute buffer
-        glBindVertexArray(drawObjectData->vertexArrayId);
-
-        //Calculate and obtain matrices
-        glm::mat4 modelMatrix = drawObject->positionData.modelMatrix;
-        glm::mat4 mvp = viewProjectionMatrix * modelMatrix;
-
-        //Send uniforms to the shaders
-        glUniformMatrix4fv(lightMatrixId, 1, GL_FALSE, &mvp[0][0]);
-        glUniform1i(lightIndexId, lightId);
-
-        //Set the requested draw mode (normal, wireframe, points)
-        GLenum mode = GL_TRIANGLES;
-        if (drawObject->drawMode == 1) {
-          //Use wireframe if requested
-          setWireframe(true);
-        } else {
-          //Draw points if requested
-          if (drawObject->drawMode == 2) {
-            mode = GL_POINTS;
-          }
-          setWireframe(false);
-        }
-
-        //Draw the triangles
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, drawObjectData->elementBufferId);
-        glDrawElements(mode, drawObjectData->vertexCount, GL_UNSIGNED_INT, (void*)0);
-      }
 
     long getTotalFrames() {
       return totalFrames;
@@ -231,7 +202,7 @@ namespace ammonite {
         //Only draw non-light emitting models that exist
         if (modelPtr != nullptr) {
           if (!modelPtr->lightEmitting) {
-            drawModel(modelPtr, viewProjectionMatrix);
+            drawModel(modelPtr, viewProjectionMatrix, -1);
           }
         }
       }
@@ -249,11 +220,11 @@ namespace ammonite {
       //Draw light sources with models attached
       for (int i = 0; i < lightCount; i++) {
         int modelId = lightData[(i * 2)];
-        int lightId = lightData[(i * 2) + 1];
+        int lightIndex = lightData[(i * 2) + 1];
         ammonite::models::InternalModel* modelPtr = ammonite::models::getModelPtr(modelId);
 
         if (modelPtr != nullptr) {
-          drawLightModel(modelPtr, viewProjectionMatrix, lightId);
+          drawModel(modelPtr, viewProjectionMatrix, lightIndex);
         }
       }
 
