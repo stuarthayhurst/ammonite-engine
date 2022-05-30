@@ -19,16 +19,27 @@ namespace ammonite {
     };
 
     int createLightSource();
-    void updateLightSources();
-    LightSource* getLightSourcePtr(int lightId);
     void deleteLightSource(int lightId);
+    void updateLightSources();
 
-    void getLightEmitters(int* lightCount, std::vector<int>* lightData);
     void linkModel(int lightId, int modelId);
     void unlinkModel(int lightId);
 
-    void setAmbientLight(glm::vec3 newAmbientLight);
     glm::vec3 getAmbientLight();
+    void setAmbientLight(glm::vec3 newAmbientLight);
+
+    LightSource* getLightSourcePtr(int lightId);
+    void getLightEmitters(int* lightCount, std::vector<int>* lightData);
+
+    namespace properties {
+      glm::vec3 getGeometry(int lightId);
+      glm::vec3 getColour(int lightId);
+      float getPower(int lightId);
+
+      void setGeometry(int lightId, glm::vec3 geometry);
+      void setColour(int lightId, glm::vec3 colour);
+      void setPower(int lightId, float power);
+    }
   }
 }
 

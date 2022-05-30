@@ -53,6 +53,16 @@ namespace ammonite {
         lightData->push_back(lightEmitterData[i]);
       }
     }
+
+    LightSource* getLightSourcePtr(int lightId) {
+      //Check the light source exists, and return a pointer
+      auto it = lightTrackerMap.find(lightId);
+      if (it != lightTrackerMap.end()) {
+        return &it->second;
+      } else {
+        return nullptr;
+      }
+    }
   }
 
   //Exposed light handling methods
@@ -148,16 +158,6 @@ namespace ammonite {
       return lightSource.lightId;
     }
 
-    LightSource* getLightSourcePtr(int lightId) {
-      //Check the light source exists, and return a pointer
-      auto it = lightTrackerMap.find(lightId);
-      if (it != lightTrackerMap.end()) {
-        return &it->second;
-      } else {
-        return nullptr;
-      }
-    }
-
     void deleteLightSource(int lightId) {
       //Check the light source exists
       auto it = lightTrackerMap.find(lightId);
@@ -206,6 +206,65 @@ namespace ammonite {
 
     glm::vec3 getAmbientLight() {
       return ambientLight;
+    }
+  }
+
+  //Exposed methods to modify light properties
+  namespace lighting {
+    namespace properties {
+      glm::vec3 getGeometry(int lightId) {
+        ammonite::lighting::LightSource* lightSource = ammonite::lighting::getLightSourcePtr(lightId);
+        if (lightSource == nullptr) {
+          return glm::vec3(0.0f);
+        }
+
+        return lightSource->geometry;
+      }
+
+      glm::vec3 getColour(int lightId) {
+        ammonite::lighting::LightSource* lightSource = ammonite::lighting::getLightSourcePtr(lightId);
+        if (lightSource == nullptr) {
+          return glm::vec3(0.0f);
+        }
+
+        return lightSource->colour;
+      }
+
+      float getPower(int lightId) {
+        ammonite::lighting::LightSource* lightSource = ammonite::lighting::getLightSourcePtr(lightId);
+        if (lightSource == nullptr) {
+          return 0.0f;
+        }
+
+        return lightSource->power;
+      }
+
+      void setGeometry(int lightId, glm::vec3 geometry) {
+        ammonite::lighting::LightSource* lightSource = ammonite::lighting::getLightSourcePtr(lightId);
+        if (lightSource == nullptr) {
+          return;
+        }
+
+        lightSource->geometry = geometry;
+      }
+
+      void setColour(int lightId, glm::vec3 colour) {
+        ammonite::lighting::LightSource* lightSource = ammonite::lighting::getLightSourcePtr(lightId);
+        if (lightSource == nullptr) {
+          return;
+        }
+
+        lightSource->colour = colour;
+      }
+
+      void setPower(int lightId, float power) {
+        ammonite::lighting::LightSource* lightSource = ammonite::lighting::getLightSourcePtr(lightId);
+        if (lightSource == nullptr) {
+          return;
+        }
+
+        lightSource->power = power;
+      }
     }
   }
 }

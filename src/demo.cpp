@@ -128,9 +128,8 @@ int main(int argc, char* argv[]) {
   int lightId = ammonite::lighting::createLightSource();
 
   //Set light source properties
-  ammonite::lighting::LightSource* lightSource = ammonite::lighting::getLightSourcePtr(lightId);
-  lightSource->geometry = glm::vec3(4.0f, 4.0f, 4.0f);
-  lightSource->power = 50.0f;
+  ammonite::lighting::properties::setGeometry(lightId, glm::vec3(4.0f, 4.0f, 4.0f));
+  ammonite::lighting::properties::setPower(lightId, 50.0f);
   ammonite::lighting::updateLightSources();
 
   //Setup the renderer
