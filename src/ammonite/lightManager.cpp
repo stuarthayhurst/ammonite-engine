@@ -64,6 +64,7 @@ namespace ammonite {
           //Reset the modelId on the previously linked light source
           if (lightIt->second.modelId == modelId) {
             lightIt->second.modelId = -1;
+            return;
           }
 
           lightIt++;
