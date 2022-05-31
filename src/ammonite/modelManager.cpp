@@ -14,6 +14,7 @@
 
 #include "textures.hpp"
 #include "internal/modelTracker.hpp"
+#include "internal/lightTracker.hpp"
 
 namespace ammonite {
   namespace {
@@ -295,6 +296,9 @@ namespace ammonite {
           deleteBuffers(modelObjectData);
           modelDataMap.erase(modelObject->modelName);
         }
+
+        //Unlink any attached light source
+        ammonite::lighting::unlinkByModel(modelId);
 
         //Remove the model from the tracker
         modelTrackerMap.erase(modelId);

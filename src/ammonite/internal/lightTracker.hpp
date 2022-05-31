@@ -16,6 +16,7 @@ namespace ammonite {
       int modelId = -1;
     };
 
+    void unlinkByModel(int modelId);
     LightSource* getLightSourcePtr(int lightId);
     void getLightEmitters(int* lightCount, std::vector<int>* lightData);
   }

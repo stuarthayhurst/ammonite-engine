@@ -53,6 +53,23 @@ namespace ammonite {
         return nullptr;
       }
     }
+
+    //Unlink a light source from a model, using only the model ID (doesn't touch the model)
+    void unlinkByModel(int modelId) {
+      //Check if the model has already been linked to
+      if (ammonite::models::getLightEmitting(modelId)) {
+        //Find the light source responsible and unlink
+        auto lightIt = lightTrackerMap.begin();
+        for(unsigned int i = 0; i < lightTrackerMap.size(); i++) {
+          //Reset the modelId on the previously linked light source
+          if (lightIt->second.modelId == modelId) {
+            lightIt->second.modelId = -1;
+          }
+
+          lightIt++;
+        }
+      }
+    }
   }
 
   //Exposed light handling methods
@@ -148,29 +165,9 @@ namespace ammonite {
       return lightSource.lightId;
     }
 
-    void deleteLightSource(int lightId) {
-      //Check the light source exists
-      auto it = lightTrackerMap.find(lightId);
-      if (it != lightTrackerMap.end()) {
-        //Remove the light source from the tracker
-        lightTrackerMap.erase(lightId);
-      }
-    }
-
     void linkModel(int lightId, int modelId) {
-      //Check if the model has already been linked to
-      if (ammonite::models::getLightEmitting(modelId)) {
-        //Find the light source responsible and unlink
-        auto lightIt = lightTrackerMap.begin();
-        for(unsigned int i = 0; i < lightTrackerMap.size(); i++) {
-          //Reset the modelId on the previously linked light source
-          if (lightIt->second.modelId == modelId) {
-            lightIt->second.modelId = -1;
-          }
-
-          lightIt++;
-        }
-      }
+      //Remove the light source's attachment to any model
+      ammonite::lighting::unlinkByModel(modelId);
 
       //If the light source is already linked to another model, reset the linked model
       ammonite::lighting::LightSource* lightSource = ammonite::lighting::getLightSourcePtr(lightId);
@@ -188,6 +185,18 @@ namespace ammonite {
       ammonite::lighting::LightSource* lightSource = ammonite::lighting::getLightSourcePtr(lightId);
       ammonite::models::setLightEmitting(lightSource->modelId, false);
       lightSource->modelId = -1;
+    }
+
+    void deleteLightSource(int lightId) {
+      //Unlink any attached models
+      ammonite::lighting::unlinkModel(lightId);
+
+      //Check the light source exists
+      auto it = lightTrackerMap.find(lightId);
+      if (it != lightTrackerMap.end()) {
+        //Remove the light source from the tracker
+        lightTrackerMap.erase(lightId);
+      }
     }
 
     void setAmbientLight(glm::vec3 newAmbientLight) {
