@@ -95,7 +95,7 @@ int main(int argc, char* argv[]) {
     {"assets/cube.obj", "assets/texture.bmp"}
   };
   int modelCount = sizeof(models) / sizeof(models[0]);
-  int loadedModelIds[modelCount];
+  int loadedModelIds[modelCount + 1];
 
   long int vertexCount = 0;
   performanceTimer.reset();
@@ -109,6 +109,12 @@ int main(int argc, char* argv[]) {
     //Load texture
     ammonite::models::applyTexture(loadedModelIds[i], models[i][1], &success);
   }
+
+  //Copy last loaded model
+  loadedModelIds[modelCount] = ammonite::models::copyModel(loadedModelIds[modelCount - 1]);
+  vertexCount += ammonite::models::getVertexCount(loadedModelIds[modelCount]);
+  ammonite::models::position::setPosition(loadedModelIds[modelCount], glm::vec3(4.0f, 4.0f, 4.0f));
+  ammonite::models::position::scaleModel(loadedModelIds[modelCount], 0.25f);
 
   //Example translation, scale and rotation
   ammonite::models::position::translateModel(loadedModelIds[0], glm::vec3(-1.0f, 0.0f, 0.0f));
@@ -128,8 +134,9 @@ int main(int argc, char* argv[]) {
   int lightId = ammonite::lighting::createLightSource();
 
   //Set light source properties
-  ammonite::lighting::properties::setGeometry(lightId, glm::vec3(4.0f, 4.0f, 4.0f));
+  ammonite::lighting::properties::setGeometry(lightId, glm::vec3(0.0f, 0.0f, 0.0f));
   ammonite::lighting::properties::setPower(lightId, 50.0f);
+  ammonite::lighting::linkModel(lightId, loadedModelIds[modelCount]);
   ammonite::lighting::updateLightSources();
 
   //Setup the renderer
