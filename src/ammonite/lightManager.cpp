@@ -112,7 +112,7 @@ namespace ammonite {
         //Override position for light emitting models, and add to tracker
         if (lightSource.modelId != -1) {
           //Override light position
-          glm::vec3 modelPosition = ammonite::models::position::getModelPosition(lightSource.modelId);
+          glm::vec3 modelPosition = ammonite::models::position::getPosition(lightSource.modelId);
           shaderData[i].geometry = glm::vec4(modelPosition, 0);
 
           //Add to tracker

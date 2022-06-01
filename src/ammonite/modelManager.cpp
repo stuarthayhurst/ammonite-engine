@@ -352,9 +352,10 @@ namespace ammonite {
       }
     }
 
+    //Return position, scale and rotation of a model
     namespace position {
-      glm::vec3 getModelPosition(int modelId) {
-        //Check the model exists
+      glm::vec3 getPosition(int modelId) {
+        //Get the model and check it exists
         models::InternalModel* modelObject = models::getModelPtr(modelId);
         if (modelObject == nullptr) {
           return glm::vec3(0.0f);
@@ -363,15 +364,89 @@ namespace ammonite {
         return glm::vec3(modelObject->positionData.translationMatrix * glm::vec4(glm::vec3(0, 0, 0), 1));
       }
 
-      void translateModel(int modelId, glm::vec3 translation) {
-        //Get the model and translate it
+      glm::vec3 getScale(int modelId) {
+        //Get the model and check it exists
         models::InternalModel* modelObject = models::getModelPtr(modelId);
+        if (modelObject == nullptr) {
+          return glm::vec3(0.0f);
+        }
 
-        //Check the model exists
+        return glm::vec3(modelObject->positionData.scaleMatrix * glm::vec4(glm::vec3(1, 1, 1), 1));
+      }
+
+      glm::vec3 getRotation(int modelId) {
+        //Get the model and check it exists
+        models::InternalModel* modelObject = models::getModelPtr(modelId);
+        if (modelObject == nullptr) {
+          return glm::vec3(0.0f);
+        }
+
+        return glm::degrees(glm::eulerAngles(modelObject->positionData.rotationQuat));
+      }
+    }
+
+    //Set absolute position, scale and rotation of models
+    namespace position {
+      void setPosition(int modelId, glm::vec3 position) {
+        //Get the model and check it exists
+        models::InternalModel* modelObject = models::getModelPtr(modelId);
         if (modelObject == nullptr) {
           return;
         }
 
+        //Set the position
+        modelObject->positionData.translationMatrix = glm::translate(glm::mat4(1.0f), position);
+
+        //Recalculate model and normal matrices
+        calcModelMatrices(modelObject);
+      }
+
+      void setScale(int modelId, glm::vec3 scale) {
+        //Get the model and check it exists
+        models::InternalModel* modelObject = models::getModelPtr(modelId);
+        if (modelObject == nullptr) {
+          return;
+        }
+
+        //Set the scale
+        modelObject->positionData.scaleMatrix = glm::scale(glm::mat4(1.0f), scale);
+
+        //Recalculate model and normal matrices
+        calcModelMatrices(modelObject);
+      }
+
+      void setScale(int modelId, float scaleMultiplier) {
+        setScale(modelId, glm::vec3(scaleMultiplier, scaleMultiplier, scaleMultiplier));
+      }
+
+      void setRotation(int modelId, glm::vec3 rotation) {
+        //Get the model and check it exists
+        models::InternalModel* modelObject = models::getModelPtr(modelId);
+        if (modelObject == nullptr) {
+          return;
+        }
+
+        //Set the rotation
+        glm::vec3 rotationRadians = glm::vec3(glm::radians(rotation[0]),
+                                              glm::radians(rotation[1]),
+                                              glm::radians(rotation[2]));
+        modelObject->positionData.rotationQuat = glm::quat(rotationRadians) * glm::quat(glm::vec3(0, 0, 0));
+
+        //Recalculate model and normal matrices
+        calcModelMatrices(modelObject);
+      }
+    }
+
+    //Translate, scale and rotate models
+    namespace position {
+      void translateModel(int modelId, glm::vec3 translation) {
+        //Get the model and check it exists
+        models::InternalModel* modelObject = models::getModelPtr(modelId);
+        if (modelObject == nullptr) {
+          return;
+        }
+
+        //Translate it
         modelObject->positionData.translationMatrix = glm::translate(
           modelObject->positionData.translationMatrix,
           translation);
@@ -381,14 +456,13 @@ namespace ammonite {
       }
 
       void scaleModel(int modelId, glm::vec3 scaleVector) {
-        //Get the model and scale it
+        //Get the model and check it exists
         models::InternalModel* modelObject = models::getModelPtr(modelId);
-
-        //Check the model exists
         if (modelObject == nullptr) {
           return;
         }
 
+        //Scale it
         modelObject->positionData.scaleMatrix = glm::scale(
           modelObject->positionData.scaleMatrix,
           scaleVector);
@@ -402,16 +476,16 @@ namespace ammonite {
       }
 
       void rotateModel(int modelId, glm::vec3 rotation) {
-        //Get the model and rotate it
+        //Get the model and check it exists
         models::InternalModel* modelObject = models::getModelPtr(modelId);
-
-        //Check the model exists
         if (modelObject == nullptr) {
           return;
         }
 
-        glm::vec3 rotationRadians = glm::vec3(glm::radians(rotation[0]), glm::radians(rotation[1]), glm::radians(rotation[2]));
-
+        //Rotate it
+        glm::vec3 rotationRadians = glm::vec3(glm::radians(rotation[0]),
+                                              glm::radians(rotation[1]),
+                                              glm::radians(rotation[2]));
         modelObject->positionData.rotationQuat = glm::quat(rotationRadians) * modelObject->positionData.rotationQuat;
 
         //Recalculate model and normal matrices
