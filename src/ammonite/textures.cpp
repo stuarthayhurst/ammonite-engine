@@ -96,5 +96,12 @@ namespace ammonite {
       glBindTexture(GL_TEXTURE_2D, 0);
       return textureId;
     }
+
+    void copyTexture(int textureId) {
+      //Increase reference count on given texture, if it exists
+      if (idToNameMap.find(textureId) != idToNameMap.end()) {
+        textureTrackerMap[idToNameMap[textureId]].refCount += 1;
+      }
+    }
   }
 }

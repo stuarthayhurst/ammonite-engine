@@ -15,6 +15,7 @@
 #include "textures.hpp"
 #include "internal/modelTracker.hpp"
 #include "internal/lightTracker.hpp"
+#include "internal/textureTracker.hpp"
 
 namespace ammonite {
   namespace {
@@ -288,6 +289,8 @@ namespace ammonite {
       //Copy model data
       InternalModel modelObject = *oldModelObject;
       modelObject.data->refCount += 1;
+
+      ammonite::textures::copyTexture(modelObject.textureId);
 
       //Add model to the tracker and return the ID
       modelObject.modelId = modelTrackerMap.size() + 1;
