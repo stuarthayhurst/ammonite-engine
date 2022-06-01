@@ -11,6 +11,7 @@ namespace ammonite {
   namespace models {
     int createModel(const char* objectPath, bool* externalSuccess);
     void deleteModel(int modelId);
+    int copyModel(int modelId);
 
     void applyTexture(int modelId, const char* texturePath, bool* externalSuccess);
     int getVertexCount(int modelId);

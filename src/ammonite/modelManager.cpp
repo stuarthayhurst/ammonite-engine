@@ -278,6 +278,23 @@ namespace ammonite {
       return modelObject.modelId;
     }
 
+    int copyModel(int modelId) {
+      //Get the model and check it exists
+      models::InternalModel* oldModelObject = models::getModelPtr(modelId);
+      if (oldModelObject == nullptr) {
+        return -1;
+      }
+
+      //Copy model data
+      InternalModel modelObject = *oldModelObject;
+      modelObject.data->refCount += 1;
+
+      //Add model to the tracker and return the ID
+      modelObject.modelId = modelTrackerMap.size() + 1;
+      modelTrackerMap[modelObject.modelId] = modelObject;
+      return modelObject.modelId;
+    }
+
     void deleteModel(int modelId) {
       //Check the model actually exists
       auto it = modelTrackerMap.find(modelId);
