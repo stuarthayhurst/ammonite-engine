@@ -89,9 +89,6 @@ namespace ammonite {
         glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LEQUAL);
-
-        //Use the shader
-        glUseProgram(programId);
       }
 
       void setupMatrices(glm::mat4* newProjectionMatrix, glm::mat4* newViewMatrix) {
@@ -186,6 +183,9 @@ namespace ammonite {
         frameCount = 0;
       }
 
+      //Swap to the model shader
+      glUseProgram(programId);
+
       //Setup and pass ambient light to shader
       glm::vec3 ambientLight = ammonite::lighting::getAmbientLight();
       glUniform3f(ambientLightId, ambientLight.x, ambientLight.y, ambientLight.z);
@@ -193,9 +193,6 @@ namespace ammonite {
       //Send view matrix to shader
       glUniformMatrix4fv(viewMatrixId, 1, GL_FALSE, &(*viewMatrix)[0][0]);
       const glm::mat4 viewProjectionMatrix = *projectionMatrix * *viewMatrix;
-
-      //Swap to the model shader
-      glUseProgram(programId);
 
       //Draw given models
       for (int i = 0; i < modelCount; i++) {
