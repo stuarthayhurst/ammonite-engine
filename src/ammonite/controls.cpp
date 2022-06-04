@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "internal/sharedSettings.hpp"
 #include "utils/timer.hpp"
 
 #ifdef DEBUG
@@ -19,7 +20,6 @@ namespace ammonite {
 
       //Pointers for window and info
       GLFWwindow* window;
-      int *width, *height;
       float* aspectRatio;
 
       //Base sensitivities and zoom
@@ -155,12 +155,10 @@ namespace ammonite {
       }
     }
 
-    void setupControls(GLFWwindow* newWindow, int* widthAddr, int* heightAddr, float* aspectRatioAddr) {
-      //Connect window, width, height and aspect ratio pointers
+    void setupControls(GLFWwindow* newWindow) {
+      //Connect window and aspect ratio pointers
       window = newWindow;
-      width = widthAddr;
-      height = heightAddr;
-      aspectRatio = aspectRatioAddr;
+      aspectRatio = ammonite::settings::getAspectRatioPtr();
 
       //Set mouse callbacks
       glfwSetScrollCallback(window, scroll_callback);

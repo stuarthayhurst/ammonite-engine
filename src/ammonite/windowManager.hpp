@@ -1,7 +1,6 @@
 #ifndef WINDOW
 #define WINDOW
 
-#include <tuple>
 #include <GLFW/glfw3.h>
 
 namespace ammonite {
@@ -18,12 +17,12 @@ namespace ammonite {
       void destroyGlfw();
     }
 
-    std::tuple<GLFWwindow*, int*, int*, float*> createWindow(int width, int height);
+    GLFWwindow* createWindow(int width, int height);
     void setTitle(GLFWwindow* window, const char* title);
     void useIconDir(GLFWwindow* window, const char* iconDirPath);
 
     //Wrapper for setup methods and createWindow()
-    std::tuple<GLFWwindow*, int*, int*, float*> setupWindow(int newWidth, int newHeight, int antialiasing, const char* title);
+    GLFWwindow* setupWindow(int width, int height, int antialiasing, const char* title);
   }
 }
 

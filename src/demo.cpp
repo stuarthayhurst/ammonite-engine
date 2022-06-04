@@ -1,6 +1,5 @@
 #include <iostream>
 #include <cstdlib>
-#include <tuple>
 #include <string>
 
 #include <GL/glew.h>
@@ -50,7 +49,7 @@ int main(int argc, char* argv[]) {
   }
 
   //Create the window
-  auto [window, widthPtr, heightPtr, aspectRatioPtr] = ammonite::windowManager::setupWindow(width, height, 4, "OpenGL Experiments");
+  auto window = ammonite::windowManager::setupWindow(width, height, 4, "OpenGL Experiments");
   if (window == NULL) {
     return EXIT_FAILURE;
   }
@@ -59,7 +58,7 @@ int main(int argc, char* argv[]) {
   ammonite::windowManager::useIconDir(window, "assets/icons/");
 
   //Initialise controls
-  ammonite::controls::setupControls(window, widthPtr, heightPtr, aspectRatioPtr);
+  ammonite::controls::setupControls(window);
 
   //Set vsync (disable if benchmarking)
   if (useVsync == "false" or useBenchmark == true) {

@@ -21,7 +21,7 @@ namespace ammonite {
       float getZoomSpeed();
     }
 
-    void setupControls(GLFWwindow* newWindow, int* widthAddr, int* heightAddr, float* aspectRatioAddr);
+    void setupControls(GLFWwindow* window);
     bool shouldWindowClose();
     void processInput();
   }

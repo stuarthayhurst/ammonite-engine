@@ -1,7 +1,6 @@
 #include <iostream>
 #include <filesystem>
 #include <cmath>
-#include <tuple>
 #include <vector>
 #include <string>
 
@@ -9,21 +8,19 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include "internal/sharedSettings.hpp"
+
 namespace ammonite {
   namespace windowManager {
     namespace {
-      //Window and info
+      //Window and settings
       GLFWwindow* window;
-      int width, height;
-      float aspectRatio;
-
       bool vsyncEnabled = true;
 
-      //Callback to update height and width and viewport size on window resize
-      static void window_size_callback(GLFWwindow*, int newWidth, int newHeight) {
-        width = newWidth;
-        height = newHeight;
-        aspectRatio = float(width) / float(height);
+      //Callback to update height, width and viewport size on window resize
+      static void window_size_callback(GLFWwindow*, int width, int height) {
+        ammonite::settings::setWidth(width);
+        ammonite::settings::setHeight(height);
         glViewport(0, 0, width, height);
       }
     }
@@ -98,24 +95,23 @@ namespace ammonite {
       }
     }
 
-    //Create a window and return pointers to the width, height and aspect ratio
-    std::tuple<GLFWwindow*, int*, int*, float*> createWindow(int newWidth, int newHeight) {
-      //Set initial size and aspect ratio values
-      width = newWidth;
-      height = newHeight;
-      aspectRatio = float(width) / float(height);
+    //Create a window and a pointer
+    GLFWwindow* createWindow(int width, int height) {
+      //Set initial size
+      ammonite::settings::setWidth(width);
+      ammonite::settings::setHeight(height);
 
       window = glfwCreateWindow(width, height, "Ammonite Window", NULL, NULL);
       if (window == NULL) {
         std::cerr << "Failed to open window" << std::endl;
         glfwTerminate();
-        return {NULL, nullptr, nullptr, nullptr};
+        return nullptr;
       }
 
       glfwMakeContextCurrent(window);
 
-      //Return the pointers
-      return {window, &width, &height, &aspectRatio};
+      //Return the window pointer
+      return window;
     }
 
     void setTitle(GLFWwindow* window, const char* title) {
@@ -158,15 +154,15 @@ namespace ammonite {
     }
 
     //Wrapper to create and setup window
-    std::tuple<GLFWwindow*, int*, int*, float*> setupWindow(int newWidth, int newHeight, int antialiasing, const char* title) {
+    GLFWwindow* setupWindow(int width, int height, int antialiasing, const char* title) {
       //Setup GLFW and antialiasing
       if (!windowManager::setup::setupGlfw(antialiasing)) {
-        return {NULL, nullptr, nullptr, nullptr};
+        return nullptr;
       }
 
-      auto [window, widthPtr, heightPtr, aspectRatioPtr] = windowManager::createWindow(newWidth, newHeight);
+      auto window = windowManager::createWindow(width, height);
       if (window == NULL) {
-        return {NULL, nullptr, nullptr, nullptr};
+        return nullptr;
       }
 
       //Set window title
@@ -174,14 +170,14 @@ namespace ammonite {
 
       //Setup GLEW
       if (!windowManager::setup::setupGlew(window)) {
-        return {NULL, nullptr, nullptr, nullptr};
+        return nullptr;
       }
 
       //Setup input for window
       windowManager::setup::setupGlfwInput(window);
 
       //Return same values as createWindow()
-      return {window, &width, &height, &aspectRatio};
+      return window;
     }
   }
 }
