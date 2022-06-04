@@ -145,6 +145,7 @@ namespace ammonite {
 
         std::vector<GLchar> errorLog(maxLength);
         glGetShaderInfoLog(shaderId, maxLength, &maxLength, &errorLog[0]);
+        std::cerr << "\n" << shaderPath << ":" << std::endl;
         std::cerr << &errorLog[0] << std::endl;
 
         //Clean up and exit
