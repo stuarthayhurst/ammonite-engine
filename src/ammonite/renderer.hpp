@@ -10,7 +10,7 @@
 namespace ammonite {
   namespace renderer {
     namespace setup {
-      void setupRenderer(GLFWwindow* targetWindow, GLuint targetModelId, GLuint targetLightId, GLuint targetDepthId, bool* externalSuccess);
+      void setupRenderer(GLFWwindow* targetWindow, const char* shaderPath, bool* externalSuccess);
       void setupMatrices(glm::mat4* projectionMatrix, glm::mat4* viewMatrix);
     }
 

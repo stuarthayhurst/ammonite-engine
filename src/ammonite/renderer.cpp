@@ -1,10 +1,12 @@
 #include <iostream>
 #include <vector>
+#include <string>
 
 #include <glm/glm.hpp>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include "shaders.hpp"
 #include "internal/modelTracker.hpp"
 #include "internal/lightTracker.hpp"
 #include "lightManager.hpp"
@@ -70,7 +72,7 @@ namespace ammonite {
     }
 
     namespace setup {
-      void setupRenderer(GLFWwindow* targetWindow, GLuint targetModelId, GLuint targetLightId, GLuint targetDepthId, bool* externalSuccess) {
+      void setupRenderer(GLFWwindow* targetWindow, const char* shaderPath, bool* externalSuccess) {
         //Check GPU supported required extensions
         int failureCount = 0;
         if (!checkGPUCapabilities(&failureCount)) {
@@ -79,11 +81,26 @@ namespace ammonite {
           return;
         }
 
-        //Set window and shader to be used
+        //Set window to be used
         window = targetWindow;
-        modelShaderId = targetModelId;
-        lightShaderId = targetLightId;
-        depthShaderId = targetDepthId;
+
+        //Create shaders
+        std::string shaderLocation;
+        shaderLocation = shaderPath;
+        shaderLocation += "models/";
+        modelShaderId = ammonite::shaders::loadDirectory(shaderLocation.c_str(), externalSuccess);
+
+        shaderLocation = shaderPath;
+        shaderLocation += "lights/";
+        lightShaderId = ammonite::shaders::loadDirectory(shaderLocation.c_str(), externalSuccess);
+
+        shaderLocation = shaderPath;
+        shaderLocation += "depth/";
+        depthShaderId = ammonite::shaders::loadDirectory(shaderLocation.c_str(), externalSuccess);
+
+        if (!*externalSuccess) {
+          return;
+        }
 
         //Shader uniform locations
         matrixId = glGetUniformLocation(modelShaderId, "MVP");

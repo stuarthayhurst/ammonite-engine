@@ -19,13 +19,12 @@ void printMetrics(double frameTime) {
   std::printf(" (%fms)\n", frameTime * 1000);
 }
 
-void cleanUp(int programId, int modelCount, int loadedModelIds[]) {
+void cleanUp(int modelCount, int loadedModelIds[]) {
   //Cleanup
   for (int i = 0; i < modelCount; i++) {
     ammonite::models::deleteModel(loadedModelIds[i]);
   }
   ammonite::shaders::eraseShaders();
-  glDeleteProgram(programId);
   ammonite::windowManager::setup::destroyGlfw();
 }
 
@@ -76,21 +75,9 @@ int main(int argc, char* argv[]) {
   //Enable binary caching
   ammonite::shaders::useProgramCache("cache");
 
-  //Create program from shaders
+  //Load models from a set of objects and textures
   bool success = true;
   ammonite::utils::Timer performanceTimer;
-  GLuint modelShaderId = ammonite::shaders::loadDirectory("shaders/models/", &success);
-  GLuint lightShaderId = ammonite::shaders::loadDirectory("shaders/lights/", &success);
-  GLuint depthShaderId = ammonite::shaders::loadDirectory("shaders/depth/", &success);
-
-  if (!success) {
-    std::cerr << "Program creation failed" << std::endl;
-    return EXIT_FAILURE;
-  }
-
-  std::cout << "Loaded shaders in: " << performanceTimer.getTime() << "s" << std::endl;
-
-  //Load models from a set of objects and textures
   const char* models[][2] = {
     {"assets/suzanne.obj", "assets/gradient.png"},
     {"assets/cube.obj", "assets/texture.bmp"}
@@ -124,7 +111,7 @@ int main(int argc, char* argv[]) {
 
   //Destroy all models, textures and shaders then exit
   if (!success) {
-    cleanUp(modelShaderId, modelCount, loadedModelIds);
+    cleanUp(modelCount, loadedModelIds);
     return EXIT_FAILURE;
   }
 
@@ -142,13 +129,18 @@ int main(int argc, char* argv[]) {
 
   //Setup the renderer
   glm::mat4 projectionMatrix, viewMatrix;
-  ammonite::renderer::setup::setupRenderer(window, modelShaderId, lightShaderId, depthShaderId, &success);
+  ammonite::renderer::setup::setupRenderer(window, "shaders/", &success);
   ammonite::renderer::setup::setupMatrices(&projectionMatrix, &viewMatrix);
+
+  if (!success) {
+    std::cerr << "Renderer setup failed" << std::endl;
+    return EXIT_FAILURE;
+  }
 
   //Renderer failed to initialise, clean up and exit
   if (!success) {
     std::cerr << "Failed to initialise renderer, exiting" << std::endl;
-    cleanUp(modelShaderId, modelCount, loadedModelIds);
+    cleanUp(modelCount, loadedModelIds);
     return EXIT_FAILURE;
   }
 
@@ -182,6 +174,6 @@ int main(int argc, char* argv[]) {
   }
 
   //Clean up and exit
-  cleanUp(modelShaderId, modelCount, loadedModelIds);
+  cleanUp(modelCount, loadedModelIds);
   return EXIT_SUCCESS;
 }
