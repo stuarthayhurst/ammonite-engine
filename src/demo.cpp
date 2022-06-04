@@ -103,6 +103,7 @@ int main(int argc, char* argv[]) {
   vertexCount += ammonite::models::getVertexCount(loadedModelIds[modelCount]);
   ammonite::models::position::setPosition(loadedModelIds[modelCount], glm::vec3(4.0f, 4.0f, 4.0f));
   ammonite::models::position::scaleModel(loadedModelIds[modelCount], 0.25f);
+  modelCount += 1;
 
   //Example translation, scale and rotation
   ammonite::models::position::translateModel(loadedModelIds[0], glm::vec3(-1.0f, 0.0f, 0.0f));
@@ -124,7 +125,7 @@ int main(int argc, char* argv[]) {
   //Set light source properties
   ammonite::lighting::properties::setGeometry(lightId, glm::vec3(0.0f, 0.0f, 0.0f));
   ammonite::lighting::properties::setPower(lightId, 50.0f);
-  ammonite::lighting::linkModel(lightId, loadedModelIds[modelCount]);
+  ammonite::lighting::linkModel(lightId, loadedModelIds[modelCount - 1]);
   ammonite::lighting::updateLightSources();
 
   //Setup the renderer
