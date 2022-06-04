@@ -79,7 +79,7 @@ int main(int argc, char* argv[]) {
   //Create program from shaders
   bool success = true;
   ammonite::utils::Timer performanceTimer;
-  GLuint programId = ammonite::shaders::loadDirectory("shaders/models/", &success);
+  GLuint modelShaderId = ammonite::shaders::loadDirectory("shaders/models/", &success);
   GLuint lightShaderId = ammonite::shaders::loadDirectory("shaders/lights/", &success);
   GLuint depthShaderId = ammonite::shaders::loadDirectory("shaders/depth/", &success);
 
@@ -124,7 +124,7 @@ int main(int argc, char* argv[]) {
 
   //Destroy all models, textures and shaders then exit
   if (!success) {
-    cleanUp(programId, modelCount, loadedModelIds);
+    cleanUp(modelShaderId, modelCount, loadedModelIds);
     return EXIT_FAILURE;
   }
 
@@ -142,13 +142,13 @@ int main(int argc, char* argv[]) {
 
   //Setup the renderer
   glm::mat4 projectionMatrix, viewMatrix;
-  ammonite::renderer::setup::setupRenderer(window, programId, lightShaderId, depthShaderId, &success);
+  ammonite::renderer::setup::setupRenderer(window, modelShaderId, lightShaderId, depthShaderId, &success);
   ammonite::renderer::setup::setupMatrices(&projectionMatrix, &viewMatrix);
 
   //Renderer failed to initialise, clean up and exit
   if (!success) {
     std::cerr << "Failed to initialise renderer, exiting" << std::endl;
-    cleanUp(programId, modelCount, loadedModelIds);
+    cleanUp(modelShaderId, modelCount, loadedModelIds);
     return EXIT_FAILURE;
   }
 
@@ -182,6 +182,6 @@ int main(int argc, char* argv[]) {
   }
 
   //Clean up and exit
-  cleanUp(programId, modelCount, loadedModelIds);
+  cleanUp(modelShaderId, modelCount, loadedModelIds);
   return EXIT_SUCCESS;
 }

@@ -15,7 +15,7 @@ namespace ammonite {
   namespace renderer {
     namespace {
       GLFWwindow* window;
-      GLuint programId;
+      GLuint modelShaderId;
       GLuint lightShaderId;
       GLuint depthShaderId;
 
@@ -70,7 +70,7 @@ namespace ammonite {
     }
 
     namespace setup {
-      void setupRenderer(GLFWwindow* targetWindow, GLuint targetProgramId, GLuint targetLightId, GLuint targetDepthId, bool* externalSuccess) {
+      void setupRenderer(GLFWwindow* targetWindow, GLuint targetModelId, GLuint targetLightId, GLuint targetDepthId, bool* externalSuccess) {
         //Check GPU supported required extensions
         int failureCount = 0;
         if (!checkGPUCapabilities(&failureCount)) {
@@ -81,19 +81,19 @@ namespace ammonite {
 
         //Set window and shader to be used
         window = targetWindow;
-        programId = targetProgramId;
+        modelShaderId = targetModelId;
         lightShaderId = targetLightId;
         depthShaderId = targetDepthId;
 
         //Shader uniform locations
-        matrixId = glGetUniformLocation(programId, "MVP");
-        modelMatrixId = glGetUniformLocation(programId, "M");
-        viewMatrixId = glGetUniformLocation(programId, "V");
-        normalMatrixId = glGetUniformLocation(programId, "normalMatrix");
-        textureSamplerId = glGetUniformLocation(programId, "textureSampler");
-        ambientLightId = glGetUniformLocation(programId, "ambientLight");
-        lightSpaceMatrixId = glGetUniformLocation(programId, "lightSpaceMatrix");
-        shadowMapId = glGetUniformLocation(programId, "shadowMap");
+        matrixId = glGetUniformLocation(modelShaderId, "MVP");
+        modelMatrixId = glGetUniformLocation(modelShaderId, "M");
+        viewMatrixId = glGetUniformLocation(modelShaderId, "V");
+        normalMatrixId = glGetUniformLocation(modelShaderId, "normalMatrix");
+        textureSamplerId = glGetUniformLocation(modelShaderId, "textureSampler");
+        ambientLightId = glGetUniformLocation(modelShaderId, "ambientLight");
+        lightSpaceMatrixId = glGetUniformLocation(modelShaderId, "lightSpaceMatrix");
+        shadowMapId = glGetUniformLocation(modelShaderId, "shadowMap");
 
         lightMatrixId = glGetUniformLocation(lightShaderId, "MVP");
         lightIndexId = glGetUniformLocation(lightShaderId, "lightIndex");
@@ -259,7 +259,7 @@ namespace ammonite {
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
       //Swap to the model shader
-      glUseProgram(programId);
+      glUseProgram(modelShaderId);
 
       //Bind the depth map in the shader
       glActiveTexture(GL_TEXTURE1);
