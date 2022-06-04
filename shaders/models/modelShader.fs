@@ -120,7 +120,6 @@ void main() {
   //Base colour of the fragment
   vec3 materialColour = texture(textureSampler, texCoord).rgb;
   colour = vec3(0.0, 0.0, 0.0);
-  vec3 lightComp = vec3(0.0, 0.0, 0.0);
 
   //Normal of the fragment (camera space)
   vec3 normal = normalize(Normal_cameraspace);
@@ -139,9 +138,9 @@ void main() {
     lightSource.power = lightSources[i].power.x;
 
     //Calculate fragment colour from current light
-    lightComp += calcPointLight(lightSource, materialColour, Position_worldspace, normal, eyeDirection);
+    colour += calcPointLight(lightSource, materialColour, Position_worldspace, normal, eyeDirection);
   }
 
   float shadow = calcShadow(FragPos_lightspace);
-  colour = (ambientLight + (1.0 - shadow) * lightComp) * materialColour;
+  colour = (ambientLight + (1.0 - shadow) * colour) * materialColour;
 }
