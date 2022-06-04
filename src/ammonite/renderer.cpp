@@ -119,6 +119,11 @@ namespace ammonite {
         depthLightSpaceMatrixId = glGetUniformLocation(depthShaderId, "lightSpaceMatrix");
         depthModelMatrixId = glGetUniformLocation(depthShaderId, "modelMatrix");
 
+        //Pass texture unit locations
+        glUseProgram(modelShaderId);
+        glUniform1i(textureSamplerId, 0);
+        glUniform1i(shadowMapId, 1);
+
         //Create depth map
         glGenTextures(1, &depthMapId);
         glBindTexture(GL_TEXTURE_2D, depthMapId);
@@ -168,11 +173,9 @@ namespace ammonite {
 
         ammonite::models::InternalModelData* drawObjectData = drawObject->data;
         if (lightIndex == -1) {
-          //Bind texture in Texture Unit 0
+          //Bind texture in texture unit 0
           glActiveTexture(GL_TEXTURE0);
           glBindTexture(GL_TEXTURE_2D, drawObject->textureId);
-          //Set texture sampler to use Texture Unit 0
-          glUniform1i(textureSamplerId, 0);
         }
 
         //Bind vertex attribute buffer
@@ -282,7 +285,6 @@ namespace ammonite {
       //Bind the depth map in the shader
       glActiveTexture(GL_TEXTURE1);
       glBindTexture(GL_TEXTURE_2D, depthMapId);
-      glUniform1i(shadowMapId, 1);
 
       //Pass ambient light to shader
       glm::vec3 ambientLight = ammonite::lighting::getAmbientLight();
