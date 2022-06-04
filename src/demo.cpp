@@ -81,6 +81,7 @@ int main(int argc, char* argv[]) {
   ammonite::utils::Timer performanceTimer;
   GLuint programId = ammonite::shaders::loadDirectory("shaders/models/", &success);
   GLuint lightShaderId = ammonite::shaders::loadDirectory("shaders/lights/", &success);
+  GLuint depthShaderId = ammonite::shaders::loadDirectory("shaders/depth/", &success);
 
   if (!success) {
     std::cerr << "Program creation failed" << std::endl;
@@ -141,7 +142,7 @@ int main(int argc, char* argv[]) {
 
   //Setup the renderer
   glm::mat4 projectionMatrix, viewMatrix;
-  ammonite::renderer::setup::setupRenderer(window, programId, lightShaderId, &success);
+  ammonite::renderer::setup::setupRenderer(window, programId, lightShaderId, depthShaderId, &success);
   ammonite::renderer::setup::setupMatrices(&projectionMatrix, &viewMatrix);
 
   //Renderer failed to initialise, clean up and exit

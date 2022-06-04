@@ -10,12 +10,14 @@ out vec2 texCoord;
 out vec3 Position_worldspace;
 out vec3 Normal_cameraspace;
 out vec3 EyeDirection_cameraspace;
+out vec4 FragPos_lightspace;
 
 //Constants from C++
 uniform mat4 MVP;
 uniform mat4 V;
 uniform mat4 M;
 uniform mat3 normalMatrix;
+uniform mat4 lightSpaceMatrix;
 
 void main() {
   //Output position of the vertex, in clip space (MVP * position)
@@ -30,6 +32,8 @@ void main() {
 
   //Normal of the the vertex (camera space)
   Normal_cameraspace = (mat3(V) * normalMatrix * vertexNormal_modelspace).xyz;
+
+  FragPos_lightspace = lightSpaceMatrix * vec4(Position_worldspace, 1);
 
   //Coordinate of the vertex
   texCoord = vertexTexCoord;

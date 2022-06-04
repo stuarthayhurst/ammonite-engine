@@ -5,6 +5,7 @@ in vec2 texCoord;
 in vec3 Position_worldspace;
 in vec3 Normal_cameraspace;
 in vec3 EyeDirection_cameraspace;
+in vec4 FragPos_lightspace;
 
 //Ouput data
 out vec3 colour;
@@ -34,8 +35,38 @@ layout(std430, binding = 0) buffer LightPropertiesBuffer {
 
 //Engine inputs
 uniform sampler2D textureSampler;
+uniform sampler2D shadowMap;
 uniform mat4 V;
 uniform vec3 ambientLight;
+
+float calcShadow(vec4 FragPos_lightspace) {
+  //Perspective divide (Range [-1, 1])
+  vec3 projCoords = FragPos_lightspace.xyz / FragPos_lightspace.w;
+
+  //Shift to within [0, 1]
+  projCoords = projCoords * 0.5 + 0.5;
+
+  //Get depth of current fragment from light's perspective
+  float currentDepth = projCoords.z;
+
+  //Check whether fragment is in shadow
+  float shadow = 0.0;
+  float bias = 0.0005;
+  vec2 texelSize = 1.0 / textureSize(shadowMap, 0);
+  for (int x = -1; x <= 1; ++x) {
+    for (int y = -1; y <= 1; ++y) {
+      float pcfDepth = texture(shadowMap, projCoords.xy + vec2(x, y) * texelSize).r;
+      shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;
+      if (currentDepth - bias > pcfDepth) {
+        shadow += 1.0;
+      }
+    }
+  }
+
+  //shadow /= 9.0;
+
+  return shadow / 9.0;
+}
 
 vec3 calcDiffuseLight(LightSource lightSource, vec3 materialColour, vec3 lightDirection, vec3 normal) {
   //Cosine of the angle between the normal and light direction
@@ -89,6 +120,7 @@ void main() {
   //Base colour of the fragment
   vec3 materialColour = texture(textureSampler, texCoord).rgb;
   colour = vec3(0.0, 0.0, 0.0);
+  vec3 lightComp = vec3(0.0, 0.0, 0.0);
 
   //Normal of the fragment (camera space)
   vec3 normal = normalize(Normal_cameraspace);
@@ -107,9 +139,9 @@ void main() {
     lightSource.power = lightSources[i].power.x;
 
     //Calculate fragment colour from current light
-    colour += calcPointLight(lightSource, materialColour, Position_worldspace, normal, eyeDirection);
+    lightComp += calcPointLight(lightSource, materialColour, Position_worldspace, normal, eyeDirection);
   }
 
-  //Add ambient lighting
-  colour += ambientLight * materialColour;
+  float shadow = calcShadow(FragPos_lightspace);
+  colour = (ambientLight + (1.0 - shadow) * lightComp) * materialColour;
 }
