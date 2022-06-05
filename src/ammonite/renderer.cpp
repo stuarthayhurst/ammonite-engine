@@ -10,6 +10,7 @@
 #include "internal/modelTracker.hpp"
 #include "internal/lightTracker.hpp"
 #include "shaders.hpp"
+#include "controls.hpp"
 #include "lightManager.hpp"
 #include "utils/timer.hpp"
 #include "utils/extension.hpp"
@@ -27,9 +28,10 @@ namespace ammonite {
       GLuint modelMatrixId;
       GLuint viewMatrixId;
       GLuint normalMatrixId;
-      GLuint textureSamplerId;
       GLuint ambientLightId;
       GLuint lightSpaceMatrixId;
+      GLuint cameraPosId;
+      GLuint textureSamplerId;
       GLuint shadowMapId;
 
       GLuint lightMatrixId;
@@ -108,9 +110,10 @@ namespace ammonite {
         modelMatrixId = glGetUniformLocation(modelShaderId, "M");
         viewMatrixId = glGetUniformLocation(modelShaderId, "V");
         normalMatrixId = glGetUniformLocation(modelShaderId, "normalMatrix");
-        textureSamplerId = glGetUniformLocation(modelShaderId, "textureSampler");
-        ambientLightId = glGetUniformLocation(modelShaderId, "ambientLight");
         lightSpaceMatrixId = glGetUniformLocation(modelShaderId, "lightSpaceMatrix");
+        ambientLightId = glGetUniformLocation(modelShaderId, "ambientLight");
+        cameraPosId = glGetUniformLocation(modelShaderId, "cameraPos");
+        textureSamplerId = glGetUniformLocation(modelShaderId, "textureSampler");
         shadowMapId = glGetUniformLocation(modelShaderId, "shadowMap");
 
         lightMatrixId = glGetUniformLocation(lightShaderId, "MVP");
@@ -289,6 +292,10 @@ namespace ammonite {
       //Pass ambient light to shader
       glm::vec3 ambientLight = ammonite::lighting::getAmbientLight();
       glUniform3f(ambientLightId, ambientLight.x, ambientLight.y, ambientLight.z);
+
+      //Pass camera position to shader
+      glm::vec3 cameraPosition = ammonite::controls::getCameraPosition();
+      glUniform3f(cameraPosId, cameraPosition.x, cameraPosition.y, cameraPosition.z);
 
       //Pass matrices and render regular models
       glUniformMatrix4fv(viewMatrixId, 1, GL_FALSE, &(*viewMatrix)[0][0]);

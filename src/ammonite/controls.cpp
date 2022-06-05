@@ -155,6 +155,10 @@ namespace ammonite {
       }
     }
 
+    glm::vec3 getCameraPosition() {
+      return position;
+    }
+
     void setupControls(GLFWwindow* newWindow) {
       //Connect window and aspect ratio pointers
       window = newWindow;

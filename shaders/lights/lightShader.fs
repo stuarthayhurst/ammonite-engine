@@ -1,11 +1,5 @@
 #version 430 core
 
-//Ouput data
-out vec3 colour;
-
-//Engine inputs
-uniform int lightIndex;
-
 //Data structure to match input from shader storage buffer object
 struct RawLightSource {
   vec4 geometry;
@@ -29,7 +23,10 @@ layout(std430, binding = 0) buffer LightPropertiesBuffer {
   RawLightSource lightSources[];
 };
 
+out vec3 colour;
+uniform int lightIndex;
+
 void main() {
-  //Use light source colour
+  //Use light source colour as fragment colour
   colour = lightSources[lightIndex].colour.xyz;
 }

@@ -1,18 +1,17 @@
 #version 430 core
 
-//Input vertex data, changes every execution
-layout(location = 0) in vec3 vertexPosition_modelspace;
+layout(location = 0) in vec3 inPosition;
 layout(location = 1) in vec2 vertexTexCoord;
-layout(location = 2) in vec3 vertexNormal_modelspace;
+layout(location = 2) in vec3 inNormal;
 
-//Output data, interpolated for each fragment
-out vec2 texCoord;
-out vec3 Position_worldspace;
-out vec3 Normal_cameraspace;
-out vec3 EyeDirection_cameraspace;
-out vec4 FragPos_lightspace;
+//Output fragment data, sent to fragment shader
+out FragmentDataOut {
+  vec3 fragPos;
+  vec4 fragPos_lightspace;
+  vec3 normal;
+  vec2 texCoord;
+} fragData;
 
-//Constants from C++
 uniform mat4 MVP;
 uniform mat4 V;
 uniform mat4 M;
@@ -20,21 +19,18 @@ uniform mat3 normalMatrix;
 uniform mat4 lightSpaceMatrix;
 
 void main() {
-  //Output position of the vertex, in clip space (MVP * position)
-  gl_Position = MVP * vec4(vertexPosition_modelspace, 1);
+  //Position of the vertex, in worldspace
+  fragData.fragPos = (M * vec4(inPosition, 1)).xyz;
 
-  //Position of the vertex, in worldspace (M * position)
-  Position_worldspace = (M * vec4(vertexPosition_modelspace, 1)).xyz;
+  //Vertex normal
+  fragData.normal = normalize((normalMatrix * inNormal).xyz);
 
-  //Vector from vertex to camera (camera space - camera at 0, 0, 0)
-  vec3 vertexPosition_cameraspace = (V * M * vec4(vertexPosition_modelspace, 1)).xyz;
-  EyeDirection_cameraspace = vec3(0, 0, 0) - vertexPosition_cameraspace;
+  //Vertex texture coord
+  fragData.texCoord = vertexTexCoord;
 
-  //Normal of the the vertex (camera space)
-  Normal_cameraspace = (mat3(V) * normalMatrix * vertexNormal_modelspace).xyz;
+  //Vertex position in light space
+  fragData.fragPos_lightspace = lightSpaceMatrix * vec4(fragData.fragPos, 1);
 
-  FragPos_lightspace = lightSpaceMatrix * vec4(Position_worldspace, 1);
-
-  //Coordinate of the vertex
-  texCoord = vertexTexCoord;
+  //Output position of the vertex
+  gl_Position = MVP * vec4(inPosition, 1);
 }

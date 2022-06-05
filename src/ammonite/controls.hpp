@@ -24,6 +24,8 @@ namespace ammonite {
     void setupControls(GLFWwindow* window);
     bool shouldWindowClose();
     void processInput();
+
+    glm::vec3 getCameraPosition();
   }
 }
 
