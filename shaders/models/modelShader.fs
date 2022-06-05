@@ -73,6 +73,24 @@ float calcShadow(vec4 fragPos_lightspace, vec3 normal, vec3 lightDir) {
   return shadow;
 }
 
+vec3 calcLight(LightSource lightSource, vec3 normal, vec3 fragPos, vec3 lightDir) {
+    //Diffuse component
+    float diff = max(dot(lightDir, normal), 0.0);
+    vec3 diffuse = lightSource.diffuse * diff * lightSource.colour;
+
+    //Specular component
+    vec3 viewDir = normalize(cameraPos - fragPos);
+    vec3 halfwayDir = normalize(lightDir + viewDir);
+    float spec = pow(max(dot(normal, halfwayDir), 0.0), 2.0);
+    vec3 specular = lightSource.specular * spec * lightSource.colour;
+
+    //Attenuation of the source
+    float dist = distance(lightSource.geometry, fragPos);
+    float attenuation = lightSource.power / (dist * dist);
+
+    return (diffuse + specular) * attenuation;
+}
+
 void main() {
   //Base colour of the fragment
   vec3 materialColour = texture(textureSampler, fragData.texCoord).rgb;
@@ -89,25 +107,11 @@ void main() {
     lightSource.specular = lightSources[i].specular.xyz;
     lightSource.power = lightSources[i].power.x;
 
-    //Diffuse component
-    vec3 normal = fragData.normal;
     vec3 lightDir = normalize(lightSource.geometry - fragData.fragPos);
-    float diff = max(dot(lightDir, normal), 0.0);
-    vec3 diffuse = lightSource.diffuse * diff * lightSource.colour;
-
-    //Specular component
-    vec3 viewDir = normalize(cameraPos - fragData.fragPos);
-    vec3 halfwayDir = normalize(lightDir + viewDir);
-    float spec = pow(max(dot(normal, halfwayDir), 0.0), 2.0);
-    vec3 specular = lightSource.specular * spec * lightSource.colour;
-
-    //Attenuation of the source
-    float dist = distance(lightSource.geometry, fragData.fragPos);
-    float attenuation = lightSource.power / (dist * dist);
 
     //Final contribution from the current light source
-    shadow = calcShadow(fragData.fragPos_lightspace, normal, lightDir);
-    lightColour += (diffuse + specular) * attenuation;
+    shadow = calcShadow(fragData.fragPos_lightspace, fragData.normal, lightDir);
+    lightColour += calcLight(lightSource, fragData.normal, fragData.fragPos, lightDir);
   }
 
   //Final fragment colour, from ambient, diffuse, specular and shadow components
