@@ -38,7 +38,7 @@ namespace ammonite {
 
       //Position, start looking towards the horizon at -Z
       glm::vec3 position = glm::vec3(0, 0, 5);
-      float horizontalAngle = 3.14f;
+      float horizontalAngle = glm::pi<float>();
       float verticalAngle = 0.0f;
 
       //Used to find x and y mouse offsets
@@ -213,9 +213,9 @@ namespace ammonite {
 
       //Right vector, relative to the camera
       glm::vec3 right = glm::vec3(
-        std::sin(horizontalAngle - 3.14f / 2.0f),
+        std::sin(horizontalAngle - glm::half_pi<float>()),
         0,
-        std::cos(horizontalAngle - 3.14f / 2.0f)
+        std::cos(horizontalAngle - glm::half_pi<float>())
       );
 
       //Apply movement from inputs
