@@ -129,11 +129,6 @@ int main(int argc, char* argv[]) {
   ammonite::renderer::setup::setupRenderer(window, "shaders/", &success);
   ammonite::renderer::setup::setupMatrices(&projectionMatrix, &viewMatrix);
 
-  if (!success) {
-    std::cerr << "Renderer setup failed" << std::endl;
-    return EXIT_FAILURE;
-  }
-
   //Renderer failed to initialise, clean up and exit
   if (!success) {
     std::cerr << "Failed to initialise renderer, exiting" << std::endl;
