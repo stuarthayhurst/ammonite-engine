@@ -285,6 +285,9 @@ namespace ammonite {
       //Swap to the model shader
       glUseProgram(modelShaderId);
 
+      //Enable gamma correction while colouring
+      glEnable(GL_FRAMEBUFFER_SRGB);
+
       //Bind the depth map in the shader
       glActiveTexture(GL_TEXTURE1);
       glBindTexture(GL_TEXTURE_2D, depthMapId);
@@ -322,6 +325,9 @@ namespace ammonite {
           }
         }
       }
+
+      //Disable gamma correction
+      glDisable(GL_FRAMEBUFFER_SRGB);
 
       //Swap buffers
       glfwSwapBuffers(window);
