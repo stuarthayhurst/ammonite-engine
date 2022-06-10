@@ -9,8 +9,9 @@
 #include "internal/sharedSettings.hpp"
 #include "internal/modelTracker.hpp"
 #include "internal/lightTracker.hpp"
+#include "internal/cameraMatrices.hpp"
 #include "shaders.hpp"
-#include "controls.hpp"
+#include "camera.hpp"
 #include "lightManager.hpp"
 #include "utils/timer.hpp"
 #include "utils/extension.hpp"
@@ -48,8 +49,8 @@ namespace ammonite {
       int frameCount = 0;
       double frameTime = 0.0f;
 
-      glm::mat4* projectionMatrix;
-      glm::mat4* viewMatrix;
+      glm::mat4* viewMatrix = ammonite::camera::matrices::getViewMatrixPtr();
+      glm::mat4* projectionMatrix = ammonite::camera::matrices::getProjectionMatrixPtr();
     }
 
     namespace {
@@ -150,12 +151,6 @@ namespace ammonite {
         glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LEQUAL);
-      }
-
-      void setupMatrices(glm::mat4* newProjectionMatrix, glm::mat4* newViewMatrix) {
-        //Accept pointers to the view and projection matrices
-        projectionMatrix = newProjectionMatrix;
-        viewMatrix = newViewMatrix;
       }
     }
 
@@ -297,7 +292,7 @@ namespace ammonite {
       glUniform3f(ambientLightId, ambientLight.x, ambientLight.y, ambientLight.z);
 
       //Pass camera position to shader
-      glm::vec3 cameraPosition = ammonite::controls::getCameraPosition();
+      glm::vec3 cameraPosition = ammonite::camera::getPosition();
       glUniform3f(cameraPosId, cameraPosition.x, cameraPosition.y, cameraPosition.z);
 
       //Pass matrices and render regular models

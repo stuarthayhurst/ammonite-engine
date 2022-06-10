@@ -58,7 +58,7 @@ int main(int argc, char* argv[]) {
   ammonite::windowManager::useIconDir(window, "assets/icons/");
 
   //Initialise controls
-  ammonite::controls::setupControls(window);
+  ammonite::utils::controls::setupControls(window);
 
   //Set vsync (disable if benchmarking)
   if (useVsync == "false" or useBenchmark == true) {
@@ -125,9 +125,7 @@ int main(int argc, char* argv[]) {
   ammonite::lighting::setAmbientLight(glm::vec3(0.1f, 0.1f, 0.1f));
 
   //Setup the renderer
-  glm::mat4 projectionMatrix, viewMatrix;
   ammonite::renderer::setup::setupRenderer(window, "shaders/", &success);
-  ammonite::renderer::setup::setupMatrices(&projectionMatrix, &viewMatrix);
 
   //Renderer failed to initialise, clean up and exit
   if (!success) {
@@ -136,12 +134,15 @@ int main(int argc, char* argv[]) {
     return EXIT_FAILURE;
   }
 
+  //Set the camera to the start position
+  ammonite::camera::setPosition(glm::vec3(0.0f, 0.0f, 5.0f));
+
   //Performance metrics setup
   ammonite::utils::Timer benchmarkTimer;
   performanceTimer.reset();
 
   //Draw frames until window closed
-  while(ammonite::controls::shouldWindowClose()) {
+  while(ammonite::utils::controls::shouldWindowClose()) {
     //Every second, output the framerate
     if (performanceTimer.getTime() >= 1.0f) {
       printMetrics(ammonite::renderer::getFrameTime());
@@ -149,12 +150,9 @@ int main(int argc, char* argv[]) {
     }
 
     //Process new input since last frame
-    ammonite::controls::processInput();
+    ammonite::utils::controls::processInput();
 
-    //Get view and projection matrices
-    projectionMatrix = ammonite::controls::matrix::getProjectionMatrix();
-    viewMatrix = ammonite::controls::matrix::getViewMatrix();
-
+    //Draw the frame
     ammonite::renderer::drawFrame(loadedModelIds, modelCount);
   }
 
