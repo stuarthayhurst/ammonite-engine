@@ -292,7 +292,7 @@ namespace ammonite {
       glUniform3f(ambientLightId, ambientLight.x, ambientLight.y, ambientLight.z);
 
       //Pass camera position to shader
-      glm::vec3 cameraPosition = ammonite::camera::getPosition();
+      glm::vec3 cameraPosition = ammonite::camera::getPosition(ammonite::camera::getActiveCamera());
       glUniform3f(cameraPosId, cameraPosition.x, cameraPosition.y, cameraPosition.z);
 
       //Pass matrices and render regular models

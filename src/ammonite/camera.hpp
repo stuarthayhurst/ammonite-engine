@@ -5,15 +5,21 @@
 
 namespace ammonite {
   namespace camera {
-    glm::vec3 getPosition();
-    float getHorizontal();
-    float getVertical();
-    float getFieldOfView();
+    int createCamera();
+    void deleteCamera(int cameraId);
 
-    void setPosition(glm::vec3 newPosition);
-    void setHorizontal(float newHorizontal);
-    void setVertical(float newVertical);
-    void setFieldOfView(float newFov);
+    int getActiveCamera();
+    void setActiveCamera(int cameraId);
+
+    glm::vec3 getPosition(int cameraId);
+    float getHorizontal(int cameraId);
+    float getVertical(int cameraId);
+    float getFieldOfView(int cameraId);
+
+    void setPosition(int cameraId, glm::vec3 newPosition);
+    void setHorizontal(int cameraId, float newHorizontal);
+    void setVertical(int cameraId, float newVertical);
+    void setFieldOfView(int cameraId, float newFov);
   }
 }
 

@@ -44,17 +44,18 @@ namespace ammonite {
         //Increase / decrease FoV on scroll (xoffset is unused)
         static void scroll_callback(GLFWwindow*, double, double yoffset) {
           //Only zoom if FoV will be between 1 and 90
-          float fov = ammonite::camera::getFieldOfView();
+          int activeCameraId = ammonite::camera::getActiveCamera();
+          float fov = ammonite::camera::getFieldOfView(activeCameraId);
           float newFov = fov - (yoffset * zoomMultiplier);
           if (newFov > 0 and newFov <= 90) {
-            ammonite::camera::setFieldOfView(newFov);
+            ammonite::camera::setFieldOfView(activeCameraId, newFov);
           }
         }
 
         //Reset FoV on middle click, (modifier bits are unused)
         static void zoom_reset_callback(GLFWwindow*, int button, int action, int) {
           if (button == GLFW_MOUSE_BUTTON_MIDDLE and action == GLFW_PRESS) {
-            ammonite::camera::setFieldOfView(45);
+            ammonite::camera::setFieldOfView(ammonite::camera::getActiveCamera(), 45.0f);
           }
         }
 
@@ -68,11 +69,12 @@ namespace ammonite {
           yposLast = ypos;
 
           //Get current viewing angles
-          float horizontalAngle = ammonite::camera::getHorizontal();
-          float verticalAngle = ammonite::camera::getVertical();
+          int activeCameraId = ammonite::camera::getActiveCamera();
+          float horizontalAngle = ammonite::camera::getHorizontal(activeCameraId);
+          float verticalAngle = ammonite::camera::getVertical(activeCameraId);
 
           //Update viewing angles ('-' corrects camera inversion)
-          ammonite::camera::setHorizontal(horizontalAngle - (mouseSpeed * xoffset));
+          ammonite::camera::setHorizontal(activeCameraId, horizontalAngle - (mouseSpeed * xoffset));
 
           //Only accept vertical angle if it won't create an impossible movement
           float newAngle = verticalAngle - (mouseSpeed * yoffset);
@@ -84,7 +86,7 @@ namespace ammonite {
           } else {
             verticalAngle += -mouseSpeed * yoffset;
           }
-          ammonite::camera::setVertical(verticalAngle);
+          ammonite::camera::setVertical(activeCameraId, verticalAngle);
         }
 
         //Helper function to set input state
@@ -186,8 +188,11 @@ namespace ammonite {
           lastInputToggleState = inputToggleState;
         }
 
+        //Get active camera
+        int activeCameraId = ammonite::camera::getActiveCamera();
+
         //Vector for current direction, without vertical component
-        float horizontalAngle = ammonite::camera::getHorizontal();
+        float horizontalAngle = ammonite::camera::getHorizontal(activeCameraId);
         glm::vec3 horizontalDirection(
           std::sin(horizontalAngle),
           0,
@@ -202,7 +207,7 @@ namespace ammonite {
         );
 
         //Get the current camera position
-        glm::vec3 position = ammonite::camera::getPosition();
+        glm::vec3 position = ammonite::camera::getPosition(activeCameraId);
 
         //Apply movement from inputs
         if (inputBound) {
@@ -227,7 +232,7 @@ namespace ammonite {
           }
 
           //Update the camera position
-          ammonite::camera::setPosition(position);
+          ammonite::camera::setPosition(activeCameraId, position);
         }
 
         //Reset time between inputs

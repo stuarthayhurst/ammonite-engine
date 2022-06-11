@@ -134,8 +134,14 @@ int main(int argc, char* argv[]) {
     return EXIT_FAILURE;
   }
 
+  //Camera ids
+  int cameraIds[2] = {0, ammonite::camera::createCamera()};
+  int cameraIndex = 0;
+  bool cameraToggleHeld = false;
+
   //Set the camera to the start position
-  ammonite::camera::setPosition(glm::vec3(0.0f, 0.0f, 5.0f));
+  ammonite::camera::setPosition(0, glm::vec3(0.0f, 0.0f, 5.0f));
+  ammonite::camera::setPosition(cameraIds[1], glm::vec3(0.0f, 0.0f, 2.0f));
 
   //Performance metrics setup
   ammonite::utils::Timer benchmarkTimer;
@@ -147,6 +153,15 @@ int main(int argc, char* argv[]) {
     if (performanceTimer.getTime() >= 1.0f) {
       printMetrics(ammonite::renderer::getFrameTime());
       performanceTimer.reset();
+    }
+
+    //Cycle camera when pressed
+    if (glfwGetKey(window, GLFW_KEY_B) != GLFW_PRESS) {
+      cameraToggleHeld = false;
+    } else if (!cameraToggleHeld) {
+      cameraToggleHeld = true;
+      cameraIndex = (cameraIndex + 1) % (sizeof(cameraIds) / sizeof(cameraIds[0]));
+      ammonite::camera::setActiveCamera(cameraIds[cameraIndex]);
     }
 
     //Process new input since last frame
