@@ -28,6 +28,9 @@ namespace ammonite {
     std::map<int, lighting::LightSource> lightTrackerMap;
     unsigned int prevLightCount = 0;
 
+    //Track cumulative number of created light sources
+    int totalLights = 0;
+
     //Track light emitting models
     std::vector<int> lightEmitterData;
   }
@@ -159,7 +162,7 @@ namespace ammonite {
       LightSource lightSource;
 
       //Add light source to the tracker
-      lightSource.lightId = lightTrackerMap.size() + 1;
+      lightSource.lightId = ++totalLights;
       lightTrackerMap[lightSource.lightId] = lightSource;
 
       //Return the light source's ID
