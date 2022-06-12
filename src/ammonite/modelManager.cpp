@@ -240,6 +240,9 @@ namespace ammonite {
         //Normal matrix
         modelObject->positionData.normalMatrix = glm::transpose(glm::inverse(modelObject->positionData.modelMatrix));
       }
+
+      //Track cumulative number of created models
+      int totalModels = 0;
     }
 
     int createModel(const char* objectPath, bool* externalSuccess) {
@@ -274,7 +277,7 @@ namespace ammonite {
       calcModelMatrices(&modelObject);
 
       //Add model to the tracker and return the ID
-      modelObject.modelId = modelTrackerMap.size() + 1;
+      modelObject.modelId = ++totalModels;
       modelTrackerMap[modelObject.modelId] = modelObject;
       return modelObject.modelId;
     }
@@ -293,7 +296,7 @@ namespace ammonite {
       ammonite::textures::copyTexture(modelObject.textureId);
 
       //Add model to the tracker and return the ID
-      modelObject.modelId = modelTrackerMap.size() + 1;
+      modelObject.modelId = ++totalModels;
       modelTrackerMap[modelObject.modelId] = modelObject;
       return modelObject.modelId;
     }
