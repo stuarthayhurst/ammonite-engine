@@ -51,6 +51,9 @@ namespace ammonite {
 
       glm::mat4* viewMatrix = ammonite::camera::matrices::getViewMatrixPtr();
       glm::mat4* projectionMatrix = ammonite::camera::matrices::getProjectionMatrixPtr();
+
+      //View projection combined matrix
+      glm::mat4 viewProjectionMatrix;
     }
 
     namespace {
@@ -163,34 +166,39 @@ namespace ammonite {
         }
       }
 
-      static void drawModel(ammonite::models::InternalModel *drawObject, const glm::mat4 viewProjectionMatrix, int lightIndex, bool depthPass) {
+      static void drawModel(ammonite::models::InternalModel *drawObject, int lightIndex, bool depthPass) {
         //If the model is disabled, skip it
         if (!drawObject->active) {
           return;
         }
 
-        ammonite::models::InternalModelData* drawObjectData = drawObject->data;
-        if (lightIndex == -1) {
-          //Bind texture in texture unit 0
+        //Set texture for regular shading pass
+        if (lightIndex == -1 and !depthPass) {
           glActiveTexture(GL_TEXTURE0);
           glBindTexture(GL_TEXTURE_2D, drawObject->textureId);
         }
 
-        //Bind vertex attribute buffer
+        //Get draw data and bind vertex attribute buffer
+        ammonite::models::InternalModelData* drawObjectData = drawObject->data;
         glBindVertexArray(drawObjectData->vertexArrayId);
 
         //Calculate and obtain matrices
         glm::mat4 modelMatrix = drawObject->positionData.modelMatrix;
-        glm::mat4 mvp = viewProjectionMatrix * modelMatrix;
+
+        //Calculate the MVP matrix for shading and light emitter passes
+        glm::mat4 mvp;
+        if (!depthPass) {
+          mvp = viewProjectionMatrix * modelMatrix;
+        }
 
         //Send uniforms to the shaders
-        if (depthPass) {
+        if (depthPass) { //Depth pass
           glUniformMatrix4fv(depthModelMatrixId, 1, GL_FALSE, &modelMatrix[0][0]);
-        } else if (lightIndex == -1) {
+        } else if (lightIndex == -1) { //Regular pass
           glUniformMatrix4fv(matrixId, 1, GL_FALSE, &mvp[0][0]);
           glUniformMatrix4fv(modelMatrixId, 1, GL_FALSE, &modelMatrix[0][0]);
           glUniformMatrix3fv(normalMatrixId, 1, GL_FALSE, &drawObject->positionData.normalMatrix[0][0]);
-        } else {
+        } else { //Light emitter pass
           glUniformMatrix4fv(lightMatrixId, 1, GL_FALSE, &mvp[0][0]);
           glUniform1i(lightIndexId, lightIndex);
         }
@@ -222,14 +230,14 @@ namespace ammonite {
       return frameTime;
     }
 
-    static void drawModels(const int modelIds[], const int modelCount, glm::mat4 viewProjectionMatrix, bool depthPass) {
+    static void drawModels(const int modelIds[], const int modelCount, bool depthPass) {
       //Draw given models
       for (int i = 0; i < modelCount; i++) {
         ammonite::models::InternalModel* modelPtr = ammonite::models::getModelPtr(modelIds[i]);
         //Only draw non-light emitting models that exist
         if (modelPtr != nullptr) {
           if (!modelPtr->lightEmitting) {
-            drawModel(modelPtr, viewProjectionMatrix, -1, depthPass);
+            drawModel(modelPtr, -1, depthPass);
           }
         }
       }
@@ -258,7 +266,7 @@ namespace ammonite {
 
       //Calculate matrices used later
       glm::mat4 lightSpaceMatrix = lightProjection * lightView;
-      const glm::mat4 viewProjectionMatrix = *projectionMatrix * *viewMatrix;
+      viewProjectionMatrix = *projectionMatrix * *viewMatrix;
 
       //Swap to depth shader and pass light space matrix
       glUseProgram(depthShaderId);
@@ -269,36 +277,30 @@ namespace ammonite {
       glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
       glClear(GL_DEPTH_BUFFER_BIT);
 
-      //Render to depth buffer (doesn't really need viewProjectionMatrix)
-      drawModels(modelIds, modelCount, viewProjectionMatrix, true);
+      //Render to depth buffer
+      drawModels(modelIds, modelCount, true);
 
       //Reset the framebuffer, viewport and canvas
       glBindFramebuffer(GL_FRAMEBUFFER, 0);
       glViewport(0, 0, ammonite::settings::getWidth(), ammonite::settings::getHeight());
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-      //Swap to the model shader
+      //Prepare model shader, gamma correction and depth map
       glUseProgram(modelShaderId);
-
-      //Enable gamma correction while colouring
       glEnable(GL_FRAMEBUFFER_SRGB);
-
-      //Bind the depth map in the shader
       glActiveTexture(GL_TEXTURE1);
       glBindTexture(GL_TEXTURE_2D, depthMapId);
 
-      //Pass ambient light to shader
+      //Pass ambient light and camera position to shader
       glm::vec3 ambientLight = ammonite::lighting::getAmbientLight();
-      glUniform3f(ambientLightId, ambientLight.x, ambientLight.y, ambientLight.z);
-
-      //Pass camera position to shader
       glm::vec3 cameraPosition = ammonite::camera::getPosition(ammonite::camera::getActiveCamera());
+      glUniform3f(ambientLightId, ambientLight.x, ambientLight.y, ambientLight.z);
       glUniform3f(cameraPosId, cameraPosition.x, cameraPosition.y, cameraPosition.z);
 
       //Pass matrices and render regular models
       glUniformMatrix4fv(viewMatrixId, 1, GL_FALSE, &(*viewMatrix)[0][0]);
       glUniformMatrix4fv(lightSpaceMatrixId, 1, GL_FALSE, &lightSpaceMatrix[0][0]);
-      drawModels(modelIds, modelCount, viewProjectionMatrix, false);
+      drawModels(modelIds, modelCount, false);
 
       //Get information about light sources to be rendered
       int lightCount;
@@ -316,7 +318,7 @@ namespace ammonite {
           ammonite::models::InternalModel* modelPtr = ammonite::models::getModelPtr(modelId);
 
           if (modelPtr != nullptr) {
-            drawModel(modelPtr, viewProjectionMatrix, lightIndex, false);
+            drawModel(modelPtr, lightIndex, false);
           }
         }
       }
