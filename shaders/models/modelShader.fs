@@ -79,10 +79,13 @@ vec3 calcLight(LightSource lightSource, vec3 normal, vec3 fragPos, vec3 lightDir
     vec3 diffuse = lightSource.diffuse * diff * lightSource.colour;
 
     //Specular component
-    vec3 viewDir = normalize(cameraPos - fragPos);
-    vec3 halfwayDir = normalize(lightDir + viewDir);
-    float spec = pow(clamp(dot(normal, halfwayDir), 0.0, 1.0), 2.0);
-    vec3 specular = lightSource.specular * spec * lightSource.colour;
+    vec3 specular = vec3(0.0f);
+    if (diff > 0.0f) {
+      vec3 viewDir = normalize(cameraPos - fragPos);
+      vec3 halfwayDir = normalize(lightDir + viewDir);
+      float spec = pow(clamp(dot(normal, halfwayDir), 0.0, 1.0), 2.0);
+      vec3 specular = lightSource.specular * spec * lightSource.colour;
+    }
 
     //Attenuation of the source
     float dist = distance(lightSource.geometry, fragPos);

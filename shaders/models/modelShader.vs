@@ -23,7 +23,7 @@ void main() {
   fragData.fragPos = (M * vec4(inPosition, 1)).xyz;
 
   //Vertex normal
-  fragData.normal = normalize((normalMatrix * inNormal).xyz);
+  fragData.normal = normalize(normalMatrix * inNormal);
 
   //Vertex texture coord
   fragData.texCoord = vertexTexCoord;
