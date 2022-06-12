@@ -79,7 +79,7 @@ int main(int argc, char* argv[]) {
   ammonite::utils::Timer performanceTimer;
   const char* models[][2] = {
     {"assets/suzanne.obj", "assets/gradient.png"},
-    {"assets/cube.obj", "assets/texture.bmp"}
+    {"assets/cube.obj", "assets/flat.png"}
   };
   int modelCount = sizeof(models) / sizeof(models[0]);
   int loadedModelIds[modelCount + 1];
