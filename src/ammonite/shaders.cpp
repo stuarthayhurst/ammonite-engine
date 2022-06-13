@@ -414,6 +414,9 @@ namespace ammonite {
         } else if (extension == ".fs" or extension == ".frag") {
           shaders.push_back(std::string(filePath));
           types.push_back(GL_FRAGMENT_SHADER);
+        } else if (extension == ".gs" or extension == ".geo") {
+          shaders.push_back(std::string(filePath));
+          types.push_back(GL_GEOMETRY_SHADER);
         }
       }
 
