@@ -27,7 +27,6 @@ namespace ammonite {
       //Shader uniform IDs
       GLuint matrixId;
       GLuint modelMatrixId;
-      GLuint viewMatrixId;
       GLuint normalMatrixId;
       GLuint ambientLightId;
       GLuint cameraPosId;
@@ -113,7 +112,6 @@ namespace ammonite {
         //Shader uniform locations
         matrixId = glGetUniformLocation(modelShaderId, "MVP");
         modelMatrixId = glGetUniformLocation(modelShaderId, "M");
-        viewMatrixId = glGetUniformLocation(modelShaderId, "V");
         normalMatrixId = glGetUniformLocation(modelShaderId, "normalMatrix");
         ambientLightId = glGetUniformLocation(modelShaderId, "ambientLight");
         cameraPosId = glGetUniformLocation(modelShaderId, "cameraPos");
@@ -313,15 +311,14 @@ namespace ammonite {
       glActiveTexture(GL_TEXTURE1);
       glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubeMapId);
 
-      //Pass ambient light and camera position to shader
+      //Get ambient light and camera position
       glm::vec3 ambientLight = ammonite::lighting::getAmbientLight();
       glm::vec3 cameraPosition = ammonite::camera::getPosition(ammonite::camera::getActiveCamera());
+
+      //Pass uniforms and render regular models
       glUniform3fv(ambientLightId, 1, &ambientLight[0]);
       glUniform3fv(cameraPosId, 1, &cameraPosition[0]);
       glUniform1f(modelFarPlaneId, farPlane);
-
-      //Pass matrices and render regular models
-      glUniformMatrix4fv(viewMatrixId, 1, GL_FALSE, &(*viewMatrix)[0][0]);
       drawModels(modelIds, modelCount, false);
 
       //Get information about light sources to be rendered

@@ -12,7 +12,6 @@ out FragmentDataOut {
 } fragData;
 
 uniform mat4 MVP;
-uniform mat4 V;
 uniform mat4 M;
 uniform mat3 normalMatrix;
 

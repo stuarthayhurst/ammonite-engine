@@ -36,7 +36,6 @@ out vec3 outputColour;
 //Engine inputs
 uniform sampler2D textureSampler;
 uniform samplerCube shadowCubeMap;
-uniform mat4 V;
 uniform vec3 ambientLight;
 uniform vec3 cameraPos;
 uniform float farPlane;
