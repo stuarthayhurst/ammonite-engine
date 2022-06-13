@@ -30,18 +30,19 @@ namespace ammonite {
       GLuint viewMatrixId;
       GLuint normalMatrixId;
       GLuint ambientLightId;
-      GLuint lightSpaceMatrixId;
       GLuint cameraPosId;
+      GLuint modelFarPlaneId;
       GLuint textureSamplerId;
-      GLuint shadowMapId;
+      GLuint shadowCubeMapId;
 
       GLuint lightMatrixId;
       GLuint lightIndexId;
 
-      GLuint depthLightSpaceMatrixId;
       GLuint depthModelMatrixId;
+      GLuint depthFarPlaneId;
+      GLuint depthLightPosId;
 
-      GLuint depthMapId;
+      GLuint depthCubeMapId;
       GLuint depthMapFBO;
       unsigned int shadowWidth = 1024, shadowHeight = 1024;
 
@@ -114,38 +115,43 @@ namespace ammonite {
         modelMatrixId = glGetUniformLocation(modelShaderId, "M");
         viewMatrixId = glGetUniformLocation(modelShaderId, "V");
         normalMatrixId = glGetUniformLocation(modelShaderId, "normalMatrix");
-        lightSpaceMatrixId = glGetUniformLocation(modelShaderId, "lightSpaceMatrix");
         ambientLightId = glGetUniformLocation(modelShaderId, "ambientLight");
         cameraPosId = glGetUniformLocation(modelShaderId, "cameraPos");
+        modelFarPlaneId = glGetUniformLocation(modelShaderId, "farPlane");
         textureSamplerId = glGetUniformLocation(modelShaderId, "textureSampler");
-        shadowMapId = glGetUniformLocation(modelShaderId, "shadowMap");
+        shadowCubeMapId = glGetUniformLocation(modelShaderId, "shadowCubeMap");
 
         lightMatrixId = glGetUniformLocation(lightShaderId, "MVP");
         lightIndexId = glGetUniformLocation(lightShaderId, "lightIndex");
 
-        depthLightSpaceMatrixId = glGetUniformLocation(depthShaderId, "lightSpaceMatrix");
         depthModelMatrixId = glGetUniformLocation(depthShaderId, "modelMatrix");
+        depthFarPlaneId = glGetUniformLocation(depthShaderId, "farPlane");
+        depthLightPosId = glGetUniformLocation(depthShaderId, "lightPos");
 
         //Pass texture unit locations
         glUseProgram(modelShaderId);
         glUniform1i(textureSamplerId, 0);
-        glUniform1i(shadowMapId, 1);
+        glUniform1i(shadowCubeMapId, 1);
 
-        //Create depth map
-        glGenTextures(1, &depthMapId);
-        glBindTexture(GL_TEXTURE_2D, depthMapId);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, shadowWidth, shadowHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-        const float borderColour[] = {1.0f, 1.0f, 1.0f, 1.0f};
-        glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColour);
+        //Create depth cube map
+        glGenTextures(1, &depthCubeMapId);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubeMapId);
+        for (unsigned int i = 0; i < 6; i++) {
+          glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT,
+                       shadowWidth, shadowHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+        }
+
+        //Set depth texture parameters
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
         //Setup depth map framebuffer
         glGenFramebuffers(1, &depthMapFBO);
         glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMapId, 0);
+        glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthCubeMapId, 0);
         glDrawBuffer(GL_NONE);
         glReadBuffer(GL_NONE);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -257,25 +263,41 @@ namespace ammonite {
         frameCount = 0;
       }
 
-      static const float nearPlane = 0.0f, farPlane = 100.0f;
-      static const glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, nearPlane, farPlane);
+      glm::vec3 lightPos = glm::vec3(4.0f, 4.0f, 4.0f);
 
-      glm::mat4 lightView = glm::lookAt(glm::vec3(4.0f, 4.0f, 4.0f),
-                                  glm::vec3(0.0f),
-                                  glm::vec3(0.0f, 1.0f, 0.0f));
+      float const aspectRatio = float(shadowWidth) / float(shadowHeight);
+      const float nearPlane = 0.0f, farPlane = 25.0f;
+      glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), aspectRatio, nearPlane, farPlane);
+
+      //Transformations to cube map faces
+      std::vector<glm::mat4> shadowTransforms;
+      shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
+      shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
+      shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0)));
+      shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0)));
+      shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0)));
+      shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0)));
 
       //Calculate matrices used later
-      glm::mat4 lightSpaceMatrix = lightProjection * lightView;
       viewProjectionMatrix = *projectionMatrix * *viewMatrix;
 
       //Swap to depth shader and pass light space matrix
       glUseProgram(depthShaderId);
-      glUniformMatrix4fv(depthLightSpaceMatrixId, 1, GL_FALSE, &lightSpaceMatrix[0][0]);
 
       //Prepare to fill depth buffer
       glViewport(0, 0, shadowWidth, shadowHeight);
       glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
       glClear(GL_DEPTH_BUFFER_BIT);
+
+      //Pass shadow matrices to depth shader
+      for (int i = 0; i < 6; i++) {
+        GLuint shadowMatrixId = glGetUniformLocation(depthShaderId, std::string("shadowMatrices[" + std::to_string(i) + "]").c_str());
+        glUniformMatrix4fv(shadowMatrixId, 1, GL_FALSE, &(shadowTransforms[i])[0][0]);
+      }
+
+      //Pass depth shader uniforms
+      glUniform1f(depthFarPlaneId, farPlane);
+      glUniform3fv(depthLightPosId, 1, &lightPos[0]);
 
       //Render to depth buffer
       drawModels(modelIds, modelCount, true);
@@ -285,21 +307,21 @@ namespace ammonite {
       glViewport(0, 0, ammonite::settings::getWidth(), ammonite::settings::getHeight());
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-      //Prepare model shader, gamma correction and depth map
+      //Prepare model shader, gamma correction and depth cube map
       glUseProgram(modelShaderId);
       glEnable(GL_FRAMEBUFFER_SRGB);
       glActiveTexture(GL_TEXTURE1);
-      glBindTexture(GL_TEXTURE_2D, depthMapId);
+      glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubeMapId);
 
       //Pass ambient light and camera position to shader
       glm::vec3 ambientLight = ammonite::lighting::getAmbientLight();
       glm::vec3 cameraPosition = ammonite::camera::getPosition(ammonite::camera::getActiveCamera());
       glUniform3f(ambientLightId, ambientLight.x, ambientLight.y, ambientLight.z);
       glUniform3f(cameraPosId, cameraPosition.x, cameraPosition.y, cameraPosition.z);
+      glUniform1f(modelFarPlaneId, farPlane);
 
       //Pass matrices and render regular models
       glUniformMatrix4fv(viewMatrixId, 1, GL_FALSE, &(*viewMatrix)[0][0]);
-      glUniformMatrix4fv(lightSpaceMatrixId, 1, GL_FALSE, &lightSpaceMatrix[0][0]);
       drawModels(modelIds, modelCount, false);
 
       //Get information about light sources to be rendered

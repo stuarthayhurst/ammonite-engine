@@ -7,7 +7,6 @@ layout(location = 2) in vec3 inNormal;
 //Output fragment data, sent to fragment shader
 out FragmentDataOut {
   vec3 fragPos;
-  vec4 fragPos_lightspace;
   vec3 normal;
   vec2 texCoord;
 } fragData;
@@ -16,7 +15,6 @@ uniform mat4 MVP;
 uniform mat4 V;
 uniform mat4 M;
 uniform mat3 normalMatrix;
-uniform mat4 lightSpaceMatrix;
 
 void main() {
   //Position of the vertex, in worldspace
@@ -27,9 +25,6 @@ void main() {
 
   //Vertex texture coord
   fragData.texCoord = vertexTexCoord;
-
-  //Vertex position in light space
-  fragData.fragPos_lightspace = lightSpaceMatrix * vec4(fragData.fragPos, 1);
 
   //Output position of the vertex
   gl_Position = MVP * vec4(inPosition, 1);

@@ -26,7 +26,6 @@ layout(std430, binding = 0) buffer LightPropertiesBuffer {
 //Input fragment data, from vertex shader
 in FragmentDataOut {
   vec3 fragPos;
-  vec4 fragPos_lightspace;
   vec3 normal;
   vec2 texCoord;
 } fragData;
@@ -36,41 +35,41 @@ out vec3 outputColour;
 
 //Engine inputs
 uniform sampler2D textureSampler;
-uniform sampler2D shadowMap;
+uniform samplerCube shadowCubeMap;
 uniform mat4 V;
 uniform vec3 ambientLight;
 uniform vec3 cameraPos;
+uniform float farPlane;
 
-float calcShadow(vec4 fragPos_lightspace, vec3 normal, vec3 lightDir) {
-  //Perspective divide (range [-1, 1])
-  vec3 projCoords = fragPos_lightspace.xyz / fragPos_lightspace.w;
+vec3 sampleOffsets[20] = vec3[](
+  vec3(1, 1, 1), vec3(1, -1, 1), vec3(-1, -1, 1), vec3(-1, 1, 1),
+  vec3(1, 1, -1), vec3(1, -1, -1), vec3(-1, -1, -1), vec3(-1, 1, -1),
+  vec3(1, 1, 0), vec3(1, -1, 0), vec3(-1, -1, 0), vec3(-1, 1, 0),
+  vec3(1, 0, 1), vec3(-1, 0, 1), vec3(1, 0, -1), vec3(-1, 0, -1),
+  vec3(0, 1, 1), vec3(0, -1, 1), vec3(0, -1, -1), vec3(0, 1, -1)
+);
 
-  //Shift to within [0, 1]
-  projCoords = projCoords * 0.5 + 0.5;
+float calcShadow(vec3 fragPos, vec3 lightPos) {
+  //Get depth of current fragment
+  vec3 lightToFrag = fragPos - lightPos;
+  float currentDepth = length(lightToFrag);
 
-  //Get depth of current fragment from light's perspective
-  float currentDepth = projCoords.z;
+  float shadow = 0.0f;
+  float bias = 0.15f;
+  int samples = 20;
+  float diskRadius = 0.005f;
 
-  //Check whether fragment is in shadow
-  float shadow = 0.0;
-  float bias = max(0.005 * (1.0 - dot(normal, lightDir)), 0.0005);
-  vec2 texelSize = 1.0 / textureSize(shadowMap, 0);
-  for (int x = -1; x <= 1; ++x) {
-    for (int y = -1; y <= 1; ++y) {
-      float pcfDepth = texture(shadowMap, projCoords.xy + vec2(x, y) * texelSize).r;
-      if (currentDepth - bias > pcfDepth) {
-        shadow += 1.0;
-      }
+  for (int i = 0; i < samples; i++) {
+    //Get depth of closest fragment (convert from [0, 1])
+    float closestDepth = texture(shadowCubeMap, lightToFrag + sampleOffsets[i] * diskRadius).r;
+    closestDepth *= farPlane;
+
+    if (currentDepth - bias > closestDepth) {
+      shadow += 1.0;
     }
   }
-  shadow /= 9.0;
 
-  //No shadow outside of calculated area
-  if (projCoords.z > 1.0) {
-    shadow = 0.0;
-  }
-
-  return shadow;
+  return shadow / float(samples);
 }
 
 vec3 calcLight(LightSource lightSource, vec3 normal, vec3 fragPos, vec3 lightDir) {
@@ -113,7 +112,7 @@ void main() {
     vec3 lightDir = normalize(lightSource.geometry - fragData.fragPos);
 
     //Final contribution from the current light source
-    shadow = calcShadow(fragData.fragPos_lightspace, fragData.normal, lightDir);
+    shadow = calcShadow(fragData.fragPos, lightSource.geometry);
     lightColour += calcLight(lightSource, fragData.normal, fragData.fragPos, lightDir);
   }
 
