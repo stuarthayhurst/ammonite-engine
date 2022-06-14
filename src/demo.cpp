@@ -61,10 +61,10 @@ int main(int argc, char* argv[]) {
   ammonite::utils::controls::setupControls(window);
 
   //Set vsync (disable if benchmarking)
-  if (useVsync == "false" or useBenchmark == true) {
-    ammonite::windowManager::settings::useVsync(false);
+  if (useVsync == "false" or useBenchmark) {
+    ammonite::settings::graphics::setVsync(false);
   } else if (useVsync == "true") {
-    ammonite::windowManager::settings::useVsync(true);
+    ammonite::settings::graphics::setVsync(true);
   }
 
 #ifdef DEBUG

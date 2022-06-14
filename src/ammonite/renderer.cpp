@@ -6,7 +6,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include "internal/sharedSettings.hpp"
+#include "internal/runtimeSettings.hpp"
 #include "internal/modelTracker.hpp"
 #include "internal/lightTracker.hpp"
 #include "internal/cameraMatrices.hpp"
@@ -302,7 +302,7 @@ namespace ammonite {
 
       //Reset the framebuffer, viewport and canvas
       glBindFramebuffer(GL_FRAMEBUFFER, 0);
-      glViewport(0, 0, ammonite::settings::getWidth(), ammonite::settings::getHeight());
+      glViewport(0, 0, ammonite::settings::runtime::getWidth(), ammonite::settings::runtime::getHeight());
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
       //Prepare model shader, gamma correction and depth cube map

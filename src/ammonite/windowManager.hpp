@@ -5,11 +5,6 @@
 
 namespace ammonite {
   namespace windowManager {
-    namespace settings {
-      void useVsync(bool enabled);
-      bool isVsyncEnabled();
-    }
-
     namespace setup {
       bool setupGlfw(int antialiasing);
       bool setupGlew(GLFWwindow* window);

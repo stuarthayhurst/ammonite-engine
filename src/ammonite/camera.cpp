@@ -4,7 +4,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/constants.hpp>
 
-#include "internal/sharedSettings.hpp"
+#include "internal/runtimeSettings.hpp"
 
 #ifdef DEBUG
   #include <iostream>
@@ -23,7 +23,7 @@ namespace ammonite {
       //View and projection matrices
       glm::mat4 viewMatrix;
       glm::mat4 projectionMatrix;
-      float* aspectRatio = ammonite::settings::getAspectRatioPtr();
+      float* aspectRatio = ammonite::settings::runtime::getAspectRatioPtr();
 
       //Create map to track cameras, with default camera
       int totalCameras = 1;

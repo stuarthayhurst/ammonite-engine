@@ -8,31 +8,19 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include "internal/sharedSettings.hpp"
+#include "internal/runtimeSettings.hpp"
 
 namespace ammonite {
   namespace windowManager {
     namespace {
-      //Window and settings
+      //Window pointer
       GLFWwindow* window;
-      bool vsyncEnabled = true;
 
       //Callback to update height, width and viewport size on window resize
       static void window_size_callback(GLFWwindow*, int width, int height) {
-        ammonite::settings::setWidth(width);
-        ammonite::settings::setHeight(height);
+        ammonite::settings::runtime::setWidth(width);
+        ammonite::settings::runtime::setHeight(height);
         glViewport(0, 0, width, height);
-      }
-    }
-
-    namespace settings {
-      void useVsync(bool enabled) {
-        glfwSwapInterval(int(enabled));
-        vsyncEnabled = enabled;
-      }
-
-      bool isVsyncEnabled() {
-        return vsyncEnabled;
       }
     }
 
@@ -98,8 +86,8 @@ namespace ammonite {
     //Create a window and a pointer
     GLFWwindow* createWindow(int width, int height) {
       //Set initial size
-      ammonite::settings::setWidth(width);
-      ammonite::settings::setHeight(height);
+      ammonite::settings::runtime::setWidth(width);
+      ammonite::settings::runtime::setHeight(height);
 
       window = glfwCreateWindow(width, height, "Ammonite Window", NULL, NULL);
       if (window == NULL) {
