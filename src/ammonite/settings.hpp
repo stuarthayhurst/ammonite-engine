@@ -6,8 +6,8 @@ namespace ammonite {
     namespace graphics {
       void setVsync(bool enabled);
       bool getVsync();
-      void setFrameTarget(float frameTarget);
-      float getFrameTarget();
+      void setFrameLimit(float frameTarget);
+      float getFrameLimit();
     }
   }
 }

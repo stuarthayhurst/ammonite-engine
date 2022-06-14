@@ -355,8 +355,8 @@ namespace ammonite {
 
       //Sleep until target frame time is met, if not 0
       static ammonite::utils::Timer targetFrameTimer;
-      if (ammonite::settings::graphics::getFrameTarget() != 0.0f) {
-        float targetFrameTime = 1 / ammonite::settings::graphics::getFrameTarget();
+      if (ammonite::settings::graphics::getFrameLimit() != 0.0f) {
+        float targetFrameTime = 1 / ammonite::settings::graphics::getFrameLimit();
         float spareTime = targetFrameTime - targetFrameTimer.getTime();
         std::this_thread::sleep_for(std::chrono::microseconds(int(spareTime * 1000000.0f)));
       }
