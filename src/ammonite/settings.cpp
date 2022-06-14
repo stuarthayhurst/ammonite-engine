@@ -6,6 +6,7 @@ namespace ammonite {
       namespace {
         struct GraphicsSettings {
           bool vsyncEnabled = true;
+          float frameTarget = 0.0f;
         } graphics;
       }
 
@@ -16,6 +17,14 @@ namespace ammonite {
 
       bool getVsync() {
         return graphics.vsyncEnabled;
+      }
+
+      void setFrameTarget(float frameTarget) {
+        graphics.frameTarget = frameTarget;
+      }
+
+      float getFrameTarget() {
+        return graphics.frameTarget;
       }
     }
   }

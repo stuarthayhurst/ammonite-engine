@@ -1,6 +1,8 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <chrono>
+#include <thread>
 
 #include <glm/glm.hpp>
 #include <GL/glew.h>
@@ -10,9 +12,12 @@
 #include "internal/modelTracker.hpp"
 #include "internal/lightTracker.hpp"
 #include "internal/cameraMatrices.hpp"
+
+#include "settings.hpp"
 #include "shaders.hpp"
 #include "camera.hpp"
 #include "lightManager.hpp"
+
 #include "utils/timer.hpp"
 #include "utils/extension.hpp"
 
@@ -347,6 +352,15 @@ namespace ammonite {
 
       //Swap buffers
       glfwSwapBuffers(window);
+
+      //Sleep until target frame time is met, if not 0
+      static ammonite::utils::Timer targetFrameTimer;
+      if (ammonite::settings::graphics::getFrameTarget() != 0.0f) {
+        float targetFrameTime = 1 / ammonite::settings::graphics::getFrameTarget();
+        float spareTime = targetFrameTime - targetFrameTimer.getTime();
+        std::this_thread::sleep_for(std::chrono::microseconds(int(spareTime * 1000000.0f)));
+      }
+      targetFrameTimer.reset();
     }
   }
 }
