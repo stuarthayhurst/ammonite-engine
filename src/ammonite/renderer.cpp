@@ -358,7 +358,9 @@ namespace ammonite {
       if (ammonite::settings::graphics::getFrameLimit() != 0.0f) {
         double targetFrameTime = 1.0 / ammonite::settings::graphics::getFrameLimit();
         double spareTime = targetFrameTime - targetFrameTimer.getTime();
-        std::this_thread::sleep_for(std::chrono::nanoseconds(int(std::floor(spareTime * 1000000000.0))));
+        if (spareTime > 0.0) {
+          std::this_thread::sleep_for(std::chrono::nanoseconds(int(std::floor(spareTime * 1000000000.0))));
+        }
       }
       targetFrameTimer.reset();
     }
