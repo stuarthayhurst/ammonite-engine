@@ -4,16 +4,18 @@ namespace ammonite {
   namespace settings {
     namespace graphics {
       namespace {
-        bool vsyncEnabled = true;
+        struct GraphicsSettings {
+          bool vsyncEnabled = true;
+        } graphics;
       }
 
       void setVsync(bool enabled) {
         glfwSwapInterval(int(enabled));
-        vsyncEnabled = enabled;
+        graphics.vsyncEnabled = enabled;
       }
 
       bool getVsync() {
-        return vsyncEnabled;
+        return graphics.vsyncEnabled;
       }
     }
   }
