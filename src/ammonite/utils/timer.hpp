@@ -33,7 +33,6 @@ namespace ammonite {
         }
 
         void reset() {
-          running = true;
           start = getTimeDelta();
           stopTime = 0.0;
           offset = 0.0;
