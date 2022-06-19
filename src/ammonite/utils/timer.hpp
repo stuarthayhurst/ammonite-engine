@@ -32,6 +32,10 @@ namespace ammonite {
           }
         }
 
+        bool isRunning() {
+          return running;
+        }
+
         void reset() {
           start = getTimeDelta();
           stopTime = 0.0;
