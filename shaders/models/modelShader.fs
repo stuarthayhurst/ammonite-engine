@@ -96,7 +96,6 @@ void main() {
   //Base colour of the fragment
   vec3 materialColour = texture(textureSampler, fragData.texCoord).rgb;
   vec3 lightColour = vec3(0.0f, 0.0f, 0.0f);
-  float shadow = 0.0f;
 
   //Calculate lighting influence from each light source
   LightSource lightSource;
@@ -111,10 +110,11 @@ void main() {
     vec3 lightDir = normalize(lightSource.geometry - fragData.fragPos);
 
     //Final contribution from the current light source
-    shadow = calcShadow(fragData.fragPos, lightSource.geometry);
-    lightColour += calcLight(lightSource, fragData.normal, fragData.fragPos, lightDir);
+    float shadow = calcShadow(fragData.fragPos, lightSource.geometry);
+    vec3 light = calcLight(lightSource, fragData.normal, fragData.fragPos, lightDir);
+    lightColour += (1.0 - shadow) * light;
   }
 
   //Final fragment colour, from ambient, diffuse, specular and shadow components
-  outputColour = (ambientLight + ((1.0 - shadow) * lightColour)) * materialColour;
+  outputColour = (ambientLight + lightColour) * materialColour;
 }
