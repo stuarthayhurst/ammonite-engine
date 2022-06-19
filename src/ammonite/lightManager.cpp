@@ -57,6 +57,10 @@ namespace ammonite {
       }
     }
 
+    std::map<int, LightSource>* getLightTracker() {
+      return &lightTrackerMap;
+    }
+
     //Unlink a light source from a model, using only the model ID (doesn't touch the model)
     void unlinkByModel(int modelId) {
       //Check if the model has already been linked to
@@ -105,25 +109,23 @@ namespace ammonite {
         //Repacking light sources
         auto lightIt = lightTrackerMap.begin();
         std::advance(lightIt, i);
-        auto lightSource = lightIt->second;
-
-        shaderData[i].colour = glm::vec4(lightSource.colour, 0);
-        shaderData[i].diffuse = glm::vec4(lightSource.diffuse, 0);
-        shaderData[i].specular = glm::vec4(lightSource.specular, 0);
-        shaderData[i].power[0] = lightSource.power;
+        auto lightSource = &lightIt->second;
 
         //Override position for light emitting models, and add to tracker
-        if (lightSource.modelId != -1) {
-          //Override light position
-          glm::vec3 modelPosition = ammonite::models::position::getPosition(lightSource.modelId);
-          shaderData[i].geometry = glm::vec4(modelPosition, 0);
+        if (lightSource->modelId != -1) {
+          //Override light position, using linked model
+          lightSource->geometry = ammonite::models::position::getPosition(lightSource->modelId);
 
           //Add to tracker
-          lightEmitterData.push_back(lightSource.modelId);
+          lightEmitterData.push_back(lightSource->modelId);
           lightEmitterData.push_back(i);
-        } else {
-          shaderData[i].geometry = glm::vec4(lightSource.geometry, 0);
         }
+
+        shaderData[i].geometry = glm::vec4(lightSource->geometry, 0);
+        shaderData[i].colour = glm::vec4(lightSource->colour, 0);
+        shaderData[i].diffuse = glm::vec4(lightSource->diffuse, 0);
+        shaderData[i].specular = glm::vec4(lightSource->specular, 0);
+        shaderData[i].power[0] = lightSource->power;
       }
 
       //If no lights remain, unbind and return early

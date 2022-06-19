@@ -1,6 +1,7 @@
 #ifndef INTERNALLIGHTS
 #define INTERNALLIGHTS
 
+#include <map>
 #include <vector>
 #include <glm/glm.hpp>
 
@@ -19,6 +20,8 @@ namespace ammonite {
     void unlinkByModel(int modelId);
     LightSource* getLightSourcePtr(int lightId);
     void getLightEmitters(int* lightCount, std::vector<int>* lightData);
+
+    std::map<int, LightSource>* getLightTracker();
   }
 }
 

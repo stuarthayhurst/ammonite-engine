@@ -1,4 +1,5 @@
 #include <iostream>
+#include <map>
 #include <vector>
 #include <string>
 #include <chrono>
@@ -56,6 +57,9 @@ namespace ammonite {
 
       glm::mat4* viewMatrix = ammonite::camera::matrices::getViewMatrixPtr();
       glm::mat4* projectionMatrix = ammonite::camera::matrices::getProjectionMatrixPtr();
+
+      //Get the light tracker
+      std::map<int, ammonite::lighting::LightSource>* lightTrackerMap = ammonite::lighting::getLightTracker();
 
       //View projection combined matrix
       glm::mat4 viewProjectionMatrix;
@@ -266,44 +270,47 @@ namespace ammonite {
         frameCount = 0;
       }
 
-      glm::vec3 lightPos = glm::vec3(4.0f, 4.0f, 4.0f);
+      //Swap to depth shader
+      glUseProgram(depthShaderId);
+      glViewport(0, 0, shadowWidth, shadowHeight);
 
       float const aspectRatio = float(shadowWidth) / float(shadowHeight);
       const float nearPlane = 0.0f, farPlane = 25.0f;
       glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), aspectRatio, nearPlane, farPlane);
 
-      //Transformations to cube map faces
-      std::vector<glm::mat4> shadowTransforms;
-      shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
-      shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
-      shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0)));
-      shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0)));
-      shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0)));
-      shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0)));
+      auto lightIt = lightTrackerMap->begin();
+      for (unsigned int shadowCount = 0; shadowCount < lightTrackerMap->size(); shadowCount++) {
+        //Prepare to fill depth buffer
+        glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+        glClear(GL_DEPTH_BUFFER_BIT);
 
-      //Calculate matrices used later
-      viewProjectionMatrix = *projectionMatrix * *viewMatrix;
+        //Get light source and position from tracker
+        auto lightSource = lightIt->second;
+        glm::vec3 lightPos = lightSource.geometry;
 
-      //Swap to depth shader and pass light space matrix
-      glUseProgram(depthShaderId);
+        //Transformations to cube map faces
+        std::vector<glm::mat4> shadowTransforms;
+        shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
+        shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
+        shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0)));
+        shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0)));
+        shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0)));
+        shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0)));
 
-      //Prepare to fill depth buffer
-      glViewport(0, 0, shadowWidth, shadowHeight);
-      glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-      glClear(GL_DEPTH_BUFFER_BIT);
+        //Pass shadow matrices to depth shader
+        for (int i = 0; i < 6; i++) {
+          GLuint shadowMatrixId = glGetUniformLocation(depthShaderId, std::string("shadowMatrices[" + std::to_string(i) + "]").c_str());
+          glUniformMatrix4fv(shadowMatrixId, 1, GL_FALSE, &(shadowTransforms[i])[0][0]);
+        }
 
-      //Pass shadow matrices to depth shader
-      for (int i = 0; i < 6; i++) {
-        GLuint shadowMatrixId = glGetUniformLocation(depthShaderId, std::string("shadowMatrices[" + std::to_string(i) + "]").c_str());
-        glUniformMatrix4fv(shadowMatrixId, 1, GL_FALSE, &(shadowTransforms[i])[0][0]);
+        //Pass depth shader uniforms
+        glUniform1f(depthFarPlaneId, farPlane);
+        glUniform3fv(depthLightPosId, 1, &lightPos[0]);
+
+        //Render to depth buffer and move to the next light source
+        drawModels(modelIds, modelCount, true);
+        std::advance(lightIt, 1);
       }
-
-      //Pass depth shader uniforms
-      glUniform1f(depthFarPlaneId, farPlane);
-      glUniform3fv(depthLightPosId, 1, &lightPos[0]);
-
-      //Render to depth buffer
-      drawModels(modelIds, modelCount, true);
 
       //Reset the framebuffer, viewport and canvas
       glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -315,6 +322,9 @@ namespace ammonite {
       glEnable(GL_FRAMEBUFFER_SRGB);
       glActiveTexture(GL_TEXTURE1);
       glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubeMapId);
+
+      //Calculate view projection matrix
+      viewProjectionMatrix = *projectionMatrix * *viewMatrix;
 
       //Get ambient light and camera position
       glm::vec3 ambientLight = ammonite::lighting::getAmbientLight();
