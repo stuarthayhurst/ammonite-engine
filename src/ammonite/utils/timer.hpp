@@ -31,11 +31,12 @@ namespace ammonite {
             return stopTime - start - offset;
           }
         }
+
         void reset() {
           running = true;
           start = getTimeDelta();
-          stopTime = 0.0f;
-          offset = 0.0f;
+          stopTime = 0.0;
+          offset = 0.0;
         }
 
         void pause() {
@@ -44,17 +45,19 @@ namespace ammonite {
             running = false;
           }
         }
+
         void unpause() {
           if (!running) {
             offset += getTimeDelta() - stopTime;
             running = true;
           }
         }
+
       private:
         bool running = true;
         double start = getTimeDelta();
-        double stopTime = 0.0f;
-        double offset = 0.0f;
+        double stopTime = 0.0;
+        double offset = 0.0;
     };
   }
 }
