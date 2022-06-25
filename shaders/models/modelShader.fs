@@ -35,7 +35,7 @@ out vec3 outputColour;
 
 //Engine inputs
 uniform sampler2D textureSampler;
-uniform samplerCube shadowCubeMap;
+uniform samplerCubeArray shadowCubeMap;
 uniform vec3 ambientLight;
 uniform vec3 cameraPos;
 uniform float farPlane;
@@ -48,7 +48,7 @@ vec3 sampleOffsets[20] = vec3[](
   vec3(0, 1, 1), vec3(0, -1, 1), vec3(0, -1, -1), vec3(0, 1, -1)
 );
 
-float calcShadow(vec3 fragPos, vec3 lightPos) {
+float calcShadow(int layer, vec3 fragPos, vec3 lightPos) {
   //Get depth of current fragment
   vec3 lightToFrag = fragPos - lightPos;
   float currentDepth = length(lightToFrag);
@@ -60,7 +60,7 @@ float calcShadow(vec3 fragPos, vec3 lightPos) {
 
   for (int i = 0; i < samples; i++) {
     //Get depth of closest fragment (convert from [0, 1])
-    float closestDepth = texture(shadowCubeMap, lightToFrag + sampleOffsets[i] * diskRadius).r;
+    float closestDepth = texture(shadowCubeMap, vec4(lightToFrag + sampleOffsets[i] * diskRadius, layer)).r;
     closestDepth *= farPlane;
 
     if (currentDepth - bias > closestDepth) {
@@ -110,7 +110,7 @@ void main() {
     vec3 lightDir = normalize(lightSource.geometry - fragData.fragPos);
 
     //Final contribution from the current light source
-    float shadow = calcShadow(fragData.fragPos, lightSource.geometry);
+    float shadow = calcShadow(i, fragData.fragPos, lightSource.geometry);
     vec3 light = calcLight(lightSource, fragData.normal, fragData.fragPos, lightDir);
     lightColour += (1.0 - shadow) * light;
   }

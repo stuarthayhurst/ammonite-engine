@@ -7,6 +7,7 @@ namespace ammonite {
         struct GraphicsSettings {
           bool vsyncEnabled = true;
           float frameLimit = 0.0f;
+          int shadowRes = 1024;
         } graphics;
       }
 
@@ -25,6 +26,14 @@ namespace ammonite {
 
       float getFrameLimit() {
         return graphics.frameLimit;
+      }
+
+      void setShadowRes(int shadowRes) {
+        graphics.shadowRes = shadowRes;
+      }
+
+      int getShadowRes() {
+        return graphics.shadowRes;
       }
     }
   }

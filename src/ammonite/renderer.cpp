@@ -46,10 +46,10 @@ namespace ammonite {
       GLuint depthModelMatrixId;
       GLuint depthFarPlaneId;
       GLuint depthLightPosId;
+      GLuint depthShadowIndex;
 
-      GLuint depthCubeMapId;
+      GLuint depthCubeMapId = 0;
       GLuint depthMapFBO;
-      unsigned int shadowWidth = 1024, shadowHeight = 1024;
 
       long totalFrames = 0;
       int frameCount = 0;
@@ -134,31 +134,16 @@ namespace ammonite {
         depthModelMatrixId = glGetUniformLocation(depthShaderId, "modelMatrix");
         depthFarPlaneId = glGetUniformLocation(depthShaderId, "farPlane");
         depthLightPosId = glGetUniformLocation(depthShaderId, "lightPos");
+        depthShadowIndex = glGetUniformLocation(depthShaderId, "shadowMapIndex");
 
         //Pass texture unit locations
         glUseProgram(modelShaderId);
         glUniform1i(textureSamplerId, 0);
         glUniform1i(shadowCubeMapId, 1);
 
-        //Create depth cube map
-        glGenTextures(1, &depthCubeMapId);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubeMapId);
-        for (unsigned int i = 0; i < 6; i++) {
-          glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT,
-                       shadowWidth, shadowHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-        }
-
-        //Set depth texture parameters
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-
         //Setup depth map framebuffer
         glGenFramebuffers(1, &depthMapFBO);
         glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-        glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthCubeMapId, 0);
         glDrawBuffer(GL_NONE);
         glReadBuffer(GL_NONE);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -270,23 +255,63 @@ namespace ammonite {
         frameCount = 0;
       }
 
+      //Get shadow resolution and light count, save for next time to avoid cubemap recreation
+      int shadowRes = ammonite::settings::graphics::getShadowRes();
+      static int lastShadowRes = 0;
+      unsigned int lightCount = lightTrackerMap->size();
+      static unsigned int lastLightCount = 0;
+
+      //If number of lights or shadow resolution changes, recreate cubemap
+      if ((shadowRes != lastShadowRes) or (lightCount != lastLightCount)) {
+        //Delete the cubemap array if it already exists
+        if (depthCubeMapId != 0) {
+          glDeleteTextures(1, &depthCubeMapId);
+        }
+
+        //Create a cubemap for shadows
+        glGenTextures(1, &depthCubeMapId);
+        glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, depthCubeMapId);
+
+        //Create 6 faces for each light source
+        glTexStorage3D(GL_TEXTURE_CUBE_MAP_ARRAY, 1, GL_DEPTH_COMPONENT24, shadowRes, shadowRes, lightCount * 6);
+
+        //Set depth texture parameters
+        glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+        //Save for next time to avoid cubemap recreation
+        lastShadowRes = shadowRes;
+        lastLightCount = lightCount;
+      }
+
       //Swap to depth shader
       glUseProgram(depthShaderId);
-      glViewport(0, 0, shadowWidth, shadowHeight);
+      glViewport(0, 0, shadowRes, shadowRes);
+      glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
 
-      float const aspectRatio = float(shadowWidth) / float(shadowHeight);
       const float nearPlane = 0.0f, farPlane = 25.0f;
-      glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), aspectRatio, nearPlane, farPlane);
+      glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), 1.0f, nearPlane, farPlane);
+
+      //Pass uniforms that don't change between light source
+      glUniform1f(depthFarPlaneId, farPlane);
+
+      //Attach cubemap array to framebuffer and clear existing depths
+      glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthCubeMapId, 0);
+      glClear(GL_DEPTH_BUFFER_BIT);
 
       auto lightIt = lightTrackerMap->begin();
-      for (unsigned int shadowCount = 0; shadowCount < lightTrackerMap->size(); shadowCount++) {
-        //Prepare to fill depth buffer
-        glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-        glClear(GL_DEPTH_BUFFER_BIT);
-
+      for (unsigned int shadowCount = 0; shadowCount < lightCount; shadowCount++) {
         //Get light source and position from tracker
         auto lightSource = lightIt->second;
         glm::vec3 lightPos = lightSource.geometry;
+
+        //Check framebuffer status
+        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+          std::cerr << "Incomplete framebuffer" << std::endl;
+        }
 
         //Transformations to cube map faces
         std::vector<glm::mat4> shadowTransforms;
@@ -303,9 +328,9 @@ namespace ammonite {
           glUniformMatrix4fv(shadowMatrixId, 1, GL_FALSE, &(shadowTransforms[i])[0][0]);
         }
 
-        //Pass depth shader uniforms
-        glUniform1f(depthFarPlaneId, farPlane);
+        //Pass light source specific uniforms
         glUniform3fv(depthLightPosId, 1, &lightPos[0]);
+        glUniform1i(depthShadowIndex, shadowCount);
 
         //Render to depth buffer and move to the next light source
         drawModels(modelIds, modelCount, true);
@@ -321,7 +346,7 @@ namespace ammonite {
       glUseProgram(modelShaderId);
       glEnable(GL_FRAMEBUFFER_SRGB);
       glActiveTexture(GL_TEXTURE1);
-      glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubeMapId);
+      glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, depthCubeMapId);
 
       //Calculate view projection matrix
       viewProjectionMatrix = *projectionMatrix * *viewMatrix;
@@ -337,16 +362,16 @@ namespace ammonite {
       drawModels(modelIds, modelCount, false);
 
       //Get information about light sources to be rendered
-      int lightCount;
+      int lightEmitterCount;
       std::vector<int> lightData;
-      ammonite::lighting::getLightEmitters(&lightCount, &lightData);
+      ammonite::lighting::getLightEmitters(&lightEmitterCount, &lightData);
 
       //Swap to the light emitting model shader
-      if (lightCount > 0) {
+      if (lightEmitterCount > 0) {
         glUseProgram(lightShaderId);
 
         //Draw light sources with models attached
-        for (int i = 0; i < lightCount; i++) {
+        for (int i = 0; i < lightEmitterCount; i++) {
           int modelId = lightData[(i * 2)];
           int lightIndex = lightData[(i * 2) + 1];
           ammonite::models::InternalModel* modelPtr = ammonite::models::getModelPtr(modelId);

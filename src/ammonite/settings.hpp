@@ -8,6 +8,8 @@ namespace ammonite {
       bool getVsync();
       void setFrameLimit(float frameTarget);
       float getFrameLimit();
+      void setShadowRes(int shadowRes);
+      int getShadowRes();
     }
   }
 }
