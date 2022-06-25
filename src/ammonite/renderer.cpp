@@ -264,7 +264,7 @@ namespace ammonite {
       static ammonite::utils::Timer frameTimer;
       double deltaTime = frameTimer.getTime();
       if (deltaTime >= 0.1f) {
-        frameTime = (deltaTime) / frameCount;
+        frameTime = deltaTime / frameCount;
         frameTimer.reset();
         frameCount = 0;
       }
