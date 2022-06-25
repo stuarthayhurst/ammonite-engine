@@ -105,7 +105,7 @@ int main(int argc, char* argv[]) {
   modelCount += 1;
 
   //Example translation, scale and rotation
-  ammonite::models::position::translateModel(loadedModelIds[0], glm::vec3(-1.0f, 0.0f, 0.0f));
+  ammonite::models::position::translateModel(loadedModelIds[0], glm::vec3(-2.0f, 0.0f, 0.0f));
   ammonite::models::position::scaleModel(loadedModelIds[0], 0.8f);
   ammonite::models::position::rotateModel(loadedModelIds[0], glm::vec3(0.0f, 0.0f, 0.0f));
 
