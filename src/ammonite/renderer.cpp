@@ -76,6 +76,20 @@ namespace ammonite {
           *failureCount += 1;
         }
 
+        //Check texture storage is supported
+        if (!ammonite::utils::checkExtension("GL_ARB_texture_storage", "GL_VERSION_4_2")) {
+          std::cerr << "Texture storage unsupported" << std::endl;
+          success = false;
+          *failureCount += 1;
+        }
+
+        //Check cubemap arrays are supported
+        if (!ammonite::utils::checkExtension("GL_ARB_texture_cube_map_array", "GL_VERSION_4_0")) {
+          std::cerr << "Cubemap arrays unsupported" << std::endl;
+          success = false;
+          *failureCount += 1;
+        }
+
         //Check minimum OpenGL version is supported
         if (!glewIsSupported("GL_VERSION_3_2")) {
           std::cerr << "OpenGL 3.2 unsupported" << std::endl;
