@@ -230,7 +230,7 @@ namespace ammonite {
 
         //Draw the triangles
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, drawObjectData->elementBufferId);
-        glDrawElements(mode, drawObjectData->vertexCount, GL_UNSIGNED_INT, (void*)0);
+        glDrawElements(mode, drawObjectData->vertexCount, GL_UNSIGNED_INT, nullptr);
       }
     }
 
