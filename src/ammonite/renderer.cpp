@@ -116,16 +116,13 @@ namespace ammonite {
 
         //Create shaders
         std::string shaderLocation;
-        shaderLocation = shaderPath;
-        shaderLocation += "models/";
+        shaderLocation = std::string(shaderPath) + std::string("models/");
         modelShaderId = ammonite::shaders::loadDirectory(shaderLocation.c_str(), externalSuccess);
 
-        shaderLocation = shaderPath;
-        shaderLocation += "lights/";
+        shaderLocation = std::string(shaderPath) + std::string("lights/");
         lightShaderId = ammonite::shaders::loadDirectory(shaderLocation.c_str(), externalSuccess);
 
-        shaderLocation = shaderPath;
-        shaderLocation += "depth/";
+        shaderLocation = std::string(shaderPath) + std::string("depth/");
         depthShaderId = ammonite::shaders::loadDirectory(shaderLocation.c_str(), externalSuccess);
 
         if (!*externalSuccess) {
