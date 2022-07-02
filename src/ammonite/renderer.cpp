@@ -153,11 +153,9 @@ namespace ammonite {
         glUniform1i(shadowCubeMapId, 1);
 
         //Setup depth map framebuffer
-        glGenFramebuffers(1, &depthMapFBO);
-        glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-        glDrawBuffer(GL_NONE);
-        glReadBuffer(GL_NONE);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glCreateFramebuffers(1, &depthMapFBO);
+        glNamedFramebufferDrawBuffer(depthMapFBO, GL_NONE);
+        glNamedFramebufferReadBuffer(depthMapFBO, GL_NONE);
 
         //Enable culling triangles and depth testing (only show fragments closer than the previous)
         glEnable(GL_CULL_FACE);
@@ -226,7 +224,6 @@ namespace ammonite {
         }
 
         //Draw the triangles
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, drawObjectData->elementBufferId);
         glDrawElements(mode, drawObjectData->vertexCount, GL_UNSIGNED_INT, nullptr);
       }
     }
@@ -310,7 +307,7 @@ namespace ammonite {
       glUniform1f(depthFarPlaneId, farPlane);
 
       //Attach cubemap array to framebuffer and clear existing depths
-      glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthCubeMapId, 0);
+      glNamedFramebufferTexture(depthMapFBO, GL_DEPTH_ATTACHMENT, depthCubeMapId, 0);
       glClear(GL_DEPTH_BUFFER_BIT);
 
       auto lightIt = lightTrackerMap->begin();
@@ -320,7 +317,7 @@ namespace ammonite {
         glm::vec3 lightPos = lightSource.geometry;
 
         //Check framebuffer status
-        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+        if (glCheckNamedFramebufferStatus(depthMapFBO, GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
           std::cerr << "Incomplete framebuffer" << std::endl;
         }
 

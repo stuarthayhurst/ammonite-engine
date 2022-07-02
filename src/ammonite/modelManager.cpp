@@ -48,32 +48,41 @@ namespace ammonite {
     }
 
     static void createBuffers(models::MeshData* modelObjectData) {
-      //Create and fill interleaved vertex + texture + normal buffer
-      glGenBuffers(1, &modelObjectData->vertexBufferId);
-      glBindBuffer(GL_ARRAY_BUFFER, modelObjectData->vertexBufferId);
-      glBufferData(GL_ARRAY_BUFFER, modelObjectData->modelData.size() * sizeof(models::VertexData), &modelObjectData->modelData[0], GL_STATIC_DRAW);
+      //Create and fill interleaved vertex + normal + texture buffer
+      glCreateBuffers(1, &modelObjectData->vertexBufferId);
+      glNamedBufferData(modelObjectData->vertexBufferId, modelObjectData->modelData.size() * sizeof(models::VertexData), &modelObjectData->modelData[0], GL_STATIC_DRAW);
 
       //Create and fill an indices buffer
-      glGenBuffers(1, &modelObjectData->elementBufferId);
-      glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelObjectData->elementBufferId);
-      glBufferData(GL_ELEMENT_ARRAY_BUFFER, modelObjectData->indices.size() * sizeof(unsigned int), &modelObjectData->indices[0], GL_STATIC_DRAW);
+      glCreateBuffers(1, &modelObjectData->elementBufferId);
+      glNamedBufferData(modelObjectData->elementBufferId, modelObjectData->indices.size() * sizeof(unsigned int), &modelObjectData->indices[0], GL_STATIC_DRAW);
 
       //Create the vertex attribute buffer
-      glGenVertexArrays(1, &modelObjectData->vertexArrayId);
-      glBindVertexArray(modelObjectData->vertexArrayId);
-      glBindBuffer(GL_ARRAY_BUFFER, modelObjectData->vertexBufferId);
+      glCreateVertexArrays(1, &modelObjectData->vertexArrayId);
+
+      GLuint vaoId = modelObjectData->vertexArrayId;
+      GLuint vboId = modelObjectData->vertexBufferId;
+      int stride = 8 * sizeof(float); //(3 + 3 + 2) * bytes per float
 
       //Vertex attribute
-      glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(0));
-      glEnableVertexAttribArray(0);
+      glEnableVertexArrayAttrib(vaoId, 0);
+      glVertexArrayVertexBuffer(vaoId, 0, vboId, 0, stride);
+      glVertexArrayAttribFormat(vaoId, 0, 3, GL_FLOAT, GL_FALSE, 0);
+      glVertexArrayAttribBinding(vaoId, 0, 0);
 
       //Normal attribute
-      glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-      glEnableVertexAttribArray(1);
+      glEnableVertexArrayAttrib(vaoId, 1);
+      glVertexArrayVertexBuffer(vaoId, 1, vboId, 3 * sizeof(float), stride);
+      glVertexArrayAttribFormat(vaoId, 1, 3, GL_FLOAT, GL_FALSE, 0);
+      glVertexArrayAttribBinding(vaoId, 1, 1);
 
       //Texture attribute
-      glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-      glEnableVertexAttribArray(2);
+      glEnableVertexArrayAttrib(vaoId, 2);
+      glVertexArrayVertexBuffer(vaoId, 2, vboId, 6 * sizeof(float), stride);
+      glVertexArrayAttribFormat(vaoId, 2, 2, GL_FLOAT, GL_FALSE, 0);
+      glVertexArrayAttribBinding(vaoId, 2, 2);
+
+      //Element buffer
+      glVertexArrayElementBuffer(vaoId, modelObjectData->elementBufferId);
     }
 
     static void deleteBuffers(models::MeshData* modelObjectData) {

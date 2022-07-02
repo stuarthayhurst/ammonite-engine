@@ -138,8 +138,7 @@ namespace ammonite {
 
       //If the light count hasn't changed, sub the data instead of recreating the buffer
       if (prevLightCount == lightTrackerMap.size()) {
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, lightDataId);
-        glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(shaderData), &shaderData);
+        glNamedBufferSubData(lightDataId, 0, sizeof(shaderData), &shaderData);
       } else {
         //If the buffer already exists, destroy it
         if (lightDataId != 0) {
@@ -147,14 +146,12 @@ namespace ammonite {
         }
 
         //Add the shader data to a shader storage buffer object
-        glGenBuffers(1, &lightDataId);
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, lightDataId);
-        glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(shaderData), &shaderData, GL_STATIC_DRAW);
+        glCreateBuffers(1, &lightDataId);
+        glNamedBufferData(lightDataId, sizeof(shaderData), &shaderData, GL_STATIC_DRAW);
       }
 
       //Use the lighting shader storage buffer
       glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, lightDataId);
-      glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
       //Update previous light count for next run
       prevLightCount = lightTrackerMap.size();
