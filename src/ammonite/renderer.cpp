@@ -69,6 +69,13 @@ namespace ammonite {
       //Check for essential GPU capabilities
       static bool checkGPUCapabilities(int* failureCount) {
         bool success = true;
+        //Check DSA is supported
+        if (!ammonite::utils::checkExtension("GL_ARB_direct_state_access", "GL_VERSION_4_5")) {
+          std::cerr << "Direct state access unsupported" << std::endl;
+          success = false;
+          *failureCount += 1;
+        }
+
         //Check SSBOs are supported
         if (!ammonite::utils::checkExtension("GL_ARB_shader_storage_buffer_object", "GL_VERSION_4_3")) {
           std::cerr << "Shader Storage Buffer Objects (SSBOs) unsupported" << std::endl;

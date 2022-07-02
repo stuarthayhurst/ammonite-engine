@@ -8,11 +8,12 @@
 ## Requirements:
   - A `c++17` compatible compiler (`g++ 8+`)
   - An OpenMP supported compiler
-  - An OpenGL 4.3+ compatible driver
+  - An OpenGL 4.5+ compatible driver
   - Alternatively, an OpenGL 3.2+ driver supporting the following extensions can be used
+    - `ARB_direct_state_access`
     - `ARB_shader_storage_buffer_object`
-    - `GL_ARB_texture_storage`
-    - `GL_ARB_texture_cube_map_array`
+    - `ARB_texture_storage`
+    - `ARB_texture_cube_map_array`
     - `KHR_debug`, when compiled in debug mode
   - Program caching is supported with `ARB_get_program_binary`
 
