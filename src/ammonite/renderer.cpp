@@ -175,7 +175,7 @@ namespace ammonite {
         }
       }
 
-      static void drawModel(ammonite::models::InternalModel *drawObject, int lightIndex, bool depthPass) {
+      static void drawModel(ammonite::models::ModelInfo *drawObject, int lightIndex, bool depthPass) {
         //If the model is disabled, skip it
         if (!drawObject->active) {
           return;
@@ -188,7 +188,7 @@ namespace ammonite {
         }
 
         //Get draw data and bind vertex attribute buffer
-        ammonite::models::InternalModelData* drawObjectData = drawObject->data;
+        ammonite::models::MeshData* drawObjectData = drawObject->data;
         glBindVertexArray(drawObjectData->vertexArrayId);
 
         //Calculate and obtain matrices
@@ -242,7 +242,7 @@ namespace ammonite {
     static void drawModels(const int modelIds[], const int modelCount, bool depthPass) {
       //Draw given models
       for (int i = 0; i < modelCount; i++) {
-        ammonite::models::InternalModel* modelPtr = ammonite::models::getModelPtr(modelIds[i]);
+        ammonite::models::ModelInfo* modelPtr = ammonite::models::getModelPtr(modelIds[i]);
         //Only draw non-light emitting models that exist
         if (modelPtr != nullptr) {
           if (!modelPtr->lightEmitting) {
@@ -385,7 +385,7 @@ namespace ammonite {
         for (int i = 0; i < lightEmitterCount; i++) {
           int modelId = lightData[(i * 2)];
           int lightIndex = lightData[(i * 2) + 1];
-          ammonite::models::InternalModel* modelPtr = ammonite::models::getModelPtr(modelId);
+          ammonite::models::ModelInfo* modelPtr = ammonite::models::getModelPtr(modelId);
 
           if (modelPtr != nullptr) {
             drawModel(modelPtr, lightIndex, false);

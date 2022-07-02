@@ -14,7 +14,7 @@ namespace ammonite {
       glm::vec2 texturePoints;
     };
 
-    struct InternalModelData {
+    struct MeshData {
       std::vector<VertexData> modelData;
       std::vector<unsigned int> indices;
       GLuint vertexBufferId = 0;
@@ -32,8 +32,8 @@ namespace ammonite {
       glm::quat rotationQuat;
     };
 
-    struct InternalModel {
-      InternalModelData* data;
+    struct ModelInfo {
+      MeshData* data;
       PositionData positionData;
       GLuint textureId = 0;
       int drawMode = 0;
@@ -43,7 +43,7 @@ namespace ammonite {
       int modelId;
     };
 
-    InternalModel* getModelPtr(int modelId);
+    ModelInfo* getModelPtr(int modelId);
     void setLightEmitting(int modelId, bool lightEmitting);
     bool getLightEmitting(int modelId);
   }
