@@ -22,7 +22,7 @@ namespace ammonite {
     struct PackedVertexInfo {
       glm::vec3 position, normal;
       glm::vec2 texturePoint;
-      bool operator<(const PackedVertexInfo that) const{
+      bool operator<(const PackedVertexInfo that) const {
         return std::memcmp((void*)this, (void*)&that, sizeof(PackedVertexInfo))>0;
       };
     };
