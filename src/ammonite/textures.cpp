@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <map>
+#include <cmath>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
@@ -39,19 +40,16 @@ namespace ammonite {
     }
 
     GLuint loadTexture(const char* texturePath, bool* externalSuccess) {
-      int width, height, bpp;
-      unsigned char* data;
-
-      std::string textureString = std::string(texturePath);
-
       //Check if texture has already been loaded
+      std::string textureString = std::string(texturePath);
       if (textureTrackerMap.find(textureString) != textureTrackerMap.end()) {
         textureTrackerMap[textureString].refCount += 1;
         return textureTrackerMap[textureString].textureId;
       }
 
       //Read image data
-      data = stbi_load(texturePath, &width, &height, &bpp, 3);
+      int width, height, bpp;
+      unsigned char* data = stbi_load(texturePath, &width, &height, &bpp, 0);
 
       if (!data) {
         std::cerr << "Failed to load texture '" << texturePath << "'" << std::endl;
@@ -61,30 +59,35 @@ namespace ammonite {
 
       //Create a texture
       GLuint textureId;
-      glGenTextures(1, &textureId);
+      glCreateTextures(GL_TEXTURE_2D, 1, &textureId);
 
-      //Select and pass texture to OpenGL
-      glBindTexture(GL_TEXTURE_2D, textureId);
-      if (bpp == 3) {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_COMPRESSED_RGB_ARB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-      } else if (bpp == 4) {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_COMPRESSED_RGBA_ARB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-      } else {
+      //Decide the format of the texture and data
+      GLenum internalFormat = GL_RGB8;
+      GLenum dataFormat = GL_RGB;
+      if (bpp == 4) {
+        internalFormat = GL_RGBA8;
+        dataFormat = GL_RGBA;
+      } else if (bpp != 3) {
         std::cerr << "Failed to load texture '" << texturePath << "'" << std::endl;
         glDeleteTextures(1, &textureId);
         *externalSuccess = false;
         return 0;
       }
 
-      //Release the image data
-      stbi_image_free(data);
+      //Create and fill immutable storage for the texture
+      int mipmapLevels = std::floor(std::log2(std::max(width, height))) + 1;
+      glTextureStorage2D(textureId, mipmapLevels, internalFormat, width, height);
+      glTextureSubImage2D(textureId, 0, 0, 0, width, height, dataFormat, GL_UNSIGNED_BYTE, data);
 
       //When magnifying the image, use linear filtering
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glTextureParameteri(textureId, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       //When minifying the image, use a linear blend of two mipmaps
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+      glTextureParameteri(textureId, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
       //Generate mipmaps
-      glGenerateMipmap(GL_TEXTURE_2D);
+      glGenerateTextureMipmap(textureId);
+
+      //Release the image data
+      stbi_image_free(data);
 
       //Save texture's info to textureTracker
       TextureInfo currentTexture;
@@ -92,8 +95,6 @@ namespace ammonite {
       textureTrackerMap[textureString] = currentTexture;
 
       idToNameMap[textureId] = textureString;
-
-      glBindTexture(GL_TEXTURE_2D, 0);
       return textureId;
     }
 

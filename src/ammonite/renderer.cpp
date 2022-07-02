@@ -188,8 +188,7 @@ namespace ammonite {
 
         //Set texture for regular shading pass
         if (lightIndex == -1 and !depthPass) {
-          glActiveTexture(GL_TEXTURE0);
-          glBindTexture(GL_TEXTURE_2D, drawObject->textureId);
+          glBindTextureUnit(0, drawObject->textureId);
         }
 
         //Get draw data and bind vertex attribute buffer
@@ -284,18 +283,17 @@ namespace ammonite {
         }
 
         //Create a cubemap for shadows
-        glGenTextures(1, &depthCubeMapId);
-        glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, depthCubeMapId);
+        glCreateTextures(GL_TEXTURE_CUBE_MAP_ARRAY, 1, &depthCubeMapId);
 
         //Create 6 faces for each light source
-        glTexStorage3D(GL_TEXTURE_CUBE_MAP_ARRAY, 1, GL_DEPTH_COMPONENT24, shadowRes, shadowRes, lightCount * 6);
+        glTextureStorage3D(depthCubeMapId, 1, GL_DEPTH_COMPONENT24, shadowRes, shadowRes, lightCount * 6);
 
         //Set depth texture parameters
-        glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+        glTextureParameteri(depthCubeMapId, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTextureParameteri(depthCubeMapId, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTextureParameteri(depthCubeMapId, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTextureParameteri(depthCubeMapId, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTextureParameteri(depthCubeMapId, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
         //Save for next time to avoid cubemap recreation
         lastShadowRes = shadowRes;
@@ -360,8 +358,7 @@ namespace ammonite {
       //Prepare model shader, gamma correction and depth cube map
       glUseProgram(modelShaderId);
       glEnable(GL_FRAMEBUFFER_SRGB);
-      glActiveTexture(GL_TEXTURE1);
-      glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, depthCubeMapId);
+      glBindTextureUnit(1, depthCubeMapId);
 
       //Calculate view projection matrix
       viewProjectionMatrix = *projectionMatrix * *viewMatrix;
