@@ -19,16 +19,9 @@
 
 namespace ammonite {
   namespace {
-    struct modelData {
-      std::vector<glm::vec3> vertices, normals;
-      std::vector<glm::vec2> texturePoints;
-      std::vector<unsigned int> indices;
-    };
-
     struct PackedVertexInfo {
-      glm::vec3 position;
-      glm::vec2 uv;
-      glm::vec3 normal;
+      glm::vec3 position, normal;
+      glm::vec2 texturePoint;
       bool operator<(const PackedVertexInfo that) const{
         return std::memcmp((void*)this, (void*)&that, sizeof(PackedVertexInfo))>0;
       };
@@ -55,20 +48,10 @@ namespace ammonite {
     }
 
     static void createBuffers(models::InternalModelData* modelObjectData) {
-      //Create and fill a vertex buffer
+      //Create and fill interleaved vertex + texture + normal buffer
       glGenBuffers(1, &modelObjectData->vertexBufferId);
       glBindBuffer(GL_ARRAY_BUFFER, modelObjectData->vertexBufferId);
-      glBufferData(GL_ARRAY_BUFFER, modelObjectData->vertices.size() * sizeof(glm::vec3), &modelObjectData->vertices[0], GL_STATIC_DRAW);
-
-      //Create and fill a normal buffer
-      glGenBuffers(1, &modelObjectData->normalBufferId);
-      glBindBuffer(GL_ARRAY_BUFFER, modelObjectData->normalBufferId);
-      glBufferData(GL_ARRAY_BUFFER, modelObjectData->normals.size() * sizeof(glm::vec3), &modelObjectData->normals[0], GL_STATIC_DRAW);
-
-      //Create and fill a texture buffer
-      glGenBuffers(1, &modelObjectData->textureBufferId);
-      glBindBuffer(GL_ARRAY_BUFFER, modelObjectData->textureBufferId);
-      glBufferData(GL_ARRAY_BUFFER, modelObjectData->texturePoints.size() * sizeof(glm::vec2), &modelObjectData->texturePoints[0], GL_STATIC_DRAW);
+      glBufferData(GL_ARRAY_BUFFER, modelObjectData->modelData.size() * sizeof(models::VertexData), &modelObjectData->modelData[0], GL_STATIC_DRAW);
 
       //Create and fill an indices buffer
       glGenBuffers(1, &modelObjectData->elementBufferId);
@@ -78,54 +61,50 @@ namespace ammonite {
       //Create the vertex attribute buffer
       glGenVertexArrays(1, &modelObjectData->vertexArrayId);
       glBindVertexArray(modelObjectData->vertexArrayId);
-
-      //Vertex attribute buffer
       glBindBuffer(GL_ARRAY_BUFFER, modelObjectData->vertexBufferId);
-      glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+      //Vertex attribute
+      glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(0));
       glEnableVertexAttribArray(0);
 
-      //Texture attribute buffer
-      glBindBuffer(GL_ARRAY_BUFFER, modelObjectData->textureBufferId);
-      glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+      //Normal attribute
+      glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
       glEnableVertexAttribArray(1);
 
-      //Normal attribute buffer
-      glBindBuffer(GL_ARRAY_BUFFER, modelObjectData->normalBufferId);
-      glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+      //Texture attribute
+      glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
       glEnableVertexAttribArray(2);
     }
 
     static void deleteBuffers(models::InternalModelData* modelObjectData) {
       //Delete created buffers and the VAO
       glDeleteBuffers(1, &modelObjectData->vertexBufferId);
-      glDeleteBuffers(1, &modelObjectData->normalBufferId);
-      glDeleteBuffers(1, &modelObjectData->textureBufferId);
       glDeleteBuffers(1, &modelObjectData->elementBufferId);
       glDeleteVertexArrays(1, &modelObjectData->vertexArrayId);
     }
 
-    static void indexModel(models::InternalModelData* modelObjectData, modelData* rawModelData) {
+    static void indexModel(models::InternalModelData* modelObjectData, std::vector<models::VertexData>* rawModelData) {
       //Map of known vertices
       std::map<PackedVertexInfo, unsigned int> vertexIndexMap;
 
+      std::vector<models::VertexData>* modelData = &modelObjectData->modelData;
+
       //Iterate over every vertex, and index them
-      for (unsigned int i = 0; i < rawModelData->vertices.size(); i++) {
+      for (unsigned int i = 0; i < rawModelData->size(); i++) {
         //Pack vertex information into a struct
-        PackedVertexInfo packedVertex = {rawModelData->vertices[i], rawModelData->texturePoints[i], rawModelData->normals[i]};
+        PackedVertexInfo packedVertex = {(*rawModelData)[i].vertices, (*rawModelData)[i].normals, (*rawModelData)[i].texturePoints};
 
         //Search for an identical vertex
-        bool found;
+        bool found = false;
         unsigned int index = getIdenticalVertexIndex(&packedVertex, &vertexIndexMap, &found);
 
         //If the vertex has already been used, reuse the index
         if (found) {
           modelObjectData->indices.push_back(index);
-        } else { //Otherwise, add the new vertex to buffer
-          modelObjectData->vertices.push_back(rawModelData->vertices[i]);
-          modelObjectData->texturePoints.push_back(rawModelData->texturePoints[i]);
-          modelObjectData->normals.push_back(rawModelData->normals[i]);
+        } else { //Otherwise, add the new vertex to bufferd
+          modelData->push_back((*rawModelData)[i]);
 
-          index = (unsigned int)modelObjectData->vertices.size() - 1;
+          index = (unsigned int)modelObjectData->modelData.size() - 1;
           modelObjectData->indices.push_back(index);
           vertexIndexMap[packedVertex] = index;
         }
@@ -148,8 +127,8 @@ namespace ammonite {
       auto& attrib = reader.GetAttrib();
       auto& shapes = reader.GetShapes();
 
-      //Temporary storage for unindexed model data
-      modelData rawModelData;
+      //Storage for unindexed model data
+      std::vector<models::VertexData> rawModelData;
 
       //Loop over shapes
       for (size_t s = 0; s < shapes.size(); s++) {
@@ -160,42 +139,41 @@ namespace ammonite {
 
           //Loop each vertex
           for (size_t v = 0; v < fv; v++) {
+            models::VertexData currVertex;
+
             //Vertex
             tinyobj::index_t idx = shapes[s].mesh.indices[index_offset + v];
             tinyobj::real_t vx = attrib.vertices[3 * size_t(idx.vertex_index) + 0];
             tinyobj::real_t vy = attrib.vertices[3 * size_t(idx.vertex_index) + 1];
             tinyobj::real_t vz = attrib.vertices[3 * size_t(idx.vertex_index) + 2];
-
-            glm::vec3 vertex = glm::vec3(vx, vy, vz);
-            rawModelData.vertices.push_back(vertex);
+            currVertex.vertices = glm::vec3(vx, vy, vz);
 
             //Normals
             if (idx.normal_index >= 0) {
               tinyobj::real_t nx = attrib.normals[3 * size_t(idx.normal_index) + 0];
               tinyobj::real_t ny = attrib.normals[3 * size_t(idx.normal_index) + 1];
               tinyobj::real_t nz = attrib.normals[3 * size_t(idx.normal_index) + 2];
-
-              glm::vec3 normal = glm::vec3(nx, ny, nz);
-              rawModelData.normals.push_back(normal);
+              currVertex.normals = glm::vec3(nx, ny, nz);
             }
 
             //Texture points
             if (idx.texcoord_index >= 0) {
               tinyobj::real_t tx = attrib.texcoords[2 * size_t(idx.texcoord_index) + 0];
               tinyobj::real_t ty = 1.0f - attrib.texcoords[2 * size_t(idx.texcoord_index) + 1];
-
-              glm::vec2 texturePoint = glm::vec2(tx, ty);
-              rawModelData.texturePoints.push_back(texturePoint);
+              currVertex.texturePoints = glm::vec2(tx, ty);
             } else {
-              rawModelData.texturePoints.push_back(glm::vec2(0.0f, 0.0f));
+              currVertex.texturePoints = glm::vec2(0.0f, 0.0f);
             }
+
+            //Save the vertex
+            rawModelData.push_back(currVertex);
           }
           index_offset += fv;
         }
       }
 
       //Fill the index buffer
-      modelObjectData->vertexCount = rawModelData.vertices.size();
+      modelObjectData->vertexCount = rawModelData.size();
       indexModel(modelObjectData, &rawModelData);
 
       return;
