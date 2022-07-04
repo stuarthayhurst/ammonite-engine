@@ -1,11 +1,7 @@
 #ifndef RENDERER
 #define RENDERER
 
-#include <glm/glm.hpp>
-#include <GL/glew.h>
 #include <GLFW/glfw3.h>
-
-#include "modelManager.hpp"
 
 namespace ammonite {
   namespace renderer {
