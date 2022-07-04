@@ -286,7 +286,7 @@ namespace ammonite {
         glCreateTextures(GL_TEXTURE_CUBE_MAP_ARRAY, 1, &depthCubeMapId);
 
         //Create 6 faces for each light source
-        glTextureStorage3D(depthCubeMapId, 1, GL_DEPTH_COMPONENT24, shadowRes, shadowRes, lightCount * 6);
+        glTextureStorage3D(depthCubeMapId, 1, GL_DEPTH_COMPONENT32, shadowRes, shadowRes, lightCount * 6);
 
         //Set depth texture parameters
         glTextureParameteri(depthCubeMapId, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
