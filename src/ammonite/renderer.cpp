@@ -289,8 +289,10 @@ namespace ammonite {
         glTextureStorage3D(depthCubeMapId, 1, GL_DEPTH_COMPONENT24, shadowRes, shadowRes, lightCount * 6);
 
         //Set depth texture parameters
-        glTextureParameteri(depthCubeMapId, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTextureParameteri(depthCubeMapId, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTextureParameteri(depthCubeMapId, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTextureParameteri(depthCubeMapId, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTextureParameteri(depthCubeMapId, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+        glTextureParameteri(depthCubeMapId, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
         glTextureParameteri(depthCubeMapId, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTextureParameteri(depthCubeMapId, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glTextureParameteri(depthCubeMapId, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
