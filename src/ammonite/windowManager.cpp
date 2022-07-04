@@ -15,6 +15,7 @@ namespace ammonite {
     namespace {
       //Window pointer
       GLFWwindow* window;
+      const char* DEFAULT_TITLE = "Ammonite Window";
 
       //Callback to update height, width and viewport size on window resize
       static void window_size_callback(GLFWwindow*, int width, int height) {
@@ -84,12 +85,12 @@ namespace ammonite {
     }
 
     //Create a window and a pointer
-    GLFWwindow* createWindow(int width, int height) {
+    GLFWwindow* createWindow(int width, int height, const char* title) {
       //Set initial size
       ammonite::settings::runtime::setWidth(width);
       ammonite::settings::runtime::setHeight(height);
 
-      window = glfwCreateWindow(width, height, "Ammonite Window", NULL, NULL);
+      window = glfwCreateWindow(width, height, title, NULL, NULL);
       if (window == NULL) {
         std::cerr << "Failed to open window" << std::endl;
         glfwTerminate();
@@ -102,11 +103,15 @@ namespace ammonite {
       return window;
     }
 
+    GLFWwindow* createWindow(int width, int height) {
+      return createWindow(width, height, DEFAULT_TITLE);
+    }
+
     void setTitle(GLFWwindow* window, const char* title) {
       if (title != NULL) {
         glfwSetWindowTitle(window, title);
       } else {
-        glfwSetWindowTitle(window, "Ammonite Window");
+        glfwSetWindowTitle(window, DEFAULT_TITLE);
       }
     }
 
@@ -148,13 +153,10 @@ namespace ammonite {
         return nullptr;
       }
 
-      auto window = windowManager::createWindow(width, height);
+      auto window = windowManager::createWindow(width, height, title);
       if (window == NULL) {
         return nullptr;
       }
-
-      //Set window title
-      windowManager::setTitle(window, title);
 
       //Setup GLEW
       if (!windowManager::setup::setupGlew(window)) {
@@ -166,6 +168,10 @@ namespace ammonite {
 
       //Return same values as createWindow()
       return window;
+    }
+
+    GLFWwindow* setupWindow(int width, int height, int antialiasing) {
+      return setupWindow(width, height, antialiasing, DEFAULT_TITLE);
     }
   }
 }
