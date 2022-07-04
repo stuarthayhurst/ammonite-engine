@@ -26,27 +26,33 @@ namespace ammonite {
   namespace renderer {
     namespace {
       GLFWwindow* window;
-      GLuint modelShaderId;
-      GLuint lightShaderId;
-      GLuint depthShaderId;
 
-      //Shader uniform IDs
-      GLuint matrixId;
-      GLuint modelMatrixId;
-      GLuint normalMatrixId;
-      GLuint ambientLightId;
-      GLuint cameraPosId;
-      GLuint modelFarPlaneId;
-      GLuint textureSamplerId;
-      GLuint shadowCubeMapId;
+      //Structures to store uniform IDs for the shaders
+      struct {
+        GLuint shaderId;
+        GLuint matrixId;
+        GLuint modelMatrixId;
+        GLuint normalMatrixId;
+        GLuint ambientLightId;
+        GLuint cameraPosId;
+        GLuint farPlaneId;
+        GLuint textureSamplerId;
+        GLuint shadowCubeMapId;
+      } modelShader;
 
-      GLuint lightMatrixId;
-      GLuint lightIndexId;
+      struct {
+        GLuint shaderId;
+        GLuint lightMatrixId;
+        GLuint lightIndexId;
+      } lightShader;
 
-      GLuint depthModelMatrixId;
-      GLuint depthFarPlaneId;
-      GLuint depthLightPosId;
-      GLuint depthShadowIndex;
+      struct {
+        GLuint shaderId;
+        GLuint modelMatrixId;
+        GLuint farPlaneId;
+        GLuint depthLightPosId;
+        GLuint depthShadowIndex;
+      } depthShader;
 
       GLuint depthCubeMapId = 0;
       GLuint depthMapFBO;
@@ -124,47 +130,47 @@ namespace ammonite {
         //Create shaders
         std::string shaderLocation;
         shaderLocation = std::string(shaderPath) + std::string("models/");
-        modelShaderId = ammonite::shaders::loadDirectory(shaderLocation.c_str(), externalSuccess);
+        modelShader.shaderId = ammonite::shaders::loadDirectory(shaderLocation.c_str(), externalSuccess);
 
         shaderLocation = std::string(shaderPath) + std::string("lights/");
-        lightShaderId = ammonite::shaders::loadDirectory(shaderLocation.c_str(), externalSuccess);
+        lightShader.shaderId = ammonite::shaders::loadDirectory(shaderLocation.c_str(), externalSuccess);
 
         shaderLocation = std::string(shaderPath) + std::string("depth/");
-        depthShaderId = ammonite::shaders::loadDirectory(shaderLocation.c_str(), externalSuccess);
+        depthShader.shaderId = ammonite::shaders::loadDirectory(shaderLocation.c_str(), externalSuccess);
 
         if (!*externalSuccess) {
           return;
         }
 
         //Shader uniform locations
-        matrixId = glGetUniformLocation(modelShaderId, "MVP");
-        modelMatrixId = glGetUniformLocation(modelShaderId, "M");
-        normalMatrixId = glGetUniformLocation(modelShaderId, "normalMatrix");
-        ambientLightId = glGetUniformLocation(modelShaderId, "ambientLight");
-        cameraPosId = glGetUniformLocation(modelShaderId, "cameraPos");
-        modelFarPlaneId = glGetUniformLocation(modelShaderId, "farPlane");
-        textureSamplerId = glGetUniformLocation(modelShaderId, "textureSampler");
-        shadowCubeMapId = glGetUniformLocation(modelShaderId, "shadowCubeMap");
+        modelShader.matrixId = glGetUniformLocation(modelShader.shaderId, "MVP");
+        modelShader.modelMatrixId = glGetUniformLocation(modelShader.shaderId, "M");
+        modelShader.normalMatrixId = glGetUniformLocation(modelShader.shaderId, "normalMatrix");
+        modelShader.ambientLightId = glGetUniformLocation(modelShader.shaderId, "ambientLight");
+        modelShader.cameraPosId = glGetUniformLocation(modelShader.shaderId, "cameraPos");
+        modelShader.farPlaneId = glGetUniformLocation(modelShader.shaderId, "farPlane");
+        modelShader.textureSamplerId = glGetUniformLocation(modelShader.shaderId, "textureSampler");
+        modelShader.shadowCubeMapId = glGetUniformLocation(modelShader.shaderId, "shadowCubeMap");
 
-        lightMatrixId = glGetUniformLocation(lightShaderId, "MVP");
-        lightIndexId = glGetUniformLocation(lightShaderId, "lightIndex");
+        lightShader.lightMatrixId = glGetUniformLocation(lightShader.shaderId, "MVP");
+        lightShader.lightIndexId = glGetUniformLocation(lightShader.shaderId, "lightIndex");
 
-        depthModelMatrixId = glGetUniformLocation(depthShaderId, "modelMatrix");
-        depthFarPlaneId = glGetUniformLocation(depthShaderId, "farPlane");
-        depthLightPosId = glGetUniformLocation(depthShaderId, "lightPos");
-        depthShadowIndex = glGetUniformLocation(depthShaderId, "shadowMapIndex");
+        depthShader.modelMatrixId = glGetUniformLocation(depthShader.shaderId, "modelMatrix");
+        depthShader.farPlaneId = glGetUniformLocation(depthShader.shaderId, "farPlane");
+        depthShader.depthLightPosId = glGetUniformLocation(depthShader.shaderId, "lightPos");
+        depthShader.depthShadowIndex = glGetUniformLocation(depthShader.shaderId, "shadowMapIndex");
 
         //Pass texture unit locations
-        glUseProgram(modelShaderId);
-        glUniform1i(textureSamplerId, 0);
-        glUniform1i(shadowCubeMapId, 1);
+        glUseProgram(modelShader.shaderId);
+        glUniform1i(modelShader.textureSamplerId, 0);
+        glUniform1i(modelShader.shadowCubeMapId, 1);
 
         //Setup depth map framebuffer
         glCreateFramebuffers(1, &depthMapFBO);
         glNamedFramebufferDrawBuffer(depthMapFBO, GL_NONE);
         glNamedFramebufferReadBuffer(depthMapFBO, GL_NONE);
 
-        //Enable culling triangles and depth testing (only show fragments closer than the previous)
+        //Enable culling triangles and depth testing
         glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LEQUAL);
@@ -206,14 +212,14 @@ namespace ammonite {
 
         //Send uniforms to the shaders
         if (depthPass) { //Depth pass
-          glUniformMatrix4fv(depthModelMatrixId, 1, GL_FALSE, &modelMatrix[0][0]);
+          glUniformMatrix4fv(depthShader.modelMatrixId, 1, GL_FALSE, &modelMatrix[0][0]);
         } else if (lightIndex == -1) { //Regular pass
-          glUniformMatrix4fv(matrixId, 1, GL_FALSE, &mvp[0][0]);
-          glUniformMatrix4fv(modelMatrixId, 1, GL_FALSE, &modelMatrix[0][0]);
-          glUniformMatrix3fv(normalMatrixId, 1, GL_FALSE, &drawObject->positionData.normalMatrix[0][0]);
+          glUniformMatrix4fv(modelShader.matrixId, 1, GL_FALSE, &mvp[0][0]);
+          glUniformMatrix4fv(modelShader.modelMatrixId, 1, GL_FALSE, &modelMatrix[0][0]);
+          glUniformMatrix3fv(modelShader.normalMatrixId, 1, GL_FALSE, &drawObject->positionData.normalMatrix[0][0]);
         } else { //Light emitter pass
-          glUniformMatrix4fv(lightMatrixId, 1, GL_FALSE, &mvp[0][0]);
-          glUniform1i(lightIndexId, lightIndex);
+          glUniformMatrix4fv(lightShader.lightMatrixId, 1, GL_FALSE, &mvp[0][0]);
+          glUniform1i(lightShader.lightIndexId, lightIndex);
         }
 
         //Set the requested draw mode (normal, wireframe, points)
@@ -303,7 +309,7 @@ namespace ammonite {
       }
 
       //Swap to depth shader
-      glUseProgram(depthShaderId);
+      glUseProgram(depthShader.shaderId);
       glViewport(0, 0, shadowRes, shadowRes);
       glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
 
@@ -311,7 +317,7 @@ namespace ammonite {
       glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), 1.0f, nearPlane, farPlane);
 
       //Pass uniforms that don't change between light source
-      glUniform1f(depthFarPlaneId, farPlane);
+      glUniform1f(depthShader.farPlaneId, farPlane);
 
       //Attach cubemap array to framebuffer and clear existing depths
       glNamedFramebufferTexture(depthMapFBO, GL_DEPTH_ATTACHMENT, depthCubeMapId, 0);
@@ -339,13 +345,13 @@ namespace ammonite {
 
         //Pass shadow matrices to depth shader
         for (int i = 0; i < 6; i++) {
-          GLuint shadowMatrixId = glGetUniformLocation(depthShaderId, std::string("shadowMatrices[" + std::to_string(i) + "]").c_str());
+          GLuint shadowMatrixId = glGetUniformLocation(depthShader.shaderId, std::string("shadowMatrices[" + std::to_string(i) + "]").c_str());
           glUniformMatrix4fv(shadowMatrixId, 1, GL_FALSE, &(shadowTransforms[i])[0][0]);
         }
 
         //Pass light source specific uniforms
-        glUniform3fv(depthLightPosId, 1, &lightPos[0]);
-        glUniform1i(depthShadowIndex, shadowCount);
+        glUniform3fv(depthShader.depthLightPosId, 1, &lightPos[0]);
+        glUniform1i(depthShader.depthShadowIndex, shadowCount);
 
         //Render to depth buffer and move to the next light source
         drawModels(modelIds, modelCount, true);
@@ -358,7 +364,7 @@ namespace ammonite {
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
       //Prepare model shader, gamma correction and depth cube map
-      glUseProgram(modelShaderId);
+      glUseProgram(modelShader.shaderId);
       glEnable(GL_FRAMEBUFFER_SRGB);
       glBindTextureUnit(1, depthCubeMapId);
 
@@ -370,9 +376,9 @@ namespace ammonite {
       glm::vec3 cameraPosition = ammonite::camera::getPosition(ammonite::camera::getActiveCamera());
 
       //Pass uniforms and render regular models
-      glUniform3fv(ambientLightId, 1, &ambientLight[0]);
-      glUniform3fv(cameraPosId, 1, &cameraPosition[0]);
-      glUniform1f(modelFarPlaneId, farPlane);
+      glUniform3fv(modelShader.ambientLightId, 1, &ambientLight[0]);
+      glUniform3fv(modelShader.cameraPosId, 1, &cameraPosition[0]);
+      glUniform1f(modelShader.farPlaneId, farPlane);
       drawModels(modelIds, modelCount, false);
 
       //Get information about light sources to be rendered
@@ -382,7 +388,7 @@ namespace ammonite {
 
       //Swap to the light emitting model shader
       if (lightEmitterCount > 0) {
-        glUseProgram(lightShaderId);
+        glUseProgram(lightShader.shaderId);
 
         //Draw light sources with models attached
         for (int i = 0; i < lightEmitterCount; i++) {
