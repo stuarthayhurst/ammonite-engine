@@ -162,8 +162,6 @@ namespace ammonite {
         bool getControlsActive() {
           return isControlActive;
         }
-
-
       }
 
       void setupControls(GLFWwindow* newWindow) {
