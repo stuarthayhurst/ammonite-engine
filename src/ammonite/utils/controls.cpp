@@ -35,58 +35,62 @@ namespace ammonite {
         //Used to find x and y mouse offsets
         double xposLast, yposLast;
 
-        //Current input bind state
-        bool inputBound = true;
-
-        //Vectors to ignore certain axis (absoluteUp -> only y-axis)
-        const glm::vec3 absoluteUp = glm::vec3(0, 1, 0);
+        //Current input bind, camera and control states
+        bool inputBound = true, isCameraActive = true, isControlActive = true;
 
         //Increase / decrease FoV on scroll (xoffset is unused)
         static void scroll_callback(GLFWwindow*, double, double yoffset) {
-          //Only zoom if FoV will be between 1 and 90
-          int activeCameraId = ammonite::camera::getActiveCamera();
-          float fov = ammonite::camera::getFieldOfView(activeCameraId);
-          float newFov = fov - (yoffset * zoomMultiplier);
-          if (newFov > 0 and newFov <= 90) {
-            ammonite::camera::setFieldOfView(activeCameraId, newFov);
+          if (isCameraActive) {
+            //Only zoom if FoV will be between 1 and 90
+            int activeCameraId = ammonite::camera::getActiveCamera();
+            float fov = ammonite::camera::getFieldOfView(activeCameraId);
+            float newFov = fov - (yoffset * zoomMultiplier);
+
+            if (newFov > 0 and newFov <= 90) {
+              ammonite::camera::setFieldOfView(activeCameraId, newFov);
+            }
           }
         }
 
         //Reset FoV on middle click, (modifier bits are unused)
         static void zoom_reset_callback(GLFWwindow*, int button, int action, int) {
-          if (button == GLFW_MOUSE_BUTTON_MIDDLE and action == GLFW_PRESS) {
-            ammonite::camera::setFieldOfView(ammonite::camera::getActiveCamera(), 45.0f);
+          if (isCameraActive) {
+            if (button == GLFW_MOUSE_BUTTON_MIDDLE and action == GLFW_PRESS) {
+              ammonite::camera::setFieldOfView(ammonite::camera::getActiveCamera(), 45.0f);
+            }
           }
         }
 
         static void cursor_position_callback(GLFWwindow*, double xpos, double ypos) {
-          //Work out distance moved since last movement
-          float xoffset = xpos - xposLast;
-          float yoffset = ypos - yposLast;
+          if (isCameraActive) {
+            //Work out distance moved since last movement
+            float xoffset = xpos - xposLast;
+            float yoffset = ypos - yposLast;
 
-          //Update saved cursor positions
-          xposLast = xpos;
-          yposLast = ypos;
+            //Update saved cursor positions
+            xposLast = xpos;
+            yposLast = ypos;
 
-          //Get current viewing angles
-          int activeCameraId = ammonite::camera::getActiveCamera();
-          float horizontalAngle = ammonite::camera::getHorizontal(activeCameraId);
-          float verticalAngle = ammonite::camera::getVertical(activeCameraId);
+            //Get current viewing angles
+            int activeCameraId = ammonite::camera::getActiveCamera();
+            float horizontalAngle = ammonite::camera::getHorizontal(activeCameraId);
+            float verticalAngle = ammonite::camera::getVertical(activeCameraId);
 
-          //Update viewing angles ('-' corrects camera inversion)
-          ammonite::camera::setHorizontal(activeCameraId, horizontalAngle - (mouseSpeed * xoffset));
+            //Update viewing angles ('-' corrects camera inversion)
+            ammonite::camera::setHorizontal(activeCameraId, horizontalAngle - (mouseSpeed * xoffset));
 
-          //Only accept vertical angle if it won't create an impossible movement
-          float newAngle = verticalAngle - (mouseSpeed * yoffset);
-          static const float limit = glm::radians(90.0f);
-          if (newAngle > limit) { //Vertical max
-            verticalAngle = limit;
-          } else if (newAngle < -limit) { //Vertical min
-            verticalAngle = -limit;
-          } else {
-            verticalAngle += -mouseSpeed * yoffset;
+            //Only accept vertical angle if it won't create an impossible movement
+            float newAngle = verticalAngle - (mouseSpeed * yoffset);
+            static const float limit = glm::radians(90.0f);
+            if (newAngle > limit) { //Vertical max
+              verticalAngle = limit;
+            } else if (newAngle < -limit) { //Vertical min
+              verticalAngle = -limit;
+            } else {
+              verticalAngle += -mouseSpeed * yoffset;
+            }
+            ammonite::camera::setVertical(activeCameraId, verticalAngle);
           }
-          ammonite::camera::setVertical(activeCameraId, verticalAngle);
         }
 
         //Helper function to set input state
@@ -142,6 +146,24 @@ namespace ammonite {
         float getZoomSpeed() {
           return zoomMultiplier;
         }
+
+        void setCameraActive(bool active) {
+          isCameraActive = active;
+        }
+
+        void setControlsActive(bool active) {
+          isControlActive = active;
+        }
+
+        bool getCameraActive() {
+          return isCameraActive;
+        }
+
+        bool getControlsActive() {
+          return isControlActive;
+        }
+
+
       }
 
       void setupControls(GLFWwindow* newWindow) {
@@ -188,51 +210,53 @@ namespace ammonite {
           lastInputToggleState = inputToggleState;
         }
 
-        //Get active camera
-        int activeCameraId = ammonite::camera::getActiveCamera();
+        if (isControlActive) {
+          //Get active camera
+          int activeCameraId = ammonite::camera::getActiveCamera();
 
-        //Vector for current direction, without vertical component
-        float horizontalAngle = ammonite::camera::getHorizontal(activeCameraId);
-        glm::vec3 horizontalDirection(
-          std::sin(horizontalAngle),
-          0,
-          std::cos(horizontalAngle)
-        );
+          //Vector for current direction, without vertical component
+          float horizontalAngle = ammonite::camera::getHorizontal(activeCameraId);
+          glm::vec3 horizontalDirection(
+            std::sin(horizontalAngle),
+            0,
+            std::cos(horizontalAngle)
+          );
 
-        //Right vector, relative to the camera
-        glm::vec3 right = glm::vec3(
-          std::sin(horizontalAngle - glm::half_pi<float>()),
-          0,
-          std::cos(horizontalAngle - glm::half_pi<float>())
-        );
+          //Right vector, relative to the camera
+          glm::vec3 right = glm::vec3(
+            std::sin(horizontalAngle - glm::half_pi<float>()),
+            0,
+            std::cos(horizontalAngle - glm::half_pi<float>())
+          );
 
-        //Get the current camera position
-        glm::vec3 position = ammonite::camera::getPosition(activeCameraId);
+          //Get the current camera position
+          glm::vec3 position = ammonite::camera::getPosition(activeCameraId);
 
-        //Apply movement from inputs
-        if (inputBound) {
-          if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) { //Move forward
-            position += horizontalDirection * deltaTime * movementSpeed;
-          }
-          if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) { //Move back
-            position -= horizontalDirection * deltaTime * movementSpeed;
-          }
-          if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) { //Move right
-            position += right * deltaTime * movementSpeed;
-          }
-          if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) { //Move left
-            position -= right * deltaTime * movementSpeed;
-          }
+          //Apply movement from inputs
+          if (inputBound) {
+            if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) { //Move forward
+              position += horizontalDirection * deltaTime * movementSpeed;
+            }
+            if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) { //Move back
+              position -= horizontalDirection * deltaTime * movementSpeed;
+            }
+            if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) { //Move right
+              position += right * deltaTime * movementSpeed;
+            }
+            if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) { //Move left
+              position -= right * deltaTime * movementSpeed;
+            }
 
-          if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) { //Move up
-            position += absoluteUp * deltaTime * movementSpeed;
-          }
-          if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) { //Move down
-            position -= absoluteUp * deltaTime * movementSpeed;
-          }
+            if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) { //Move up
+              position += glm::vec3(0, 1, 0) * deltaTime * movementSpeed;
+            }
+            if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) { //Move down
+              position -= glm::vec3(0, 1, 0) * deltaTime * movementSpeed;
+            }
 
-          //Update the camera position
-          ammonite::camera::setPosition(activeCameraId, position);
+            //Update the camera position
+            ammonite::camera::setPosition(activeCameraId, position);
+          }
         }
 
         //Reset time between inputs
