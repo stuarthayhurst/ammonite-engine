@@ -23,15 +23,14 @@
 
 ## Building + running demo:
   - `make clean` will clean the build area, to start from fresh
-  - Run `make library` to build the shared library
-  - Run either `make local-build` or `make build; sudo make install`, to build the demo
-    - `local-build` will only allow running from this project's root directory (recommended, as the code is only a demo)
-    - `build` + `install` will build the demo, but use the system copy of `libammonite.so`
-  - `./build/demo` will run the built demo
-  - To compile in debug mode, use `DEBUG=true make ...`, or `make debug`
+  - Run either `make build` or `make system-build; sudo make install`, to build the demo
+    - `build` will only allow running from this project's root directory (recommended, as the code is only a demo)
+    - `system-build` + `install` will build the demo, but use the system copy of `libammonite.so`
+  - Run `./build/demo` to launch the demo
+  - To compile in debug mode, use `make debug` or `DEBUG=true make ...`
     - This will compile some extras in the code to help with debugging (every header gets `iostream`)
     - It will also enable OpenGL debug warning, messages and errors
-    - It won't trigger a rebuild of the library, so `make clean` should be run before swapping the value
+    - Before swapping back to regular builds, run `make clean`
 
 ## Options:
   - Compiled demos have a few arguments supported:
