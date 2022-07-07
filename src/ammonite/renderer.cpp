@@ -408,15 +408,26 @@ namespace ammonite {
       //Swap buffers
       glfwSwapBuffers(window);
 
-      //Sleep until target frame time is met, if not 0
+      //Figure out time budget remaining
       static ammonite::utils::Timer targetFrameTimer;
+
+      //Wait until next frame should be prepared
       if (ammonite::settings::graphics::getFrameLimit() != 0.0f) {
-        double targetFrameTime = 1.0 / ammonite::settings::graphics::getFrameLimit();
-        double spareTime = targetFrameTime - targetFrameTimer.getTime();
-        if (spareTime > 0.0) {
-          std::this_thread::sleep_for(std::chrono::nanoseconds(int(std::floor(spareTime * 1000000000.0))));
+        //Length of microsleep and allowable error
+        static const double sleepInterval = 1.0 / 100000;
+        static const double maxError = (sleepInterval) * 1.1;
+        static const auto sleepLength = std::chrono::nanoseconds(int(std::floor(sleepInterval * 1000000000.0)));
+
+        double const targetFrameTime = 1.0 / ammonite::settings::graphics::getFrameLimit();
+        double spareTime = targetFrameTime - targetFrameTimer.getTime();;
+
+        //Sleep for short intervals until the frametime budget is gone
+        while (spareTime > maxError) {
+          std::this_thread::sleep_for(sleepLength);
+          spareTime = targetFrameTime - targetFrameTimer.getTime();
         }
       }
+
       targetFrameTimer.reset();
     }
   }
