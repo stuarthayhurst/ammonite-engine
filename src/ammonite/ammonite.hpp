@@ -4,6 +4,7 @@
 #include "utils/timer.hpp"
 #include "utils/extension.hpp"
 #include "utils/controls.hpp"
+#include "utils/cacheManager.hpp"
 
 #ifdef DEBUG
   #include "utils/debug.hpp"

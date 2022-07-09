@@ -9,6 +9,7 @@
 #include <GLFW/glfw3.h>
 
 #include "internal/runtimeSettings.hpp"
+#include "internal/shaderCacheUpdate.hpp"
 
 namespace ammonite {
   namespace windowManager {
@@ -60,6 +61,9 @@ namespace ammonite {
 
         //Update values when resized
         glfwSetWindowSizeCallback(window, window_size_callback);
+
+        //Prompt shader cache setup
+        ammonite::shaders::updateGLCacheSupport();
 
         return true;
       }

@@ -5,37 +5,27 @@
 #include <fstream>
 #include <sstream>
 #include <filesystem>
-#include <sys/stat.h>
 
 #include <GL/glew.h>
 
 #include "utils/extension.hpp"
+#include "utils/cacheManager.hpp"
+#include "internal/fileManager.hpp"
 
 namespace ammonite {
   namespace {
     //Vector to store all existing shaders
     std::vector<int> shaderIds(0);
-
-    //Toggle and path for binary caching, set by useProgramCache()
-    bool cacheBinaries = false;
-    std::string programCacheDir;
   }
 
   //Static helper functions
   namespace {
-    static void deleteCacheFile(const char* cacheName) {
-      const std::string targetFiles[2] = {
-        programCacheDir + cacheName + ".cache",
-        programCacheDir + cacheName + ".cacheinfo"
-      };
+    static void deleteCacheFile(std::string cacheFilePath) {
+      //Delete the cache and cacheinfo files
+      std::cout << "Clearing '" << cacheFilePath << "'" << std::endl;
 
-      //Delete the cache and cachinfo files
-      std::cout << "Clearing '" << targetFiles[0] << "'" << std::endl;
-      for (int i = 0; i < 2; i++) {
-        if (targetFiles[i] != "/") {
-          std::remove(targetFiles[i].c_str());
-        }
-      }
+      ammonite::utils::files::deleteFile(cacheFilePath);
+      ammonite::utils::files::deleteFile(cacheFilePath + "info");
     }
 
     static bool checkProgram(GLuint programId) {
@@ -59,18 +49,27 @@ namespace ammonite {
       return false;
     }
 
-    //In C++ 20, the std::filesystem can do this
-    static void getFileMetadata(const char* filePath, long long int* filesize, long long int* timestamp) {
-      struct stat fileInfo;
-      if (stat(filePath, &fileInfo) != 0) {
-        //Failed to open file, fail the shader
-        *filesize = 0;
-        *timestamp = 0;
-        return;
+    //Set by updateGLCacheSupport(), when GLEW loads
+    bool isBinaryCacheSupported = false;
+  }
+
+  //Internally exposed only
+  namespace shaders {
+    void updateGLCacheSupport() {
+      //Get number of supported formats
+      GLint numBinaryFormats = 0;
+      glGetIntegerv(GL_NUM_PROGRAM_BINARY_FORMATS, &numBinaryFormats);
+
+      //Check support for collecting the program binary
+      if (!ammonite::utils::checkExtension("GL_ARB_get_program_binary", "GL_VERSION_4_1")) {
+        std::cerr << "Program caching unsupported" << std::endl;
+        isBinaryCacheSupported = false;
+      } else if (numBinaryFormats < 1) {
+        std::cerr << "Program caching unsupported (no supported formats)" << std::endl;
+        isBinaryCacheSupported = false;
       }
 
-      *timestamp = fileInfo.st_mtime;
-      *filesize = fileInfo.st_size;
+      isBinaryCacheSupported = true;
     }
   }
 
@@ -183,173 +182,107 @@ namespace ammonite {
 
       return programId;
     }
-  }
 
-  //Binary caching related code
-  namespace shaders {
-    bool useProgramCache(const char* programCachePath) {
-      //Get number of supported formats
-      GLint numBinaryFormats = 0;
-      glGetIntegerv(GL_NUM_PROGRAM_BINARY_FORMATS, &numBinaryFormats);
-
-      //Check support for collecting the program binary
-      if (!ammonite::utils::checkExtension("GL_ARB_get_program_binary", "GL_VERSION_4_1")) {
-        std::cerr << "Binary caching unsupported" << std::endl;
-        cacheBinaries = false;
-        return false;
-      } else if (numBinaryFormats < 1) {
-        std::cerr << "Binary caching unsupported (no supported formats)" << std::endl;
-        cacheBinaries = false;
-        return false;
-      }
-
-      //Attempt to create a cache directory
-      try {
-        std::filesystem::create_directory(programCachePath);
-      } catch (const std::filesystem::filesystem_error&) {
-        std::cerr << "Failed to create cache directory: '" << programCachePath << "'" << std::endl;
-        cacheBinaries = false;
-        return false;
-      }
-
-      //If the cache directory doesn't exist, disable caching and exit
-      if (!std::filesystem::is_directory(programCachePath)) {
-        std::cerr << "Couldn't find cache directory: '" << programCachePath << "'" << std::endl;
-        cacheBinaries = false;
-        return false;
-      }
-
-      //Enable cache and ensure path has a trailing slash
-      cacheBinaries = true;
-      programCacheDir = programCachePath;
-      if (programCacheDir.back() != '/') {
-        programCacheDir.push_back('/');
-      }
-
-      std::cout << "Binary caching enabled ('" << programCacheDir << "')" << std::endl;
-      return true;
-    }
-
-    GLuint createProgram(const char* shaderPaths[], const GLenum shaderTypes[], const int shaderCount, bool* externalSuccess, const char* programName) {
-      //Used later as the return value
-      GLuint programId;
-
-      const std::string targetFiles[2] = {
-        programCacheDir + programName + ".cache",
-        programCacheDir + programName + ".cacheinfo"
-      };
-
-      //If caching is enabled, attempt to use a cached version instead
-      if (cacheBinaries) {
-        //Check the cache files are present
-        bool filesExist = true;
-        for (int i = 0; i < 2; i++) {
-          if (!std::filesystem::exists(targetFiles[i])) {
-            //File(s) missing, cache can't be used
-            filesExist = false;
-            i = 1;
-          }
-        }
-
-        //Attempt to load the cached file
-        bool cacheValid = true;
-        if (filesExist) {
-          GLenum cachedBinaryFormat = 0;
-          GLsizei cachedBinaryLength = 0;
-
-          std::string line;
-          std::ifstream cachedBinaryInfoFile(targetFiles[1]);
-          if (cachedBinaryInfoFile.is_open()) {
-            try {
-              //Get the binary format
-              getline(cachedBinaryInfoFile, line);
-              cachedBinaryFormat = std::stoi(line);
-              //Get the length of the binary
-              getline(cachedBinaryInfoFile, line);
-              cachedBinaryLength = std::stoi(line);
-            } catch (const std::out_of_range&) {
-              cacheValid = false;
-            }
-
-            //Validate filesize and access times of shaders used
-            if (cacheValid) {
-              for (int i = 0; i < shaderCount; i++) {
-                //Get expected filename, filesize and timestamp
-                std::vector<std::string> strings;
-                getline(cachedBinaryInfoFile, line);
-                std::stringstream rawLine(line);
-
-                while (getline(rawLine, line, ';')) {
-                  strings.push_back(line);
-                }
-
-                if (strings.size() == 3) {
-                  if (strings[0] != shaderPaths[i]) {
-                    //Program made from different shaders, invalidate
-                    cacheValid = false;
-                    i = shaderCount;
-                  }
-
-                  //Get filesize and time of last modification of the shader source
-                  long long int filesize, modificationTime;
-                  getFileMetadata(shaderPaths[i], &filesize, &modificationTime);
-
-                  if (std::stoi(strings[1]) != filesize or std::stoi(strings[2]) != modificationTime) {
-                    //Shader source code has changed, invalidate
-                    cacheValid = false;
-                    i = shaderCount;
-                  }
-                } else {
-                  //Cache info file broken, invalidate
-                  cacheValid = false;
-                  i = shaderCount;
-                }
-              }
-
-              cachedBinaryInfoFile.close();
-            }
-          }
-
-          if (cacheValid) {
-            //Read the cached data from file
-            char cachedBinaryData[cachedBinaryLength];
-            std::ifstream input(targetFiles[0], std::ios::binary);
-            input.read(&cachedBinaryData[0], cachedBinaryLength);
-
-            //Load the cached binary data
-            programId = glCreateProgram();
-            glProgramBinary(programId, cachedBinaryFormat, cachedBinaryData, cachedBinaryLength);
-
-            //Return the program ID, unless the cache was faulty, then delete and carry on
-            if (checkProgram(programId)) {
-              return programId;
-            } else {
-              std::cerr << "Failed to process '" << targetFiles[0] << "'" << std::endl;
-              deleteCacheFile(programName);
-            }
-          } else {
-            //Shader source doesn't match cache, delete the old cache
-            deleteCacheFile(programName);
-          }
-        }
-      }
-
+    //Create program from set of shader paths
+    GLuint createProgram(const char* shaderPaths[], const GLenum shaderTypes[], const int shaderCount, bool* externalSuccess) {
       GLuint shaderIds[shaderCount];
       for (int i = 0; i < shaderCount; i++) {
         shaderIds[i] = loadShader(shaderPaths[i], shaderTypes[i], externalSuccess);
       }
 
       //Create the program like normal, as a valid cache wasn't found
-      programId = createProgram(shaderIds, shaderCount, externalSuccess);
+      GLuint programId = createProgram(shaderIds, shaderCount, externalSuccess);
 
+      //Cleanup on failure
       if (!*externalSuccess) {
         ammonite::shaders::eraseShaders();
         return 0;
       }
 
+      return programId;
+    }
+  }
+
+  //Cached versions of program creation
+  namespace shaders {
+    GLuint createProgram(const char* shaderPaths[], const GLenum shaderTypes[], const int shaderCount, bool* externalSuccess, const char* programName) {
+      //Used later as the return value
+      GLuint programId;
+
+      //Check for OpenGL and engine cache support
+      const bool cacheSupported = isBinaryCacheSupported and ammonite::utils::cache::getCacheEnabled();
+
+      if (cacheSupported) {
+        bool cacheValid = false;
+        std::string cacheFilePath = ammonite::utils::cache::requestCachedData(shaderPaths, shaderCount, programName, &cacheValid);
+        std::string cacheFileInfoPath = cacheFilePath + "info";
+
+        //Attempt to get the shader format and size
+        GLenum cachedBinaryFormat = 0;
+        GLsizei cachedBinaryLength = 0;
+
+        if (cacheValid) {
+          std::string line;
+          std::ifstream cacheInfoFile(cacheFileInfoPath);
+          if (cacheInfoFile.is_open()) {
+            try {
+              //Skip input files
+              for (int i = 0; i < shaderCount; i++) {
+                getline(cacheInfoFile, line);
+              }
+
+              //Get the binary format
+              getline(cacheInfoFile, line);
+              cachedBinaryFormat = std::stoi(line);
+
+              //Get the length of the binary
+              getline(cacheInfoFile, line);
+              cachedBinaryLength = std::stoi(line);
+            } catch (const std::out_of_range&) {
+              cacheValid = false;
+            } catch (const std::invalid_argument&) {
+              cacheValid = false;
+            }
+
+            cacheInfoFile.close();
+          }
+        }
+
+        //If cache is still valid, attempt to use it
+        if (cacheValid) {
+          //Read the cached data from file
+          char cachedBinaryData[cachedBinaryLength];
+          std::ifstream input(cacheFilePath, std::ios::binary);
+          input.read(&cachedBinaryData[0], cachedBinaryLength);
+
+          //Load the cached binary data
+          programId = glCreateProgram();
+          glProgramBinary(programId, cachedBinaryFormat, cachedBinaryData, cachedBinaryLength);
+
+          //Return the program ID, unless the cache was faulty, then delete and carry on
+          if (checkProgram(programId)) {
+            return programId;
+          } else {
+            std::cerr << "Failed to process '" << cacheFilePath << "'" << std::endl;
+            deleteCacheFile(cacheFilePath);
+          }
+        } else {
+          //Shader source doesn't match cache, delete the old cache
+          if (cacheFilePath != "") {
+            deleteCacheFile(cacheFilePath);
+          }
+        }
+      }
+
+      //Fall back to non-cached program creation
+      programId = createProgram(shaderPaths, shaderTypes, shaderCount, externalSuccess);
+
       //If caching is enabled, cache the binary
-      if (cacheBinaries) {
-        std::cout << "Caching '" << targetFiles[0] << "'" << std::endl;
+      if (cacheSupported) {
+        std::string cacheFilePath = ammonite::utils::cache::requestNewCache(programName);
+        std::string cacheFileInfoPath = cacheFilePath + "info";
+
+        std::cout << "Caching '" << cacheFilePath << "'" << std::endl;
         int binaryLength;
         GLenum binaryFormat;
 
@@ -359,36 +292,36 @@ namespace ammonite {
         glGetProgramBinary(programId, binaryLength, NULL, &binaryFormat, &binaryData);
 
         if (binaryLength == 0) {
-          std::cerr << "Failed to cache '" << targetFiles[0] << "'" << std::endl;
+          std::cerr << "Failed to cache '" << cacheFilePath << "'" << std::endl;
           return programId;
         }
 
         //Write the binary to cache directory
-        std::ofstream binarySave(targetFiles[0], std::ios::binary);
+        std::ofstream binarySave(cacheFilePath, std::ios::binary);
         if (binarySave.is_open()) {
           binarySave.write(&binaryData[0], binaryLength);
         } else {
-          std::cerr << "Failed to cache '" << targetFiles[0] << "'" << std::endl;
-          deleteCacheFile(programName);
+          std::cerr << "Failed to cache '" << cacheFilePath << "'" << std::endl;
+          deleteCacheFile(cacheFilePath);
           return programId;
         }
 
         //Write the cache info to cache directory as programName.cacheinfo
-        std::ofstream binaryInfo(targetFiles[1]);
+        std::ofstream binaryInfo(cacheFileInfoPath);
         if (binaryInfo.is_open()) {
+          for (int i = 0; i < shaderCount; i++) {
+            long long int filesize, modificationTime;
+            ammonite::utils::files::getFileMetadata(shaderPaths[i], &filesize, &modificationTime);
+
+            binaryInfo << "input;" << shaderPaths[i] << ";" << filesize << ";" << modificationTime << "\n";
+          }
+
           binaryInfo << binaryFormat << "\n";
           binaryInfo << binaryLength << "\n";
 
-          for (int i = 0; i < shaderCount; i++) {
-            long long int filesize, modificationTime;
-            getFileMetadata(shaderPaths[i], &filesize, &modificationTime);
-
-            binaryInfo << shaderPaths[i] << ";" << filesize << ";" << modificationTime << "\n";
-          }
-
           binaryInfo.close();
         } else {
-          std::cerr << "Failed to cache '" << targetFiles[0] << "'" << std::endl;
+          std::cerr << "Failed to cache '" << cacheFileInfoPath << "'" << std::endl;
           deleteCacheFile(programName);
           return programId;
         }

@@ -71,8 +71,8 @@ int main(int argc, char* argv[]) {
   ammonite::utils::debug::enableDebug();
 #endif
 
-  //Enable binary caching
-  ammonite::shaders::useProgramCache("cache");
+  //Enable engine caching
+  ammonite::utils::cache::useDataCache("cache");
 
   //Load models from a set of objects and textures
   bool success = true;
