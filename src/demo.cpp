@@ -155,6 +155,17 @@ int main(int argc, char* argv[]) {
       performanceTimer.reset();
     }
 
+    //Handle toggling input focus
+    static int lastInputToggleState = GLFW_RELEASE;
+    int inputToggleState = glfwGetKey(window, GLFW_KEY_C);
+    if (lastInputToggleState != inputToggleState) {
+      if (lastInputToggleState == GLFW_RELEASE) {
+        ammonite::utils::controls::setInputFocus(!ammonite::utils::controls::getInputFocus());
+      }
+
+      lastInputToggleState = inputToggleState;
+    }
+
     //Cycle camera when pressed
     if (glfwGetKey(window, GLFW_KEY_B) != GLFW_PRESS) {
       cameraToggleHeld = false;

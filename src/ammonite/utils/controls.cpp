@@ -199,22 +199,8 @@ namespace ammonite {
         static ammonite::utils::Timer controlTimer;
         float deltaTime = controlTimer.getTime();
 
-        //Save last input toggle key state and current input state
-        static int lastInputToggleState = GLFW_RELEASE;
-        int inputToggleState;
-
         //Poll GLFW for input
         glfwPollEvents();
-
-        //Handle toggling input
-        inputToggleState = glfwGetKey(window, GLFW_KEY_C);
-        if (lastInputToggleState != inputToggleState) {
-          if (lastInputToggleState == GLFW_RELEASE) {
-            setInputFocusInternal(!isInputFocused);
-          }
-
-          lastInputToggleState = inputToggleState;
-        }
 
         if (isControlActive) {
           //Get active camera
