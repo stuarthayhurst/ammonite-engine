@@ -3,6 +3,7 @@
 #include <vector>
 #include <fstream>
 #include <sstream>
+#include <functional>
 
 #include "../internal/fileManager.hpp"
 
@@ -12,6 +13,18 @@ namespace ammonite {
       namespace {
         bool cacheData = false;
         std::string dataCacheDir;
+      }
+
+      namespace {
+        //Hash input filenames together to create a unique cache string
+        static std::string generateCacheString(const char* inputNames[], const int inputCount) {
+          std::string inputString = "";
+          for (int i = 0; i < inputCount; i++) {
+            inputString += std::string(inputNames[i]) + std::string(";");
+          }
+
+          return std::to_string(std::hash<std::string>{}(inputString));
+        }
       }
 
       bool useDataCache(const char* dataCachePath) {
@@ -46,13 +59,13 @@ namespace ammonite {
         return cacheData;
       }
 
-      std::string requestNewCache(std::string cacheString) {
-        return std::string(dataCacheDir + cacheString + ".cache");
+      std::string requestNewCache(const char* filePaths[], const int fileCount) {
+        return std::string(dataCacheDir + generateCacheString(filePaths, fileCount) + ".cache");
       }
 
-      std::string requestCachedData(const char* filePaths[], const int fileCount, std::string cacheString, bool* found) {
+      std::string requestCachedData(const char* filePaths[], const int fileCount, bool* found) {
         //Generate path to cache file from cache string
-        std::string cacheFilePath = dataCacheDir + cacheString + ".cache";
+        std::string cacheFilePath = requestNewCache(filePaths, fileCount);
         std::string cacheInfoFilePath = cacheFilePath + "info";
 
         //Check cache and info file exist

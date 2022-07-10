@@ -6,8 +6,8 @@
 namespace ammonite {
   namespace utils {
     namespace cache {
-      std::string requestNewCache(std::string cacheString);
-      std::string requestCachedData(const char* filePaths[], const int fileCount, std::string cacheString, bool* found);
+      std::string requestNewCache(const char* filePaths[], const int fileCount);
+      std::string requestCachedData(const char* filePaths[], const int fileCount, bool* found);
 
       bool useDataCache(const char* dataCachePath);
       bool getCacheEnabled();
