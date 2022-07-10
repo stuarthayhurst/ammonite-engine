@@ -2,6 +2,10 @@
 #include <filesystem>
 #include <string>
 
+#ifdef DEBUG
+  #include <iostream>
+#endif
+
 namespace ammonite {
   namespace utils {
     namespace files {

@@ -1,5 +1,9 @@
 #include <GLFW/glfw3.h>
 
+#ifdef DEBUG
+  #include <iostream>
+#endif
+
 namespace ammonite {
   namespace settings {
     namespace graphics {

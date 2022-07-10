@@ -1,3 +1,7 @@
+#ifdef DEBUG
+  #include <iostream>
+#endif
+
 namespace ammonite {
   namespace settings {
     namespace runtime {
