@@ -245,10 +245,10 @@ namespace ammonite {
             if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) { //Move down
               position -= glm::vec3(0, 1, 0) * deltaTime * movementSpeed;
             }
-
-            //Update the camera position
-            ammonite::camera::setPosition(activeCameraId, position);
           }
+
+          //Update the camera position
+          ammonite::camera::setPosition(activeCameraId, position);
         }
 
         //Reset time between inputs
