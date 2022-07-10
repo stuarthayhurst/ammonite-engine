@@ -6,6 +6,68 @@
 
 namespace ammonite {
   namespace settings {
+    namespace controls {
+      namespace {
+        //Structure to store base speeds, multipliers and calculated speeds
+        struct ControlSettings {
+          struct BaseControlSettings {
+            const float movementSpeed = 3.0f;
+            const float mouseSpeed = 0.005f;
+            const float zoomSpeed = 1.0f;
+          } baseSettings;
+
+          struct ControlMultipliers {
+            float movement = 1.0f;
+            float mouse = 1.0f;
+            float zoom = 1.0f;
+          } multipliers;
+
+          //Final sensitivites, exposed through "internal/runtimeSettings.hpp"
+          float movementSpeed = baseSettings.movementSpeed;
+          float mouseSpeed = baseSettings.mouseSpeed;
+          float zoomSpeed = baseSettings.zoomSpeed;
+        } controls;
+      }
+
+      void setMovementSpeed(float newMovementSpeed) {
+        controls.multipliers.movement = newMovementSpeed;
+        controls.movementSpeed = controls.baseSettings.movementSpeed * newMovementSpeed;
+      }
+
+      void setMouseSpeed(float newMouseSpeed) {
+        controls.multipliers.mouse = newMouseSpeed;
+        controls.mouseSpeed = controls.baseSettings.mouseSpeed * newMouseSpeed;
+      }
+
+      void setZoomSpeed(float newZoomSpeed) {
+        controls.multipliers.zoom = newZoomSpeed;
+        controls.zoomSpeed = controls.baseSettings.zoomSpeed * newZoomSpeed;
+      }
+
+      float getRuntimeMovementSpeed() {
+        return controls.movementSpeed;
+      }
+
+      float getRuntimeMouseSpeed() {
+        return controls.mouseSpeed;
+      }
+
+      float getRuntimeZoomSpeed() {
+        return controls.zoomSpeed;
+      }
+
+      float getMovementSpeed() {
+        return controls.multipliers.movement;
+      }
+
+      float getMouseSpeed() {
+        return controls.multipliers.mouse;
+      }
+
+      float getZoomSpeed() {
+        return controls.multipliers.zoom;
+      }
+    }
     namespace graphics {
       namespace {
         struct GraphicsSettings {

@@ -5,6 +5,7 @@
 #include <glm/gtc/constants.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "../internal/runtimeSettings.hpp"
 #include "../camera.hpp"
 #include "timer.hpp"
 
@@ -19,19 +20,6 @@ namespace ammonite {
         //Window pointer
         GLFWwindow* window;
 
-        //Base sensitivities and zoom
-        const float baseMovementSpeed = 3.0f;
-        const float baseMouseSpeed = 0.005f;
-
-        //Sensitivity multipliers (using a negative value will invert movement)
-        float movementSpeedMultiplier = 1.0f;
-        float mouseSpeedMultiplier = 1.0f;
-        float zoomMultiplier = 1.0f;
-
-        //Final sensitivites (zoom only uses the multiplier)
-        float movementSpeed = baseMovementSpeed * movementSpeedMultiplier;
-        float mouseSpeed = baseMouseSpeed * mouseSpeedMultiplier;
-
         //Used to find x and y mouse offsets
         double xposLast, yposLast;
 
@@ -44,7 +32,7 @@ namespace ammonite {
             //Only zoom if FoV will be between 1 and 90
             int activeCameraId = ammonite::camera::getActiveCamera();
             float fov = ammonite::camera::getFieldOfView(activeCameraId);
-            float newFov = fov - (yoffset * zoomMultiplier);
+            float newFov = fov - (yoffset * ammonite::settings::controls::getRuntimeZoomSpeed());
 
             if (newFov > 0 and newFov <= 90) {
               ammonite::camera::setFieldOfView(activeCameraId, newFov);
@@ -75,6 +63,8 @@ namespace ammonite {
             int activeCameraId = ammonite::camera::getActiveCamera();
             float horizontalAngle = ammonite::camera::getHorizontal(activeCameraId);
             float verticalAngle = ammonite::camera::getVertical(activeCameraId);
+
+            float mouseSpeed = ammonite::settings::controls::getRuntimeMouseSpeed();
 
             //Update viewing angles ('-' corrects camera inversion)
             ammonite::camera::setHorizontal(activeCameraId, horizontalAngle - (mouseSpeed * xoffset));
@@ -116,35 +106,6 @@ namespace ammonite {
           if (!focused) {
             setInputFocusInternal(focused);
           }
-        }
-      }
-
-      //Using negative values for movement will invert the axis
-      namespace settings {
-        void setMovementSpeed(float newMovementSpeed) {
-          movementSpeedMultiplier = newMovementSpeed;
-          movementSpeed = baseMovementSpeed * movementSpeedMultiplier;
-        }
-
-        void setMouseSpeed(float newMouseSpeed) {
-          mouseSpeedMultiplier = newMouseSpeed;
-          mouseSpeed = baseMouseSpeed * mouseSpeedMultiplier;
-        }
-
-        void setZoomSpeed(float newZoomMultiplier) {
-          zoomMultiplier = newZoomMultiplier;
-        }
-
-        float getMovementSpeed() {
-          return movementSpeedMultiplier;
-        }
-
-        float getMouseSpeed() {
-          return mouseSpeedMultiplier;
-        }
-
-        float getZoomSpeed() {
-          return zoomMultiplier;
         }
       }
 
@@ -223,6 +184,8 @@ namespace ammonite {
 
           //Get the current camera position
           glm::vec3 position = ammonite::camera::getPosition(activeCameraId);
+
+          float movementSpeed = ammonite::settings::controls::getRuntimeMovementSpeed();
 
           //Apply movement from inputs
           if (isInputFocused) {

@@ -3,6 +3,12 @@
 
 namespace ammonite {
   namespace settings {
+    namespace controls {
+      float getRuntimeMovementSpeed();
+      float getRuntimeMouseSpeed();
+      float getRuntimeZoomSpeed();
+    }
+
     namespace runtime {
       float* getAspectRatioPtr();
 
