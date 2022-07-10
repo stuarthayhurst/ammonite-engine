@@ -36,7 +36,7 @@ namespace ammonite {
         double xposLast, yposLast;
 
         //Current input bind, camera and control states
-        bool inputBound = true, isCameraActive = true, isControlActive = true;
+        bool isInputFocused = true, isCameraActive = true, isControlActive = true;
 
         //Increase / decrease FoV on scroll (xoffset is unused)
         static void scroll_callback(GLFWwindow*, double, double yoffset) {
@@ -94,11 +94,11 @@ namespace ammonite {
         }
 
         //Helper function to set input state
-        static void setInputBound(bool newInputBound) {
-          inputBound = newInputBound;
+        static void setInputFocusInternal(bool newisInputFocused) {
+          isInputFocused = newisInputFocused;
 
           //Hide and unhide cursor as necessary
-          if (inputBound) {
+          if (isInputFocused) {
             //Hide cursor and start taking mouse input
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
             glfwSetCursorPosCallback(window, cursor_position_callback);
@@ -114,7 +114,7 @@ namespace ammonite {
         static void window_focus_callback(GLFWwindow*, int focused) {
           //Bind / unbind input with window focus (fixes missing mouse)
           if (!focused) {
-            setInputBound(focused);
+            setInputFocusInternal(focused);
           }
         }
       }
@@ -146,22 +146,30 @@ namespace ammonite {
         float getZoomSpeed() {
           return zoomMultiplier;
         }
+      }
 
-        void setCameraActive(bool active) {
-          isCameraActive = active;
-        }
+      void setCameraActive(bool active) {
+        isCameraActive = active;
+      }
 
-        void setControlsActive(bool active) {
-          isControlActive = active;
-        }
+      void setControlsActive(bool active) {
+        isControlActive = active;
+      }
 
-        bool getCameraActive() {
-          return isCameraActive;
-        }
+      void setInputFocus(bool active) {
+        setInputFocusInternal(active);
+      }
 
-        bool getControlsActive() {
-          return isControlActive;
-        }
+      bool getCameraActive() {
+        return isCameraActive;
+      }
+
+      bool getControlsActive() {
+        return isControlActive;
+      }
+
+      bool getInputFocus() {
+        return isInputFocused;
       }
 
       void setupControls(GLFWwindow* newWindow) {
@@ -202,7 +210,7 @@ namespace ammonite {
         inputToggleState = glfwGetKey(window, GLFW_KEY_C);
         if (lastInputToggleState != inputToggleState) {
           if (lastInputToggleState == GLFW_RELEASE) {
-            setInputBound(!inputBound);
+            setInputFocusInternal(!isInputFocused);
           }
 
           lastInputToggleState = inputToggleState;
@@ -231,7 +239,7 @@ namespace ammonite {
           glm::vec3 position = ammonite::camera::getPosition(activeCameraId);
 
           //Apply movement from inputs
-          if (inputBound) {
+          if (isInputFocused) {
             if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) { //Move forward
               position += horizontalDirection * deltaTime * movementSpeed;
             }

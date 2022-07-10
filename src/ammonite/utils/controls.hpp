@@ -14,13 +14,15 @@ namespace ammonite {
         float getMovementSpeed();
         float getMouseSpeed();
         float getZoomSpeed();
-
-        void setCameraActive(bool active);
-        void setControlsActive(bool active);
-
-        bool getCameraActive();
-        bool getControlsActive();
       }
+
+      void setCameraActive(bool active);
+      void setControlsActive(bool active);
+      void setInputFocus(bool active);
+
+      bool getCameraActive();
+      bool getControlsActive();
+      bool getInputFocus();
 
       void setupControls(GLFWwindow* window);
       bool shouldWindowClose();
