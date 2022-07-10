@@ -183,29 +183,7 @@ namespace ammonite {
       return programId;
     }
 
-    //Create program from set of shader paths
     GLuint createProgram(const char* shaderPaths[], const GLenum shaderTypes[], const int shaderCount, bool* externalSuccess) {
-      GLuint shaderIds[shaderCount];
-      for (int i = 0; i < shaderCount; i++) {
-        shaderIds[i] = loadShader(shaderPaths[i], shaderTypes[i], externalSuccess);
-      }
-
-      //Create the program like normal, as a valid cache wasn't found
-      GLuint programId = createProgram(shaderIds, shaderCount, externalSuccess);
-
-      //Cleanup on failure
-      if (!*externalSuccess) {
-        ammonite::shaders::eraseShaders();
-        return 0;
-      }
-
-      return programId;
-    }
-  }
-
-  //Cached versions of program creation
-  namespace shaders {
-    GLuint createProgram(const char* shaderPaths[], const GLenum shaderTypes[], const int shaderCount, bool* externalSuccess, const char* programName) {
       //Used later as the return value
       GLuint programId;
 
@@ -214,7 +192,7 @@ namespace ammonite {
 
       if (cacheSupported) {
         bool cacheValid = false;
-        std::string cacheFilePath = ammonite::utils::cache::requestCachedData(shaderPaths, shaderCount, programName, &cacheValid);
+        std::string cacheFilePath = ammonite::utils::cache::requestCachedData(shaderPaths, shaderCount, &cacheValid);
         std::string cacheFileInfoPath = cacheFilePath + "info";
 
         //Attempt to get the shader format and size
@@ -274,12 +252,24 @@ namespace ammonite {
         }
       }
 
-      //Fall back to non-cached program creation
-      programId = createProgram(shaderPaths, shaderTypes, shaderCount, externalSuccess);
+      //Since cache wasn't available, generate fresh shaders
+      GLuint shaderIds[shaderCount];
+      for (int i = 0; i < shaderCount; i++) {
+        shaderIds[i] = loadShader(shaderPaths[i], shaderTypes[i], externalSuccess);
+      }
+
+      //Create the program like normal, as a valid cache wasn't found
+      programId = createProgram(shaderIds, shaderCount, externalSuccess);
+
+      //Cleanup on failure
+      if (!*externalSuccess) {
+        ammonite::shaders::eraseShaders();
+        return 0;
+      }
 
       //If caching is enabled, cache the binary
       if (cacheSupported) {
-        std::string cacheFilePath = ammonite::utils::cache::requestNewCache(programName);
+        std::string cacheFilePath = ammonite::utils::cache::requestNewCache(shaderPaths, shaderCount);
         std::string cacheFileInfoPath = cacheFilePath + "info";
 
         std::cout << "Caching '" << cacheFilePath << "'" << std::endl;
@@ -306,7 +296,7 @@ namespace ammonite {
           return programId;
         }
 
-        //Write the cache info to cache directory as programName.cacheinfo
+        //Write the cache info to cache directory
         std::ofstream binaryInfo(cacheFileInfoPath);
         if (binaryInfo.is_open()) {
           for (int i = 0; i < shaderCount; i++) {
@@ -322,7 +312,7 @@ namespace ammonite {
           binaryInfo.close();
         } else {
           std::cerr << "Failed to cache '" << cacheFileInfoPath << "'" << std::endl;
-          deleteCacheFile(programName);
+          deleteCacheFile(cacheFilePath);
           return programId;
         }
       }
@@ -363,12 +353,8 @@ namespace ammonite {
         shaderTypes[i] = types[i];
       }
 
-      //Get the final component of the path
-      const char* directoryName = std::string(shaderDir.parent_path().filename()).c_str();
-
       //Create the program and return the ID
-      GLuint programId = createProgram(shaderPaths, shaderTypes, shaderCount, externalSuccess, directoryName);
-      return programId;
+      return createProgram(shaderPaths, shaderTypes, shaderCount, externalSuccess);
     }
   }
 }
