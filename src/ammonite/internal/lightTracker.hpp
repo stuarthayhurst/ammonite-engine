@@ -5,6 +5,10 @@
 #include <vector>
 #include <glm/glm.hpp>
 
+/* Internally exposed header:
+ - Allow access to light tracker internally
+*/
+
 namespace ammonite {
   namespace lighting {
     struct LightSource {

@@ -1,6 +1,10 @@
 #ifndef FILES
 #define FILES
 
+/* Internally exposed header:
+ - Expose some file handling methods internally
+*/
+
 namespace ammonite {
   namespace utils {
     namespace files {

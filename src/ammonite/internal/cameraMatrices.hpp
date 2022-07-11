@@ -1,6 +1,10 @@
 #ifndef INTERNALCAMERA
 #define INTERNALCAMERA
 
+/* Internally exposed header:
+ - Allow renderer to request pointers to the view and projection matrices
+*/
+
 namespace ammonite {
   namespace camera {
     namespace matrices {

@@ -1,6 +1,11 @@
 #ifndef INTERNALSETTINGS
 #define INTERNALSETTINGS
 
+/* Internally exposed header:
+ - Allow access to internally set settings
+ - Allow access to pointers storing settings values
+*/
+
 namespace ammonite {
   namespace settings {
     namespace controls {

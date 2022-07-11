@@ -7,6 +7,11 @@
 #include <glm/gtx/quaternion.hpp>
 #include <GL/glew.h>
 
+/* Internally exposed header:
+ - Allow access to model tracker internally
+ - Expose data structures for models
+*/
+
 namespace ammonite {
   namespace models {
     struct VertexData {

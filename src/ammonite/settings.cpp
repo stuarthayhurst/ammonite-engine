@@ -31,6 +31,7 @@ namespace ammonite {
         } controls;
       }
 
+      //Exposed internally only
       namespace internal {
         float* getMovementSpeedPtr() {
           return &controls.movementSpeed;
@@ -94,6 +95,7 @@ namespace ammonite {
         } graphics;
       }
 
+      //Exposed internally only
       namespace internal {
         float* getFrameLimitPtr() {
           return &graphics.frameLimit;
@@ -136,6 +138,7 @@ namespace ammonite {
         float aspectRatio = 0.0f;
       }
 
+      //Exposed internally only
       namespace internal {
         float* getAspectRatioPtr() {
           return &aspectRatio;
