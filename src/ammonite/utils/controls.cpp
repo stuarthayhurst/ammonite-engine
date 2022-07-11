@@ -29,13 +29,15 @@ namespace ammonite {
         //Increase / decrease FoV on scroll (xoffset is unused)
         static void scroll_callback(GLFWwindow*, double, double yoffset) {
           if (isCameraActive) {
-            //Only zoom if FoV will be between 1 and 90
             int activeCameraId = ammonite::camera::getActiveCamera();
-            static float* zoomSpeedPtr = ammonite::settings::controls::internal::getZoomSpeedPtr();
             float fov = ammonite::camera::getFieldOfView(activeCameraId);
-            float newFov = fov - (yoffset * *zoomSpeedPtr);
 
-            if (newFov > 0 and newFov <= 180) {
+            static float* zoomSpeedPtr = ammonite::settings::controls::internal::getZoomSpeedPtr();
+            static float* fovLimitPtr = ammonite::settings::controls::internal::getFovLimitPtr();
+
+            //Only zoom if FoV will be between 1 and FoV limit
+            float newFov = fov - (yoffset * *zoomSpeedPtr);
+            if (newFov > 0 and newFov <= *fovLimitPtr) {
               ammonite::camera::setFieldOfView(activeCameraId, newFov);
             }
           }

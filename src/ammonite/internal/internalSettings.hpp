@@ -8,6 +8,7 @@ namespace ammonite {
         float* getMovementSpeedPtr();
         float* getMouseSpeedPtr();
         float* getZoomSpeedPtr();
+        float* getFovLimitPtr();
       }
     }
 

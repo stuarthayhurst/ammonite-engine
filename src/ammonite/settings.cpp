@@ -22,6 +22,8 @@ namespace ammonite {
             float zoom = 1.0f;
           } multipliers;
 
+          float fovLimit = 120.0f;
+
           //Final sensitivites, exposed through "internal/runtimeSettings.hpp"
           float movementSpeed = baseSettings.movementSpeed;
           float mouseSpeed = baseSettings.mouseSpeed;
@@ -41,6 +43,10 @@ namespace ammonite {
         float* getZoomSpeedPtr() {
           return &controls.zoomSpeed;
         }
+
+        float* getFovLimitPtr() {
+          return &controls.fovLimit;
+        }
       }
 
       void setMovementSpeed(float newMovementSpeed) {
@@ -58,6 +64,10 @@ namespace ammonite {
         controls.zoomSpeed = controls.baseSettings.zoomSpeed * newZoomSpeed;
       }
 
+      void setFovLimit(float newFovLimit) {
+        controls.fovLimit = newFovLimit;
+      }
+
       float getMovementSpeed() {
         return controls.multipliers.movement;
       }
@@ -68,6 +78,10 @@ namespace ammonite {
 
       float getZoomSpeed() {
         return controls.multipliers.zoom;
+      }
+
+      float getFovLimit() {
+        return controls.fovLimit;
       }
     }
 

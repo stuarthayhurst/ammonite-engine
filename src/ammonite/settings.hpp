@@ -7,10 +7,12 @@ namespace ammonite {
       void setMovementSpeed(float newMovementSpeed);
       void setMouseSpeed(float newMouseSpeed);
       void setZoomSpeed(float newZoomSpeed);
+      void setFovLimit(float newFovLimit);
 
       float getMovementSpeed();
       float getMouseSpeed();
       float getZoomSpeed();
+      float getFovLimit();
     }
 
     namespace graphics {
