@@ -70,6 +70,7 @@ namespace ammonite {
         return controls.multipliers.zoom;
       }
     }
+
     namespace graphics {
       namespace {
         struct GraphicsSettings {
@@ -77,6 +78,16 @@ namespace ammonite {
           float frameLimit = 0.0f;
           int shadowRes = 1024;
         } graphics;
+      }
+
+      namespace internal {
+        float* getFrameLimitPtr() {
+          return &graphics.frameLimit;
+        }
+
+        int* getShadowResPtr() {
+          return &graphics.shadowRes;
+        }
       }
 
       void setVsync(bool enabled) {
@@ -102,6 +113,45 @@ namespace ammonite {
 
       int getShadowRes() {
         return graphics.shadowRes;
+      }
+    }
+
+    namespace runtime {
+      namespace {
+        int width = 0, height = 0;
+        float aspectRatio = 0.0f;
+      }
+
+      namespace internal {
+        float* getAspectRatioPtr() {
+          return &aspectRatio;
+        }
+
+        int* getWidthPtr() {
+          return &width;
+        }
+
+        int* getHeightPtr() {
+          return &height;
+        }
+
+        void setWidth(int newWidth) {
+          width = newWidth;
+          aspectRatio = float(width) / float(height);
+        }
+
+        void setHeight(int newHeight) {
+          height = newHeight;
+          aspectRatio = float(width) / float(height);
+        }
+      }
+
+      int getWidth() {
+        return width;
+      }
+
+      int getHeight() {
+        return height;
       }
     }
   }

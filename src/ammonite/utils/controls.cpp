@@ -5,7 +5,7 @@
 #include <glm/gtc/constants.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "../internal/settingPointers.hpp"
+#include "../internal/internalSettings.hpp"
 #include "../camera.hpp"
 #include "timer.hpp"
 

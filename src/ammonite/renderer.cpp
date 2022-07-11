@@ -9,7 +9,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include "internal/runtimeSettings.hpp"
+#include "internal/internalSettings.hpp"
 #include "internal/modelTracker.hpp"
 #include "internal/lightTracker.hpp"
 #include "internal/cameraMatrices.hpp"
@@ -276,13 +276,13 @@ namespace ammonite {
       }
 
       //Get shadow resolution and light count, save for next time to avoid cubemap recreation
-      int shadowRes = ammonite::settings::graphics::getShadowRes();
+      static int* shadowResPtr = ammonite::settings::graphics::internal::getShadowResPtr();
       static int lastShadowRes = 0;
       unsigned int lightCount = lightTrackerMap->size();
       static unsigned int lastLightCount = 0;
 
       //If number of lights or shadow resolution changes, recreate cubemap
-      if ((shadowRes != lastShadowRes) or (lightCount != lastLightCount)) {
+      if ((*shadowResPtr != lastShadowRes) or (lightCount != lastLightCount)) {
         //Delete the cubemap array if it already exists
         if (depthCubeMapId != 0) {
           glDeleteTextures(1, &depthCubeMapId);
@@ -292,7 +292,7 @@ namespace ammonite {
         glCreateTextures(GL_TEXTURE_CUBE_MAP_ARRAY, 1, &depthCubeMapId);
 
         //Create 6 faces for each light source
-        glTextureStorage3D(depthCubeMapId, 1, GL_DEPTH_COMPONENT32, shadowRes, shadowRes, lightCount * 6);
+        glTextureStorage3D(depthCubeMapId, 1, GL_DEPTH_COMPONENT32, *shadowResPtr, *shadowResPtr, lightCount * 6);
 
         //Set depth texture parameters
         glTextureParameteri(depthCubeMapId, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -304,13 +304,13 @@ namespace ammonite {
         glTextureParameteri(depthCubeMapId, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
         //Save for next time to avoid cubemap recreation
-        lastShadowRes = shadowRes;
+        lastShadowRes = *shadowResPtr;
         lastLightCount = lightCount;
       }
 
       //Swap to depth shader
       glUseProgram(depthShader.shaderId);
-      glViewport(0, 0, shadowRes, shadowRes);
+      glViewport(0, 0, *shadowResPtr, *shadowResPtr);
       glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
 
       const float nearPlane = 0.0f, farPlane = 25.0f;
@@ -360,7 +360,9 @@ namespace ammonite {
 
       //Reset the framebuffer, viewport and canvas
       glBindFramebuffer(GL_FRAMEBUFFER, 0);
-      glViewport(0, 0, ammonite::settings::runtime::getWidth(), ammonite::settings::runtime::getHeight());
+      static int* widthPtr = ammonite::settings::runtime::internal::getWidthPtr();
+      static int* heightPtr = ammonite::settings::runtime::internal::getHeightPtr();
+      glViewport(0, 0, *widthPtr, *heightPtr);
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
       //Prepare model shader, gamma correction and depth cube map
@@ -412,13 +414,14 @@ namespace ammonite {
       static ammonite::utils::Timer targetFrameTimer;
 
       //Wait until next frame should be prepared
-      if (ammonite::settings::graphics::getFrameLimit() != 0.0f) {
+      static float* frameLimitPtr = ammonite::settings::graphics::internal::getFrameLimitPtr();
+      if (*frameLimitPtr != 0.0f) {
         //Length of microsleep and allowable error
         static const double sleepInterval = 1.0 / 100000;
         static const double maxError = (sleepInterval) * 1.1;
         static const auto sleepLength = std::chrono::nanoseconds(int(std::floor(sleepInterval * 1000000000.0)));
 
-        double const targetFrameTime = 1.0 / ammonite::settings::graphics::getFrameLimit();
+        double const targetFrameTime = 1.0 / *frameLimitPtr;
         double spareTime = targetFrameTime - targetFrameTimer.getTime();;
 
         //Sleep for short intervals until the frametime budget is gone

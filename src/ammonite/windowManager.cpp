@@ -8,7 +8,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include "internal/runtimeSettings.hpp"
+#include "internal/internalSettings.hpp"
 #include "internal/shaderCacheUpdate.hpp"
 
 namespace ammonite {
@@ -20,8 +20,8 @@ namespace ammonite {
 
       //Callback to update height, width and viewport size on window resize
       static void window_size_callback(GLFWwindow*, int width, int height) {
-        ammonite::settings::runtime::setWidth(width);
-        ammonite::settings::runtime::setHeight(height);
+        ammonite::settings::runtime::internal::setWidth(width);
+        ammonite::settings::runtime::internal::setHeight(height);
         glViewport(0, 0, width, height);
       }
     }
@@ -91,8 +91,8 @@ namespace ammonite {
     //Create a window and a pointer
     GLFWwindow* createWindow(int width, int height, const char* title) {
       //Set initial size
-      ammonite::settings::runtime::setWidth(width);
-      ammonite::settings::runtime::setHeight(height);
+      ammonite::settings::runtime::internal::setWidth(width);
+      ammonite::settings::runtime::internal::setHeight(height);
 
       window = glfwCreateWindow(width, height, title, NULL, NULL);
       if (window == NULL) {

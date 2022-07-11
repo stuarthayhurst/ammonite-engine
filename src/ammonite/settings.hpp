@@ -15,11 +15,19 @@ namespace ammonite {
 
     namespace graphics {
       void setVsync(bool enabled);
-      bool getVsync();
       void setFrameLimit(float frameTarget);
-      float getFrameLimit();
       void setShadowRes(int shadowRes);
+
+      bool getVsync();
+      float getFrameLimit();
       int getShadowRes();
+    }
+  }
+
+  namespace settings {
+    namespace runtime {
+      int getWidth();
+      int getHeight();
     }
   }
 }
