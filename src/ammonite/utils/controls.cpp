@@ -5,7 +5,7 @@
 #include <glm/gtc/constants.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "../internal/runtimeSettings.hpp"
+#include "../internal/settingPointers.hpp"
 #include "../camera.hpp"
 #include "timer.hpp"
 
@@ -31,10 +31,11 @@ namespace ammonite {
           if (isCameraActive) {
             //Only zoom if FoV will be between 1 and 90
             int activeCameraId = ammonite::camera::getActiveCamera();
+            static float* zoomSpeedPtr = ammonite::settings::controls::internal::getZoomSpeedPtr();
             float fov = ammonite::camera::getFieldOfView(activeCameraId);
-            float newFov = fov - (yoffset * ammonite::settings::controls::getRuntimeZoomSpeed());
+            float newFov = fov - (yoffset * *zoomSpeedPtr);
 
-            if (newFov > 0 and newFov <= 90) {
+            if (newFov > 0 and newFov <= 180) {
               ammonite::camera::setFieldOfView(activeCameraId, newFov);
             }
           }
@@ -64,20 +65,20 @@ namespace ammonite {
             float horizontalAngle = ammonite::camera::getHorizontal(activeCameraId);
             float verticalAngle = ammonite::camera::getVertical(activeCameraId);
 
-            float mouseSpeed = ammonite::settings::controls::getRuntimeMouseSpeed();
+            static float* mouseSpeedPtr = ammonite::settings::controls::internal::getMouseSpeedPtr();
 
             //Update viewing angles ('-' corrects camera inversion)
-            ammonite::camera::setHorizontal(activeCameraId, horizontalAngle - (mouseSpeed * xoffset));
+            ammonite::camera::setHorizontal(activeCameraId, horizontalAngle - (*mouseSpeedPtr * xoffset));
 
             //Only accept vertical angle if it won't create an impossible movement
-            float newAngle = verticalAngle - (mouseSpeed * yoffset);
+            float newAngle = verticalAngle - (*mouseSpeedPtr * yoffset);
             static const float limit = glm::radians(90.0f);
             if (newAngle > limit) { //Vertical max
               verticalAngle = limit;
             } else if (newAngle < -limit) { //Vertical min
               verticalAngle = -limit;
             } else {
-              verticalAngle += -mouseSpeed * yoffset;
+              verticalAngle += -*mouseSpeedPtr * yoffset;
             }
             ammonite::camera::setVertical(activeCameraId, verticalAngle);
           }
@@ -185,28 +186,28 @@ namespace ammonite {
           //Get the current camera position
           glm::vec3 position = ammonite::camera::getPosition(activeCameraId);
 
-          float movementSpeed = ammonite::settings::controls::getRuntimeMovementSpeed();
+          static float* movementSpeedPtr = ammonite::settings::controls::internal::getMovementSpeedPtr();
 
           //Apply movement from inputs
           if (isInputFocused) {
             if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) { //Move forward
-              position += horizontalDirection * deltaTime * movementSpeed;
+              position += horizontalDirection * deltaTime * *movementSpeedPtr;
             }
             if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) { //Move back
-              position -= horizontalDirection * deltaTime * movementSpeed;
+              position -= horizontalDirection * deltaTime * *movementSpeedPtr;
             }
             if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) { //Move right
-              position += right * deltaTime * movementSpeed;
+              position += right * deltaTime * *movementSpeedPtr;
             }
             if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) { //Move left
-              position -= right * deltaTime * movementSpeed;
+              position -= right * deltaTime * *movementSpeedPtr;
             }
 
             if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) { //Move up
-              position += glm::vec3(0, 1, 0) * deltaTime * movementSpeed;
+              position += glm::vec3(0, 1, 0) * deltaTime * *movementSpeedPtr;
             }
             if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) { //Move down
-              position -= glm::vec3(0, 1, 0) * deltaTime * movementSpeed;
+              position -= glm::vec3(0, 1, 0) * deltaTime * *movementSpeedPtr;
             }
           }
 

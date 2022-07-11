@@ -29,6 +29,20 @@ namespace ammonite {
         } controls;
       }
 
+      namespace internal {
+        float* getMovementSpeedPtr() {
+          return &controls.movementSpeed;
+        }
+
+        float* getMouseSpeedPtr() {
+          return &controls.mouseSpeed;
+        }
+
+        float* getZoomSpeedPtr() {
+          return &controls.zoomSpeed;
+        }
+      }
+
       void setMovementSpeed(float newMovementSpeed) {
         controls.multipliers.movement = newMovementSpeed;
         controls.movementSpeed = controls.baseSettings.movementSpeed * newMovementSpeed;
@@ -42,18 +56,6 @@ namespace ammonite {
       void setZoomSpeed(float newZoomSpeed) {
         controls.multipliers.zoom = newZoomSpeed;
         controls.zoomSpeed = controls.baseSettings.zoomSpeed * newZoomSpeed;
-      }
-
-      float getRuntimeMovementSpeed() {
-        return controls.movementSpeed;
-      }
-
-      float getRuntimeMouseSpeed() {
-        return controls.mouseSpeed;
-      }
-
-      float getRuntimeZoomSpeed() {
-        return controls.zoomSpeed;
       }
 
       float getMovementSpeed() {
