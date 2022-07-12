@@ -4,6 +4,7 @@
 #include <string>
 #include <chrono>
 #include <thread>
+#include <cmath>
 
 #include <glm/glm.hpp>
 #include <GL/glew.h>
@@ -66,6 +67,7 @@ namespace ammonite {
 
       //Get the light tracker
       std::map<int, ammonite::lighting::LightSource>* lightTrackerMap = ammonite::lighting::getLightTracker();
+      unsigned int maxLightCount = 0;
 
       //View projection combined matrix
       glm::mat4 viewProjectionMatrix;
@@ -174,6 +176,11 @@ namespace ammonite {
         glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LEQUAL);
+
+        //Get the max number of lights supported, from the max layers on a cubemap
+        static int maxArrayLayers = 0;
+        glGetIntegerv(GL_MAX_ARRAY_TEXTURE_LAYERS, &maxArrayLayers);
+        maxLightCount = std::floor(maxArrayLayers / 6);
       }
     }
 
@@ -292,7 +299,8 @@ namespace ammonite {
         glCreateTextures(GL_TEXTURE_CUBE_MAP_ARRAY, 1, &depthCubeMapId);
 
         //Create 6 faces for each light source
-        glTextureStorage3D(depthCubeMapId, 1, GL_DEPTH_COMPONENT32, *shadowResPtr, *shadowResPtr, lightCount * 6);
+        int depthLayers = std::min(maxLightCount, lightCount) * 6;
+        glTextureStorage3D(depthCubeMapId, 1, GL_DEPTH_COMPONENT32, *shadowResPtr, *shadowResPtr, depthLayers);
 
         //Set depth texture parameters
         glTextureParameteri(depthCubeMapId, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -326,14 +334,15 @@ namespace ammonite {
       glClear(GL_DEPTH_BUFFER_BIT);
 
       auto lightIt = lightTrackerMap->begin();
-      for (unsigned int shadowCount = 0; shadowCount < lightCount; shadowCount++) {
+      unsigned int maxShadows = std::min(lightCount, maxLightCount);
+      for (unsigned int shadowCount = 0; shadowCount < maxShadows; shadowCount++) {
         //Get light source and position from tracker
         auto lightSource = lightIt->second;
         glm::vec3 lightPos = lightSource.geometry;
 
         //Check framebuffer status
         if (glCheckNamedFramebufferStatus(depthMapFBO, GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-          std::cerr << "Incomplete framebuffer" << std::endl;
+          std::cerr << "Warning: Incomplete depth framebuffer" << std::endl;
         }
 
         //Transformations to cube map faces
