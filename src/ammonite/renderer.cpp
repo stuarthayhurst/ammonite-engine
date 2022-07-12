@@ -279,7 +279,7 @@ namespace ammonite {
       static int* shadowResPtr = ammonite::settings::graphics::internal::getShadowResPtr();
       static int lastShadowRes = 0;
       unsigned int lightCount = lightTrackerMap->size();
-      static unsigned int lastLightCount = 0;
+      static unsigned int lastLightCount = -1;
 
       //If number of lights or shadow resolution changes, recreate cubemap
       if ((*shadowResPtr != lastShadowRes) or (lightCount != lastLightCount)) {
@@ -303,6 +303,9 @@ namespace ammonite {
         glTextureParameteri(depthCubeMapId, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glTextureParameteri(depthCubeMapId, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
+        //Attach cubemap array to framebuffer
+        glNamedFramebufferTexture(depthMapFBO, GL_DEPTH_ATTACHMENT, depthCubeMapId, 0);
+
         //Save for next time to avoid cubemap recreation
         lastShadowRes = *shadowResPtr;
         lastLightCount = lightCount;
@@ -319,8 +322,7 @@ namespace ammonite {
       //Pass uniforms that don't change between light source
       glUniform1f(depthShader.farPlaneId, farPlane);
 
-      //Attach cubemap array to framebuffer and clear existing depths
-      glNamedFramebufferTexture(depthMapFBO, GL_DEPTH_ATTACHMENT, depthCubeMapId, 0);
+      //Clear existing depths values
       glClear(GL_DEPTH_BUFFER_BIT);
 
       auto lightIt = lightTrackerMap->begin();
