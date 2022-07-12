@@ -243,29 +243,23 @@ namespace ammonite {
 
       void setGeometry(int lightId, glm::vec3 geometry) {
         ammonite::lighting::LightSource* lightSource = ammonite::lighting::getLightSourcePtr(lightId);
-        if (lightSource == nullptr) {
-          return;
+        if (lightSource != nullptr) {
+          lightSource->geometry = geometry;
         }
-
-        lightSource->geometry = geometry;
       }
 
       void setColour(int lightId, glm::vec3 colour) {
         ammonite::lighting::LightSource* lightSource = ammonite::lighting::getLightSourcePtr(lightId);
-        if (lightSource == nullptr) {
-          return;
+        if (lightSource != nullptr) {
+          lightSource->colour = colour;
         }
-
-        lightSource->colour = colour;
       }
 
       void setPower(int lightId, float power) {
         ammonite::lighting::LightSource* lightSource = ammonite::lighting::getLightSourcePtr(lightId);
-        if (lightSource == nullptr) {
-          return;
+        if (lightSource != nullptr) {
+          lightSource->power = power;;
         }
-
-        lightSource->power = power;
       }
     }
   }
