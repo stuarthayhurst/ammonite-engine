@@ -336,8 +336,8 @@ namespace ammonite {
       unsigned int maxShadows = std::min(lightCount, maxLightCount);
       for (unsigned int shadowCount = 0; shadowCount < maxShadows; shadowCount++) {
         //Get light source and position from tracker
-        auto lightSource = lightIt->second;
-        glm::vec3 lightPos = lightSource.geometry;
+        auto lightSource = &lightIt->second;
+        glm::vec3 lightPos = lightSource->geometry;
 
         //Check framebuffer status
         if (glCheckNamedFramebufferStatus(depthMapFBO, GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
@@ -348,7 +348,7 @@ namespace ammonite {
         for (int i = 0; i < 6; i++) {
           GLuint shadowMatrixId = glGetUniformLocation(depthShader.shaderId, std::string("shadowMatrices[" + std::to_string(i) + "]").c_str());
           //Fetch the transform from the tracker, and send to the shader
-          glUniformMatrix4fv(shadowMatrixId, 1, GL_FALSE, &((*lightTransformMap)[lightSource.lightId][i])[0][0]);
+          glUniformMatrix4fv(shadowMatrixId, 1, GL_FALSE, &((*lightTransformMap)[lightSource->lightId][i])[0][0]);
         }
 
         //Pass light source specific uniforms
