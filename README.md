@@ -1,7 +1,8 @@
 ## Ammonite Renderer
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://paypal.me/stuartahayhurst)
-  - A simple OpenGL based renderer to render loaded data, focused on ease of use
-  - If you found this project interesting, any donations are greatly appreciated :)
+  - A simple OpenGL based graphics engine, designed to render loaded models and data
+  - This project was built to learn C++ and graphics programming, but contributions are welcome
+    - If you found this project interesting, any donations are greatly appreciated :)
 
 ![Icon](assets/icons/icon.svg)
 
