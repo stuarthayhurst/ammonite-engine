@@ -14,7 +14,12 @@ const unsigned short int width = 1024;
 const unsigned short int height = 768;
 
 void printMetrics(double frameTime) {
-  std::printf("%.2f fps", 1 / frameTime);
+  double frameRate = 0.0;
+  if (frameTime != 0.0) {
+    frameRate = 1 / frameTime;
+  }
+
+  std::printf("%.2f fps", frameRate);
   std::printf(" (%fms)\n", frameTime * 1000);
 }
 
