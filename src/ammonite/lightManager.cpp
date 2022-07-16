@@ -97,11 +97,10 @@ namespace ammonite {
         float power[4];
       } shaderData[lightTrackerMap.size()];
 
-      //Use 1 thread per 25 light sources, up to hardware maximum
-      unsigned int threadCount = std::ceil(lightTrackerMap.size() / 25);
-      if (threadCount > std::thread::hardware_concurrency()) {
-        threadCount = std::thread::hardware_concurrency();
-      }
+      //Use 1 thread per 20 light sources, up to hardware maximum
+      unsigned int threadCount = std::ceil(lightTrackerMap.size() / 20);
+      threadCount = std::min(threadCount, std::thread::hardware_concurrency());
+
       omp_set_dynamic(0);
       omp_set_num_threads(threadCount);
 
