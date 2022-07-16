@@ -7,6 +7,7 @@
 
 /* Internally exposed header:
  - Allow access to light tracker internally
+ - Allow access to light transforms internally
 */
 
 namespace ammonite {
@@ -26,6 +27,7 @@ namespace ammonite {
     void getLightEmitters(int* lightCount, std::vector<int>* lightData);
 
     std::map<int, LightSource>* getLightTracker();
+    std::map<int, glm::mat4[6]>* getLightTransforms();
   }
 }
 

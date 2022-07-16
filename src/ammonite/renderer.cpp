@@ -66,8 +66,9 @@ namespace ammonite {
       glm::mat4* viewMatrix = ammonite::camera::matrices::getViewMatrixPtr();
       glm::mat4* projectionMatrix = ammonite::camera::matrices::getProjectionMatrixPtr();
 
-      //Get the light tracker
+      //Get the light trackers
       std::map<int, ammonite::lighting::LightSource>* lightTrackerMap = ammonite::lighting::getLightTracker();
+      std::map<int, glm::mat4[6]>* lightTransformMap = ammonite::lighting::getLightTransforms();
       unsigned int maxLightCount = 0;
 
       //View projection combined matrix
@@ -324,10 +325,8 @@ namespace ammonite {
       glViewport(0, 0, *shadowResPtr, *shadowResPtr);
       glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
 
-      const float nearPlane = 0.0f, farPlane = 25.0f;
-      glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), 1.0f, nearPlane, farPlane);
-
       //Pass uniforms that don't change between light source
+      static const float farPlane = 25.0f;
       glUniform1f(depthShader.farPlaneId, farPlane);
 
       //Clear existing depths values
@@ -345,19 +344,11 @@ namespace ammonite {
           std::cerr << "Warning: Incomplete depth framebuffer" << std::endl;
         }
 
-        //Transformations to cube map faces
-        std::vector<glm::mat4> shadowTransforms;
-        shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
-        shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
-        shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0)));
-        shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0)));
-        shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0)));
-        shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0)));
-
-        //Pass shadow matrices to depth shader
+        //Pass shadow transform matrices to depth shader
         for (int i = 0; i < 6; i++) {
           GLuint shadowMatrixId = glGetUniformLocation(depthShader.shaderId, std::string("shadowMatrices[" + std::to_string(i) + "]").c_str());
-          glUniformMatrix4fv(shadowMatrixId, 1, GL_FALSE, &(shadowTransforms[i])[0][0]);
+          //Fetch the transform from the tracker, and send to the shader
+          glUniformMatrix4fv(shadowMatrixId, 1, GL_FALSE, &((*lightTransformMap)[lightSource.lightId][i])[0][0]);
         }
 
         //Pass light source specific uniforms

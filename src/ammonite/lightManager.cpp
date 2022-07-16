@@ -1,6 +1,6 @@
 #include <map>
-#include <cmath>
 #include <vector>
+#include <cmath>
 
 #include <GL/glew.h>
 #include <glm/glm.hpp>
@@ -26,6 +26,7 @@ namespace ammonite {
 
     //Track light sources
     std::map<int, lighting::LightSource> lightTrackerMap;
+    std::map<int, glm::mat4[6]> lightTransformMap;
     unsigned int prevLightCount = 0;
 
     //Track cumulative number of created light sources
@@ -59,6 +60,10 @@ namespace ammonite {
 
     std::map<int, LightSource>* getLightTracker() {
       return &lightTrackerMap;
+    }
+
+    std::map<int, glm::mat4[6]>* getLightTransforms() {
+      return &lightTransformMap;
     }
 
     //Unlink a light source from a model, using only the model ID (doesn't touch the model)
@@ -120,6 +125,18 @@ namespace ammonite {
           lightEmitterData.push_back(lightSource->modelId);
           lightEmitterData.push_back(i);
         }
+
+        static const float nearPlane = 0.0f, farPlane = 25.0f;
+        static glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), 1.0f, nearPlane, farPlane);
+
+        //Calculate shadow transforms for shadows
+        glm::vec3 lightPos = lightSource->geometry;
+        lightTransformMap[lightSource->lightId][0] = shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));
+        lightTransformMap[lightSource->lightId][1] = shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));
+        lightTransformMap[lightSource->lightId][2] = shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0));
+        lightTransformMap[lightSource->lightId][3] = shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0));
+        lightTransformMap[lightSource->lightId][4] = shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0));
+        lightTransformMap[lightSource->lightId][5] = shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0));
 
         shaderData[i].geometry = glm::vec4(lightSource->geometry, 0);
         shaderData[i].colour = glm::vec4(lightSource->colour, 0);
@@ -206,6 +223,13 @@ namespace ammonite {
       if (it != lightTrackerMap.end()) {
         //Remove the light source from the tracker
         lightTrackerMap.erase(lightId);
+      }
+
+      //Remove any light transform entry
+      auto transformIt = lightTransformMap.find(lightId);
+      if (transformIt != lightTransformMap.end()) {
+        //Remove the light source tranforms from the tracker
+        lightTransformMap.erase(lightId);
       }
     }
 
