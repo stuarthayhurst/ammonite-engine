@@ -178,7 +178,7 @@ namespace ammonite {
         glDepthFunc(GL_LEQUAL);
 
         //Get the max number of lights supported, from the max layers on a cubemap
-        static int maxArrayLayers = 0;
+        int maxArrayLayers = 0;
         glGetIntegerv(GL_MAX_ARRAY_TEXTURE_LAYERS, &maxArrayLayers);
         maxLightCount = std::floor(maxArrayLayers / 6);
       }
