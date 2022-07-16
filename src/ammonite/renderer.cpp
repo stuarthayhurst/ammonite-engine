@@ -326,8 +326,8 @@ namespace ammonite {
       glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
 
       //Pass uniforms that don't change between light source
-      static const float farPlane = 25.0f;
-      glUniform1f(depthShader.farPlaneId, farPlane);
+      static float* farPlanePtr = ammonite::settings::graphics::internal::getShadowFarPlanePtr();
+      glUniform1f(depthShader.farPlaneId, *farPlanePtr);
 
       //Clear existing depths values
       glClear(GL_DEPTH_BUFFER_BIT);
@@ -382,7 +382,7 @@ namespace ammonite {
       //Pass uniforms and render regular models
       glUniform3fv(modelShader.ambientLightId, 1, &ambientLight[0]);
       glUniform3fv(modelShader.cameraPosId, 1, &cameraPosition[0]);
-      glUniform1f(modelShader.farPlaneId, farPlane);
+      glUniform1f(modelShader.farPlaneId, *farPlanePtr);
       glUniform1i(modelShader.lightCountId, maxShadows);
       drawModels(modelIds, modelCount, false);
 

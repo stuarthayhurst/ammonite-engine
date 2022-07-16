@@ -92,6 +92,7 @@ namespace ammonite {
           bool vsyncEnabled = true;
           float frameLimit = 0.0f;
           int shadowRes = 1024;
+          float farPlane = 25.0f;
         } graphics;
       }
 
@@ -103,6 +104,10 @@ namespace ammonite {
 
         int* getShadowResPtr() {
           return &graphics.shadowRes;
+        }
+
+        float* getShadowFarPlanePtr() {
+          return &graphics.farPlane;
         }
       }
 
@@ -129,6 +134,14 @@ namespace ammonite {
 
       int getShadowRes() {
         return graphics.shadowRes;
+      }
+
+      void setShadowFarPlane(float farPlane) {
+        graphics.farPlane = farPlane;
+      }
+
+      float getShadowfarPlane() {
+        return graphics.farPlane;
       }
     }
 

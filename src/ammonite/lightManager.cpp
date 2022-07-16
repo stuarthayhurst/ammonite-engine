@@ -8,6 +8,7 @@
 #include <omp.h>
 #include <thread>
 
+#include "internal/internalSettings.hpp"
 #include "internal/lightTracker.hpp"
 #include "internal/modelTracker.hpp"
 #include "modelManager.hpp"
@@ -115,6 +116,9 @@ namespace ammonite {
         return;
       }
 
+      static float* farPlanePtr = ammonite::settings::graphics::internal::getShadowFarPlanePtr();
+      glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), 1.0f, 0.0f, *farPlanePtr);
+
       //Repack light sources into ShaderData (uses vec4s for OpenGL)
       #pragma omp parallel for
       for(unsigned int i = 0; i < lightTrackerMap.size(); i++) {
@@ -132,9 +136,6 @@ namespace ammonite {
           lightEmitterData.push_back(lightSource->modelId);
           lightEmitterData.push_back(i);
         }
-
-        static const float nearPlane = 0.0f, farPlane = 25.0f;
-        static glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), 1.0f, nearPlane, farPlane);
 
         //Calculate shadow transforms for shadows
         glm::vec3 lightPos = lightSource->geometry;
