@@ -17,7 +17,7 @@ jobs:
         sudo apt-get update
         sudo apt-get install --no-install-recommends git make pkg-config
         sudo apt-get install --no-install-recommends inkscape optipng
-        sudo apt-get install --no-install-recommends libgomp1 libglm-dev libglfw3-dev libglew-dev libstb-dev libtinyobjloader-dev
+        sudo apt-get install --no-install-recommends libgomp1 libglm-dev libglfw3-dev libglew-dev libstb-dev libassimp-dev
 
     - name: Test icons build correctly
       run: |
