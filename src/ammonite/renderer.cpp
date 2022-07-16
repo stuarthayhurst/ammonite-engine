@@ -200,14 +200,21 @@ namespace ammonite {
           return;
         }
 
-        //Set texture for regular shading pass
-        if (lightIndex == -1 and !depthPass) {
-          glBindTextureUnit(0, drawObject->textureId);
-        }
+        //Get model draw data
+        ammonite::models::ModelData* drawObjectData = drawObject->modelData;
 
-        //Get draw data and bind vertex attribute buffer
-        ammonite::models::MeshData* drawObjectData = drawObject->data;
-        glBindVertexArray(drawObjectData->vertexArrayId);
+        //Set the requested draw mode (normal, wireframe, points)
+        GLenum mode = GL_TRIANGLES;
+        if (drawObject->drawMode == 1) {
+          //Use wireframe if requested
+          setWireframe(true);
+        } else {
+          //Draw points if requested
+          if (drawObject->drawMode == 2) {
+            mode = GL_POINTS;
+          }
+          setWireframe(false);
+        }
 
         //Calculate and obtain matrices
         glm::mat4 modelMatrix = drawObject->positionData.modelMatrix;
@@ -230,21 +237,18 @@ namespace ammonite {
           glUniform1i(lightShader.lightIndexId, lightIndex);
         }
 
-        //Set the requested draw mode (normal, wireframe, points)
-        GLenum mode = GL_TRIANGLES;
-        if (drawObject->drawMode == 1) {
-          //Use wireframe if requested
-          setWireframe(true);
-        } else {
-          //Draw points if requested
-          if (drawObject->drawMode == 2) {
-            mode = GL_POINTS;
+        for (unsigned int i = 0; i < drawObjectData->meshes.size(); i++) {
+          //Set texture for regular shading pass
+          if (lightIndex == -1 and !depthPass) {
+            glBindTextureUnit(0, drawObjectData->meshes[i].textureId);
           }
-          setWireframe(false);
-        }
 
-        //Draw the triangles
-        glDrawElements(mode, drawObjectData->vertexCount, GL_UNSIGNED_INT, nullptr);
+          //Bind vertex attribute buffer
+          glBindVertexArray(drawObjectData->meshes[i].vertexArrayId);
+
+          //Draw the triangles
+          glDrawElements(mode, drawObjectData->meshes[i].vertexCount, GL_UNSIGNED_INT, nullptr);
+        }
       }
     }
 

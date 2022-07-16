@@ -20,13 +20,18 @@ namespace ammonite {
     };
 
     struct MeshData {
-      std::vector<VertexData> modelData;
+      std::vector<VertexData> vertexData;
       std::vector<unsigned int> indices;
       GLuint vertexBufferId = 0;
       GLuint elementBufferId = 0;
       GLuint vertexArrayId = 0;
+      GLuint textureId = 0;
       int vertexCount = 0;
+    };
+
+    struct ModelData {
       int refCount = 1;
+      std::vector<MeshData> meshes;
     };
 
     struct PositionData {
@@ -38,9 +43,8 @@ namespace ammonite {
     };
 
     struct ModelInfo {
-      MeshData* data;
+      ModelData* modelData;
       PositionData positionData;
-      GLuint textureId = 0;
       int drawMode = 0;
       bool active = true;
       bool lightEmitting = false;

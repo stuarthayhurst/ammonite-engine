@@ -1,7 +1,7 @@
 CXX ?= $(shell command -v g++)
 SHELL = bash
 
-LIBS = glm glfw3 glew stb tinyobjloader
+LIBS = glm glfw3 glew stb assimp
 BUILD_DIR = build
 CACHE_DIR = cache
 #These two should always end in ammonite, otherwise filesystem damage is a possibility

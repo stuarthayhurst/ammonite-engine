@@ -4,9 +4,11 @@
 #include <cstring>
 #include <string>
 
-#define TINYOBJLOADER_IMPLEMENTATION
-#include <tiny_obj_loader.h>
 #include <GL/glew.h>
+
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -19,173 +21,144 @@
 
 namespace ammonite {
   namespace {
-    struct PackedVertexInfo {
-      glm::vec3 position, normal;
-      glm::vec2 texturePoint;
-      bool operator<(const PackedVertexInfo that) const {
-        return std::memcmp((void*)this, (void*)&that, sizeof(PackedVertexInfo))>0;
-      };
-    };
-
     //Track all loaded models
     std::map<int, models::ModelInfo> modelTrackerMap;
-    std::map<std::string, models::MeshData> modelDataMap;
+    std::map<std::string, models::ModelData> modelDataMap;
   }
 
   namespace {
-    static unsigned int getIdenticalVertexIndex(PackedVertexInfo* packed, std::map<PackedVertexInfo, unsigned int>* vertexIndexMap, bool* found) {
-      //Look for an identical vertex
-      std::map<PackedVertexInfo, unsigned int>::iterator it = vertexIndexMap->find(*packed);
-      if (it == vertexIndexMap->end()) {
-        //No vertex was found
-        *found = false;
-        return 0;
-      } else {
-        //A vertex was found, return its index
-        *found = true;
-        return it->second;
+    static void createBuffers(models::ModelData* modelObjectData) {
+      //Generate buffers for every mesh
+      for (unsigned int i = 0; i < modelObjectData->meshes.size(); i++) {
+        models::MeshData* meshData = &modelObjectData->meshes[i];
+
+        //Create and fill interleaved vertex + normal + texture buffer
+        glCreateBuffers(1, &meshData->vertexBufferId);
+        glNamedBufferData(meshData->vertexBufferId, meshData->vertexData.size() * sizeof(models::VertexData), &meshData->vertexData[0], GL_STATIC_DRAW);
+
+        //Create and fill an indices buffer
+        glCreateBuffers(1, &meshData->elementBufferId);
+        glNamedBufferData(meshData->elementBufferId, meshData->indices.size() * sizeof(unsigned int), &meshData->indices[0], GL_STATIC_DRAW);
+
+        //Create the vertex attribute buffer
+        glCreateVertexArrays(1, &meshData->vertexArrayId);
+
+        GLuint vaoId = meshData->vertexArrayId;
+        GLuint vboId = meshData->vertexBufferId;
+        int stride = 8 * sizeof(float); //(3 + 3 + 2) * bytes per float
+
+        //Vertex attribute
+        glEnableVertexArrayAttrib(vaoId, 0);
+        glVertexArrayVertexBuffer(vaoId, 0, vboId, 0, stride);
+        glVertexArrayAttribFormat(vaoId, 0, 3, GL_FLOAT, GL_FALSE, 0);
+        glVertexArrayAttribBinding(vaoId, 0, 0);
+
+        //Normal attribute
+        glEnableVertexArrayAttrib(vaoId, 1);
+        glVertexArrayVertexBuffer(vaoId, 1, vboId, 3 * sizeof(float), stride);
+        glVertexArrayAttribFormat(vaoId, 1, 3, GL_FLOAT, GL_FALSE, 0);
+        glVertexArrayAttribBinding(vaoId, 1, 1);
+
+        //Texture attribute
+        glEnableVertexArrayAttrib(vaoId, 2);
+        glVertexArrayVertexBuffer(vaoId, 2, vboId, 6 * sizeof(float), stride);
+        glVertexArrayAttribFormat(vaoId, 2, 2, GL_FLOAT, GL_FALSE, 0);
+        glVertexArrayAttribBinding(vaoId, 2, 2);
+
+        //Element buffer
+        glVertexArrayElementBuffer(vaoId, meshData->elementBufferId);
       }
     }
 
-    static void createBuffers(models::MeshData* modelObjectData) {
-      //Create and fill interleaved vertex + normal + texture buffer
-      glCreateBuffers(1, &modelObjectData->vertexBufferId);
-      glNamedBufferData(modelObjectData->vertexBufferId, modelObjectData->modelData.size() * sizeof(models::VertexData), &modelObjectData->modelData[0], GL_STATIC_DRAW);
-
-      //Create and fill an indices buffer
-      glCreateBuffers(1, &modelObjectData->elementBufferId);
-      glNamedBufferData(modelObjectData->elementBufferId, modelObjectData->indices.size() * sizeof(unsigned int), &modelObjectData->indices[0], GL_STATIC_DRAW);
-
-      //Create the vertex attribute buffer
-      glCreateVertexArrays(1, &modelObjectData->vertexArrayId);
-
-      GLuint vaoId = modelObjectData->vertexArrayId;
-      GLuint vboId = modelObjectData->vertexBufferId;
-      int stride = 8 * sizeof(float); //(3 + 3 + 2) * bytes per float
-
-      //Vertex attribute
-      glEnableVertexArrayAttrib(vaoId, 0);
-      glVertexArrayVertexBuffer(vaoId, 0, vboId, 0, stride);
-      glVertexArrayAttribFormat(vaoId, 0, 3, GL_FLOAT, GL_FALSE, 0);
-      glVertexArrayAttribBinding(vaoId, 0, 0);
-
-      //Normal attribute
-      glEnableVertexArrayAttrib(vaoId, 1);
-      glVertexArrayVertexBuffer(vaoId, 1, vboId, 3 * sizeof(float), stride);
-      glVertexArrayAttribFormat(vaoId, 1, 3, GL_FLOAT, GL_FALSE, 0);
-      glVertexArrayAttribBinding(vaoId, 1, 1);
-
-      //Texture attribute
-      glEnableVertexArrayAttrib(vaoId, 2);
-      glVertexArrayVertexBuffer(vaoId, 2, vboId, 6 * sizeof(float), stride);
-      glVertexArrayAttribFormat(vaoId, 2, 2, GL_FLOAT, GL_FALSE, 0);
-      glVertexArrayAttribBinding(vaoId, 2, 2);
-
-      //Element buffer
-      glVertexArrayElementBuffer(vaoId, modelObjectData->elementBufferId);
-    }
-
-    static void deleteBuffers(models::MeshData* modelObjectData) {
+    static void deleteBuffers(models::ModelData* modelObjectData) {
       //Delete created buffers and the VAO
-      glDeleteBuffers(1, &modelObjectData->vertexBufferId);
-      glDeleteBuffers(1, &modelObjectData->elementBufferId);
-      glDeleteVertexArrays(1, &modelObjectData->vertexArrayId);
-    }
+      for (unsigned int i = 0; i < modelObjectData->meshes.size(); i++) {
+        models::MeshData* meshData = &modelObjectData->meshes[i];
 
-    static void indexModel(models::MeshData* modelObjectData, std::vector<models::VertexData>* rawModelData) {
-      //Map of known vertices
-      std::map<PackedVertexInfo, unsigned int> vertexIndexMap;
-
-      std::vector<models::VertexData>* modelData = &modelObjectData->modelData;
-
-      //Iterate over every vertex, and index them
-      for (unsigned int i = 0; i < rawModelData->size(); i++) {
-        //Pack vertex information into a struct
-        PackedVertexInfo packedVertex = {(*rawModelData)[i].vertices, (*rawModelData)[i].normals, (*rawModelData)[i].texturePoints};
-
-        //Search for an identical vertex
-        bool found = false;
-        unsigned int index = getIdenticalVertexIndex(&packedVertex, &vertexIndexMap, &found);
-
-        //If the vertex has already been used, reuse the index
-        if (found) {
-          modelObjectData->indices.push_back(index);
-        } else { //Otherwise, add the new vertex to bufferd
-          modelData->push_back((*rawModelData)[i]);
-
-          index = (unsigned int)modelObjectData->modelData.size() - 1;
-          modelObjectData->indices.push_back(index);
-          vertexIndexMap[packedVertex] = index;
-        }
+        glDeleteBuffers(1, &meshData->vertexBufferId);
+        glDeleteBuffers(1, &meshData->elementBufferId);
+        glDeleteVertexArrays(1, &meshData->vertexArrayId);
       }
     }
 
-    static void loadObject(const char* objectPath, models::MeshData* modelObjectData, bool* externalSuccess) {
-      tinyobj::ObjReaderConfig reader_config;
-      tinyobj::ObjReader reader;
+    void processMesh(aiMesh* mesh, const aiScene* scene, std::vector<models::MeshData>* meshes, std::string directory, bool* externalSuccess) {
+      //Add a new empty mesh to the mesh vector
+      meshes->emplace_back();
+      models::MeshData* newMesh = &meshes->back();
 
-      //Atempt to parse the object
-      if (!reader.ParseFromFile(objectPath, reader_config)) {
-        if (!reader.Error().empty()) {
-          std::cerr << reader.Error();
+      //Fill the mesh with vertex data
+      for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
+        models::VertexData vertexData;
+
+        vertexData.vertices.x = mesh->mVertices[i].x;
+        vertexData.vertices.y = mesh->mVertices[i].y;
+        vertexData.vertices.z = mesh->mVertices[i].z;
+
+        vertexData.normals.x = mesh->mNormals[i].x;
+        vertexData.normals.y = mesh->mNormals[i].y;
+        vertexData.normals.z = mesh->mNormals[i].z;
+
+        if (mesh->mTextureCoords[0]) {
+          vertexData.texturePoints.x = mesh->mTextureCoords[0][i].x;
+          vertexData.texturePoints.y = mesh->mTextureCoords[0][i].y;
+        } else {
+          vertexData.texturePoints = glm::vec2(0.0f);
         }
+
+        newMesh->vertexData.push_back(vertexData);
+      }
+
+      //Fill mesh indices
+      for (unsigned int i = 0; i < mesh->mNumFaces; i++) {
+        aiFace face = mesh->mFaces[i];
+        for (unsigned int j = 0; j < face.mNumIndices; j++) {
+          newMesh->indices.push_back(face.mIndices[j]);
+        }
+      }
+      newMesh->vertexCount = newMesh->indices.size();
+
+      //Load any diffuse texture given
+      aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
+      if (material->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
+        aiString texturePath;
+        material->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath);
+
+        std::string fullTexturePath = directory + '/' + texturePath.C_Str();
+
+        int textureId = ammonite::textures::loadTexture(fullTexturePath.c_str(), externalSuccess);
+        if (!*externalSuccess) {
+          return;
+        }
+
+        newMesh->textureId = textureId;
+      }
+    }
+
+    void processNode(aiNode* node, const aiScene* scene, std::vector<models::MeshData>* meshes, std::string directory, bool* externalSuccess) {
+      for (unsigned int i = 0; i < node->mNumMeshes; i++) {
+        processMesh(scene->mMeshes[node->mMeshes[i]], scene, meshes, directory, externalSuccess);
+      }
+
+      for (unsigned int i = 0; i < node->mNumChildren; i++) {
+        processNode(node->mChildren[i], scene, meshes, directory, externalSuccess);
+      }
+    }
+
+    static void loadObject(const char* objectPath, models::ModelData* modelObjectData, bool* externalSuccess) {
+      Assimp::Importer importer;
+      const aiScene *scene = importer.ReadFile(objectPath, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals);
+
+      //Check model loaded correctly
+      if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
+        std::cerr << importer.GetErrorString() << std::endl;
         *externalSuccess = false;
         return;
       }
 
-      auto& attrib = reader.GetAttrib();
-      auto& shapes = reader.GetShapes();
-
-      //Storage for unindexed model data
-      std::vector<models::VertexData> rawModelData;
-
-      //Loop over shapes
-      for (size_t s = 0; s < shapes.size(); s++) {
-        //Loop over faces
-        size_t index_offset = 0;
-        for (size_t f = 0; f < shapes[s].mesh.num_face_vertices.size(); f++) {
-          size_t fv = size_t(shapes[s].mesh.num_face_vertices[f]);
-
-          //Loop each vertex
-          for (size_t v = 0; v < fv; v++) {
-            models::VertexData currVertex;
-
-            //Vertex
-            tinyobj::index_t idx = shapes[s].mesh.indices[index_offset + v];
-            tinyobj::real_t vx = attrib.vertices[3 * size_t(idx.vertex_index) + 0];
-            tinyobj::real_t vy = attrib.vertices[3 * size_t(idx.vertex_index) + 1];
-            tinyobj::real_t vz = attrib.vertices[3 * size_t(idx.vertex_index) + 2];
-            currVertex.vertices = glm::vec3(vx, vy, vz);
-
-            //Normals
-            if (idx.normal_index >= 0) {
-              tinyobj::real_t nx = attrib.normals[3 * size_t(idx.normal_index) + 0];
-              tinyobj::real_t ny = attrib.normals[3 * size_t(idx.normal_index) + 1];
-              tinyobj::real_t nz = attrib.normals[3 * size_t(idx.normal_index) + 2];
-              currVertex.normals = glm::vec3(nx, ny, nz);
-            }
-
-            //Texture points
-            if (idx.texcoord_index >= 0) {
-              tinyobj::real_t tx = attrib.texcoords[2 * size_t(idx.texcoord_index) + 0];
-              tinyobj::real_t ty = 1.0f - attrib.texcoords[2 * size_t(idx.texcoord_index) + 1];
-              currVertex.texturePoints = glm::vec2(tx, ty);
-            } else {
-              currVertex.texturePoints = glm::vec2(0.0f, 0.0f);
-            }
-
-            //Save the vertex
-            rawModelData.push_back(currVertex);
-          }
-          index_offset += fv;
-        }
-      }
-
-      //Fill the index buffer
-      modelObjectData->vertexCount = rawModelData.size();
-      indexModel(modelObjectData, &rawModelData);
-
-      return;
+      //Recursively process nodes
+      std::string pathString = objectPath;
+      std::string directory = pathString.substr(0, pathString.find_last_of('/'));
+      processNode(scene->mRootNode, scene, &modelObjectData->meshes, directory, externalSuccess);
     }
   }
 
@@ -220,12 +193,12 @@ namespace ammonite {
   //Exposed model handling methods
   namespace models {
     namespace {
-      static void calcModelMatrices(models::ModelInfo* modelObject) {
+      static void calcModelMatrices(models::PositionData* positionData) {
         //Recalculate the model matrix when a component changes
-        modelObject->positionData.modelMatrix = modelObject->positionData.translationMatrix * glm::toMat4(modelObject->positionData.rotationQuat) * modelObject->positionData.scaleMatrix;
+        positionData->modelMatrix = positionData->translationMatrix * glm::toMat4(positionData->rotationQuat) * positionData->scaleMatrix;
 
         //Normal matrix
-        modelObject->positionData.normalMatrix = glm::transpose(glm::inverse(modelObject->positionData.modelMatrix));
+        positionData->normalMatrix = glm::transpose(glm::inverse(positionData->modelMatrix));
       }
 
       //Track cumulative number of created models
@@ -240,17 +213,17 @@ namespace ammonite {
       //Reuse model data if it has already been loaded
       auto it = modelDataMap.find(modelObject.modelName);
       if (it != modelDataMap.end()) {
-        modelObject.data = &it->second;
-        modelObject.data->refCount += 1;
+        modelObject.modelData = &it->second;
+        modelObject.modelData->refCount += 1;
       } else {
-        //Create empty MeshData object and add to tracker
-        MeshData newModelData;
+        //Create empty ModelData object and add to tracker
+        ModelData newModelData;
         modelDataMap[modelObject.modelName] = newModelData;
-        modelObject.data = &modelDataMap[modelObject.modelName];
+        modelObject.modelData = &modelDataMap[modelObject.modelName];
 
         //Fill the model data
-        loadObject(objectPath, modelObject.data, externalSuccess);
-        createBuffers(modelObject.data);
+        loadObject(objectPath, modelObject.modelData, externalSuccess);
+        createBuffers(modelObject.modelData);
       }
 
       PositionData positionData;
@@ -261,7 +234,7 @@ namespace ammonite {
       modelObject.positionData = positionData;
 
       //Calculate model and normal matrices
-      calcModelMatrices(&modelObject);
+      calcModelMatrices(&modelObject.positionData);
 
       //Add model to the tracker and return the ID
       modelObject.modelId = ++totalModels;
@@ -278,9 +251,7 @@ namespace ammonite {
 
       //Copy model data
       ModelInfo modelObject = *oldModelObject;
-      modelObject.data->refCount += 1;
-
-      ammonite::textures::copyTexture(modelObject.textureId);
+      modelObject.modelData->refCount += 1;
 
       //Add model to the tracker and return the ID
       modelObject.modelId = ++totalModels;
@@ -293,15 +264,17 @@ namespace ammonite {
       auto it = modelTrackerMap.find(modelId);
       if (it != modelTrackerMap.end()) {
         ModelInfo* modelObject = &it->second;
-        MeshData* modelObjectData = modelObject->data;
+        ModelData* modelObjectData = modelObject->modelData;
         //Decrease the reference count of the model data
         modelObjectData->refCount -= 1;
 
-        //Reduce reference count on texture
-        ammonite::textures::deleteTexture(modelObject->textureId);
-
         //If the model data is now unused, destroy it
         if (modelObjectData->refCount < 1) {
+          //Reduce reference count on textures
+          for (unsigned int i = 0; i < modelObjectData->meshes.size(); i++) {
+            ammonite::textures::deleteTexture(modelObjectData->meshes[i].textureId);
+          }
+
           //Destroy the model buffers and position in second tracker layer
           deleteBuffers(modelObjectData);
           modelDataMap.erase(modelObject->modelName);
@@ -322,18 +295,23 @@ namespace ammonite {
         return;
       }
 
-      //If a texture is already applied, remove it
-      if (modelPtr->textureId != 0) {
-        ammonite::textures::deleteTexture(modelPtr->textureId);
-        modelPtr->textureId = 0;
-      }
+      ModelData* modelObjectData = modelPtr->modelData;
+      for (unsigned int i = 0; i < modelObjectData->meshes.size(); i++) {
+        models::MeshData* meshData = &modelObjectData->meshes[i];
 
-      //Create new texture and apply to the model
-      int textureId = ammonite::textures::loadTexture(texturePath, externalSuccess);
-      if (!*externalSuccess) {
-        return;
+        //If a texture is already applied, remove it
+        if (meshData->textureId != 0) {
+          ammonite::textures::deleteTexture(meshData->textureId);
+          meshData->textureId = 0;
+        }
+
+        //Create new texture and apply to the model
+        int textureId = ammonite::textures::loadTexture(texturePath, externalSuccess);
+        if (!*externalSuccess) {
+          return;
+        }
+        meshData->textureId = textureId;
       }
-      modelPtr->textureId = textureId;
     }
 
     //Return the number of vertices on a model
@@ -343,7 +321,13 @@ namespace ammonite {
         return 0;
       }
 
-      return modelPtr->data->vertexCount;
+      int vertexCount = 0;
+      models::ModelData* modelData = modelPtr->modelData;
+      for (unsigned int i = 0; i < modelData->meshes.size(); i++) {
+        vertexCount += modelData->meshes[i].vertexCount;
+      }
+
+      return vertexCount;
     }
 
     namespace draw {
@@ -408,7 +392,7 @@ namespace ammonite {
         modelObject->positionData.translationMatrix = glm::translate(glm::mat4(1.0f), position);
 
         //Recalculate model and normal matrices
-        calcModelMatrices(modelObject);
+        calcModelMatrices(&modelObject->positionData);
       }
 
       void setScale(int modelId, glm::vec3 scale) {
@@ -422,7 +406,7 @@ namespace ammonite {
         modelObject->positionData.scaleMatrix = glm::scale(glm::mat4(1.0f), scale);
 
         //Recalculate model and normal matrices
-        calcModelMatrices(modelObject);
+        calcModelMatrices(&modelObject->positionData);
       }
 
       void setScale(int modelId, float scaleMultiplier) {
@@ -443,7 +427,7 @@ namespace ammonite {
         modelObject->positionData.rotationQuat = glm::quat(rotationRadians) * glm::quat(glm::vec3(0, 0, 0));
 
         //Recalculate model and normal matrices
-        calcModelMatrices(modelObject);
+        calcModelMatrices(&modelObject->positionData);
       }
     }
 
@@ -462,7 +446,7 @@ namespace ammonite {
           translation);
 
         //Recalculate model and normal matrices
-        calcModelMatrices(modelObject);
+        calcModelMatrices(&modelObject->positionData);
       }
 
       void scaleModel(int modelId, glm::vec3 scaleVector) {
@@ -478,7 +462,7 @@ namespace ammonite {
           scaleVector);
 
         //Recalculate model and normal matrices
-        calcModelMatrices(modelObject);
+        calcModelMatrices(&modelObject->positionData);
       }
 
       void scaleModel(int modelId, float scaleMultiplier) {
@@ -499,7 +483,7 @@ namespace ammonite {
         modelObject->positionData.rotationQuat = glm::quat(rotationRadians) * modelObject->positionData.rotationQuat;
 
         //Recalculate model and normal matrices
-        calcModelMatrices(modelObject);
+        calcModelMatrices(&modelObject->positionData);
       }
     }
   }

@@ -62,7 +62,7 @@
   - `g++`
   - `pkg-config`
   - ### Libraries:
-    - `libgomp1 libglm-dev libglfw3-dev libglew-dev libstb-dev libtinyobjloader-dev`
+    - `libgomp1 libglm-dev libglfw3-dev libglew-dev libstb-dev libassimp-dev`
   - ### Icons:
     - `inkscape optipng`
 
@@ -77,7 +77,6 @@
  - Reference materials:
    - [OpenGL Tutorial](https://www.opengl-tutorial.org/)
    - [Learn OpenGL](https://learnopengl.com/Introduction)
-   - [tinyobjloader source](https://github.com/tinyobjloader/tinyobjloader)
 
 ## License
   - This project is available under the terms of the GNU Lesser General Public License (v3.0)
