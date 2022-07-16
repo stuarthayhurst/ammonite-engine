@@ -108,6 +108,14 @@ namespace ammonite {
       //Clear saved data on light emitting models
       lightEmitterData.clear();
 
+      //If no lights remain, unbind and return early
+      if (lightTrackerMap.size() == 0) {
+        glDeleteBuffers(1, &lightDataId);
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, 0);
+        lightDataId = 0;
+        return;
+      }
+
       //Repack light sources into ShaderData (uses vec4s for OpenGL)
       #pragma omp parallel for
       for(unsigned int i = 0; i < lightTrackerMap.size(); i++) {
@@ -143,14 +151,6 @@ namespace ammonite {
         shaderData[i].diffuse = glm::vec4(lightSource->diffuse, 0);
         shaderData[i].specular = glm::vec4(lightSource->specular, 0);
         shaderData[i].power[0] = lightSource->power;
-      }
-
-      //If no lights remain, unbind and return early
-      if (lightTrackerMap.size() == 0) {
-        glDeleteBuffers(1, &lightDataId);
-        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, 0);
-        lightDataId = 0;
-        return;
       }
 
       //If the light count hasn't changed, sub the data instead of recreating the buffer
