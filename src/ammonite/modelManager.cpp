@@ -34,7 +34,7 @@ namespace ammonite {
 
         //Create and fill interleaved vertex + normal + texture buffer
         glCreateBuffers(1, &meshData->vertexBufferId);
-        glNamedBufferData(meshData->vertexBufferId, meshData->vertexData.size() * sizeof(models::VertexData), &meshData->vertexData[0], GL_STATIC_DRAW);
+        glNamedBufferData(meshData->vertexBufferId, meshData->meshData.size() * sizeof(models::VertexData), &meshData->meshData[0], GL_STATIC_DRAW);
 
         //Create and fill an indices buffer
         glCreateBuffers(1, &meshData->elementBufferId);
@@ -90,22 +90,22 @@ namespace ammonite {
       for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
         models::VertexData vertexData;
 
-        vertexData.vertices.x = mesh->mVertices[i].x;
-        vertexData.vertices.y = mesh->mVertices[i].y;
-        vertexData.vertices.z = mesh->mVertices[i].z;
+        vertexData.vertex.x = mesh->mVertices[i].x;
+        vertexData.vertex.y = mesh->mVertices[i].y;
+        vertexData.vertex.z = mesh->mVertices[i].z;
 
-        vertexData.normals.x = mesh->mNormals[i].x;
-        vertexData.normals.y = mesh->mNormals[i].y;
-        vertexData.normals.z = mesh->mNormals[i].z;
+        vertexData.normal.x = mesh->mNormals[i].x;
+        vertexData.normal.y = mesh->mNormals[i].y;
+        vertexData.normal.z = mesh->mNormals[i].z;
 
         if (mesh->mTextureCoords[0]) {
-          vertexData.texturePoints.x = mesh->mTextureCoords[0][i].x;
-          vertexData.texturePoints.y = mesh->mTextureCoords[0][i].y;
+          vertexData.texturePoint.x = mesh->mTextureCoords[0][i].x;
+          vertexData.texturePoint.y = mesh->mTextureCoords[0][i].y;
         } else {
-          vertexData.texturePoints = glm::vec2(0.0f);
+          vertexData.texturePoint = glm::vec2(0.0f);
         }
 
-        newMesh->vertexData.push_back(vertexData);
+        newMesh->meshData.push_back(vertexData);
       }
 
       //Fill mesh indices
