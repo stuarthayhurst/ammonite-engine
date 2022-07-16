@@ -37,6 +37,7 @@ namespace ammonite {
         GLuint ambientLightId;
         GLuint cameraPosId;
         GLuint farPlaneId;
+        GLuint lightCountId;
         GLuint textureSamplerId;
         GLuint shadowCubeMapId;
       } modelShader;
@@ -151,6 +152,7 @@ namespace ammonite {
         modelShader.ambientLightId = glGetUniformLocation(modelShader.shaderId, "ambientLight");
         modelShader.cameraPosId = glGetUniformLocation(modelShader.shaderId, "cameraPos");
         modelShader.farPlaneId = glGetUniformLocation(modelShader.shaderId, "farPlane");
+        modelShader.lightCountId = glGetUniformLocation(modelShader.shaderId, "lightCount");
         modelShader.textureSamplerId = glGetUniformLocation(modelShader.shaderId, "textureSampler");
         modelShader.shadowCubeMapId = glGetUniformLocation(modelShader.shaderId, "shadowCubeMap");
 
@@ -390,6 +392,7 @@ namespace ammonite {
       glUniform3fv(modelShader.ambientLightId, 1, &ambientLight[0]);
       glUniform3fv(modelShader.cameraPosId, 1, &cameraPosition[0]);
       glUniform1f(modelShader.farPlaneId, farPlane);
+      glUniform1i(modelShader.lightCountId, maxShadows);
       drawModels(modelIds, modelCount, false);
 
       //Get information about light sources to be rendered
