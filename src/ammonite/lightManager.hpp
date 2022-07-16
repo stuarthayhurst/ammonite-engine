@@ -6,6 +6,7 @@
 
 namespace ammonite {
   namespace lighting {
+    int getMaxLightCount();
     int createLightSource();
     void deleteLightSource(int lightId);
     void updateLightSources();

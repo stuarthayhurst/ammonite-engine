@@ -157,6 +157,13 @@ namespace ammonite {
       prevLightCount = lightTrackerMap.size();
     }
 
+    int getMaxLightCount() {
+      //Get the max number of lights supported, from the max layers on a cubemap
+      int maxArrayLayers = 0;
+      glGetIntegerv(GL_MAX_ARRAY_TEXTURE_LAYERS, &maxArrayLayers);
+      return std::floor(maxArrayLayers / 6);
+    }
+
     int createLightSource() {
       LightSource lightSource;
 
