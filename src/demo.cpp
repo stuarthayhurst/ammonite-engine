@@ -9,10 +9,6 @@
 #include "ammonite/ammonite.hpp"
 #include "common/argHandler.hpp"
 
-//Initial width and height
-const unsigned short int width = 1024;
-const unsigned short int height = 768;
-
 void printMetrics(double frameTime) {
   double frameRate = 0.0;
   if (frameTime != 0.0) {
@@ -54,7 +50,7 @@ int main(int argc, char* argv[]) {
   }
 
   //Create the window
-  auto window = ammonite::windowManager::setupWindow(width, height, 4, "OpenGL Experiments");
+  auto window = ammonite::windowManager::setupWindow(1024, 768, 4, "OpenGL Experiments");
   if (window == NULL) {
     return EXIT_FAILURE;
   }
