@@ -146,7 +146,9 @@ namespace ammonite {
 
     static void loadObject(const char* objectPath, models::ModelData* modelObjectData, bool flipTexCoords, bool* externalSuccess) {
       //Generate postprocessing flags
-      auto aiProcessFlags = aiProcess_Triangulate | aiProcess_GenNormals | aiProcess_GenUVCoords | aiProcess_RemoveRedundantMaterials | aiProcess_OptimizeMeshes | aiProcess_JoinIdenticalVertices;
+      auto aiProcessFlags = aiProcess_Triangulate | aiProcess_GenNormals | aiProcess_GenUVCoords | aiProcess_RemoveRedundantMaterials | aiProcess_OptimizeMeshes | aiProcess_JoinIdenticalVertices | aiProcess_PreTransformVertices;
+
+      //Flip texture coords, if requested
       if (flipTexCoords) {
         aiProcessFlags = aiProcessFlags | aiProcess_FlipUVs;
       }
