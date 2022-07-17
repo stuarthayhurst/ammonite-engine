@@ -1,5 +1,6 @@
 #include <map>
 #include <vector>
+#include <cstring>
 #include <cmath>
 
 #include <GL/glew.h>
@@ -119,9 +120,13 @@ namespace ammonite {
       static float* farPlanePtr = ammonite::settings::graphics::internal::getShadowFarPlanePtr();
       glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), 1.0f, 0.0f, *farPlanePtr);
 
+      //Hold all calculated light / shadow transformation matrices
+      glm::mat4 lightTransforms[lightTrackerMap.size()][6];
+      int lightTransformIds[lightTrackerMap.size()];
+
       //Repack light sources into ShaderData (uses vec4s for OpenGL)
       #pragma omp parallel for
-      for(unsigned int i = 0; i < lightTrackerMap.size(); i++) {
+      for (unsigned int i = 0; i < lightTrackerMap.size(); i++) {
         //Repacking light sources
         auto lightIt = lightTrackerMap.begin();
         std::advance(lightIt, i);
@@ -139,18 +144,25 @@ namespace ammonite {
 
         //Calculate shadow transforms for shadows
         glm::vec3 lightPos = lightSource->geometry;
-        lightTransformMap[lightSource->lightId][0] = shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));
-        lightTransformMap[lightSource->lightId][1] = shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));
-        lightTransformMap[lightSource->lightId][2] = shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0));
-        lightTransformMap[lightSource->lightId][3] = shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0));
-        lightTransformMap[lightSource->lightId][4] = shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0));
-        lightTransformMap[lightSource->lightId][5] = shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0));
+        lightTransformIds[i] = lightSource->lightId;
+        lightTransforms[i][0] = shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));
+        lightTransforms[i][1] = shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));
+        lightTransforms[i][2] = shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0));
+        lightTransforms[i][3] = shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0));
+        lightTransforms[i][4] = shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0));
+        lightTransforms[i][5] = shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0));
 
+        //Repack lighting information
         shaderData[i].geometry = glm::vec4(lightSource->geometry, 0);
         shaderData[i].colour = glm::vec4(lightSource->colour, 0);
         shaderData[i].diffuse = glm::vec4(lightSource->diffuse, 0);
         shaderData[i].specular = glm::vec4(lightSource->specular, 0);
         shaderData[i].power[0] = lightSource->power;
+      }
+
+      //Copy calculated tranforms to map
+      for (unsigned int i = 0; i < lightTrackerMap.size(); i++) {
+        memcpy(lightTransformMap[lightTransformIds[i]], lightTransforms[i], sizeof(glm::mat4) * 6);
       }
 
       //If the light count hasn't changed, sub the data instead of recreating the buffer
