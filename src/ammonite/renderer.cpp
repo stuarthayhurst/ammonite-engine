@@ -19,6 +19,7 @@
 #include "shaders.hpp"
 #include "camera.hpp"
 #include "lightManager.hpp"
+#include "environment.hpp"
 
 #include "utils/timer.hpp"
 #include "utils/extension.hpp"
@@ -55,6 +56,15 @@ namespace ammonite {
         GLuint depthLightPosId;
         GLuint depthShadowIndex;
       } depthShader;
+
+      struct {
+        GLuint shaderId;
+        GLuint viewMatrixId;
+        GLuint projectionMatrixId;
+        GLuint skyboxSamplerId;
+      } skyboxShader;
+
+      GLuint skyboxVertexArrayId, skyboxBuffer;
 
       GLuint depthCubeMapId = 0;
       GLuint depthMapFBO;
@@ -142,6 +152,9 @@ namespace ammonite {
         shaderLocation = std::string(shaderPath) + std::string("depth/");
         depthShader.shaderId = ammonite::shaders::loadDirectory(shaderLocation.c_str(), externalSuccess);
 
+        shaderLocation = std::string(shaderPath) + std::string("skybox/");
+        skyboxShader.shaderId = ammonite::shaders::loadDirectory(shaderLocation.c_str(), externalSuccess);
+
         if (!*externalSuccess) {
           return;
         }
@@ -165,10 +178,17 @@ namespace ammonite {
         depthShader.depthLightPosId = glGetUniformLocation(depthShader.shaderId, "lightPos");
         depthShader.depthShadowIndex = glGetUniformLocation(depthShader.shaderId, "shadowMapIndex");
 
+        skyboxShader.viewMatrixId = glGetUniformLocation(skyboxShader.shaderId, "V");
+        skyboxShader.projectionMatrixId = glGetUniformLocation(skyboxShader.shaderId, "P");
+        skyboxShader.skyboxSamplerId = glGetUniformLocation(skyboxShader.shaderId, "skyboxSampler");
+
         //Pass texture unit locations
         glUseProgram(modelShader.shaderId);
         glUniform1i(modelShader.textureSamplerId, 0);
         glUniform1i(modelShader.shadowCubeMapId, 1);
+
+        glUseProgram(skyboxShader.shaderId);
+        glUniform1i(skyboxShader.skyboxSamplerId, 2);
 
         //Setup depth map framebuffer
         glCreateFramebuffers(1, &depthMapFBO);
@@ -182,6 +202,59 @@ namespace ammonite {
 
         //Get the max number of lights supported
         maxLightCount = ammonite::lighting::getMaxLightCount();
+
+        const float skyboxVertices[] = {
+          -1.0f,  1.0f, -1.0f,
+          -1.0f, -1.0f, -1.0f,
+           1.0f, -1.0f, -1.0f,
+           1.0f, -1.0f, -1.0f,
+           1.0f,  1.0f, -1.0f,
+          -1.0f,  1.0f, -1.0f,
+
+          -1.0f, -1.0f,  1.0f,
+          -1.0f, -1.0f, -1.0f,
+          -1.0f,  1.0f, -1.0f,
+          -1.0f,  1.0f, -1.0f,
+          -1.0f,  1.0f,  1.0f,
+          -1.0f, -1.0f,  1.0f,
+
+           1.0f, -1.0f, -1.0f,
+           1.0f, -1.0f,  1.0f,
+           1.0f,  1.0f,  1.0f,
+           1.0f,  1.0f,  1.0f,
+           1.0f,  1.0f, -1.0f,
+           1.0f, -1.0f, -1.0f,
+
+          -1.0f, -1.0f,  1.0f,
+          -1.0f,  1.0f,  1.0f,
+           1.0f,  1.0f,  1.0f,
+           1.0f,  1.0f,  1.0f,
+           1.0f, -1.0f,  1.0f,
+          -1.0f, -1.0f,  1.0f,
+
+          -1.0f,  1.0f, -1.0f,
+           1.0f,  1.0f, -1.0f,
+           1.0f,  1.0f,  1.0f,
+           1.0f,  1.0f,  1.0f,
+          -1.0f,  1.0f,  1.0f,
+          -1.0f,  1.0f, -1.0f,
+
+          -1.0f, -1.0f, -1.0f,
+          -1.0f, -1.0f,  1.0f,
+           1.0f, -1.0f, -1.0f,
+           1.0f, -1.0f, -1.0f,
+          -1.0f, -1.0f,  1.0f,
+           1.0f, -1.0f,  1.0f
+        };
+
+        //Create vertex buffer and array for skybox
+        glGenVertexArrays(1, &skyboxVertexArrayId);
+        glGenBuffers(1, &skyboxBuffer);
+        glBindVertexArray(skyboxVertexArrayId);
+        glBindBuffer(GL_ARRAY_BUFFER, skyboxBuffer);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
       }
     }
 
@@ -409,6 +482,20 @@ namespace ammonite {
             drawModel(modelPtr, lightIndex, false);
           }
         }
+      }
+
+      //Draw the skybox
+      int activeSkybox = ammonite::environment::skybox::getActiveSkybox();
+      if (activeSkybox != 0) {
+        //Swap to skybox shader and pass uniforms
+        glUseProgram(skyboxShader.shaderId);
+        glUniformMatrix4fv(skyboxShader.viewMatrixId, 1, GL_FALSE, &(glm::mat4(glm::mat3(*viewMatrix)))[0][0]);
+        glUniformMatrix4fv(skyboxShader.projectionMatrixId, 1, GL_FALSE, &(*projectionMatrix)[0][0]);
+
+        //Prepare and draw the skybox
+        glBindVertexArray(skyboxVertexArrayId);
+        glBindTextureUnit(2, activeSkybox);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
       }
 
       //Disable gamma correction

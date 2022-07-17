@@ -18,6 +18,7 @@
 #include "renderer.hpp"
 #include "modelManager.hpp"
 #include "lightManager.hpp"
+#include "environment.hpp"
 
 #include "windowManager.hpp"
 
