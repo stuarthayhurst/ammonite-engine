@@ -10,6 +10,7 @@
 namespace ammonite {
   namespace models {
     int createModel(const char* objectPath, bool* externalSuccess);
+    int createModel(const char* objectPath, bool flipTexCoords, bool* externalSuccess);
     void deleteModel(int modelId);
     int copyModel(int modelId);
 

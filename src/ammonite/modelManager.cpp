@@ -81,7 +81,7 @@ namespace ammonite {
       }
     }
 
-    void processMesh(aiMesh* mesh, const aiScene* scene, std::vector<models::MeshData>* meshes, std::string directory, bool* externalSuccess) {
+    static void processMesh(aiMesh* mesh, const aiScene* scene, std::vector<models::MeshData>* meshes, std::string directory, bool* externalSuccess) {
       //Add a new empty mesh to the mesh vector
       meshes->emplace_back();
       models::MeshData* newMesh = &meshes->back();
@@ -134,7 +134,7 @@ namespace ammonite {
       }
     }
 
-    void processNode(aiNode* node, const aiScene* scene, std::vector<models::MeshData>* meshes, std::string directory, bool* externalSuccess) {
+    static void processNode(aiNode* node, const aiScene* scene, std::vector<models::MeshData>* meshes, std::string directory, bool* externalSuccess) {
       for (unsigned int i = 0; i < node->mNumMeshes; i++) {
         processMesh(scene->mMeshes[node->mMeshes[i]], scene, meshes, directory, externalSuccess);
       }
@@ -144,9 +144,15 @@ namespace ammonite {
       }
     }
 
-    static void loadObject(const char* objectPath, models::ModelData* modelObjectData, bool* externalSuccess) {
+    static void loadObject(const char* objectPath, models::ModelData* modelObjectData, bool flipTexCoords, bool* externalSuccess) {
+      //Generate postprocessing flags
+      auto aiProcessFlags = aiProcess_Triangulate | aiProcess_GenNormals | aiProcess_GenUVCoords | aiProcess_RemoveRedundantMaterials | aiProcess_OptimizeMeshes | aiProcess_JoinIdenticalVertices;
+      if (flipTexCoords) {
+        aiProcessFlags = aiProcessFlags | aiProcess_FlipUVs;
+      }
+
       Assimp::Importer importer;
-      const aiScene *scene = importer.ReadFile(objectPath, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals);
+      const aiScene *scene = importer.ReadFile(objectPath, aiProcessFlags);
 
       //Check model loaded correctly
       if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
@@ -205,7 +211,7 @@ namespace ammonite {
       int totalModels = 0;
     }
 
-    int createModel(const char* objectPath, bool* externalSuccess) {
+    int createModel(const char* objectPath, bool flipTexCoords, bool* externalSuccess) {
       //Create the model
       ModelInfo modelObject;
       modelObject.modelName = std::string(objectPath);
@@ -222,7 +228,7 @@ namespace ammonite {
         modelObject.modelData = &modelDataMap[modelObject.modelName];
 
         //Fill the model data
-        loadObject(objectPath, modelObject.modelData, externalSuccess);
+        loadObject(objectPath, modelObject.modelData, flipTexCoords, externalSuccess);
         createBuffers(modelObject.modelData);
       }
 
@@ -240,6 +246,10 @@ namespace ammonite {
       modelObject.modelId = ++totalModels;
       modelTrackerMap[modelObject.modelId] = modelObject;
       return modelObject.modelId;
+    }
+
+    int createModel(const char* objectPath, bool* externalSuccess) {
+      return createModel(objectPath, true, externalSuccess);
     }
 
     int copyModel(int modelId) {
