@@ -64,7 +64,7 @@ namespace ammonite {
         GLuint skyboxSamplerId;
       } skyboxShader;
 
-      GLuint skyboxVertexArrayId, skyboxBuffer;
+      GLuint skyboxVertexArrayId;
 
       GLuint depthCubeMapId = 0;
       GLuint depthMapFBO;
@@ -207,54 +207,37 @@ namespace ammonite {
           -1,  1, -1,
           -1, -1, -1,
            1, -1, -1,
-           1, -1, -1,
            1,  1, -1,
-          -1,  1, -1,
-
           -1, -1,  1,
-          -1, -1, -1,
-          -1,  1, -1,
-          -1,  1, -1,
           -1,  1,  1,
-          -1, -1,  1,
-
-           1, -1, -1,
            1, -1,  1,
-           1,  1,  1,
-           1,  1,  1,
-           1,  1, -1,
-           1, -1, -1,
-
-          -1, -1,  1,
-          -1,  1,  1,
-           1,  1,  1,
-           1,  1,  1,
-           1, -1,  1,
-          -1, -1,  1,
-
-          -1,  1, -1,
-           1,  1, -1,
-           1,  1,  1,
-           1,  1,  1,
-          -1,  1,  1,
-          -1,  1, -1,
-
-          -1, -1, -1,
-          -1, -1,  1,
-           1, -1, -1,
-           1, -1, -1,
-          -1, -1,  1,
-           1, -1,  1
+           1,  1,  1
         };
 
-        //Create vertex buffer and array for skybox
-        glGenVertexArrays(1, &skyboxVertexArrayId);
-        glGenBuffers(1, &skyboxBuffer);
-        glBindVertexArray(skyboxVertexArrayId);
-        glBindBuffer(GL_ARRAY_BUFFER, skyboxBuffer);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_BYTE, GL_FALSE, 3 * sizeof(char), nullptr);
+        const unsigned char skyboxIndices[36] = {
+          0, 1, 2, 2, 3, 0,
+          4, 1, 0, 0, 5, 4,
+          2, 6, 7, 7, 3, 2,
+          4, 5, 7, 7, 6, 4,
+          0, 3, 7, 7, 5, 0,
+          1, 4, 2, 2, 4, 6
+        };
+
+
+        //Create vertex and element buffers for the skybox
+        GLuint skyboxBufferId, skyboxElementBufferId;
+        glCreateBuffers(1, &skyboxBufferId);
+        glCreateBuffers(1, &skyboxElementBufferId);
+        glNamedBufferData(skyboxBufferId, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
+        glNamedBufferData(skyboxElementBufferId, sizeof(skyboxIndices), &skyboxIndices, GL_STATIC_DRAW);
+
+        //Create vertex array object for skybox
+        glCreateVertexArrays(1, &skyboxVertexArrayId);
+        glEnableVertexArrayAttrib(skyboxVertexArrayId, 0);
+        glVertexArrayVertexBuffer(skyboxVertexArrayId, 0, skyboxBufferId, 0, 3 * sizeof(char));
+        glVertexArrayAttribFormat(skyboxVertexArrayId, 0, 3, GL_BYTE, GL_FALSE, 0);
+        glVertexArrayAttribBinding(skyboxVertexArrayId, 0, 0);
+        glVertexArrayElementBuffer(skyboxVertexArrayId, skyboxElementBufferId);
       }
     }
 
@@ -501,7 +484,7 @@ namespace ammonite {
         //Prepare and draw the skybox
         glBindVertexArray(skyboxVertexArrayId);
         glBindTextureUnit(2, activeSkybox);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, nullptr);
       }
 
       //Disable gamma correction
