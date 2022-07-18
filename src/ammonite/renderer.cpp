@@ -437,12 +437,19 @@ namespace ammonite {
         std::advance(lightIt, 1);
       }
 
-      //Reset the framebuffer, viewport and canvas
+      //Reset the framebuffer and viewport
       glBindFramebuffer(GL_FRAMEBUFFER, 0);
       static int* widthPtr = ammonite::settings::runtime::internal::getWidthPtr();
       static int* heightPtr = ammonite::settings::runtime::internal::getHeightPtr();
       glViewport(0, 0, *widthPtr, *heightPtr);
-      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+      //CLear depth and colour (if no skybox is used)
+      int activeSkybox = ammonite::environment::skybox::getActiveSkybox();
+      if (activeSkybox == 0) {
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+      } else {
+        glClear(GL_DEPTH_BUFFER_BIT);
+      }
 
       //Prepare model shader, gamma correction and depth cube map
       glUseProgram(modelShader.shaderId);
@@ -485,7 +492,6 @@ namespace ammonite {
       }
 
       //Draw the skybox
-      int activeSkybox = ammonite::environment::skybox::getActiveSkybox();
       if (activeSkybox != 0) {
         //Swap to skybox shader and pass uniforms
         glUseProgram(skyboxShader.shaderId);
