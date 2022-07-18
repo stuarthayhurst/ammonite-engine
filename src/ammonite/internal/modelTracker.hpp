@@ -22,7 +22,7 @@ namespace ammonite {
     struct MeshData {
       std::vector<VertexData> meshData;
       std::vector<unsigned int> indices;
-      GLuint vertexBufferId = 0;
+      GLuint vertexBufferId = 0; //vertexBufferId and elementBufferId must stay in this memory layout
       GLuint elementBufferId = 0;
       GLuint vertexArrayId = 0;
       GLuint textureId = 0;

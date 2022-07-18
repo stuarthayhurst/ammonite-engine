@@ -32,12 +32,11 @@ namespace ammonite {
       for (unsigned int i = 0; i < modelObjectData->meshes.size(); i++) {
         models::MeshData* meshData = &modelObjectData->meshes[i];
 
-        //Create and fill interleaved vertex + normal + texture buffer
-        glCreateBuffers(1, &meshData->vertexBufferId);
-        glNamedBufferData(meshData->vertexBufferId, meshData->meshData.size() * sizeof(models::VertexData), &meshData->meshData[0], GL_STATIC_DRAW);
+        //Create vertex and index buffers
+        glCreateBuffers(2, &meshData->vertexBufferId);
 
-        //Create and fill an indices buffer
-        glCreateBuffers(1, &meshData->elementBufferId);
+        //Fill interleaved vertex + normal + texture buffer and index buffer
+        glNamedBufferData(meshData->vertexBufferId, meshData->meshData.size() * sizeof(models::VertexData), &meshData->meshData[0], GL_STATIC_DRAW);
         glNamedBufferData(meshData->elementBufferId, meshData->indices.size() * sizeof(unsigned int), &meshData->indices[0], GL_STATIC_DRAW);
 
         //Create the vertex attribute buffer
