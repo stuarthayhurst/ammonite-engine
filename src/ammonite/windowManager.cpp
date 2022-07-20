@@ -120,16 +120,21 @@ namespace ammonite {
     }
 
     void useIconDir(GLFWwindow* window, const char* iconDirPath) {
-      const std::filesystem::path searchDir{iconDirPath};
-      const auto it = std::filesystem::directory_iterator{searchDir};
-
-      //Add all png files to a vector
+      //Attempt to add all png files to a vector
       std::vector<std::string> pngFiles(0);
-      for (auto const& fileName : it) {
-        std::filesystem::path filePath{fileName};
-        if (filePath.extension() == ".png") {
-          pngFiles.push_back(std::string(filePath));
+      try {
+        const std::filesystem::path searchDir{iconDirPath};
+        const auto it = std::filesystem::directory_iterator{searchDir};
+
+        for (auto const& fileName : it) {
+          std::filesystem::path filePath{fileName};
+          if (filePath.extension() == ".png") {
+            pngFiles.push_back(std::string(filePath));
+          }
         }
+      } catch (const std::filesystem::filesystem_error&) {
+        std::cerr << "Couldn't open '" << iconDirPath << "'" << std::endl;
+        return;
       }
 
       //Read image data
@@ -147,7 +152,6 @@ namespace ammonite {
       for (unsigned int i = 0; i < pngFiles.size(); i++) {
         stbi_image_free(images[i].pixels);
       }
-
     }
 
     //Wrapper to create and setup window
