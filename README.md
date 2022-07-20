@@ -40,22 +40,26 @@
     - `--vsync`: Enable / disable VSync (`true` / `false`)
 
 ## Build system:
-  - `build`, `debug` `system-build` and `library` support building on multiple cores with `-jX`
-  - `make build` - Builds demo binary, a working demonstration of the renderer
-  - `make debug` - Cleans build directory, then runs `make build` in debug mode
-  - `make system-build` - Same as `build`, but uses the system copy of `libammonite.so`
-  - `make library` - Builds `build/libammonite.so`
-  - `make install` - Installs `libammonite.so` to system directories
-    - The install path can be configured, by setting the environment variable `INSTALL_DIR`
-    - This should always end in `/ammonite`, for example, `/usr/local/lib/ammonite`
-  - `make headers` - Installs Ammonite headers to the system
-    - The install path can be configured, by setting the environment variable `HEADER_DIR`
-    - This should always end in `/ammonite`, for example, `/usr/local/include/ammonite`
-  - `make uninstall` - Removes installed library
-    - Custom install locations can be removed using the environment variable `INSTALL_DIR`
-  - `make icons` - Creates `assets/icons/icon.png` from `assets/icons/icon.svg`
-  - `make clean` - Cleans the build area (`build/`) and default runtime cache (`cache/`)
-  - `make cache` - Clears the default runtime binary cache, useful if running into issues with caching
+  - ### Targets:
+    - `build`, `debug` `system-build` and `library` support building on multiple cores with `-jX`
+    - `make build` - Builds demo binary, a working demonstration of the renderer
+    - `make debug` - Cleans build directory, then runs `make build` in debug mode
+    - `make system-build` - Same as `build`, but uses the system copy of `libammonite.so`
+    - `make library` - Builds `build/libammonite.so`
+    - `make install` - Installs `libammonite.so` to system directories
+      - The install path can be configured, by setting the environment variable `INSTALL_DIR`
+      - This should always end in `/ammonite`, for example, `/usr/local/lib/ammonite`
+    - `make headers` - Installs Ammonite headers to the system
+      - The install path can be configured, by setting the environment variable `HEADER_DIR`
+      - This should always end in `/ammonite`, for example, `/usr/local/include/ammonite`
+    - `make uninstall` - Removes installed library
+      - Custom install locations can be removed using the environment variable `INSTALL_DIR`
+    - `make icons` - Creates `assets/icons/icon.png` from `assets/icons/icon.svg`
+    - `make clean` - Cleans the build area (`build/`) and default runtime cache (`cache/`)
+    - `make cache` - Clears the default runtime binary cache, useful if running into issues with caching
+  - ### Flags:
+    - `DEBUG`: `true / false` - Compiles the target in debug mode
+    - `FAST`: `true / false` - Compiles with `-Ofast -march=native`
 
 ## Dependencies:
   - `make`
