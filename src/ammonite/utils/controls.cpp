@@ -166,56 +166,54 @@ namespace ammonite {
         //Poll GLFW for input
         glfwPollEvents();
 
-        if (isControlActive) {
-          //Get active camera
-          int activeCameraId = ammonite::camera::getActiveCamera();
+        //Get active camera
+        int activeCameraId = ammonite::camera::getActiveCamera();
 
-          //Vector for current direction, without vertical component
-          float horizontalAngle = ammonite::camera::getHorizontal(activeCameraId);
-          glm::vec3 horizontalDirection(
-            std::sin(horizontalAngle),
-            0,
-            std::cos(horizontalAngle)
-          );
+        //Vector for current direction, without vertical component
+        float horizontalAngle = ammonite::camera::getHorizontal(activeCameraId);
+        glm::vec3 horizontalDirection(
+          std::sin(horizontalAngle),
+           0,
+           std::cos(horizontalAngle)
+         );
 
-          //Right vector, relative to the camera
-          glm::vec3 right = glm::vec3(
-            std::sin(horizontalAngle - glm::half_pi<float>()),
-            0,
-            std::cos(horizontalAngle - glm::half_pi<float>())
-          );
+         //Right vector, relative to the camera
+        glm::vec3 right = glm::vec3(
+           std::sin(horizontalAngle - glm::half_pi<float>()),
+          0,
+          std::cos(horizontalAngle - glm::half_pi<float>())
+        );
 
-          //Get the current camera position
-          glm::vec3 position = ammonite::camera::getPosition(activeCameraId);
+        //Get the current camera position
+        glm::vec3 position = ammonite::camera::getPosition(activeCameraId);
 
-          static float* movementSpeedPtr = ammonite::settings::controls::internal::getMovementSpeedPtr();
+        static float* movementSpeedPtr = ammonite::settings::controls::internal::getMovementSpeedPtr();
 
-          //Apply movement from inputs
-          if (isInputFocused) {
-            if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) { //Move forward
-              position += horizontalDirection * deltaTime * *movementSpeedPtr;
-            }
-            if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) { //Move back
-              position -= horizontalDirection * deltaTime * *movementSpeedPtr;
-            }
-            if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) { //Move right
-              position += right * deltaTime * *movementSpeedPtr;
-            }
-            if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) { //Move left
-              position -= right * deltaTime * *movementSpeedPtr;
-            }
-
-            if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) { //Move up
-              position += glm::vec3(0, 1, 0) * deltaTime * *movementSpeedPtr;
-            }
-            if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) { //Move down
-              position -= glm::vec3(0, 1, 0) * deltaTime * *movementSpeedPtr;
-            }
+        //Apply movement from inputs
+        if (isInputFocused and isControlActive) {
+          if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) { //Move forward
+            position += horizontalDirection * deltaTime * *movementSpeedPtr;
+          }
+          if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) { //Move back
+            position -= horizontalDirection * deltaTime * *movementSpeedPtr;
+          }
+          if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) { //Move right
+            position += right * deltaTime * *movementSpeedPtr;
+          }
+          if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) { //Move left
+            position -= right * deltaTime * *movementSpeedPtr;
           }
 
-          //Update the camera position
-          ammonite::camera::setPosition(activeCameraId, position);
+          if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) { //Move up
+            position += glm::vec3(0, 1, 0) * deltaTime * *movementSpeedPtr;
+          }
+          if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) { //Move down
+            position -= glm::vec3(0, 1, 0) * deltaTime * *movementSpeedPtr;
+          }
         }
+
+        //Update the camera position
+        ammonite::camera::setPosition(activeCameraId, position);
 
         //Reset time between inputs
         controlTimer.reset();
