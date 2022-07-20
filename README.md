@@ -80,6 +80,12 @@
   - ### Icons:
     - `inkscape optipng`
 
+## Issues:
+  - Due to the small size of this project, only a small range of hardware can be tested
+    - If you hardware / driver meets the requirements listed [here](#requirements), but the engine doesn't work, please file a bug report
+  - Issues, feature requests and bug reports can be filed [here](https://github.com/stuarthayhurst/ammonite/issues)
+  - Feel free to work on any issues / feature ideas, suggestions are welcome :)
+
 ## Notes:
   - All targets are compiled with `-Wall` and `-Wextra`
   - Targets are also compiled with `-O3` and `-flto`, which may cause some systems to struggle to compile, or produce unstable results
