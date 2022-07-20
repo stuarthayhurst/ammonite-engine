@@ -15,7 +15,7 @@
     - `ARB_shader_storage_buffer_object`
     - `ARB_texture_storage`
     - `ARB_texture_cube_map_array`
-    - `KHR_debug`, when compiled in debug mode
+  - OpenGL debugging is supported with `KHR_debug`
   - Program caching is supported with `ARB_get_program_binary`
 
 ## Building + installing libammonite:
@@ -28,16 +28,18 @@
     - `build` will only allow running from this project's root directory (recommended, as the code is only a demo)
     - `system-build` + `install` will build the demo, but use the system copy of `libammonite.so`
   - Run `./build/demo` to launch the demo
-  - To compile in debug mode, use `make debug` or `DEBUG=true make ...`
-    - This will compile some extras in the code to help with debugging (every header gets `iostream`)
-    - It will also enable OpenGL debug warning, messages and errors
-    - Before swapping back to regular builds, run `make clean`
 
 ## Options:
   - Compiled demos have a few arguments supported:
     - `--help`: Displays a help menu
     - `--benchmark`: Start a benchmark
     - `--vsync`: Enable / disable VSync (`true` / `false`)
+
+## Debug mode:
+  - To compile in debug mode, use `make debug` or `DEBUG=true make ...`
+    - This will compile some extras in the code to help with debugging (every header gets `iostream`)
+    - It will also enable OpenGL debug warnings, messages and errors
+    - Before swapping back to regular builds, run `make clean`
 
 ## Build system:
   - ### Targets:
@@ -74,7 +76,7 @@
   - All targets are compiled with `-Wall` and `-Wextra`
   - Targets are also compiled with `-O3` and `-flto`, which may cause some systems to struggle to compile, or produce unstable results
     - These can be changed by modifying `CXXFLAGS` in `Makefile`
-    - `-flto` is strongly recommended, otherwise the build results can be very large
+    - `-flto` is strongly recommended, otherwise the build results can be unnecessarily large
 
 ## Credits:
  - Some models in `assets/` may have been created by third parties, attribution can be found in `docs/CREDITS.md`
