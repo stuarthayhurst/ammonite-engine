@@ -18,8 +18,14 @@ AMMONITE_HEADER_SOURCE = $(wildcard ./src/ammonite/*.hpp) $(wildcard ./src/ammon
 COMMON_HEADER_SOURCE = $(wildcard ./src/common/*.hpp)
 
 CXXFLAGS := $(shell pkg-config --cflags $(LIBS)) -fopenmp
-CXXFLAGS += -Wall -Wextra -Werror -O3 -flto -std=c++17
+CXXFLAGS += -Wall -Wextra -Werror -std=c++17 -flto
 LDFLAGS := $(shell pkg-config --libs $(LIBS)) -pthread
+
+ifeq ($(FAST),true)
+  CXXFLAGS += -Ofast -march=native
+else
+  CXXFLAGS += -O3
+endif
 
 ifeq ($(DEBUG),true)
   CXXFLAGS += -DDEBUG -g
