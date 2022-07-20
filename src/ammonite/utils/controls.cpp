@@ -28,7 +28,7 @@ namespace ammonite {
 
         //Increase / decrease FoV on scroll (xoffset is unused)
         static void scroll_callback(GLFWwindow*, double, double yoffset) {
-          if (isCameraActive) {
+          if (isInputFocused and isCameraActive) {
             int activeCameraId = ammonite::camera::getActiveCamera();
             float fov = ammonite::camera::getFieldOfView(activeCameraId);
 
@@ -45,7 +45,7 @@ namespace ammonite {
 
         //Reset FoV on middle click, (modifier bits are unused)
         static void zoom_reset_callback(GLFWwindow*, int button, int action, int) {
-          if (isCameraActive) {
+          if (isInputFocused and isCameraActive) {
             if (button == GLFW_MOUSE_BUTTON_MIDDLE and action == GLFW_PRESS) {
               ammonite::camera::setFieldOfView(ammonite::camera::getActiveCamera(), 45.0f);
             }
