@@ -4,7 +4,6 @@
 #include <vector>
 #include <string>
 #include <glm/glm.hpp>
-#include <glm/gtx/quaternion.hpp>
 #include <GL/glew.h>
 
 namespace ammonite {

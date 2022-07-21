@@ -1,7 +1,6 @@
 #ifndef LIGHTING
 #define LIGHTING
 
-#include <GL/glew.h>
 #include <glm/glm.hpp>
 
 namespace ammonite {
