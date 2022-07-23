@@ -17,7 +17,6 @@
 #include "internal/textures.hpp"
 #include "internal/modelTracker.hpp"
 #include "internal/lightTracker.hpp"
-#include "internal/textureTracker.hpp"
 
 namespace ammonite {
   namespace {
