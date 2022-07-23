@@ -30,6 +30,10 @@ namespace ammonite {
       bool flipTexCoords;
       bool srgbTextures;
     };
+
+    //Constants for loading assumptions
+    const bool ASSUME_FLIP_UVS = true;
+    const bool ASSUME_SRGB_TEXTURES = false;
   }
 
   namespace {
@@ -261,7 +265,7 @@ namespace ammonite {
     }
 
     int createModel(const char* objectPath, bool* externalSuccess) {
-      return createModel(objectPath, true, false, externalSuccess);
+      return createModel(objectPath, ASSUME_FLIP_UVS, ASSUME_SRGB_TEXTURES, externalSuccess);
     }
 
     int copyModel(int modelId) {
@@ -337,7 +341,7 @@ namespace ammonite {
     }
 
     void applyTexture(int modelId, const char* texturePath, bool* externalSuccess) {
-      applyTexture(modelId, texturePath, false, externalSuccess);
+      applyTexture(modelId, texturePath, ASSUME_SRGB_TEXTURES, externalSuccess);
     }
 
     //Return the number of vertices on a model
