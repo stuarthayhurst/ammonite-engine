@@ -58,9 +58,6 @@ int main(int argc, char* argv[]) {
   //Set an icon
   ammonite::windowManager::useIconDir(window, "assets/icons/");
 
-  //Initialise controls
-  ammonite::utils::controls::setupControls(window);
-
   //Set vsync (disable if benchmarking)
   if (useVsync == "false" or useBenchmark) {
     ammonite::settings::graphics::setVsync(false);
@@ -72,12 +69,23 @@ int main(int argc, char* argv[]) {
   ammonite::utils::debug::enableDebug();
 #endif
 
-  //Enable engine caching
+  //Enable engine caching, setup renderer and initialise controls
+  bool success = true;
   ammonite::utils::cache::useDataCache("cache");
+  ammonite::renderer::setup::setupRenderer(window, "shaders/", &success);
+  ammonite::utils::controls::setupControls(window);
+
+  //Graphics settings
+  ammonite::settings::graphics::setGammaCorrection(true);
+
+  //Renderer failed to initialise, clean up and exit
+  if (!success) {
+    std::cerr << "Failed to initialise renderer, exiting" << std::endl;
+    cleanUp(0, nullptr);
+    return EXIT_FAILURE;
+  }
 
   //Load models from a set of objects and textures
-  bool success = true;
-  ammonite::utils::Timer performanceTimer;
   const char* models[][2] = {
     {"assets/suzanne.obj", "assets/gradient.png"},
     {"assets/cube.obj", "assets/flat.png"}
@@ -86,7 +94,7 @@ int main(int argc, char* argv[]) {
   int loadedModelIds[modelCount + 1];
 
   long int vertexCount = 0;
-  performanceTimer.reset();
+  ammonite::utils::Timer performanceTimer;
   for (int i = 0; i < modelCount; i++) {
     //Load model
     loadedModelIds[i] = ammonite::models::createModel(models[i][0], &success);
@@ -95,7 +103,7 @@ int main(int argc, char* argv[]) {
     vertexCount += ammonite::models::getVertexCount(loadedModelIds[i]);
 
     //Load texture
-    ammonite::models::applyTexture(loadedModelIds[i], models[i][1], &success);
+    ammonite::models::applyTexture(loadedModelIds[i], models[i][1], true, &success);
   }
 
   //Copy last loaded model
@@ -124,16 +132,6 @@ int main(int argc, char* argv[]) {
   ammonite::lighting::linkModel(lightId, loadedModelIds[modelCount - 1]);
   ammonite::lighting::updateLightSources();
   ammonite::lighting::setAmbientLight(glm::vec3(0.1f, 0.1f, 0.1f));
-
-  //Setup the renderer
-  ammonite::renderer::setup::setupRenderer(window, "shaders/", &success);
-
-  //Renderer failed to initialise, clean up and exit
-  if (!success) {
-    std::cerr << "Failed to initialise renderer, exiting" << std::endl;
-    cleanUp(modelCount, loadedModelIds);
-    return EXIT_FAILURE;
-  }
 
   //Camera ids
   int cameraIds[2] = {0, ammonite::camera::createCamera()};
