@@ -39,7 +39,7 @@ namespace ammonite {
       }
     }
 
-    GLuint loadTexture(const char* texturePath, bool* externalSuccess) {
+    GLuint loadTexture(const char* texturePath, bool srgbTexture, bool* externalSuccess) {
       //Check if texture has already been loaded
       std::string textureString = std::string(texturePath);
       if (textureTrackerMap.find(textureString) != textureTrackerMap.end()) {
@@ -48,8 +48,8 @@ namespace ammonite {
       }
 
       //Read image data
-      int width, height, bpp;
-      unsigned char* data = stbi_load(texturePath, &width, &height, &bpp, 0);
+      int width, height, nChannels;
+      unsigned char* data = stbi_load(texturePath, &width, &height, &nChannels, 0);
 
       if (!data) {
         std::cerr << "Failed to load texture '" << texturePath << "'" << std::endl;
@@ -62,12 +62,23 @@ namespace ammonite {
       glCreateTextures(GL_TEXTURE_2D, 1, &textureId);
 
       //Decide the format of the texture and data
-      GLenum internalFormat = GL_RGB8;
-      GLenum dataFormat = GL_RGB;
-      if (bpp == 4) {
-        internalFormat = GL_RGBA8;
+      GLenum internalFormat;
+      GLenum dataFormat;
+      if (nChannels == 3) {
+        dataFormat = GL_RGB;
+        if (srgbTexture) {
+          internalFormat = GL_SRGB8;
+        } else {
+          internalFormat = GL_RGB8;
+        }
+      } else if (nChannels == 4) {
         dataFormat = GL_RGBA;
-      } else if (bpp != 3) {
+        if (srgbTexture) {
+          internalFormat = GL_SRGB8_ALPHA8;
+        } else {
+          internalFormat = GL_RGBA8;
+        }
+      } else if (nChannels != 3) {
         std::cerr << "Failed to load texture '" << texturePath << "'" << std::endl;
         glDeleteTextures(1, &textureId);
         *externalSuccess = false;

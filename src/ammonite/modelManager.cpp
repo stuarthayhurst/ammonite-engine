@@ -24,6 +24,12 @@ namespace ammonite {
     //Track all loaded models
     std::map<int, models::ModelInfo> modelTrackerMap;
     std::map<std::string, models::ModelData> modelDataMap;
+
+    struct ModelLoadInfo {
+      std::string modelDirectory;
+      bool flipTexCoords;
+      bool srgbTextures;
+    };
   }
 
   namespace {
@@ -80,7 +86,7 @@ namespace ammonite {
       }
     }
 
-    static void processMesh(aiMesh* mesh, const aiScene* scene, std::vector<models::MeshData>* meshes, std::string directory, bool* externalSuccess) {
+    static void processMesh(aiMesh* mesh, const aiScene* scene, std::vector<models::MeshData>* meshes, ModelLoadInfo modelLoadInfo, bool* externalSuccess) {
       //Add a new empty mesh to the mesh vector
       meshes->emplace_back();
       models::MeshData* newMesh = &meshes->back();
@@ -122,9 +128,9 @@ namespace ammonite {
         aiString texturePath;
         material->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath);
 
-        std::string fullTexturePath = directory + '/' + texturePath.C_Str();
+        std::string fullTexturePath = modelLoadInfo.modelDirectory + '/' + texturePath.C_Str();
 
-        int textureId = ammonite::textures::loadTexture(fullTexturePath.c_str(), externalSuccess);
+        int textureId = ammonite::textures::loadTexture(fullTexturePath.c_str(), modelLoadInfo.srgbTextures, externalSuccess);
         if (!*externalSuccess) {
           return;
         }
@@ -133,22 +139,22 @@ namespace ammonite {
       }
     }
 
-    static void processNode(aiNode* node, const aiScene* scene, std::vector<models::MeshData>* meshes, std::string directory, bool* externalSuccess) {
+    static void processNode(aiNode* node, const aiScene* scene, std::vector<models::MeshData>* meshes, ModelLoadInfo modelLoadInfo, bool* externalSuccess) {
       for (unsigned int i = 0; i < node->mNumMeshes; i++) {
-        processMesh(scene->mMeshes[node->mMeshes[i]], scene, meshes, directory, externalSuccess);
+        processMesh(scene->mMeshes[node->mMeshes[i]], scene, meshes, modelLoadInfo, externalSuccess);
       }
 
       for (unsigned int i = 0; i < node->mNumChildren; i++) {
-        processNode(node->mChildren[i], scene, meshes, directory, externalSuccess);
+        processNode(node->mChildren[i], scene, meshes, modelLoadInfo, externalSuccess);
       }
     }
 
-    static void loadObject(const char* objectPath, models::ModelData* modelObjectData, bool flipTexCoords, bool* externalSuccess) {
+    static void loadObject(const char* objectPath, models::ModelData* modelObjectData, ModelLoadInfo modelLoadInfo, bool* externalSuccess) {
       //Generate postprocessing flags
       auto aiProcessFlags = aiProcess_Triangulate | aiProcess_GenNormals | aiProcess_GenUVCoords | aiProcess_RemoveRedundantMaterials | aiProcess_OptimizeMeshes | aiProcess_JoinIdenticalVertices | aiProcess_PreTransformVertices;
 
       //Flip texture coords, if requested
-      if (flipTexCoords) {
+      if (modelLoadInfo.flipTexCoords) {
         aiProcessFlags = aiProcessFlags | aiProcess_FlipUVs;
       }
 
@@ -163,9 +169,7 @@ namespace ammonite {
       }
 
       //Recursively process nodes
-      std::string pathString = objectPath;
-      std::string directory = pathString.substr(0, pathString.find_last_of('/'));
-      processNode(scene->mRootNode, scene, &modelObjectData->meshes, directory, externalSuccess);
+      processNode(scene->mRootNode, scene, &modelObjectData->meshes, modelLoadInfo, externalSuccess);
     }
   }
 
@@ -212,7 +216,7 @@ namespace ammonite {
       int totalModels = 0;
     }
 
-    int createModel(const char* objectPath, bool flipTexCoords, bool* externalSuccess) {
+    int createModel(const char* objectPath, bool flipTexCoords, bool srgbTextures, bool* externalSuccess) {
       //Create the model
       ModelInfo modelObject;
       modelObject.modelName = std::string(objectPath);
@@ -228,8 +232,15 @@ namespace ammonite {
         modelDataMap[modelObject.modelName] = newModelData;
         modelObject.modelData = &modelDataMap[modelObject.modelName];
 
+        //Generate info required to load model
+        std::string pathString = objectPath;
+        ModelLoadInfo modelLoadInfo;
+        modelLoadInfo.flipTexCoords = flipTexCoords;
+        modelLoadInfo.srgbTextures = srgbTextures;
+        modelLoadInfo.modelDirectory = pathString.substr(0, pathString.find_last_of('/'));
+
         //Fill the model data
-        loadObject(objectPath, modelObject.modelData, flipTexCoords, externalSuccess);
+        loadObject(objectPath, modelObject.modelData, modelLoadInfo, externalSuccess);
         createBuffers(modelObject.modelData);
       }
 
@@ -250,7 +261,7 @@ namespace ammonite {
     }
 
     int createModel(const char* objectPath, bool* externalSuccess) {
-      return createModel(objectPath, true, externalSuccess);
+      return createModel(objectPath, true, false, externalSuccess);
     }
 
     int copyModel(int modelId) {
@@ -299,7 +310,7 @@ namespace ammonite {
       }
     }
 
-    void applyTexture(int modelId, const char* texturePath, bool* externalSuccess) {
+    void applyTexture(int modelId, const char* texturePath, bool srgbTexture, bool* externalSuccess) {
       ModelInfo* modelPtr = models::getModelPtr(modelId);
       if (modelPtr == nullptr) {
         *externalSuccess = false;
@@ -317,12 +328,16 @@ namespace ammonite {
         }
 
         //Create new texture and apply to the model
-        int textureId = ammonite::textures::loadTexture(texturePath, externalSuccess);
+        int textureId = ammonite::textures::loadTexture(texturePath, srgbTexture, externalSuccess);
         if (!*externalSuccess) {
           return;
         }
         meshData->textureId = textureId;
       }
+    }
+
+    void applyTexture(int modelId, const char* texturePath, bool* externalSuccess) {
+      applyTexture(modelId, texturePath, false, externalSuccess);
     }
 
     //Return the number of vertices on a model
