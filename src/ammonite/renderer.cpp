@@ -434,10 +434,15 @@ namespace ammonite {
         glClear(GL_DEPTH_BUFFER_BIT);
       }
 
-      //Prepare model shader, gamma correction and depth cube map
+      //Prepare model shader and depth cube map
       glUseProgram(modelShader.shaderId);
-      glEnable(GL_FRAMEBUFFER_SRGB);
       glBindTextureUnit(1, depthCubeMapId);
+
+      //Use gamma correction if enabled
+      static bool* gammaPtr = ammonite::settings::graphics::internal::getGammaCorrectionPtr();
+      if (*gammaPtr) {
+        glEnable(GL_FRAMEBUFFER_SRGB);
+      }
 
       //Calculate view projection matrix
       viewProjectionMatrix = *projectionMatrix * *viewMatrix;
@@ -487,7 +492,7 @@ namespace ammonite {
         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, nullptr);
       }
 
-      //Disable gamma correction
+      //Disable gamma correction for start of next pass
       glDisable(GL_FRAMEBUFFER_SRGB);
 
       //Swap buffers

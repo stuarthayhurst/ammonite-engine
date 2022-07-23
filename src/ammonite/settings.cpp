@@ -93,6 +93,7 @@ namespace ammonite {
           float frameLimit = 0.0f;
           int shadowRes = 1024;
           float farPlane = 25.0f;
+          bool gammaCorrection = false;
         } graphics;
       }
 
@@ -108,6 +109,10 @@ namespace ammonite {
 
         float* getShadowFarPlanePtr() {
           return &graphics.farPlane;
+        }
+
+        bool* getGammaCorrectionPtr() {
+          return &graphics.gammaCorrection;
         }
       }
 
@@ -142,6 +147,14 @@ namespace ammonite {
 
       float getShadowfarPlane() {
         return graphics.farPlane;
+      }
+
+      void setGammaCorrection(bool gammaCorrection) {
+        graphics.gammaCorrection = gammaCorrection;
+      }
+
+      bool getGammaCorrection() {
+        return graphics.gammaCorrection;
       }
     }
 
