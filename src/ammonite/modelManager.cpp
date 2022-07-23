@@ -14,7 +14,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/quaternion.hpp>
 
-#include "textures.hpp"
+#include "internal/textures.hpp"
 #include "internal/modelTracker.hpp"
 #include "internal/lightTracker.hpp"
 #include "internal/textureTracker.hpp"

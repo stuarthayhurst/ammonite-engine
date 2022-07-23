@@ -13,7 +13,6 @@
 #include "settings.hpp"
 
 #include "shaders.hpp"
-#include "textures.hpp"
 #include "camera.hpp"
 #include "renderer.hpp"
 #include "modelManager.hpp"
