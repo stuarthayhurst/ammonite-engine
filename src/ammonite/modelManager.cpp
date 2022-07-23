@@ -35,6 +35,34 @@ namespace ammonite {
     const bool ASSUME_SRGB_TEXTURES = false;
   }
 
+  //Internally exposed model handling methods
+  namespace models {
+    ModelInfo* getModelPtr(int modelId) {
+      //Check the model exists, and return a pointer
+      auto it = modelTrackerMap.find(modelId);
+      if (it != modelTrackerMap.end()) {
+        return &it->second;
+      } else {
+        return nullptr;
+      }
+    }
+
+    void setLightEmitting(int modelId, bool lightEmitting) {
+      ModelInfo* modelPtr = models::getModelPtr(modelId);
+      if (modelPtr != nullptr) {
+        modelPtr->lightEmitting = lightEmitting;
+      }
+    }
+
+    bool getLightEmitting(int modelId) {
+      ModelInfo* modelPtr = models::getModelPtr(modelId);
+      if (modelPtr != nullptr) {
+        return modelPtr->lightEmitting;
+      }
+      return false;
+    }
+  }
+
   namespace {
     static void createBuffers(models::ModelData* modelObjectData) {
       //Generate buffers for every mesh
@@ -173,34 +201,6 @@ namespace ammonite {
 
       //Recursively process nodes
       processNode(scene->mRootNode, scene, &modelObjectData->meshes, modelLoadInfo, externalSuccess);
-    }
-  }
-
-  //Internally exposed model handling methods
-  namespace models {
-    ModelInfo* getModelPtr(int modelId) {
-      //Check the model exists, and return a pointer
-      auto it = modelTrackerMap.find(modelId);
-      if (it != modelTrackerMap.end()) {
-        return &it->second;
-      } else {
-        return nullptr;
-      }
-    }
-
-    void setLightEmitting(int modelId, bool lightEmitting) {
-      ModelInfo* modelPtr = models::getModelPtr(modelId);
-      if (modelPtr != nullptr) {
-        modelPtr->lightEmitting = lightEmitting;
-      }
-    }
-
-    bool getLightEmitting(int modelId) {
-      ModelInfo* modelPtr = models::getModelPtr(modelId);
-      if (modelPtr != nullptr) {
-        return modelPtr->lightEmitting;
-      }
-      return false;
     }
   }
 
