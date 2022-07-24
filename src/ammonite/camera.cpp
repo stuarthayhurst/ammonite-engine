@@ -115,6 +115,21 @@ namespace ammonite {
       }
     }
 
+    glm::vec3 getDirection(int cameraId) {
+      auto it = cameraTrackerMap.find(cameraId);
+      if (it != cameraTrackerMap.end()) {
+        auto activeCamera = it->second;
+        glm::vec3 direction = glm::vec3(
+          std::cos(activeCamera.verticalAngle) * std::sin(activeCamera.horizontalAngle),
+          std::sin(activeCamera.verticalAngle),
+          std::cos(activeCamera.verticalAngle) * std::cos(activeCamera.horizontalAngle)
+        );
+        return glm::normalize(direction);
+      } else {
+        return glm::vec3(0.0f);
+      }
+    }
+
     //Get horizontal angle (radians)
     float getHorizontal(int cameraId) {
       auto it = cameraTrackerMap.find(cameraId);

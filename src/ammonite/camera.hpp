@@ -12,6 +12,7 @@ namespace ammonite {
     void setActiveCamera(int cameraId);
 
     glm::vec3 getPosition(int cameraId);
+    glm::vec3 getDirection(int cameraId);
     float getHorizontal(int cameraId);
     float getVertical(int cameraId);
     float getFieldOfView(int cameraId);
