@@ -65,6 +65,7 @@ library: $(BUILD_DIR)/libammonite.so
 	ln -s "libammonite.so" "$(BUILD_DIR)/$(LIBRARY_NAME)"
 headers:
 	cp -r "./src/ammonite" "$(HEADER_DIR)/ammonite"
+	rm -rf "$(HEADER_DIR)/ammonite/internal"
 install:
 	@mkdir -p "$(INSTALL_DIR)/ammonite"
 	install "$(BUILD_DIR)/libammonite.so" "$(INSTALL_DIR)/ammonite/$(LIBRARY_NAME)"
