@@ -6,6 +6,8 @@
 #include <stb/stb_image.h>
 #include <GL/glew.h>
 
+#include "internal/textures.hpp"
+
 namespace ammonite {
   namespace environment {
     namespace {
@@ -46,21 +48,7 @@ namespace ammonite {
           //Decide the format of the texture and data
           GLenum internalFormat;
           GLenum dataFormat;
-          if (nChannels == 3) {
-            dataFormat = GL_RGB;
-            if (srgbTextures) {
-              internalFormat = GL_SRGB8;
-            } else {
-              internalFormat = GL_RGB8;
-            }
-          } else if (nChannels == 4) {
-            dataFormat = GL_RGBA;
-            if (srgbTextures) {
-              internalFormat = GL_SRGB8_ALPHA8;
-            } else {
-              internalFormat = GL_RGBA8;
-            }
-          } else {
+          if (!ammonite::textures::getTextureFormat(nChannels, srgbTextures, &internalFormat, &dataFormat)) {
             //Free image data, destroy texture, set failure and return
             std::cerr << "Failed to load '" << texturePaths[i] << "'" << std::endl;
             stbi_image_free(imageData);
