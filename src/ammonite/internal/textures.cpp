@@ -78,7 +78,7 @@ namespace ammonite {
         } else {
           internalFormat = GL_RGBA8;
         }
-      } else if (nChannels != 3) {
+      } else {
         std::cerr << "Failed to load texture '" << texturePath << "'" << std::endl;
         glDeleteTextures(1, &textureId);
         *externalSuccess = false;

@@ -11,6 +11,7 @@ namespace ammonite {
       void setActiveSkybox(int skyboxId);
 
       int createSkybox(std::vector<std::string> texturePaths, bool* externalSuccess);
+      int createSkybox(std::vector<std::string> texturePaths, bool srgbTextures, bool* externalSuccess);
       void deleteSkybox(int skyboxId);
     }
   }

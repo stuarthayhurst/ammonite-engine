@@ -26,7 +26,7 @@ namespace ammonite {
         }
       }
 
-      int createSkybox(std::vector<std::string> texturePaths, bool* externalSuccess) {
+      int createSkybox(std::vector<std::string> texturePaths, bool srgbTextures, bool* externalSuccess) {
         if (texturePaths.size() != 6) {
           std::cerr << "Skyboxes require 6 texture paths" << std::endl;
           *externalSuccess = false;
@@ -44,11 +44,30 @@ namespace ammonite {
           unsigned char* imageData = stbi_load(texturePaths[i].c_str(), &width, &height, &nChannels, 0);
 
           //Decide the format of the texture and data
-          GLenum internalFormat = GL_RGB8;
-          GLenum dataFormat = GL_RGB;
-          if (nChannels == 4) {
-            internalFormat = GL_RGBA8;
+          GLenum internalFormat;
+          GLenum dataFormat;
+          if (nChannels == 3) {
+            dataFormat = GL_RGB;
+            if (srgbTextures) {
+              internalFormat = GL_SRGB8;
+            } else {
+              internalFormat = GL_RGB8;
+            }
+          } else if (nChannels == 4) {
             dataFormat = GL_RGBA;
+            if (srgbTextures) {
+              internalFormat = GL_SRGB8_ALPHA8;
+            } else {
+              internalFormat = GL_RGBA8;
+            }
+          } else {
+            //Free image data, destroy texture, set failure and return
+            std::cerr << "Failed to load '" << texturePaths[i] << "'" << std::endl;
+            stbi_image_free(imageData);
+            glDeleteTextures(1, &textureId);
+
+            *externalSuccess = false;
+            return -1;
           }
 
           //Only create texture storage once
@@ -80,6 +99,10 @@ namespace ammonite {
 
         skyboxTracker.push_back(textureId);
         return textureId;
+      }
+
+      int createSkybox(std::vector<std::string> texturePaths, bool* externalSuccess) {
+        return createSkybox(texturePaths, false, externalSuccess);
       }
 
       void deleteSkybox(int skyboxId) {
