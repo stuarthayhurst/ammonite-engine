@@ -490,6 +490,7 @@ namespace ammonite {
         glUniformMatrix4fv(skyboxShader.projectionMatrixId, 1, GL_FALSE, &(*projectionMatrix)[0][0]);
 
         //Prepare and draw the skybox
+        setWireframe(false);
         glBindVertexArray(skyboxVertexArrayId);
         glBindTextureUnit(2, activeSkybox);
         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, nullptr);
