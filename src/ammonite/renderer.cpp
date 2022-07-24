@@ -195,6 +195,9 @@ namespace ammonite {
         glNamedFramebufferDrawBuffer(depthMapFBO, GL_NONE);
         glNamedFramebufferReadBuffer(depthMapFBO, GL_NONE);
 
+        //Enable seamless cubemaps
+        glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+
         //Enable culling triangles and depth testing
         glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
