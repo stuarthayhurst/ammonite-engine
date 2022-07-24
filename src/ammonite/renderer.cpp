@@ -396,8 +396,8 @@ namespace ammonite {
       glClear(GL_DEPTH_BUFFER_BIT);
 
       auto lightIt = lightTrackerMap->begin();
-      unsigned int maxShadows = std::min(lightCount, maxLightCount);
-      for (unsigned int shadowCount = 0; shadowCount < maxShadows; shadowCount++) {
+      unsigned int activeLights = std::min(lightCount, maxLightCount);
+      for (unsigned int shadowCount = 0; shadowCount < activeLights; shadowCount++) {
         //Get light source and position from tracker
         auto lightSource = &lightIt->second;
         glm::vec3 lightPos = lightSource->geometry;
@@ -458,7 +458,7 @@ namespace ammonite {
       glUniform3fv(modelShader.ambientLightId, 1, &ambientLight[0]);
       glUniform3fv(modelShader.cameraPosId, 1, &cameraPosition[0]);
       glUniform1f(modelShader.farPlaneId, *farPlanePtr);
-      glUniform1i(modelShader.lightCountId, maxShadows);
+      glUniform1i(modelShader.lightCountId, activeLights);
       drawModels(modelIds, modelCount, false);
 
       //Get information about light sources to be rendered
