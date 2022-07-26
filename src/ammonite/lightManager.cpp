@@ -74,7 +74,7 @@ namespace ammonite {
       if (ammonite::models::getLightEmitting(modelId)) {
         //Find the light source responsible and unlink
         auto lightIt = lightTrackerMap.begin();
-        for(unsigned int i = 0; i < lightTrackerMap.size(); i++) {
+        for (unsigned int i = 0; i < lightTrackerMap.size(); i++) {
           //Reset the modelId on the previously linked light source
           if (lightIt->second.modelId == modelId) {
             lightIt->second.modelId = -1;

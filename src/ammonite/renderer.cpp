@@ -161,7 +161,7 @@ namespace ammonite {
 
         //Shader uniform locations
         modelShader.matrixId = glGetUniformLocation(modelShader.shaderId, "MVP");
-        modelShader.modelMatrixId = glGetUniformLocation(modelShader.shaderId, "M");
+        modelShader.modelMatrixId = glGetUniformLocation(modelShader.shaderId, "modelMatrix");
         modelShader.normalMatrixId = glGetUniformLocation(modelShader.shaderId, "normalMatrix");
         modelShader.ambientLightId = glGetUniformLocation(modelShader.shaderId, "ambientLight");
         modelShader.cameraPosId = glGetUniformLocation(modelShader.shaderId, "cameraPos");
@@ -178,8 +178,8 @@ namespace ammonite {
         depthShader.depthLightPosId = glGetUniformLocation(depthShader.shaderId, "lightPos");
         depthShader.depthShadowIndex = glGetUniformLocation(depthShader.shaderId, "shadowMapIndex");
 
-        skyboxShader.viewMatrixId = glGetUniformLocation(skyboxShader.shaderId, "V");
-        skyboxShader.projectionMatrixId = glGetUniformLocation(skyboxShader.shaderId, "P");
+        skyboxShader.viewMatrixId = glGetUniformLocation(skyboxShader.shaderId, "viewMatrix");
+        skyboxShader.projectionMatrixId = glGetUniformLocation(skyboxShader.shaderId, "projectionMatrix");
         skyboxShader.skyboxSamplerId = glGetUniformLocation(skyboxShader.shaderId, "skyboxSampler");
 
         //Pass texture unit locations

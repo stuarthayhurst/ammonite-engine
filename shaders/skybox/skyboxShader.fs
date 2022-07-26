@@ -2,6 +2,7 @@
 
 in vec3 texCoords;
 out vec4 colour;
+
 uniform samplerCube skyboxSampler;
 
 void main() {
