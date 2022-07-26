@@ -276,6 +276,7 @@ namespace ammonite {
 
       //Copy model data
       ModelInfo modelObject = *oldModelObject;
+      modelObject.lightEmitting = false;
       modelObject.modelData->refCount += 1;
 
       //Add model to the tracker and return the ID
