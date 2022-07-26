@@ -139,7 +139,7 @@ namespace ammonite {
       }
     }
 
-    GLuint loadShader(const char* shaderPath, const GLenum shaderType, bool* externalSuccess) {
+    int loadShader(const char* shaderPath, const GLenum shaderType, bool* externalSuccess) {
       //Check for compute shader support if needed
       if (shaderType == GL_COMPUTE_SHADER) {
         if (!ammonite::utils::checkExtension("GL_ARB_compute_shader", "GL_VERSION_4_3")) {
@@ -206,7 +206,7 @@ namespace ammonite {
       return shaderId;
     }
 
-    GLuint createProgram(const GLuint shaderIds[], const int shaderCount, bool* externalSuccess) {
+    int createProgram(const GLuint shaderIds[], const int shaderCount, bool* externalSuccess) {
       //Create the program
       GLuint programId = glCreateProgram();
 
@@ -231,7 +231,7 @@ namespace ammonite {
       return programId;
     }
 
-    GLuint createProgram(const char* shaderPaths[], const GLenum shaderTypes[], const int shaderCount, bool* externalSuccess) {
+    int createProgram(const char* shaderPaths[], const GLenum shaderTypes[], const int shaderCount, bool* externalSuccess) {
       //Used later as the return value
       GLuint programId;
 
@@ -323,7 +323,7 @@ namespace ammonite {
       return programId;
     }
 
-    GLuint loadDirectory(const char* directoryPath, bool* externalSuccess) {
+    int loadDirectory(const char* directoryPath, bool* externalSuccess) {
       const std::filesystem::path shaderDir{directoryPath};
       const auto it = std::filesystem::directory_iterator{shaderDir};
 

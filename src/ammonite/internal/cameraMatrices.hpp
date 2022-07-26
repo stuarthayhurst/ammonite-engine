@@ -5,6 +5,8 @@
  - Allow renderer to request pointers to the view and projection matrices
 */
 
+#include <glm/glm.hpp>
+
 namespace ammonite {
   namespace camera {
     namespace matrices {
