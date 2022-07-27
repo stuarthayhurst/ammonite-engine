@@ -1,5 +1,4 @@
 #include <vector>
-#include <string>
 #include <algorithm>
 #include <iostream>
 
@@ -28,13 +27,7 @@ namespace ammonite {
         }
       }
 
-      int createSkybox(std::vector<std::string> texturePaths, bool srgbTextures, bool* externalSuccess) {
-        if (texturePaths.size() != 6) {
-          std::cerr << "Skyboxes require 6 texture paths" << std::endl;
-          *externalSuccess = false;
-          return 0;
-        }
-
+      int createSkybox(const char* texturePaths[6], bool srgbTextures, bool* externalSuccess) {
         GLuint textureId;
         glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &textureId);
 
@@ -43,7 +36,7 @@ namespace ammonite {
         bool createdStorage = false;
         for (unsigned int i = 0; i < 6; i++) {
           //Read the image data
-          unsigned char* imageData = stbi_load(texturePaths[i].c_str(), &width, &height, &nChannels, 0);
+          unsigned char* imageData = stbi_load(texturePaths[i], &width, &height, &nChannels, 0);
 
           //Decide the format of the texture and data
           GLenum internalFormat;
@@ -89,7 +82,7 @@ namespace ammonite {
         return textureId;
       }
 
-      int createSkybox(std::vector<std::string> texturePaths, bool* externalSuccess) {
+      int createSkybox(const char* texturePaths[6], bool* externalSuccess) {
         return createSkybox(texturePaths, false, externalSuccess);
       }
 
