@@ -32,7 +32,7 @@ namespace ammonite {
         if (texturePaths.size() != 6) {
           std::cerr << "Skyboxes require 6 texture paths" << std::endl;
           *externalSuccess = false;
-          return -1;
+          return 0;
         }
 
         GLuint textureId;
@@ -55,7 +55,7 @@ namespace ammonite {
             glDeleteTextures(1, &textureId);
 
             *externalSuccess = false;
-            return -1;
+            return 0;
           }
 
           //Only create texture storage once
@@ -75,7 +75,7 @@ namespace ammonite {
             glDeleteTextures(1, &textureId);
 
             *externalSuccess = false;
-            return -1;
+            return 0;
           }
         }
 

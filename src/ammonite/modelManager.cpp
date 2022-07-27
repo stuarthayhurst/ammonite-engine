@@ -271,7 +271,7 @@ namespace ammonite {
       //Get the model and check it exists
       models::ModelInfo* oldModelObject = models::getModelPtr(modelId);
       if (oldModelObject == nullptr) {
-        return -1;
+        return 0;
       }
 
       //Copy model data
