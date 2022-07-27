@@ -346,11 +346,15 @@ namespace ammonite {
       if (it != modelTrackerMap.end()) {
         ModelInfo* modelObject = &it->second;
         ModelData* modelObjectData = modelObject->modelData;
-        //Decrease the reference count of the model data
-        modelObjectData->refCount -= 1;
+        //Decrease the reference / soft reference count of the model data
+        if (modelObject->loaded) {
+          modelObjectData->refCount -= 1;
+        } else {
+          modelObjectData->softRefCount -= 1;
+        }
 
         //If the model data is now unused, destroy it
-        if (modelObjectData->refCount < 1) {
+        if (modelObjectData->refCount < 1 and modelObjectData->softRefCount < 1) {
           //Reduce reference count on textures
           for (unsigned int i = 0; i < modelObjectData->meshes.size(); i++) {
             ammonite::textures::deleteTexture(modelObject->textureIds[i]);
