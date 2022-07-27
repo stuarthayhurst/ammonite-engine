@@ -301,7 +301,7 @@ namespace ammonite {
         for (unsigned int i = 0; i < drawObjectData->meshes.size(); i++) {
           //Set texture for regular shading pass
           if (lightIndex == -1 and !depthPass) {
-            glBindTextureUnit(0, drawObjectData->meshes[i].textureId);
+            glBindTextureUnit(0, drawObject->textureIds[i]);
           }
 
           //Bind vertex attribute buffer

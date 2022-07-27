@@ -25,7 +25,6 @@ namespace ammonite {
       GLuint vertexBufferId = 0; //vertexBufferId and elementBufferId must stay in this memory layout
       GLuint elementBufferId = 0;
       GLuint vertexArrayId = 0;
-      GLuint textureId = 0;
       int vertexCount = 0;
     };
 
@@ -46,6 +45,7 @@ namespace ammonite {
     struct ModelInfo {
       ModelData* modelData;
       PositionData positionData;
+      std::vector<GLuint> textureIds;
       int drawMode = 0;
       bool active = true;
       bool loaded = true;

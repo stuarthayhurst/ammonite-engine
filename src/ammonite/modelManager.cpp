@@ -117,7 +117,7 @@ namespace ammonite {
       }
     }
 
-    static void processMesh(aiMesh* mesh, const aiScene* scene, std::vector<models::MeshData>* meshes, ModelLoadInfo modelLoadInfo, bool* externalSuccess) {
+    static void processMesh(aiMesh* mesh, const aiScene* scene, std::vector<models::MeshData>* meshes, std::vector<GLuint>* textureIds, ModelLoadInfo modelLoadInfo, bool* externalSuccess) {
       //Add a new empty mesh to the mesh vector
       meshes->emplace_back();
       models::MeshData* newMesh = &meshes->back();
@@ -168,21 +168,24 @@ namespace ammonite {
           return;
         }
 
-        newMesh->textureId = textureId;
+        textureIds->push_back(textureId);
+      } else {
+        //Add an empty texture to the tracker, to keep pace with meshes
+        textureIds->push_back(0);
       }
     }
 
-    static void processNode(aiNode* node, const aiScene* scene, std::vector<models::MeshData>* meshes, ModelLoadInfo modelLoadInfo, bool* externalSuccess) {
+    static void processNode(aiNode* node, const aiScene* scene, std::vector<models::MeshData>* meshes, std::vector<GLuint>* textureIds, ModelLoadInfo modelLoadInfo, bool* externalSuccess) {
       for (unsigned int i = 0; i < node->mNumMeshes; i++) {
-        processMesh(scene->mMeshes[node->mMeshes[i]], scene, meshes, modelLoadInfo, externalSuccess);
+        processMesh(scene->mMeshes[node->mMeshes[i]], scene, meshes, textureIds, modelLoadInfo, externalSuccess);
       }
 
       for (unsigned int i = 0; i < node->mNumChildren; i++) {
-        processNode(node->mChildren[i], scene, meshes, modelLoadInfo, externalSuccess);
+        processNode(node->mChildren[i], scene, meshes, textureIds, modelLoadInfo, externalSuccess);
       }
     }
 
-    static void loadObject(const char* objectPath, models::ModelData* modelObjectData, ModelLoadInfo modelLoadInfo, bool* externalSuccess) {
+    static void loadObject(const char* objectPath, models::ModelData* modelObjectData, std::vector<GLuint>* textureIds, ModelLoadInfo modelLoadInfo, bool* externalSuccess) {
       //Generate postprocessing flags
       auto aiProcessFlags = aiProcess_Triangulate | aiProcess_GenNormals | aiProcess_GenUVCoords | aiProcess_RemoveRedundantMaterials | aiProcess_OptimizeMeshes | aiProcess_JoinIdenticalVertices | aiProcess_PreTransformVertices;
 
@@ -202,7 +205,7 @@ namespace ammonite {
       }
 
       //Recursively process nodes
-      processNode(scene->mRootNode, scene, &modelObjectData->meshes, modelLoadInfo, externalSuccess);
+      processNode(scene->mRootNode, scene, &modelObjectData->meshes, textureIds, modelLoadInfo, externalSuccess);
     }
   }
 
@@ -246,7 +249,7 @@ namespace ammonite {
 
         //Fill the model data
         bool createdObject = true;
-        loadObject(objectPath, modelObject.modelData, modelLoadInfo, &createdObject);
+        loadObject(objectPath, modelObject.modelData, &modelObject.textureIds, modelLoadInfo, &createdObject);
         if (!createdObject) {
           modelDataMap.erase(modelObject.modelName);
           *externalSuccess = false;
@@ -350,7 +353,7 @@ namespace ammonite {
         if (modelObjectData->refCount < 1) {
           //Reduce reference count on textures
           for (unsigned int i = 0; i < modelObjectData->meshes.size(); i++) {
-            ammonite::textures::deleteTexture(modelObjectData->meshes[i].textureId);
+            ammonite::textures::deleteTexture(modelObject->textureIds[i]);
           }
 
           //Destroy the model buffers and position in second tracker layer
@@ -373,24 +376,24 @@ namespace ammonite {
         return;
       }
 
+      //Apply texture to every mesh on the model
       ModelData* modelObjectData = modelPtr->modelData;
       for (unsigned int i = 0; i < modelObjectData->meshes.size(); i++) {
-        models::MeshData* meshData = &modelObjectData->meshes[i];
-
         //If a texture is already applied, remove it
-        if (meshData->textureId != 0) {
-          ammonite::textures::deleteTexture(meshData->textureId);
-          meshData->textureId = 0;
+        if (modelPtr->textureIds[i] != 0) {
+          ammonite::textures::deleteTexture(modelPtr->textureIds[i]);
+          modelPtr->textureIds[i] = 0;
         }
 
-        //Create new texture and apply to the model
+        //Create new texture and apply to the mesh
         bool createdTexture = true;
         int textureId = ammonite::textures::loadTexture(texturePath, srgbTexture, &createdTexture);
         if (!createdTexture) {
           *externalSuccess = false;
           return;
         }
-        meshData->textureId = textureId;
+
+        modelPtr->textureIds[i] = textureId;
       }
     }
 
