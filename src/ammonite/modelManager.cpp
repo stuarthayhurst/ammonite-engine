@@ -299,8 +299,20 @@ namespace ammonite {
         return;
       }
 
-      modelPtr->active = false;
-      deleteBuffers(modelPtr->modelData);
+      //Check if model is loaded
+      if (modelPtr->loaded) {
+        //Set model as unloaded
+        modelPtr->loaded = false;
+
+        //Decrease refcount, add a new soft reference
+        modelPtr->modelData->softRefCount++;
+        modelPtr->modelData->refCount--;
+
+        //Unload actual data if no models reference it
+        if (modelPtr->modelData->refCount < 1) {
+          deleteBuffers(modelPtr->modelData);
+        }
+      }
     }
 
     void reloadModel(int modelId) {
@@ -309,8 +321,20 @@ namespace ammonite {
         return;
       }
 
-      createBuffers(modelPtr->modelData);
-      modelPtr->active = true;
+      //Check if model is unloaded
+      if (!modelPtr->loaded) {
+        //Set model as loaded
+        modelPtr->loaded = true;
+
+        //Increase refcount, remove a soft reference
+        modelPtr->modelData->softRefCount--;
+        modelPtr->modelData->refCount++;
+
+        //Upload actual data to the GPU, if it wasn't present
+        if (modelPtr->modelData->refCount == 1) {
+          createBuffers(modelPtr->modelData);
+        }
+      }
     }
 
     void deleteModel(int modelId) {

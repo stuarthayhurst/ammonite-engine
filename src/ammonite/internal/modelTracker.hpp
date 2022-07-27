@@ -31,6 +31,7 @@ namespace ammonite {
 
     struct ModelData {
       int refCount = 1;
+      int softRefCount = 0;
       std::vector<MeshData> meshes;
     };
 
@@ -47,6 +48,7 @@ namespace ammonite {
       PositionData positionData;
       int drawMode = 0;
       bool active = true;
+      bool loaded = true;
       bool lightEmitting = false;
       std::string modelName;
       int modelId;

@@ -257,7 +257,7 @@ namespace ammonite {
 
       static void drawModel(ammonite::models::ModelInfo *drawObject, int lightIndex, bool depthPass) {
         //If the model is disabled, skip it
-        if (!drawObject->active) {
+        if (!drawObject->active or !drawObject->loaded) {
           return;
         }
 
