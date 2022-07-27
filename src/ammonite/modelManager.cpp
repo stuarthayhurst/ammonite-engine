@@ -243,7 +243,13 @@ namespace ammonite {
         modelLoadInfo.modelDirectory = pathString.substr(0, pathString.find_last_of('/'));
 
         //Fill the model data
-        loadObject(objectPath, modelObject.modelData, modelLoadInfo, externalSuccess);
+        bool createdObject = true;
+        loadObject(objectPath, modelObject.modelData, modelLoadInfo, &createdObject);
+        if (!createdObject) {
+          modelDataMap.erase(modelObject.modelName);
+          *externalSuccess = false;
+          return 0;
+        }
         createBuffers(modelObject.modelData);
       }
 
