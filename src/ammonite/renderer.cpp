@@ -142,20 +142,22 @@ namespace ammonite {
         window = targetWindow;
 
         //Create shaders
+        bool createdShaders = true;
         std::string shaderLocation;
         shaderLocation = std::string(shaderPath) + std::string("models/");
-        modelShader.shaderId = ammonite::shaders::loadDirectory(shaderLocation.c_str(), externalSuccess);
+        modelShader.shaderId = ammonite::shaders::loadDirectory(shaderLocation.c_str(), &createdShaders);
 
         shaderLocation = std::string(shaderPath) + std::string("lights/");
-        lightShader.shaderId = ammonite::shaders::loadDirectory(shaderLocation.c_str(), externalSuccess);
+        lightShader.shaderId = ammonite::shaders::loadDirectory(shaderLocation.c_str(), &createdShaders);
 
         shaderLocation = std::string(shaderPath) + std::string("depth/");
-        depthShader.shaderId = ammonite::shaders::loadDirectory(shaderLocation.c_str(), externalSuccess);
+        depthShader.shaderId = ammonite::shaders::loadDirectory(shaderLocation.c_str(), &createdShaders);
 
         shaderLocation = std::string(shaderPath) + std::string("skybox/");
-        skyboxShader.shaderId = ammonite::shaders::loadDirectory(shaderLocation.c_str(), externalSuccess);
+        skyboxShader.shaderId = ammonite::shaders::loadDirectory(shaderLocation.c_str(), &createdShaders);
 
-        if (!*externalSuccess) {
+        if (!createdShaders) {
+          *externalSuccess = false;
           return;
         }
 
