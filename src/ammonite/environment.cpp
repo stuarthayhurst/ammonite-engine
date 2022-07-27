@@ -13,6 +13,10 @@ namespace ammonite {
       //Tracker for loaded skyboxes
       std::vector<int> skyboxTracker;
       int activeSkybox = 0;
+
+      //Constants for loading assumptions
+      const bool ASSUME_FLIP_FACES = false;
+      const bool ASSUME_SRGB_TEXTURES = false;
     }
 
     namespace skybox {
@@ -27,7 +31,7 @@ namespace ammonite {
         }
       }
 
-      int createSkybox(const char* texturePaths[6], bool srgbTextures, bool* externalSuccess) {
+      int createSkybox(const char* texturePaths[6], bool flipTextures, bool srgbTextures, bool* externalSuccess) {
         GLuint textureId;
         glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &textureId);
 
@@ -35,8 +39,17 @@ namespace ammonite {
         int width, height, nChannels;
         bool createdStorage = false;
         for (unsigned int i = 0; i < 6; i++) {
+          if (flipTextures) {
+            stbi_set_flip_vertically_on_load(true);
+          }
+
           //Read the image data
           unsigned char* imageData = stbi_load(texturePaths[i], &width, &height, &nChannels, 0);
+
+          //Disable texture flipping, to avoid interfering with future calls
+          if (flipTextures) {
+            stbi_set_flip_vertically_on_load(false);
+          }
 
           //Decide the format of the texture and data
           GLenum internalFormat;
@@ -83,7 +96,7 @@ namespace ammonite {
       }
 
       int createSkybox(const char* texturePaths[6], bool* externalSuccess) {
-        return createSkybox(texturePaths, false, externalSuccess);
+        return createSkybox(texturePaths, ASSUME_FLIP_FACES, ASSUME_SRGB_TEXTURES, externalSuccess);
       }
 
       void deleteSkybox(int skyboxId) {
