@@ -307,10 +307,12 @@ namespace ammonite {
       }
 
       //Create the program like normal, as a valid cache wasn't found
-      programId = createProgram(shaderIds, shaderCount, externalSuccess);
+      bool createdProgram = true;
+      programId = createProgram(shaderIds, shaderCount, &createdProgram);
 
       //Cleanup on failure
-      if (!*externalSuccess) {
+      if (!createdProgram) {
+        *externalSuccess = false;
         ammonite::shaders::eraseShaders();
         return 0;
       }
