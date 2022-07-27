@@ -293,6 +293,26 @@ namespace ammonite {
       return modelObject.modelId;
     }
 
+    void unloadModel(int modelId) {
+      ModelInfo* modelPtr = models::getModelPtr(modelId);
+      if (modelPtr == nullptr) {
+        return;
+      }
+
+      modelPtr->active = false;
+      deleteBuffers(modelPtr->modelData);
+    }
+
+    void reloadModel(int modelId) {
+      ModelInfo* modelPtr = models::getModelPtr(modelId);
+      if (modelPtr == nullptr) {
+        return;
+      }
+
+      createBuffers(modelPtr->modelData);
+      modelPtr->active = true;
+    }
+
     void deleteModel(int modelId) {
       //Check the model actually exists
       auto it = modelTrackerMap.find(modelId);
