@@ -161,8 +161,10 @@ namespace ammonite {
 
         std::string fullTexturePath = modelLoadInfo.modelDirectory + '/' + texturePath.C_Str();
 
-        int textureId = ammonite::textures::loadTexture(fullTexturePath.c_str(), modelLoadInfo.srgbTextures, externalSuccess);
-        if (!*externalSuccess) {
+        bool createdTexture = true;
+        int textureId = ammonite::textures::loadTexture(fullTexturePath.c_str(), modelLoadInfo.srgbTextures, &createdTexture);
+        if (!createdTexture) {
+          *externalSuccess = false;
           return;
         }
 
