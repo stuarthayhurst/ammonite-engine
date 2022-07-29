@@ -233,7 +233,7 @@ namespace ammonite {
       auto it = modelDataMap.find(modelObject.modelName);
       if (it != modelDataMap.end()) {
         modelObject.modelData = &it->second;
-        modelObject.modelData->refCount += 1;
+        modelObject.modelData->refCount++;
       } else {
         //Create empty ModelData object and add to tracker
         ModelData newModelData;
@@ -288,7 +288,7 @@ namespace ammonite {
       //Copy model data
       ModelInfo modelObject = *oldModelObject;
       modelObject.lightEmitting = false;
-      modelObject.modelData->refCount += 1;
+      modelObject.modelData->refCount++;
 
       //Add model to the tracker and return the ID
       modelObject.modelId = ++totalModels;
@@ -348,9 +348,9 @@ namespace ammonite {
         ModelData* modelObjectData = modelObject->modelData;
         //Decrease the reference / soft reference count of the model data
         if (modelObject->loaded) {
-          modelObjectData->refCount -= 1;
+          modelObjectData->refCount--;
         } else {
-          modelObjectData->softRefCount -= 1;
+          modelObjectData->softRefCount--;
         }
 
         //If the model data is now unused, destroy it

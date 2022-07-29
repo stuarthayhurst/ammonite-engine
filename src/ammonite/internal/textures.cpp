@@ -31,7 +31,7 @@ namespace ammonite {
       TextureInfo* textureInfo = &textureTrackerMap[textureName];
 
       //Decrease the reference counter
-      textureInfo->refCount -= 1;
+      textureInfo->refCount--;
 
       //If texture is now unused, delete the buffer and tracker elements
       if (textureInfo->refCount < 1) {
@@ -68,7 +68,7 @@ namespace ammonite {
       if (textureTrackerMap.find(textureString) != textureTrackerMap.end()) {
         TextureInfo* textureInfo = &textureTrackerMap[texturePath];
 
-        textureInfo->refCount += 1;
+        textureInfo->refCount++;
         return textureInfo->textureId;
       }
 
@@ -123,7 +123,7 @@ namespace ammonite {
     void copyTexture(GLuint textureId) {
       //Increase reference count on given texture, if it exists
       if (textureIdNameMap.find(textureId) != textureIdNameMap.end()) {
-        textureTrackerMap[textureIdNameMap[textureId]].refCount += 1;
+        textureTrackerMap[textureIdNameMap[textureId]].refCount++;
       }
     }
   }

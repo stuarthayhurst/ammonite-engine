@@ -93,35 +93,35 @@ namespace ammonite {
         if (!ammonite::utils::checkExtension("GL_ARB_direct_state_access", "GL_VERSION_4_5")) {
           std::cerr << "Direct state access unsupported" << std::endl;
           success = false;
-          *failureCount += 1;
+          (*failureCount)++;
         }
 
         //Check SSBOs are supported
         if (!ammonite::utils::checkExtension("GL_ARB_shader_storage_buffer_object", "GL_VERSION_4_3")) {
           std::cerr << "Shader Storage Buffer Objects (SSBOs) unsupported" << std::endl;
           success = false;
-          *failureCount += 1;
+          (*failureCount)++;
         }
 
         //Check texture storage is supported
         if (!ammonite::utils::checkExtension("GL_ARB_texture_storage", "GL_VERSION_4_2")) {
           std::cerr << "Texture storage unsupported" << std::endl;
           success = false;
-          *failureCount += 1;
+          (*failureCount)++;
         }
 
         //Check cubemap arrays are supported
         if (!ammonite::utils::checkExtension("GL_ARB_texture_cube_map_array", "GL_VERSION_4_0")) {
           std::cerr << "Cubemap arrays unsupported" << std::endl;
           success = false;
-          *failureCount += 1;
+          (*failureCount)++;
         }
 
         //Check minimum OpenGL version is supported
         if (!glewIsSupported("GL_VERSION_3_2")) {
           std::cerr << "OpenGL 3.2 unsupported" << std::endl;
           success = false;
-          *failureCount += 1;
+          (*failureCount)++;
         }
 
         return success;
