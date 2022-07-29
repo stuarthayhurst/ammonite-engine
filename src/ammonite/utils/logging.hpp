@@ -3,9 +3,9 @@
 
 namespace ammonite {
   namespace utils {
-    const char* error = "ERROR: ";
-    const char* warning = "WARNING: ";
-    const char* status = "";
+    extern const char* error;
+    extern const char* warning;
+    extern const char* status;
   }
 }
 
