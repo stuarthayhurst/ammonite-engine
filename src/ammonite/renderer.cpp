@@ -23,6 +23,9 @@
 
 #include "utils/timer.hpp"
 #include "utils/extension.hpp"
+#include "utils/logging.hpp"
+
+#include "internal/internalDebug.hpp"
 
 namespace ammonite {
   namespace renderer {
@@ -91,35 +94,35 @@ namespace ammonite {
         bool success = true;
         //Check DSA is supported
         if (!ammonite::utils::checkExtension("GL_ARB_direct_state_access", "GL_VERSION_4_5")) {
-          std::cerr << "Direct state access unsupported" << std::endl;
+          std::cerr << ammonite::utils::error << "Direct state access unsupported" << std::endl;
           success = false;
           (*failureCount)++;
         }
 
         //Check SSBOs are supported
         if (!ammonite::utils::checkExtension("GL_ARB_shader_storage_buffer_object", "GL_VERSION_4_3")) {
-          std::cerr << "Shader Storage Buffer Objects (SSBOs) unsupported" << std::endl;
+          std::cerr << ammonite::utils::error << "Shader Storage Buffer Objects (SSBOs) unsupported" << std::endl;
           success = false;
           (*failureCount)++;
         }
 
         //Check texture storage is supported
         if (!ammonite::utils::checkExtension("GL_ARB_texture_storage", "GL_VERSION_4_2")) {
-          std::cerr << "Texture storage unsupported" << std::endl;
+          std::cerr << ammonite::utils::error << "Texture storage unsupported" << std::endl;
           success = false;
           (*failureCount)++;
         }
 
         //Check cubemap arrays are supported
         if (!ammonite::utils::checkExtension("GL_ARB_texture_cube_map_array", "GL_VERSION_4_0")) {
-          std::cerr << "Cubemap arrays unsupported" << std::endl;
+          std::cerr << ammonite::utils::error << "Cubemap arrays unsupported" << std::endl;
           success = false;
           (*failureCount)++;
         }
 
         //Check minimum OpenGL version is supported
         if (!glewIsSupported("GL_VERSION_3_2")) {
-          std::cerr << "OpenGL 3.2 unsupported" << std::endl;
+          std::cerr << ammonite::utils::error << "OpenGL 3.2 unsupported" << std::endl;
           success = false;
           (*failureCount)++;
         }
@@ -133,7 +136,7 @@ namespace ammonite {
         //Check GPU supported required extensions
         int failureCount = 0;
         if (!checkGPUCapabilities(&failureCount)) {
-          std::cerr << failureCount << " required extensions are unsupported" << std::endl;
+          std::cerr << ammonite::utils::error << failureCount << " required extensions are unsupported" << std::endl;
           *externalSuccess = false;
           return;
         }
@@ -405,7 +408,7 @@ namespace ammonite {
 
         //Check framebuffer status
         if (glCheckNamedFramebufferStatus(depthMapFBO, GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-          std::cerr << "Warning: Incomplete depth framebuffer" << std::endl;
+          std::cerr << ammonite::utils::warning << "Warning: Incomplete depth framebuffer" << std::endl;
         }
 
         //Pass shadow transform matrices to depth shader

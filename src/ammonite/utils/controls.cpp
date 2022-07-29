@@ -9,9 +9,7 @@
 #include "../camera.hpp"
 #include "timer.hpp"
 
-#ifdef DEBUG
-  #include <iostream>
-#endif
+#include "../internal/internalDebug.hpp"
 
 namespace ammonite {
   namespace utils {

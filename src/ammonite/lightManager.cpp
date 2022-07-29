@@ -14,9 +14,7 @@
 #include "internal/modelTracker.hpp"
 #include "modelManager.hpp"
 
-#ifdef DEBUG
-  #include <iostream>
-#endif
+#include "internal/internalDebug.hpp"
 
 namespace ammonite {
   namespace {

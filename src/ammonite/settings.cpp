@@ -1,8 +1,6 @@
 #include <GLFW/glfw3.h>
 
-#ifdef DEBUG
-  #include <iostream>
-#endif
+#include "internal/internalDebug.hpp"
 
 namespace ammonite {
   namespace settings {

@@ -6,6 +6,9 @@
 #include <functional>
 
 #include "../internal/fileManager.hpp"
+#include "../utils/logging.hpp"
+
+#include "../internal/internalDebug.hpp"
 
 namespace ammonite {
   namespace utils {
@@ -32,14 +35,14 @@ namespace ammonite {
         try {
           std::filesystem::create_directory(dataCachePath);
         } catch (const std::filesystem::filesystem_error&) {
-          std::cerr << "Failed to create cache directory: '" << dataCachePath << "'" << std::endl;
+          std::cerr << ammonite::utils::warning << "Failed to create cache directory: '" << dataCachePath << "'" << std::endl;
           cacheData = false;
           return false;
         }
 
         //If the cache directory doesn't exist, disable caching and exit
         if (!std::filesystem::is_directory(dataCachePath)) {
-          std::cerr << "Couldn't find cache directory: '" << dataCachePath << "'" << std::endl;
+          std::cerr << ammonite::utils::warning << "Couldn't find cache directory: '" << dataCachePath << "'" << std::endl;
           cacheData = false;
           return false;
         }
@@ -51,7 +54,7 @@ namespace ammonite {
           dataCacheDir.push_back('/');
         }
 
-        std::cout << "Data caching enabled ('" << dataCacheDir << "')" << std::endl;
+        std::cout << ammonite::utils::status << "Data caching enabled ('" << dataCacheDir << "')" << std::endl;
         return true;
       }
 

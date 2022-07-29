@@ -10,6 +10,9 @@
 
 #include "internal/internalSettings.hpp"
 #include "internal/shaderCacheUpdate.hpp"
+#include "utils/logging.hpp"
+
+#include "internal/internalDebug.hpp"
 
 namespace ammonite {
   namespace windowManager {
@@ -31,7 +34,7 @@ namespace ammonite {
       bool setupGlfw(int antialiasing) {
         //Setup GLFW
         if (!glfwInit()) {
-          std::cerr << "Failed to initialize GLFW" << std::endl;
+          std::cerr << ammonite::utils::error << "Failed to initialize GLFW" << std::endl;
           return false;
         }
 
@@ -55,7 +58,7 @@ namespace ammonite {
       bool setupGlew(GLFWwindow* window) {
         glewExperimental = GL_TRUE;
         if (glewInit() != GLEW_OK) {
-          std::cerr << "Failed to initialize GLEW" << std::endl;
+          std::cerr << ammonite::utils::error << "Failed to initialize GLEW" << std::endl;
           return false;
         }
 
@@ -96,7 +99,7 @@ namespace ammonite {
 
       window = glfwCreateWindow(width, height, title, NULL, NULL);
       if (window == NULL) {
-        std::cerr << "Failed to open window" << std::endl;
+        std::cerr << ammonite::utils::error << "Failed to open window" << std::endl;
         glfwTerminate();
         return nullptr;
       }
@@ -133,7 +136,7 @@ namespace ammonite {
           }
         }
       } catch (const std::filesystem::filesystem_error&) {
-        std::cerr << "Couldn't open '" << iconDirPath << "'" << std::endl;
+        std::cerr << ammonite::utils::warning << "Couldn't open '" << iconDirPath << "'" << std::endl;
         return;
       }
 

@@ -1,21 +1,19 @@
 #include <iostream>
 #include <GL/glew.h>
 
+#include "../internal/internalDebug.hpp"
+
 namespace ammonite {
   namespace utils {
     bool checkExtension(const char extension[], const char version[]) {
       if (glewIsSupported(extension) or glewIsSupported(version)) {
         //Extension supported, either explicitly or by version
-        #ifdef DEBUG
-          std::cout << "DEBUG: " << extension << " supported (" << version << ")" << std::endl;
-        #endif
+        ammoniteInternalDebug << extension << " supported (" << version << ")" << std::endl;
         return true;
       }
 
       //Extension unsupported
-      #ifdef DEBUG
-        std::cout << "DEBUG: " << extension << " unsupported (" << version << ")" << std::endl;
-      #endif
+      ammoniteInternalDebug << extension << " unsupported (" << version << ")" << std::endl;
       return false;
     }
 
@@ -23,16 +21,12 @@ namespace ammonite {
     bool checkExtension(const char extension[]) {
       if (glewIsSupported(extension)) {
         //Extension supported
-        #ifdef DEBUG
-          std::cout << "DEBUG: " << extension << " supported" << std::endl;
-        #endif
+        ammoniteInternalDebug << extension << " supported" << std::endl;
         return true;
       }
 
       //Extension unsupported
-      #ifdef DEBUG
-        std::cout << "DEBUG: " << extension << " unsupported" << std::endl;
-      #endif
+      ammoniteInternalDebug << extension << " unsupported" << std::endl;
       return false;
     }
   }

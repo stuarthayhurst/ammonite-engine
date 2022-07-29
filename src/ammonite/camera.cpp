@@ -6,9 +6,7 @@
 
 #include "internal/internalSettings.hpp"
 
-#ifdef DEBUG
-  #include <iostream>
-#endif
+#include "internal/internalDebug.hpp"
 
 namespace ammonite {
   namespace camera {

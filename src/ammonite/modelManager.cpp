@@ -17,6 +17,9 @@
 #include "internal/textures.hpp"
 #include "internal/modelTracker.hpp"
 #include "internal/lightTracker.hpp"
+#include "utils/logging.hpp"
+
+#include "internal/internalDebug.hpp"
 
 namespace ammonite {
   namespace {
@@ -199,7 +202,7 @@ namespace ammonite {
 
       //Check model loaded correctly
       if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
-        std::cerr << importer.GetErrorString() << std::endl;
+        std::cerr << ammonite::utils::warning << importer.GetErrorString() << std::endl;
         *externalSuccess = false;
         return;
       }

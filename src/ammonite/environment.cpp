@@ -6,6 +6,9 @@
 #include <GL/glew.h>
 
 #include "internal/textures.hpp"
+#include "utils/logging.hpp"
+
+#include "internal/internalDebug.hpp"
 
 namespace ammonite {
   namespace environment {
@@ -56,7 +59,7 @@ namespace ammonite {
           GLenum dataFormat;
           if (!ammonite::textures::getTextureFormat(nChannels, srgbTextures, &internalFormat, &dataFormat)) {
             //Free image data, destroy texture, set failure and return
-            std::cerr << "Failed to load '" << texturePaths[i] << "'" << std::endl;
+            std::cerr << ammonite::utils::warning << "Failed to load '" << texturePaths[i] << "'" << std::endl;
             stbi_image_free(imageData);
             glDeleteTextures(1, &textureId);
 
@@ -76,7 +79,7 @@ namespace ammonite {
             stbi_image_free(imageData);
           } else {
             //Free image data, destroy texture, set failure and return
-            std::cerr << "Failed to load '" << texturePaths[i] << "'" << std::endl;
+            std::cerr << ammonite::utils::warning << "Failed to load '" << texturePaths[i] << "'" << std::endl;
             stbi_image_free(imageData);
             glDeleteTextures(1, &textureId);
 

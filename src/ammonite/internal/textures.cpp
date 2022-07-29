@@ -7,6 +7,10 @@
 #include <stb/stb_image.h>
 #include <GL/glew.h>
 
+#include "../utils/logging.hpp"
+
+#include "internalDebug.hpp"
+
 namespace ammonite {
   namespace {
     struct TextureInfo {
@@ -77,7 +81,7 @@ namespace ammonite {
       unsigned char* data = stbi_load(texturePath, &width, &height, &nChannels, 0);
 
       if (!data) {
-        std::cerr << "Failed to load texture '" << texturePath << "'" << std::endl;
+        std::cerr << ammonite::utils::warning << "Failed to load texture '" << texturePath << "'" << std::endl;
         *externalSuccess = false;
         return 0;
       }
@@ -90,7 +94,7 @@ namespace ammonite {
       GLenum internalFormat;
       GLenum dataFormat;
       if (!getTextureFormat(nChannels, srgbTexture, &internalFormat, &dataFormat)) {
-        std::cerr << "Failed to load texture '" << texturePath << "'" << std::endl;
+        std::cerr << ammonite::utils::warning << "Failed to load texture '" << texturePath << "'" << std::endl;
         glDeleteTextures(1, &textureId);
         *externalSuccess = false;
         return 0;

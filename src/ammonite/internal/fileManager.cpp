@@ -2,9 +2,7 @@
 #include <filesystem>
 #include <string>
 
-#ifdef DEBUG
-  #include <iostream>
-#endif
+#include "internalDebug.hpp"
 
 namespace ammonite {
   namespace utils {
