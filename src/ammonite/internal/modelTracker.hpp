@@ -47,9 +47,9 @@ namespace ammonite {
       PositionData positionData;
       std::vector<GLuint> textureIds;
       int drawMode = 0;
-      bool active = true;
-      bool loaded = true;
-      bool lightEmitting = false;
+      bool isActive = true;
+      bool isLoaded = true;
+      bool isLightEmitting = false;
       std::string modelName;
       int modelId;
     };

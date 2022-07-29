@@ -24,41 +24,41 @@ namespace ammonite {
     class Timer {
       public:
         double getTime() {
-          if (running) {
-            return getTimeDelta() - start - offset;
+          if (isTimerRunning) {
+            return getTimeDelta() - startTime - offset;
           } else {
             //If the timer hasn't been unpaused yet, correct for the time
-            return stopTime - start - offset;
+            return stopTime - startTime - offset;
           }
         }
 
         bool isRunning() {
-          return running;
+          return isTimerRunning;
         }
 
         void reset() {
-          start = getTimeDelta();
+          startTime = getTimeDelta();
           stopTime = 0.0;
           offset = 0.0;
         }
 
         void pause() {
-          if (running) {
+          if (isTimerRunning) {
             stopTime = getTimeDelta();
-            running = false;
+            isTimerRunning = false;
           }
         }
 
         void unpause() {
-          if (!running) {
+          if (!isTimerRunning) {
             offset += getTimeDelta() - stopTime;
-            running = true;
+            isTimerRunning = true;
           }
         }
 
       private:
-        bool running = true;
-        double start = getTimeDelta();
+        bool isTimerRunning = true;
+        double startTime = getTimeDelta();
         double stopTime = 0.0;
         double offset = 0.0;
     };

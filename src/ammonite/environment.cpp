@@ -37,7 +37,7 @@ namespace ammonite {
 
         //Load each face into a cubemap
         int width, height, nChannels;
-        bool createdStorage = false;
+        bool hasCreatedStorage = false;
         for (unsigned int i = 0; i < 6; i++) {
           if (flipTextures) {
             stbi_set_flip_vertically_on_load(true);
@@ -65,9 +65,9 @@ namespace ammonite {
           }
 
           //Only create texture storage once
-          if (!createdStorage) {
+          if (!hasCreatedStorage) {
             glTextureStorage2D(textureId, 1, internalFormat, width, height);
-            createdStorage = true;
+            hasCreatedStorage = true;
           }
 
           //Fill the texture with each face

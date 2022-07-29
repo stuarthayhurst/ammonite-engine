@@ -75,7 +75,7 @@ namespace ammonite {
         }
 
         //Validate filesizes and timestamps for each input file
-        bool cacheValid = true;
+        bool isCacheValid = true;
         std::string line;
         std::ifstream cacheInfoFile(cacheInfoFilePath);
         if (cacheInfoFile.is_open()) {
@@ -92,7 +92,7 @@ namespace ammonite {
             if (strings.size() == 4) {
               if (strings[0] != "input" or strings[1] != filePaths[i]) {
                 //Cache made from different files, invalidate
-                cacheValid = false;
+                isCacheValid = false;
                 break;
               }
 
@@ -100,18 +100,18 @@ namespace ammonite {
               long long int filesize = 0, modificationTime = 0;
               if (!ammonite::utils::files::getFileMetadata(filePaths[i], &filesize, &modificationTime)) {
                 //Failed to get the metadata
-                cacheValid = false;
+                isCacheValid = false;
                 break;
               }
 
               if (std::stoi(strings[2]) != filesize or std::stoi(strings[3]) != modificationTime) {
                 //Shader source code has changed, invalidate
-                cacheValid = false;
+                isCacheValid = false;
                 break;
               }
             } else {
               //Cache info file broken, invalidate
-              cacheValid = false;
+              isCacheValid = false;
               break;
             }
           }
@@ -119,12 +119,12 @@ namespace ammonite {
           cacheInfoFile.close();
         } else {
           //Failed to open the cache info
-          cacheValid = false;
+          isCacheValid = false;
         }
 
 
         //If cache failed to validate, set found and return nothing
-        if (!cacheValid) {
+        if (!isCacheValid) {
           *found = false;
           return std::string("");
         }

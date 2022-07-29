@@ -236,9 +236,9 @@ namespace ammonite {
       GLuint programId;
 
       //Check for OpenGL and engine cache support
-      const bool cacheSupported = isBinaryCacheSupported and ammonite::utils::cache::getCacheEnabled();
+      const bool isCacheSupported = isBinaryCacheSupported and ammonite::utils::cache::getCacheEnabled();
 
-      if (cacheSupported) {
+      if (isCacheSupported) {
         bool cacheValid = false;
         std::string cacheFilePath = ammonite::utils::cache::requestCachedData(shaderPaths, shaderCount, &cacheValid);
         std::string cacheFileInfoPath = cacheFilePath + "info";
@@ -307,18 +307,18 @@ namespace ammonite {
       }
 
       //Create the program like normal, as a valid cache wasn't found
-      bool createdProgram = true;
-      programId = createProgram(shaderIds, shaderCount, &createdProgram);
+      bool hasCreatedProgram = true;
+      programId = createProgram(shaderIds, shaderCount, &hasCreatedProgram);
 
       //Cleanup on failure
-      if (!createdProgram) {
+      if (!hasCreatedProgram) {
         *externalSuccess = false;
         ammonite::shaders::eraseShaders();
         return 0;
       }
 
       //Cache the binary if enabled
-      if (cacheSupported) {
+      if (isCacheSupported) {
         cacheShader(programId, shaderPaths, shaderCount);
       }
 

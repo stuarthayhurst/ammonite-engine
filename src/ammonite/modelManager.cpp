@@ -50,14 +50,14 @@ namespace ammonite {
     void setLightEmitting(int modelId, bool lightEmitting) {
       ModelInfo* modelPtr = models::getModelPtr(modelId);
       if (modelPtr != nullptr) {
-        modelPtr->lightEmitting = lightEmitting;
+        modelPtr->isLightEmitting = lightEmitting;
       }
     }
 
     bool getLightEmitting(int modelId) {
       ModelInfo* modelPtr = models::getModelPtr(modelId);
       if (modelPtr != nullptr) {
-        return modelPtr->lightEmitting;
+        return modelPtr->isLightEmitting;
       }
       return false;
     }
@@ -161,9 +161,9 @@ namespace ammonite {
 
         std::string fullTexturePath = modelLoadInfo.modelDirectory + '/' + texturePath.C_Str();
 
-        bool createdTexture = true;
-        int textureId = ammonite::textures::loadTexture(fullTexturePath.c_str(), modelLoadInfo.srgbTextures, &createdTexture);
-        if (!createdTexture) {
+        bool hasCreatedTexture = true;
+        int textureId = ammonite::textures::loadTexture(fullTexturePath.c_str(), modelLoadInfo.srgbTextures, &hasCreatedTexture);
+        if (!hasCreatedTexture) {
           *externalSuccess = false;
           return;
         }
@@ -248,9 +248,9 @@ namespace ammonite {
         modelLoadInfo.modelDirectory = pathString.substr(0, pathString.find_last_of('/'));
 
         //Fill the model data
-        bool createdObject = true;
-        loadObject(objectPath, modelObject.modelData, &modelObject.textureIds, modelLoadInfo, &createdObject);
-        if (!createdObject) {
+        bool hasCreatedObject = true;
+        loadObject(objectPath, modelObject.modelData, &modelObject.textureIds, modelLoadInfo, &hasCreatedObject);
+        if (!hasCreatedObject) {
           modelDataMap.erase(modelObject.modelName);
           *externalSuccess = false;
           return 0;
@@ -287,7 +287,7 @@ namespace ammonite {
 
       //Copy model data
       ModelInfo modelObject = *oldModelObject;
-      modelObject.lightEmitting = false;
+      modelObject.isLightEmitting = false;
       modelObject.modelData->refCount++;
 
       //Add model to the tracker and return the ID
@@ -303,9 +303,9 @@ namespace ammonite {
       }
 
       //Check if model is loaded
-      if (modelPtr->loaded) {
+      if (modelPtr->isLoaded) {
         //Set model as unloaded
-        modelPtr->loaded = false;
+        modelPtr->isLoaded = false;
 
         //Decrease refcount, add a new soft reference
         modelPtr->modelData->softRefCount++;
@@ -325,9 +325,9 @@ namespace ammonite {
       }
 
       //Check if model is unloaded
-      if (!modelPtr->loaded) {
+      if (!modelPtr->isLoaded) {
         //Set model as loaded
-        modelPtr->loaded = true;
+        modelPtr->isLoaded = true;
 
         //Increase refcount, remove a soft reference
         modelPtr->modelData->softRefCount--;
@@ -347,7 +347,7 @@ namespace ammonite {
         ModelInfo* modelObject = &it->second;
         ModelData* modelObjectData = modelObject->modelData;
         //Decrease the reference / soft reference count of the model data
-        if (modelObject->loaded) {
+        if (modelObject->isLoaded) {
           modelObjectData->refCount--;
         } else {
           modelObjectData->softRefCount--;
@@ -390,9 +390,9 @@ namespace ammonite {
         }
 
         //Create new texture and apply to the mesh
-        bool createdTexture = true;
-        int textureId = ammonite::textures::loadTexture(texturePath, srgbTexture, &createdTexture);
-        if (!createdTexture) {
+        bool hasCreatedTexture = true;
+        int textureId = ammonite::textures::loadTexture(texturePath, srgbTexture, &hasCreatedTexture);
+        if (!hasCreatedTexture) {
           *externalSuccess = false;
           return;
         }
@@ -432,7 +432,7 @@ namespace ammonite {
       void setActive(int modelId, bool active) {
         ModelInfo* modelPtr = models::getModelPtr(modelId);
         if (modelPtr != nullptr) {
-          modelPtr->active = active;
+          modelPtr->isActive = active;
         }
       }
     }

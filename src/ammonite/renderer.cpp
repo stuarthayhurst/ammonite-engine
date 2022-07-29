@@ -142,21 +142,20 @@ namespace ammonite {
         window = targetWindow;
 
         //Create shaders
-        bool createdShaders = true;
-        std::string shaderLocation;
-        shaderLocation = std::string(shaderPath) + std::string("models/");
-        modelShader.shaderId = ammonite::shaders::loadDirectory(shaderLocation.c_str(), &createdShaders);
+        bool hasCreatedShaders = true;
+        std::string shaderLocation = std::string(shaderPath) + std::string("models/");
+        modelShader.shaderId = ammonite::shaders::loadDirectory(shaderLocation.c_str(), &hasCreatedShaders);
 
         shaderLocation = std::string(shaderPath) + std::string("lights/");
-        lightShader.shaderId = ammonite::shaders::loadDirectory(shaderLocation.c_str(), &createdShaders);
+        lightShader.shaderId = ammonite::shaders::loadDirectory(shaderLocation.c_str(), &hasCreatedShaders);
 
         shaderLocation = std::string(shaderPath) + std::string("depth/");
-        depthShader.shaderId = ammonite::shaders::loadDirectory(shaderLocation.c_str(), &createdShaders);
+        depthShader.shaderId = ammonite::shaders::loadDirectory(shaderLocation.c_str(), &hasCreatedShaders);
 
         shaderLocation = std::string(shaderPath) + std::string("skybox/");
-        skyboxShader.shaderId = ammonite::shaders::loadDirectory(shaderLocation.c_str(), &createdShaders);
+        skyboxShader.shaderId = ammonite::shaders::loadDirectory(shaderLocation.c_str(), &hasCreatedShaders);
 
-        if (!createdShaders) {
+        if (!hasCreatedShaders) {
           *externalSuccess = false;
           return;
         }
@@ -257,7 +256,7 @@ namespace ammonite {
 
       static void drawModel(ammonite::models::ModelInfo *drawObject, int lightIndex, bool depthPass) {
         //If the model is disabled, skip it
-        if (!drawObject->active or !drawObject->loaded) {
+        if (!drawObject->isActive or !drawObject->isLoaded) {
           return;
         }
 
@@ -327,7 +326,7 @@ namespace ammonite {
         ammonite::models::ModelInfo* modelPtr = ammonite::models::getModelPtr(modelIds[i]);
         //Only draw non-light emitting models that exist
         if (modelPtr != nullptr) {
-          if (!modelPtr->lightEmitting) {
+          if (!modelPtr->isLightEmitting) {
             drawModel(modelPtr, -1, depthPass);
           }
         }
