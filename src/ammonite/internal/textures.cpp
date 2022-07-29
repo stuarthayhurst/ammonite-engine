@@ -15,27 +15,29 @@ namespace ammonite {
     };
 
     std::map<std::string, TextureInfo> textureTrackerMap;
-    std::map<GLuint, std::string> idToNameMap;
+    std::map<GLuint, std::string> textureIdNameMap;
   }
 
   namespace textures {
     void deleteTexture(GLuint textureId) {
-      std::string textureName;
       //Check the texture has been loaded, and get a textureName
-      if (idToNameMap.find(textureId) != idToNameMap.end()) {
-        textureName = idToNameMap[textureId];
+      std::string textureName;
+      if (textureIdNameMap.find(textureId) != textureIdNameMap.end()) {
+        textureName = textureIdNameMap[textureId];
       } else {
         return;
       }
 
+      TextureInfo* textureInfo = &textureTrackerMap[textureName];
+
       //Decrease the reference counter
-      textureTrackerMap[textureName].refCount -= 1;
+      textureInfo->refCount -= 1;
 
       //If texture is now unused, delete the buffer and tracker elements
-      if (textureTrackerMap[textureName].refCount < 1) {
+      if (textureInfo->refCount < 1) {
         glDeleteTextures(1, &textureId);
         textureTrackerMap.erase(textureName);
-        idToNameMap.erase(textureId);
+        textureIdNameMap.erase(textureId);
       }
     }
 
@@ -64,8 +66,10 @@ namespace ammonite {
       //Check if texture has already been loaded
       std::string textureString = std::string(texturePath);
       if (textureTrackerMap.find(textureString) != textureTrackerMap.end()) {
-        textureTrackerMap[textureString].refCount += 1;
-        return textureTrackerMap[textureString].textureId;
+        TextureInfo* textureInfo = &textureTrackerMap[texturePath];
+
+        textureInfo->refCount += 1;
+        return textureInfo->textureId;
       }
 
       //Read image data
@@ -112,14 +116,14 @@ namespace ammonite {
       currentTexture.textureId = textureId;
       textureTrackerMap[textureString] = currentTexture;
 
-      idToNameMap[textureId] = textureString;
+      textureIdNameMap[textureId] = textureString;
       return textureId;
     }
 
-    void copyTexture(int textureId) {
+    void copyTexture(GLuint textureId) {
       //Increase reference count on given texture, if it exists
-      if (idToNameMap.find(textureId) != idToNameMap.end()) {
-        textureTrackerMap[idToNameMap[textureId]].refCount += 1;
+      if (textureIdNameMap.find(textureId) != textureIdNameMap.end()) {
+        textureTrackerMap[textureIdNameMap[textureId]].refCount += 1;
       }
     }
   }
