@@ -10,7 +10,7 @@
   if(true); else std::cout
 #endif
 
-#ifndef DEBUG
+#ifdef DEBUG
   #include <iostream>
 #endif
 
