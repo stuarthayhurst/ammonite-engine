@@ -2,6 +2,7 @@
 #define AMMONITE
 
 #include "utils/timer.hpp"
+#include "utils/logging.hpp"
 #include "utils/extension.hpp"
 #include "utils/controls.hpp"
 #include "utils/cacheManager.hpp"
