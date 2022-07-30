@@ -21,6 +21,7 @@ namespace ammonite {
       namespace internal {
         float* getFrameLimitPtr();
         int* getShadowResPtr();
+        float* getRenderResMultiplierPtr();
         float* getShadowFarPlanePtr();
         bool* getGammaCorrectionPtr();
       }

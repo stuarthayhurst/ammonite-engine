@@ -90,6 +90,7 @@ namespace ammonite {
           bool vsyncEnabled = true;
           float frameLimit = 0.0f;
           int shadowRes = 1024;
+          float renderResMultiplier = 1.0f;
           float farPlane = 25.0f;
           bool gammaCorrection = false;
         } graphics;
@@ -103,6 +104,10 @@ namespace ammonite {
 
         int* getShadowResPtr() {
           return &graphics.shadowRes;
+        }
+
+        float* getRenderResMultiplierPtr() {
+          return &graphics.renderResMultiplier;
         }
 
         float* getShadowFarPlanePtr() {
@@ -137,6 +142,14 @@ namespace ammonite {
 
       int getShadowRes() {
         return graphics.shadowRes;
+      }
+
+      void setRenderResMultiplier(float renderResMultiplier) {
+        graphics.renderResMultiplier = renderResMultiplier;
+      }
+
+      int getRenderResMultiplier() {
+        return graphics.renderResMultiplier;
       }
 
       void setShadowFarPlane(float farPlane) {

@@ -67,10 +67,20 @@ namespace ammonite {
         GLuint skyboxSamplerId;
       } skyboxShader;
 
+      struct {
+        GLuint shaderId;
+        GLuint screenSamplerId;
+      } screenShader;
+
       GLuint skyboxVertexArrayId;
+      GLuint screenQuadVertexArrayId;
 
       GLuint depthCubeMapId = 0;
       GLuint depthMapFBO;
+
+      GLuint screenQuadTextureId = 0;
+      GLuint screenQuadFBO;
+      GLuint renderBufferId;
 
       long totalFrames = 0;
       int frameCount = 0;
@@ -158,6 +168,9 @@ namespace ammonite {
         shaderLocation = std::string(shaderPath) + std::string("skybox/");
         skyboxShader.shaderId = ammonite::shaders::loadDirectory(shaderLocation.c_str(), &hasCreatedShaders);
 
+        shaderLocation = std::string(shaderPath) + std::string("screen/");
+        screenShader.shaderId = ammonite::shaders::loadDirectory(shaderLocation.c_str(), &hasCreatedShaders);
+
         if (!hasCreatedShaders) {
           *externalSuccess = false;
           return;
@@ -186,6 +199,8 @@ namespace ammonite {
         skyboxShader.projectionMatrixId = glGetUniformLocation(skyboxShader.shaderId, "projectionMatrix");
         skyboxShader.skyboxSamplerId = glGetUniformLocation(skyboxShader.shaderId, "skyboxSampler");
 
+        screenShader.screenSamplerId = glGetUniformLocation(screenShader.shaderId, "screenSampler");
+
         //Pass texture unit locations
         glUseProgram(modelShader.shaderId);
         glUniform1i(modelShader.textureSamplerId, 0);
@@ -194,17 +209,23 @@ namespace ammonite {
         glUseProgram(skyboxShader.shaderId);
         glUniform1i(skyboxShader.skyboxSamplerId, 2);
 
+        glUseProgram(screenShader.shaderId);
+        glUniform1i(screenShader.screenSamplerId, 3);
+
         //Setup depth map framebuffer
         glCreateFramebuffers(1, &depthMapFBO);
         glNamedFramebufferDrawBuffer(depthMapFBO, GL_NONE);
         glNamedFramebufferReadBuffer(depthMapFBO, GL_NONE);
 
+        //Create framebuffer and renderbuffer to draw to
+        glCreateFramebuffers(1, &screenQuadFBO);
+        glCreateRenderbuffers(1, &renderBufferId);
+
         //Enable seamless cubemaps
         glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
-        //Enable culling triangles and depth testing
+        //Enable culling triangles setup depth testing function
         glEnable(GL_CULL_FACE);
-        glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LEQUAL);
 
         //Get the max number of lights supported
@@ -230,21 +251,60 @@ namespace ammonite {
           1, 4, 2, 2, 4, 6
         };
 
+        //Position and texture coord of screen quad
+        const char screenVertices[16] = {
+          -1,  1,  0,  1,
+          -1, -1,  0,  0,
+           1, -1,  1,  0,
+           1,  1,  1,  1
+        };
 
-        //Create vertex and element buffers for the skybox
-        GLuint skyboxBufferId, skyboxElementBufferId;
-        glCreateBuffers(1, &skyboxBufferId);
-        glCreateBuffers(1, &skyboxElementBufferId);
-        glNamedBufferData(skyboxBufferId, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
-        glNamedBufferData(skyboxElementBufferId, sizeof(skyboxIndices), &skyboxIndices, GL_STATIC_DRAW);
+        const unsigned char screenIndices[6] = {
+          0, 1, 2,
+          0, 2, 3
+        };
+
+        struct {
+          GLuint skybox;
+          GLuint skyboxElement;
+          GLuint screenQuad;
+          GLuint screenQuadElement;
+        } bufferIds;
+
+        //Create vertex and element buffers for the skybox and screen quad
+        glCreateBuffers(4, &bufferIds.skybox);
+
+        //Fill vertex and element buffers for the skybox
+        glNamedBufferData(bufferIds.skybox, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
+        glNamedBufferData(bufferIds.skyboxElement, sizeof(skyboxIndices), &skyboxIndices, GL_STATIC_DRAW);
 
         //Create vertex array object for skybox
         glCreateVertexArrays(1, &skyboxVertexArrayId);
         glEnableVertexArrayAttrib(skyboxVertexArrayId, 0);
-        glVertexArrayVertexBuffer(skyboxVertexArrayId, 0, skyboxBufferId, 0, 3 * sizeof(char));
+        glVertexArrayVertexBuffer(skyboxVertexArrayId, 0, bufferIds.skybox, 0, 3 * sizeof(char));
         glVertexArrayAttribFormat(skyboxVertexArrayId, 0, 3, GL_BYTE, GL_FALSE, 0);
         glVertexArrayAttribBinding(skyboxVertexArrayId, 0, 0);
-        glVertexArrayElementBuffer(skyboxVertexArrayId, skyboxElementBufferId);
+        glVertexArrayElementBuffer(skyboxVertexArrayId, bufferIds.skyboxElement);
+
+        //Fill vertex and element buffers for the screen quad
+        glNamedBufferData(bufferIds.screenQuad, sizeof(screenVertices), &screenVertices, GL_STATIC_DRAW);
+        glNamedBufferData(bufferIds.screenQuadElement, sizeof(screenIndices), &screenIndices, GL_STATIC_DRAW);
+
+        //Create vertex array object for screen quad
+        glCreateVertexArrays(1, &screenQuadVertexArrayId);
+        //Vertex positions
+        glEnableVertexArrayAttrib(screenQuadVertexArrayId, 0);
+        glVertexArrayVertexBuffer(screenQuadVertexArrayId, 0, bufferIds.screenQuad, 0, 4 * sizeof(char));
+        glVertexArrayAttribFormat(screenQuadVertexArrayId, 0, 2, GL_BYTE, GL_FALSE, 0);
+        glVertexArrayAttribBinding(screenQuadVertexArrayId, 0, 0);
+
+        //Texture coords
+        glEnableVertexArrayAttrib(screenQuadVertexArrayId, 1);
+        glVertexArrayVertexBuffer(screenQuadVertexArrayId, 1, bufferIds.screenQuad, 2 * sizeof(char), 4 * sizeof(char));
+        glVertexArrayAttribFormat(screenQuadVertexArrayId, 1, 2, GL_BYTE, GL_FALSE, 0);
+        glVertexArrayAttribBinding(screenQuadVertexArrayId, 1, 1);
+
+        glVertexArrayElementBuffer(screenQuadVertexArrayId, bufferIds.screenQuadElement);
       }
     }
 
@@ -387,10 +447,11 @@ namespace ammonite {
         lastLightCount = lightCount;
       }
 
-      //Swap to depth shader
+      //Swap to depth shader and enable depth testing
       glUseProgram(depthShader.shaderId);
       glViewport(0, 0, *shadowResPtr, *shadowResPtr);
       glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+      glEnable(GL_DEPTH_TEST);
 
       //Pass uniforms that don't change between light source
       static float* farPlanePtr = ammonite::settings::graphics::internal::getShadowFarPlanePtr();
@@ -399,6 +460,7 @@ namespace ammonite {
       //Clear existing depths values
       glClear(GL_DEPTH_BUFFER_BIT);
 
+      //Depth mapping render passes
       auto lightIt = lightTrackerMap->begin();
       unsigned int activeLights = std::min(lightCount, maxLightCount);
       for (unsigned int shadowCount = 0; shadowCount < activeLights; shadowCount++) {
@@ -427,13 +489,55 @@ namespace ammonite {
         std::advance(lightIt, 1);
       }
 
-      //Reset the framebuffer and viewport
-      glBindFramebuffer(GL_FRAMEBUFFER, 0);
+      static int lastWidth = 0, lastHeight = 0;
       static int* widthPtr = ammonite::settings::runtime::internal::getWidthPtr();
       static int* heightPtr = ammonite::settings::runtime::internal::getHeightPtr();
-      glViewport(0, 0, *widthPtr, *heightPtr);
 
-      //CLear depth and colour (if no skybox is used)
+      static float lastRenderResMultiplier = 0.0f;
+      static float* renderResMultiplierPtr = ammonite::settings::graphics::internal::getRenderResMultiplierPtr();
+
+      static int renderWidth = 0, renderHeight = 0;
+
+      //Recreate the framebuffer if the width, height or multiplier changes
+      if ((lastRenderResMultiplier != *renderResMultiplierPtr) or (lastWidth != *widthPtr) or (lastHeight != *heightPtr)) {
+        //Update values used to determine when to recreate framebuffer
+        lastRenderResMultiplier = *renderResMultiplierPtr;
+        lastWidth = *widthPtr;
+        lastHeight = *heightPtr;
+
+        if (screenQuadTextureId != 0) {
+          glDeleteTextures(1, &screenQuadTextureId);
+        }
+
+        //Create framebuffer and texture for whole screen
+        glCreateTextures(GL_TEXTURE_2D, 1, &screenQuadTextureId);
+
+        //Calculate render resolution
+        renderWidth = std::floor(*widthPtr * *renderResMultiplierPtr);
+        renderHeight = std::floor(*heightPtr * *renderResMultiplierPtr);
+
+        //Create texture to store colour data and bind to framebuffer
+        glTextureStorage2D(screenQuadTextureId, 1, GL_RGB8, renderWidth, renderHeight);
+        glTextureParameteri(screenQuadTextureId, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTextureParameteri(screenQuadTextureId, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glNamedFramebufferTexture(screenQuadFBO, GL_COLOR_ATTACHMENT0, screenQuadTextureId, 0);
+
+        //Attach the render buffer
+        glNamedRenderbufferStorage(renderBufferId, GL_DEPTH_COMPONENT, renderWidth, renderHeight);
+        glNamedFramebufferRenderbuffer(screenQuadFBO, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, renderBufferId);
+
+        if (glCheckNamedFramebufferStatus(screenQuadFBO, GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+          std::cerr << ammonite::utils::warning << "Incomplete render framebuffer" << std::endl;
+        } else {
+          ammoniteInternalDebug << "Created new render framebuffer (" << renderWidth << " x " << renderHeight << ")" << std::endl;
+        }
+      }
+
+      //Reset the framebuffer and viewport
+      glBindFramebuffer(GL_FRAMEBUFFER, screenQuadFBO);
+      glViewport(0, 0, renderWidth, renderHeight);
+
+      //Clear depth and colour (if no skybox is used)
       int activeSkybox = ammonite::environment::skybox::getActiveSkybox();
       if (activeSkybox == 0) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -444,12 +548,6 @@ namespace ammonite {
       //Prepare model shader and depth cube map
       glUseProgram(modelShader.shaderId);
       glBindTextureUnit(1, depthCubeMapId);
-
-      //Use gamma correction if enabled
-      static bool* gammaPtr = ammonite::settings::graphics::internal::getGammaCorrectionPtr();
-      if (*gammaPtr) {
-        glEnable(GL_FRAMEBUFFER_SRGB);
-      }
 
       //Calculate view projection matrix
       viewProjectionMatrix = *projectionMatrix * *viewMatrix;
@@ -486,6 +584,9 @@ namespace ammonite {
         }
       }
 
+      //Ensure wireframe is disabled
+      setWireframe(false);
+
       //Draw the skybox
       if (activeSkybox != 0) {
         //Swap to skybox shader and pass uniforms
@@ -494,11 +595,27 @@ namespace ammonite {
         glUniformMatrix4fv(skyboxShader.projectionMatrixId, 1, GL_FALSE, &(*projectionMatrix)[0][0]);
 
         //Prepare and draw the skybox
-        setWireframe(false);
         glBindVertexArray(skyboxVertexArrayId);
         glBindTextureUnit(2, activeSkybox);
         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, nullptr);
       }
+
+      //Use gamma correction if enabled
+      static bool* gammaPtr = ammonite::settings::graphics::internal::getGammaCorrectionPtr();
+      if (*gammaPtr) {
+        glEnable(GL_FRAMEBUFFER_SRGB);
+      }
+
+      //Swap to default framebuffer and correct shaders
+      glUseProgram(screenShader.shaderId);
+      glBindFramebuffer(GL_FRAMEBUFFER, 0);
+      glViewport(0, 0, *widthPtr, *heightPtr);
+      glDisable(GL_DEPTH_TEST);
+
+      //Display the rendered frame
+      glBindVertexArray(screenQuadVertexArrayId);
+      glBindTextureUnit(3, screenQuadTextureId);
+      glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, nullptr);
 
       //Disable gamma correction for start of next pass
       glDisable(GL_FRAMEBUFFER_SRGB);

@@ -19,12 +19,14 @@ namespace ammonite {
       void setVsync(bool enabled);
       void setFrameLimit(float frameTarget);
       void setShadowRes(int shadowRes);
+      void setRenderResMultiplier(float shadowRes);
       void setShadowFarPlane(float farPlane);
       void setGammaCorrection(bool gammaCorrection);
 
       bool getVsync();
       float getFrameLimit();
       int getShadowRes();
+      float setRenderResMultiplier();
       float getShadowFarPlane();
       bool getGammaCorrection();
     }
