@@ -2,7 +2,7 @@
 
 layout (location = 0) in vec3 inPosition;
 layout (location = 1) in vec3 inNormal;
-layout (location = 2) in vec2 vertexTexCoord;
+layout (location = 2) in vec2 inTexCoord;
 
 //Output fragment data, sent to fragment shader
 out FragmentDataOut {
@@ -23,7 +23,7 @@ void main() {
   fragData.normal = normalize(normalMatrix * inNormal);
 
   //Vertex texture coord
-  fragData.texCoord = vertexTexCoord;
+  fragData.texCoord = inTexCoord;
 
   //Output position of the vertex
   gl_Position = MVP * vec4(inPosition, 1);
