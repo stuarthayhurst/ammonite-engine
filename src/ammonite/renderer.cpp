@@ -96,6 +96,8 @@ namespace ammonite {
       std::map<int, glm::mat4[6]>* lightTransformMap = ammonite::lighting::getLightTransforms();
       unsigned int maxLightCount = 0;
 
+      int maxSampleCount = 0;
+
       //View projection combined matrix
       glm::mat4 viewProjectionMatrix;
     }
@@ -233,6 +235,9 @@ namespace ammonite {
         //Enable culling triangles setup depth testing function
         glEnable(GL_CULL_FACE);
         glDepthFunc(GL_LEQUAL);
+
+        //Find multisampling limits
+        glGetIntegerv(GL_MAX_SAMPLES, &maxSampleCount);
 
         //Get the max number of lights supported
         maxLightCount = ammonite::lighting::getMaxLightCount();
@@ -504,6 +509,7 @@ namespace ammonite {
 
       static int lastSamples = 0;
       static int* samplesPtr = ammonite::settings::graphics::internal::getAntialiasingSamplesPtr();
+      static int sampleCount = *samplesPtr;
 
       static int renderWidth = 0, renderHeight = 0;
 
@@ -516,6 +522,15 @@ namespace ammonite {
         lastRenderResMultiplier = *renderResMultiplierPtr;
         lastSamples = *samplesPtr;
 
+        //Limit sample count to implementation limit
+        const int requestedSamples = *samplesPtr;
+        sampleCount = std::min(requestedSamples, maxSampleCount);
+
+        if (sampleCount < requestedSamples) {
+          std::cerr << ammonite::utils::warning << "Ignoring request for " << requestedSamples << " samples, using implementation limit of " << maxSampleCount << std::endl;
+          *samplesPtr = sampleCount;
+        }
+
         //Delete regular colour storage texture
         if (screenQuadTextureId != 0) {
           glDeleteTextures(1, &screenQuadTextureId);
@@ -527,7 +542,7 @@ namespace ammonite {
         }
 
         //Decide which framebuffer to render to
-        if (*samplesPtr != 0) {
+        if (sampleCount != 0) {
           targetBufferId = colourBufferMultisampleFBO;
         } else {
           targetBufferId = screenQuadFBO;
@@ -535,7 +550,7 @@ namespace ammonite {
 
         //Create texture and multisampled renderbuffer for whole screen
         glCreateTextures(GL_TEXTURE_2D, 1, &screenQuadTextureId);
-        if (*samplesPtr != 0) {
+        if (sampleCount != 0) {
           glCreateRenderbuffers(1, &colourRenderBufferId);
         } else {
           colourRenderBufferId = 0;
@@ -546,8 +561,8 @@ namespace ammonite {
         renderHeight = std::floor(*heightPtr * *renderResMultiplierPtr);
 
         //Create multisampled renderbuffer to store colour data and bind to framebuffer
-        if (*samplesPtr != 0) {
-          glNamedRenderbufferStorageMultisample(colourRenderBufferId, *samplesPtr, GL_RGB8, renderWidth, renderHeight);
+        if (sampleCount != 0) {
+          glNamedRenderbufferStorageMultisample(colourRenderBufferId, sampleCount, GL_RGB8, renderWidth, renderHeight);
           glNamedFramebufferRenderbuffer(colourBufferMultisampleFBO, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, colourRenderBufferId);
         }
 
@@ -558,8 +573,8 @@ namespace ammonite {
         glNamedFramebufferTexture(screenQuadFBO, GL_COLOR_ATTACHMENT0, screenQuadTextureId, 0);
 
         //Attach the depth buffer
-        if (*samplesPtr != 0) {
-          glNamedRenderbufferStorageMultisample(depthRenderBufferId, *samplesPtr, GL_DEPTH_COMPONENT, renderWidth, renderHeight);
+        if (sampleCount != 0) {
+          glNamedRenderbufferStorageMultisample(depthRenderBufferId, sampleCount, GL_DEPTH_COMPONENT, renderWidth, renderHeight);
           //Detach from other framebuffer, in case it was bound
           glNamedFramebufferRenderbuffer(screenQuadFBO, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, 0);
         } else {
@@ -568,11 +583,11 @@ namespace ammonite {
         glNamedFramebufferRenderbuffer(targetBufferId, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthRenderBufferId);
 
         //Check multisampled framebuffer
-        if (*samplesPtr != 0) {
+        if (sampleCount != 0) {
           if (glCheckNamedFramebufferStatus(colourBufferMultisampleFBO, GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
             std::cerr << ammonite::utils::warning << "Incomplete multisampled render framebuffer" << std::endl;
           } else {
-            ammoniteInternalDebug << "Created new multisampled render framebuffer (" << renderWidth << " x " << renderHeight << "), samples: x" << *samplesPtr << std::endl;
+            ammoniteInternalDebug << "Created new multisampled render framebuffer (" << renderWidth << " x " << renderHeight << "), samples: x" << sampleCount << std::endl;
           }
         }
 
@@ -658,7 +673,7 @@ namespace ammonite {
       }
 
       //Resolve multisampling into regular texture
-      if (*samplesPtr != 0) {
+      if (sampleCount != 0) {
         glBindFramebuffer(GL_READ_FRAMEBUFFER, colourBufferMultisampleFBO);
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, screenQuadFBO);
         glBlitFramebuffer(0, 0, renderWidth, renderHeight, 0, 0, renderWidth, renderHeight, GL_COLOR_BUFFER_BIT, GL_NEAREST);
