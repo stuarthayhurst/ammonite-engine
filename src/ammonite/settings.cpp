@@ -153,7 +153,7 @@ namespace ammonite {
         graphics.renderResMultiplier = renderResMultiplier;
       }
 
-      int getRenderResMultiplier() {
+      float getRenderResMultiplier() {
         return graphics.renderResMultiplier;
       }
 
