@@ -50,7 +50,7 @@ int main(int argc, char* argv[]) {
   }
 
   //Create the window
-  auto window = ammonite::windowManager::setupWindow(1024, 768, 4, "OpenGL Experiments");
+  auto window = ammonite::windowManager::setupWindow(1024, 768, "OpenGL Experiments");
   if (window == NULL) {
     return EXIT_FAILURE;
   }

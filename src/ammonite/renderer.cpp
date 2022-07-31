@@ -224,6 +224,9 @@ namespace ammonite {
         //Enable seamless cubemaps
         glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
+        //Enable multisampling
+        glEnable(GL_MULTISAMPLE);
+
         //Enable culling triangles setup depth testing function
         glEnable(GL_CULL_FACE);
         glDepthFunc(GL_LEQUAL);

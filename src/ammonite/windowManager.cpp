@@ -30,8 +30,8 @@ namespace ammonite {
     }
 
     namespace setup {
-      //Initialise GLFW and setup antialiasing
-      bool setupGlfw(int antialiasing) {
+      //Initialise GLFW
+      bool setupGlfw() {
         //Setup GLFW
         if (!glfwInit()) {
           std::cerr << ammonite::utils::error << "Failed to initialize GLFW" << std::endl;
@@ -44,12 +44,6 @@ namespace ammonite {
 
         //Disable compatibility profile
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-        //Set antialiasing level if requested
-        if (antialiasing != 0) {
-          glfwWindowHint(GLFW_SAMPLES, antialiasing);
-          glEnable(GL_MULTISAMPLE);
-        }
 
         return true;
       }
@@ -158,9 +152,9 @@ namespace ammonite {
     }
 
     //Wrapper to create and setup window
-    GLFWwindow* setupWindow(int width, int height, int antialiasing, const char* title) {
-      //Setup GLFW and antialiasing
-      if (!windowManager::setup::setupGlfw(antialiasing)) {
+    GLFWwindow* setupWindow(int width, int height, const char* title) {
+      //Setup GLFW
+      if (!windowManager::setup::setupGlfw()) {
         return nullptr;
       }
 
@@ -181,8 +175,8 @@ namespace ammonite {
       return window;
     }
 
-    GLFWwindow* setupWindow(int width, int height, int antialiasing) {
-      return setupWindow(width, height, antialiasing, DEFAULT_TITLE);
+    GLFWwindow* setupWindow(int width, int height) {
+      return setupWindow(width, height, DEFAULT_TITLE);
     }
   }
 }
