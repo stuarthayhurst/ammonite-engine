@@ -78,11 +78,11 @@ namespace ammonite {
       GLuint depthCubeMapId = 0;
       GLuint depthMapFBO;
 
-      GLuint colourBufferMultisampleId = 0;
-      GLuint colourBufferMultisampleFBO;
-      GLuint screenQuadTextureId;
+      GLuint screenQuadTextureId = 0;
       GLuint screenQuadFBO;
-      GLuint renderBufferId;
+      GLuint depthRenderBufferId;
+      GLuint colourRenderBufferId;
+      GLuint colourBufferMultisampleFBO;
 
       long totalFrames = 0;
       int frameCount = 0;
@@ -219,10 +219,10 @@ namespace ammonite {
         glNamedFramebufferDrawBuffer(depthMapFBO, GL_NONE);
         glNamedFramebufferReadBuffer(depthMapFBO, GL_NONE);
 
-        //Create multisampled framebuffer and renderbuffer to draw to
+        //Create multisampled framebuffer and depthbuffer to draw to
         glCreateFramebuffers(1, &colourBufferMultisampleFBO);
         glCreateFramebuffers(1, &screenQuadFBO);
-        glCreateRenderbuffers(1, &renderBufferId);
+        glCreateRenderbuffers(1, &depthRenderBufferId);
 
         //Enable seamless cubemaps
         glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
@@ -511,24 +511,24 @@ namespace ammonite {
         lastWidth = *widthPtr;
         lastHeight = *heightPtr;
 
-        if (colourBufferMultisampleId != 0) {
-          glDeleteTextures(1, &colourBufferMultisampleId);
+        if (screenQuadTextureId != 0) {
           glDeleteTextures(1, &screenQuadTextureId);
+          glDeleteRenderbuffers(1, &colourRenderBufferId);
         }
 
         int samples = 4;
 
-        //Create regular and multisampled textures for whole screen
-        glCreateTextures(GL_TEXTURE_2D_MULTISAMPLE, 1, &colourBufferMultisampleId);
+        //Create texture and multisampled renderbuffer for whole screen
         glCreateTextures(GL_TEXTURE_2D, 1, &screenQuadTextureId);
+        glCreateRenderbuffers(1, &colourRenderBufferId);
 
         //Calculate render resolution
         renderWidth = std::floor(*widthPtr * *renderResMultiplierPtr);
         renderHeight = std::floor(*heightPtr * *renderResMultiplierPtr);
 
-        //Create texture to multisampled store colour data and bind to framebuffer
-        glTextureStorage2DMultisample(colourBufferMultisampleId, samples, GL_RGB8, renderWidth, renderHeight, GL_TRUE);
-        glNamedFramebufferTexture(colourBufferMultisampleFBO, GL_COLOR_ATTACHMENT0, colourBufferMultisampleId, 0);
+        //Create multisampled renderbuffer to store colour data and bind to framebuffer
+        glNamedRenderbufferStorageMultisample(colourRenderBufferId, samples, GL_RGB8, renderWidth, renderHeight);
+        glNamedFramebufferRenderbuffer(colourBufferMultisampleFBO, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, colourRenderBufferId);
 
         //Create texture to store colour data and bind to framebuffer
         glTextureStorage2D(screenQuadTextureId, 1, GL_RGB8, renderWidth, renderHeight);
@@ -536,9 +536,9 @@ namespace ammonite {
         glTextureParameteri(screenQuadTextureId, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glNamedFramebufferTexture(screenQuadFBO, GL_COLOR_ATTACHMENT0, screenQuadTextureId, 0);
 
-        //Attach the render buffer
-        glNamedRenderbufferStorageMultisample(renderBufferId, samples, GL_DEPTH_COMPONENT, renderWidth, renderHeight);
-        glNamedFramebufferRenderbuffer(colourBufferMultisampleFBO, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, renderBufferId);
+        //Attach the depth buffer
+        glNamedRenderbufferStorageMultisample(depthRenderBufferId, samples, GL_DEPTH_COMPONENT, renderWidth, renderHeight);
+        glNamedFramebufferRenderbuffer(colourBufferMultisampleFBO, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthRenderBufferId);
 
         if (glCheckNamedFramebufferStatus(colourBufferMultisampleFBO, GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
           std::cerr << ammonite::utils::warning << "Incomplete render framebuffer" << std::endl;
