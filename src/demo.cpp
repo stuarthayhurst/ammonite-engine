@@ -76,6 +76,7 @@ int main(int argc, char* argv[]) {
   ammonite::utils::controls::setupControls(window);
 
   //Graphics settings
+  ammonite::settings::graphics::setAntialiasingSamples(4);
   ammonite::settings::graphics::setGammaCorrection(true);
 
   //Renderer failed to initialise, clean up and exit
