@@ -91,6 +91,7 @@ namespace ammonite {
           float frameLimit = 0.0f;
           int shadowRes = 1024;
           float renderResMultiplier = 1.0f;
+          int antialiasingSamples = 0;
           float farPlane = 25.0f;
           bool gammaCorrection = false;
         } graphics;
@@ -108,6 +109,10 @@ namespace ammonite {
 
         float* getRenderResMultiplierPtr() {
           return &graphics.renderResMultiplier;
+        }
+
+        int* getAntialiasingSamplesPtr() {
+          return &graphics.antialiasingSamples;
         }
 
         float* getShadowFarPlanePtr() {
@@ -150,6 +155,14 @@ namespace ammonite {
 
       int getRenderResMultiplier() {
         return graphics.renderResMultiplier;
+      }
+
+      void setAntialiasingSamples(int samples) {
+        graphics.antialiasingSamples = samples;
+      }
+
+      int getAntialiasingSamples() {
+        return graphics.antialiasingSamples;
       }
 
       void setShadowFarPlane(float farPlane) {

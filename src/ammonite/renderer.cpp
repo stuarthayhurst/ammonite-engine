@@ -502,21 +502,23 @@ namespace ammonite {
       static float lastRenderResMultiplier = 0.0f;
       static float* renderResMultiplierPtr = ammonite::settings::graphics::internal::getRenderResMultiplierPtr();
 
+      static int lastSamples = 0;
+      static int* samplesPtr = ammonite::settings::graphics::internal::getAntialiasingSamplesPtr();
+
       static int renderWidth = 0, renderHeight = 0;
 
-      //Recreate the framebuffer if the width, height or multiplier changes
-      if ((lastRenderResMultiplier != *renderResMultiplierPtr) or (lastWidth != *widthPtr) or (lastHeight != *heightPtr)) {
+      //Recreate the framebuffer if the width, height, resolution multiplier or sample count changes
+      if ((lastWidth != *widthPtr) or (lastHeight != *heightPtr) or (lastRenderResMultiplier != *renderResMultiplierPtr) or (lastSamples != *samplesPtr)) {
         //Update values used to determine when to recreate framebuffer
-        lastRenderResMultiplier = *renderResMultiplierPtr;
         lastWidth = *widthPtr;
         lastHeight = *heightPtr;
+        lastRenderResMultiplier = *renderResMultiplierPtr;
+        lastSamples = *samplesPtr;
 
         if (screenQuadTextureId != 0) {
           glDeleteTextures(1, &screenQuadTextureId);
           glDeleteRenderbuffers(1, &colourRenderBufferId);
         }
-
-        int samples = 4;
 
         //Create texture and multisampled renderbuffer for whole screen
         glCreateTextures(GL_TEXTURE_2D, 1, &screenQuadTextureId);
@@ -527,7 +529,7 @@ namespace ammonite {
         renderHeight = std::floor(*heightPtr * *renderResMultiplierPtr);
 
         //Create multisampled renderbuffer to store colour data and bind to framebuffer
-        glNamedRenderbufferStorageMultisample(colourRenderBufferId, samples, GL_RGB8, renderWidth, renderHeight);
+        glNamedRenderbufferStorageMultisample(colourRenderBufferId, *samplesPtr, GL_RGB8, renderWidth, renderHeight);
         glNamedFramebufferRenderbuffer(colourBufferMultisampleFBO, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, colourRenderBufferId);
 
         //Create texture to store colour data and bind to framebuffer
@@ -537,7 +539,7 @@ namespace ammonite {
         glNamedFramebufferTexture(screenQuadFBO, GL_COLOR_ATTACHMENT0, screenQuadTextureId, 0);
 
         //Attach the depth buffer
-        glNamedRenderbufferStorageMultisample(depthRenderBufferId, samples, GL_DEPTH_COMPONENT, renderWidth, renderHeight);
+        glNamedRenderbufferStorageMultisample(depthRenderBufferId, *samplesPtr, GL_DEPTH_COMPONENT, renderWidth, renderHeight);
         glNamedFramebufferRenderbuffer(colourBufferMultisampleFBO, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthRenderBufferId);
 
         if (glCheckNamedFramebufferStatus(colourBufferMultisampleFBO, GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
