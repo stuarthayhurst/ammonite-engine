@@ -21,11 +21,10 @@ namespace ammonite {
       GLFWwindow* window;
       const char* DEFAULT_TITLE = "Ammonite Window";
 
-      //Callback to update height, width and viewport size on window resize
+      //Callback to update height and width on window resize
       static void window_size_callback(GLFWwindow*, int width, int height) {
         ammonite::settings::runtime::internal::setWidth(width);
         ammonite::settings::runtime::internal::setHeight(height);
-        glViewport(0, 0, width, height);
       }
     }
 
