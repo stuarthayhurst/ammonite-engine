@@ -579,6 +579,8 @@ namespace ammonite {
           glNamedFramebufferRenderbuffer(screenQuadFBO, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, 0);
         } else {
           glNamedRenderbufferStorage(depthRenderBufferId, GL_DEPTH_COMPONENT, renderWidth, renderHeight);
+          //Detach from other framebuffer, in case it was bound
+          glNamedFramebufferRenderbuffer(colourBufferMultisampleFBO, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, 0);
         }
         glNamedFramebufferRenderbuffer(targetBufferId, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthRenderBufferId);
 
