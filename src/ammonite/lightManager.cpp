@@ -94,7 +94,7 @@ namespace ammonite {
         glm::vec4 colour;
         glm::vec4 diffuse;
         glm::vec4 specular;
-        float power[4];
+        glm::vec4 power;
       } shaderData[lightTrackerMap.size()];
 
       //Use 1 thread per 20 light sources, up to hardware maximum
@@ -151,11 +151,11 @@ namespace ammonite {
         lightTransforms[i][5] = shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0));
 
         //Repack lighting information
-        shaderData[i].geometry = glm::vec4(lightSource->geometry, 0);
-        shaderData[i].colour = glm::vec4(lightSource->colour, 0);
-        shaderData[i].diffuse = glm::vec4(lightSource->diffuse, 0);
-        shaderData[i].specular = glm::vec4(lightSource->specular, 0);
-        shaderData[i].power[0] = lightSource->power;
+        shaderData[i].geometry = glm::vec4(lightSource->geometry, 0.0f);
+        shaderData[i].colour = glm::vec4(lightSource->colour, 0.0f);
+        shaderData[i].diffuse = glm::vec4(lightSource->diffuse, 0.0f);
+        shaderData[i].specular = glm::vec4(lightSource->specular, 0.0f);
+        shaderData[i].power = glm::vec4(lightSource->power, 0.0f, 0.0f, 0);
       }
 
       //Copy calculated tranforms to map
