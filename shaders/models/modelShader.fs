@@ -51,24 +51,24 @@ float calcShadow(int layer, vec3 fragPos, vec3 lightPos) {
 }
 
 vec3 calcLight(LightSource lightSource, vec3 normal, vec3 fragPos, vec3 lightDir) {
-    //Diffuse component
-    float diff = clamp(dot(lightDir, normal), 0.0, 1.0);
-    vec3 diffuse = lightSource.diffuse * diff * lightSource.colour;
+  //Diffuse component
+  float diff = clamp(dot(lightDir, normal), 0.0, 1.0);
+  vec3 diffuse = lightSource.diffuse * diff * lightSource.colour;
 
-    //Specular component
-    vec3 specular = vec3(0.0f);
-    if (diff > 0.0f) {
-      vec3 viewDir = normalize(cameraPos - fragPos);
-      vec3 halfwayDir = normalize(lightDir + viewDir);
-      float spec = pow(clamp(dot(normal, halfwayDir), 0.0, 1.0), 2.0);
-      vec3 specular = lightSource.specular * spec * lightSource.colour;
-    }
+  //Specular component
+  vec3 specular = vec3(0.0f);
+  if (diff > 0.0f) {
+    vec3 viewDir = normalize(cameraPos - fragPos);
+    vec3 halfwayDir = normalize(lightDir + viewDir);
+    float spec = pow(clamp(dot(normal, halfwayDir), 0.0, 1.0), 2.0);
+    vec3 specular = lightSource.specular * spec * lightSource.colour;
+  }
 
-    //Attenuation of the source
-    float dist = distance(lightSource.geometry, fragPos);
-    float attenuation = lightSource.power / (dist * dist);
+  //Attenuation of the source
+  float dist = distance(lightSource.geometry, fragPos);
+  float attenuation = lightSource.power / (dist * dist);
 
-    return (diffuse + specular) * attenuation;
+  return (diffuse + specular) * attenuation;
 }
 
 void main() {
