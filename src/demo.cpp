@@ -49,6 +49,9 @@ int main(int argc, char* argv[]) {
     return EXIT_FAILURE;
   }
 
+  //Start timer for demo loading
+  ammonite::utils::Timer utilityTimer;
+
   //Create the window
   auto window = ammonite::windowManager::setupWindow(1024, 768, "OpenGL Experiments");
   if (window == NULL) {
@@ -125,7 +128,7 @@ int main(int argc, char* argv[]) {
     return EXIT_FAILURE;
   }
 
-  std::cout << "Loaded models in: " << performanceTimer.getTime() << "s (" << vertexCount << " vertices)" << std::endl;
+  std::cout << "Loaded models in : " << performanceTimer.getTime() << "s (" << vertexCount << " vertices)" << std::endl;
 
   //Set light source properties
   int lightId = ammonite::lighting::createLightSource();
@@ -143,8 +146,10 @@ int main(int argc, char* argv[]) {
   ammonite::camera::setPosition(0, glm::vec3(0.0f, 0.0f, 5.0f));
   ammonite::camera::setPosition(cameraIds[1], glm::vec3(0.0f, 0.0f, 2.0f));
 
-  //Performance metrics setup
-  ammonite::utils::Timer benchmarkTimer;
+  std::cout << "Loaded demo in   : " << utilityTimer.getTime() << "s" << std::endl;
+
+  //Reset timers for performance metrics
+  utilityTimer.reset();
   performanceTimer.reset();
 
   //Draw frames until window closed
@@ -186,7 +191,7 @@ int main(int argc, char* argv[]) {
   if (useBenchmark) {
     std::cout << "\nBenchmark complete:" << std::endl;
     std::cout << "  Average fps: ";
-    printMetrics(benchmarkTimer.getTime() / ammonite::renderer::getTotalFrames());
+    printMetrics(utilityTimer.getTime() / ammonite::renderer::getTotalFrames());
   }
 
   //Clean up and exit
