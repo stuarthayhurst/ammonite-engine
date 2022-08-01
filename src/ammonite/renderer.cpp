@@ -685,9 +685,7 @@ namespace ammonite {
 
       //Resolve multisampling into regular texture
       if (sampleCount != 0) {
-        glBindFramebuffer(GL_READ_FRAMEBUFFER, colourBufferMultisampleFBO);
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, screenQuadFBO);
-        glBlitFramebuffer(0, 0, renderWidth, renderHeight, 0, 0, renderWidth, renderHeight, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+        glBlitNamedFramebuffer(colourBufferMultisampleFBO, screenQuadFBO, 0, 0, renderWidth, renderHeight, 0, 0, renderWidth, renderHeight, GL_COLOR_BUFFER_BIT, GL_NEAREST);
       }
 
       //Swap to default framebuffer and correct shaders
