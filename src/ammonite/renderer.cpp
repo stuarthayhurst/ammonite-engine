@@ -407,6 +407,45 @@ namespace ammonite {
       }
     }
 
+    //Create, configure and bind depth cubemap for shadows
+    static void setupDepthMap(unsigned int lightCount, int shadowRes) {
+      //Delete the cubemap array if it already exists
+      if (depthCubeMapId != 0) {
+        glDeleteTextures(1, &depthCubeMapId);
+      }
+
+      //Create a cubemap for shadows
+      glCreateTextures(GL_TEXTURE_CUBE_MAP_ARRAY, 1, &depthCubeMapId);
+
+      //Create 6 faces for each light source
+      int depthLayers = std::min(maxLightCount, lightCount) * 6;
+      glTextureStorage3D(depthCubeMapId, 1, GL_DEPTH_COMPONENT32, shadowRes, shadowRes, depthLayers);
+
+      //Set depth texture parameters
+      glTextureParameteri(depthCubeMapId, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glTextureParameteri(depthCubeMapId, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTextureParameteri(depthCubeMapId, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+      glTextureParameteri(depthCubeMapId, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+      glTextureParameteri(depthCubeMapId, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+      glTextureParameteri(depthCubeMapId, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+      glTextureParameteri(depthCubeMapId, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+      //Attach cubemap array to framebuffer
+      glNamedFramebufferTexture(depthMapFBO, GL_DEPTH_ATTACHMENT, depthCubeMapId, 0);
+    }
+
+    static void drawSkybox(int activeSkyboxId) {
+      //Swap to skybox shader and pass uniforms
+      glUseProgram(skyboxShader.shaderId);
+      glUniformMatrix4fv(skyboxShader.viewMatrixId, 1, GL_FALSE, &(glm::mat4(glm::mat3(*viewMatrix)))[0][0]);
+      glUniformMatrix4fv(skyboxShader.projectionMatrixId, 1, GL_FALSE, &(*projectionMatrix)[0][0]);
+
+      //Prepare and draw the skybox
+      glBindVertexArray(skyboxVertexArrayId);
+      glBindTextureUnit(2, activeSkyboxId);
+      glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, nullptr);
+    }
+
     void drawFrame(const int modelIds[], const int modelCount) {
       //Increase frame counters
       totalFrames++;
@@ -429,29 +468,7 @@ namespace ammonite {
 
       //If number of lights or shadow resolution changes, recreate cubemap
       if ((*shadowResPtr != lastShadowRes) or (lightCount != lastLightCount)) {
-        //Delete the cubemap array if it already exists
-        if (depthCubeMapId != 0) {
-          glDeleteTextures(1, &depthCubeMapId);
-        }
-
-        //Create a cubemap for shadows
-        glCreateTextures(GL_TEXTURE_CUBE_MAP_ARRAY, 1, &depthCubeMapId);
-
-        //Create 6 faces for each light source
-        int depthLayers = std::min(maxLightCount, lightCount) * 6;
-        glTextureStorage3D(depthCubeMapId, 1, GL_DEPTH_COMPONENT32, *shadowResPtr, *shadowResPtr, depthLayers);
-
-        //Set depth texture parameters
-        glTextureParameteri(depthCubeMapId, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTextureParameteri(depthCubeMapId, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTextureParameteri(depthCubeMapId, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
-        glTextureParameteri(depthCubeMapId, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
-        glTextureParameteri(depthCubeMapId, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTextureParameteri(depthCubeMapId, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTextureParameteri(depthCubeMapId, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-
-        //Attach cubemap array to framebuffer
-        glNamedFramebufferTexture(depthMapFBO, GL_DEPTH_ATTACHMENT, depthCubeMapId, 0);
+        setupDepthMap(lightCount, *shadowResPtr);
 
         //Save for next time to avoid cubemap recreation
         lastShadowRes = *shadowResPtr;
@@ -464,11 +481,11 @@ namespace ammonite {
       glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
       glEnable(GL_DEPTH_TEST);
 
-      //Pass uniforms that don't change between light source
+      //Pass uniforms that don't change between light sources
       static float* farPlanePtr = ammonite::settings::graphics::internal::getShadowFarPlanePtr();
       glUniform1f(depthShader.farPlaneId, *farPlanePtr);
 
-      //Clear existing depths values
+      //Clear existing depth values
       glClear(GL_DEPTH_BUFFER_BIT);
 
       //Depth mapping render passes
@@ -481,7 +498,7 @@ namespace ammonite {
 
         //Check framebuffer status
         if (glCheckNamedFramebufferStatus(depthMapFBO, GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-          std::cerr << ammonite::utils::warning << "Warning: Incomplete depth framebuffer" << std::endl;
+          std::cerr << ammonite::utils::warning << "Incomplete depth framebuffer" << std::endl;
         }
 
         //Pass shadow transform matrices to depth shader
@@ -657,15 +674,7 @@ namespace ammonite {
 
       //Draw the skybox
       if (activeSkybox != 0) {
-        //Swap to skybox shader and pass uniforms
-        glUseProgram(skyboxShader.shaderId);
-        glUniformMatrix4fv(skyboxShader.viewMatrixId, 1, GL_FALSE, &(glm::mat4(glm::mat3(*viewMatrix)))[0][0]);
-        glUniformMatrix4fv(skyboxShader.projectionMatrixId, 1, GL_FALSE, &(*projectionMatrix)[0][0]);
-
-        //Prepare and draw the skybox
-        glBindVertexArray(skyboxVertexArrayId);
-        glBindTextureUnit(2, activeSkybox);
-        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, nullptr);
+        drawSkybox(activeSkybox);
       }
 
       //Use gamma correction if enabled
