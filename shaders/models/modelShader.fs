@@ -38,7 +38,7 @@ float calcShadow(int layer, vec3 fragPos, vec3 lightPos) {
   float currentDepth = length(lightToFrag) / farPlane;
 
   float bias = 0.01f;
-  return 1 - texture(shadowCubeMap, vec4(lightToFrag, layer), currentDepth - bias).r;
+  return 1.0f - texture(shadowCubeMap, vec4(lightToFrag, layer), currentDepth - bias).r;
 }
 
 vec3 calcLight(LightSource lightSource, vec3 normal, vec3 fragPos, vec3 lightDir) {
@@ -51,7 +51,7 @@ vec3 calcLight(LightSource lightSource, vec3 normal, vec3 fragPos, vec3 lightDir
   if (diff > 0.0f) {
     vec3 viewDir = normalize(cameraPos - fragPos);
     vec3 halfwayDir = normalize(lightDir + viewDir);
-    float spec = pow(clamp(dot(normal, halfwayDir), 0.0, 1.0), 2.0);
+    float spec = pow(dot(normal, halfwayDir), 2.0);
     vec3 specular = lightSource.specular * spec * lightSource.colour;
   }
 
@@ -65,7 +65,7 @@ vec3 calcLight(LightSource lightSource, vec3 normal, vec3 fragPos, vec3 lightDir
 void main() {
   //Base colour of the fragment
   vec3 materialColour = texture(textureSampler, fragData.texCoord).rgb;
-  vec3 lightColour = vec3(0.0f, 0.0f, 0.0f);
+  vec3 lightColour = vec3(0.0f);
 
   //Calculate lighting influence from each light source
   for (int i = 0; i < lightCount; i++) {
@@ -74,7 +74,7 @@ void main() {
     //Final contribution from the current light source
     float shadow = calcShadow(i, fragData.fragPos, lightSources[i].geometry);
     vec3 light = calcLight(lightSources[i], fragData.normal, fragData.fragPos, lightDir);
-    lightColour += (1.0 - shadow) * light;
+    lightColour += (1.0f - shadow) * light;
   }
 
   //Final fragment colour, from ambient, diffuse, specular and shadow components
