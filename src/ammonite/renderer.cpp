@@ -127,6 +127,13 @@ namespace ammonite {
           (*failureCount)++;
         }
 
+        //Check GLSL 4.20 is supported
+        if (!ammonite::utils::checkExtension("GL_ARB_shading_language_420pack", "GL_VERSION_4_2")) {
+          std::cerr << ammonite::utils::error << "GLSL shader version 4.20 unsupported" << std::endl;
+          success = false;
+          (*failureCount)++;
+        }
+
         //Check cubemap arrays are supported
         if (!ammonite::utils::checkExtension("GL_ARB_texture_cube_map_array", "GL_VERSION_4_0")) {
           std::cerr << ammonite::utils::error << "Cubemap arrays unsupported" << std::endl;
