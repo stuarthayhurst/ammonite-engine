@@ -147,6 +147,9 @@ namespace ammonite {
 
     namespace setup {
       void setupRenderer(GLFWwindow* targetWindow, const char* shaderPath, bool* externalSuccess) {
+        //Start a time to measure load time
+        ammonite::utils::Timer loadTimer;
+
         //Check GPU supported required extensions
         int failureCount = 0;
         if (!checkGPUCapabilities(&failureCount)) {
@@ -316,6 +319,9 @@ namespace ammonite {
         glVertexArrayAttribBinding(screenQuadVertexArrayId, 1, 1);
 
         glVertexArrayElementBuffer(screenQuadVertexArrayId, bufferIds.screenQuadElement);
+
+        //Output time taken to load renderer
+        std::cout << ammonite::utils::status << "Loaded renderer in: " << loadTimer.getTime() << "s" << std::endl;
       }
     }
 
