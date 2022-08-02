@@ -105,40 +105,22 @@ namespace ammonite {
     namespace {
       //Check for essential GPU capabilities
       static bool checkGPUCapabilities(int* failureCount) {
+        const char* extensions[][3] = {
+          {"GL_ARB_direct_state_access", "GL_VERSION_4_6", "Direct state access"},
+          {"GL_ARB_shader_storage_buffer_object", "GL_VERSION_4_3", "Shader Storage Buffer Objects (SSBOs)"},
+          {"GL_ARB_texture_storage", "GL_VERSION_4_2", "Texture storage"},
+          {"GL_ARB_shading_language_420pack", "GL_VERSION_4_2", "GLSL shader version 4.20"},
+          {"GL_ARB_texture_cube_map_array", "GL_VERSION_4_0", "Cubemap arrays"}
+        };
+        const int extensionCount = sizeof(extensions) / sizeof(extensions[0]);
+
         bool success = true;
-        //Check DSA is supported
-        if (!ammonite::utils::checkExtension("GL_ARB_direct_state_access", "GL_VERSION_4_5")) {
-          std::cerr << ammonite::utils::error << "Direct state access unsupported" << std::endl;
-          success = false;
-          (*failureCount)++;
-        }
-
-        //Check SSBOs are supported
-        if (!ammonite::utils::checkExtension("GL_ARB_shader_storage_buffer_object", "GL_VERSION_4_3")) {
-          std::cerr << ammonite::utils::error << "Shader Storage Buffer Objects (SSBOs) unsupported" << std::endl;
-          success = false;
-          (*failureCount)++;
-        }
-
-        //Check texture storage is supported
-        if (!ammonite::utils::checkExtension("GL_ARB_texture_storage", "GL_VERSION_4_2")) {
-          std::cerr << ammonite::utils::error << "Texture storage unsupported" << std::endl;
-          success = false;
-          (*failureCount)++;
-        }
-
-        //Check GLSL 4.20 is supported
-        if (!ammonite::utils::checkExtension("GL_ARB_shading_language_420pack", "GL_VERSION_4_2")) {
-          std::cerr << ammonite::utils::error << "GLSL shader version 4.20 unsupported" << std::endl;
-          success = false;
-          (*failureCount)++;
-        }
-
-        //Check cubemap arrays are supported
-        if (!ammonite::utils::checkExtension("GL_ARB_texture_cube_map_array", "GL_VERSION_4_0")) {
-          std::cerr << ammonite::utils::error << "Cubemap arrays unsupported" << std::endl;
-          success = false;
-          (*failureCount)++;
+        for (int i = 0; i < extensionCount; i++) {
+          if (!ammonite::utils::checkExtension(extensions[i][0], extensions[i][1])) {
+            std::cerr << ammonite::utils::error << extensions[i][2] << " unsupported" << std::endl;
+            success = false;
+            (*failureCount)++;
+          }
         }
 
         //Check minimum OpenGL version is supported
@@ -160,7 +142,7 @@ namespace ammonite {
         //Check GPU supported required extensions
         int failureCount = 0;
         if (!checkGPUCapabilities(&failureCount)) {
-          std::cerr << ammonite::utils::error << failureCount << " required extensions are unsupported" << std::endl;
+          std::cerr << ammonite::utils::error << failureCount << " required extension(s) unsupported" << std::endl;
           *externalSuccess = false;
           return;
         }
