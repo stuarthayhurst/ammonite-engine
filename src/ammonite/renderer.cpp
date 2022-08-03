@@ -7,6 +7,7 @@
 #include <cmath>
 
 #include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
@@ -136,7 +137,7 @@ namespace ammonite {
 
     namespace setup {
       void setupRenderer(GLFWwindow* targetWindow, const char* shaderPath, bool* externalSuccess) {
-        //Start a time to measure load time
+        //Start a timer to measure load time
         ammonite::utils::Timer loadTimer;
 
         //Check GPU supported required extensions
@@ -356,13 +357,13 @@ namespace ammonite {
 
         //Send uniforms to the shaders
         if (depthPass) { //Depth pass
-          glUniformMatrix4fv(depthShader.modelMatrixId, 1, GL_FALSE, &modelMatrix[0][0]);
+          glUniformMatrix4fv(depthShader.modelMatrixId, 1, GL_FALSE, glm::value_ptr(modelMatrix));
         } else if (lightIndex == -1) { //Regular pass
-          glUniformMatrix4fv(modelShader.matrixId, 1, GL_FALSE, &mvp[0][0]);
-          glUniformMatrix4fv(modelShader.modelMatrixId, 1, GL_FALSE, &modelMatrix[0][0]);
-          glUniformMatrix3fv(modelShader.normalMatrixId, 1, GL_FALSE, &drawObject->positionData.normalMatrix[0][0]);
+          glUniformMatrix4fv(modelShader.matrixId, 1, GL_FALSE, glm::value_ptr(mvp));
+          glUniformMatrix4fv(modelShader.modelMatrixId, 1, GL_FALSE, glm::value_ptr(modelMatrix));
+          glUniformMatrix3fv(modelShader.normalMatrixId, 1, GL_FALSE, glm::value_ptr(drawObject->positionData.normalMatrix));
         } else { //Light emitter pass
-          glUniformMatrix4fv(lightShader.lightMatrixId, 1, GL_FALSE, &mvp[0][0]);
+          glUniformMatrix4fv(lightShader.lightMatrixId, 1, GL_FALSE, glm::value_ptr(mvp));
           glUniform1i(lightShader.lightIndexId, lightIndex);
         }
 
@@ -432,8 +433,8 @@ namespace ammonite {
     static void drawSkybox(int activeSkyboxId) {
       //Swap to skybox shader and pass uniforms
       glUseProgram(skyboxShader.shaderId);
-      glUniformMatrix4fv(skyboxShader.viewMatrixId, 1, GL_FALSE, &(glm::mat4(glm::mat3(*viewMatrix)))[0][0]);
-      glUniformMatrix4fv(skyboxShader.projectionMatrixId, 1, GL_FALSE, &(*projectionMatrix)[0][0]);
+      glUniformMatrix4fv(skyboxShader.viewMatrixId, 1, GL_FALSE, glm::value_ptr(glm::mat4(glm::mat3(*viewMatrix))));
+      glUniformMatrix4fv(skyboxShader.projectionMatrixId, 1, GL_FALSE, glm::value_ptr(*projectionMatrix));
 
       //Prepare and draw the skybox
       glBindVertexArray(skyboxVertexArrayId);
@@ -500,11 +501,11 @@ namespace ammonite {
         for (int i = 0; i < 6; i++) {
           GLuint shadowMatrixId = glGetUniformLocation(depthShader.shaderId, std::string("shadowMatrices[" + std::to_string(i) + "]").c_str());
           //Fetch the transform from the tracker, and send to the shader
-          glUniformMatrix4fv(shadowMatrixId, 1, GL_FALSE, &((*lightTransformMap)[lightSource->lightId][i])[0][0]);
+          glUniformMatrix4fv(shadowMatrixId, 1, GL_FALSE, glm::value_ptr((*lightTransformMap)[lightSource->lightId][i]));
         }
 
         //Pass light source specific uniforms
-        glUniform3fv(depthShader.depthLightPosId, 1, &lightPos[0]);
+        glUniform3fv(depthShader.depthLightPosId, 1, glm::value_ptr(lightPos));
         glUniform1i(depthShader.depthShadowIndex, shadowCount);
 
         //Render to depth buffer and move to the next light source
@@ -637,8 +638,8 @@ namespace ammonite {
       glm::vec3 cameraPosition = ammonite::camera::getPosition(ammonite::camera::getActiveCamera());
 
       //Pass uniforms and render regular models
-      glUniform3fv(modelShader.ambientLightId, 1, &ambientLight[0]);
-      glUniform3fv(modelShader.cameraPosId, 1, &cameraPosition[0]);
+      glUniform3fv(modelShader.ambientLightId, 1, glm::value_ptr(ambientLight));
+      glUniform3fv(modelShader.cameraPosId, 1, glm::value_ptr(cameraPosition));
       glUniform1f(modelShader.farPlaneId, *farPlanePtr);
       glUniform1i(modelShader.lightCountId, activeLights);
       drawModels(modelIds, modelCount, false);
