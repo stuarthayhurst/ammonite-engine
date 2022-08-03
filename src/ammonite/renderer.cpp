@@ -105,7 +105,7 @@ namespace ammonite {
     namespace {
       //Check for essential GPU capabilities
       static bool checkGPUCapabilities(int* failureCount) {
-        const char* extensions[][3] = {
+        const char* extensions[5][3] = {
           {"GL_ARB_direct_state_access", "GL_VERSION_4_6", "Direct state access"},
           {"GL_ARB_shader_storage_buffer_object", "GL_VERSION_4_3", "Shader Storage Buffer Objects (SSBOs)"},
           {"GL_ARB_texture_storage", "GL_VERSION_4_2", "Texture storage"},
