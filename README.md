@@ -8,7 +8,7 @@
 
 ## Requirements:
   - A `c++17` compatible compiler (`g++ 8+`)
-  - An OpenMP supported compiler
+    - An OpenMP supported compiler + libraries installed
   - An OpenGL 4.5+ compatible driver
   - Alternatively, an OpenGL 3.2+ driver supporting the following extensions can be used
     - `ARB_direct_state_access`
@@ -73,10 +73,10 @@
 
 ## Dependencies:
   - `make`
-  - `g++`
   - `pkg-config`
+  - `g++ libgomp1` **OR** `clang libomp-dev`
   - ### Libraries:
-    - `libgomp1 libglm-dev libglfw3-dev libglew-dev libstb-dev libassimp-dev`
+    - `libglm-dev libglfw3-dev libglew-dev libstb-dev libassimp-dev`
   - ### Icons:
     - `inkscape optipng`
 

@@ -18,7 +18,7 @@ COMMON_HEADER_SOURCE = $(wildcard ./src/common/*.hpp)
 
 CXXFLAGS := $(shell pkg-config --cflags $(LIBS)) -fopenmp
 CXXFLAGS += -Wall -Wextra -Werror -std=c++17 -flto=auto
-LDFLAGS := $(shell pkg-config --libs $(LIBS)) -pthread
+LDFLAGS := $(shell pkg-config --libs $(LIBS)) -lstdc++ -pthread
 
 ifeq ($(FAST),true)
   CXXFLAGS += -Ofast -march=native
