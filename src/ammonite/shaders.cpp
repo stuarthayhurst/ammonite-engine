@@ -63,7 +63,7 @@ namespace ammonite {
       std::ofstream binaryInfo(cacheFileInfoPath);
       if (binaryInfo.is_open()) {
         for (int i = 0; i < shaderCount; i++) {
-          long long int filesize, modificationTime;
+          long long int filesize = 0, modificationTime = 0;
           ammonite::utils::files::getFileMetadata(shaderPaths[i], &filesize, &modificationTime);
 
           binaryInfo << "input;" << shaderPaths[i] << ";" << filesize << ";" << modificationTime << "\n";
