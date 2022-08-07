@@ -7,7 +7,7 @@
 ![Icon](assets/icons/icon.svg)
 
 ## Requirements:
-  - A `c++17` compatible compiler (`g++ 8+`)
+  - A `c++20` compatible compiler (`g++ 10+`)
     - An OpenMP supported compiler + libraries installed
   - An OpenGL 4.5+ compatible driver
   - Alternatively, an OpenGL 3.2+ driver supporting the following extensions can be used
