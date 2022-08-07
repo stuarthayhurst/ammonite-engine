@@ -107,8 +107,13 @@ namespace ammonite {
                 break;
               }
 
-              if (std::stoi(strings[2]) != filesize or std::stoi(strings[3]) != modificationTime) {
-                //Shader source code has changed, invalidate
+              try {
+                if (std::stoi(strings[2]) != filesize or std::stoi(strings[3]) != modificationTime) {
+                  //Shader source code has changed, invalidate
+                  isCacheValid = false;
+                  break;
+                }
+              } catch (const std::out_of_range&) {
                 isCacheValid = false;
                 break;
               }
