@@ -91,7 +91,6 @@ namespace ammonite {
       //Data structure to pass light sources into shader
       struct ShaderLightSource {
         glm::vec4 geometry;
-        glm::vec4 colour;
         glm::vec4 diffuse;
         glm::vec4 specular;
         glm::vec4 power;
@@ -152,7 +151,6 @@ namespace ammonite {
 
         //Repack lighting information
         shaderData[i].geometry = glm::vec4(lightSource->geometry, 0.0f);
-        shaderData[i].colour = glm::vec4(lightSource->colour, 0.0f);
         shaderData[i].diffuse = glm::vec4(lightSource->diffuse, 0.0f);
         shaderData[i].specular = glm::vec4(lightSource->specular, 0.0f);
         shaderData[i].power = glm::vec4(lightSource->power, 0.0f, 0.0f, 0);
@@ -270,7 +268,7 @@ namespace ammonite {
           return glm::vec3(0.0f);
         }
 
-        return lightSource->colour;
+        return lightSource->diffuse;
       }
 
       float getPower(int lightId) {
@@ -292,14 +290,14 @@ namespace ammonite {
       void setColour(int lightId, glm::vec3 colour) {
         ammonite::lighting::LightSource* lightSource = ammonite::lighting::getLightSourcePtr(lightId);
         if (lightSource != nullptr) {
-          lightSource->colour = colour;
+          lightSource->diffuse = colour;
         }
       }
 
       void setPower(int lightId, float power) {
         ammonite::lighting::LightSource* lightSource = ammonite::lighting::getLightSourcePtr(lightId);
         if (lightSource != nullptr) {
-          lightSource->power = power;;
+          lightSource->power = power;
         }
       }
     }

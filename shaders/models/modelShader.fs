@@ -3,7 +3,6 @@
 //Data structure to handle input from shader storage buffer object
 struct LightSource {
   vec3 geometry;
-  vec3 colour;
   vec3 diffuse;
   vec3 specular;
   vec3 power;
@@ -44,7 +43,7 @@ float calcShadow(int layer, vec3 fragPos, vec3 lightPos) {
 vec3 calcLight(LightSource lightSource, vec3 normal, vec3 fragPos, vec3 lightDir) {
   //Diffuse component
   float diff = clamp(dot(lightDir, normal), 0.0, 1.0);
-  vec3 diffuse = lightSource.diffuse * diff * lightSource.colour;
+  vec3 diffuse = diff * lightSource.diffuse;
 
   //Specular component
   vec3 specular = vec3(0.0f);
@@ -52,7 +51,7 @@ vec3 calcLight(LightSource lightSource, vec3 normal, vec3 fragPos, vec3 lightDir
     vec3 viewDir = normalize(cameraPos - fragPos);
     vec3 halfwayDir = normalize(lightDir + viewDir);
     float spec = pow(dot(normal, halfwayDir), 2.0);
-    vec3 specular = lightSource.specular * spec * lightSource.colour;
+    vec3 specular = lightSource.specular * spec * lightSource.diffuse;
   }
 
   //Attenuation of the source
