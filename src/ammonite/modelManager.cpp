@@ -42,9 +42,8 @@ namespace ammonite {
   namespace models {
     ModelInfo* getModelPtr(int modelId) {
       //Check the model exists, and return a pointer
-      auto it = modelTrackerMap.find(modelId);
-      if (it != modelTrackerMap.end()) {
-        return &it->second;
+      if (modelTrackerMap.contains(modelId)) {
+        return &modelTrackerMap[modelId];
       } else {
         return nullptr;
       }
@@ -233,9 +232,8 @@ namespace ammonite {
       modelObject.modelName = std::string(objectPath);
 
       //Reuse model data if it has already been loaded
-      auto it = modelDataMap.find(modelObject.modelName);
-      if (it != modelDataMap.end()) {
-        modelObject.modelData = &it->second;
+      if (modelDataMap.contains(modelObject.modelName)) {
+        modelObject.modelData = &modelDataMap[modelObject.modelName];
         modelObject.modelData->refCount++;
       } else {
         //Create empty ModelData object and add to tracker
@@ -345,9 +343,8 @@ namespace ammonite {
 
     void deleteModel(int modelId) {
       //Check the model actually exists
-      auto it = modelTrackerMap.find(modelId);
-      if (it != modelTrackerMap.end()) {
-        ModelInfo* modelObject = &it->second;
+      if (modelTrackerMap.contains(modelId)) {
+        ModelInfo* modelObject = &modelTrackerMap[modelId];
         ModelData* modelObjectData = modelObject->modelData;
         //Decrease the reference / soft reference count of the model data
         if (modelObject->isLoaded) {

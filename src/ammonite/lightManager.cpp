@@ -50,9 +50,8 @@ namespace ammonite {
 
     LightSource* getLightSourcePtr(int lightId) {
       //Check the light source exists, and return a pointer
-      auto it = lightTrackerMap.find(lightId);
-      if (it != lightTrackerMap.end()) {
-        return &it->second;
+      if (lightTrackerMap.contains(lightId)) {
+        return &lightTrackerMap[lightId];
       } else {
         return nullptr;
       }
@@ -227,15 +226,13 @@ namespace ammonite {
       ammonite::lighting::unlinkModel(lightId);
 
       //Check the light source exists
-      auto it = lightTrackerMap.find(lightId);
-      if (it != lightTrackerMap.end()) {
+      if (lightTrackerMap.contains(lightId)) {
         //Remove the light source from the tracker
         lightTrackerMap.erase(lightId);
       }
 
       //Remove any light transform entry
-      auto transformIt = lightTransformMap.find(lightId);
-      if (transformIt != lightTransformMap.end()) {
+      if (lightTransformMap.contains(lightId)) {
         //Remove the light source tranforms from the tracker
         lightTransformMap.erase(lightId);
       }

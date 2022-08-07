@@ -26,7 +26,7 @@ namespace ammonite {
     void deleteTexture(GLuint textureId) {
       //Check the texture has been loaded, and get a textureName
       std::string textureName;
-      if (textureIdNameMap.find(textureId) != textureIdNameMap.end()) {
+      if (textureIdNameMap.contains(textureId)) {
         textureName = textureIdNameMap[textureId];
       } else {
         return;
@@ -69,7 +69,7 @@ namespace ammonite {
     GLuint loadTexture(const char* texturePath, bool srgbTexture, bool* externalSuccess) {
       //Check if texture has already been loaded
       std::string textureString = std::string(texturePath);
-      if (textureTrackerMap.find(textureString) != textureTrackerMap.end()) {
+      if (textureTrackerMap.contains(textureString)) {
         TextureInfo* textureInfo = &textureTrackerMap[texturePath];
 
         textureInfo->refCount++;
@@ -126,7 +126,7 @@ namespace ammonite {
 
     void copyTexture(GLuint textureId) {
       //Increase reference count on given texture, if it exists
-      if (textureIdNameMap.find(textureId) != textureIdNameMap.end()) {
+      if (textureIdNameMap.contains(textureId)) {
         textureTrackerMap[textureIdNameMap[textureId]].refCount++;
       }
     }

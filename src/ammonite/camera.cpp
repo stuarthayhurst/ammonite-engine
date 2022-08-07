@@ -73,8 +73,7 @@ namespace ammonite {
 
     void setActiveCamera(int cameraId) {
       //If the camera exists, set as active
-      auto it = cameraTrackerMap.find(cameraId);
-      if (it != cameraTrackerMap.end()) {
+      if (cameraTrackerMap.contains(cameraId)) {
         activeCameraId = cameraId;
         matrices::calcMatrices();
       }
@@ -94,8 +93,7 @@ namespace ammonite {
 
     void deleteCamera(int cameraId) {
       //Delete the camera if present
-      auto it = cameraTrackerMap.find(cameraId);
-      if (it != cameraTrackerMap.end() and cameraId != 0) {
+      if (cameraTrackerMap.contains(cameraId) and cameraId != 0) {
         cameraTrackerMap.erase(cameraId);
       }
 
@@ -105,22 +103,20 @@ namespace ammonite {
 
     //Get position
     glm::vec3 getPosition(int cameraId) {
-      auto it = cameraTrackerMap.find(cameraId);
-      if (it != cameraTrackerMap.end()) {
-        return it->second.position;
+      if (cameraTrackerMap.contains(cameraId)) {
+        return cameraTrackerMap[cameraId].position;
       } else {
         return glm::vec3(0.0f);
       }
     }
 
     glm::vec3 getDirection(int cameraId) {
-      auto it = cameraTrackerMap.find(cameraId);
-      if (it != cameraTrackerMap.end()) {
-        auto activeCamera = it->second;
+      if (cameraTrackerMap.contains(cameraId)) {
+        auto activeCamera = &cameraTrackerMap[cameraId];
         glm::vec3 direction = glm::vec3(
-          std::cos(activeCamera.verticalAngle) * std::sin(activeCamera.horizontalAngle),
-          std::sin(activeCamera.verticalAngle),
-          std::cos(activeCamera.verticalAngle) * std::cos(activeCamera.horizontalAngle)
+          std::cos(activeCamera->verticalAngle) * std::sin(activeCamera->horizontalAngle),
+          std::sin(activeCamera->verticalAngle),
+          std::cos(activeCamera->verticalAngle) * std::cos(activeCamera->horizontalAngle)
         );
         return glm::normalize(direction);
       } else {
@@ -130,9 +126,8 @@ namespace ammonite {
 
     //Get horizontal angle (radians)
     float getHorizontal(int cameraId) {
-      auto it = cameraTrackerMap.find(cameraId);
-      if (it != cameraTrackerMap.end()) {
-        return it->second.horizontalAngle;
+      if (cameraTrackerMap.contains(cameraId)) {
+        return cameraTrackerMap[cameraId].horizontalAngle;
       } else {
         return 0.0f;
       }
@@ -140,9 +135,8 @@ namespace ammonite {
 
     //Get vertical angle (radians)
     float getVertical(int cameraId) {
-      auto it = cameraTrackerMap.find(cameraId);
-      if (it != cameraTrackerMap.end()) {
-        return it->second.verticalAngle;
+      if (cameraTrackerMap.contains(cameraId)) {
+        return cameraTrackerMap[cameraId].verticalAngle;
       } else {
         return 0.0f;
       }
@@ -150,9 +144,8 @@ namespace ammonite {
 
     //Get field of view
     float getFieldOfView(int cameraId) {
-      auto it = cameraTrackerMap.find(cameraId);
-      if (it != cameraTrackerMap.end()) {
-        return it->second.fov;
+      if (cameraTrackerMap.contains(cameraId)) {
+        return cameraTrackerMap[cameraId].fov;
       } else {
         return 45.0f;
       }
@@ -161,9 +154,8 @@ namespace ammonite {
     //Set position
     void setPosition(int cameraId, glm::vec3 newPosition) {
       //Find the target camera and update position
-      auto it = cameraTrackerMap.find(cameraId);
-      if (it != cameraTrackerMap.end()) {
-        it->second.position = newPosition;
+      if (cameraTrackerMap.contains(cameraId)) {
+        cameraTrackerMap[cameraId].position = newPosition;
         matrices::calcMatrices();
       }
     }
@@ -171,9 +163,8 @@ namespace ammonite {
     //Set horizontal angle (radians)
     void setHorizontal(int cameraId, float newHorizontal) {
       //Find the target camera and update horizontal angle
-      auto it = cameraTrackerMap.find(cameraId);
-      if (it != cameraTrackerMap.end()) {
-        it->second.horizontalAngle = newHorizontal;
+      if (cameraTrackerMap.contains(cameraId)) {
+        cameraTrackerMap[cameraId].horizontalAngle = newHorizontal;
         matrices::calcMatrices();
       }
     }
@@ -181,9 +172,8 @@ namespace ammonite {
     //Set vertical angle (radians)
     void setVertical(int cameraId, float newVertical) {
       //Find the target camera and update vertical angle
-      auto it = cameraTrackerMap.find(cameraId);
-      if (it != cameraTrackerMap.end()) {
-        it->second.verticalAngle = newVertical;
+      if (cameraTrackerMap.contains(cameraId)) {
+        cameraTrackerMap[cameraId].verticalAngle = newVertical;
         matrices::calcMatrices();
       }
     }
@@ -191,9 +181,8 @@ namespace ammonite {
     //Set field of view
     void setFieldOfView(int cameraId, float newFov) {
       //Find the target camera and update field of view
-      auto it = cameraTrackerMap.find(cameraId);
-      if (it != cameraTrackerMap.end()) {
-        it->second.fov = newFov;
+      if (cameraTrackerMap.contains(cameraId)) {
+        cameraTrackerMap[cameraId].fov = newFov;
         matrices::calcMatrices();
       }
     }
