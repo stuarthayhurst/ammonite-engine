@@ -187,7 +187,7 @@ namespace ammonite {
       }
     }
 
-    static void loadObject(const char* objectPath, models::ModelData* modelObjectData, std::vector<GLuint>* textureIds, ModelLoadInfo modelLoadInfo, bool* externalSuccess) {
+    static void loadObject(const char* objectPath, models::ModelData* modelObjectData, ModelLoadInfo modelLoadInfo, bool* externalSuccess) {
       //Generate postprocessing flags
       auto aiProcessFlags = aiProcess_Triangulate | aiProcess_GenNormals | aiProcess_GenUVCoords | aiProcess_RemoveRedundantMaterials | aiProcess_OptimizeMeshes | aiProcess_JoinIdenticalVertices | aiProcess_PreTransformVertices;
 
@@ -207,6 +207,7 @@ namespace ammonite {
       }
 
       //Recursively process nodes
+      std::vector<GLuint>* textureIds = &modelObjectData->textureIds;
       processNode(scene->mRootNode, scene, &modelObjectData->meshes, textureIds, modelLoadInfo, externalSuccess);
     }
   }
@@ -233,6 +234,7 @@ namespace ammonite {
 
       //Reuse model data if it has already been loaded
       if (modelDataMap.contains(modelObject.modelName)) {
+        //Link to existing model data
         modelObject.modelData = &modelDataMap[modelObject.modelName];
         modelObject.modelData->refCount++;
       } else {
@@ -250,14 +252,19 @@ namespace ammonite {
 
         //Fill the model data
         bool hasCreatedObject = true;
-        loadObject(objectPath, modelObject.modelData, &modelObject.textureIds, modelLoadInfo, &hasCreatedObject);
+        loadObject(objectPath, modelObject.modelData, modelLoadInfo, &hasCreatedObject);
         if (!hasCreatedObject) {
           modelDataMap.erase(modelObject.modelName);
           *externalSuccess = false;
           return 0;
         }
+
+        //Create buffers from loaded data
         createBuffers(modelObject.modelData);
       }
+
+      //Load default texture IDs per mesh
+      modelObject.textureIds = modelObject.modelData->textureIds;
 
       PositionData positionData;
       positionData.translationMatrix = glm::mat4(1.0f);

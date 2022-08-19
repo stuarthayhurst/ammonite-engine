@@ -32,6 +32,7 @@ namespace ammonite {
       int refCount = 1;
       int softRefCount = 0;
       std::vector<MeshData> meshes;
+      std::vector<GLuint> textureIds;
     };
 
     struct PositionData {
