@@ -38,6 +38,13 @@ namespace ammonite {
         }
       }
 
+      void setTime(double newTime) {
+        double currentTime = getTimeDelta();
+        startTime = currentTime - newTime;
+        stopTime = currentTime;
+        offset = 0.0;
+      }
+
       bool isRunning() {
         return isTimerRunning;
       }
