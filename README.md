@@ -33,8 +33,9 @@
     - This can normally be sorted with `git rebase master [DEMO BRANCH]`
     - However, manual intervention is sometimes required
   - After choosing a branch, it can be compiled and run like normal
+  - Screenshots of demos can be found at the end of the README
 
-## Building + running demo:
+## Building + running a demo:
   - `make clean` will clean the build area, to start from fresh
   - Run either `make build` or `make system-build; sudo make install`, to build the demo
     - `build` will only allow running from this project's root directory (recommended, as the code is only a demo)
@@ -93,6 +94,11 @@
   - Targets are also compiled with `-O3` and `-flto`
     - This should be fine for 99% of systems, but some may struggle to compile, or produce unstable results
     - These can be changed by modifying `CXXFLAGS` in `Makefile`
+
+## Screenshots:
+<p align="center">
+  <img src="https://github.com/stuarthayhurst/ammonite/raw/master/docs/demo-1.png" alt="Demo 1">
+</p>
 
 ## Credits:
  - Some models in `assets/` may have been created by third parties, attribution can be found in `docs/CREDITS.md`
