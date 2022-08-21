@@ -1,10 +1,12 @@
+<p align="center">
+  <img src="https://github.com/stuarthayhurst/ammonite/raw/master/assets/icons/icon.svg" alt="ammonite" width="200px">
+</p>
+
 ## Ammonite Renderer
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://paypal.me/stuartahayhurst)
-  - A simple OpenGL based graphics engine, designed to render loaded models and data
-  - This project was built to learn C++ and graphics programming, but contributions are welcome
+  - A simple OpenGL based graphics engine, built to learn C++ and graphics programming
+  - Despite the project being for learning any contributions are still welcome
     - If you found this project interesting, any donations are greatly appreciated :)
-
-![Icon](assets/icons/icon.svg)
 
 ## Requirements:
   - A `c++20` compatible compiler (`g++ 10+`)
