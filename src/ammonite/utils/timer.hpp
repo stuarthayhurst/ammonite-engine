@@ -5,42 +5,39 @@
 
 namespace ammonite {
   namespace utils {
-    namespace {
+    class Timer {
+    private:
+      bool isTimerRunning = true;
+      double startTime = getNanoTime();
+      double stopTime = 0.0;
+      double offset = 0.0;
+
       static double getNanoTime() {
         auto systemTime = std::chrono::system_clock::now().time_since_epoch();
         auto systemTimeNano = std::chrono::duration_cast<std::chrono::nanoseconds>(systemTime).count();
         return systemTimeNano;
       }
-    }
 
-    class Timer {
-    private:
-      static double getTimeDelta() {
-        static const double initTime = getNanoTime();
-        double systemTime = getNanoTime() - initTime;
-
-        //Convert nanoseconds into seconds
-        return systemTime / 1000000000;
+      static double getTimeDelta(double timePoint) {
+        return getNanoTime() - timePoint;
       }
-
-      bool isTimerRunning = true;
-      double startTime = getTimeDelta();
-      double stopTime = 0.0;
-      double offset = 0.0;
 
     public:
       double getTime() {
+        double runTime;
         if (isTimerRunning) {
-          return getTimeDelta() - startTime - offset;
+          runTime = getNanoTime() - startTime - offset;
         } else {
           //If the timer hasn't been unpaused yet, correct for the time
-          return stopTime - startTime - offset;
+          runTime = stopTime - startTime - offset;
         }
+
+        return runTime / 1000000000;
       }
 
       void setTime(double newTime) {
-        double currentTime = getTimeDelta();
-        startTime = currentTime - newTime;
+        double currentTime = getNanoTime();
+        startTime = currentTime - (newTime * 1000000000);
         stopTime = currentTime;
         offset = 0.0;
       }
@@ -50,21 +47,21 @@ namespace ammonite {
       }
 
       void reset() {
-        startTime = getTimeDelta();
-        stopTime = 0.0;
+        startTime = getNanoTime();
+        stopTime = startTime;
         offset = 0.0;
       }
 
       void pause() {
         if (isTimerRunning) {
-          stopTime = getTimeDelta();
+          stopTime = getNanoTime();
           isTimerRunning = false;
         }
       }
 
       void unpause() {
         if (!isTimerRunning) {
-          offset += getTimeDelta() - stopTime;
+          offset += getNanoTime() - stopTime;
           isTimerRunning = true;
         }
       }
