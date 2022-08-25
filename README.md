@@ -78,6 +78,8 @@
   - `make`
   - `pkg-config`
   - `g++ libgomp1` **OR** `clang libomp-dev`
+    - If using clang, `CXX="clang++" make [TARGET]`
+    - When swapping between different compilers, run `make clean`
   - ### Libraries:
     - `libglm-dev libglfw3-dev libglew-dev libstb-dev libassimp-dev`
   - ### Icons:
