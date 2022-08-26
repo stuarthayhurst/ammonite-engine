@@ -1,4 +1,5 @@
 #include <cmath>
+#include <map>
 
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
@@ -6,6 +7,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "../internal/internalSettings.hpp"
+#include "../internal/keybindTracker.hpp"
+#include "../constants.hpp"
 #include "../camera.hpp"
 #include "timer.hpp"
 
@@ -23,6 +26,9 @@ namespace ammonite {
 
         //Current input bind, camera and control states
         bool isInputFocused = true, isCameraActive = true, isControlActive = true;
+
+        //Access map for keybind stores
+        std::map<unsigned short, int>* keybindTrackerPtr = ammonite::utils::controls::internal::getKeybindTrackerPtr();
 
         //Increase / decrease FoV on scroll (xoffset is unused)
         static void scroll_callback(GLFWwindow*, double, double yoffset) {
@@ -152,7 +158,7 @@ namespace ammonite {
 
       //Return true if the window should be closed
       bool shouldWindowClose() {
-        return (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS and !glfwWindowShouldClose(window));
+        return (glfwGetKey(window, (*keybindTrackerPtr)[AMMONITE_EXIT]) != GLFW_PRESS and !glfwWindowShouldClose(window));
       }
 
       //Handle keyboard and mouse movements, calculate matrices
@@ -189,23 +195,23 @@ namespace ammonite {
 
         //Apply movement from inputs
         if (isInputFocused and isControlActive) {
-          if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) { //Move forward
+          if (glfwGetKey(window, (*keybindTrackerPtr)[AMMONITE_FORWARD]) == GLFW_PRESS) { //Move forward
             position += horizontalDirection * deltaTime * *movementSpeedPtr;
           }
-          if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) { //Move back
+          if (glfwGetKey(window, (*keybindTrackerPtr)[AMMONITE_BACK]) == GLFW_PRESS) { //Move back
             position -= horizontalDirection * deltaTime * *movementSpeedPtr;
           }
-          if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) { //Move right
+          if (glfwGetKey(window, (*keybindTrackerPtr)[AMMONITE_RIGHT]) == GLFW_PRESS) { //Move right
             position += right * deltaTime * *movementSpeedPtr;
           }
-          if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) { //Move left
+          if (glfwGetKey(window, (*keybindTrackerPtr)[AMMONITE_LEFT]) == GLFW_PRESS) { //Move left
             position -= right * deltaTime * *movementSpeedPtr;
           }
 
-          if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) { //Move up
+          if (glfwGetKey(window, (*keybindTrackerPtr)[AMMONITE_UP]) == GLFW_PRESS) { //Move up
             position += glm::vec3(0, 1, 0) * deltaTime * *movementSpeedPtr;
           }
-          if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) { //Move down
+          if (glfwGetKey(window, (*keybindTrackerPtr)[AMMONITE_DOWN]) == GLFW_PRESS) { //Move down
             position -= glm::vec3(0, 1, 0) * deltaTime * *movementSpeedPtr;
           }
         }
