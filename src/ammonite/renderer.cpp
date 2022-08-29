@@ -16,6 +16,7 @@
 #include "internal/lightTracker.hpp"
 #include "internal/cameraMatrices.hpp"
 
+#include "constants.hpp"
 #include "settings.hpp"
 #include "shaders.hpp"
 #include "camera.hpp"
@@ -335,12 +336,12 @@ namespace ammonite {
 
         //Set the requested draw mode (normal, wireframe, points)
         GLenum mode = GL_TRIANGLES;
-        if (drawObject->drawMode == 1) {
+        if (drawObject->drawMode == AMMONITE_DRAW_WIREFRAME) {
           //Use wireframe if requested
           setWireframe(true);
         } else {
           //Draw points if requested
-          if (drawObject->drawMode == 2) {
+          if (drawObject->drawMode == AMMONITE_DRAW_POINTS) {
             mode = GL_POINTS;
           }
           setWireframe(false);

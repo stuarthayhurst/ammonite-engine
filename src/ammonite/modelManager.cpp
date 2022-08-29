@@ -429,7 +429,7 @@ namespace ammonite {
     }
 
     namespace draw {
-      void setDrawMode(int modelId, int drawMode) {
+      void setDrawMode(int modelId, short drawMode) {
         ModelInfo* modelPtr = models::getModelPtr(modelId);
         if (modelPtr != nullptr) {
           modelPtr->drawMode = drawMode;

@@ -20,7 +20,7 @@ namespace ammonite {
     int getVertexCount(int modelId);
 
     namespace draw {
-      void setDrawMode(int modelId, int drawMode);
+      void setDrawMode(int modelId, short drawMode);
       void setActive(int modelId, bool active);
     }
 
