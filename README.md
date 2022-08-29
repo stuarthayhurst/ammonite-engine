@@ -91,6 +91,10 @@
   - Issues, feature requests and bug reports can be filed [here](https://github.com/stuarthayhurst/ammonite/issues)
   - Feel free to work on any issues / feature ideas, suggestions are welcome :)
 
+## Usage:
+  - Some very basic usage information can be found in `docs/USAGE.md`
+  - Better documentation is planned in the future
+
 ## Notes:
   - All targets are compiled with `-Wall` and `-Wextra`
   - Targets are also compiled with `-O3` and `-flto`
