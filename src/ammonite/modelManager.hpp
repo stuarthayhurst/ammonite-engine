@@ -21,7 +21,6 @@ namespace ammonite {
 
     namespace draw {
       void setDrawMode(int modelId, short drawMode);
-      void setActive(int modelId, bool active);
     }
 
     namespace position {

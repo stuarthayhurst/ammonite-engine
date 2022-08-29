@@ -435,13 +435,6 @@ namespace ammonite {
           modelPtr->drawMode = drawMode;
         }
       }
-
-      void setActive(int modelId, bool active) {
-        ModelInfo* modelPtr = models::getModelPtr(modelId);
-        if (modelPtr != nullptr) {
-          modelPtr->isActive = active;
-        }
-      }
     }
 
     //Return position, scale and rotation of a model
