@@ -2,7 +2,7 @@
   <img src="https://github.com/stuarthayhurst/ammonite/raw/master/assets/icons/icon.svg" alt="ammonite" width="200px">
 </p>
 
-## Ammonite Renderer
+## Ammonite Engine
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://paypal.me/stuartahayhurst)
   - A simple OpenGL based graphics engine, built to learn C++ and graphics programming
   - Despite the project being for learning any contributions are still welcome
