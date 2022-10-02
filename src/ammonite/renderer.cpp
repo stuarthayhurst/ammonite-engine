@@ -102,8 +102,11 @@ namespace ammonite {
 
       //View projection combined matrix
       glm::mat4 viewProjectionMatrix;
-      const unsigned short AMMONITE_RENDER_PASS = 0;
-      const unsigned short AMMONITE_DEPTH_PASS = 1;
+
+      //Named draw constants
+      const unsigned short AMMONITE_RENDER_PASS  = 0;
+      const unsigned short AMMONITE_DEPTH_PASS   = 1;
+      const unsigned short AMMONITE_DATA_REFRESH = 2;
     }
 
     namespace {
@@ -389,15 +392,26 @@ namespace ammonite {
     }
 
     static void drawModels(const unsigned short drawMode) {
-      int modelCount = ammonite::models::getModelCount(AMMONITE_MODEL);
-      ammonite::models::ModelInfo* modelPtrs[modelCount];
-      ammonite::models::getModels(AMMONITE_MODEL, modelCount, modelPtrs);
+      //Create initial array for model pointers
+      static int modelCount = ammonite::models::getModelCount(AMMONITE_MODEL);
+      static ammonite::models::ModelInfo** modelPtrs = new ammonite::models::ModelInfo* [modelCount];
 
-      bool depthPass = (drawMode == AMMONITE_DEPTH_PASS);
-      if (drawMode == AMMONITE_RENDER_PASS or drawMode == AMMONITE_DEPTH_PASS) {
-        for (int i = 0; i < modelCount; i++) {
-          drawModel(modelPtrs[i], -1, depthPass);
-        }
+      //If requested, create a new array for model pointers
+      if (drawMode == AMMONITE_DATA_REFRESH) {
+        //Replace array with one of the correct size
+        modelCount = ammonite::models::getModelCount(AMMONITE_MODEL);
+        ammonite::models::ModelInfo** newArr = new ammonite::models::ModelInfo* [modelCount];
+        delete [] modelPtrs;
+        modelPtrs = newArr;
+
+        //Update saved model pointers and return
+        ammonite::models::getModels(AMMONITE_MODEL, modelCount, modelPtrs);
+        return;
+      }
+
+      //Draw the model pointers
+      for (int i = 0; i < modelCount; i++) {
+        drawModel(modelPtrs[i], -1, (drawMode == AMMONITE_DEPTH_PASS));
       }
     }
 
@@ -481,6 +495,9 @@ namespace ammonite {
 
       //Clear existing depth values
       glClear(GL_DEPTH_BUFFER_BIT);
+
+      //Update cached model pointers
+      drawModels(AMMONITE_DATA_REFRESH);
 
       //Depth mapping render passes
       auto lightIt = lightTrackerMap->begin();
