@@ -102,6 +102,8 @@ namespace ammonite {
 
       //View projection combined matrix
       glm::mat4 viewProjectionMatrix;
+      const unsigned short AMMONITE_RENDER_PASS = 0;
+      const unsigned short AMMONITE_DEPTH_PASS = 1;
     }
 
     namespace {
@@ -326,11 +328,6 @@ namespace ammonite {
       }
 
       static void drawModel(ammonite::models::ModelInfo *drawObject, int lightIndex, bool depthPass) {
-        //If the model is disabled, skip it
-        if (drawObject->drawMode == AMMONITE_DRAW_INACTIVE or !drawObject->isLoaded) {
-          return;
-        }
-
         //Get model draw data
         ammonite::models::ModelData* drawObjectData = drawObject->modelData;
 
@@ -391,15 +388,15 @@ namespace ammonite {
       return frameTime;
     }
 
-    static void drawModels(const int modelIds[], const int modelCount, bool depthPass) {
-      //Draw given models
-      for (int i = 0; i < modelCount; i++) {
-        ammonite::models::ModelInfo* modelPtr = ammonite::models::getModelPtr(modelIds[i]);
-        //Only draw non-light emitting models that exist
-        if (modelPtr != nullptr) {
-          if (!modelPtr->isLightEmitting) {
-            drawModel(modelPtr, -1, depthPass);
-          }
+    static void drawModels(const unsigned short drawMode) {
+      int modelCount = ammonite::models::getModelCount(AMMONITE_MODEL);
+      ammonite::models::ModelInfo* modelPtrs[modelCount];
+      ammonite::models::getModels(AMMONITE_MODEL, modelCount, modelPtrs);
+
+      bool depthPass = (drawMode == AMMONITE_DEPTH_PASS);
+      if (drawMode == AMMONITE_RENDER_PASS or drawMode == AMMONITE_DEPTH_PASS) {
+        for (int i = 0; i < modelCount; i++) {
+          drawModel(modelPtrs[i], -1, depthPass);
         }
       }
     }
@@ -443,7 +440,7 @@ namespace ammonite {
       glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, nullptr);
     }
 
-    void drawFrame(const int modelIds[], const int modelCount) {
+    void drawFrame() {
       //Increase frame counters
       totalFrames++;
       frameCount++;
@@ -510,7 +507,7 @@ namespace ammonite {
         glUniform1i(depthShader.depthShadowIndex, shadowCount);
 
         //Render to depth buffer and move to the next light source
-        drawModels(modelIds, modelCount, true);
+        drawModels(AMMONITE_DEPTH_PASS);
         std::advance(lightIt, 1);
       }
 
@@ -645,12 +642,12 @@ namespace ammonite {
       glUniform3fv(modelShader.cameraPosId, 1, glm::value_ptr(cameraPosition));
       glUniform1f(modelShader.farPlaneId, *farPlanePtr);
       glUniform1i(modelShader.lightCountId, activeLights);
-      drawModels(modelIds, modelCount, false);
+      drawModels(AMMONITE_RENDER_PASS);
 
       //Get information about light sources to be rendered
-      int lightEmitterCount;
-      std::vector<int> lightData;
-      ammonite::lighting::getLightEmitters(&lightEmitterCount, &lightData);
+      int lightEmitterCount = ammonite::lighting::getLightEmitterCount();
+      int lightData[lightEmitterCount * 2];
+      ammonite::lighting::getLightEmitters(lightData);
 
       //Swap to the light emitting model shader
       if (lightEmitterCount > 0) {

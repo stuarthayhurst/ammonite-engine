@@ -184,7 +184,7 @@ int main(int argc, char* argv[]) {
     ammonite::utils::controls::processInput();
 
     //Draw the frame
-    ammonite::renderer::drawFrame(loadedModelIds, modelCount);
+    ammonite::renderer::drawFrame();
   }
 
   //Output benchmark score

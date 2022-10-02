@@ -39,12 +39,14 @@ namespace ammonite {
   //Internally exposed light handling methods
   namespace lighting {
     //Return data on light emitting models
-    void getLightEmitters(int* lightCount, std::vector<int>* lightData) {
-      *lightCount = lightEmitterData.size() / 2;
+    int getLightEmitterCount() {
+      return lightEmitterData.size() / 2;
+    }
 
-      //Fill passed vector with data
+    void getLightEmitters(int lightData[]) {
+      //Fill passed array with data
       for (unsigned int i = 0; i < lightEmitterData.size(); i++) {
-        lightData->push_back(lightEmitterData[i]);
+        lightData[i] = lightEmitterData[i];
       }
     }
 

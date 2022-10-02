@@ -16,4 +16,8 @@ const short AMMONITE_DRAW_ACTIVE     = 0;
 const short AMMONITE_DRAW_WIREFRAME  = 1;
 const short AMMONITE_DRAW_POINTS     = 2;
 
+//Model types
+const unsigned short AMMONITE_MODEL         = 1;
+const unsigned short AMMONITE_LIGHT_EMITTER = 2;
+
 #endif

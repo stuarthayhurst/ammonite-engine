@@ -12,7 +12,7 @@ namespace ammonite {
     long getTotalFrames();
     double getFrameTime();
 
-    void drawFrame(const int modelIds[], const int modelCount);
+    void drawFrame();
   }
 }
 
