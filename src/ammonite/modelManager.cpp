@@ -169,7 +169,11 @@ namespace ammonite {
       }
 
       //Move model to different sub-tracker and update pointer
-      selectedTracker->changeModelType(modelId, AMMONITE_LIGHT_EMITTER);
+      if (lightEmitting) {
+        selectedTracker->changeModelType(modelId, AMMONITE_LIGHT_EMITTER);
+      } else {
+        selectedTracker->changeModelType(modelId, AMMONITE_MODEL);
+      }
       modelPtr = modelIdPtrMap[modelId];
 
       //Set light emission property
