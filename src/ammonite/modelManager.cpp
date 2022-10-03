@@ -27,22 +27,23 @@
 //Class definitions
 namespace ammonite {
   typedef std::map<int, ammonite::models::ModelInfo> ModelTrackerMap;
+  typedef std::map<int, ammonite::models::ModelInfo*> ModelPtrTrackerMap;
   typedef std::map<std::string, ammonite::models::ModelData> ModelDataMap;
 
   class ModelTracker {
   private:
     ModelTrackerMap modelTrackerMap;
     ModelTrackerMap lightTrackerMap;
+    ModelPtrTrackerMap* modelIdPtrMapPtr;
 
     std::map<unsigned short, ModelTrackerMap*> modelSelector = {
       {AMMONITE_MODEL, &modelTrackerMap},
       {AMMONITE_LIGHT_EMITTER, &lightTrackerMap}
     };
 
-    ModelDataMap* modelDataMapPtr;
   public:
-    ModelTracker(ModelDataMap* modelDataMapAddr) {
-      modelDataMapPtr = modelDataMapAddr;
+    ModelTracker(ModelPtrTrackerMap* modelIdPtrMapAddr) {
+      modelIdPtrMapPtr = modelIdPtrMapAddr;
     }
 
     int getModelCount(unsigned short modelType) {
@@ -55,7 +56,7 @@ namespace ammonite {
 
       //Fill modelArr with first number modelCount of items
       auto it = modelMapPtr->begin();
-     modelCount = std::min(modelCount, int(modelMapPtr->size()));
+      modelCount = std::min(modelCount, int(modelMapPtr->size()));
       for (int i = 0; i < modelCount; i++) {
         modelArr[i] = &it->second;
         std::advance(it, 1);
@@ -64,13 +65,16 @@ namespace ammonite {
 
     void addModel(int modelId, ammonite::models::ModelInfo modelObject) {
       modelTrackerMap[modelId] = modelObject;
+      (*modelIdPtrMapPtr)[modelId] = &modelTrackerMap[modelId];
     }
 
     void deleteModel(int modelId) {
       //Find which tracker holds the model, then delete the model
       for (auto it = modelSelector.begin(); it != modelSelector.end(); it++) {
         if (it->second->contains(modelId)) {
+          //Remove model and id to pointer entry
           it->second->erase(modelId);
+          modelIdPtrMapPtr->erase(modelId);
           return;
         }
       }
@@ -83,8 +87,12 @@ namespace ammonite {
         if (it->second->contains(modelId)) {
           //Only move if the target is different from the current
           if (targetMapPtr != it->second) {
+            //Move the model
             (*targetMapPtr)[modelId] = (*(it->second))[modelId];
             it->second->erase(modelId);
+
+            //Update the id to pointer map
+            (*modelIdPtrMapPtr)[modelId] = &(*targetMapPtr)[modelId];
           }
 
           return;
@@ -120,10 +128,10 @@ namespace ammonite {
   namespace {
     //Track all loaded models
     ModelDataMap modelDataMap;
-    ModelTracker activeModelTracker(&modelDataMap);
-    ModelTracker inactiveModelTracker(&modelDataMap);
+    ModelPtrTrackerMap modelIdPtrMap;
 
-    std::map<int, ammonite::models::ModelInfo*> modelIdPtrMap;
+    ModelTracker activeModelTracker(&modelIdPtrMap);
+    ModelTracker inactiveModelTracker(&modelIdPtrMap);
 
     struct ModelLoadInfo {
       std::string modelDirectory;
@@ -165,8 +173,7 @@ namespace ammonite {
 
       //Move model to different sub-tracker and update pointer
       selectedTracker->moveModel(modelId, AMMONITE_LIGHT_EMITTER);
-      modelPtr = selectedTracker->getModelPtr(modelId);
-      modelIdPtrMap[modelId] = modelPtr;
+      modelPtr = modelIdPtrMap[modelId];
 
       //Set light emission property
       if (modelPtr != nullptr) {
@@ -334,17 +341,15 @@ namespace ammonite {
     static void moveModelToActive(int modelId, ammonite::models::ModelInfo* modelPtr) {
       //Move from inactive to active tracker, update model pointer map
       ammonite::models::ModelInfo modelObject = *modelPtr;
-      activeModelTracker.addModel(modelId, modelObject);
       inactiveModelTracker.deleteModel(modelId);
-      modelIdPtrMap[modelId] = activeModelTracker.getModelPtr(modelId);
+      activeModelTracker.addModel(modelId, modelObject);
     }
 
     static void moveModelToInactive(int modelId, ammonite::models::ModelInfo* modelPtr) {
       //Move from active to inactive tracker, update model pointer map
       ammonite::models::ModelInfo modelObject = *modelPtr;
-      inactiveModelTracker.addModel(modelId, modelObject);
       activeModelTracker.deleteModel(modelId);
-      modelIdPtrMap[modelId] = inactiveModelTracker.getModelPtr(modelId);
+      inactiveModelTracker.addModel(modelId, modelObject);
     }
   }
 
@@ -415,7 +420,6 @@ namespace ammonite {
       //Add model to the tracker and return the ID
       modelObject.modelId = ++totalModels;
       activeModelTracker.addModel(modelObject.modelId, modelObject);
-      modelIdPtrMap[modelObject.modelId] = activeModelTracker.getModelPtr(modelObject.modelId);
       return modelObject.modelId;
     }
 
@@ -438,7 +442,6 @@ namespace ammonite {
       //Add model to the tracker and return the ID
       modelObject.modelId = ++totalModels;
       activeModelTracker.addModel(modelObject.modelId, modelObject);
-      modelIdPtrMap[modelObject.modelId] = activeModelTracker.getModelPtr(modelObject.modelId);
       return modelObject.modelId;
     }
 
