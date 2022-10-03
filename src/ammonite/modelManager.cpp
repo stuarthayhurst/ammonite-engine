@@ -61,7 +61,7 @@ namespace ammonite {
         modelArr[i] = &it->second;
         std::advance(it, 1);
       }
-   }
+    }
 
     void addModel(int modelId, ammonite::models::ModelInfo modelObject) {
       modelTrackerMap[modelId] = modelObject;
