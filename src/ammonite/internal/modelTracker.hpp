@@ -7,6 +7,8 @@
 #include <glm/gtx/quaternion.hpp>
 #include <GL/glew.h>
 
+#include "../constants.hpp"
+
 /* Internally exposed header:
  - Allow access to model tracker internally
  - Expose data structures for models
@@ -52,6 +54,7 @@ namespace ammonite {
       bool isLightEmitting = false;
       std::string modelName;
       int modelId;
+      unsigned short modelType = AMMONITE_MODEL;
     };
 
     int getModelCount(unsigned short modelType);

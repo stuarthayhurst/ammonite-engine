@@ -64,8 +64,9 @@ namespace ammonite {
     }
 
     void addModel(int modelId, ammonite::models::ModelInfo modelObject) {
-      modelTrackerMap[modelId] = modelObject;
-      (*modelIdPtrMapPtr)[modelId] = &modelTrackerMap[modelId];
+      ModelTrackerMap* targetMapPtr = modelSelector[modelObject.modelType];
+      (*targetMapPtr)[modelId] = modelObject;
+      (*modelIdPtrMapPtr)[modelId] = &(*targetMapPtr)[modelId];
     }
 
     void deleteModel(int modelId) {
@@ -92,7 +93,11 @@ namespace ammonite {
             it->second->erase(modelId);
 
             //Update the id to pointer map
-            (*modelIdPtrMapPtr)[modelId] = &(*targetMapPtr)[modelId];
+            ammonite::models::ModelInfo* modelPtr = &(*targetMapPtr)[modelId];
+            (*modelIdPtrMapPtr)[modelId] = modelPtr;
+
+            //Update the type saved on the model
+            modelPtr->modelType = targetType;
           }
 
           return;
