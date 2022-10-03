@@ -80,26 +80,28 @@ namespace ammonite {
     }
 
     void moveModel(int modelId, unsigned short targetType) {
+      //Get the type of model, so the right tracker can be selected
+      unsigned short modelType = (*modelIdPtrMapPtr)[modelId]->modelType;
+
+      //Return early if no work needs to be done
+      if (modelType == targetType) {
+        return;
+      }
+
+      //Select current and target trackers
+      ModelTrackerMap* currentMapPtr = modelSelector[modelType];
       ModelTrackerMap* targetMapPtr = modelSelector[targetType];
-      //Find which tracker holds the model, then move the model to the new tracker
-      for (auto it = modelSelector.begin(); it != modelSelector.end(); it++) {
-        if (it->second->contains(modelId)) {
-          //Only move if the target is different from the current
-          if (targetMapPtr != it->second) {
-            //Move the model
-            (*targetMapPtr)[modelId] = (*(it->second))[modelId];
-            it->second->erase(modelId);
 
-            //Update the id to pointer map
-            ammonite::models::ModelInfo* modelPtr = &(*targetMapPtr)[modelId];
-            (*modelIdPtrMapPtr)[modelId] = modelPtr;
+      if (currentMapPtr->contains(modelId)) {
+        (*targetMapPtr)[modelId] = (*currentMapPtr)[modelId];
+        currentMapPtr->erase(modelId);
 
-            //Update the type saved on the model
-            modelPtr->modelType = targetType;
-          }
+        //Update the id to pointer map
+        ammonite::models::ModelInfo* modelPtr = &(*targetMapPtr)[modelId];
+        (*modelIdPtrMapPtr)[modelId] = modelPtr;
 
-          return;
-        }
+        //Update the type saved on the model
+        modelPtr->modelType = targetType;
       }
     }
 
