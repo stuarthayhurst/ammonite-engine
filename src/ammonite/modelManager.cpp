@@ -79,7 +79,7 @@ namespace ammonite {
       modelIdPtrMapPtr->erase(modelId);
     }
 
-    void moveModel(int modelId, unsigned short targetType) {
+    void changeModelType(int modelId, unsigned short targetType) {
       //Get the type of model, so the right tracker can be selected
       unsigned short modelType = (*modelIdPtrMapPtr)[modelId]->modelType;
 
@@ -169,7 +169,7 @@ namespace ammonite {
       }
 
       //Move model to different sub-tracker and update pointer
-      selectedTracker->moveModel(modelId, AMMONITE_LIGHT_EMITTER);
+      selectedTracker->changeModelType(modelId, AMMONITE_LIGHT_EMITTER);
       modelPtr = modelIdPtrMap[modelId];
 
       //Set light emission property
