@@ -71,7 +71,7 @@ namespace ammonite {
 
     void deleteModel(int modelId) {
       //Get the type of model, so the right tracker can be selected
-      unsigned short modelType = (*modelIdPtrMapPtr)[modelId]->modelType;;
+      unsigned short modelType = (*modelIdPtrMapPtr)[modelId]->modelType;
       ModelTrackerMap* targetMapPtr = modelSelector[modelType];
 
       //Delete the model and id to pointer map entry
@@ -104,14 +104,17 @@ namespace ammonite {
     }
 
     bool hasModel(int modelId) {
-      //Find which tracker holds the model, if any
-      for (auto it = modelSelector.begin(); it != modelSelector.end(); it++) {
-        if (it->second->contains(modelId)) {
-          return true;
-        }
+      //Return false if the model isn't tracked at all
+      if (!modelIdPtrMapPtr->contains(modelId)) {
+        return false;
       }
 
-      return false;
+      //Get the type of model, so the right tracker can be selected
+      unsigned short modelType = (*modelIdPtrMapPtr)[modelId]->modelType;
+      ModelTrackerMap* targetMapPtr = modelSelector[modelType];
+
+      //Return whether the selected tracker holds the model
+      return targetMapPtr->contains(modelId);
     }
   };
 }
