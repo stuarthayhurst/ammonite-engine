@@ -103,17 +103,6 @@ namespace ammonite {
       }
     }
 
-    ammonite::models::ModelInfo* getModelPtr(int modelId) {
-      //Find which tracker holds the model, and return the model pointer
-      for (auto it = modelSelector.begin(); it != modelSelector.end(); it++) {
-        if (it->second->contains(modelId)) {
-          return &((*(it->second))[modelId]);
-        }
-      }
-
-      return nullptr;
-    }
-
     bool hasModel(int modelId) {
       //Find which tracker holds the model, if any
       for (auto it = modelSelector.begin(); it != modelSelector.end(); it++) {
