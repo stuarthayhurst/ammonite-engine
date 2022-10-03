@@ -70,15 +70,13 @@ namespace ammonite {
     }
 
     void deleteModel(int modelId) {
-      //Find which tracker holds the model, then delete the model
-      for (auto it = modelSelector.begin(); it != modelSelector.end(); it++) {
-        if (it->second->contains(modelId)) {
-          //Remove model and id to pointer entry
-          it->second->erase(modelId);
-          modelIdPtrMapPtr->erase(modelId);
-          return;
-        }
-      }
+      //Get the type of model, so the right tracker can be selected
+      unsigned short modelType = (*modelIdPtrMapPtr)[modelId]->modelType;;
+      ModelTrackerMap* targetMapPtr = modelSelector[modelType];
+
+      //Delete the model and id to pointer map entry
+      targetMapPtr->erase(modelId);
+      modelIdPtrMapPtr->erase(modelId);
     }
 
     void moveModel(int modelId, unsigned short targetType) {
@@ -535,7 +533,6 @@ namespace ammonite {
         ammonite::lighting::unlinkByModel(modelId);
 
         //Remove the model from the tracker
-        modelIdPtrMap.erase(modelId);
         if (activeModelTracker.hasModel(modelId)) {
           activeModelTracker.deleteModel(modelId);
         } else if (inactiveModelTracker.hasModel(modelId)) {
