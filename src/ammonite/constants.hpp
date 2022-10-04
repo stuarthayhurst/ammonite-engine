@@ -2,7 +2,7 @@
 #define CONSTANTS
 
 namespace ammonite {
-enum AmmoniteEnum {
+enum AmmoniteEnum : unsigned char {
   //Keybinding constants
   AMMONITE_EXIT,
   AMMONITE_FORWARD,
