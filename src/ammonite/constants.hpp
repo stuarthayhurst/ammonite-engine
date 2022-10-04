@@ -1,7 +1,6 @@
 #ifndef CONSTANTS
 #define CONSTANTS
 
-namespace ammonite {
 enum AmmoniteEnum : unsigned char {
   //Keybinding constants
   AMMONITE_EXIT,
@@ -22,6 +21,5 @@ enum AmmoniteEnum : unsigned char {
   AMMONITE_MODEL,
   AMMONITE_LIGHT_EMITTER
 };
-}
 
 #endif
