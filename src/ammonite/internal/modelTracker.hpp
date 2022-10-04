@@ -54,11 +54,11 @@ namespace ammonite {
       bool isLightEmitting = false;
       std::string modelName;
       int modelId;
-      unsigned short modelType = AMMONITE_MODEL;
+      AmmoniteEnum modelType = AMMONITE_MODEL;
     };
 
-    int getModelCount(unsigned short modelType);
-    void getModels(unsigned short modelType, int modelCount, ModelInfo* modelArr[]);
+    int getModelCount(AmmoniteEnum modelType);
+    void getModels(AmmoniteEnum modelType, int modelCount, ModelInfo* modelArr[]);
 
     ModelInfo* getModelPtr(int modelId);
     void setLightEmitting(int modelId, bool lightEmitting);

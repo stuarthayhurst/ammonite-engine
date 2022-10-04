@@ -1,23 +1,27 @@
 #ifndef CONSTANTS
 #define CONSTANTS
 
-//Keybinding constants
-const unsigned short AMMONITE_EXIT    = 1;
-const unsigned short AMMONITE_FORWARD = 2;
-const unsigned short AMMONITE_BACK    = 3;
-const unsigned short AMMONITE_UP      = 4;
-const unsigned short AMMONITE_DOWN    = 5;
-const unsigned short AMMONITE_LEFT    = 6;
-const unsigned short AMMONITE_RIGHT   = 7;
+namespace ammonite {
+enum AmmoniteEnum {
+  //Keybinding constants
+  AMMONITE_EXIT,
+  AMMONITE_FORWARD,
+  AMMONITE_BACK,
+  AMMONITE_UP,
+  AMMONITE_DOWN,
+  AMMONITE_LEFT,
+  AMMONITE_RIGHT,
 
-//Draw modes
-const short AMMONITE_DRAW_INACTIVE   = -1;
-const short AMMONITE_DRAW_ACTIVE     = 0;
-const short AMMONITE_DRAW_WIREFRAME  = 1;
-const short AMMONITE_DRAW_POINTS     = 2;
+  //Draw modes
+  AMMONITE_DRAW_INACTIVE,
+  AMMONITE_DRAW_ACTIVE,
+  AMMONITE_DRAW_WIREFRAME,
+  AMMONITE_DRAW_POINTS,
 
-//Model types
-const unsigned short AMMONITE_MODEL         = 1;
-const unsigned short AMMONITE_LIGHT_EMITTER = 2;
+  //Model types
+  AMMONITE_MODEL,
+  AMMONITE_LIGHT_EMITTER
+};
+}
 
 #endif

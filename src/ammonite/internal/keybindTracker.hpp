@@ -3,6 +3,8 @@
 
 #include <map>
 
+#include "../constants.hpp"
+
 /* Internally exposed header:
  - Allow access to keybind tracker internally
 */
@@ -11,7 +13,7 @@ namespace ammonite {
   namespace utils {
     namespace controls {
       namespace internal {
-        std::map<unsigned short, int>* getKeybindTrackerPtr();
+        std::map<AmmoniteEnum, int>* getKeybindTrackerPtr();
       }
     }
   }

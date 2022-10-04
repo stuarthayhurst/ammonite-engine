@@ -28,7 +28,7 @@ namespace ammonite {
         bool isInputFocused = true, isCameraActive = true, isControlActive = true;
 
         //Access map for keybind stores
-        std::map<unsigned short, int>* keybindTrackerPtr = ammonite::utils::controls::internal::getKeybindTrackerPtr();
+        std::map<AmmoniteEnum, int>* keybindTrackerPtr = ammonite::utils::controls::internal::getKeybindTrackerPtr();
 
         //Increase / decrease FoV on scroll (xoffset is unused)
         static void scroll_callback(GLFWwindow*, double, double yoffset) {

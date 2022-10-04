@@ -9,7 +9,7 @@ namespace ammonite {
   namespace utils {
     namespace controls {
       namespace {
-        std::map<unsigned short, int> keybindTracker = {
+        std::map<AmmoniteEnum, int> keybindTracker = {
           {AMMONITE_EXIT, GLFW_KEY_ESCAPE},
           {AMMONITE_FORWARD, GLFW_KEY_UP},
           {AMMONITE_BACK, GLFW_KEY_DOWN},
@@ -21,18 +21,18 @@ namespace ammonite {
       }
 
       namespace internal {
-        std::map<unsigned short, int>* getKeybindTrackerPtr() {
+        std::map<AmmoniteEnum, int>* getKeybindTrackerPtr() {
           return &keybindTracker;
         }
       }
 
-      void setKeybind(unsigned short engineKey, int keycode) {
+      void setKeybind(AmmoniteEnum engineKey, int keycode) {
         if (keybindTracker.contains(engineKey)) {
           keybindTracker[engineKey] = keycode;
         }
       }
 
-      int getKeybind(unsigned short engineKey) {
+      int getKeybind(AmmoniteEnum engineKey) {
         if (keybindTracker.contains(engineKey)) {
           return keybindTracker[engineKey];
         } else {
