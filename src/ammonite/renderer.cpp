@@ -103,7 +103,7 @@ namespace ammonite {
       //View projection combined matrix
       glm::mat4 viewProjectionMatrix;
 
-      //Named draw constants
+      //Render modes for drawModels()
       enum AmmoniteRenderMode : unsigned char {
         AMMONITE_RENDER_PASS,
         AMMONITE_DEPTH_PASS,
@@ -115,7 +115,7 @@ namespace ammonite {
       //Check for essential GPU capabilities
       static bool checkGPUCapabilities(int* failureCount) {
         const char* extensions[5][3] = {
-          {"GL_ARB_direct_state_access", "GL_VERSION_4_6", "Direct state access"},
+          {"GL_ARB_direct_state_access", "GL_VERSION_4_5", "Direct state access"},
           {"GL_ARB_shader_storage_buffer_object", "GL_VERSION_4_3", "Shader Storage Buffer Objects (SSBOs)"},
           {"GL_ARB_texture_storage", "GL_VERSION_4_2", "Texture storage"},
           {"GL_ARB_shading_language_420pack", "GL_VERSION_4_2", "GLSL shader version 4.20"},
