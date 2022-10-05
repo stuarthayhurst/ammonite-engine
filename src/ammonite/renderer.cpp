@@ -104,9 +104,11 @@ namespace ammonite {
       glm::mat4 viewProjectionMatrix;
 
       //Named draw constants
-      const unsigned short AMMONITE_RENDER_PASS  = 0;
-      const unsigned short AMMONITE_DEPTH_PASS   = 1;
-      const unsigned short AMMONITE_DATA_REFRESH = 2;
+      enum AmmoniteRenderMode : unsigned char {
+        AMMONITE_RENDER_PASS,
+        AMMONITE_DEPTH_PASS,
+        AMMONITE_DATA_REFRESH
+      };
     }
 
     namespace {
@@ -391,13 +393,13 @@ namespace ammonite {
       return frameTime;
     }
 
-    static void drawModels(const unsigned short drawMode) {
+    static void drawModels(AmmoniteRenderMode renderMode) {
       //Create initial array for model pointers
       static int modelCount = ammonite::models::getModelCount(AMMONITE_MODEL);
       static ammonite::models::ModelInfo** modelPtrs = new ammonite::models::ModelInfo* [modelCount];
 
       //If requested, create a new array for model pointers
-      if (drawMode == AMMONITE_DATA_REFRESH) {
+      if (renderMode == AMMONITE_DATA_REFRESH) {
         //Replace array with one of the correct size
         modelCount = ammonite::models::getModelCount(AMMONITE_MODEL);
         ammonite::models::ModelInfo** newArr = new ammonite::models::ModelInfo* [modelCount];
@@ -411,7 +413,7 @@ namespace ammonite {
 
       //Draw the model pointers
       for (int i = 0; i < modelCount; i++) {
-        drawModel(modelPtrs[i], -1, (drawMode == AMMONITE_DEPTH_PASS));
+        drawModel(modelPtrs[i], -1, (renderMode == AMMONITE_DEPTH_PASS));
       }
     }
 
