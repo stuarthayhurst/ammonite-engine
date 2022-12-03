@@ -122,24 +122,6 @@ namespace ammonite {
 
   namespace shaders {
     int loadShader(const char* shaderPath, const GLenum shaderType, bool* externalSuccess) {
-      //Check for compute shader support if needed
-      if (shaderType == GL_COMPUTE_SHADER) {
-        if (!ammonite::utils::checkExtension("GL_ARB_compute_shader", "GL_VERSION_4_3")) {
-          std::cerr << ammonite::utils::warning << "Compute shaders unsupported" << std::endl;
-          *externalSuccess = false;
-          return 0;
-        }
-      }
-
-      //Check for tessellation shader support if needed
-      if (shaderType == GL_TESS_CONTROL_SHADER or shaderType == GL_TESS_EVALUATION_SHADER) {
-        if (!ammonite::utils::checkExtension("GL_ARB_tessellation_shader", "GL_VERSION_4_0")) {
-          std::cerr << ammonite::utils::warning << "Tessellation shaders unsupported" << std::endl;
-          *externalSuccess = false;
-          return 0;
-        }
-      }
-
       //Create the shader
       GLuint shaderId = glCreateShader(shaderType);
 
@@ -314,12 +296,12 @@ namespace ammonite {
     int createProgram(const char* inputShaderPaths[], const int inputShaderCount, bool* externalSuccess) {
       //Convert file extensions to shader types
       std::map<std::string, GLenum> shaderExtensions = {
-        {".vert", GL_VERTEX_SHADER},
-        {".vs", GL_VERTEX_SHADER},
-        {".frag", GL_FRAGMENT_SHADER},
-        {".fs", GL_FRAGMENT_SHADER},
-        {".geom", GL_GEOMETRY_SHADER},
-        {".gs", GL_GEOMETRY_SHADER},
+        {".vert", GL_VERTEX_SHADER}, {".vs", GL_VERTEX_SHADER},
+        {".frag", GL_FRAGMENT_SHADER}, {".fs", GL_FRAGMENT_SHADER},
+        {".geom", GL_GEOMETRY_SHADER}, {".gs", GL_GEOMETRY_SHADER},
+        {".tessc", GL_TESS_CONTROL_SHADER}, {".tsc", GL_TESS_CONTROL_SHADER},
+        {".tesse", GL_TESS_EVALUATION_SHADER}, {".tes", GL_TESS_EVALUATION_SHADER},
+        {".comp", GL_COMPUTE_SHADER}, {".cs", GL_COMPUTE_SHADER}
       };
 
       //Find all shaders
@@ -332,8 +314,26 @@ namespace ammonite {
         std::string extension = filePath.extension();
 
         if (shaderExtensions.contains(extension)) {
+          GLenum shaderType = shaderExtensions[extension];
+
+          //Check for compute shader support if needed
+          if (shaderType == GL_COMPUTE_SHADER) {
+            if (!ammonite::utils::checkExtension("GL_ARB_compute_shader", "GL_VERSION_4_3")) {
+              std::cerr << ammonite::utils::warning << "Compute shaders unsupported" << std::endl;
+              continue;
+            }
+          }
+
+          //Check for tessellation shader support if needed
+          if (shaderType == GL_TESS_CONTROL_SHADER or shaderType == GL_TESS_EVALUATION_SHADER) {
+            if (!ammonite::utils::checkExtension("GL_ARB_tessellation_shader", "GL_VERSION_4_0")) {
+              std::cerr << ammonite::utils::warning << "Tessellation shaders unsupported" << std::endl;
+              continue;
+            }
+          }
+
           shaders.push_back(std::string(filePath));
-          types.push_back(shaderExtensions[extension]);
+          types.push_back(shaderType);
         }
       }
 
