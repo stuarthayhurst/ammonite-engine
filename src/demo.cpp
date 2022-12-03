@@ -24,7 +24,6 @@ void cleanUp(int modelCount, int loadedModelIds[]) {
   for (int i = 0; i < modelCount; i++) {
     ammonite::models::deleteModel(loadedModelIds[i]);
   }
-  ammonite::shaders::eraseShaders();
   ammonite::windowManager::setup::destroyGlfw();
 }
 
@@ -122,7 +121,7 @@ int main(int argc, char* argv[]) {
   ammonite::models::position::scaleModel(loadedModelIds[0], 0.8f);
   ammonite::models::position::rotateModel(loadedModelIds[0], glm::vec3(0.0f, 0.0f, 0.0f));
 
-  //Destroy all models, textures and shaders then exit
+  //Destroy all models then exit
   if (!success) {
     cleanUp(modelCount, loadedModelIds);
     return EXIT_FAILURE;

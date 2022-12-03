@@ -17,11 +17,6 @@
 #include "internal/internalDebug.hpp"
 
 namespace ammonite {
-  namespace {
-    //Vector to store all existing shaders
-    std::vector<int> shaderIds(0);
-  }
-
   //Static helper functions
   namespace {
     static void deleteCacheFile(std::string cacheFilePath) {
@@ -32,7 +27,7 @@ namespace ammonite {
       ammonite::utils::files::deleteFile(cacheFilePath + "info");
     }
 
-    static void cacheShader(const GLuint programId, const char* shaderPaths[], const int shaderCount) {
+    static void cacheProgram(const GLuint programId, const char* shaderPaths[], const int shaderCount) {
       std::string cacheFilePath = ammonite::utils::cache::requestNewCache(shaderPaths, shaderCount);
       std::string cacheFileInfoPath = cacheFilePath + "info";
 
@@ -126,23 +121,6 @@ namespace ammonite {
   }
 
   namespace shaders {
-    void deleteShader(const GLuint shaderId) {
-      //Search for and delete shaderId
-      auto shaderPosition = std::find(shaderIds.begin(), shaderIds.end(), shaderId);
-      if (shaderPosition != shaderIds.end()) {
-        const int intShaderPosition = std::distance(shaderIds.begin(), shaderPosition);
-        glDeleteShader(shaderIds[intShaderPosition]);
-        shaderIds.erase(shaderPosition);
-      }
-    }
-
-    //Delete every remaining shader
-    void eraseShaders() {
-      while (shaderIds.size() != 0) {
-        deleteShader(shaderIds[0]);
-      }
-    }
-
     int loadShader(const char* shaderPath, const GLenum shaderType, bool* externalSuccess) {
       //Check for compute shader support if needed
       if (shaderType == GL_COMPUTE_SHADER) {
@@ -200,13 +178,11 @@ namespace ammonite {
         std::cerr << ammonite::utils::warning << &errorLog[0] << std::endl;
 
         //Clean up and exit
-        glDeleteShader(shaderId); //Use glDeleteShader, as the shader never made it to shaderIds
+        glDeleteShader(shaderId);
         *externalSuccess = false;
         return 0;
       }
 
-      //Add the shader to the shader id store
-      shaderIds.push_back(shaderId);
       return shaderId;
     }
 
@@ -229,12 +205,14 @@ namespace ammonite {
       //Detach and remove all passed shader ids
       for (int i = 0; i < shaderCount; i++) {
         glDetachShader(programId, shaderIds[i]);
-        deleteShader(shaderIds[i]);
+        glDeleteShader(shaderIds[i]);
       }
 
       return programId;
     }
+  }
 
+  namespace shaders {
     int createProgram(const char* shaderPaths[], const GLenum shaderTypes[], const int shaderCount, bool* externalSuccess) {
       //Used later as the return value
       GLuint programId;
@@ -317,13 +295,15 @@ namespace ammonite {
       //Cleanup on failure
       if (!hasCreatedProgram) {
         *externalSuccess = false;
-        ammonite::shaders::eraseShaders();
+        for (int i = 0; i < shaderCount; i++) {
+          glDeleteShader(shaderIds[shaderCount]);
+        }
         return 0;
       }
 
       //Cache the binary if enabled
       if (isCacheSupported) {
-        cacheShader(programId, shaderPaths, shaderCount);
+        cacheProgram(programId, shaderPaths, shaderCount);
       }
 
       return programId;
