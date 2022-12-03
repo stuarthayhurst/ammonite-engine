@@ -120,6 +120,7 @@ namespace ammonite {
     }
   }
 
+  //Shader compilation functions, local to this file
   namespace shaders {
     int loadShader(const char* shaderPath, const GLenum shaderType, bool* externalSuccess) {
       //Create the shader
@@ -192,10 +193,8 @@ namespace ammonite {
 
       return programId;
     }
-  }
 
-  namespace shaders {
-    //Attempt to find cached program, and hand off to loadShader
+    //Attempt to find cached program or hand off to loadShader and createProgram
     int createProgram(const char* shaderPaths[], const GLenum shaderTypes[], const int shaderCount, bool* externalSuccess) {
       //Used later as the return value
       GLuint programId;
@@ -291,7 +290,10 @@ namespace ammonite {
 
       return programId;
     }
+  }
 
+  //Externally exposed functions
+  namespace shaders {
     //Find shader types and hand off to createProgram(paths, types)
     int createProgram(const char* inputShaderPaths[], const int inputShaderCount, bool* externalSuccess) {
       //Convert file extensions to shader types
