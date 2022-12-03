@@ -1,4 +1,5 @@
 #include <string>
+#include <map>
 #include <vector>
 #include <algorithm>
 #include <iostream>
@@ -332,6 +333,16 @@ namespace ammonite {
       const std::filesystem::path shaderDir{directoryPath};
       const auto it = std::filesystem::directory_iterator{shaderDir};
 
+      //Convert file extensions to shader types
+      std::map<std::string, GLenum> shaderExtensions = {
+        {".vert", GL_VERTEX_SHADER},
+        {".vs", GL_VERTEX_SHADER},
+        {".frag", GL_FRAGMENT_SHADER},
+        {".fs", GL_FRAGMENT_SHADER},
+        {".geom", GL_GEOMETRY_SHADER},
+        {".gs", GL_GEOMETRY_SHADER},
+      };
+
       //Find all shaders
       std::vector<std::string> shaders(0);
       std::vector<GLenum> types(0);
@@ -339,15 +350,9 @@ namespace ammonite {
         std::filesystem::path filePath{fileName};
         std::string extension = filePath.extension();
 
-        if (extension == ".vs" or extension == ".vert") {
+        if (shaderExtensions.contains(extension)) {
           shaders.push_back(std::string(filePath));
-          types.push_back(GL_VERTEX_SHADER);
-        } else if (extension == ".fs" or extension == ".frag") {
-          shaders.push_back(std::string(filePath));
-          types.push_back(GL_FRAGMENT_SHADER);
-        } else if (extension == ".gs" or extension == ".geo") {
-          shaders.push_back(std::string(filePath));
-          types.push_back(GL_GEOMETRY_SHADER);
+          types.push_back(shaderExtensions[extension]);
         }
       }
 
