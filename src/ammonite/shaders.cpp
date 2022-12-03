@@ -213,6 +213,7 @@ namespace ammonite {
   }
 
   namespace shaders {
+    //Attempt to find cached program, and hand off to loadShader
     int createProgram(const char* shaderPaths[], const GLenum shaderTypes[], const int shaderCount, bool* externalSuccess) {
       //Used later as the return value
       GLuint programId;
@@ -309,10 +310,8 @@ namespace ammonite {
       return programId;
     }
 
-    int loadDirectory(const char* directoryPath, bool* externalSuccess) {
-      const std::filesystem::path shaderDir{directoryPath};
-      const auto it = std::filesystem::directory_iterator{shaderDir};
-
+    //Find shader types and hand off to createProgram(paths, types)
+    int createProgram(const char* inputShaderPaths[], const int inputShaderCount, bool* externalSuccess) {
       //Convert file extensions to shader types
       std::map<std::string, GLenum> shaderExtensions = {
         {".vert", GL_VERTEX_SHADER},
@@ -326,7 +325,9 @@ namespace ammonite {
       //Find all shaders
       std::vector<std::string> shaders(0);
       std::vector<GLenum> types(0);
-      for (auto const& fileName : it) {
+      for (int i = 0; i < inputShaderCount; i++) {
+        std::string fileName = inputShaderPaths[i];
+
         std::filesystem::path filePath{fileName};
         std::string extension = filePath.extension();
 
@@ -348,6 +349,30 @@ namespace ammonite {
 
       //Create the program and return the ID
       return createProgram(shaderPaths, shaderTypes, shaderCount, externalSuccess);
+    }
+
+    //Load all shaders in a directory and had off to createProgram(paths)
+    int loadDirectory(const char* directoryPath, bool* externalSuccess) {
+      const std::filesystem::path shaderDir{directoryPath};
+      const auto it = std::filesystem::directory_iterator{shaderDir};
+
+      //Find files to send to next stage
+      std::vector<std::string> shaders(0);
+      for (auto const& fileName : it) {
+        std::filesystem::path filePath{fileName};
+        shaders.push_back(std::string(filePath));
+      }
+
+      //Repack shaders
+      const char* shaderPaths[shaders.size()];
+      const int shaderCount = sizeof(shaderPaths) / sizeof(shaderPaths[0]);
+
+      for (unsigned int i = 0; i < shaders.size(); i++) {
+        shaderPaths[i] = shaders[i].c_str();
+      }
+
+      //Create the program and return the ID
+      return createProgram(shaderPaths, shaderCount, externalSuccess);
     }
   }
 }
