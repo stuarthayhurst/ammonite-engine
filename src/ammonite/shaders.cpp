@@ -308,9 +308,7 @@ namespace ammonite {
       std::vector<std::string> shaders(0);
       std::vector<GLenum> types(0);
       for (int i = 0; i < inputShaderCount; i++) {
-        std::string fileName = inputShaderPaths[i];
-
-        std::filesystem::path filePath{fileName};
+        std::filesystem::path filePath{inputShaderPaths[i]};
         std::string extension = filePath.extension();
 
         if (shaderExtensions.contains(extension)) {
