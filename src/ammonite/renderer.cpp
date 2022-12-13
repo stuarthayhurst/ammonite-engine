@@ -571,18 +571,15 @@ namespace ammonite {
           glDeleteRenderbuffers(1, &colourRenderBufferId);
         }
 
-        //Decide which framebuffer to render to
+        //Create texture for whole screen (and multisampled renderbuffer, if needed
+        glCreateTextures(GL_TEXTURE_2D, 1, &screenQuadTextureId);
+
+        //Deicde which framebuffer to render to and create multisampled renderbuffer, if needed
         if (sampleCount != 0) {
           targetBufferId = colourBufferMultisampleFBO;
-        } else {
-          targetBufferId = screenQuadFBO;
-        }
-
-        //Create texture and multisampled renderbuffer for whole screen
-        glCreateTextures(GL_TEXTURE_2D, 1, &screenQuadTextureId);
-        if (sampleCount != 0) {
           glCreateRenderbuffers(1, &colourRenderBufferId);
         } else {
+          targetBufferId = screenQuadFBO;
           colourRenderBufferId = 0;
         }
 
