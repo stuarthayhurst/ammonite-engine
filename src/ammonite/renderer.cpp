@@ -628,6 +628,7 @@ namespace ammonite {
         } else {
           ammoniteInternalDebug << "Created new render framebuffer (" << renderWidth << " x " << renderHeight << ")" << std::endl;
         }
+        ammoniteInternalDebug << "Output resolution: " << *widthPtr << " x " << *heightPtr << std::endl;
       }
 
       //Reset the framebuffer and viewport
