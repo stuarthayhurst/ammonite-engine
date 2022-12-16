@@ -629,6 +629,7 @@ namespace ammonite {
         return glm::vec3(modelObject->positionData.scaleMatrix * glm::vec4(glm::vec3(1, 1, 1), 1));
       }
 
+      //Return rotation, in radians
       glm::vec3 getRotation(int modelId) {
         //Get the model and check it exists
         models::ModelInfo* modelObject = modelIdPtrMap[modelId];
@@ -636,7 +637,7 @@ namespace ammonite {
           return glm::vec3(0.0f);
         }
 
-        return glm::degrees(glm::eulerAngles(modelObject->positionData.rotationQuat));
+        return glm::eulerAngles(modelObject->positionData.rotationQuat);
       }
     }
 
@@ -674,6 +675,7 @@ namespace ammonite {
         setScale(modelId, glm::vec3(scaleMultiplier, scaleMultiplier, scaleMultiplier));
       }
 
+      //Rotation, in radians
       void setRotation(int modelId, glm::vec3 rotation) {
         //Get the model and check it exists
         models::ModelInfo* modelObject = modelIdPtrMap[modelId];
@@ -682,10 +684,7 @@ namespace ammonite {
         }
 
         //Set the rotation
-        glm::vec3 rotationRadians = glm::vec3(glm::radians(rotation[0]),
-                                              glm::radians(rotation[1]),
-                                              glm::radians(rotation[2]));
-        modelObject->positionData.rotationQuat = glm::quat(rotationRadians) * glm::quat(glm::vec3(0, 0, 0));
+        modelObject->positionData.rotationQuat = glm::quat(rotation) * glm::quat(glm::vec3(0, 0, 0));
 
         //Recalculate model and normal matrices
         calcModelMatrices(&modelObject->positionData);
@@ -730,6 +729,7 @@ namespace ammonite {
         scaleModel(modelId, glm::vec3(scaleMultiplier, scaleMultiplier, scaleMultiplier));
       }
 
+      //Rotation, in radians
       void rotateModel(int modelId, glm::vec3 rotation) {
         //Get the model and check it exists
         models::ModelInfo* modelObject = modelIdPtrMap[modelId];
@@ -738,10 +738,7 @@ namespace ammonite {
         }
 
         //Rotate it
-        glm::vec3 rotationRadians = glm::vec3(glm::radians(rotation[0]),
-                                              glm::radians(rotation[1]),
-                                              glm::radians(rotation[2]));
-        modelObject->positionData.rotationQuat = glm::quat(rotationRadians) * modelObject->positionData.rotationQuat;
+        modelObject->positionData.rotationQuat = glm::quat(rotation) * modelObject->positionData.rotationQuat;
 
         //Recalculate model and normal matrices
         calcModelMatrices(&modelObject->positionData);
