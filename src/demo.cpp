@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <string>
+#include <vector>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -19,7 +20,7 @@ void printMetrics(double frameTime) {
   std::printf(" (%fms)\n", frameTime * 1000);
 }
 
-void cleanUp(int modelCount, int loadedModelIds[]) {
+void cleanUp(int modelCount, std::vector<int> loadedModelIds) {
   //Cleanup
   for (int i = 0; i < modelCount; i++) {
     ammonite::models::deleteModel(loadedModelIds[i]);
@@ -84,7 +85,8 @@ int main(int argc, char* argv[]) {
   //Renderer failed to initialise, clean up and exit
   if (!success) {
     std::cerr << "Failed to initialise renderer, exiting" << std::endl;
-    cleanUp(0, nullptr);
+    std::vector<int> loadedModelIds;
+    cleanUp(0, loadedModelIds);
     return EXIT_FAILURE;
   }
 
@@ -94,13 +96,13 @@ int main(int argc, char* argv[]) {
     {"assets/cube.obj", "assets/flat.png"}
   };
   int modelCount = sizeof(models) / sizeof(models[0]);
-  int loadedModelIds[modelCount + 1];
+  std::vector<int> loadedModelIds;
 
   long int vertexCount = 0;
   ammonite::utils::Timer performanceTimer;
   for (int i = 0; i < modelCount; i++) {
     //Load model
-    loadedModelIds[i] = ammonite::models::createModel(models[i][0], &success);
+    loadedModelIds.push_back(ammonite::models::createModel(models[i][0], &success));
 
     //Count vertices
     vertexCount += ammonite::models::getVertexCount(loadedModelIds[i]);
