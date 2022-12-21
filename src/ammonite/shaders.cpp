@@ -169,7 +169,7 @@ namespace ammonite {
       return shaderId;
     }
 
-    int createProgram(const GLuint shaderIds[], const int shaderCount, bool* externalSuccess) {
+    int createProgram(GLuint shaderIds[], const int shaderCount, bool* externalSuccess) {
       //Create the program
       GLuint programId = glCreateProgram();
 
