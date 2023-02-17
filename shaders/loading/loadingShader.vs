@@ -3,9 +3,9 @@
 layout (location = 0) in vec2 inPosition;
 
 uniform float progress;
-uniform float width = 0.85f;
-uniform float height = 0.04f;
-uniform float heightOffset = 0.86f;
+uniform float width;
+uniform float height;
+uniform float heightOffset;
 
 void main() {
   //Scale to width and fill by progress

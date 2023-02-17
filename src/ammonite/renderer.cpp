@@ -78,6 +78,9 @@ namespace ammonite {
       struct {
         GLuint shaderId;
         GLuint progressId;
+        GLuint widthId;
+        GLuint heightId;
+        GLuint heightOffsetId;
       } loadingShader;
 
       GLuint skyboxVertexArrayId;
@@ -219,6 +222,9 @@ namespace ammonite {
         screenShader.screenSamplerId = glGetUniformLocation(screenShader.shaderId, "screenSampler");
 
         loadingShader.progressId = glGetUniformLocation(loadingShader.shaderId, "progress");
+        loadingShader.widthId = glGetUniformLocation(loadingShader.shaderId, "width");
+        loadingShader.heightId = glGetUniformLocation(loadingShader.shaderId, "height");
+        loadingShader.heightOffsetId = glGetUniformLocation(loadingShader.shaderId, "heightOffset");
 
         //Pass texture unit locations
         glUseProgram(modelShader.shaderId);
@@ -607,8 +613,12 @@ namespace ammonite {
         glUseProgram(loadingShader.shaderId);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        float progress = (*loadingScreenTracker)[loadingScreenId].progress;
-        glUniform1f(loadingShader.progressId, progress);
+        //Pass drawing parameters
+        ammonite::interface::LoadingScreen loadingScreen = (*loadingScreenTracker)[loadingScreenId];
+        glUniform1f(loadingShader.progressId, loadingScreen.progress);
+        glUniform1f(loadingShader.widthId, loadingScreen.width);
+        glUniform1f(loadingShader.heightId, loadingScreen.height);
+        glUniform1f(loadingShader.heightOffsetId, loadingScreen.heightOffset);
 
         //Prepare viewport and framebuffer
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
