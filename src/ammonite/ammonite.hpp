@@ -21,6 +21,7 @@
 #include "modelManager.hpp"
 #include "lightManager.hpp"
 #include "environment.hpp"
+#include "interface.hpp"
 
 #include "windowManager.hpp"
 

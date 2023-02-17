@@ -15,6 +15,7 @@
 #include "internal/modelTracker.hpp"
 #include "internal/lightTracker.hpp"
 #include "internal/cameraMatrices.hpp"
+#include "internal/interfaceTracker.hpp"
 
 #include "constants.hpp"
 #include "settings.hpp"
@@ -74,6 +75,11 @@ namespace ammonite {
         GLuint screenSamplerId;
       } screenShader;
 
+      struct {
+        GLuint shaderId;
+        GLuint progressId;
+      } loadingShader;
+
       GLuint skyboxVertexArrayId;
       GLuint screenQuadVertexArrayId;
 
@@ -97,6 +103,9 @@ namespace ammonite {
       std::map<int, ammonite::lighting::LightSource>* lightTrackerMap = ammonite::lighting::getLightTracker();
       std::map<int, glm::mat4[6]>* lightTransformMap = ammonite::lighting::getLightTransforms();
       unsigned int maxLightCount = 0;
+
+      //Get the loading screen tracker
+      std::map<int, ammonite::interface::LoadingScreen>* loadingScreenTracker = ammonite::interface::internal::getLoadingScreenTracker();
 
       int maxSampleCount = 0;
 
@@ -176,6 +185,9 @@ namespace ammonite {
         shaderLocation = std::string(shaderPath) + std::string("screen/");
         screenShader.shaderId = ammonite::shaders::loadDirectory(shaderLocation.c_str(), &hasCreatedShaders);
 
+        shaderLocation = std::string(shaderPath) + std::string("loading/");
+        loadingShader.shaderId = ammonite::shaders::loadDirectory(shaderLocation.c_str(), &hasCreatedShaders);
+
         if (!hasCreatedShaders) {
           *externalSuccess = false;
           return;
@@ -205,6 +217,8 @@ namespace ammonite {
         skyboxShader.skyboxSamplerId = glGetUniformLocation(skyboxShader.shaderId, "skyboxSampler");
 
         screenShader.screenSamplerId = glGetUniformLocation(screenShader.shaderId, "screenSampler");
+
+        loadingShader.progressId = glGetUniformLocation(loadingShader.shaderId, "progress");
 
         //Pass texture unit locations
         glUseProgram(modelShader.shaderId);
@@ -470,66 +484,6 @@ namespace ammonite {
         frameCount = 0;
       }
 
-      //Get shadow resolution and light count, save for next time to avoid cubemap recreation
-      static int* shadowResPtr = ammonite::settings::graphics::internal::getShadowResPtr();
-      static int lastShadowRes = 0;
-      unsigned int lightCount = lightTrackerMap->size();
-      static unsigned int lastLightCount = -1;
-
-      //If number of lights or shadow resolution changes, recreate cubemap
-      if ((*shadowResPtr != lastShadowRes) or (lightCount != lastLightCount)) {
-        setupDepthMap(lightCount, *shadowResPtr);
-
-        //Save for next time to avoid cubemap recreation
-        lastShadowRes = *shadowResPtr;
-        lastLightCount = lightCount;
-      }
-
-      //Swap to depth shader and enable depth testing
-      glUseProgram(depthShader.shaderId);
-      glViewport(0, 0, *shadowResPtr, *shadowResPtr);
-      glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-      glEnable(GL_DEPTH_TEST);
-
-      //Pass uniforms that don't change between light sources
-      static float* farPlanePtr = ammonite::settings::graphics::internal::getShadowFarPlanePtr();
-      glUniform1f(depthShader.farPlaneId, *farPlanePtr);
-
-      //Clear existing depth values
-      glClear(GL_DEPTH_BUFFER_BIT);
-
-      //Update cached model pointers
-      drawModels(AMMONITE_DATA_REFRESH);
-
-      //Depth mapping render passes
-      auto lightIt = lightTrackerMap->begin();
-      unsigned int activeLights = std::min(lightCount, maxLightCount);
-      for (unsigned int shadowCount = 0; shadowCount < activeLights; shadowCount++) {
-        //Get light source and position from tracker
-        auto lightSource = &lightIt->second;
-        glm::vec3 lightPos = lightSource->geometry;
-
-        //Check framebuffer status
-        if (glCheckNamedFramebufferStatus(depthMapFBO, GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-          std::cerr << ammonite::utils::warning << "Incomplete depth framebuffer" << std::endl;
-        }
-
-        //Pass shadow transform matrices to depth shader
-        for (int i = 0; i < 6; i++) {
-          GLuint shadowMatrixId = glGetUniformLocation(depthShader.shaderId, std::string("shadowMatrices[" + std::to_string(i) + "]").c_str());
-          //Fetch the transform from the tracker, and send to the shader
-          glUniformMatrix4fv(shadowMatrixId, 1, GL_FALSE, glm::value_ptr((*lightTransformMap)[lightSource->lightId][i]));
-        }
-
-        //Pass light source specific uniforms
-        glUniform3fv(depthShader.depthLightPosId, 1, glm::value_ptr(lightPos));
-        glUniform1i(depthShader.depthShadowIndex, shadowCount);
-
-        //Render to depth buffer and move to the next light source
-        drawModels(AMMONITE_DEPTH_PASS);
-        std::advance(lightIt, 1);
-      }
-
       static int lastWidth = 0, lastHeight = 0;
       static int* widthPtr = ammonite::settings::runtime::internal::getWidthPtr();
       static int* heightPtr = ammonite::settings::runtime::internal::getHeightPtr();
@@ -629,6 +583,90 @@ namespace ammonite {
           ammoniteInternalDebug << "Created new render framebuffer (" << renderWidth << " x " << renderHeight << ")" << std::endl;
         }
         ammoniteInternalDebug << "Output resolution: " << *widthPtr << " x " << *heightPtr << std::endl;
+      }
+
+      //Get shadow resolution and light count, save for next time to avoid cubemap recreation
+      static int* shadowResPtr = ammonite::settings::graphics::internal::getShadowResPtr();
+      static int lastShadowRes = 0;
+      unsigned int lightCount = lightTrackerMap->size();
+      static unsigned int lastLightCount = -1;
+
+      //If number of lights or shadow resolution changes, recreate cubemap
+      if ((*shadowResPtr != lastShadowRes) or (lightCount != lastLightCount)) {
+        setupDepthMap(lightCount, *shadowResPtr);
+
+        //Save for next time to avoid cubemap recreation
+        lastShadowRes = *shadowResPtr;
+        lastLightCount = lightCount;
+      }
+
+      //If a loading screen is active, draw it and return
+      int loadingScreenId = ammonite::interface::internal::getActiveLoadingScreenId();
+      if (loadingScreenId != 0) {
+        //Draw loading screen
+        glUseProgram(loadingShader.shaderId);
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        float progress = (*loadingScreenTracker)[loadingScreenId].progress;
+        glUniform1f(loadingShader.progressId, progress);
+
+        //Prepare viewport and framebuffer
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glViewport(0, 0, *widthPtr, *heightPtr);
+        glDisable(GL_DEPTH_TEST);
+
+        //Display the progress bar
+        glBindVertexArray(screenQuadVertexArrayId);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, nullptr);
+
+        glfwSwapBuffers(window);
+
+        return;
+      }
+
+      //Swap to depth shader and enable depth testing
+      glUseProgram(depthShader.shaderId);
+      glViewport(0, 0, *shadowResPtr, *shadowResPtr);
+      glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+      glEnable(GL_DEPTH_TEST);
+
+      //Pass uniforms that don't change between light sources
+      static float* farPlanePtr = ammonite::settings::graphics::internal::getShadowFarPlanePtr();
+      glUniform1f(depthShader.farPlaneId, *farPlanePtr);
+
+      //Clear existing depth values
+      glClear(GL_DEPTH_BUFFER_BIT);
+
+      //Update cached model pointers
+      drawModels(AMMONITE_DATA_REFRESH);
+
+      //Depth mapping render passes
+      auto lightIt = lightTrackerMap->begin();
+      unsigned int activeLights = std::min(lightCount, maxLightCount);
+      for (unsigned int shadowCount = 0; shadowCount < activeLights; shadowCount++) {
+        //Get light source and position from tracker
+        auto lightSource = &lightIt->second;
+        glm::vec3 lightPos = lightSource->geometry;
+
+        //Check framebuffer status
+        if (glCheckNamedFramebufferStatus(depthMapFBO, GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+          std::cerr << ammonite::utils::warning << "Incomplete depth framebuffer" << std::endl;
+        }
+
+        //Pass shadow transform matrices to depth shader
+        for (int i = 0; i < 6; i++) {
+          GLuint shadowMatrixId = glGetUniformLocation(depthShader.shaderId, std::string("shadowMatrices[" + std::to_string(i) + "]").c_str());
+          //Fetch the transform from the tracker, and send to the shader
+          glUniformMatrix4fv(shadowMatrixId, 1, GL_FALSE, glm::value_ptr((*lightTransformMap)[lightSource->lightId][i]));
+        }
+
+        //Pass light source specific uniforms
+        glUniform3fv(depthShader.depthLightPosId, 1, glm::value_ptr(lightPos));
+        glUniform1i(depthShader.depthShadowIndex, shadowCount);
+
+        //Render to depth buffer and move to the next light source
+        drawModels(AMMONITE_DEPTH_PASS);
+        std::advance(lightIt, 1);
       }
 
       //Reset the framebuffer and viewport
