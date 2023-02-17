@@ -172,25 +172,26 @@ namespace ammonite {
         //Set window to be used
         window = targetWindow;
 
-        //Create shaders
+        //Directory and pointer to ID of each shader
+        struct {
+          std::string shaderDir;
+          GLuint* shaderId;
+        } shaderInfo[6] = {
+          {"models/", &modelShader.shaderId},
+          {"lights/", &lightShader.shaderId},
+          {"depth/", &depthShader.shaderId},
+          {"skybox/", &skyboxShader.shaderId},
+          {"screen/", &screenShader.shaderId},
+          {"loading/", &loadingShader.shaderId}
+        };
+
+        //Load shaders
         bool hasCreatedShaders = true;
-        std::string shaderLocation = std::string(shaderPath) + std::string("models/");
-        modelShader.shaderId = ammonite::shaders::loadDirectory(shaderLocation.c_str(), &hasCreatedShaders);
-
-        shaderLocation = std::string(shaderPath) + std::string("lights/");
-        lightShader.shaderId = ammonite::shaders::loadDirectory(shaderLocation.c_str(), &hasCreatedShaders);
-
-        shaderLocation = std::string(shaderPath) + std::string("depth/");
-        depthShader.shaderId = ammonite::shaders::loadDirectory(shaderLocation.c_str(), &hasCreatedShaders);
-
-        shaderLocation = std::string(shaderPath) + std::string("skybox/");
-        skyboxShader.shaderId = ammonite::shaders::loadDirectory(shaderLocation.c_str(), &hasCreatedShaders);
-
-        shaderLocation = std::string(shaderPath) + std::string("screen/");
-        screenShader.shaderId = ammonite::shaders::loadDirectory(shaderLocation.c_str(), &hasCreatedShaders);
-
-        shaderLocation = std::string(shaderPath) + std::string("loading/");
-        loadingShader.shaderId = ammonite::shaders::loadDirectory(shaderLocation.c_str(), &hasCreatedShaders);
+        const int shaderCount = sizeof(shaderInfo) / sizeof(shaderInfo[0]);
+        for (int i = 0; i < shaderCount; i++) {
+          std::string shaderLocation = std::string(shaderPath) + shaderInfo[i].shaderDir;
+          *shaderInfo[i].shaderId = ammonite::shaders::loadDirectory(shaderLocation.c_str(), &hasCreatedShaders);
+        }
 
         if (!hasCreatedShaders) {
           *externalSuccess = false;
