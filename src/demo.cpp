@@ -90,6 +90,12 @@ int main(int argc, char* argv[]) {
     return EXIT_FAILURE;
   }
 
+  //Create a loading screen
+  int screenId = ammonite::interface::createLoadingScreen();
+  ammonite::interface::setActiveLoadingScreen(screenId);
+  ammonite::interface::setLoadingScreenProgress(screenId, 0);
+  ammonite::renderer::drawFrame();
+
   //Load models from a set of objects and textures
   const char* models[][2] = {
     {"assets/suzanne.obj", "assets/gradient.png"},
@@ -109,6 +115,10 @@ int main(int argc, char* argv[]) {
 
     //Load texture
     ammonite::models::applyTexture(loadedModelIds[i], models[i][1], true, &success);
+
+    //Update loading screen
+    ammonite::interface::setLoadingScreenProgress(screenId, i + 1 / modelCount + 1);
+    ammonite::renderer::drawFrame();
   }
 
   //Copy last loaded model
@@ -117,6 +127,10 @@ int main(int argc, char* argv[]) {
   ammonite::models::position::setPosition(loadedModelIds[modelCount], glm::vec3(4.0f, 4.0f, 4.0f));
   ammonite::models::position::scaleModel(loadedModelIds[modelCount], 0.25f);
   modelCount++;
+
+  //Update loading screen
+  ammonite::interface::setLoadingScreenProgress(screenId, 1.0f);
+  ammonite::renderer::drawFrame();
 
   //Example translation, scale and rotation
   ammonite::models::position::translateModel(loadedModelIds[0], glm::vec3(-2.0f, 0.0f, 0.0f));
@@ -147,7 +161,9 @@ int main(int argc, char* argv[]) {
   ammonite::camera::setPosition(0, glm::vec3(0.0f, 0.0f, 5.0f));
   ammonite::camera::setPosition(cameraIds[1], glm::vec3(0.0f, 0.0f, 2.0f));
 
+  //Engine loaded, delete the loading screen
   std::cout << "Loaded demo in   : " << utilityTimer.getTime() << "s" << std::endl;
+  ammonite::interface::deleteLoadingScreen(screenId);
 
   //Reset timers for performance metrics
   utilityTimer.reset();
