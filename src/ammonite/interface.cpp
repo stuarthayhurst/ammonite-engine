@@ -77,5 +77,15 @@ namespace ammonite {
         std::cerr << ammonite::utils::warning << "Loading screen " << targetScreenId << " doesn't exist" << std::endl;
       }
     }
+
+    void setLoadingScreenColours(int targetScreenId, glm::vec3 backgroundColour, glm::vec3 progressColour) {
+      if (loadingScreenTracker.contains(targetScreenId)) {
+        loadingScreenTracker[targetScreenId].backgroundColour = backgroundColour;
+        loadingScreenTracker[targetScreenId].progressColour = progressColour;
+      } else {
+        std::cerr << ammonite::utils::warning << "Loading screen " << targetScreenId << " doesn't exist" << std::endl;
+      }
+    }
+
   }
 }

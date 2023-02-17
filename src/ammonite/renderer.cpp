@@ -81,6 +81,7 @@ namespace ammonite {
         GLuint widthId;
         GLuint heightId;
         GLuint heightOffsetId;
+        GLuint progressColourId;
       } loadingShader;
 
       GLuint skyboxVertexArrayId;
@@ -225,6 +226,7 @@ namespace ammonite {
         loadingShader.widthId = glGetUniformLocation(loadingShader.shaderId, "width");
         loadingShader.heightId = glGetUniformLocation(loadingShader.shaderId, "height");
         loadingShader.heightOffsetId = glGetUniformLocation(loadingShader.shaderId, "heightOffset");
+        loadingShader.progressColourId = glGetUniformLocation(loadingShader.shaderId, "progressColour");
 
         //Pass texture unit locations
         glUseProgram(modelShader.shaderId);
@@ -609,9 +611,8 @@ namespace ammonite {
       //If a loading screen is active, draw it and return
       int loadingScreenId = ammonite::interface::internal::getActiveLoadingScreenId();
       if (loadingScreenId != 0) {
-        //Draw loading screen
+        //Swap to loading screen shader
         glUseProgram(loadingShader.shaderId);
-        glClear(GL_COLOR_BUFFER_BIT);
 
         //Pass drawing parameters
         ammonite::interface::LoadingScreen loadingScreen = (*loadingScreenTracker)[loadingScreenId];
@@ -619,16 +620,21 @@ namespace ammonite {
         glUniform1f(loadingShader.widthId, loadingScreen.width);
         glUniform1f(loadingShader.heightId, loadingScreen.height);
         glUniform1f(loadingShader.heightOffsetId, loadingScreen.heightOffset);
+        glUniform3fv(loadingShader.progressColourId, 1, glm::value_ptr(loadingScreen.progressColour));
 
         //Prepare viewport and framebuffer
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glViewport(0, 0, *widthPtr, *heightPtr);
         glDisable(GL_DEPTH_TEST);
 
-        //Display the progress bar
+        //Draw the screen
+        glm::vec3 backgroundColour = loadingScreen.backgroundColour;
+        glClearColor(backgroundColour.x, backgroundColour.y, backgroundColour.z, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
         glBindVertexArray(screenQuadVertexArrayId);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, nullptr);
 
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glfwSwapBuffers(window);
 
         return;

@@ -2,6 +2,8 @@
 
 out vec4 colour;
 
+uniform vec3 progressColour;
+
 void main() {
-  colour = vec4(1.0f, 1.0f, 1.0f, 1.0f);
+  colour = vec4(progressColour, 1.0f);
 }
