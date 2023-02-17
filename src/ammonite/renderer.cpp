@@ -490,7 +490,7 @@ namespace ammonite {
       if (*frameLimitPtr != 0.0f) {
         //Length of microsleep and allowable error
         static const double sleepInterval = 1.0 / 100000;
-        static const double maxError = (sleepInterval) * 1.1;
+        static const double maxError = (sleepInterval) * 2.0f;
         static const auto sleepLength = std::chrono::nanoseconds(int(std::floor(sleepInterval * 1000000000.0)));
 
         double const targetFrameTime = 1.0 / *frameLimitPtr;
