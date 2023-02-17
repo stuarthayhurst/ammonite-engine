@@ -616,22 +616,29 @@ namespace ammonite {
 
         //Pass drawing parameters
         ammonite::interface::LoadingScreen loadingScreen = (*loadingScreenTracker)[loadingScreenId];
-        glUniform1f(loadingShader.progressId, loadingScreen.progress);
         glUniform1f(loadingShader.widthId, loadingScreen.width);
         glUniform1f(loadingShader.heightId, loadingScreen.height);
         glUniform1f(loadingShader.heightOffsetId, loadingScreen.heightOffset);
-        glUniform3fv(loadingShader.progressColourId, 1, glm::value_ptr(loadingScreen.progressColour));
 
         //Prepare viewport and framebuffer
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glViewport(0, 0, *widthPtr, *heightPtr);
         glDisable(GL_DEPTH_TEST);
 
-        //Draw the screen
+        //Prepare to draw the screen
         glm::vec3 backgroundColour = loadingScreen.backgroundColour;
         glClearColor(backgroundColour.x, backgroundColour.y, backgroundColour.z, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         glBindVertexArray(screenQuadVertexArrayId);
+
+        //Draw the track
+        glUniform1f(loadingShader.progressId, 1.0f);
+        glUniform3fv(loadingShader.progressColourId, 1, glm::value_ptr(loadingScreen.trackColour));
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, nullptr);
+
+        //Fill in the bar
+        glUniform1f(loadingShader.progressId, loadingScreen.progress);
+        glUniform3fv(loadingShader.progressColourId, 1, glm::value_ptr(loadingScreen.progressColour));
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, nullptr);
 
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);

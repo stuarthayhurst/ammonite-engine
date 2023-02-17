@@ -11,7 +11,7 @@ namespace ammonite {
 
     void setLoadingScreenProgress(int targetScreenId, float progress);
     void setLoadingScreenGeometry(int targetScreenId, float width, float height, float heightOffset);
-    void setLoadingScreenColours(int targetScreenId, glm::vec3 backgroundColour, glm::vec3 progressColour);
+    void setLoadingScreenColours(int targetScreenId, glm::vec3 backgroundColour, glm::vec3 trackColour, glm::vec3 progressColour);
   }
 }
 
