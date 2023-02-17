@@ -478,6 +478,34 @@ namespace ammonite {
       glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, nullptr);
     }
 
+    void finishFrame() {
+      //Swap buffers
+      glfwSwapBuffers(window);
+
+      //Figure out time budget remaining
+      static ammonite::utils::Timer targetFrameTimer;
+
+      //Wait until next frame should be prepared
+      static float* frameLimitPtr = ammonite::settings::graphics::internal::getFrameLimitPtr();
+      if (*frameLimitPtr != 0.0f) {
+        //Length of microsleep and allowable error
+        static const double sleepInterval = 1.0 / 100000;
+        static const double maxError = (sleepInterval) * 1.1;
+        static const auto sleepLength = std::chrono::nanoseconds(int(std::floor(sleepInterval * 1000000000.0)));
+
+        double const targetFrameTime = 1.0 / *frameLimitPtr;
+        double spareTime = targetFrameTime - targetFrameTimer.getTime();;
+
+        //Sleep for short intervals until the frametime budget is gone
+        while (spareTime > maxError) {
+          std::this_thread::sleep_for(sleepLength);
+          spareTime = targetFrameTime - targetFrameTimer.getTime();
+        }
+      }
+
+      targetFrameTimer.reset();
+    }
+
     void drawFrame() {
       //Increase frame counters
       totalFrames++;
@@ -641,9 +669,9 @@ namespace ammonite {
         glUniform3fv(loadingShader.progressColourId, 1, glm::value_ptr(loadingScreen.progressColour));
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, nullptr);
 
+        //Prepare for next frame
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        glfwSwapBuffers(window);
-
+        finishFrame();
         return;
       }
 
@@ -776,31 +804,8 @@ namespace ammonite {
       //Disable gamma correction for start of next pass
       glDisable(GL_FRAMEBUFFER_SRGB);
 
-      //Swap buffers
-      glfwSwapBuffers(window);
-
-      //Figure out time budget remaining
-      static ammonite::utils::Timer targetFrameTimer;
-
-      //Wait until next frame should be prepared
-      static float* frameLimitPtr = ammonite::settings::graphics::internal::getFrameLimitPtr();
-      if (*frameLimitPtr != 0.0f) {
-        //Length of microsleep and allowable error
-        static const double sleepInterval = 1.0 / 100000;
-        static const double maxError = (sleepInterval) * 1.1;
-        static const auto sleepLength = std::chrono::nanoseconds(int(std::floor(sleepInterval * 1000000000.0)));
-
-        double const targetFrameTime = 1.0 / *frameLimitPtr;
-        double spareTime = targetFrameTime - targetFrameTimer.getTime();;
-
-        //Sleep for short intervals until the frametime budget is gone
-        while (spareTime > maxError) {
-          std::this_thread::sleep_for(sleepLength);
-          spareTime = targetFrameTime - targetFrameTimer.getTime();
-        }
-      }
-
-      targetFrameTimer.reset();
+      //Display frame and handle any sleeping required
+      finishFrame();
     }
   }
 }
