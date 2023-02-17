@@ -60,9 +60,19 @@ namespace ammonite {
       }
     }
 
-    void updateLoadingScreen(int targetScreenId, float progress) {
+    void setLoadingScreenProgress(int targetScreenId, float progress) {
       if (loadingScreenTracker.contains(targetScreenId)) {
         loadingScreenTracker[targetScreenId].progress = progress;
+      } else {
+        std::cerr << ammonite::utils::warning << "Loading screen " << targetScreenId << " doesn't exist" << std::endl;
+      }
+    }
+
+    void setLoadingScreenGeometry(int targetScreenId, float width, float height, float heightOffset) {
+      if (loadingScreenTracker.contains(targetScreenId)) {
+        loadingScreenTracker[targetScreenId].width = width;
+        loadingScreenTracker[targetScreenId].height = height;
+        loadingScreenTracker[targetScreenId].heightOffset = heightOffset;
       } else {
         std::cerr << ammonite::utils::warning << "Loading screen " << targetScreenId << " doesn't exist" << std::endl;
       }
