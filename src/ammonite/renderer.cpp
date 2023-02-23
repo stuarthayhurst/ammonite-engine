@@ -689,8 +689,11 @@ namespace ammonite {
       //Clear existing depth values
       glClear(GL_DEPTH_BUFFER_BIT);
 
-      //Update cached model pointers
-      drawModels(AMMONITE_DATA_REFRESH);
+      //Update cached model pointers, if the models have changed trackers
+      static bool* modelsMovedPtr = ammonite::models::getModelsMovedPtr();
+      if (*modelsMovedPtr) {
+        drawModels(AMMONITE_DATA_REFRESH);
+      }
 
       //Depth mapping render passes
       auto lightIt = lightTrackerMap->begin();

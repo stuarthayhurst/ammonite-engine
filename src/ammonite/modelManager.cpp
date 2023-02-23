@@ -30,6 +30,8 @@ namespace ammonite {
   typedef std::map<int, ammonite::models::ModelInfo*> ModelPtrTrackerMap;
   typedef std::map<std::string, ammonite::models::ModelData> ModelDataMap;
 
+  bool haveModelsMoved = false;
+
   class ModelTracker {
   private:
     ModelTrackerMap modelTrackerMap;
@@ -67,6 +69,7 @@ namespace ammonite {
       ModelTrackerMap* targetMapPtr = modelSelector[modelObject.modelType];
       (*targetMapPtr)[modelId] = modelObject;
       (*modelIdPtrMapPtr)[modelId] = &(*targetMapPtr)[modelId];
+      haveModelsMoved = true;
     }
 
     void deleteModel(int modelId) {
@@ -77,6 +80,7 @@ namespace ammonite {
       //Delete the model and id to pointer map entry
       targetMapPtr->erase(modelId);
       modelIdPtrMapPtr->erase(modelId);
+      haveModelsMoved = true;
     }
 
     void changeModelType(int modelId, AmmoniteEnum targetType) {
@@ -103,6 +107,8 @@ namespace ammonite {
         //Update the type saved on the model
         modelPtr->modelType = targetType;
       }
+
+      haveModelsMoved = true;
     }
 
     bool hasModel(int modelId) {
@@ -158,6 +164,10 @@ namespace ammonite {
       } else {
         return nullptr;
       }
+    }
+
+    bool* getModelsMovedPtr() {
+      return &haveModelsMoved;
     }
 
     void setLightEmitting(int modelId, bool lightEmitting) {
