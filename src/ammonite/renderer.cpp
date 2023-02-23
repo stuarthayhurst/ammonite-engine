@@ -693,6 +693,7 @@ namespace ammonite {
       static bool* modelsMovedPtr = ammonite::models::getModelsMovedPtr();
       if (*modelsMovedPtr) {
         drawModels(AMMONITE_DATA_REFRESH);
+        *modelsMovedPtr = false;
       }
 
       //Depth mapping render passes
