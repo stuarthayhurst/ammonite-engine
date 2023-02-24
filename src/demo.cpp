@@ -93,7 +93,7 @@ int main(int argc, char* argv[]) {
   //Create a loading screen
   int screenId = ammonite::interface::createLoadingScreen();
   ammonite::interface::setActiveLoadingScreen(screenId);
-  ammonite::interface::setLoadingScreenProgress(screenId, 0);
+  ammonite::interface::setLoadingScreenProgress(screenId, 0.0f);
   ammonite::renderer::drawFrame();
 
   //Load models from a set of objects and textures
@@ -117,7 +117,7 @@ int main(int argc, char* argv[]) {
     ammonite::models::applyTexture(loadedModelIds[i], models[i][1], true, &success);
 
     //Update loading screen
-    ammonite::interface::setLoadingScreenProgress(screenId, i + 1 / modelCount + 1);
+    ammonite::interface::setLoadingScreenProgress(screenId, float(i + 1) / float(modelCount + 1));
     ammonite::renderer::drawFrame();
   }
 
