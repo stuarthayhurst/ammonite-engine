@@ -37,10 +37,9 @@
 
 ## Building + running a demo:
   - `make clean` will clean the build area, to start from fresh
-  - Run either `make build` or `make system-build; sudo make install`, to build the demo
-    - `build` will only allow running from this project's root directory (recommended, as the code is only a demo)
-    - `system-build` + `install` will build the demo, but use the system copy of `libammonite.so`
-  - Run `./build/demo` to launch the demo
+  - Run `make build` to build the demo
+    - Running the binary directly will only work if `libammonite` is installed to the system
+  - Run `./launch.sh` to launch the demo, from within the project itself
 
 ## Options:
   - Compiled demos have a few arguments supported:
@@ -56,10 +55,9 @@
 
 ## Build system:
   - ### Targets:
-    - `build`, `debug` `system-build` and `library` support building on multiple cores with `-jX`
+    - `build`, `debug` and `library` support building on multiple cores with `-jX`
     - `make build` - Builds demo binary, a working demonstration of the renderer
     - `make debug` - Cleans build directory, then runs `make build` in debug mode
-    - `make system-build` - Same as `build`, but uses the system copy of `libammonite.so`
     - `make library` - Builds `build/libammonite.so`
     - `make install` - Installs `libammonite.so` to system directories
       - The install path can be configured, by setting the environment variable `INSTALL_DIR`

@@ -38,7 +38,7 @@ endif
 
 $(BUILD_DIR)/demo: library $(COMMON_OBJECTS) $(OBJECT_DIR)/demo.o
 	@mkdir -p "$(BUILD_DIR)"
-	$(CXX) -o "$(BUILD_DIR)/demo" $(COMMON_OBJECTS) $(OBJECT_DIR)/demo.o $(CXXFLAGS) "-L$(BUILD_DIR)" -lammonite $(LDFLAGS) $(RPATH)
+	$(CXX) -o "$(BUILD_DIR)/demo" $(COMMON_OBJECTS) $(OBJECT_DIR)/demo.o $(CXXFLAGS) "-L$(BUILD_DIR)" -lammonite $(LDFLAGS)
 
 $(BUILD_DIR)/libammonite.so: $(AMMONITE_OBJECTS)
 	@mkdir -p "$(OBJECT_DIR)"
@@ -56,16 +56,14 @@ $(OBJECT_DIR)/demo.o: ./src/demo.cpp $(AMMONITE_HEADER_SOURCE) $(COMMON_HEADER_S
 	@mkdir -p "$(OBJECT_DIR)"
 	$(CXX) ./src/demo.cpp -c $(CXXFLAGS) -o "$@"
 
-.PHONY: build debug system-build library headers install uninstall clean cache icons
+.PHONY: build debug library headers install uninstall clean cache icons
 build:
-	RPATH="-Wl,-rpath=$(BUILD_DIR)" $(MAKE) system-build
-debug: clean
-	DEBUG="true" $(MAKE) build
-system-build:
 	$(MAKE) "$(BUILD_DIR)/demo"
 	@if [[ "$(DEBUG)" != "true" ]]; then \
 	  strip --strip-unneeded "$(BUILD_DIR)/libammonite.so" "$(BUILD_DIR)/demo"; \
 	fi
+debug: clean
+	DEBUG="true" $(MAKE) build
 library: $(BUILD_DIR)/libammonite.so
 	rm -f "$(BUILD_DIR)/$(LIBRARY_NAME)"
 	ln -s "libammonite.so" "$(BUILD_DIR)/$(LIBRARY_NAME)"
