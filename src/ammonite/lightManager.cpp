@@ -11,8 +11,9 @@
 
 #include "internal/internalSettings.hpp"
 #include "internal/lightTracker.hpp"
-#include "internal/modelTracker.hpp"
-#include "modelManager.hpp"
+
+#include "models/modelInterface.hpp"
+#include "models/internal/modelTracker.hpp"
 
 #include "internal/internalDebug.hpp"
 

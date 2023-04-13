@@ -1,5 +1,9 @@
-#ifndef INTERNALMODELS
-#define INTERNALMODELS
+/* Internally exposed header:
+ - Define data structures for models
+*/
+
+#ifndef MODELTYPES
+#define MODELTYPES
 
 #include <vector>
 #include <string>
@@ -7,12 +11,7 @@
 #include <glm/gtx/quaternion.hpp>
 #include <GL/glew.h>
 
-#include "../constants.hpp"
-
-/* Internally exposed header:
- - Allow access to model tracker internally
- - Expose data structures for models
-*/
+#include "../../constants.hpp"
 
 namespace ammonite {
   namespace models {
@@ -56,14 +55,6 @@ namespace ammonite {
       int modelId;
       AmmoniteEnum modelType = AMMONITE_MODEL;
     };
-
-    int getModelCount(AmmoniteEnum modelType);
-    void getModels(AmmoniteEnum modelType, int modelCount, ModelInfo* modelArr[]);
-
-    ModelInfo* getModelPtr(int modelId);
-    bool* getModelsMovedPtr();
-    void setLightEmitting(int modelId, bool lightEmitting);
-    bool getLightEmitting(int modelId);
   }
 }
 

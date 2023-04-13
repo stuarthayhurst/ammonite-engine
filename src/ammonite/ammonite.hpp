@@ -18,11 +18,13 @@
 #include "shaders.hpp"
 #include "camera.hpp"
 #include "renderer.hpp"
-#include "modelManager.hpp"
 #include "lightManager.hpp"
 #include "environment.hpp"
 #include "interface.hpp"
 
 #include "windowManager.hpp"
+
+#include "models/modelInterface.hpp"
+#include "models/modelStorage.hpp"
 
 #endif

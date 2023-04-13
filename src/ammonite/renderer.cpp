@@ -12,10 +12,11 @@
 #include <GLFW/glfw3.h>
 
 #include "internal/internalSettings.hpp"
-#include "internal/modelTracker.hpp"
 #include "internal/lightTracker.hpp"
 #include "internal/cameraMatrices.hpp"
 #include "internal/interfaceTracker.hpp"
+
+#include "models/internal/modelTracker.hpp"
 
 #include "constants.hpp"
 #include "settings.hpp"

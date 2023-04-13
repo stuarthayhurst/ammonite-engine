@@ -15,14 +15,15 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/quaternion.hpp>
 
-#include "constants.hpp"
+#include "../constants.hpp"
 
-#include "internal/textures.hpp"
-#include "internal/modelTracker.hpp"
-#include "internal/lightTracker.hpp"
-#include "utils/logging.hpp"
+#include "internal/modelTypes.hpp"
 
-#include "internal/internalDebug.hpp"
+#include "../internal/textures.hpp"
+#include "../internal/lightTracker.hpp"
+#include "../utils/logging.hpp"
+
+#include "../internal/internalDebug.hpp"
 
 //Class definitions
 namespace ammonite {
