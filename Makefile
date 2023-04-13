@@ -8,13 +8,19 @@ INSTALL_DIR ?= /usr/local/lib
 HEADER_DIR ?= /usr/local/include
 LIBRARY_NAME = libammonite.so.1
 
-OBJECT_DIR = $(BUILD_DIR)/objects
-AMMONITE_OBJECTS_SOURCE = $(wildcard ./src/ammonite/*.cpp) $(wildcard ./src/ammonite/*/*.cpp)
-AMMONITE_OBJECTS = $(subst ./src/ammonite,$(OBJECT_DIR),$(subst .cpp,.o,$(AMMONITE_OBJECTS_SOURCE)))
+AMMONITE_OBJECTS_SOURCE = $(wildcard ./src/ammonite/*.cpp) \
+			  $(wildcard ./src/ammonite/*/*.cpp) \
+			  $(wildcard ./src/ammonite/*/*/*.cpp)
+AMMONITE_HEADER_SOURCE = $(wildcard ./src/ammonite/*.hpp) \
+			 $(wildcard ./src/ammonite/*/*.hpp) \
+			 $(wildcard ./src/ammonite/*/*/*.hpp)
+
 COMMON_OBJECTS_SOURCE = $(wildcard ./src/common/*.cpp)
-COMMON_OBJECTS = $(subst ./src/common,$(OBJECT_DIR),$(subst .cpp,.o,$(COMMON_OBJECTS_SOURCE)))
-AMMONITE_HEADER_SOURCE = $(wildcard ./src/ammonite/*.hpp) $(wildcard ./src/ammonite/*/*.hpp)
 COMMON_HEADER_SOURCE = $(wildcard ./src/common/*.hpp)
+
+OBJECT_DIR = $(BUILD_DIR)/objects
+AMMONITE_OBJECTS = $(subst ./src/ammonite,$(OBJECT_DIR),$(subst .cpp,.o,$(AMMONITE_OBJECTS_SOURCE)))
+COMMON_OBJECTS = $(subst ./src/common,$(OBJECT_DIR),$(subst .cpp,.o,$(COMMON_OBJECTS_SOURCE)))
 
 CXXFLAGS := $(shell pkg-config --cflags $(LIBS)) -fopenmp
 CXXFLAGS += -Wall -Wextra -Werror -std=c++20 -flto=auto
