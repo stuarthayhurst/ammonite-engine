@@ -7,4 +7,4 @@ if [[ ! -f "$buildDir/demo" ]]; then
   exit 1
 fi
 
-LD_LIBRARY_PATH="$buildDir" $buildDir/demo $@
+LD_LIBRARY_PATH="$buildDir" $buildDir/demo "$@"
