@@ -9,7 +9,7 @@
 #include <GLFW/glfw3.h>
 
 #include "internal/internalSettings.hpp"
-#include "internal/shaderCacheUpdate.hpp"
+#include "graphics/internal/shaderCacheUpdate.hpp"
 #include "utils/logging.hpp"
 
 #include "internal/internalDebug.hpp"

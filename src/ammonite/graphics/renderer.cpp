@@ -11,8 +11,8 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include "internal/lightTracker.hpp"
 #include "../internal/internalSettings.hpp"
-#include "../internal/lightTracker.hpp"
 #include "../internal/cameraMatrices.hpp"
 #include "../internal/interfaceTracker.hpp"
 

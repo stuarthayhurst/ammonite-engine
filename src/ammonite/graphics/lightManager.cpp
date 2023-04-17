@@ -9,8 +9,8 @@
 #include <omp.h>
 #include <thread>
 
+#include "internal/lightTracker.hpp"
 #include "../internal/internalSettings.hpp"
-#include "../internal/lightTracker.hpp"
 
 #include "../models/modelInterface.hpp"
 #include "../models/internal/modelTracker.hpp"

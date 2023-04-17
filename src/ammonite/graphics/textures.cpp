@@ -9,7 +9,7 @@
 
 #include "../utils/logging.hpp"
 
-#include "internalDebug.hpp"
+#include "../internal/internalDebug.hpp"
 
 namespace ammonite {
   namespace {

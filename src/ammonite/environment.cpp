@@ -5,7 +5,7 @@
 #include <stb/stb_image.h>
 #include <GL/glew.h>
 
-#include "internal/textures.hpp"
+#include "graphics/internal/textures.hpp"
 #include "utils/logging.hpp"
 
 #include "internal/internalDebug.hpp"

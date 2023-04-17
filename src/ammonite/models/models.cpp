@@ -19,8 +19,8 @@
 
 #include "internal/modelTypes.hpp"
 
-#include "../internal/textures.hpp"
-#include "../internal/lightTracker.hpp"
+#include "../graphics/internal/textures.hpp"
+#include "../graphics/internal/lightTracker.hpp"
 #include "../utils/logging.hpp"
 
 #include "../internal/internalDebug.hpp"
