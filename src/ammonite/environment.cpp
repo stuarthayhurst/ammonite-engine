@@ -10,16 +10,16 @@
 
 #include "internal/internalDebug.hpp"
 
+//Loading assumptions
+#define ASSUME_FLIP_FACES false
+#define ASSUME_SRGB_TEXTURES false
+
 namespace ammonite {
   namespace environment {
     namespace {
       //Tracker for loaded skyboxes
       std::vector<int> skyboxTracker;
       int activeSkybox = 0;
-
-      //Constants for loading assumptions
-      const bool ASSUME_FLIP_FACES = false;
-      const bool ASSUME_SRGB_TEXTURES = false;
     }
 
     namespace skybox {
