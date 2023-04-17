@@ -11,15 +11,17 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include "internal/lightTracker.hpp"
 #include "../internal/internalSettings.hpp"
 #include "../internal/cameraMatrices.hpp"
 #include "../internal/interfaceTracker.hpp"
 
 #include "../models/internal/modelTracker.hpp"
 
+#include "../lighting/internal/lightTypes.hpp"
+#include "../lighting/internal/lightTracker.hpp"
+#include "../lighting/lightStorage.hpp"
+
 #include "shaders.hpp"
-#include "lightManager.hpp"
 #include "../constants.hpp"
 #include "../settings.hpp"
 #include "../camera.hpp"
@@ -105,8 +107,8 @@ namespace ammonite {
       glm::mat4* projectionMatrix = ammonite::camera::matrices::getProjectionMatrixPtr();
 
       //Get the light trackers
-      std::map<int, ammonite::lighting::LightSource>* lightTrackerMap = ammonite::lighting::getLightTracker();
-      std::map<int, glm::mat4[6]>* lightTransformMap = ammonite::lighting::getLightTransforms();
+      std::map<int, ammonite::lighting::internal::LightSource>* lightTrackerMap = ammonite::lighting::internal::getLightTracker();
+      std::map<int, glm::mat4[6]>* lightTransformMap = ammonite::lighting::internal::getLightTransforms();
       unsigned int maxLightCount = 0;
 
       //Get the loading screen tracker
@@ -757,9 +759,9 @@ namespace ammonite {
       drawModels(AMMONITE_RENDER_PASS);
 
       //Get information about light sources to be rendered
-      int lightEmitterCount = ammonite::lighting::getLightEmitterCount();
+      int lightEmitterCount = ammonite::lighting::internal::getLightEmitterCount();
       int lightData[lightEmitterCount * 2];
-      ammonite::lighting::getLightEmitters(lightData);
+      ammonite::lighting::internal::getLightEmitters(lightData);
 
       //Swap to the light emitting model shader
       if (lightEmitterCount > 0) {

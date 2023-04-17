@@ -23,9 +23,11 @@
 
 #include "graphics/shaders.hpp"
 #include "graphics/renderer.hpp"
-#include "graphics/lightManager.hpp"
 
 #include "models/modelInterface.hpp"
 #include "models/modelStorage.hpp"
+
+#include "lighting/lightInterface.hpp"
+#include "lighting/lightStorage.hpp"
 
 #endif

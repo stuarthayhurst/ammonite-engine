@@ -19,8 +19,8 @@
 
 #include "internal/modelTypes.hpp"
 
+#include "../lighting/internal/lightTracker.hpp"
 #include "../graphics/internal/textures.hpp"
-#include "../graphics/internal/lightTracker.hpp"
 #include "../utils/logging.hpp"
 
 #include "../internal/internalDebug.hpp"
@@ -539,7 +539,7 @@ namespace ammonite {
         }
 
         //Unlink any attached light source
-        ammonite::lighting::unlinkByModel(modelId);
+        ammonite::lighting::internal::unlinkByModel(modelId);
 
         //Remove the model from the tracker
         if (activeModelTracker.hasModel(modelId)) {
