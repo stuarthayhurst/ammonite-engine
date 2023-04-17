@@ -15,14 +15,15 @@
 #include "constants.hpp"
 #include "settings.hpp"
 
-#include "shaders.hpp"
 #include "camera.hpp"
-#include "renderer.hpp"
-#include "lightManager.hpp"
 #include "environment.hpp"
 #include "interface.hpp"
 
 #include "windowManager.hpp"
+
+#include "graphics/shaders.hpp"
+#include "graphics/renderer.hpp"
+#include "graphics/lightManager.hpp"
 
 #include "models/modelInterface.hpp"
 #include "models/modelStorage.hpp"

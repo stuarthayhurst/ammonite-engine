@@ -9,12 +9,12 @@
 
 #include <GL/glew.h>
 
-#include "internal/fileManager.hpp"
-#include "utils/logging.hpp"
-#include "utils/extension.hpp"
-#include "utils/cacheManager.hpp"
+#include "../internal/fileManager.hpp"
+#include "../utils/logging.hpp"
+#include "../utils/extension.hpp"
+#include "../utils/cacheManager.hpp"
 
-#include "internal/internalDebug.hpp"
+#include "../internal/internalDebug.hpp"
 
 namespace ammonite {
   //Static helper functions

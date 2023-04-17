@@ -9,13 +9,13 @@
 #include <omp.h>
 #include <thread>
 
-#include "internal/internalSettings.hpp"
-#include "internal/lightTracker.hpp"
+#include "../internal/internalSettings.hpp"
+#include "../internal/lightTracker.hpp"
 
-#include "models/modelInterface.hpp"
-#include "models/internal/modelTracker.hpp"
+#include "../models/modelInterface.hpp"
+#include "../models/internal/modelTracker.hpp"
 
-#include "internal/internalDebug.hpp"
+#include "../internal/internalDebug.hpp"
 
 namespace ammonite {
   namespace {

@@ -11,25 +11,25 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include "internal/internalSettings.hpp"
-#include "internal/lightTracker.hpp"
-#include "internal/cameraMatrices.hpp"
-#include "internal/interfaceTracker.hpp"
+#include "../internal/internalSettings.hpp"
+#include "../internal/lightTracker.hpp"
+#include "../internal/cameraMatrices.hpp"
+#include "../internal/interfaceTracker.hpp"
 
-#include "models/internal/modelTracker.hpp"
+#include "../models/internal/modelTracker.hpp"
 
-#include "constants.hpp"
-#include "settings.hpp"
 #include "shaders.hpp"
-#include "camera.hpp"
 #include "lightManager.hpp"
-#include "environment.hpp"
+#include "../constants.hpp"
+#include "../settings.hpp"
+#include "../camera.hpp"
+#include "../environment.hpp"
 
-#include "utils/timer.hpp"
-#include "utils/extension.hpp"
-#include "utils/logging.hpp"
+#include "../utils/timer.hpp"
+#include "../utils/extension.hpp"
+#include "../utils/logging.hpp"
 
-#include "internal/internalDebug.hpp"
+#include "../internal/internalDebug.hpp"
 
 namespace ammonite {
   namespace renderer {
