@@ -99,10 +99,6 @@ namespace ammonite {
       GLuint colourRenderBufferId = 0;
       GLuint colourBufferMultisampleFBO;
 
-      long totalFrames = 0;
-      int frameCount = 0;
-      double frameTime = 0.0f;
-
       glm::mat4* viewMatrix = ammonite::camera::matrices::getViewMatrixPtr();
       glm::mat4* projectionMatrix = ammonite::camera::matrices::getProjectionMatrixPtr();
 
@@ -415,14 +411,6 @@ namespace ammonite {
       }
     }
 
-    long getTotalFrames() {
-      return totalFrames;
-    }
-
-    double getFrameTime() {
-      return frameTime;
-    }
-
     static void drawModels(AmmoniteRenderMode renderMode) {
       //Create initial array for model pointers
       static int modelCount = ammonite::models::getModelCount(AMMONITE_MODEL);
@@ -514,20 +502,7 @@ namespace ammonite {
       targetFrameTimer.reset();
     }
 
-    void drawFrame() {
-      //Increase frame counters
-      totalFrames++;
-      frameCount++;
-
-      //Every tenth of a second, update the frame time
-      static ammonite::utils::Timer frameTimer;
-      double deltaTime = frameTimer.getTime();
-      if (deltaTime >= 0.1f) {
-        frameTime = deltaTime / frameCount;
-        frameTimer.reset();
-        frameCount = 0;
-      }
-
+    void internalDrawFrame() {
       static int lastWidth = 0, lastHeight = 0;
       static int* widthPtr = ammonite::settings::runtime::internal::getWidthPtr();
       static int* heightPtr = ammonite::settings::runtime::internal::getHeightPtr();

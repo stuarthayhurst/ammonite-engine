@@ -9,7 +9,7 @@ namespace ammonite {
       void setupRenderer(GLFWwindow* targetWindow, const char* shaderPath, bool* externalSuccess);
     }
 
-    long getTotalFrames();
+    long long getTotalFrames();
     double getFrameTime();
 
     void drawFrame();
