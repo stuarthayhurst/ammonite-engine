@@ -28,6 +28,12 @@ namespace ammonite {
       }
     }
 
+    namespace internal {
+      GLFWwindow* getWindowPtr() {
+        return window;
+      }
+    }
+
     namespace setup {
       //Initialise GLFW
       bool setupGlfw() {

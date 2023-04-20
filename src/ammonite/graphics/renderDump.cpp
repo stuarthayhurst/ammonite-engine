@@ -156,7 +156,7 @@ namespace ammonite {
     }
 
     namespace setup {
-      void setupRenderer(GLFWwindow* targetWindow, const char* shaderPath, bool* externalSuccess) {
+      void internalSetupRenderer(GLFWwindow* targetWindow, const char* shaderPath, bool* externalSuccess) {
         //Start a timer to measure load time
         ammonite::utils::Timer loadTimer;
 

@@ -75,7 +75,7 @@ int main(int argc, char* argv[]) {
   //Enable engine caching, setup renderer and initialise controls
   bool success = true;
   ammonite::utils::cache::useDataCache("cache");
-  ammonite::renderer::setup::setupRenderer(window, "shaders/", &success);
+  ammonite::renderer::setup::setupRenderer("shaders/", &success);
   ammonite::utils::controls::setupControls(window);
 
   //Graphics settings

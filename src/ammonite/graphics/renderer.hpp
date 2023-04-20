@@ -1,12 +1,10 @@
 #ifndef RENDERER
 #define RENDERER
 
-#include <GLFW/glfw3.h>
-
 namespace ammonite {
   namespace renderer {
     namespace setup {
-      void setupRenderer(GLFWwindow* targetWindow, const char* shaderPath, bool* externalSuccess);
+      void setupRenderer(const char* shaderPath, bool* externalSuccess);
     }
 
     long long getTotalFrames();

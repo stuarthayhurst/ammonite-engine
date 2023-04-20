@@ -1,6 +1,9 @@
+#include <GLFW/glfw3.h>
+
 #include "../utils/timer.hpp"
 
 #include "internal/internalRenderer.hpp"
+#include "../internal/internalWindowManager.hpp"
 
 namespace ammonite {
   namespace renderer {
@@ -10,7 +13,10 @@ namespace ammonite {
     }
 
     namespace setup {
-      //TODO
+      void setupRenderer(const char* shaderPath, bool* externalSuccess) {
+        GLFWwindow* window = ammonite::windowManager::internal::getWindowPtr();
+        internalSetupRenderer(window, shaderPath, externalSuccess);
+      }
     }
 
     long long int getTotalFrames() {
