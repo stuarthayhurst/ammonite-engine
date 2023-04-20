@@ -351,11 +351,15 @@ namespace ammonite {
 
     namespace {
       static void setWireframe(bool enabled) {
-        if (enabled) {
-          glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        } else {
-          glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        //Avoid changing polygon mode if it's already correct
+        static bool oldEnabled = true;
+        if (oldEnabled == enabled) {
+          return;
         }
+        oldEnabled = enabled;
+
+        //Change the draw mode
+        glPolygonMode(GL_FRONT_AND_BACK, enabled ? GL_LINE : GL_FILL);
       }
 
       static void drawModel(ammonite::models::ModelInfo *drawObject, int lightIndex, bool depthPass) {
