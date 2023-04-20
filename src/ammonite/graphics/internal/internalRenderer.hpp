@@ -10,10 +10,19 @@
 namespace ammonite {
   namespace renderer {
     namespace setup {
-      void internalSetupRenderer(GLFWwindow* targetWindow, const char* shaderPath, bool* externalSuccess);
+      namespace internal {
+        void internalSetupRenderer(GLFWwindow* targetWindow, const char* shaderPath, bool* externalSuccess);
+        void connectWindow(GLFWwindow* newWindow);
+
+        bool createShaders(const char* shaderPath, bool* externalSuccess);
+        bool checkGPUCapabilities(int* failureCount);
+        void setupOpenGLObjects();
+      }
     }
 
-    void internalDrawFrame();
+    namespace internal {
+      void internalDrawFrame();
+    }
   }
 }
 

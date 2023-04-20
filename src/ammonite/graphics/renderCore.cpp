@@ -1,6 +1,9 @@
+#include <iostream>
+
 #include <GLFW/glfw3.h>
 
 #include "../utils/timer.hpp"
+#include "../utils/logging.hpp"
 
 #include "internal/internalRenderer.hpp"
 #include "../internal/internalWindowManager.hpp"
@@ -14,8 +17,27 @@ namespace ammonite {
 
     namespace setup {
       void setupRenderer(const char* shaderPath, bool* externalSuccess) {
+        //Start a timer to measure load time
+        ammonite::utils::Timer loadTimer;
+
         GLFWwindow* window = ammonite::windowManager::internal::getWindowPtr();
-        internalSetupRenderer(window, shaderPath, externalSuccess);
+
+        //Check GPU supported required extensions
+        int failureCount = 0;
+        if (!internal::checkGPUCapabilities(&failureCount)) {
+          std::cerr << ammonite::utils::error << failureCount << " required extension(s) unsupported" << std::endl;
+          *externalSuccess = false;
+          return;
+        }
+
+        internal::connectWindow(window);
+        if (!internal::createShaders(shaderPath, externalSuccess)) {
+          return;
+        }
+        internal::setupOpenGLObjects();
+
+        //Output time taken to load renderer
+        std::cout << ammonite::utils::status << "Loaded renderer in: " << loadTimer.getTime() << "s" << std::endl;
       }
     }
 
@@ -43,7 +65,7 @@ namespace ammonite {
       }
 
       //Offload rest of frame drawing to helpers
-      internalDrawFrame();
+      internal::internalDrawFrame();
     }
   }
 }
