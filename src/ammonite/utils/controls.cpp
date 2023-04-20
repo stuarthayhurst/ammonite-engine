@@ -6,6 +6,7 @@
 #include <glm/gtc/constants.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "../internal/internalWindowManager.hpp"
 #include "../internal/internalSettings.hpp"
 #include "../internal/keybindTracker.hpp"
 #include "../constants.hpp"
@@ -140,9 +141,9 @@ namespace ammonite {
         return isInputFocused;
       }
 
-      void setupControls(GLFWwindow* newWindow) {
+      void setupControls() {
         //Connect window and aspect ratio pointers
-        window = newWindow;
+        window = ammonite::windowManager::internal::getWindowPtr();
 
         //Set mouse callbacks
         glfwSetScrollCallback(window, scroll_callback);

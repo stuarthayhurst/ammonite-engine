@@ -1,8 +1,6 @@
 #ifndef CONTROLS
 #define CONTROLS
 
-#include <GLFW/glfw3.h>
-
 namespace ammonite {
   namespace utils {
     namespace controls {
@@ -14,7 +12,7 @@ namespace ammonite {
       bool getControlsActive();
       bool getInputFocus();
 
-      void setupControls(GLFWwindow* window);
+      void setupControls();
       bool shouldWindowClose();
       void processInput();
     }

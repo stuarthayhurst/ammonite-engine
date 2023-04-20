@@ -76,7 +76,7 @@ int main(int argc, char* argv[]) {
   bool success = true;
   ammonite::utils::cache::useDataCache("cache");
   ammonite::renderer::setup::setupRenderer("shaders/", &success);
-  ammonite::utils::controls::setupControls(window);
+  ammonite::utils::controls::setupControls();
 
   //Graphics settings
   ammonite::settings::graphics::setAntialiasingSamples(4);
