@@ -59,7 +59,7 @@ int main(int argc, char* argv[]) {
   }
 
   //Set an icon
-  ammonite::windowManager::useIconDir(window, "assets/icons/");
+  ammonite::windowManager::useIconDir("assets/icons/");
 
   //Set vsync (disable if benchmarking)
   if (useVsync == "false" or useBenchmark) {

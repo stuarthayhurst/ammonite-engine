@@ -113,7 +113,7 @@ namespace ammonite {
       return createWindow(width, height, DEFAULT_TITLE);
     }
 
-    void setTitle(GLFWwindow* window, const char* title) {
+    void setTitle(const char* title) {
       if (title != NULL) {
         glfwSetWindowTitle(window, title);
       } else {
@@ -121,7 +121,7 @@ namespace ammonite {
       }
     }
 
-    void useIconDir(GLFWwindow* window, const char* iconDirPath) {
+    void useIconDir(const char* iconDirPath) {
       //Attempt to add all png files to a vector
       std::vector<std::string> pngFiles(0);
       try {
