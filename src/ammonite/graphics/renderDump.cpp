@@ -482,7 +482,7 @@ namespace ammonite {
         static const auto sleepLength = std::chrono::nanoseconds(int(std::floor(sleepInterval * 1000000000.0)));
 
         double const targetFrameTime = 1.0 / *frameLimitPtr;
-        double spareTime = targetFrameTime - targetFrameTimer.getTime();;
+        double spareTime = targetFrameTime - targetFrameTimer.getTime();
 
         //Sleep for short intervals until the frametime budget is gone
         while (spareTime > maxError) {
@@ -493,6 +493,46 @@ namespace ammonite {
 
       targetFrameTimer.reset();
     }
+
+    void prepareScreen(int framebufferId, int width, int height, bool depthTest) {
+      glBindFramebuffer(GL_FRAMEBUFFER, framebufferId);
+      glViewport(0, 0, width, height);
+      if (depthTest) {
+        glEnable(GL_DEPTH_TEST);
+      } else {
+        glDisable(GL_DEPTH_TEST);
+      }
+    }
+
+    void drawLoadingScreen(int loadingScreenId, int width, int height) {
+        //Swap to loading screen shader
+        glUseProgram(loadingShader.shaderId);
+
+        //Pass drawing parameters
+        ammonite::interface::LoadingScreen loadingScreen = (*loadingScreenTracker)[loadingScreenId];
+        glUniform1f(loadingShader.widthId, loadingScreen.width);
+        glUniform1f(loadingShader.heightId, loadingScreen.height);
+        glUniform1f(loadingShader.heightOffsetId, loadingScreen.heightOffset);
+
+        //Prepare viewport and framebuffer
+        prepareScreen(0, width, height, false);
+
+        //Prepare to draw the screen
+        glm::vec3 backgroundColour = loadingScreen.backgroundColour;
+        glClearColor(backgroundColour.x, backgroundColour.y, backgroundColour.z, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+        glBindVertexArray(screenQuadVertexArrayId);
+
+        //Draw the track
+        glUniform1f(loadingShader.progressId, 1.0f);
+        glUniform3fv(loadingShader.progressColourId, 1, glm::value_ptr(loadingScreen.trackColour));
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, nullptr);
+
+        //Fill in the bar
+        glUniform1f(loadingShader.progressId, loadingScreen.progress);
+        glUniform3fv(loadingShader.progressColourId, 1, glm::value_ptr(loadingScreen.progressColour));
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, nullptr);
+      }
 
     namespace internal {
       void internalDrawFrame() {
@@ -615,35 +655,7 @@ namespace ammonite {
         //If a loading screen is active, draw it and return
         int loadingScreenId = ammonite::interface::internal::getActiveLoadingScreenId();
         if (loadingScreenId != 0) {
-          //Swap to loading screen shader
-          glUseProgram(loadingShader.shaderId);
-
-          //Pass drawing parameters
-          ammonite::interface::LoadingScreen loadingScreen = (*loadingScreenTracker)[loadingScreenId];
-          glUniform1f(loadingShader.widthId, loadingScreen.width);
-          glUniform1f(loadingShader.heightId, loadingScreen.height);
-          glUniform1f(loadingShader.heightOffsetId, loadingScreen.heightOffset);
-
-          //Prepare viewport and framebuffer
-          glBindFramebuffer(GL_FRAMEBUFFER, 0);
-          glViewport(0, 0, *widthPtr, *heightPtr);
-          glDisable(GL_DEPTH_TEST);
-
-          //Prepare to draw the screen
-          glm::vec3 backgroundColour = loadingScreen.backgroundColour;
-          glClearColor(backgroundColour.x, backgroundColour.y, backgroundColour.z, 1.0f);
-          glClear(GL_COLOR_BUFFER_BIT);
-          glBindVertexArray(screenQuadVertexArrayId);
-
-          //Draw the track
-          glUniform1f(loadingShader.progressId, 1.0f);
-          glUniform3fv(loadingShader.progressColourId, 1, glm::value_ptr(loadingScreen.trackColour));
-          glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, nullptr);
-
-          //Fill in the bar
-          glUniform1f(loadingShader.progressId, loadingScreen.progress);
-          glUniform3fv(loadingShader.progressColourId, 1, glm::value_ptr(loadingScreen.progressColour));
-          glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, nullptr);
+          drawLoadingScreen(loadingScreenId, *widthPtr, *heightPtr);
 
           //Prepare for next frame
           glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -653,9 +665,7 @@ namespace ammonite {
 
         //Swap to depth shader and enable depth testing
         glUseProgram(depthShader.shaderId);
-        glViewport(0, 0, *shadowResPtr, *shadowResPtr);
-        glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-        glEnable(GL_DEPTH_TEST);
+        prepareScreen(depthMapFBO, *shadowResPtr, *shadowResPtr, true);
 
         //Pass uniforms that don't change between light sources
         static float* farPlanePtr = ammonite::settings::graphics::internal::getShadowFarPlanePtr();
@@ -701,8 +711,7 @@ namespace ammonite {
         }
 
         //Reset the framebuffer and viewport
-        glBindFramebuffer(GL_FRAMEBUFFER, targetBufferId);
-        glViewport(0, 0, renderWidth, renderHeight);
+        prepareScreen(targetBufferId, renderWidth, renderHeight, true);
 
         //Clear depth and colour (if no skybox is used)
         int activeSkybox = ammonite::environment::skybox::getActiveSkybox();
@@ -772,12 +781,10 @@ namespace ammonite {
 
         //Swap to default framebuffer and correct shaders
         glUseProgram(screenShader.shaderId);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        glViewport(0, 0, *widthPtr, *heightPtr);
-        glDisable(GL_DEPTH_TEST);
+        prepareScreen(0, *widthPtr, *heightPtr, false);
 
         //Display the rendered frame
-         glBindVertexArray(screenQuadVertexArrayId);
+        glBindVertexArray(screenQuadVertexArrayId);
         glBindTextureUnit(3, screenQuadTextureId);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, nullptr);
 
