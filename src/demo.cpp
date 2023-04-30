@@ -30,21 +30,22 @@ void cleanUp(int modelCount, std::vector<int> loadedModelIds) {
 
 int main(int argc, char* argv[]) {
   //Handle arguments
-  const int showHelp = arguments::searchArgument(argc, argv, "--help", true, nullptr);
+  const int showHelp = arguments::searchArgument(argc, argv, "--help", nullptr);
   if (showHelp == 1) {
     std::cout << "Program help: \n"
-    " --help:       Display this help page\n"
-    " --benchmark:  Start a benchmark\n"
-    " --vsync:      Enable / disable VSync (true / false)" << std::endl;
+    " --help      :  Display this help page\n"
+    " --benchmark :  Start a benchmark\n"
+    " --vsync     :  Enable / disable VSync (true / false)\n"
+    " --demo      :  Run the selected demo" << std::endl;
     return EXIT_SUCCESS;
   } else if (showHelp == -1) {
     return EXIT_FAILURE;
   }
 
-  const bool useBenchmark = arguments::searchArgument(argc, argv, "--benchmark", true, nullptr);
+  const bool useBenchmark = arguments::searchArgument(argc, argv, "--benchmark", nullptr);
 
   std::string useVsync;
-  if (arguments::searchArgument(argc, argv, "--vsync", false, &useVsync) == -1) {
+  if (arguments::searchArgument(argc, argv, "--vsync", &useVsync) == -1) {
     std::cout << "--vsync requires a value" << std::endl;
     return EXIT_FAILURE;
   }
