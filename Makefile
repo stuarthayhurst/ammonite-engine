@@ -18,9 +18,13 @@ AMMONITE_HEADER_SOURCE = $(wildcard ./src/ammonite/*.hpp) \
 COMMON_OBJECTS_SOURCE = $(wildcard ./src/common/*.cpp)
 COMMON_HEADER_SOURCE = $(wildcard ./src/common/*.hpp)
 
+DEMO_OBJECTS_SOURCE = $(wildcard ./src/demos/*.cpp)
+DEMO_HEADER_SOURCE = $(wildcard ./src/demos/*.hpp)
+
 OBJECT_DIR = $(BUILD_DIR)/objects
 AMMONITE_OBJECTS = $(subst ./src/ammonite,$(OBJECT_DIR),$(subst .cpp,.o,$(AMMONITE_OBJECTS_SOURCE)))
 COMMON_OBJECTS = $(subst ./src/common,$(OBJECT_DIR),$(subst .cpp,.o,$(COMMON_OBJECTS_SOURCE)))
+DEMO_OBJECTS = $(subst ./src/demos,$(OBJECT_DIR),$(subst .cpp,.o,$(DEMO_OBJECTS_SOURCE)))
 
 CXXFLAGS := $(shell pkg-config --cflags $(LIBS)) -fopenmp
 CXXFLAGS += -Wall -Wextra -Werror -std=c++20 -flto=auto
@@ -36,9 +40,9 @@ ifeq ($(DEBUG),true)
   CXXFLAGS += -DDEBUG -g
 endif
 
-$(BUILD_DIR)/demo: library $(COMMON_OBJECTS) $(OBJECT_DIR)/demo.o
+$(BUILD_DIR)/demo: library $(COMMON_OBJECTS) $(DEMO_OBJECTS) $(OBJECT_DIR)/demo.o
 	@mkdir -p "$(BUILD_DIR)"
-	$(CXX) -o "$(BUILD_DIR)/demo" $(COMMON_OBJECTS) $(OBJECT_DIR)/demo.o $(CXXFLAGS) "-L$(BUILD_DIR)" -lammonite $(LDFLAGS)
+	$(CXX) -o "$(BUILD_DIR)/demo" $(COMMON_OBJECTS) $(DEMO_OBJECTS) $(OBJECT_DIR)/demo.o $(CXXFLAGS) "-L$(BUILD_DIR)" -lammonite $(LDFLAGS)
 
 $(BUILD_DIR)/libammonite.so: $(AMMONITE_OBJECTS)
 	@mkdir -p "$(OBJECT_DIR)"
@@ -51,6 +55,10 @@ $(AMMONITE_OBJECTS): $(AMMONITE_OBJECTS_SOURCE) $(AMMONITE_HEADER_SOURCE)
 $(COMMON_OBJECTS): $(COMMON_OBJECTS_SOURCE) $(COMMON_HEADER_SOURCE)
 	@mkdir -p "$(OBJECT_DIR)"
 	$(CXX) $(subst $(OBJECT_DIR),src/common,$(subst .o,.cpp,$(@))) -c $(CXXFLAGS) -o "$@"
+
+$(DEMO_OBJECTS): $(DEMO_OBJECTS_SOURCE) $(DEMO_HEADER_SOURCE)
+	@mkdir -p "$(OBJECT_DIR)"
+	$(CXX) $(subst $(OBJECT_DIR),src/demos,$(subst .o,.cpp,$(@))) -c $(CXXFLAGS) -o "$@"
 
 $(OBJECT_DIR)/demo.o: ./src/demo.cpp $(AMMONITE_HEADER_SOURCE) $(COMMON_HEADER_SOURCE)
 	@mkdir -p "$(OBJECT_DIR)"
