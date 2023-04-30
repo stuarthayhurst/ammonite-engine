@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <string>
 #include <vector>
+#include <map>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -9,6 +10,28 @@
 
 #include "ammonite/ammonite.hpp"
 #include "common/argHandler.hpp"
+
+#include "demos/default.hpp"
+
+#define EXPAND_DEMO(DEMO_NAME, NAMESPACE) {std::string(DEMO_NAME), {NAMESPACE::preRendererInit,\
+                              NAMESPACE::postRendererInit,\
+                              NAMESPACE::rendererMainloop,\
+                              NAMESPACE::demoExit}}
+
+//Definitions for demo loading
+namespace {
+  typedef int (*DemoFunctionType)(void);
+  struct DemoFunctions {
+    DemoFunctionType preRendererInit;
+    DemoFunctionType postRendererInit;
+    DemoFunctionType rendererMainloop;
+    DemoFunctionType demoExit;
+  };
+
+  std::map<std::string, DemoFunctions> demoFunctionMap = {
+    EXPAND_DEMO("default", defaultDemo)
+  };
+}
 
 void printMetrics(double frameTime) {
   double frameRate = 0.0;
@@ -46,9 +69,34 @@ int main(int argc, char* argv[]) {
 
   std::string useVsync;
   if (arguments::searchArgument(argc, argv, "--vsync", &useVsync) == -1) {
-    std::cout << "--vsync requires a value" << std::endl;
+    std::cerr << "--vsync requires a value" << std::endl;
     return EXIT_FAILURE;
   }
+
+  //Fetch demo, list options and validate the chosen demo
+  std::string demoName;
+  if (arguments::searchArgument(argc, argv, "--demo", &demoName) != 0) {
+    if (demoName == "") {
+      std::cout << "Valid demos:" << std::endl;
+      for (auto it = demoFunctionMap.begin(); it != demoFunctionMap.end(); it++) {
+        std::cout << " - " << it->first << std::endl;
+      }
+
+      return EXIT_SUCCESS;
+    }
+  }
+
+  if (!demoFunctionMap.contains(demoName)) {
+    if (demoName != "") {
+      std::cerr << "WARNING: Invalid demo '" << demoName << "', using default instead" << std::endl;
+    }
+    demoName = std::string("default");
+  }
+
+  DemoFunctionType preRendererInit = demoFunctionMap[demoName].preRendererInit;
+  DemoFunctionType postRendererInit = demoFunctionMap[demoName].postRendererInit;
+  DemoFunctionType rendererMainloop = demoFunctionMap[demoName].rendererMainloop;
+  DemoFunctionType demoExit = demoFunctionMap[demoName].demoExit;
 
   //Start timer for demo loading
   ammonite::utils::Timer utilityTimer;
@@ -73,6 +121,10 @@ int main(int argc, char* argv[]) {
   ammonite::utils::debug::enableDebug();
 #endif
 
+  if (preRendererInit != nullptr) {
+    preRendererInit();
+  }
+
   //Enable engine caching, setup renderer and initialise controls
   bool success = true;
   ammonite::utils::cache::useDataCache("cache");
@@ -89,6 +141,10 @@ int main(int argc, char* argv[]) {
     std::vector<int> loadedModelIds;
     cleanUp(0, loadedModelIds);
     return EXIT_FAILURE;
+  }
+
+  if (postRendererInit != nullptr) {
+    postRendererInit();
   }
 
   //Create a loading screen
@@ -178,6 +234,10 @@ int main(int argc, char* argv[]) {
       performanceTimer.reset();
     }
 
+    if (rendererMainloop != nullptr) {
+      rendererMainloop();
+    }
+
     //Handle toggling input focus
     static int lastInputToggleState = GLFW_RELEASE;
     int inputToggleState = glfwGetKey(window, GLFW_KEY_C);
@@ -203,6 +263,10 @@ int main(int argc, char* argv[]) {
 
     //Draw the frame
     ammonite::renderer::drawFrame();
+  }
+
+  if (demoExit != nullptr) {
+    demoExit();
   }
 
   //Output benchmark score
