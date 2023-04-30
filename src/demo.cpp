@@ -200,7 +200,7 @@ int main(int argc, char* argv[]) {
     return EXIT_FAILURE;
   }
 
-  std::cout << "Loaded models in : " << performanceTimer.getTime() << "s (" << vertexCount << " vertices)" << std::endl;
+  std::cout << "STATUS: Loaded models in:   " << performanceTimer.getTime() << "s (" << vertexCount << " vertices)" << std::endl;
 
   //Set light source properties
   int lightId = ammonite::lighting::createLightSource();
@@ -219,7 +219,7 @@ int main(int argc, char* argv[]) {
   ammonite::camera::setPosition(cameraIds[1], glm::vec3(0.0f, 0.0f, 2.0f));
 
   //Engine loaded, delete the loading screen
-  std::cout << "Loaded demo in   : " << utilityTimer.getTime() << "s" << std::endl;
+  std::cout << "STATUS: Loaded demo in:     " << utilityTimer.getTime() << "s" << std::endl;
   ammonite::interface::deleteLoadingScreen(screenId);
 
   //Reset timers for performance metrics
