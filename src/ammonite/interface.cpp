@@ -60,6 +60,10 @@ namespace ammonite {
       }
     }
 
+    int getActiveLoadingScreen() {
+      return activeLoadingScreenId;
+    }
+
     void setLoadingScreenProgress(int targetScreenId, float progress) {
       if (loadingScreenTracker.contains(targetScreenId)) {
         loadingScreenTracker[targetScreenId].progress = progress;
