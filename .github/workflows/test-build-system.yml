@@ -11,7 +11,7 @@ jobs:
   build:
     runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Install build dependencies
       run: |
         sudo apt-get update
@@ -19,30 +19,30 @@ jobs:
         sudo apt-get install --no-install-recommends inkscape optipng
         sudo apt-get install --no-install-recommends libgomp1 libglm-dev libglfw3-dev libglew-dev libstb-dev libassimp-dev
 
-    - name: Test icons build correctly
+    - name: Test icon generation target
       run: |
         make icons
 
-    - name: Test the shared library builds
+    - name: Test shared library build target
       run: |
         make library -j$(nproc)
 
-    - name: Test demo builds
+    - name: Test demo build target
       run: |
         make build -j$(nproc)
 
-    - name: Test demo builds from fresh in debug mode
+    - name: Test debug demo build target
       run: |
         make debug -j$(nproc)
 
-    - name: Test built library installs
+    - name: Check built objects are present
       run: |
         ls build/demo build/libammonite.so
 
-    - name: Test built library installs
+    - name: Test library install target
       run: |
         sudo make install
 
-    - name: Test library headers install
+    - name: Test headers install target
       run: |
         sudo make headers
