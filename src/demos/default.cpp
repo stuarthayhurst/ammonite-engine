@@ -1,3 +1,5 @@
+#include <vector>
+
 #include "../ammonite/ammonite.hpp"
 
 namespace defaultDemo {
