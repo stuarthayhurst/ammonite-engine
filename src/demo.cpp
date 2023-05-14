@@ -168,7 +168,7 @@ int main(int argc, char* argv[]) {
   ammonite::camera::setPosition(cameraIds[1], glm::vec3(0.0f, 0.0f, 2.0f));
 
   //Engine loaded, delete the loading screen
-  std::cout << "STATUS: Loaded demo in:     " << utilityTimer.getTime() << "s" << std::endl;
+  std::cout << "STATUS: Loaded demo in " << utilityTimer.getTime() << "s" << std::endl;
   ammonite::interface::deleteLoadingScreen(screenId);
 
   //Create and reset timers for performance metrics

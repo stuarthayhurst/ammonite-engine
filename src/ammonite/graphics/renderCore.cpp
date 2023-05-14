@@ -37,7 +37,7 @@ namespace ammonite {
         internal::setupOpenGLObjects();
 
         //Output time taken to load renderer
-        std::cout << ammonite::utils::status << "Loaded renderer in: " << loadTimer.getTime() << "s" << std::endl;
+        std::cout << ammonite::utils::status << "Loaded renderer in " << loadTimer.getTime() << "s" << std::endl;
       }
     }
 
