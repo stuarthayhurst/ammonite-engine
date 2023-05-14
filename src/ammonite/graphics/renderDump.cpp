@@ -437,6 +437,11 @@ namespace ammonite {
       //Create a cubemap for shadows
       glCreateTextures(GL_TEXTURE_CUBE_MAP_ARRAY, 1, &depthCubeMapId);
 
+      //Workaround for no lights causing a depth of 0
+      if (lightCount == 0) {
+        lightCount = 1;
+      }
+
       //Create 6 faces for each light source
       int depthLayers = std::min(maxLightCount, lightCount) * 6;
       glTextureStorage3D(depthCubeMapId, 1, GL_DEPTH_COMPONENT32, shadowRes, shadowRes, depthLayers);
