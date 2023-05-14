@@ -15,27 +15,48 @@ jobs:
     - name: Install build dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install --no-install-recommends git make pkg-config
+        sudo apt-get install --no-install-recommends git make pkg-config build-essential
+        sudo apt-get install --no-install-recommends g++ libgomp1 clang libomp-dev
         sudo apt-get install --no-install-recommends inkscape optipng
-        sudo apt-get install --no-install-recommends libgomp1 libglm-dev libglfw3-dev libglew-dev libstb-dev libassimp-dev
+        sudo apt-get install --no-install-recommends libglm-dev libglfw3-dev libglew-dev libstb-dev libassimp-dev
 
     - name: Test icon generation target
       run: |
         make icons
 
-    - name: Test shared library build target
+    - name: (g++) Test shared library build target
       run: |
-        make library -j$(nproc)
+        CXX="g++" make library -j$(nproc)
 
-    - name: Test demo build target
+    - name: (g++) Test demo build target
       run: |
-        make build -j$(nproc)
+        CXX="g++" make build -j$(nproc)
 
-    - name: Test debug demo build target
+    - name: (g++) Test debug demo build target
       run: |
-        make debug -j$(nproc)
+        CXX="g++" make debug -j$(nproc)
 
-    - name: Check built objects are present
+    - name: (g++) Check built objects are present
+      run: |
+        ls build/demo build/libammonite.so
+
+    - name: Clean build area
+      run: |
+        make clean
+
+    - name: (clang++) Test shared library build target
+      run: |
+        CXX="clang++" make library -j$(nproc)
+
+    - name: (clang++) Test demo build target
+      run: |
+        CXX="clang++" make build -j$(nproc)
+
+    - name: (clang++) Test debug demo build target
+      run: |
+        CXX="clang++" make debug -j$(nproc)
+
+    - name: (clang++) Check built objects are present
       run: |
         ls build/demo build/libammonite.so
 
