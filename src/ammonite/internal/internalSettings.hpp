@@ -18,6 +18,13 @@ namespace ammonite {
     }
 
     namespace graphics {
+      namespace post {
+        namespace internal {
+          bool* getFocalDepthEnabledPtr();
+          float* getFocalDepthPtr();
+          float* getBlurStrengthPtr();
+        }
+      }
       namespace internal {
         float* getFrameLimitPtr();
         int* getShadowResPtr();

@@ -16,6 +16,16 @@ namespace ammonite {
     }
 
     namespace graphics {
+      namespace post {
+        void setFocalDepthEnabled(bool enabled);
+        void setFocalDepth(float depth);
+        void setBlurStrength(float strength);
+
+        bool getFocalDepthEnabled();
+        float getFocalDepth();
+        float getBlurStrength();
+      }
+
       void setVsync(bool enabled);
       void setFrameLimit(float frameTarget);
       void setShadowRes(int shadowRes);

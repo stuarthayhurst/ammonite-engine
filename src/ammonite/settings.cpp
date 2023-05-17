@@ -85,6 +85,54 @@ namespace ammonite {
     }
 
     namespace graphics {
+      namespace post {
+        namespace {
+          struct PostSettings {
+            bool focalDepthEnabled = false;
+            float focalDepth = 0.0f;
+            float blurStrength = 1.0f;
+          } post;
+        }
+
+        namespace internal {
+          bool* getFocalDepthEnabledPtr() {
+            return &post.focalDepthEnabled;
+          }
+
+          float* getFocalDepthPtr() {
+            return &post.focalDepth;
+          }
+
+          float* getBlurStrengthPtr() {
+            return &post.blurStrength;
+          }
+        }
+
+        void setFocalDepthEnabled(bool enabled) {
+          post.focalDepthEnabled = enabled;
+        }
+
+        bool getFocalDepthEnabled() {
+          return post.focalDepthEnabled;
+        }
+
+        void setFocalDepth(float depth) {
+          post.focalDepth = depth;
+        }
+
+        float getFocalDepth() {
+          return post.focalDepth;
+        }
+
+        void setBlurStrength(float strength) {
+          post.blurStrength = strength;
+        }
+
+        float getBlurStrength() {
+          return post.blurStrength;
+        }
+      }
+
       namespace {
         struct GraphicsSettings {
           bool vsyncEnabled = true;
