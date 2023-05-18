@@ -113,6 +113,10 @@ namespace ammonite {
       return createWindow(width, height, DEFAULT_TITLE);
     }
 
+    GLFWwindow* getWindowPtr() {
+      return window;
+    }
+
     void setTitle(const char* title) {
       if (title != NULL) {
         glfwSetWindowTitle(window, title);

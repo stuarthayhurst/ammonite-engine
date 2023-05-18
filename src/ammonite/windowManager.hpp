@@ -15,6 +15,8 @@ namespace ammonite {
     GLFWwindow* createWindow(int width, int height, const char* title);
     GLFWwindow* createWindow(int width, int height);
 
+    GLFWwindow* getWindowPtr();
+
     void setTitle(const char* title);
     void useIconDir(const char* iconDirPath);
 
