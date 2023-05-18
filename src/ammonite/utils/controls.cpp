@@ -6,11 +6,11 @@
 #include <glm/gtc/constants.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "../internal/internalWindowManager.hpp"
 #include "../internal/internalSettings.hpp"
 #include "../internal/keybindTracker.hpp"
 #include "../constants.hpp"
 #include "../camera.hpp"
+#include "../windowManager.hpp"
 #include "timer.hpp"
 
 #include "../internal/internalDebug.hpp"
@@ -143,7 +143,7 @@ namespace ammonite {
 
       void setupControls() {
         //Connect window and aspect ratio pointers
-        window = ammonite::windowManager::internal::getWindowPtr();
+        window = ammonite::windowManager::getWindowPtr();
 
         //Set mouse callbacks
         glfwSetScrollCallback(window, scroll_callback);
