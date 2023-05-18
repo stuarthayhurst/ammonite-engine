@@ -4,7 +4,9 @@
 #include "../ammonite/ammonite.hpp"
 
 namespace defaultDemo {
-  std::vector<int> loadedModelIds;
+  namespace {
+    std::vector<int> loadedModelIds;
+  }
 
   int demoExit() {
     for (unsigned int i = 0; i < loadedModelIds.size(); i++) {
