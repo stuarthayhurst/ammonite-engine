@@ -12,6 +12,7 @@
 #include "common/argHandler.hpp"
 
 #include "demos/default.hpp"
+#include "demos/object-field.hpp"
 
 #define EXPAND_DEMO(DEMO_NAME, NAMESPACE) {std::string(DEMO_NAME), {NAMESPACE::preRendererInit,\
                               NAMESPACE::postRendererInit,\
@@ -29,7 +30,8 @@ namespace {
   };
 
   std::map<std::string, DemoFunctions> demoFunctionMap = {
-    EXPAND_DEMO("default", defaultDemo)
+    EXPAND_DEMO("default", defaultDemo),
+    EXPAND_DEMO("object-field", objectFieldDemo)
   };
 }
 
