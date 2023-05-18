@@ -138,7 +138,7 @@ int main(int argc, char* argv[]) {
 
   //Renderer failed to initialise, clean up and exit
   if (!success) {
-    std::cerr << "Failed to initialise renderer, exiting" << std::endl;
+    std::cerr << "ERROR: Failed to initialise renderer, exiting" << std::endl;
     ammonite::windowManager::setup::destroyGlfw();
     return EXIT_FAILURE;
   }
@@ -152,7 +152,7 @@ int main(int argc, char* argv[]) {
   //Call main demo setup
   if (postRendererInit != nullptr) {
     if (postRendererInit() == -1) {
-      std::cerr << "Failed to set up demo, exiting" << std::endl;
+      std::cerr << "ERROR: Failed to set up demo, exiting" << std::endl;
       ammonite::windowManager::setup::destroyGlfw();
       return EXIT_FAILURE;
     }
@@ -209,7 +209,7 @@ int main(int argc, char* argv[]) {
     //Call demo-specific mainloop code
     if (rendererMainloop != nullptr) {
       if (rendererMainloop() == -1) {
-        std::cerr << "Failed to run mainloop, exiting" << std::endl;
+        std::cerr << "ERROR: Failed to run mainloop, exiting" << std::endl;
         return EXIT_FAILURE;
       }
     }
@@ -227,7 +227,7 @@ int main(int argc, char* argv[]) {
     bool cleanExit = true;
     if (demoExit() == -1) {
       cleanExit = false;
-      std::cerr << "Failed to clean up, exiting" << std::endl;
+      std::cerr << "ERROR: Failed to clean up, exiting" << std::endl;
     }
     ammonite::windowManager::setup::destroyGlfw();
 
