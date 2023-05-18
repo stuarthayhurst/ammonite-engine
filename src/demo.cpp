@@ -239,8 +239,3 @@ int main(int argc, char* argv[]) {
   }
   return EXIT_SUCCESS;
 }
-
-/* TODO:
- - Add error handling to demo stages (cleanup + error code + log message)
- - Add cleanup on issues + exit
-*/
