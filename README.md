@@ -25,15 +25,11 @@
   - `sudo make install`
 
 ## Choosing a demo:
-  - Individual demos are stored in separate git branches
-  - `master` contains a very basic demo, largely for testing
-  - Each branch ending in `-demo` contains a different demo
-    - These can be listed using `git branch -a |grep "\demo" |grep -v "remotes"`
-  - Each branch isn't always up to date with `master`
-    - This can normally be sorted with `git rebase master [DEMO BRANCH]`
-    - However, manual intervention is sometimes required
-  - After choosing a branch, it can be compiled and run like normal
-  - Screenshots of demos can be found at the end of the README
+  - `make build` will compile the library and all demos on the current branch
+  - Demos can be listed with `./launch.sh --demo`
+  - Run a specific demo with `./launch.sh --demo [DEMO]`
+    - For example: `./launch.sh --demo object-field`
+  - Screenshots of some demos can be found at the end of the README
 
 ## Building + running a demo:
   - `make clean` will clean the build area, to start from fresh
