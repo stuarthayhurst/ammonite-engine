@@ -183,10 +183,6 @@ int main(int argc, char* argv[]) {
       frameTimer.reset();
     }
 
-    if (rendererMainloop != nullptr) {
-      rendererMainloop();
-    }
-
     //Handle toggling input focus
     static int lastInputToggleState = GLFW_RELEASE;
     int inputToggleState = glfwGetKey(window, GLFW_KEY_C);
@@ -210,8 +206,13 @@ int main(int argc, char* argv[]) {
     //Process new input since last frame
     ammonite::utils::controls::processInput();
 
-    //Draw the frame
-    ammonite::renderer::drawFrame();
+    //Call demo-specific mainloop code
+    if (rendererMainloop != nullptr) {
+      if (rendererMainloop() == -1) {
+        std::cerr << "Failed to run mainloop, exiting" << std::endl;
+        return EXIT_FAILURE;
+      }
+    }
   }
 
   //Output benchmark score
@@ -223,7 +224,16 @@ int main(int argc, char* argv[]) {
 
   //Clean up and exit
   if (demoExit != nullptr) {
-    demoExit();
+    bool cleanExit = true;
+    if (demoExit() == -1) {
+      cleanExit = false;
+      std::cerr << "Failed to clean up, exiting" << std::endl;
+    }
+    ammonite::windowManager::setup::destroyGlfw();
+
+    if (!cleanExit) {
+      return EXIT_FAILURE;
+    }
   }
   return EXIT_SUCCESS;
 }

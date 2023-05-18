@@ -6,6 +6,14 @@
 namespace defaultDemo {
   std::vector<int> loadedModelIds;
 
+  int demoExit() {
+    for (unsigned int i = 0; i < loadedModelIds.size(); i++) {
+      ammonite::models::deleteModel(loadedModelIds[i]);
+    }
+
+    return 0;
+  }
+
   int preRendererInit() {
     return 0;
   }
@@ -34,9 +42,7 @@ namespace defaultDemo {
     }
 
     if (!success) {
-      for (unsigned int i = 0; i < loadedModelIds.size(); i++) {
-        ammonite::models::deleteModel(loadedModelIds[i]);
-      }
+      demoExit();
 
       return -1;
     }
@@ -70,10 +76,7 @@ namespace defaultDemo {
   }
 
   int rendererMainloop() {
-    return 0;
-  }
-
-  int demoExit() {
+    ammonite::renderer::drawFrame();
     return 0;
   }
 }
