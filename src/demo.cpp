@@ -13,6 +13,7 @@
 
 #include "demos/default.hpp"
 #include "demos/object-field.hpp"
+#include "demos/many-cubes.hpp"
 
 #define EXPAND_DEMO(DEMO_NAME, NAMESPACE) {std::string(DEMO_NAME), {NAMESPACE::preRendererInit,\
                               NAMESPACE::postRendererInit,\
@@ -31,7 +32,8 @@ namespace {
 
   std::map<std::string, DemoFunctions> demoFunctionMap = {
     EXPAND_DEMO("default", defaultDemo),
-    EXPAND_DEMO("object-field", objectFieldDemo)
+    EXPAND_DEMO("object-field", objectFieldDemo),
+    EXPAND_DEMO("many-cubes", manyCubesDemo)
   };
 }
 
