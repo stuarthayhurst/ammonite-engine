@@ -41,6 +41,8 @@
   - Compiled demos have a few arguments supported:
     - `--help`: Displays a help menu
     - `--benchmark`: Start a benchmark
+    - `--demo`: List available demos
+    - `--demo [DEMO]`: Launch a specific demo
     - `--vsync`: Enable / disable VSync (`true` / `false`)
 
 ## Debug mode:
