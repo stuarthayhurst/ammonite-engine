@@ -7,6 +7,7 @@
 #include "../windowManager.hpp"
 
 #include "internal/internalRenderer.hpp"
+#include "../internal/interfaceTracker.hpp"
 
 namespace ammonite {
   namespace renderer {
@@ -52,8 +53,11 @@ namespace ammonite {
     void drawFrame() {
       //Increase frame counters
       static int frameCount = 0;
-      totalFrames++;
-      frameCount++;
+      int loadingScreenId = ammonite::interface::internal::getActiveLoadingScreenId();
+      if (loadingScreenId == 0) {
+        totalFrames++;
+        frameCount++;
+      }
 
       //Every tenth of a second, update the frame time
       static ammonite::utils::Timer frameTimer;
