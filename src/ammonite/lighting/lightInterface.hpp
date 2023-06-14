@@ -11,6 +11,9 @@ namespace ammonite {
     void updateLightSources();
 #endif
 
+    glm::vec3 getAmbientLight();
+    void setAmbientLight(glm::vec3 newAmbientLight);
+
     namespace properties {
       glm::vec3 getGeometry(int lightId);
       glm::vec3 getColour(int lightId);

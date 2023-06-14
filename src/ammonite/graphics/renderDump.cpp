@@ -20,6 +20,7 @@
 #include "../lighting/internal/lightTypes.hpp"
 #include "../lighting/internal/lightTracker.hpp"
 #include "../lighting/lightStorage.hpp"
+#include "../lighting/lightInterface.hpp"
 
 #include "shaders.hpp"
 #include "../constants.hpp"
