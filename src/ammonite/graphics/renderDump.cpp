@@ -814,7 +814,7 @@ namespace ammonite {
         glUseProgram(screenShader.shaderId);
         prepareScreen(0, *widthPtr, *heightPtr, false);
 
-        //Conditionally update uniforms for blur
+        //Conditionally send data for blur
         glUniform1i(screenShader.focalDepthEnabledId, *focalDepthEnabledPtr);
         if (*focalDepthEnabledPtr) {
           static float* focalDepthPtr = ammonite::settings::graphics::post::internal::getFocalDepthPtr();
@@ -822,12 +822,12 @@ namespace ammonite {
 
           glUniform1f(screenShader.focalDepthId, *focalDepthPtr);
           glUniform1f(screenShader.blurStrengthId, *blurStrengthPtr);
+          glBindTextureUnit(4, screenQuadDepthTextureId);
         }
 
         //Display the rendered frame
         glBindVertexArray(screenQuadVertexArrayId);
         glBindTextureUnit(3, screenQuadTextureId);
-        glBindTextureUnit(4, screenQuadDepthTextureId);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, nullptr);
 
         //Disable gamma correction for start of next pass
