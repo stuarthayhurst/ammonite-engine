@@ -808,9 +808,12 @@ namespace ammonite {
         static bool* focalDepthEnabledPtr = ammonite::settings::graphics::post::internal::getFocalDepthEnabledPtr();
         static float* focalDepthPtr = ammonite::settings::graphics::post::internal::getFocalDepthPtr();
         static float* blurStrengthPtr = ammonite::settings::graphics::post::internal::getBlurStrengthPtr();
-        glUniform1f(screenShader.focalDepthId, *focalDepthPtr);
-        glUniform1f(screenShader.blurStrengthId, *blurStrengthPtr);
+
         glUniform1i(screenShader.focalDepthEnabledId, *focalDepthEnabledPtr);
+        if (*focalDepthEnabledPtr) {
+          glUniform1f(screenShader.focalDepthId, *focalDepthPtr);
+          glUniform1f(screenShader.blurStrengthId, *blurStrengthPtr);
+        }
 
         //Display the rendered frame
         glBindVertexArray(screenQuadVertexArrayId);
