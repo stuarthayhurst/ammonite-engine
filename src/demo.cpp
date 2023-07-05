@@ -207,6 +207,38 @@ int main(int argc, char* argv[]) {
       ammonite::camera::setActiveCamera(cameraIds[cameraIndex]);
     }
 
+    //Handle toggling focal depth
+    static int lastFocalToggleState = GLFW_RELEASE;
+    int focalToggleState = glfwGetKey(window, GLFW_KEY_Z);
+    if (lastFocalToggleState != focalToggleState) {
+      if (lastFocalToggleState == GLFW_RELEASE) {
+        ammonite::settings::graphics::post::setFocalDepthEnabled(
+          !ammonite::settings::graphics::post::getFocalDepthEnabled());
+      }
+
+      lastFocalToggleState = focalToggleState;
+    }
+
+    //Get direction of focal depth change
+    float sign = 0.0f;
+    if (glfwGetKey(window, GLFW_KEY_RIGHT_BRACKET) == GLFW_PRESS) {
+      sign = 1.0f;
+    } else if (glfwGetKey(window, GLFW_KEY_LEFT_BRACKET) == GLFW_PRESS) {
+      sign = -1.0f;
+    }
+
+    //Update the focal depth, according to press duration
+    static ammonite::utils::Timer focalDepthTimer;
+    if (sign != 0.0f) {
+      const float unitsPerSecond = 1.0f;
+      const float focalTimeDelta = focalDepthTimer.getTime();
+      float depth = ammonite::settings::graphics::post::getFocalDepth();
+
+      depth += focalTimeDelta * unitsPerSecond * sign;
+      ammonite::settings::graphics::post::setFocalDepth(depth);
+    }
+    focalDepthTimer.reset();
+
     //Process new input since last frame
     ammonite::utils::controls::processInput();
 
