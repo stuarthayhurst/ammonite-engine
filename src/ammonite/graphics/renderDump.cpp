@@ -796,21 +796,30 @@ namespace ammonite {
           glEnable(GL_FRAMEBUFFER_SRGB);
         }
 
+        //Get focal depth status, used to conditionally send data
+        static bool* focalDepthEnabledPtr = ammonite::settings::graphics::post::internal::getFocalDepthEnabledPtr();
+
         //Resolve multisampling into regular texture
         if (sampleCount != 0) {
-          glBlitNamedFramebuffer(colourBufferMultisampleFBO, screenQuadFBO, 0, 0, renderWidth, renderHeight, 0, 0, renderWidth, renderHeight, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+          GLbitfield blitBits = GL_COLOR_BUFFER_BIT;
+          //Only copy depth if blur is enabled
+          if (*focalDepthEnabledPtr) {
+            blitBits |= GL_DEPTH_BUFFER_BIT;
+          }
+
+          glBlitNamedFramebuffer(colourBufferMultisampleFBO, screenQuadFBO, 0, 0, renderWidth, renderHeight, 0, 0, renderWidth, renderHeight, blitBits, GL_NEAREST);
         }
 
         //Swap to default framebuffer and correct shaders
         glUseProgram(screenShader.shaderId);
         prepareScreen(0, *widthPtr, *heightPtr, false);
 
-        static bool* focalDepthEnabledPtr = ammonite::settings::graphics::post::internal::getFocalDepthEnabledPtr();
-        static float* focalDepthPtr = ammonite::settings::graphics::post::internal::getFocalDepthPtr();
-        static float* blurStrengthPtr = ammonite::settings::graphics::post::internal::getBlurStrengthPtr();
-
+        //Conditionally update uniforms for blur
         glUniform1i(screenShader.focalDepthEnabledId, *focalDepthEnabledPtr);
         if (*focalDepthEnabledPtr) {
+          static float* focalDepthPtr = ammonite::settings::graphics::post::internal::getFocalDepthPtr();
+          static float* blurStrengthPtr = ammonite::settings::graphics::post::internal::getBlurStrengthPtr();
+
           glUniform1f(screenShader.focalDepthId, *focalDepthPtr);
           glUniform1f(screenShader.blurStrengthId, *blurStrengthPtr);
         }
