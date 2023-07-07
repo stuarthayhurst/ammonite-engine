@@ -587,43 +587,40 @@ namespace ammonite {
           if (screenQuadTextureId != 0) {
             glDeleteTextures(1, &screenQuadTextureId);
             glDeleteTextures(1, &screenQuadDepthTextureId);
+            screenQuadTextureId = 0;
+            screenQuadDepthTextureId = 0;
           }
 
           //Delete multisampled colour storage if it exists
           if (colourRenderBufferId != 0) {
             glDeleteRenderbuffers(1, &colourRenderBufferId);
+            colourRenderBufferId = 0;
           }
 
           //Create texture for whole screen
           glCreateTextures(GL_TEXTURE_2D, 1, &screenQuadTextureId);
           glCreateTextures(GL_TEXTURE_2D, 1, &screenQuadDepthTextureId);
 
-         //Decide which framebuffer to render to and create multisampled renderbuffer, if needed
+          //Decide which framebuffer to render to and create multisampled renderbuffer, if needed
           if (sampleCount != 0) {
             targetBufferId = colourBufferMultisampleFBO;
             glCreateRenderbuffers(1, &colourRenderBufferId);
           } else {
             targetBufferId = screenQuadFBO;
-            colourRenderBufferId = 0;
           }
 
           //Calculate render resolution
           renderWidth = std::floor(*widthPtr * *renderResMultiplierPtr);
           renderHeight = std::floor(*heightPtr * *renderResMultiplierPtr);
 
-          //Create multisampled renderbuffer to store colour data and bind to framebuffer
           if (sampleCount != 0) {
+            //Create multisampled renderbuffers for colour and depth
             glNamedRenderbufferStorageMultisample(colourRenderBufferId, sampleCount, GL_RGB8, renderWidth, renderHeight);
+            glNamedRenderbufferStorageMultisample(depthRenderBufferId, sampleCount, GL_DEPTH_COMPONENT32, renderWidth, renderHeight);
+
+            //Attach colour and depth renderbuffers to multisampled framebuffer
             glNamedFramebufferRenderbuffer(colourBufferMultisampleFBO, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, colourRenderBufferId);
-          }
-
-          //Create and attach the depth renderbuffer for multisampling
-          if (sampleCount != 0) {
-            glNamedRenderbufferStorageMultisample(depthRenderBufferId, sampleCount, GL_DEPTH_COMPONENT, renderWidth, renderHeight);
-            //Detach from other framebuffer, in case it was bound
-            glNamedFramebufferRenderbuffer(screenQuadFBO, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, 0);
-
-            glNamedFramebufferRenderbuffer(targetBufferId, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthRenderBufferId);
+            glNamedFramebufferRenderbuffer(colourBufferMultisampleFBO, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthRenderBufferId);
           }
 
           //Create texture to store colour data and bind to framebuffer
