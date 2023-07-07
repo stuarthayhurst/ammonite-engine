@@ -598,7 +598,7 @@ namespace ammonite {
           glCreateTextures(GL_TEXTURE_2D, 1, &screenQuadTextureId);
           glCreateTextures(GL_TEXTURE_2D, 1, &screenQuadDepthTextureId);
 
-         //Deicde which framebuffer to render to and create multisampled renderbuffer, if needed
+         //Decide which framebuffer to render to and create multisampled renderbuffer, if needed
           if (sampleCount != 0) {
             targetBufferId = colourBufferMultisampleFBO;
             glCreateRenderbuffers(1, &colourRenderBufferId);
