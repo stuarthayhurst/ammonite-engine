@@ -351,7 +351,7 @@ namespace ammonite {
     namespace {
       static void setWireframe(bool enabled) {
         //Avoid changing polygon mode if it's already correct
-        static bool oldEnabled = true;
+        static bool oldEnabled = false;
         if (oldEnabled == enabled) {
           return;
         }
