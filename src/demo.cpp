@@ -9,7 +9,7 @@
 #include <glm/glm.hpp>
 
 #include "ammonite/ammonite.hpp"
-#include "common/argHandler.hpp"
+#include "helper/argHandler.hpp"
 
 #include "demos/default.hpp"
 #include "demos/object-field.hpp"

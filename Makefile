@@ -15,15 +15,15 @@ AMMONITE_HEADER_SOURCE = $(wildcard ./src/ammonite/*.hpp) \
 			 $(wildcard ./src/ammonite/*/*.hpp) \
 			 $(wildcard ./src/ammonite/*/*/*.hpp)
 
-COMMON_OBJECTS_SOURCE = $(wildcard ./src/common/*.cpp)
-COMMON_HEADER_SOURCE = $(wildcard ./src/common/*.hpp)
+HELPER_OBJECTS_SOURCE = $(wildcard ./src/helper/*.cpp)
+HELPER_HEADER_SOURCE = $(wildcard ./src/helper/*.hpp)
 
 DEMO_OBJECTS_SOURCE = $(wildcard ./src/demos/*.cpp)
 DEMO_HEADER_SOURCE = $(wildcard ./src/demos/*.hpp)
 
 OBJECT_DIR = $(BUILD_DIR)/objects
 AMMONITE_OBJECTS = $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.o,$(AMMONITE_OBJECTS_SOURCE)))
-COMMON_OBJECTS = $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.o,$(COMMON_OBJECTS_SOURCE)))
+HELPER_OBJECTS = $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.o,$(HELPER_OBJECTS_SOURCE)))
 DEMO_OBJECTS = $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.o,$(DEMO_OBJECTS_SOURCE)))
 
 CXXFLAGS := $(shell pkg-config --cflags $(LIBS)) -fopenmp
@@ -40,9 +40,9 @@ ifeq ($(DEBUG),true)
   CXXFLAGS += -DDEBUG -g
 endif
 
-$(BUILD_DIR)/demo: library $(COMMON_OBJECTS) $(DEMO_OBJECTS) $(OBJECT_DIR)/demo.o
+$(BUILD_DIR)/demo: library $(HELPER_OBJECTS) $(DEMO_OBJECTS) $(OBJECT_DIR)/demo.o
 	@mkdir -p "$(BUILD_DIR)"
-	$(CXX) -o "$(BUILD_DIR)/demo" $(COMMON_OBJECTS) $(DEMO_OBJECTS) $(OBJECT_DIR)/demo.o $(CXXFLAGS) "-L$(BUILD_DIR)" -lammonite $(LDFLAGS)
+	$(CXX) -o "$(BUILD_DIR)/demo" $(HELPER_OBJECTS) $(DEMO_OBJECTS) $(OBJECT_DIR)/demo.o $(CXXFLAGS) "-L$(BUILD_DIR)" -lammonite $(LDFLAGS)
 
 $(BUILD_DIR)/libammonite.so: $(AMMONITE_OBJECTS)
 	@mkdir -p "$(OBJECT_DIR)"
@@ -52,7 +52,7 @@ $(OBJECT_DIR)/ammonite/%.o: ./src/ammonite/%.cpp $(AMMONITE_HEADER_SOURCE)
 	@mkdir -p "$$(dirname $@)"
 	$(CXX) $(subst $(OBJECT_DIR),./src,$(subst .o,.cpp,$(@))) -c $(CXXFLAGS) -fpic -o "$@"
 
-$(OBJECT_DIR)/common/%.o: ./src/common/%.cpp $(COMMON_HEADER_SOURCE)
+$(OBJECT_DIR)/helper/%.o: ./src/helper/%.cpp $(HELPER_HEADER_SOURCE)
 	@mkdir -p "$$(dirname $@)"
 	$(CXX) $(subst $(OBJECT_DIR),./src,$(subst .o,.cpp,$(@))) -c $(CXXFLAGS) -o "$@"
 
@@ -60,7 +60,7 @@ $(OBJECT_DIR)/demos/%.o: ./src/demos/%.cpp $(DEMO_HEADER_SOURCE)
 	@mkdir -p "$$(dirname $@)"
 	$(CXX) $(subst $(OBJECT_DIR),./src,$(subst .o,.cpp,$(@))) -c $(CXXFLAGS) -o "$@"
 
-$(OBJECT_DIR)/demo.o: ./src/demo.cpp $(AMMONITE_HEADER_SOURCE) $(COMMON_HEADER_SOURCE)
+$(OBJECT_DIR)/demo.o: ./src/demo.cpp $(AMMONITE_HEADER_SOURCE) $(HELPER_HEADER_SOURCE)
 	@mkdir -p "$(OBJECT_DIR)"
 	$(CXX) ./src/demo.cpp -c $(CXXFLAGS) -o "$@"
 
