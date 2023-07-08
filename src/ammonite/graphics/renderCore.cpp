@@ -355,18 +355,6 @@ namespace ammonite {
     }
 
     namespace {
-      static void setWireframe(bool enabled) {
-        //Avoid changing polygon mode if it's already correct
-        static bool oldEnabled = false;
-        if (oldEnabled == enabled) {
-          return;
-        }
-        oldEnabled = enabled;
-
-        //Change the draw mode
-        glPolygonMode(GL_FRONT_AND_BACK, enabled ? GL_LINE : GL_FILL);
-      }
-
       static void drawModel(ammonite::models::ModelInfo *drawObject, int lightIndex, bool depthPass) {
         //Get model draw data
         ammonite::models::ModelData* drawObjectData = drawObject->modelData;
@@ -375,13 +363,13 @@ namespace ammonite {
         GLenum mode = GL_TRIANGLES;
         if (drawObject->drawMode == AMMONITE_DRAW_WIREFRAME) {
           //Use wireframe if requested
-          setWireframe(true);
+          internal::setWireframe(true);
         } else {
           //Draw points if requested
           if (drawObject->drawMode == AMMONITE_DRAW_POINTS) {
             mode = GL_POINTS;
           }
-          setWireframe(false);
+          internal::setWireframe(false);
         }
 
         //Calculate and obtain matrices
@@ -776,7 +764,7 @@ namespace ammonite {
         }
 
         //Ensure wireframe is disabled
-        setWireframe(false);
+        internal::setWireframe(false);
 
         //Draw the skybox
         if (activeSkybox != 0) {

@@ -16,6 +16,18 @@ namespace ammonite {
           glDisable(GL_DEPTH_TEST);
         }
       }
+
+      void setWireframe(bool enabled) {
+        //Avoid changing polygon mode if it's already correct
+        static bool oldEnabled = false;
+        if (oldEnabled == enabled) {
+          return;
+        }
+        oldEnabled = enabled;
+
+        //Change the draw mode
+        glPolygonMode(GL_FRONT_AND_BACK, enabled ? GL_LINE : GL_FILL);
+      }
     }
   }
 }

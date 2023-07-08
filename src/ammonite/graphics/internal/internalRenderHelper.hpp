@@ -9,6 +9,7 @@ namespace ammonite {
   namespace renderer {
     namespace internal {
       void prepareScreen(int framebufferId, int width, int height, bool depthTest);
+      void setWireframe(bool enabled);
     }
   }
 }
