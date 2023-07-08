@@ -22,9 +22,9 @@ DEMO_OBJECTS_SOURCE = $(wildcard ./src/demos/*.cpp)
 DEMO_HEADER_SOURCE = $(wildcard ./src/demos/*.hpp)
 
 OBJECT_DIR = $(BUILD_DIR)/objects
-AMMONITE_OBJECTS = $(subst ./src/ammonite,$(OBJECT_DIR),$(subst .cpp,.o,$(AMMONITE_OBJECTS_SOURCE)))
-COMMON_OBJECTS = $(subst ./src/common,$(OBJECT_DIR),$(subst .cpp,.o,$(COMMON_OBJECTS_SOURCE)))
-DEMO_OBJECTS = $(subst ./src/demos,$(OBJECT_DIR),$(subst .cpp,.o,$(DEMO_OBJECTS_SOURCE)))
+AMMONITE_OBJECTS = $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.o,$(AMMONITE_OBJECTS_SOURCE)))
+COMMON_OBJECTS = $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.o,$(COMMON_OBJECTS_SOURCE)))
+DEMO_OBJECTS = $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.o,$(DEMO_OBJECTS_SOURCE)))
 
 CXXFLAGS := $(shell pkg-config --cflags $(LIBS)) -fopenmp
 CXXFLAGS += -Wall -Wextra -Werror -std=c++20 -flto=auto
@@ -48,17 +48,17 @@ $(BUILD_DIR)/libammonite.so: $(AMMONITE_OBJECTS)
 	@mkdir -p "$(OBJECT_DIR)"
 	$(CXX) -shared -o "$@" $(AMMONITE_OBJECTS) $(CXXFLAGS) "-Wl,-soname,$(LIBRARY_NAME)"
 
-$(OBJECT_DIR)/%.o: ./src/ammonite/%.cpp $(AMMONITE_HEADER_SOURCE)
+$(OBJECT_DIR)/ammonite/%.o: ./src/ammonite/%.cpp $(AMMONITE_HEADER_SOURCE)
 	@mkdir -p "$$(dirname $@)"
-	$(CXX) $(subst $(OBJECT_DIR),src/ammonite,$(subst .o,.cpp,$(@))) -c $(CXXFLAGS) -fpic -o "$@"
+	$(CXX) $(subst $(OBJECT_DIR),./src,$(subst .o,.cpp,$(@))) -c $(CXXFLAGS) -fpic -o "$@"
 
-$(OBJECT_DIR)/%.o: ./src/common/%.cpp $(COMMON_HEADER_SOURCE)
-	@mkdir -p "$(OBJECT_DIR)"
-	$(CXX) $(subst $(OBJECT_DIR),src/common,$(subst .o,.cpp,$(@))) -c $(CXXFLAGS) -o "$@"
+$(OBJECT_DIR)/common/%.o: ./src/common/%.cpp $(COMMON_HEADER_SOURCE)
+	@mkdir -p "$$(dirname $@)"
+	$(CXX) $(subst $(OBJECT_DIR),./src,$(subst .o,.cpp,$(@))) -c $(CXXFLAGS) -o "$@"
 
-$(OBJECT_DIR)/%.o: ./src/demos/%.cpp $(DEMO_HEADER_SOURCE)
-	@mkdir -p "$(OBJECT_DIR)"
-	$(CXX) $(subst $(OBJECT_DIR),src/demos,$(subst .o,.cpp,$(@))) -c $(CXXFLAGS) -o "$@"
+$(OBJECT_DIR)/demos/%.o: ./src/demos/%.cpp $(DEMO_HEADER_SOURCE)
+	@mkdir -p "$$(dirname $@)"
+	$(CXX) $(subst $(OBJECT_DIR),./src,$(subst .o,.cpp,$(@))) -c $(CXXFLAGS) -o "$@"
 
 $(OBJECT_DIR)/demo.o: ./src/demo.cpp $(AMMONITE_HEADER_SOURCE) $(COMMON_HEADER_SOURCE)
 	@mkdir -p "$(OBJECT_DIR)"
