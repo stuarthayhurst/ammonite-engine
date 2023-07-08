@@ -22,7 +22,7 @@
 #include "windowManager.hpp"
 
 #include "graphics/shaders.hpp"
-#include "graphics/renderer.hpp"
+#include "graphics/renderInterface.hpp"
 
 #include "models/modelInterface.hpp"
 #include "models/modelStorage.hpp"
