@@ -18,15 +18,15 @@ namespace ammonite {
       }
 
       void setWireframe(bool enabled) {
-        //Avoid changing polygon mode if it's already correct
-        static bool oldEnabled = false;
+        //Avoid unnecessary polygon mode updates
+        static bool oldEnabled = !enabled;
         if (oldEnabled == enabled) {
           return;
         }
-        oldEnabled = enabled;
 
         //Change the draw mode
         glPolygonMode(GL_FRONT_AND_BACK, enabled ? GL_LINE : GL_FILL);
+        oldEnabled = enabled;
       }
     }
   }
