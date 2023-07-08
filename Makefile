@@ -40,13 +40,17 @@ ifeq ($(DEBUG),true)
   CXXFLAGS += -DDEBUG -g
 endif
 
-$(BUILD_DIR)/demo: library $(HELPER_OBJECTS) $(DEMO_OBJECTS) $(OBJECT_DIR)/demo.o
+$(BUILD_DIR)/demo: $(BUILD_DIR)/$(LIBRARY_NAME) $(HELPER_OBJECTS) $(DEMO_OBJECTS) $(OBJECT_DIR)/demo.o
 	@mkdir -p "$(BUILD_DIR)"
 	$(CXX) -o "$(BUILD_DIR)/demo" $(HELPER_OBJECTS) $(DEMO_OBJECTS) $(OBJECT_DIR)/demo.o $(CXXFLAGS) "-L$(BUILD_DIR)" -lammonite $(LDFLAGS)
 
 $(BUILD_DIR)/libammonite.so: $(AMMONITE_OBJECTS)
 	@mkdir -p "$(OBJECT_DIR)"
 	$(CXX) -shared -o "$@" $(AMMONITE_OBJECTS) $(CXXFLAGS) "-Wl,-soname,$(LIBRARY_NAME)"
+
+$(BUILD_DIR)/$(LIBRARY_NAME): $(BUILD_DIR)/libammonite.so
+	rm -f "$(BUILD_DIR)/$(LIBRARY_NAME)"
+	ln -s "libammonite.so" "$(BUILD_DIR)/$(LIBRARY_NAME)"
 
 $(OBJECT_DIR)/ammonite/%.o: ./src/ammonite/%.cpp $(AMMONITE_HEADER_SOURCE)
 	@mkdir -p "$$(dirname $@)"
@@ -72,9 +76,7 @@ build:
 	fi
 debug: clean
 	DEBUG="true" $(MAKE) build
-library: $(BUILD_DIR)/libammonite.so
-	rm -f "$(BUILD_DIR)/$(LIBRARY_NAME)"
-	ln -s "libammonite.so" "$(BUILD_DIR)/$(LIBRARY_NAME)"
+library: $(BUILD_DIR)/$(LIBRARY_NAME)
 headers:
 	cp -r "./src/ammonite" "$(HEADER_DIR)/ammonite"
 	rm -rf "$(HEADER_DIR)/ammonite/internal"
