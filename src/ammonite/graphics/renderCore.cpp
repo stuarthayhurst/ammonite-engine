@@ -11,6 +11,8 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include "internal/internalRenderHelper.hpp"
+
 #include "../internal/internalSettings.hpp"
 #include "../internal/cameraMatrices.hpp"
 #include "../internal/interfaceTracker.hpp"
@@ -514,16 +516,6 @@ namespace ammonite {
       targetFrameTimer.reset();
     }
 
-    void prepareScreen(int framebufferId, int width, int height, bool depthTest) {
-      glBindFramebuffer(GL_FRAMEBUFFER, framebufferId);
-      glViewport(0, 0, width, height);
-      if (depthTest) {
-        glEnable(GL_DEPTH_TEST);
-      } else {
-        glDisable(GL_DEPTH_TEST);
-      }
-    }
-
     void drawLoadingScreen(int loadingScreenId, int width, int height) {
         //Swap to loading screen shader
         glUseProgram(loadingShader.shaderId);
@@ -535,7 +527,7 @@ namespace ammonite {
         glUniform1f(loadingShader.heightOffsetId, loadingScreen.heightOffset);
 
         //Prepare viewport and framebuffer
-        prepareScreen(0, width, height, false);
+        internal::prepareScreen(0, width, height, false);
 
         //Prepare to draw the screen
         glm::vec3 backgroundColour = loadingScreen.backgroundColour;
@@ -688,7 +680,7 @@ namespace ammonite {
 
         //Swap to depth shader and enable depth testing
         glUseProgram(depthShader.shaderId);
-        prepareScreen(depthMapFBO, *shadowResPtr, *shadowResPtr, true);
+        internal::prepareScreen(depthMapFBO, *shadowResPtr, *shadowResPtr, true);
 
         //Pass uniforms that don't change between light sources
         static float* farPlanePtr = ammonite::settings::graphics::internal::getShadowFarPlanePtr();
@@ -734,7 +726,7 @@ namespace ammonite {
         }
 
         //Reset the framebuffer and viewport
-        prepareScreen(targetBufferId, renderWidth, renderHeight, true);
+        internal::prepareScreen(targetBufferId, renderWidth, renderHeight, true);
 
         //Clear depth and colour (if no skybox is used)
         int activeSkybox = ammonite::environment::skybox::getActiveSkybox();
@@ -813,7 +805,7 @@ namespace ammonite {
 
         //Swap to default framebuffer and correct shaders
         glUseProgram(screenShader.shaderId);
-        prepareScreen(0, *widthPtr, *heightPtr, false);
+        internal::prepareScreen(0, *widthPtr, *heightPtr, false);
 
         //Conditionally send data for blur
         glUniform1i(screenShader.focalDepthEnabledId, *focalDepthEnabledPtr);

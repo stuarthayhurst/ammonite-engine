@@ -6,7 +6,7 @@
 #include "../utils/logging.hpp"
 #include "../windowManager.hpp"
 
-#include "internal/internalRenderer.hpp"
+#include "internal/internalRenderCore.hpp"
 #include "../internal/interfaceTracker.hpp"
 
 /*
