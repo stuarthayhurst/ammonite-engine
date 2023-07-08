@@ -49,8 +49,8 @@ $(BUILD_DIR)/libammonite.so: $(AMMONITE_OBJECTS)
 	$(CXX) -shared -o "$@" $(AMMONITE_OBJECTS) $(CXXFLAGS) "-Wl,-soname,$(LIBRARY_NAME)"
 
 $(BUILD_DIR)/$(LIBRARY_NAME): $(BUILD_DIR)/libammonite.so
-	rm -f "$(BUILD_DIR)/$(LIBRARY_NAME)"
-	ln -s "libammonite.so" "$(BUILD_DIR)/$(LIBRARY_NAME)"
+	@rm -fv "$(BUILD_DIR)/$(LIBRARY_NAME)"
+	@ln -sv "libammonite.so" "$(BUILD_DIR)/$(LIBRARY_NAME)"
 
 $(OBJECT_DIR)/ammonite/%.o: ./src/ammonite/%.cpp $(AMMONITE_HEADER_SOURCE)
 	@mkdir -p "$$(dirname $@)"
@@ -78,16 +78,16 @@ debug: clean
 	@DEBUG="true" $(MAKE) build
 library: $(BUILD_DIR)/$(LIBRARY_NAME)
 headers:
-	cp -r "./src/ammonite" "$(HEADER_DIR)/ammonite"
-	rm -rf "$(HEADER_DIR)/ammonite/internal"
+	@cp -rv "./src/ammonite" "$(HEADER_DIR)/ammonite"
+	@rm -rfv "$(HEADER_DIR)/ammonite/internal"
 install:
 	@mkdir -p "$(INSTALL_DIR)/ammonite"
 	install "$(BUILD_DIR)/libammonite.so" "$(INSTALL_DIR)/ammonite/$(LIBRARY_NAME)"
 	ldconfig "$(INSTALL_DIR)/ammonite"
 uninstall:
-	rm -f "$(INSTALL_DIR)/ammonite/libammonite.so"*
-	if [[ -d "$(INSTALL_DIR)/ammonite" ]]; then rm -di "$(INSTALL_DIR)/ammonite"; fi
-	if [[ -d "$(HEADER_DIR)/ammonite" ]]; then rm -rf "$(HEADER_DIR)/ammonite"; fi
+	@rm -fv "$(INSTALL_DIR)/ammonite/libammonite.so"*
+	@if [[ -d "$(INSTALL_DIR)/ammonite" ]]; then rm -di "$(INSTALL_DIR)/ammonite"; fi
+	@if [[ -d "$(HEADER_DIR)/ammonite" ]]; then rm -rf "$(HEADER_DIR)/ammonite"; fi
 clean: cache
 	@rm -rfv "$(BUILD_DIR)"
 cache:
