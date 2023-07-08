@@ -48,15 +48,15 @@ $(BUILD_DIR)/libammonite.so: $(AMMONITE_OBJECTS)
 	@mkdir -p "$(OBJECT_DIR)"
 	$(CXX) -shared -o "$@" $(AMMONITE_OBJECTS) $(CXXFLAGS) "-Wl,-soname,$(LIBRARY_NAME)"
 
-$(AMMONITE_OBJECTS): $(AMMONITE_OBJECTS_SOURCE) $(AMMONITE_HEADER_SOURCE)
+$(OBJECT_DIR)/%.o: ./src/ammonite/%.cpp $(AMMONITE_HEADER_SOURCE)
 	@mkdir -p "$$(dirname $@)"
 	$(CXX) $(subst $(OBJECT_DIR),src/ammonite,$(subst .o,.cpp,$(@))) -c $(CXXFLAGS) -fpic -o "$@"
 
-$(COMMON_OBJECTS): $(COMMON_OBJECTS_SOURCE) $(COMMON_HEADER_SOURCE)
+$(OBJECT_DIR)/%.o: ./src/common/%.cpp $(COMMON_HEADER_SOURCE)
 	@mkdir -p "$(OBJECT_DIR)"
 	$(CXX) $(subst $(OBJECT_DIR),src/common,$(subst .o,.cpp,$(@))) -c $(CXXFLAGS) -o "$@"
 
-$(DEMO_OBJECTS): $(DEMO_OBJECTS_SOURCE) $(DEMO_HEADER_SOURCE)
+$(OBJECT_DIR)/%.o: ./src/demos/%.cpp $(DEMO_HEADER_SOURCE)
 	@mkdir -p "$(OBJECT_DIR)"
 	$(CXX) $(subst $(OBJECT_DIR),src/demos,$(subst .o,.cpp,$(@))) -c $(CXXFLAGS) -o "$@"
 
