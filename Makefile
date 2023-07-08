@@ -78,7 +78,7 @@ debug: clean
 	@DEBUG="true" $(MAKE) build
 library: $(BUILD_DIR)/$(LIBRARY_NAME)
 headers:
-	@cp -rv "./src/ammonite" "$(HEADER_DIR)/ammonite"
+	@cp -rv "./src/ammonite" "$(HEADER_DIR)/"
 	@rm -rfv "$(HEADER_DIR)/ammonite/internal"
 install:
 	@mkdir -p "$(INSTALL_DIR)/ammonite"
