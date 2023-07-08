@@ -70,12 +70,12 @@ $(OBJECT_DIR)/demo.o: ./src/demo.cpp $(AMMONITE_HEADER_SOURCE) $(HELPER_HEADER_S
 
 .PHONY: build debug library headers install uninstall clean cache icons
 build:
-	$(MAKE) "$(BUILD_DIR)/demo"
+	@$(MAKE) "$(BUILD_DIR)/demo"
 	@if [[ "$(DEBUG)" != "true" ]]; then \
 	  strip --strip-unneeded "$(BUILD_DIR)/libammonite.so" "$(BUILD_DIR)/demo"; \
 	fi
 debug: clean
-	DEBUG="true" $(MAKE) build
+	@DEBUG="true" $(MAKE) build
 library: $(BUILD_DIR)/$(LIBRARY_NAME)
 headers:
 	cp -r "./src/ammonite" "$(HEADER_DIR)/ammonite"
