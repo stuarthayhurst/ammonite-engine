@@ -486,6 +486,24 @@ namespace ammonite {
       glNamedFramebufferTexture(screenQuadFBO, GL_DEPTH_ATTACHMENT, screenQuadDepthTextureId, 0);
     }
 
+    static void checkFramebuffers(int renderWidth, int renderHeight, int sampleCount) {
+      //Check multisampled framebuffer
+      if (sampleCount != 0) {
+        if (glCheckNamedFramebufferStatus(colourBufferMultisampleFBO, GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+          std::cerr << ammonite::utils::warning << "Incomplete multisampled render framebuffer" << std::endl;
+        } else {
+          ammoniteInternalDebug << "Created new multisampled render framebuffer (" << renderWidth << " x " << renderHeight << "), samples: x" << sampleCount << std::endl;
+        }
+      }
+
+      //Check regular framebuffer
+      if (glCheckNamedFramebufferStatus(screenQuadFBO, GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+        std::cerr << ammonite::utils::warning << "Incomplete render framebuffer" << std::endl;
+      } else {
+        ammoniteInternalDebug << "Created new render framebuffer (" << renderWidth << " x " << renderHeight << ")" << std::endl;
+      }
+    }
+
     //Create, configure and bind depth cubemap for shadows
     static void setupDepthMap(unsigned int lightCount, int shadowRes) {
       //Delete the cubemap array if it already exists
@@ -610,22 +628,8 @@ namespace ammonite {
 
           //Create or recreate the framebuffers for rendering
           recreateFramebuffers(&targetBufferId, sampleCount, renderWidth, renderHeight);
+          checkFramebuffers(renderWidth, renderHeight, sampleCount);
 
-          //Check multisampled framebuffer
-          if (sampleCount != 0) {
-            if (glCheckNamedFramebufferStatus(colourBufferMultisampleFBO, GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-              std::cerr << ammonite::utils::warning << "Incomplete multisampled render framebuffer" << std::endl;
-            } else {
-              ammoniteInternalDebug << "Created new multisampled render framebuffer (" << renderWidth << " x " << renderHeight << "), samples: x" << sampleCount << std::endl;
-            }
-          }
-
-          //Check regular framebuffer
-          if (glCheckNamedFramebufferStatus(screenQuadFBO, GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-            std::cerr << ammonite::utils::warning << "Incomplete render framebuffer" << std::endl;
-          } else {
-            ammoniteInternalDebug << "Created new render framebuffer (" << renderWidth << " x " << renderHeight << ")" << std::endl;
-          }
           ammoniteInternalDebug << "Output resolution: " << *widthPtr << " x " << *heightPtr << std::endl;
         }
 
