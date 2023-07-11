@@ -22,6 +22,7 @@ namespace ammonite {
 
     namespace internal {
       void internalDrawFrame();
+      void internalDrawLoadingScreen(int loadingScreenId);
     }
   }
 }

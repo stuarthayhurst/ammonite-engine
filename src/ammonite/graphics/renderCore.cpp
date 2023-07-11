@@ -535,6 +535,17 @@ namespace ammonite {
       }
 
     namespace internal {
+      void internalDrawLoadingScreen(int loadingScreenId) {
+        static int* widthPtr = ammonite::settings::runtime::internal::getWidthPtr();
+        static int* heightPtr = ammonite::settings::runtime::internal::getHeightPtr();
+
+        drawLoadingScreen(loadingScreenId, *widthPtr, *heightPtr);
+
+        //Prepare for next frame
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        finishFrame();
+      }
+
       void internalDrawFrame() {
         static int lastWidth = 0, lastHeight = 0;
         static int* widthPtr = ammonite::settings::runtime::internal::getWidthPtr();
@@ -653,17 +664,6 @@ namespace ammonite {
           //Save for next time to avoid cubemap recreation
           lastShadowRes = *shadowResPtr;
           lastLightCount = lightCount;
-        }
-
-        //If a loading screen is active, draw it and return
-        int loadingScreenId = ammonite::interface::internal::getActiveLoadingScreenId();
-        if (loadingScreenId != 0) {
-          drawLoadingScreen(loadingScreenId, *widthPtr, *heightPtr);
-
-          //Prepare for next frame
-          glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-          finishFrame();
-          return;
         }
 
         //Swap to depth shader and enable depth testing

@@ -73,7 +73,11 @@ namespace ammonite {
       }
 
       //Offload rest of frame drawing to helpers
-      internal::internalDrawFrame();
+      if (loadingScreenId == 0) {
+        internal::internalDrawFrame();
+      } else {
+        internal::internalDrawLoadingScreen(loadingScreenId);
+      }
     }
   }
 }
