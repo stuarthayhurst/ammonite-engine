@@ -424,8 +424,9 @@ namespace ammonite {
       }
 
       //Draw the model pointers
+      bool isDepthPass = (renderMode == AMMONITE_DEPTH_PASS);
       for (int i = 0; i < modelCount; i++) {
-        drawModel(modelPtrs[i], -1, (renderMode == AMMONITE_DEPTH_PASS));
+        drawModel(modelPtrs[i], -1, isDepthPass);
       }
     }
 
