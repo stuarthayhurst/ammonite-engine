@@ -3,7 +3,6 @@
 #include <vector>
 #include <string>
 #include <chrono>
-#include <thread>
 #include <cmath>
 
 #include <glm/glm.hpp>
@@ -26,11 +25,9 @@
 
 #include "shaders.hpp"
 #include "../constants.hpp"
-#include "../settings.hpp"
 #include "../camera.hpp"
 #include "../environment.hpp"
 
-#include "../utils/timer.hpp"
 #include "../utils/extension.hpp"
 #include "../utils/logging.hpp"
 
@@ -476,34 +473,6 @@ namespace ammonite {
       glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, nullptr);
     }
 
-    void finishFrame() {
-      //Swap buffers
-      glfwSwapBuffers(window);
-
-      //Figure out time budget remaining
-      static ammonite::utils::Timer targetFrameTimer;
-
-      //Wait until next frame should be prepared
-      static float* frameLimitPtr = ammonite::settings::graphics::internal::getFrameLimitPtr();
-      if (*frameLimitPtr != 0.0f) {
-        //Length of microsleep and allowable error
-        static const double sleepInterval = 1.0 / 100000;
-        static const double maxError = (sleepInterval) * 2.0f;
-        static const auto sleepLength = std::chrono::nanoseconds(int(std::floor(sleepInterval * 1000000000.0)));
-
-        double const targetFrameTime = 1.0 / *frameLimitPtr;
-        double spareTime = targetFrameTime - targetFrameTimer.getTime();
-
-        //Sleep for short intervals until the frametime budget is gone
-        while (spareTime > maxError) {
-          std::this_thread::sleep_for(sleepLength);
-          spareTime = targetFrameTime - targetFrameTimer.getTime();
-        }
-      }
-
-      targetFrameTimer.reset();
-    }
-
     void drawLoadingScreen(int loadingScreenId, int width, int height) {
         //Swap to loading screen shader
         glUseProgram(loadingShader.shaderId);
@@ -543,7 +512,7 @@ namespace ammonite {
 
         //Prepare for next frame
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        finishFrame();
+        finishFrame(window);
       }
 
       void internalDrawFrame() {
@@ -815,7 +784,7 @@ namespace ammonite {
         glDisable(GL_FRAMEBUFFER_SRGB);
 
         //Display frame and handle any sleeping required
-        finishFrame();
+        finishFrame(window);
       }
     }
   }
