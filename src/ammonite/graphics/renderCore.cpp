@@ -430,6 +430,62 @@ namespace ammonite {
       }
     }
 
+    //Setup framebuffers for rendering
+    static inline void recreateFramebuffers(GLuint* targetBufferIdPtr, int sampleCount,
+                                            int renderWidth, int renderHeight) {
+
+      //Delete regular colour and depth storage textures
+      if (screenQuadTextureId != 0) {
+        glDeleteTextures(1, &screenQuadTextureId);
+        glDeleteTextures(1, &screenQuadDepthTextureId);
+        screenQuadTextureId = 0;
+        screenQuadDepthTextureId = 0;
+      }
+
+      //Delete multisampled colour storage if it exists
+      if (colourRenderBufferId != 0) {
+        glDeleteRenderbuffers(1, &colourRenderBufferId);
+        colourRenderBufferId = 0;
+      }
+
+      //Create texture for whole screen
+      glCreateTextures(GL_TEXTURE_2D, 1, &screenQuadTextureId);
+      glCreateTextures(GL_TEXTURE_2D, 1, &screenQuadDepthTextureId);
+
+      //Decide which framebuffer to render to and create multisampled renderbuffer, if needed
+      if (sampleCount != 0) {
+        *targetBufferIdPtr = colourBufferMultisampleFBO;
+        glCreateRenderbuffers(1, &colourRenderBufferId);
+      } else {
+        *targetBufferIdPtr = screenQuadFBO;
+      }
+
+      if (sampleCount != 0) {
+        //Create multisampled renderbuffers for colour and depth
+        glNamedRenderbufferStorageMultisample(colourRenderBufferId, sampleCount, GL_RGB8, renderWidth, renderHeight);
+        glNamedRenderbufferStorageMultisample(depthRenderBufferId, sampleCount, GL_DEPTH_COMPONENT32, renderWidth, renderHeight);
+
+        //Attach colour and depth renderbuffers to multisampled framebuffer
+        glNamedFramebufferRenderbuffer(colourBufferMultisampleFBO, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, colourRenderBufferId);
+        glNamedFramebufferRenderbuffer(colourBufferMultisampleFBO, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthRenderBufferId);
+      }
+
+      //Create texture to store colour data and bind to framebuffer
+      glTextureStorage2D(screenQuadTextureId, 1, GL_RGB8, renderWidth, renderHeight);
+      glTextureParameteri(screenQuadTextureId, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTextureParameteri(screenQuadTextureId, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glTextureParameteri(screenQuadTextureId, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+      glTextureParameteri(screenQuadTextureId, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+      glNamedFramebufferTexture(screenQuadFBO, GL_COLOR_ATTACHMENT0, screenQuadTextureId, 0);
+
+      glTextureStorage2D(screenQuadDepthTextureId, 1, GL_DEPTH_COMPONENT32, renderWidth, renderHeight);
+      glTextureParameteri(screenQuadDepthTextureId, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTextureParameteri(screenQuadDepthTextureId, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glTextureParameteri(screenQuadDepthTextureId, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+      glTextureParameteri(screenQuadDepthTextureId, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+      glNamedFramebufferTexture(screenQuadFBO, GL_DEPTH_ATTACHMENT, screenQuadDepthTextureId, 0);
+    }
+
     //Create, configure and bind depth cubemap for shadows
     static void setupDepthMap(unsigned int lightCount, int shadowRes) {
       //Delete the cubemap array if it already exists
@@ -548,60 +604,12 @@ namespace ammonite {
             *samplesPtr = sampleCount;
           }
 
-          //Delete regular colour and depth storage textures
-          if (screenQuadTextureId != 0) {
-            glDeleteTextures(1, &screenQuadTextureId);
-            glDeleteTextures(1, &screenQuadDepthTextureId);
-            screenQuadTextureId = 0;
-            screenQuadDepthTextureId = 0;
-          }
-
-          //Delete multisampled colour storage if it exists
-          if (colourRenderBufferId != 0) {
-            glDeleteRenderbuffers(1, &colourRenderBufferId);
-            colourRenderBufferId = 0;
-          }
-
-          //Create texture for whole screen
-          glCreateTextures(GL_TEXTURE_2D, 1, &screenQuadTextureId);
-          glCreateTextures(GL_TEXTURE_2D, 1, &screenQuadDepthTextureId);
-
-          //Decide which framebuffer to render to and create multisampled renderbuffer, if needed
-          if (sampleCount != 0) {
-            targetBufferId = colourBufferMultisampleFBO;
-            glCreateRenderbuffers(1, &colourRenderBufferId);
-          } else {
-            targetBufferId = screenQuadFBO;
-          }
-
           //Calculate render resolution
           renderWidth = std::floor(*widthPtr * *renderResMultiplierPtr);
           renderHeight = std::floor(*heightPtr * *renderResMultiplierPtr);
 
-          if (sampleCount != 0) {
-            //Create multisampled renderbuffers for colour and depth
-            glNamedRenderbufferStorageMultisample(colourRenderBufferId, sampleCount, GL_RGB8, renderWidth, renderHeight);
-            glNamedRenderbufferStorageMultisample(depthRenderBufferId, sampleCount, GL_DEPTH_COMPONENT32, renderWidth, renderHeight);
-
-            //Attach colour and depth renderbuffers to multisampled framebuffer
-            glNamedFramebufferRenderbuffer(colourBufferMultisampleFBO, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, colourRenderBufferId);
-            glNamedFramebufferRenderbuffer(colourBufferMultisampleFBO, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthRenderBufferId);
-          }
-
-          //Create texture to store colour data and bind to framebuffer
-          glTextureStorage2D(screenQuadTextureId, 1, GL_RGB8, renderWidth, renderHeight);
-          glTextureParameteri(screenQuadTextureId, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-          glTextureParameteri(screenQuadTextureId, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-          glTextureParameteri(screenQuadTextureId, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-          glTextureParameteri(screenQuadTextureId, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-          glNamedFramebufferTexture(screenQuadFBO, GL_COLOR_ATTACHMENT0, screenQuadTextureId, 0);
-
-          glTextureStorage2D(screenQuadDepthTextureId, 1, GL_DEPTH_COMPONENT32, renderWidth, renderHeight);
-          glTextureParameteri(screenQuadDepthTextureId, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-          glTextureParameteri(screenQuadDepthTextureId, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-          glTextureParameteri(screenQuadDepthTextureId, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-          glTextureParameteri(screenQuadDepthTextureId, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-          glNamedFramebufferTexture(screenQuadFBO, GL_DEPTH_ATTACHMENT, screenQuadDepthTextureId, 0);
+          //Create or recreate the framebuffers for rendering
+          recreateFramebuffers(&targetBufferId, sampleCount, renderWidth, renderHeight);
 
           //Check multisampled framebuffer
           if (sampleCount != 0) {
