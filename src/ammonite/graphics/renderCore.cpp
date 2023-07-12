@@ -462,7 +462,7 @@ namespace ammonite {
 
       if (sampleCount != 0) {
         //Create multisampled renderbuffers for colour and depth
-        glNamedRenderbufferStorageMultisample(colourRenderBufferId, sampleCount, GL_RGB8, renderWidth, renderHeight);
+        glNamedRenderbufferStorageMultisample(colourRenderBufferId, sampleCount, GL_SRGB8, renderWidth, renderHeight);
         glNamedRenderbufferStorageMultisample(depthRenderBufferId, sampleCount, GL_DEPTH_COMPONENT32, renderWidth, renderHeight);
 
         //Attach colour and depth renderbuffers to multisampled framebuffer
@@ -471,7 +471,7 @@ namespace ammonite {
       }
 
       //Create texture to store colour data and bind to framebuffer
-      glTextureStorage2D(screenQuadTextureId, 1, GL_RGB8, renderWidth, renderHeight);
+      glTextureStorage2D(screenQuadTextureId, 1, GL_SRGB8, renderWidth, renderHeight);
       glTextureParameteri(screenQuadTextureId, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTextureParameteri(screenQuadTextureId, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glTextureParameteri(screenQuadTextureId, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -666,6 +666,14 @@ namespace ammonite {
           *modelsMovedPtr = false;
         }
 
+        //Use gamma correction if enabled
+        static bool* gammaPtr = ammonite::settings::graphics::internal::getGammaCorrectionPtr();
+        if (*gammaPtr) {
+          glEnable(GL_FRAMEBUFFER_SRGB);
+        } else {
+          glDisable(GL_FRAMEBUFFER_SRGB);
+        }
+
         //Depth mapping render passes
         auto lightIt = lightTrackerMap->begin();
         unsigned int activeLights = std::min(lightCount, maxLightCount);
@@ -753,48 +761,58 @@ namespace ammonite {
           drawSkybox(activeSkybox);
         }
 
-        //Use gamma correction if enabled
-        static bool* gammaPtr = ammonite::settings::graphics::internal::getGammaCorrectionPtr();
-        if (*gammaPtr) {
-          glEnable(GL_FRAMEBUFFER_SRGB);
-        }
-
-        //Get focal depth status, used to conditionally send data
+        //Get focal depth status, used to conditionally post-process
         static bool* focalDepthEnabledPtr = ammonite::settings::graphics::post::internal::getFocalDepthEnabledPtr();
 
-        //Resolve multisampling into regular texture
-        if (sampleCount != 0) {
-          GLbitfield blitBits = GL_COLOR_BUFFER_BIT;
-          //Only copy depth if blur is enabled
-          if (*focalDepthEnabledPtr) {
-            blitBits |= GL_DEPTH_BUFFER_BIT;
+        //Enable post-processor when required, or blit would fail
+        bool isPostRequired = *focalDepthEnabledPtr;
+        if (sampleCount == 0) {
+          //Workaround until non-multisampled rendering is done to an offscreen framebuffer
+          isPostRequired = true;
+        } else if (sampleCount != 0 && *renderResMultiplierPtr != 1.0f) {
+          //Workaround INVALID_OPERATION when scaling a multisampled buffer with a blit
+          isPostRequired = true;
+        }
+
+        /*
+          If post-processing is required, blit offscreen framebuffer to texture
+          Use a post-processing fragment shader with this texture to blur and scale
+
+          If post-processing isn't required or can be avoided, render directly to screen
+        */
+        if (isPostRequired) {
+          //Resolve multisampling into regular texture
+          if (sampleCount != 0) {
+            GLbitfield blitBits = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT;
+            glBlitNamedFramebuffer(colourBufferMultisampleFBO, screenQuadFBO, 0, 0, renderWidth, renderHeight, 0, 0, renderWidth, renderHeight, blitBits, GL_NEAREST);
           }
 
-          glBlitNamedFramebuffer(colourBufferMultisampleFBO, screenQuadFBO, 0, 0, renderWidth, renderHeight, 0, 0, renderWidth, renderHeight, blitBits, GL_NEAREST);
+          //Swap to default framebuffer and correct shaders
+          glUseProgram(screenShader.shaderId);
+          internal::prepareScreen(0, *widthPtr, *heightPtr, false);
+
+          //Conditionally send data for blur
+          glUniform1i(screenShader.focalDepthEnabledId, *focalDepthEnabledPtr);
+          if (*focalDepthEnabledPtr) {
+            static float* focalDepthPtr = ammonite::settings::graphics::post::internal::getFocalDepthPtr();
+            static float* blurStrengthPtr = ammonite::settings::graphics::post::internal::getBlurStrengthPtr();
+
+            glUniform1f(screenShader.focalDepthId, *focalDepthPtr);
+            glUniform1f(screenShader.blurStrengthId, *blurStrengthPtr);
+            glBindTextureUnit(4, screenQuadDepthTextureId);
+          }
+
+          //Display the rendered frame
+          glBindVertexArray(screenQuadVertexArrayId);
+          glBindTextureUnit(3, screenQuadTextureId);
+          glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, nullptr);
+        } else {
+          //Resolve multisampling into default framebuffer
+          if (sampleCount != 0) {
+            GLbitfield blitBits = GL_COLOR_BUFFER_BIT;
+            glBlitNamedFramebuffer(colourBufferMultisampleFBO, 0, 0, 0, renderWidth, renderHeight, 0, 0, *widthPtr, *heightPtr, blitBits, GL_NEAREST);
+          }
         }
-
-        //Swap to default framebuffer and correct shaders
-        glUseProgram(screenShader.shaderId);
-        internal::prepareScreen(0, *widthPtr, *heightPtr, false);
-
-        //Conditionally send data for blur
-        glUniform1i(screenShader.focalDepthEnabledId, *focalDepthEnabledPtr);
-        if (*focalDepthEnabledPtr) {
-          static float* focalDepthPtr = ammonite::settings::graphics::post::internal::getFocalDepthPtr();
-          static float* blurStrengthPtr = ammonite::settings::graphics::post::internal::getBlurStrengthPtr();
-
-          glUniform1f(screenShader.focalDepthId, *focalDepthPtr);
-          glUniform1f(screenShader.blurStrengthId, *blurStrengthPtr);
-          glBindTextureUnit(4, screenQuadDepthTextureId);
-        }
-
-        //Display the rendered frame
-        glBindVertexArray(screenQuadVertexArrayId);
-        glBindTextureUnit(3, screenQuadTextureId);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, nullptr);
-
-        //Disable gamma correction for start of next pass
-        glDisable(GL_FRAMEBUFFER_SRGB);
 
         //Display frame and handle any sleeping required
         finishFrame(window);
