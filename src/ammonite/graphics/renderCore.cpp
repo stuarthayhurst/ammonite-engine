@@ -780,6 +780,7 @@ namespace ammonite {
 
           If post-processing isn't required or can be avoided, render directly to screen
         */
+        internal::prepareScreen(0, *widthPtr, *heightPtr, false);
         if (isPostRequired) {
           //Resolve multisampling into regular texture
           if (sampleCount != 0) {
@@ -787,9 +788,8 @@ namespace ammonite {
             glBlitNamedFramebuffer(colourBufferMultisampleFBO, screenQuadFBO, 0, 0, renderWidth, renderHeight, 0, 0, renderWidth, renderHeight, blitBits, GL_NEAREST);
           }
 
-          //Swap to default framebuffer and correct shaders
+          //Swap to correct shaders
           glUseProgram(screenShader.shaderId);
-          internal::prepareScreen(0, *widthPtr, *heightPtr, false);
 
           //Conditionally send data for blur
           glUniform1i(screenShader.focalDepthEnabledId, *focalDepthEnabledPtr);
