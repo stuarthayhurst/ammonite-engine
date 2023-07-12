@@ -139,6 +139,7 @@ int main(int argc, char* argv[]) {
   //Graphics settings
   ammonite::settings::graphics::setAntialiasingSamples(4);
   ammonite::settings::graphics::setGammaCorrection(true);
+  ammonite::settings::graphics::setRenderResMultiplier(1.0f);
 
   //Renderer failed to initialise, clean up and exit
   if (!success) {
