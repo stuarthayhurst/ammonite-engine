@@ -62,11 +62,11 @@ namespace ammonite {
         }
       }
 
-      std::map<int, LightSource>* getLightTracker() {
+      std::map<int, LightSource>* getLightTrackerPtr() {
         return &lightTrackerMap;
       }
 
-      std::map<int, glm::mat4[6]>* getLightTransforms() {
+      std::map<int, glm::mat4[6]>* getLightTransformsPtr() {
         return &lightTransformMap;
       }
 

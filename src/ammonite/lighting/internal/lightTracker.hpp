@@ -18,8 +18,8 @@ namespace ammonite {
       int getLightEmitterCount();
       void getLightEmitters(int lightData[]);
 
-      std::map<int, LightSource>* getLightTracker();
-      std::map<int, glm::mat4[6]>* getLightTransforms();
+      std::map<int, LightSource>* getLightTrackerPtr();
+      std::map<int, glm::mat4[6]>* getLightTransformsPtr();
     }
   }
 }

@@ -112,8 +112,8 @@ namespace ammonite {
       glm::mat4* projectionMatrix = ammonite::camera::matrices::getProjectionMatrixPtr();
 
       //Get the light trackers
-      std::map<int, ammonite::lighting::internal::LightSource>* lightTrackerMap = ammonite::lighting::internal::getLightTracker();
-      std::map<int, glm::mat4[6]>* lightTransformMap = ammonite::lighting::internal::getLightTransforms();
+      std::map<int, ammonite::lighting::internal::LightSource>* lightTrackerMap = ammonite::lighting::internal::getLightTrackerPtr();
+      std::map<int, glm::mat4[6]>* lightTransformMap = ammonite::lighting::internal::getLightTransformsPtr();
       unsigned int maxLightCount = 0;
 
       //Get the loading screen tracker
