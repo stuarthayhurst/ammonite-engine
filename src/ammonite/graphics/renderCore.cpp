@@ -392,8 +392,10 @@ namespace ammonite {
 
         for (unsigned int i = 0; i < drawObjectData->meshes.size(); i++) {
           //Set texture for regular shading pass
-          if (lightIndex == -1 and !depthPass) {
-            glBindTextureUnit(0, drawObject->textureIds[i]);
+          if (!depthPass) {
+            if (lightIndex == -1) {
+              glBindTextureUnit(0, drawObject->textureIds[i]);
+            }
           }
 
           //Bind vertex attribute buffer
@@ -732,13 +734,13 @@ namespace ammonite {
         glUniform1i(modelShader.lightCountId, activeLights);
         drawModels(AMMONITE_RENDER_PASS);
 
-        //Get information about light sources to be rendered
+        //Swap to the light emitting model shader
         int lightEmitterCount = ammonite::lighting::internal::getLightEmitterCount();
         int lightData[lightEmitterCount * 2];
-        ammonite::lighting::internal::getLightEmitters(lightData);
-
-        //Swap to the light emitting model shader
         if (lightEmitterCount > 0) {
+          //Get information about light sources to be rendered
+          ammonite::lighting::internal::getLightEmitters(lightData);
+
           glUseProgram(lightShader.shaderId);
 
           //Draw light sources with models attached
