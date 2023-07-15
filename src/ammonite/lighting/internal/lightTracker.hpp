@@ -15,8 +15,6 @@ namespace ammonite {
     namespace internal {
       void unlinkByModel(int modelId);
       LightSource* getLightSourcePtr(int lightId);
-      int getLightEmitterCount();
-      void getLightEmitters(int lightData[]);
 
       std::map<int, LightSource>* getLightTrackerPtr();
       std::map<int, glm::mat4[6]>* getLightTransformsPtr();

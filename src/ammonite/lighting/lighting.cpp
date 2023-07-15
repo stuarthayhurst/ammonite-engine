@@ -33,26 +33,11 @@ namespace ammonite {
 
     //Track cumulative number of created light sources
     int totalLights = 0;
-
-    //Track light emitting models
-    std::vector<int> lightEmitterData;
   }
 
   namespace lighting {
     //Internally exposed light handling methods
     namespace internal {
-      //Return data on light emitting models
-      int getLightEmitterCount() {
-        return lightEmitterData.size() / 2;
-      }
-
-      void getLightEmitters(int lightData[]) {
-        //Fill passed array with data
-        for (unsigned int i = 0; i < lightEmitterData.size(); i++) {
-          lightData[i] = lightEmitterData[i];
-        }
-      }
-
       LightSource* getLightSourcePtr(int lightId) {
         //Check the light source exists, and return a pointer
         if (lightTrackerMap.contains(lightId)) {
@@ -99,9 +84,6 @@ namespace ammonite {
       omp_set_dynamic(0);
       omp_set_num_threads(threadCount);
 
-      //Clear saved data on light emitting models
-      lightEmitterData.clear();
-
       //If no lights remain, unbind and return early
       if (lightTrackerMap.size() == 0) {
         glDeleteBuffers(1, &lightDataId);
@@ -130,9 +112,9 @@ namespace ammonite {
           //Override light position, using linked model
           lightSource->geometry = ammonite::models::position::getPosition(lightSource->modelId);
 
-          //Add to tracker
-          lightEmitterData.push_back(lightSource->modelId);
-          lightEmitterData.push_back(i);
+          //Update lightIndex for rendering light emitting models
+          auto modelPtr = ammonite::models::internal::getModelPtr(lightSource->modelId);
+          modelPtr->lightIndex = i;
         }
 
         //Calculate shadow transforms for shadows

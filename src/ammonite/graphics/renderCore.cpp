@@ -740,23 +740,22 @@ namespace ammonite {
         glUniform1i(modelShader.lightCountId, activeLights);
         drawModels(AMMONITE_RENDER_PASS);
 
-        //Swap to the light emitting model shader
-        int lightEmitterCount = ammonite::lighting::internal::getLightEmitterCount();
-        int lightData[lightEmitterCount * 2];
-        if (lightEmitterCount > 0) {
-          //Get information about light sources to be rendered
-          ammonite::lighting::internal::getLightEmitters(lightData);
+        //Render light emitting models
+        int lightModelCount = ammonite::models::internal::getModelCount(AMMONITE_LIGHT_EMITTER);
+        ammonite::models::internal::ModelInfo* lightModelPtrs[lightModelCount];
 
+        if (lightModelCount > 0) {
+          //Retrieve light emitting models to be rendered
+          ammonite::models::internal::getModels(AMMONITE_LIGHT_EMITTER,
+                                                lightModelCount, lightModelPtrs);
+
+          //Get light index and render
           glUseProgram(lightShader.shaderId);
-
-          //Draw light sources with models attached
-          for (int i = 0; i < lightEmitterCount; i++) {
-            int modelId = lightData[(i * 2)];
-            int lightIndex = lightData[(i * 2) + 1];
-            ammonite::models::internal::ModelInfo* modelPtr = ammonite::models::internal::getModelPtr(modelId);
-
-            if (modelPtr != nullptr) {
-              drawModel(modelPtr, lightIndex, false);
+          for (int i = 0; i < lightModelCount; i++) {
+            ammonite::models::internal::ModelInfo* lightModelPtr = lightModelPtrs[i];
+            if (lightModelPtr != nullptr) {
+              int lightIndex = lightModelPtr->lightIndex;
+              drawModel(lightModelPtr, lightIndex, false);
             }
           }
         }

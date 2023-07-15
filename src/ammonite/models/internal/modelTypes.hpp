@@ -52,6 +52,7 @@ namespace ammonite {
         short drawMode = 0;
         bool isLoaded = true;
         int lightEmitterId = -1;
+        int lightIndex = -1;
         std::string modelName;
         int modelId;
         AmmoniteEnum modelType = AMMONITE_MODEL;

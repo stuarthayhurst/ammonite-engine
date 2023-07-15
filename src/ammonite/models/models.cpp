@@ -191,7 +191,7 @@ namespace ammonite {
         }
         modelPtr = modelIdPtrMap[modelId];
 
-        //Set light emission property
+        //Set light emitter ID property
         if (modelPtr != nullptr) {
           modelPtr->lightEmitterId = lightEmitterId;
         }
