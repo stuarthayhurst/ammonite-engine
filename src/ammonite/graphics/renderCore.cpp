@@ -352,9 +352,9 @@ namespace ammonite {
     }
 
     namespace {
-      static void drawModel(ammonite::models::ModelInfo *drawObject, int lightIndex, bool depthPass) {
+      static void drawModel(ammonite::models::internal::ModelInfo *drawObject, int lightIndex, bool depthPass) {
         //Get model draw data
-        ammonite::models::ModelData* drawObjectData = drawObject->modelData;
+        ammonite::models::internal::ModelData* drawObjectData = drawObject->modelData;
 
         //Set the requested draw mode (normal, wireframe, points)
         GLenum mode = GL_TRIANGLES;
@@ -410,13 +410,13 @@ namespace ammonite {
     static void drawModels(AmmoniteRenderMode renderMode) {
       //Create initial array for model pointers
       static int modelCount = ammonite::models::internal::getModelCount(AMMONITE_MODEL);
-      static ammonite::models::ModelInfo** modelPtrs = new ammonite::models::ModelInfo* [modelCount];
+      static ammonite::models::internal::ModelInfo** modelPtrs = new ammonite::models::internal::ModelInfo* [modelCount];
 
       //If requested, create a new array for model pointers
       if (renderMode == AMMONITE_DATA_REFRESH) {
         //Replace array with one of the correct size
         modelCount = ammonite::models::internal::getModelCount(AMMONITE_MODEL);
-        ammonite::models::ModelInfo** newArr = new ammonite::models::ModelInfo* [modelCount];
+        ammonite::models::internal::ModelInfo** newArr = new ammonite::models::internal::ModelInfo* [modelCount];
         delete [] modelPtrs;
         modelPtrs = newArr;
 
@@ -747,7 +747,7 @@ namespace ammonite {
           for (int i = 0; i < lightEmitterCount; i++) {
             int modelId = lightData[(i * 2)];
             int lightIndex = lightData[(i * 2) + 1];
-            ammonite::models::ModelInfo* modelPtr = ammonite::models::internal::getModelPtr(modelId);
+            ammonite::models::internal::ModelInfo* modelPtr = ammonite::models::internal::getModelPtr(modelId);
 
             if (modelPtr != nullptr) {
               drawModel(modelPtr, lightIndex, false);

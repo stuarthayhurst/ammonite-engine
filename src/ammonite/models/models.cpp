@@ -31,9 +31,9 @@
 
 //Class definitions
 namespace ammonite {
-  typedef std::map<int, ammonite::models::ModelInfo> ModelTrackerMap;
-  typedef std::map<int, ammonite::models::ModelInfo*> ModelPtrTrackerMap;
-  typedef std::map<std::string, ammonite::models::ModelData> ModelDataMap;
+  typedef std::map<int, ammonite::models::internal::ModelInfo> ModelTrackerMap;
+  typedef std::map<int, ammonite::models::internal::ModelInfo*> ModelPtrTrackerMap;
+  typedef std::map<std::string, ammonite::models::internal::ModelData> ModelDataMap;
 
   bool haveModelsMoved = false;
 
@@ -57,7 +57,7 @@ namespace ammonite {
       return modelSelector[modelType]->size();
     }
 
-    void getModels(AmmoniteEnum modelType, int modelCount, ammonite::models::ModelInfo* modelArr[]) {
+    void getModels(AmmoniteEnum modelType, int modelCount, ammonite::models::internal::ModelInfo* modelArr[]) {
       //Select the right model tracker
       ModelTrackerMap* modelMapPtr = modelSelector[modelType];
 
@@ -70,7 +70,7 @@ namespace ammonite {
       }
     }
 
-    void addModel(int modelId, ammonite::models::ModelInfo modelObject) {
+    void addModel(int modelId, ammonite::models::internal::ModelInfo modelObject) {
       ModelTrackerMap* targetMapPtr = modelSelector[modelObject.modelType];
       (*targetMapPtr)[modelId] = modelObject;
       (*modelIdPtrMapPtr)[modelId] = &(*targetMapPtr)[modelId];
@@ -106,7 +106,7 @@ namespace ammonite {
         currentMapPtr->erase(modelId);
 
         //Update the id to pointer map
-        ammonite::models::ModelInfo* modelPtr = &(*targetMapPtr)[modelId];
+        ammonite::models::internal::ModelInfo* modelPtr = &(*targetMapPtr)[modelId];
         (*modelIdPtrMapPtr)[modelId] = modelPtr;
 
         //Update the type saved on the model
@@ -158,11 +158,11 @@ namespace ammonite {
         return activeModelTracker.getModelCount(modelType);
       }
 
-      void getModels(AmmoniteEnum modelType, int modelCount, ammonite::models::ModelInfo* modelArr[]) {
+      void getModels(AmmoniteEnum modelType, int modelCount, ammonite::models::internal::ModelInfo* modelArr[]) {
         activeModelTracker.getModels(modelType, modelCount, modelArr);
       }
 
-      ModelInfo* getModelPtr(int modelId) {
+      internal::ModelInfo* getModelPtr(int modelId) {
         //Check the model exists, and return a pointer
         if (modelIdPtrMap.contains(modelId)) {
           return modelIdPtrMap[modelId];
@@ -178,7 +178,7 @@ namespace ammonite {
       void setLightEmitterId(int modelId, int lightEmitterId) {
         //Select the right tracker
         ModelTracker* selectedTracker = &inactiveModelTracker;
-        ModelInfo* modelPtr = modelIdPtrMap[modelId];
+        internal::ModelInfo* modelPtr = modelIdPtrMap[modelId];
         if (modelPtr->isLoaded or modelPtr->drawMode != AMMONITE_DRAW_INACTIVE) {
           selectedTracker = &activeModelTracker;
         }
@@ -198,7 +198,7 @@ namespace ammonite {
       }
 
       int getLightEmitterId(int modelId) {
-        ModelInfo* modelPtr = modelIdPtrMap[modelId];
+        internal::ModelInfo* modelPtr = modelIdPtrMap[modelId];
         if (modelPtr != nullptr) {
           return modelPtr->lightEmitterId;
         }
@@ -208,16 +208,16 @@ namespace ammonite {
   }
 
   namespace {
-    static void createBuffers(models::ModelData* modelObjectData) {
+    static void createBuffers(models::internal::ModelData* modelObjectData) {
       //Generate buffers for every mesh
       for (unsigned int i = 0; i < modelObjectData->meshes.size(); i++) {
-        models::MeshData* meshData = &modelObjectData->meshes[i];
+        models::internal::MeshData* meshData = &modelObjectData->meshes[i];
 
         //Create vertex and index buffers
         glCreateBuffers(2, &meshData->vertexBufferId);
 
         //Fill interleaved vertex + normal + texture buffer and index buffer
-        glNamedBufferData(meshData->vertexBufferId, meshData->meshData.size() * sizeof(models::VertexData), &meshData->meshData[0], GL_STATIC_DRAW);
+        glNamedBufferData(meshData->vertexBufferId, meshData->meshData.size() * sizeof(models::internal::VertexData), &meshData->meshData[0], GL_STATIC_DRAW);
         glNamedBufferData(meshData->elementBufferId, meshData->indices.size() * sizeof(unsigned int), &meshData->indices[0], GL_STATIC_DRAW);
 
         //Create the vertex attribute buffer
@@ -250,10 +250,10 @@ namespace ammonite {
       }
     }
 
-    static void deleteBuffers(models::ModelData* modelObjectData) {
+    static void deleteBuffers(models::internal::ModelData* modelObjectData) {
       //Delete created buffers and the VAO
       for (unsigned int i = 0; i < modelObjectData->meshes.size(); i++) {
-        models::MeshData* meshData = &modelObjectData->meshes[i];
+        models::internal::MeshData* meshData = &modelObjectData->meshes[i];
 
         glDeleteBuffers(1, &meshData->vertexBufferId);
         glDeleteBuffers(1, &meshData->elementBufferId);
@@ -261,14 +261,14 @@ namespace ammonite {
       }
     }
 
-    static void processMesh(aiMesh* mesh, const aiScene* scene, std::vector<models::MeshData>* meshes, std::vector<GLuint>* textureIds, ModelLoadInfo modelLoadInfo, bool* externalSuccess) {
+    static void processMesh(aiMesh* mesh, const aiScene* scene, std::vector<models::internal::MeshData>* meshes, std::vector<GLuint>* textureIds, ModelLoadInfo modelLoadInfo, bool* externalSuccess) {
       //Add a new empty mesh to the mesh vector
       meshes->emplace_back();
-      models::MeshData* newMesh = &meshes->back();
+      models::internal::MeshData* newMesh = &meshes->back();
 
       //Fill the mesh with vertex data
       for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
-        models::VertexData vertexData;
+        models::internal::VertexData vertexData;
 
         vertexData.vertex.x = mesh->mVertices[i].x;
         vertexData.vertex.y = mesh->mVertices[i].y;
@@ -319,7 +319,7 @@ namespace ammonite {
       }
     }
 
-    static void processNode(aiNode* node, const aiScene* scene, std::vector<models::MeshData>* meshes, std::vector<GLuint>* textureIds, ModelLoadInfo modelLoadInfo, bool* externalSuccess) {
+    static void processNode(aiNode* node, const aiScene* scene, std::vector<models::internal::MeshData>* meshes, std::vector<GLuint>* textureIds, ModelLoadInfo modelLoadInfo, bool* externalSuccess) {
       for (unsigned int i = 0; i < node->mNumMeshes; i++) {
         processMesh(scene->mMeshes[node->mMeshes[i]], scene, meshes, textureIds, modelLoadInfo, externalSuccess);
       }
@@ -329,7 +329,7 @@ namespace ammonite {
       }
     }
 
-    static void loadObject(const char* objectPath, models::ModelData* modelObjectData, ModelLoadInfo modelLoadInfo, bool* externalSuccess) {
+    static void loadObject(const char* objectPath, models::internal::ModelData* modelObjectData, ModelLoadInfo modelLoadInfo, bool* externalSuccess) {
       //Generate postprocessing flags
       auto aiProcessFlags = aiProcess_Triangulate | aiProcess_GenNormals | aiProcess_GenUVCoords | aiProcess_RemoveRedundantMaterials | aiProcess_OptimizeMeshes | aiProcess_JoinIdenticalVertices | aiProcess_PreTransformVertices;
 
@@ -353,21 +353,21 @@ namespace ammonite {
       processNode(scene->mRootNode, scene, &modelObjectData->meshes, textureIds, modelLoadInfo, externalSuccess);
     }
 
-    static void moveModelToActive(int modelId, ammonite::models::ModelInfo* modelPtr) {
+    static void moveModelToActive(int modelId, ammonite::models::internal::ModelInfo* modelPtr) {
       //Move from inactive to active tracker, update model pointer map
-      ammonite::models::ModelInfo modelObject = *modelPtr;
+      ammonite::models::internal::ModelInfo modelObject = *modelPtr;
       inactiveModelTracker.deleteModel(modelId);
       activeModelTracker.addModel(modelId, modelObject);
     }
 
-    static void moveModelToInactive(int modelId, ammonite::models::ModelInfo* modelPtr) {
+    static void moveModelToInactive(int modelId, ammonite::models::internal::ModelInfo* modelPtr) {
       //Move from active to inactive tracker, update model pointer map
-      ammonite::models::ModelInfo modelObject = *modelPtr;
+      ammonite::models::internal::ModelInfo modelObject = *modelPtr;
       activeModelTracker.deleteModel(modelId);
       inactiveModelTracker.addModel(modelId, modelObject);
     }
 
-    static void calcModelMatrices(models::PositionData* positionData) {
+    static void calcModelMatrices(models::internal::PositionData* positionData) {
       //Recalculate the model matrix when a component changes
       positionData->modelMatrix = positionData->translationMatrix * glm::toMat4(positionData->rotationQuat) * positionData->scaleMatrix;
 
@@ -380,7 +380,7 @@ namespace ammonite {
   namespace models {
     int createModel(const char* objectPath, bool flipTexCoords, bool srgbTextures, bool* externalSuccess) {
       //Create the model
-      ModelInfo modelObject;
+      internal::ModelInfo modelObject;
       modelObject.modelName = std::string(objectPath);
 
       //Reuse model data if it has already been loaded
@@ -390,7 +390,7 @@ namespace ammonite {
         modelObject.modelData->refCount++;
       } else {
         //Create empty ModelData object and add to tracker
-        ModelData newModelData;
+        internal::ModelData newModelData;
         modelDataMap[modelObject.modelName] = newModelData;
         modelObject.modelData = &modelDataMap[modelObject.modelName];
 
@@ -417,7 +417,7 @@ namespace ammonite {
       //Load default texture IDs per mesh
       modelObject.textureIds = modelObject.modelData->textureIds;
 
-      PositionData positionData;
+      internal::PositionData positionData;
       positionData.translationMatrix = glm::mat4(1.0f);
       positionData.scaleMatrix = glm::mat4(1.0f);
       positionData.rotationQuat = glm::quat(glm::vec3(0, 0, 0));
@@ -439,13 +439,13 @@ namespace ammonite {
 
     int copyModel(int modelId) {
       //Get the model and check it exists
-      models::ModelInfo* oldModelObject = modelIdPtrMap[modelId];
+      models::internal::ModelInfo* oldModelObject = modelIdPtrMap[modelId];
       if (oldModelObject == nullptr) {
         return 0;
       }
 
       //Copy model data
-      ModelInfo modelObject = *oldModelObject;
+      internal::ModelInfo modelObject = *oldModelObject;
       modelObject.lightEmitterId = -1;
       modelObject.modelData->refCount++;
 
@@ -456,7 +456,7 @@ namespace ammonite {
     }
 
     void unloadModel(int modelId) {
-      ModelInfo* modelPtr = modelIdPtrMap[modelId];
+      internal::ModelInfo* modelPtr = modelIdPtrMap[modelId];
       if (modelPtr == nullptr) {
         return;
       }
@@ -484,7 +484,7 @@ namespace ammonite {
     }
 
     void reloadModel(int modelId) {
-      ModelInfo* modelPtr = modelIdPtrMap[modelId];
+      internal::ModelInfo* modelPtr = modelIdPtrMap[modelId];
       if (modelPtr == nullptr) {
         return;
       }
@@ -514,8 +514,8 @@ namespace ammonite {
     void deleteModel(int modelId) {
       //Check the model actually exists
       if (modelIdPtrMap.contains(modelId)) {
-        ModelInfo* modelObject = modelIdPtrMap[modelId];
-        ModelData* modelObjectData = modelObject->modelData;
+        internal::ModelInfo* modelObject = modelIdPtrMap[modelId];
+        internal::ModelData* modelObjectData = modelObject->modelData;
 
         //Decrease the reference / soft reference count of the model data
         if (modelObject->isLoaded) {
@@ -551,14 +551,14 @@ namespace ammonite {
     }
 
     void applyTexture(int modelId, const char* texturePath, bool srgbTexture, bool* externalSuccess) {
-      ModelInfo* modelPtr = modelIdPtrMap[modelId];
+      internal::ModelInfo* modelPtr = modelIdPtrMap[modelId];
       if (modelPtr == nullptr) {
         *externalSuccess = false;
         return;
       }
 
       //Apply texture to every mesh on the model
-      ModelData* modelObjectData = modelPtr->modelData;
+      internal::ModelData* modelObjectData = modelPtr->modelData;
       for (unsigned int i = 0; i < modelObjectData->meshes.size(); i++) {
         //If a texture is already applied, remove it
         if (modelPtr->textureIds[i] != 0) {
@@ -584,13 +584,13 @@ namespace ammonite {
 
     //Return the number of vertices on a model
     int getVertexCount(int modelId) {
-      ModelInfo* modelPtr = modelIdPtrMap[modelId];
+      internal::ModelInfo* modelPtr = modelIdPtrMap[modelId];
       if (modelPtr == nullptr) {
         return 0;
       }
 
       int vertexCount = 0;
-      models::ModelData* modelData = modelPtr->modelData;
+      models::internal::ModelData* modelData = modelPtr->modelData;
       for (unsigned int i = 0; i < modelData->meshes.size(); i++) {
         vertexCount += modelData->meshes[i].vertexCount;
       }
@@ -600,7 +600,7 @@ namespace ammonite {
 
     namespace draw {
       void setDrawMode(int modelId, short drawMode) {
-        ModelInfo* modelPtr = modelIdPtrMap[modelId];
+        internal::ModelInfo* modelPtr = modelIdPtrMap[modelId];
         if (modelPtr != nullptr) {
           if (modelPtr->drawMode == AMMONITE_DRAW_INACTIVE and drawMode != AMMONITE_DRAW_INACTIVE) {
             //Move from inactive to active tracker
@@ -620,7 +620,7 @@ namespace ammonite {
     namespace position {
       glm::vec3 getPosition(int modelId) {
         //Get the model and check it exists
-        models::ModelInfo* modelObject = modelIdPtrMap[modelId];
+        models::internal::ModelInfo* modelObject = modelIdPtrMap[modelId];
         if (modelObject == nullptr) {
           return glm::vec3(0.0f);
         }
@@ -630,7 +630,7 @@ namespace ammonite {
 
       glm::vec3 getScale(int modelId) {
         //Get the model and check it exists
-        models::ModelInfo* modelObject = modelIdPtrMap[modelId];
+        models::internal::ModelInfo* modelObject = modelIdPtrMap[modelId];
         if (modelObject == nullptr) {
           return glm::vec3(0.0f);
         }
@@ -641,7 +641,7 @@ namespace ammonite {
       //Return rotation, in radians
       glm::vec3 getRotation(int modelId) {
         //Get the model and check it exists
-        models::ModelInfo* modelObject = modelIdPtrMap[modelId];
+        models::internal::ModelInfo* modelObject = modelIdPtrMap[modelId];
         if (modelObject == nullptr) {
           return glm::vec3(0.0f);
         }
@@ -654,7 +654,7 @@ namespace ammonite {
     namespace position {
       void setPosition(int modelId, glm::vec3 position) {
         //Get the model and check it exists
-        models::ModelInfo* modelObject = modelIdPtrMap[modelId];
+        models::internal::ModelInfo* modelObject = modelIdPtrMap[modelId];
         if (modelObject == nullptr) {
           return;
         }
@@ -668,7 +668,7 @@ namespace ammonite {
 
       void setScale(int modelId, glm::vec3 scale) {
         //Get the model and check it exists
-        models::ModelInfo* modelObject = modelIdPtrMap[modelId];
+        models::internal::ModelInfo* modelObject = modelIdPtrMap[modelId];
         if (modelObject == nullptr) {
           return;
         }
@@ -687,7 +687,7 @@ namespace ammonite {
       //Rotation, in radians
       void setRotation(int modelId, glm::vec3 rotation) {
         //Get the model and check it exists
-        models::ModelInfo* modelObject = modelIdPtrMap[modelId];
+        models::internal::ModelInfo* modelObject = modelIdPtrMap[modelId];
         if (modelObject == nullptr) {
           return;
         }
@@ -704,7 +704,7 @@ namespace ammonite {
     namespace position {
       void translateModel(int modelId, glm::vec3 translation) {
         //Get the model and check it exists
-        models::ModelInfo* modelObject = modelIdPtrMap[modelId];
+        models::internal::ModelInfo* modelObject = modelIdPtrMap[modelId];
         if (modelObject == nullptr) {
           return;
         }
@@ -720,7 +720,7 @@ namespace ammonite {
 
       void scaleModel(int modelId, glm::vec3 scaleVector) {
         //Get the model and check it exists
-        models::ModelInfo* modelObject = modelIdPtrMap[modelId];
+        models::internal::ModelInfo* modelObject = modelIdPtrMap[modelId];
         if (modelObject == nullptr) {
           return;
         }
@@ -741,7 +741,7 @@ namespace ammonite {
       //Rotation, in radians
       void rotateModel(int modelId, glm::vec3 rotation) {
         //Get the model and check it exists
-        models::ModelInfo* modelObject = modelIdPtrMap[modelId];
+        models::internal::ModelInfo* modelObject = modelIdPtrMap[modelId];
         if (modelObject == nullptr) {
           return;
         }
