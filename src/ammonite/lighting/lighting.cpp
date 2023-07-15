@@ -157,7 +157,7 @@ namespace ammonite {
         shaderData[i].geometry = glm::vec4(lightSource->geometry, 0.0f);
         shaderData[i].diffuse = glm::vec4(lightSource->diffuse, 0.0f);
         shaderData[i].specular = glm::vec4(lightSource->specular, 0.0f);
-        shaderData[i].power = glm::vec4(lightSource->power, 0.0f, 0.0f, 0);
+        shaderData[i].power = glm::vec4(lightSource->power, 0.0f, 0.0f, 0.0f);
       }
 
       //Copy calculated tranforms to map
