@@ -25,6 +25,10 @@
 
 #include "../internal/internalDebug.hpp"
 
+//Constants for texture loading assumptions
+#define ASSUME_FLIP_UVS true
+#define ASSUME_SRGB_TEXTURES false
+
 //Class definitions
 namespace ammonite {
   typedef std::map<int, ammonite::models::ModelInfo> ModelTrackerMap;
@@ -142,10 +146,6 @@ namespace ammonite {
       bool flipTexCoords;
       bool srgbTextures;
     };
-
-    //Constants for loading assumptions
-    const bool ASSUME_FLIP_UVS = true;
-    const bool ASSUME_SRGB_TEXTURES = false;
   }
 
   //Internally exposed model handling methods
