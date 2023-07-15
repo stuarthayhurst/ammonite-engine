@@ -205,7 +205,7 @@ namespace ammonite {
     }
 
     void linkModel(int lightId, int modelId) {
-      //Remove the light source's attachment to any model
+      //Remove any light source's attachment to the model
       ammonite::lighting::internal::unlinkByModel(modelId);
 
       //If the light source is already linked to another model, reset the linked model
