@@ -50,7 +50,7 @@ namespace ammonite {
       std::vector<GLuint> textureIds;
       short drawMode = 0;
       bool isLoaded = true;
-      bool isLightEmitting = false;
+      int lightEmitterId = -1;
       std::string modelName;
       int modelId;
       AmmoniteEnum modelType = AMMONITE_MODEL;

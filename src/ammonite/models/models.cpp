@@ -175,7 +175,7 @@ namespace ammonite {
         return &haveModelsMoved;
       }
 
-      void setLightEmitting(int modelId, bool lightEmitting) {
+      void setLightEmitterId(int modelId, int lightEmitterId) {
         //Select the right tracker
         ModelTracker* selectedTracker = &inactiveModelTracker;
         ModelInfo* modelPtr = modelIdPtrMap[modelId];
@@ -184,7 +184,7 @@ namespace ammonite {
         }
 
         //Move model to different sub-tracker and update pointer
-        if (lightEmitting) {
+        if (lightEmitterId != -1) {
           selectedTracker->changeModelType(modelId, AMMONITE_LIGHT_EMITTER);
         } else {
           selectedTracker->changeModelType(modelId, AMMONITE_MODEL);
@@ -193,14 +193,14 @@ namespace ammonite {
 
         //Set light emission property
         if (modelPtr != nullptr) {
-          modelPtr->isLightEmitting = lightEmitting;
+          modelPtr->lightEmitterId = lightEmitterId;
         }
       }
 
-      bool getLightEmitting(int modelId) {
+      int getLightEmitterId(int modelId) {
         ModelInfo* modelPtr = modelIdPtrMap[modelId];
         if (modelPtr != nullptr) {
-          return modelPtr->isLightEmitting;
+          return modelPtr->lightEmitterId;
         }
         return false;
       }
@@ -446,7 +446,7 @@ namespace ammonite {
 
       //Copy model data
       ModelInfo modelObject = *oldModelObject;
-      modelObject.isLightEmitting = false;
+      modelObject.lightEmitterId = -1;
       modelObject.modelData->refCount++;
 
       //Add model to the tracker and return the ID

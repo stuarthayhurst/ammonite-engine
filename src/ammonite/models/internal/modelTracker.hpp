@@ -16,8 +16,8 @@ namespace ammonite {
 
       ModelInfo* getModelPtr(int modelId);
       bool* getModelsMovedPtr();
-      void setLightEmitting(int modelId, bool lightEmitting);
-      bool getLightEmitting(int modelId);
+      void setLightEmitterId(int modelId, int lightEmitterId);
+      int getLightEmitterId(int modelId);
     }
   }
 }
