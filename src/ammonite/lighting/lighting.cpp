@@ -73,7 +73,7 @@ namespace ammonite {
       //Unlink a light source from a model, using only the model ID (doesn't touch the model)
       void unlinkByModel(int modelId) {
         //Check if the model has already been linked to
-        if (ammonite::models::getLightEmitting(modelId)) {
+        if (ammonite::models::internal::getLightEmitting(modelId)) {
           //Find the light source responsible and unlink
           auto lightIt = lightTrackerMap.begin();
           for (unsigned int i = 0; i < lightTrackerMap.size(); i++) {
@@ -211,18 +211,18 @@ namespace ammonite {
       //If the light source is already linked to another model, reset the linked model
       ammonite::lighting::internal::LightSource* lightSource = ammonite::lighting::internal::getLightSourcePtr(lightId);
       if (lightSource->modelId != -1) {
-        ammonite::models::setLightEmitting(lightSource->modelId, false);
+        ammonite::models::internal::setLightEmitting(lightSource->modelId, false);
       }
 
       //Link the light source and model together
       lightSource->modelId = modelId;
-      ammonite::models::setLightEmitting(modelId, true);
+      ammonite::models::internal::setLightEmitting(modelId, true);
     }
 
     void unlinkModel(int lightId) {
       //Unlink the attached model from the light source
       ammonite::lighting::internal::LightSource* lightSource = ammonite::lighting::internal::getLightSourcePtr(lightId);
-      ammonite::models::setLightEmitting(lightSource->modelId, false);
+      ammonite::models::internal::setLightEmitting(lightSource->modelId, false);
       lightSource->modelId = -1;
     }
 

@@ -409,19 +409,19 @@ namespace ammonite {
 
     static void drawModels(AmmoniteRenderMode renderMode) {
       //Create initial array for model pointers
-      static int modelCount = ammonite::models::getModelCount(AMMONITE_MODEL);
+      static int modelCount = ammonite::models::internal::getModelCount(AMMONITE_MODEL);
       static ammonite::models::ModelInfo** modelPtrs = new ammonite::models::ModelInfo* [modelCount];
 
       //If requested, create a new array for model pointers
       if (renderMode == AMMONITE_DATA_REFRESH) {
         //Replace array with one of the correct size
-        modelCount = ammonite::models::getModelCount(AMMONITE_MODEL);
+        modelCount = ammonite::models::internal::getModelCount(AMMONITE_MODEL);
         ammonite::models::ModelInfo** newArr = new ammonite::models::ModelInfo* [modelCount];
         delete [] modelPtrs;
         modelPtrs = newArr;
 
         //Update saved model pointers and return
-        ammonite::models::getModels(AMMONITE_MODEL, modelCount, modelPtrs);
+        ammonite::models::internal::getModels(AMMONITE_MODEL, modelCount, modelPtrs);
         return;
       }
 
@@ -662,7 +662,7 @@ namespace ammonite {
         glClear(GL_DEPTH_BUFFER_BIT);
 
         //Update cached model pointers, if the models have changed trackers
-        static bool* modelsMovedPtr = ammonite::models::getModelsMovedPtr();
+        static bool* modelsMovedPtr = ammonite::models::internal::getModelsMovedPtr();
         if (*modelsMovedPtr) {
           drawModels(AMMONITE_DATA_REFRESH);
           *modelsMovedPtr = false;
@@ -747,7 +747,7 @@ namespace ammonite {
           for (int i = 0; i < lightEmitterCount; i++) {
             int modelId = lightData[(i * 2)];
             int lightIndex = lightData[(i * 2) + 1];
-            ammonite::models::ModelInfo* modelPtr = ammonite::models::getModelPtr(modelId);
+            ammonite::models::ModelInfo* modelPtr = ammonite::models::internal::getModelPtr(modelId);
 
             if (modelPtr != nullptr) {
               drawModel(modelPtr, lightIndex, false);

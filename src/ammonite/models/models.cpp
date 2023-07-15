@@ -150,55 +150,57 @@ namespace ammonite {
 
   //Internally exposed model handling methods
   namespace models {
-    int getModelCount(AmmoniteEnum modelType) {
-      return activeModelTracker.getModelCount(modelType);
-    }
-
-    void getModels(AmmoniteEnum modelType, int modelCount, ammonite::models::ModelInfo* modelArr[]) {
-      activeModelTracker.getModels(modelType, modelCount, modelArr);
-    }
-
-    ModelInfo* getModelPtr(int modelId) {
-      //Check the model exists, and return a pointer
-      if (modelIdPtrMap.contains(modelId)) {
-        return modelIdPtrMap[modelId];
-      } else {
-        return nullptr;
-      }
-    }
-
-    bool* getModelsMovedPtr() {
-      return &haveModelsMoved;
-    }
-
-    void setLightEmitting(int modelId, bool lightEmitting) {
-      //Select the right tracker
-      ModelTracker* selectedTracker = &inactiveModelTracker;
-      ModelInfo* modelPtr = modelIdPtrMap[modelId];
-      if (modelPtr->isLoaded or modelPtr->drawMode != AMMONITE_DRAW_INACTIVE) {
-        selectedTracker = &activeModelTracker;
+      namespace internal {
+      int getModelCount(AmmoniteEnum modelType) {
+        return activeModelTracker.getModelCount(modelType);
       }
 
-      //Move model to different sub-tracker and update pointer
-      if (lightEmitting) {
-        selectedTracker->changeModelType(modelId, AMMONITE_LIGHT_EMITTER);
-      } else {
-        selectedTracker->changeModelType(modelId, AMMONITE_MODEL);
+      void getModels(AmmoniteEnum modelType, int modelCount, ammonite::models::ModelInfo* modelArr[]) {
+        activeModelTracker.getModels(modelType, modelCount, modelArr);
       }
-      modelPtr = modelIdPtrMap[modelId];
 
-      //Set light emission property
-      if (modelPtr != nullptr) {
-        modelPtr->isLightEmitting = lightEmitting;
+      ModelInfo* getModelPtr(int modelId) {
+        //Check the model exists, and return a pointer
+        if (modelIdPtrMap.contains(modelId)) {
+          return modelIdPtrMap[modelId];
+        } else {
+          return nullptr;
+        }
       }
-    }
 
-    bool getLightEmitting(int modelId) {
-      ModelInfo* modelPtr = modelIdPtrMap[modelId];
-      if (modelPtr != nullptr) {
-        return modelPtr->isLightEmitting;
+      bool* getModelsMovedPtr() {
+        return &haveModelsMoved;
       }
-      return false;
+
+      void setLightEmitting(int modelId, bool lightEmitting) {
+        //Select the right tracker
+        ModelTracker* selectedTracker = &inactiveModelTracker;
+        ModelInfo* modelPtr = modelIdPtrMap[modelId];
+        if (modelPtr->isLoaded or modelPtr->drawMode != AMMONITE_DRAW_INACTIVE) {
+          selectedTracker = &activeModelTracker;
+        }
+
+        //Move model to different sub-tracker and update pointer
+        if (lightEmitting) {
+          selectedTracker->changeModelType(modelId, AMMONITE_LIGHT_EMITTER);
+        } else {
+          selectedTracker->changeModelType(modelId, AMMONITE_MODEL);
+        }
+        modelPtr = modelIdPtrMap[modelId];
+
+        //Set light emission property
+        if (modelPtr != nullptr) {
+          modelPtr->isLightEmitting = lightEmitting;
+        }
+      }
+
+      bool getLightEmitting(int modelId) {
+        ModelInfo* modelPtr = modelIdPtrMap[modelId];
+        if (modelPtr != nullptr) {
+          return modelPtr->isLightEmitting;
+        }
+        return false;
+      }
     }
   }
 
