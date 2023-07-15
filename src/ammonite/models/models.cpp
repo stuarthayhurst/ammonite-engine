@@ -138,6 +138,9 @@ namespace ammonite {
     ModelDataMap modelDataMap;
     ModelPtrTrackerMap modelIdPtrMap;
 
+    //Track cumulative number of created models
+    int totalModels = 0;
+
     ModelTracker activeModelTracker(&modelIdPtrMap);
     ModelTracker inactiveModelTracker(&modelIdPtrMap);
 
@@ -150,7 +153,7 @@ namespace ammonite {
 
   //Internally exposed model handling methods
   namespace models {
-      namespace internal {
+    namespace internal {
       int getModelCount(AmmoniteEnum modelType) {
         return activeModelTracker.getModelCount(modelType);
       }
@@ -349,9 +352,7 @@ namespace ammonite {
       std::vector<GLuint>* textureIds = &modelObjectData->textureIds;
       processNode(scene->mRootNode, scene, &modelObjectData->meshes, textureIds, modelLoadInfo, externalSuccess);
     }
-  }
 
-  namespace {
     static void moveModelToActive(int modelId, ammonite::models::ModelInfo* modelPtr) {
       //Move from inactive to active tracker, update model pointer map
       ammonite::models::ModelInfo modelObject = *modelPtr;
@@ -365,23 +366,18 @@ namespace ammonite {
       activeModelTracker.deleteModel(modelId);
       inactiveModelTracker.addModel(modelId, modelObject);
     }
+
+    static void calcModelMatrices(models::PositionData* positionData) {
+      //Recalculate the model matrix when a component changes
+      positionData->modelMatrix = positionData->translationMatrix * glm::toMat4(positionData->rotationQuat) * positionData->scaleMatrix;
+
+      //Normal matrix
+      positionData->normalMatrix = glm::transpose(glm::inverse(positionData->modelMatrix));
+    }
   }
 
   //Exposed model handling methods
   namespace models {
-    namespace {
-      static void calcModelMatrices(models::PositionData* positionData) {
-        //Recalculate the model matrix when a component changes
-        positionData->modelMatrix = positionData->translationMatrix * glm::toMat4(positionData->rotationQuat) * positionData->scaleMatrix;
-
-        //Normal matrix
-        positionData->normalMatrix = glm::transpose(glm::inverse(positionData->modelMatrix));
-      }
-
-      //Track cumulative number of created models
-      int totalModels = 0;
-    }
-
     int createModel(const char* objectPath, bool flipTexCoords, bool srgbTextures, bool* externalSuccess) {
       //Create the model
       ModelInfo modelObject;
