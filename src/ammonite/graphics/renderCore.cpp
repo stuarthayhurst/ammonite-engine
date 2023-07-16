@@ -528,13 +528,15 @@ namespace ammonite {
     static void drawModels(AmmoniteRenderMode renderMode) {
       //Create initial array for model pointers
       static int modelCount = ammonite::models::internal::getModelCount(AMMONITE_MODEL);
-      static ammonite::models::internal::ModelInfo** modelPtrs = new ammonite::models::internal::ModelInfo* [modelCount];
+      static ammonite::models::internal::ModelInfo** modelPtrs =
+             new ammonite::models::internal::ModelInfo* [modelCount];
 
       //If requested, create a new array for model pointers
       if (renderMode == AMMONITE_DATA_REFRESH) {
         //Replace array with one of the correct size
         modelCount = ammonite::models::internal::getModelCount(AMMONITE_MODEL);
-        ammonite::models::internal::ModelInfo** newArr = new ammonite::models::internal::ModelInfo* [modelCount];
+        ammonite::models::internal::ModelInfo** newArr =
+                new ammonite::models::internal::ModelInfo* [modelCount];
         delete [] modelPtrs;
         modelPtrs = newArr;
 
@@ -546,6 +548,36 @@ namespace ammonite {
       //Draw the model pointers
       for (int i = 0; i < modelCount; i++) {
         drawModel(modelPtrs[i], renderMode);
+      }
+    }
+
+    /*
+     - Identical to drawModels, except it uses AMMONITE_LIGHT_EMITTER
+     - It's done this way to avoid handling both cases in performance critical code
+    */
+    static void drawLightModels(AmmoniteRenderMode renderMode) {
+      //Create initial array for light model pointers
+      static int lightModelCount = ammonite::models::internal::getModelCount(AMMONITE_LIGHT_EMITTER);
+      static ammonite::models::internal::ModelInfo** lightModelPtrs =
+             new ammonite::models::internal::ModelInfo* [lightModelCount];
+
+      //If requested, create a new array for light model pointers
+      if (renderMode == AMMONITE_DATA_REFRESH) {
+        //Replace array with one of the correct size
+        lightModelCount = ammonite::models::internal::getModelCount(AMMONITE_LIGHT_EMITTER);
+        ammonite::models::internal::ModelInfo** newArr =
+                new ammonite::models::internal::ModelInfo* [lightModelCount];
+        delete [] lightModelPtrs;
+        lightModelPtrs = newArr;
+
+        //Update saved light model pointers and return
+        ammonite::models::internal::getModels(AMMONITE_LIGHT_EMITTER, lightModelCount, lightModelPtrs);
+        return;
+      }
+
+      //Draw the light model pointers
+      for (int i = 0; i < lightModelCount; i++) {
+        drawModel(lightModelPtrs[i], renderMode);
       }
     }
 
@@ -676,6 +708,7 @@ namespace ammonite {
         static bool* modelsMovedPtr = ammonite::models::internal::getModelsMovedPtr();
         if (*modelsMovedPtr) {
           drawModels(AMMONITE_DATA_REFRESH);
+          drawLightModels(AMMONITE_DATA_REFRESH);
           *modelsMovedPtr = false;
         }
 
@@ -747,18 +780,10 @@ namespace ammonite {
 
         //Render light emitting models
         int lightModelCount = ammonite::models::internal::getModelCount(AMMONITE_LIGHT_EMITTER);
-        ammonite::models::internal::ModelInfo* lightModelPtrs[lightModelCount];
-
         if (lightModelCount > 0) {
-          //Retrieve light emitting models to be rendered
-          ammonite::models::internal::getModels(AMMONITE_LIGHT_EMITTER,
-                                                lightModelCount, lightModelPtrs);
-
-          //Get light index and render
+          //Swap to the light emitter shader and render cached light model pointers
           glUseProgram(lightShader.shaderId);
-          for (int i = 0; i < lightModelCount; i++) {
-            drawModel(lightModelPtrs[i], AMMONITE_EMISSION_PASS);
-          }
+          drawLightModels(AMMONITE_EMISSION_PASS);
         }
 
         //Ensure wireframe is disabled
