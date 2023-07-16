@@ -35,7 +35,6 @@ namespace manyCubesDemo {
     const char* models[2] = {"assets/cube.obj", "assets/flat.png"};
     int modelCount = 10000;
 
-
     //Load cube model
     bool success = true;
     loadedModelIds.push_back(ammonite::models::createModel(models[0], &success));
@@ -44,7 +43,6 @@ namespace manyCubesDemo {
 
     if (!success) {
       demoExit();
-
       return -1;
     }
 
@@ -111,7 +109,6 @@ namespace manyCubesDemo {
     }
 
     ammonite::lighting::updateLightSources();
-
     ammonite::renderer::drawFrame();
     return 0;
   }
