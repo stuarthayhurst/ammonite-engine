@@ -125,9 +125,10 @@ namespace ammonite {
       glm::mat4 viewProjectionMatrix;
 
       //Render modes for drawModels()
-      enum AmmoniteRenderMode : unsigned char {
+      enum AmmoniteRenderMode {
         AMMONITE_RENDER_PASS,
         AMMONITE_DEPTH_PASS,
+        AMMONITE_EMISSION_PASS,
         AMMONITE_DATA_REFRESH
       };
     }
@@ -464,7 +465,8 @@ namespace ammonite {
       /*
        - Helper functions to draw / wrap components
       */
-      static void drawModel(ammonite::models::internal::ModelInfo *drawObject, int lightIndex, bool depthPass) {
+      static void drawModel(ammonite::models::internal::ModelInfo *drawObject,
+                            AmmoniteRenderMode renderMode) {
         //Get model draw data
         ammonite::models::internal::ModelData* drawObjectData = drawObject->modelData;
 
@@ -481,33 +483,37 @@ namespace ammonite {
           internal::setWireframe(false);
         }
 
-        //Calculate and obtain matrices
+        //Fetch the model matrix
         glm::mat4 modelMatrix = drawObject->positionData.modelMatrix;
 
-        //Calculate the MVP matrix for shading and light emitter passes
+        //Handle pass-specific matrices and uniforms
         glm::mat4 mvp;
-        if (!depthPass) {
-          mvp = viewProjectionMatrix * modelMatrix;
-        }
-
-        //Send uniforms to the shaders
-        if (depthPass) { //Depth pass
+        switch (renderMode) {
+        case AMMONITE_DEPTH_PASS:
           glUniformMatrix4fv(depthShader.modelMatrixId, 1, GL_FALSE, glm::value_ptr(modelMatrix));
-        } else if (lightIndex == -1) { //Regular pass
+          break;
+        case AMMONITE_RENDER_PASS:
+          mvp = viewProjectionMatrix * modelMatrix;
           glUniformMatrix4fv(modelShader.matrixId, 1, GL_FALSE, glm::value_ptr(mvp));
           glUniformMatrix4fv(modelShader.modelMatrixId, 1, GL_FALSE, glm::value_ptr(modelMatrix));
-          glUniformMatrix3fv(modelShader.normalMatrixId, 1, GL_FALSE, glm::value_ptr(drawObject->positionData.normalMatrix));
-        } else { //Light emitter pass
+          glUniformMatrix3fv(modelShader.normalMatrixId, 1, GL_FALSE,
+                             glm::value_ptr(drawObject->positionData.normalMatrix));
+          break;
+        case AMMONITE_EMISSION_PASS:
+          mvp = viewProjectionMatrix * modelMatrix;
           glUniformMatrix4fv(lightShader.lightMatrixId, 1, GL_FALSE, glm::value_ptr(mvp));
-          glUniform1i(lightShader.lightIndexId, lightIndex);
+          glUniform1i(lightShader.lightIndexId, drawObject->lightIndex);
+          break;
+        case AMMONITE_DATA_REFRESH:
+          //How did we get here?
+          std::cerr << ammonite::utils::error << "drawModel() called with AMMONITE_DATA_REFRESH" << std::endl;
+          break;
         }
 
         for (unsigned int i = 0; i < drawObjectData->meshes.size(); i++) {
           //Set texture for regular shading pass
-          if (!depthPass) {
-            if (lightIndex == -1) {
-              glBindTextureUnit(0, drawObject->textureIds[i]);
-            }
+          if (renderMode == AMMONITE_RENDER_PASS) {
+            glBindTextureUnit(0, drawObject->textureIds[i]);
           }
 
           //Bind vertex attribute buffer
@@ -538,9 +544,8 @@ namespace ammonite {
       }
 
       //Draw the model pointers
-      bool isDepthPass = (renderMode == AMMONITE_DEPTH_PASS);
       for (int i = 0; i < modelCount; i++) {
-        drawModel(modelPtrs[i], -1, isDepthPass);
+        drawModel(modelPtrs[i], renderMode);
       }
     }
 
@@ -752,11 +757,7 @@ namespace ammonite {
           //Get light index and render
           glUseProgram(lightShader.shaderId);
           for (int i = 0; i < lightModelCount; i++) {
-            ammonite::models::internal::ModelInfo* lightModelPtr = lightModelPtrs[i];
-            if (lightModelPtr != nullptr) {
-              int lightIndex = lightModelPtr->lightIndex;
-              drawModel(lightModelPtr, lightIndex, false);
-            }
+            drawModel(lightModelPtrs[i], AMMONITE_EMISSION_PASS);
           }
         }
 
