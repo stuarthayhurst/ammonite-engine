@@ -266,6 +266,7 @@ namespace ammonite {
 
           //Enable culling triangles setup depth testing function
           glEnable(GL_CULL_FACE);
+          glCullFace(GL_BACK);
           glDepthFunc(GL_LEQUAL);
 
           //Find multisampling limits
