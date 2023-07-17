@@ -9,6 +9,8 @@ namespace ammonite {
 
       int createSkybox(const char* texturePaths[6], bool* externalSuccess);
       int createSkybox(const char* texturePaths[6], bool flipTextures, bool srgbTextures, bool* externalSuccess);
+      int loadDirectory(const char* directoryPath, bool* externalSuccess);
+
       void deleteSkybox(int skyboxId);
     }
   }

@@ -1,5 +1,6 @@
 #include <vector>
 #include <algorithm>
+#include <filesystem>
 #include <iostream>
 
 #include <stb/stb_image.h>
@@ -100,6 +101,75 @@ namespace ammonite {
 
       int createSkybox(const char* texturePaths[6], bool* externalSuccess) {
         return createSkybox(texturePaths, ASSUME_FLIP_FACES, ASSUME_SRGB_TEXTURES, externalSuccess);
+      }
+
+      int loadDirectory(const char* directoryPath, bool flipTextures,
+                        bool srgbTextures, bool* externalSuccess) {
+        //Create filesystem directory iterator
+        std::filesystem::directory_iterator it;
+        try {
+          const std::filesystem::path skyboxDir{directoryPath};
+          it = std::filesystem::directory_iterator{skyboxDir};
+        } catch (const std::filesystem::filesystem_error&) {
+            *externalSuccess = false;
+            std::cerr << ammonite::utils::warning << "Failed to load '" << directoryPath << "'" << std::endl;
+            return 0;
+        }
+
+        //Find files to send to next stage
+        std::vector<std::string> faces(0);
+        for (auto const& fileName : it) {
+          std::filesystem::path filePath{fileName};
+          faces.push_back(std::string(filePath));
+        }
+
+        //Check we have at least 6 faces
+        if (faces.size() < 6) {
+          *externalSuccess = false;
+          std::cerr << ammonite::utils::warning << "Failed to load '" << directoryPath << "'" << std::endl;
+          return 0;
+        }
+
+        //Repack faces
+        const int faceCount = 6;
+        const char* skyboxFaces[faceCount];
+        std::string faceOrder[6] = {"right", "left", "top", "bottom", "front", "back"};
+
+        int targetFace = 0;
+        while (true) {
+          //Look for each face
+          int foundIndex = -1;
+          for (unsigned int i = 0; i < faces.size(); i++) {
+            //Check if the current face is the desired face
+            if (faces[i].find(faceOrder[targetFace]) != std::string::npos) {
+              foundIndex = i;
+              break;
+            }
+          }
+
+          //Either add the face and repeat / break, or give up
+          if (foundIndex != -1) {
+            skyboxFaces[targetFace] = faces[foundIndex].c_str();
+            targetFace++;
+          } else {
+            *externalSuccess = false;
+            std::cerr << ammonite::utils::warning << "Failed to load '" << directoryPath << "'" << std::endl;
+            return 0;
+          }
+
+          //Break if we've found all the faces
+          if (targetFace == 6) {
+            break;
+          }
+        }
+
+        //Hand off to regular skybox creation
+        return createSkybox(skyboxFaces, flipTextures, srgbTextures, externalSuccess);
+      }
+
+      int loadDirectory(const char* directoryPath, bool* externalSuccess) {
+        return loadDirectory(directoryPath, ASSUME_FLIP_FACES,
+                             ASSUME_SRGB_TEXTURES, externalSuccess);
       }
 
       void deleteSkybox(int skyboxId) {
