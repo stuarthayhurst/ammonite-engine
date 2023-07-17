@@ -11,12 +11,12 @@ namespace ammonite {
       namespace {
         std::map<AmmoniteEnum, int> keybindTracker = {
           {AMMONITE_EXIT, GLFW_KEY_ESCAPE},
-          {AMMONITE_FORWARD, GLFW_KEY_UP},
-          {AMMONITE_BACK, GLFW_KEY_DOWN},
+          {AMMONITE_FORWARD, GLFW_KEY_W},
+          {AMMONITE_BACK, GLFW_KEY_S},
           {AMMONITE_UP, GLFW_KEY_SPACE},
           {AMMONITE_DOWN, GLFW_KEY_LEFT_SHIFT},
-          {AMMONITE_LEFT, GLFW_KEY_LEFT},
-          {AMMONITE_RIGHT, GLFW_KEY_RIGHT}
+          {AMMONITE_LEFT, GLFW_KEY_A},
+          {AMMONITE_RIGHT, GLFW_KEY_D}
         };
       }
 
