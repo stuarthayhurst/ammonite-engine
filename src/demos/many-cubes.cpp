@@ -11,7 +11,7 @@ namespace manyCubesDemo {
     std::vector<int> loadedModelIds;
     int sideLength = 0;
 
-    const int lightCount = 100;
+    const int lightCount = 50;
     int lightSourceIds[lightCount];
     glm::vec3 lightSourcePositions[lightCount];
   }
