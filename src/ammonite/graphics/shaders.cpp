@@ -353,8 +353,16 @@ namespace ammonite {
 
     //Load all shaders in a directory and had off to createProgram(paths)
     int loadDirectory(const char* directoryPath, bool* externalSuccess) {
-      const std::filesystem::path shaderDir{directoryPath};
-      const auto it = std::filesystem::directory_iterator{shaderDir};
+      //Create filesystem directory iterator
+      std::filesystem::directory_iterator it;
+      try {
+        const std::filesystem::path shaderDir{directoryPath};
+        it = std::filesystem::directory_iterator{shaderDir};
+      } catch (const std::filesystem::filesystem_error&) {
+        *externalSuccess = false;
+        std::cerr << ammonite::utils::warning << "Failed to load '" << directoryPath << "'" << std::endl;
+        return 0;
+      }
 
       //Find files to send to next stage
       std::vector<std::string> shaders(0);
