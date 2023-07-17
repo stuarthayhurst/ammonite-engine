@@ -176,18 +176,12 @@ namespace ammonite {
 
         //Vector for current direction, without vertical component
         float horizontalAngle = ammonite::camera::getHorizontal(activeCameraId);
-        glm::vec3 horizontalDirection(
-          std::sin(horizontalAngle),
-           0,
-           std::cos(horizontalAngle)
-         );
+        glm::vec3 horizontalDirection(std::sin(horizontalAngle),
+          0, std::cos(horizontalAngle));
 
          //Right vector, relative to the camera
-        glm::vec3 right = glm::vec3(
-           std::sin(horizontalAngle - glm::half_pi<float>()),
-          0,
-          std::cos(horizontalAngle - glm::half_pi<float>())
-        );
+        glm::vec3 right = glm::vec3(std::sin(horizontalAngle - glm::half_pi<float>()),
+          0, std::cos(horizontalAngle - glm::half_pi<float>()));
 
         //Get the current camera position
         glm::vec3 position = ammonite::camera::getPosition(activeCameraId);
