@@ -140,6 +140,7 @@ int main(int argc, char* argv[]) {
   ammonite::settings::graphics::setAntialiasingSamples(4);
   ammonite::settings::graphics::setGammaCorrection(true);
   ammonite::settings::graphics::setRenderResMultiplier(1.0f);
+  ammonite::settings::graphics::setShadowRes(1024);
 
   //Renderer failed to initialise, clean up and exit
   if (!success) {
