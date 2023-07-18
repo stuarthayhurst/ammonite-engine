@@ -19,7 +19,12 @@ enum AmmoniteEnum : unsigned char {
 
   //Model types
   AMMONITE_MODEL,
-  AMMONITE_LIGHT_EMITTER
+  AMMONITE_LIGHT_EMITTER,
+
+  //OpenGL / GLFW context hints
+  AMMONITE_DEFAULT_CONTEXT,
+  AMMONITE_NO_ERROR_CONTEXT,
+  AMMONITE_DEBUG_CONTEXT
 };
 
 #endif

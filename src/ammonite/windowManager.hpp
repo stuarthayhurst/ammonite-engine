@@ -3,6 +3,8 @@
 
 #include <GLFW/glfw3.h>
 
+#include "constants.hpp"
+
 namespace ammonite {
   namespace windowManager {
     namespace setup {
@@ -11,6 +13,8 @@ namespace ammonite {
       void setupGlfwInput(GLFWwindow* window);
       void destroyGlfw();
     }
+
+    void requestContextType(AmmoniteEnum contextType);
 
     GLFWwindow* createWindow(int width, int height, const char* title);
     GLFWwindow* createWindow(int width, int height);

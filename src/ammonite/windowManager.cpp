@@ -11,6 +11,7 @@
 #include "internal/internalSettings.hpp"
 #include "graphics/internal/shaderCacheUpdate.hpp"
 #include "utils/logging.hpp"
+#include "constants.hpp"
 
 #include "internal/internalDebug.hpp"
 
@@ -20,6 +21,8 @@ namespace ammonite {
       //Window pointer
       GLFWwindow* window;
       const char* DEFAULT_TITLE = "Ammonite Window";
+
+      AmmoniteEnum requestedContextType = AMMONITE_DEFAULT_CONTEXT;
 
       //Callback to update height and width on window resize
       static void window_size_callback(GLFWwindow*, int width, int height) {
@@ -49,6 +52,13 @@ namespace ammonite {
 
         //Disable compatibility profile
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+        //Set requested context type
+        if (requestedContextType == AMMONITE_NO_ERROR_CONTEXT) {
+          glfwWindowHint(GLFW_CONTEXT_NO_ERROR, GLFW_TRUE);
+        } else if (requestedContextType == AMMONITE_DEBUG_CONTEXT) {
+          glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
+        }
 
         return true;
       }
@@ -87,6 +97,18 @@ namespace ammonite {
 
       void destroyGlfw() {
         glfwTerminate();
+      }
+    }
+
+    void requestContextType(AmmoniteEnum contextType) {
+      switch (contextType) {
+      case AMMONITE_DEFAULT_CONTEXT:
+      case AMMONITE_NO_ERROR_CONTEXT:
+      case AMMONITE_DEBUG_CONTEXT:
+        requestedContextType = contextType;
+        return;
+      default:
+        return;
       }
     }
 
