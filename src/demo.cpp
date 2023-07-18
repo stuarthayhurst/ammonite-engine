@@ -52,7 +52,7 @@ void cleanUp(int modelCount, std::vector<int> loadedModelIds) {
   for (int i = 0; i < modelCount; i++) {
     ammonite::models::deleteModel(loadedModelIds[i]);
   }
-  ammonite::windowManager::setup::destroyGlfw();
+  ammonite::window::setup::destroyGlfw();
 }
 
 int main(int argc, char* argv[]) {
@@ -106,21 +106,21 @@ int main(int argc, char* argv[]) {
   ammonite::utils::Timer utilityTimer;
 
 #ifdef DEBUG
-  ammonite::windowManager::requestContextType(AMMONITE_DEBUG_CONTEXT);
+  ammonite::window::requestContextType(AMMONITE_DEBUG_CONTEXT);
 #else
   #ifdef FAST
-    ammonite::windowManager::requestContextType(AMMONITE_NO_ERROR_CONTEXT);
+    ammonite::window::requestContextType(AMMONITE_NO_ERROR_CONTEXT);
   #endif
 #endif
 
   //Create the window
-  auto window = ammonite::windowManager::setupWindow(1024, 768, "OpenGL Experiments");
+  auto window = ammonite::window::setupWindow(1024, 768, "OpenGL Experiments");
   if (window == NULL) {
     return EXIT_FAILURE;
   }
 
   //Set an icon
-  ammonite::windowManager::useIconDir("assets/icons/");
+  ammonite::window::useIconDir("assets/icons/");
 
   //Set vsync (disable if benchmarking)
   if (useVsync == "false" or useBenchmark) {
@@ -153,7 +153,7 @@ int main(int argc, char* argv[]) {
   //Renderer failed to initialise, clean up and exit
   if (!success) {
     std::cerr << "ERROR: Failed to initialise renderer, exiting" << std::endl;
-    ammonite::windowManager::setup::destroyGlfw();
+    ammonite::window::setup::destroyGlfw();
     return EXIT_FAILURE;
   }
 
@@ -167,7 +167,7 @@ int main(int argc, char* argv[]) {
   if (postRendererInit != nullptr) {
     if (postRendererInit() == -1) {
       std::cerr << "ERROR: Failed to set up demo, exiting" << std::endl;
-      ammonite::windowManager::setup::destroyGlfw();
+      ammonite::window::setup::destroyGlfw();
       return EXIT_FAILURE;
     }
   }
@@ -275,7 +275,7 @@ int main(int argc, char* argv[]) {
       cleanExit = false;
       std::cerr << "ERROR: Failed to clean up, exiting" << std::endl;
     }
-    ammonite::windowManager::setup::destroyGlfw();
+    ammonite::window::setup::destroyGlfw();
 
     if (!cleanExit) {
       return EXIT_FAILURE;

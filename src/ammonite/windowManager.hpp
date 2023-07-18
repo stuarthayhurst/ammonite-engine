@@ -6,7 +6,7 @@
 #include "constants.hpp"
 
 namespace ammonite {
-  namespace windowManager {
+  namespace window {
     namespace setup {
       bool setupGlfw(int antialiasing);
       bool setupGlew(GLFWwindow* window);

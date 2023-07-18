@@ -73,7 +73,7 @@ namespace objectFieldDemo {
 
   int postRendererInit() {
     int screenId = ammonite::interface::getActiveLoadingScreen();
-    window = ammonite::windowManager::getWindowPtr();
+    window = ammonite::window::getWindowPtr();
 
     //Hold data for randomised cube positions
     glm::vec3 cubeData[cubeCount + 1][3] = {

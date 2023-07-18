@@ -16,7 +16,7 @@
 #include "internal/internalDebug.hpp"
 
 namespace ammonite {
-  namespace windowManager {
+  namespace window {
     namespace {
       //Window pointer
       GLFWwindow* window;
@@ -185,22 +185,22 @@ namespace ammonite {
     //Wrapper to create and setup window
     GLFWwindow* setupWindow(int width, int height, const char* title) {
       //Setup GLFW
-      if (!windowManager::setup::setupGlfw()) {
+      if (!window::setup::setupGlfw()) {
         return nullptr;
       }
 
-      auto window = windowManager::createWindow(width, height, title);
+      auto window = window::createWindow(width, height, title);
       if (window == NULL) {
         return nullptr;
       }
 
       //Setup GLEW
-      if (!windowManager::setup::setupGlew(window)) {
+      if (!window::setup::setupGlew(window)) {
         return nullptr;
       }
 
       //Setup input for window
-      windowManager::setup::setupGlfwInput(window);
+      window::setup::setupGlfwInput(window);
 
       //Return same values as createWindow()
       return window;

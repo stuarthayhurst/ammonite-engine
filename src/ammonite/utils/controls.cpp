@@ -142,8 +142,8 @@ namespace ammonite {
       }
 
       void setupControls() {
-        //Connect window and aspect ratio pointers
-        window = ammonite::windowManager::getWindowPtr();
+        //Connect window pointer
+        window = ammonite::window::getWindowPtr();
 
         //Set mouse callbacks
         glfwSetScrollCallback(window, scroll_callback);
