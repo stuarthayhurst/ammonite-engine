@@ -13,7 +13,7 @@
 #include "internal/internalRenderHelper.hpp"
 
 #include "../internal/internalSettings.hpp"
-#include "../internal/cameraMatrices.hpp"
+#include "../internal/internalCamera.hpp"
 #include "../internal/interfaceTracker.hpp"
 
 #include "../models/internal/modelTracker.hpp"
