@@ -105,6 +105,14 @@ int main(int argc, char* argv[]) {
   //Start timer for demo loading
   ammonite::utils::Timer utilityTimer;
 
+#ifdef DEBUG
+  ammonite::windowManager::requestContextType(AMMONITE_DEBUG_CONTEXT);
+#else
+  #ifdef FAST
+    ammonite::windowManager::requestContextType(AMMONITE_NO_ERROR_CONTEXT);
+  #endif
+#endif
+
   //Create the window
   auto window = ammonite::windowManager::setupWindow(1024, 768, "OpenGL Experiments");
   if (window == NULL) {

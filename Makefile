@@ -31,7 +31,7 @@ CXXFLAGS += -Wall -Wextra -Werror -std=c++20 -flto=auto
 LDFLAGS := $(shell pkg-config --libs $(LIBS)) -lstdc++ -pthread
 
 ifeq ($(FAST),true)
-  CXXFLAGS += -Ofast -march=native
+  CXXFLAGS += -Ofast -march=native -DFAST
 else
   CXXFLAGS += -O3
 endif
