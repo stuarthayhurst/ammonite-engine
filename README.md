@@ -19,6 +19,7 @@
     - `ARB_texture_cube_map_array`
   - OpenGL debugging is supported with `KHR_debug`
   - Program caching is supported with `ARB_get_program_binary`
+  - No error contexts are supported with `KHR_no_error`
 
 ## Building + installing libammonite:
   - `make library`
