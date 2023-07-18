@@ -45,6 +45,12 @@ namespace ammonite {
           return;
         }
 
+        /*
+         - This isn't used for debugging, but won't be explicitly checked otherwise
+         - Handled before engine init, so no output would be shown
+        */
+        ammonite::utils::checkExtension("GL_KHR_no_error", "GL_VERSION_4_6");
+
         //Enable OpenGL debug output
         glEnable(GL_DEBUG_OUTPUT);
         glDebugMessageCallback(debugMessageCallback, 0);
