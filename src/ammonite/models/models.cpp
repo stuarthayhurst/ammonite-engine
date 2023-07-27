@@ -261,26 +261,26 @@ namespace ammonite {
       }
     }
 
-    static void processMesh(aiMesh* mesh, const aiScene* scene, std::vector<models::internal::MeshData>* meshes, std::vector<GLuint>* textureIds, ModelLoadInfo modelLoadInfo, bool* externalSuccess) {
+    static void processMesh(aiMesh* meshPtr, const aiScene* scenePtr, std::vector<models::internal::MeshData>* meshes, std::vector<GLuint>* textureIds, ModelLoadInfo modelLoadInfo, bool* externalSuccess) {
       //Add a new empty mesh to the mesh vector
       meshes->emplace_back();
       models::internal::MeshData* newMesh = &meshes->back();
 
       //Fill the mesh with vertex data
-      for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
+      for (unsigned int i = 0; i < meshPtr->mNumVertices; i++) {
         models::internal::VertexData vertexData;
 
-        vertexData.vertex.x = mesh->mVertices[i].x;
-        vertexData.vertex.y = mesh->mVertices[i].y;
-        vertexData.vertex.z = mesh->mVertices[i].z;
+        vertexData.vertex.x = meshPtr->mVertices[i].x;
+        vertexData.vertex.y = meshPtr->mVertices[i].y;
+        vertexData.vertex.z = meshPtr->mVertices[i].z;
 
-        vertexData.normal.x = mesh->mNormals[i].x;
-        vertexData.normal.y = mesh->mNormals[i].y;
-        vertexData.normal.z = mesh->mNormals[i].z;
+        vertexData.normal.x = meshPtr->mNormals[i].x;
+        vertexData.normal.y = meshPtr->mNormals[i].y;
+        vertexData.normal.z = meshPtr->mNormals[i].z;
 
-        if (mesh->mTextureCoords[0]) {
-          vertexData.texturePoint.x = mesh->mTextureCoords[0][i].x;
-          vertexData.texturePoint.y = mesh->mTextureCoords[0][i].y;
+        if (meshPtr->mTextureCoords[0]) {
+          vertexData.texturePoint.x = meshPtr->mTextureCoords[0][i].x;
+          vertexData.texturePoint.y = meshPtr->mTextureCoords[0][i].y;
         } else {
           vertexData.texturePoint = glm::vec2(0.0f);
         }
@@ -289,8 +289,8 @@ namespace ammonite {
       }
 
       //Fill mesh indices
-      for (unsigned int i = 0; i < mesh->mNumFaces; i++) {
-        aiFace face = mesh->mFaces[i];
+      for (unsigned int i = 0; i < meshPtr->mNumFaces; i++) {
+        aiFace face = meshPtr->mFaces[i];
         for (unsigned int j = 0; j < face.mNumIndices; j++) {
           newMesh->indices.push_back(face.mIndices[j]);
         }
@@ -298,7 +298,7 @@ namespace ammonite {
       newMesh->vertexCount = newMesh->indices.size();
 
       //Load any diffuse texture given
-      aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
+      aiMaterial *material = scenePtr->mMaterials[meshPtr->mMaterialIndex];
       if (material->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
         aiString texturePath;
         material->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath);
@@ -319,13 +319,13 @@ namespace ammonite {
       }
     }
 
-    static void processNode(aiNode* node, const aiScene* scene, std::vector<models::internal::MeshData>* meshes, std::vector<GLuint>* textureIds, ModelLoadInfo modelLoadInfo, bool* externalSuccess) {
-      for (unsigned int i = 0; i < node->mNumMeshes; i++) {
-        processMesh(scene->mMeshes[node->mMeshes[i]], scene, meshes, textureIds, modelLoadInfo, externalSuccess);
+    static void processNode(aiNode* nodePtr, const aiScene* scenePtr, std::vector<models::internal::MeshData>* meshes, std::vector<GLuint>* textureIds, ModelLoadInfo modelLoadInfo, bool* externalSuccess) {
+      for (unsigned int i = 0; i < nodePtr->mNumMeshes; i++) {
+        processMesh(scenePtr->mMeshes[nodePtr->mMeshes[i]], scenePtr, meshes, textureIds, modelLoadInfo, externalSuccess);
       }
 
-      for (unsigned int i = 0; i < node->mNumChildren; i++) {
-        processNode(node->mChildren[i], scene, meshes, textureIds, modelLoadInfo, externalSuccess);
+      for (unsigned int i = 0; i < nodePtr->mNumChildren; i++) {
+        processNode(nodePtr->mChildren[i], scenePtr, meshes, textureIds, modelLoadInfo, externalSuccess);
       }
     }
 
@@ -339,10 +339,10 @@ namespace ammonite {
       }
 
       Assimp::Importer importer;
-      const aiScene *scene = importer.ReadFile(objectPath, aiProcessFlags);
+      const aiScene* scenePtr = importer.ReadFile(objectPath, aiProcessFlags);
 
       //Check model loaded correctly
-      if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
+      if (!scenePtr || scenePtr->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scenePtr->mRootNode) {
         std::cerr << ammonite::utils::warning << importer.GetErrorString() << std::endl;
         *externalSuccess = false;
         return;
@@ -350,7 +350,7 @@ namespace ammonite {
 
       //Recursively process nodes
       std::vector<GLuint>* textureIds = &modelObjectData->textureIds;
-      processNode(scene->mRootNode, scene, &modelObjectData->meshes, textureIds, modelLoadInfo, externalSuccess);
+      processNode(scenePtr->mRootNode, scenePtr, &modelObjectData->meshes, textureIds, modelLoadInfo, externalSuccess);
     }
 
     static void moveModelToActive(int modelId, ammonite::models::internal::ModelInfo* modelPtr) {
