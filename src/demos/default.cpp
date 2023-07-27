@@ -1,6 +1,8 @@
 #include <vector>
 #include <iostream>
 
+#include <string.h>
+
 #include "../ammonite/ammonite.hpp"
 
 namespace defaultDemo {
@@ -42,8 +44,11 @@ namespace defaultDemo {
         continue;
       }
 
+      //Sum vertices and load texture if given
       vertexCount += ammonite::models::getVertexCount(loadedModelIds[i]);
-      ammonite::models::applyTexture(loadedModelIds[i], models[i][1], true, &success);
+      if (strcmp(models[i][1], "")) {
+        ammonite::models::applyTexture(loadedModelIds[i], models[i][1], true, &success);
+      }
 
       //Update loading screen
       ammonite::interface::setLoadingScreenProgress(screenId, float(i + 1) / float(modelCount + 1));
