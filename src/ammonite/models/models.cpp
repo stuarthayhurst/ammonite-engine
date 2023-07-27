@@ -261,7 +261,13 @@ namespace ammonite {
       }
     }
 
-    static void processMesh(aiMesh* meshPtr, const aiScene* scenePtr, std::vector<models::internal::MeshData>* meshes, std::vector<GLuint>* textureIds, ModelLoadInfo modelLoadInfo, bool* externalSuccess) {
+    static void processMesh(aiMesh* meshPtr, const aiScene* scenePtr,
+                            models::internal::ModelData* modelObjectData,
+                            ModelLoadInfo modelLoadInfo,
+                            bool* externalSuccess) {
+      std::vector<models::internal::MeshData>* meshes = &modelObjectData->meshes;
+      std::vector<GLuint>* textureIds = &modelObjectData->textureIds;
+
       //Add a new empty mesh to the mesh vector
       meshes->emplace_back();
       models::internal::MeshData* newMesh = &meshes->back();
@@ -306,7 +312,9 @@ namespace ammonite {
         std::string fullTexturePath = modelLoadInfo.modelDirectory + '/' + texturePath.C_Str();
 
         bool hasCreatedTexture = true;
-        int textureId = ammonite::textures::loadTexture(fullTexturePath.c_str(), modelLoadInfo.srgbTextures, &hasCreatedTexture);
+        int textureId = ammonite::textures::loadTexture(fullTexturePath.c_str(),
+                                                        modelLoadInfo.srgbTextures,
+                                                        &hasCreatedTexture);
         if (!hasCreatedTexture) {
           *externalSuccess = false;
           return;
@@ -319,19 +327,29 @@ namespace ammonite {
       }
     }
 
-    static void processNode(aiNode* nodePtr, const aiScene* scenePtr, std::vector<models::internal::MeshData>* meshes, std::vector<GLuint>* textureIds, ModelLoadInfo modelLoadInfo, bool* externalSuccess) {
+    static void processNode(aiNode* nodePtr, const aiScene* scenePtr,
+                            models::internal::ModelData* modelObjectData,
+                            ModelLoadInfo modelLoadInfo, bool* externalSuccess) {
       for (unsigned int i = 0; i < nodePtr->mNumMeshes; i++) {
-        processMesh(scenePtr->mMeshes[nodePtr->mMeshes[i]], scenePtr, meshes, textureIds, modelLoadInfo, externalSuccess);
+        processMesh(scenePtr->mMeshes[nodePtr->mMeshes[i]], scenePtr, modelObjectData,
+                    modelLoadInfo, externalSuccess);
       }
 
       for (unsigned int i = 0; i < nodePtr->mNumChildren; i++) {
-        processNode(nodePtr->mChildren[i], scenePtr, meshes, textureIds, modelLoadInfo, externalSuccess);
+        processNode(nodePtr->mChildren[i], scenePtr, modelObjectData, modelLoadInfo, externalSuccess);
       }
     }
 
-    static void loadObject(const char* objectPath, models::internal::ModelData* modelObjectData, ModelLoadInfo modelLoadInfo, bool* externalSuccess) {
+    static void loadObject(const char* objectPath, models::internal::ModelData* modelObjectData,
+                           ModelLoadInfo modelLoadInfo, bool* externalSuccess) {
       //Generate postprocessing flags
-      auto aiProcessFlags = aiProcess_Triangulate | aiProcess_GenNormals | aiProcess_GenUVCoords | aiProcess_RemoveRedundantMaterials | aiProcess_OptimizeMeshes | aiProcess_JoinIdenticalVertices | aiProcess_PreTransformVertices;
+      auto aiProcessFlags = aiProcess_Triangulate
+                          | aiProcess_GenNormals
+                          | aiProcess_GenUVCoords
+                          | aiProcess_RemoveRedundantMaterials
+                          | aiProcess_OptimizeMeshes
+                          | aiProcess_JoinIdenticalVertices
+                          | aiProcess_PreTransformVertices;
 
       //Flip texture coords, if requested
       if (modelLoadInfo.flipTexCoords) {
@@ -349,8 +367,7 @@ namespace ammonite {
       }
 
       //Recursively process nodes
-      std::vector<GLuint>* textureIds = &modelObjectData->textureIds;
-      processNode(scenePtr->mRootNode, scenePtr, &modelObjectData->meshes, textureIds, modelLoadInfo, externalSuccess);
+      processNode(scenePtr->mRootNode, scenePtr, modelObjectData, modelLoadInfo, externalSuccess);
     }
 
     static void moveModelToActive(int modelId, ammonite::models::internal::ModelInfo* modelPtr) {
@@ -369,7 +386,9 @@ namespace ammonite {
 
     static void calcModelMatrices(models::internal::PositionData* positionData) {
       //Recalculate the model matrix when a component changes
-      positionData->modelMatrix = positionData->translationMatrix * glm::toMat4(positionData->rotationQuat) * positionData->scaleMatrix;
+      positionData->modelMatrix = positionData->translationMatrix
+                                * glm::toMat4(positionData->rotationQuat)
+                                * positionData->scaleMatrix;
 
       //Normal matrix
       positionData->normalMatrix = glm::transpose(glm::inverse(positionData->modelMatrix));
