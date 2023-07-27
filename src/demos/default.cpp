@@ -35,6 +35,13 @@ namespace defaultDemo {
     for (int i = 0; i < modelCount; i++) {
       //Load model
       loadedModelIds.push_back(ammonite::models::createModel(models[i][0], &success));
+
+      if (!success) {
+        //Prevent total failure if models fail
+        success = true;
+        continue;
+      }
+
       vertexCount += ammonite::models::getVertexCount(loadedModelIds[i]);
       ammonite::models::applyTexture(loadedModelIds[i], models[i][1], true, &success);
 
