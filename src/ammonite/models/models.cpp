@@ -288,6 +288,7 @@ namespace ammonite {
           vertexData.texturePoint.x = meshPtr->mTextureCoords[0][i].x;
           vertexData.texturePoint.y = meshPtr->mTextureCoords[0][i].y;
         } else {
+          std::cerr << ammonite::utils::warning << "Missing texture coord data" << std::endl;
           vertexData.texturePoint = glm::vec2(0.0f);
         }
 
