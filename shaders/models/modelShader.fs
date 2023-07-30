@@ -54,10 +54,7 @@ vec3 calcLight(LightSource lightSource, vec3 normal, vec3 fragPos, vec3 lightDir
     float spec = pow(dot(normal, halfwayDir), 2.0);
     specular = lightSource.specular * spec;
     specular *= texture(specularSampler, fragData.texCoord).rgb;
-    //return specular; //TODO
   }
-
-//return vec3(0.0f); //TODO
 
   //Attenuation of the source
   float dist = distance(lightSource.geometry, fragPos);
@@ -78,12 +75,8 @@ void main() {
     //Final contribution from the current light source
     float shadow = calcShadow(i, fragData.fragPos, lightSources[i].geometry);
     vec3 light = calcLight(lightSources[i], fragData.normal, fragData.fragPos, lightDir);
-    //outputColour = light; //TODO
-    //break; //TODO
     lightColour += (1.0f - shadow) * light;
   }
-
-//return; //TODO
 
   //Final fragment colour, from ambient, diffuse, specular and shadow components
   outputColour = (ambientLight + lightColour) * materialColour;
