@@ -47,7 +47,7 @@ namespace defaultDemo {
       //Sum vertices and load texture if given
       vertexCount += ammonite::models::getVertexCount(loadedModelIds[i]);
       if (strcmp(models[i][1], "")) {
-        ammonite::models::applyTexture(loadedModelIds[i], models[i][1], true, &success);
+        ammonite::models::applyTexture(loadedModelIds[i], AMMONITE_DIFFUSE_TEXTURE, models[i][1], true, &success);
       }
 
       //Update loading screen

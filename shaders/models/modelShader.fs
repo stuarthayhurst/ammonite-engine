@@ -24,7 +24,8 @@ in FragmentDataOut {
 out vec3 outputColour;
 
 //Engine inputs
-uniform sampler2D textureSampler;
+uniform sampler2D diffuseSampler;
+uniform sampler2D specularSampler;
 uniform samplerCubeArrayShadow shadowCubeMap;
 uniform vec3 ambientLight;
 uniform vec3 cameraPos;
@@ -51,8 +52,12 @@ vec3 calcLight(LightSource lightSource, vec3 normal, vec3 fragPos, vec3 lightDir
     vec3 viewDir = normalize(cameraPos - fragPos);
     vec3 halfwayDir = normalize(lightDir + viewDir);
     float spec = pow(dot(normal, halfwayDir), 2.0);
-    vec3 specular = lightSource.specular * spec * lightSource.diffuse;
+    specular = lightSource.specular * spec;
+    specular *= texture(specularSampler, fragData.texCoord).rgb;
+    //return specular; //TODO
   }
+
+//return vec3(0.0f); //TODO
 
   //Attenuation of the source
   float dist = distance(lightSource.geometry, fragPos);
@@ -63,7 +68,7 @@ vec3 calcLight(LightSource lightSource, vec3 normal, vec3 fragPos, vec3 lightDir
 
 void main() {
   //Base colour of the fragment
-  vec3 materialColour = texture(textureSampler, fragData.texCoord).rgb;
+  vec3 materialColour = texture(diffuseSampler, fragData.texCoord).rgb;
   vec3 lightColour = vec3(0.0f);
 
   //Calculate lighting influence from each light source
@@ -73,8 +78,12 @@ void main() {
     //Final contribution from the current light source
     float shadow = calcShadow(i, fragData.fragPos, lightSources[i].geometry);
     vec3 light = calcLight(lightSources[i], fragData.normal, fragData.fragPos, lightDir);
+    //outputColour = light; //TODO
+    //break; //TODO
     lightColour += (1.0f - shadow) * light;
   }
+
+//return; //TODO
 
   //Final fragment colour, from ambient, diffuse, specular and shadow components
   outputColour = (ambientLight + lightColour) * materialColour;

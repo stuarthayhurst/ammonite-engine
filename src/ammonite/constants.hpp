@@ -24,7 +24,11 @@ enum AmmoniteEnum : unsigned char {
   //OpenGL / GLFW context hints
   AMMONITE_DEFAULT_CONTEXT,
   AMMONITE_NO_ERROR_CONTEXT,
-  AMMONITE_DEBUG_CONTEXT
+  AMMONITE_DEBUG_CONTEXT,
+
+  //Texture types
+  AMMONITE_DIFFUSE_TEXTURE,
+  AMMONITE_SPECULAR_TEXTURE
 };
 
 #endif

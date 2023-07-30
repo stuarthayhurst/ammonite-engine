@@ -52,7 +52,8 @@ namespace ammonite {
         GLuint cameraPosId;
         GLuint farPlaneId;
         GLuint lightCountId;
-        GLuint textureSamplerId;
+        GLuint diffuseSamplerId;
+        GLuint specularSamplerId;
         GLuint shadowCubeMapId;
       } modelShader;
 
@@ -209,7 +210,8 @@ namespace ammonite {
           modelShader.cameraPosId = glGetUniformLocation(modelShader.shaderId, "cameraPos");
           modelShader.farPlaneId = glGetUniformLocation(modelShader.shaderId, "farPlane");
           modelShader.lightCountId = glGetUniformLocation(modelShader.shaderId, "lightCount");
-          modelShader.textureSamplerId = glGetUniformLocation(modelShader.shaderId, "textureSampler");
+          modelShader.diffuseSamplerId = glGetUniformLocation(modelShader.shaderId, "diffuseSampler");
+          modelShader.specularSamplerId = glGetUniformLocation(modelShader.shaderId, "specularSampler");
           modelShader.shadowCubeMapId = glGetUniformLocation(modelShader.shaderId, "shadowCubeMap");
 
           lightShader.lightMatrixId = glGetUniformLocation(lightShader.shaderId, "MVP");
@@ -238,15 +240,16 @@ namespace ammonite {
 
           //Pass texture unit locations
           glUseProgram(modelShader.shaderId);
-          glUniform1i(modelShader.textureSamplerId, 0);
-          glUniform1i(modelShader.shadowCubeMapId, 1);
+          glUniform1i(modelShader.diffuseSamplerId, 0);
+          glUniform1i(modelShader.specularSamplerId, 1);
+          glUniform1i(modelShader.shadowCubeMapId, 2);
 
           glUseProgram(skyboxShader.shaderId);
-          glUniform1i(skyboxShader.skyboxSamplerId, 2);
+          glUniform1i(skyboxShader.skyboxSamplerId, 3);
 
           glUseProgram(screenShader.shaderId);
-          glUniform1i(screenShader.screenSamplerId, 3);
-          glUniform1i(screenShader.depthSamplerId, 4);
+          glUniform1i(screenShader.screenSamplerId, 4);
+          glUniform1i(screenShader.depthSamplerId, 5);
 
           //Setup depth map framebuffer
           glCreateFramebuffers(1, &depthMapFBO);
@@ -514,7 +517,10 @@ namespace ammonite {
         for (unsigned int i = 0; i < drawObjectData->meshes.size(); i++) {
           //Set texture for regular shading pass
           if (renderMode == AMMONITE_RENDER_PASS) {
-            glBindTextureUnit(0, drawObject->textureIds[i]);
+            glBindTextureUnit(0, drawObject->textureIds[i].diffuseId);
+            if (drawObject->textureIds[i].specularId != 0) {
+              glBindTextureUnit(1, drawObject->textureIds[i].specularId);
+            }
           }
 
           //Bind vertex attribute buffer
@@ -590,7 +596,7 @@ namespace ammonite {
 
       //Prepare and draw the skybox
       glBindVertexArray(skyboxVertexArrayId);
-      glBindTextureUnit(2, activeSkyboxId);
+      glBindTextureUnit(3, activeSkyboxId);
       glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, nullptr);
     }
 
@@ -763,7 +769,7 @@ namespace ammonite {
 
         //Prepare model shader and depth cube map
         glUseProgram(modelShader.shaderId);
-        glBindTextureUnit(1, depthCubeMapId);
+        glBindTextureUnit(2, depthCubeMapId);
 
         //Calculate view projection matrix
         viewProjectionMatrix = *projectionMatrix * *viewMatrix;
@@ -833,12 +839,12 @@ namespace ammonite {
 
             glUniform1f(screenShader.focalDepthId, *focalDepthPtr);
             glUniform1f(screenShader.blurStrengthId, *blurStrengthPtr);
-            glBindTextureUnit(4, screenQuadDepthTextureId);
+            glBindTextureUnit(5, screenQuadDepthTextureId);
           }
 
           //Display the rendered frame
           glBindVertexArray(screenQuadVertexArrayId);
-          glBindTextureUnit(3, screenQuadTextureId);
+          glBindTextureUnit(4, screenQuadTextureId);
           glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, nullptr);
         } else {
           //Resolve multisampling into default framebuffer

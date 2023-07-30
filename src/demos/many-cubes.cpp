@@ -38,7 +38,7 @@ namespace manyCubesDemo {
     //Load cube model
     bool success = true;
     loadedModelIds.push_back(ammonite::models::createModel(models[0], &success));
-    ammonite::models::applyTexture(loadedModelIds[0], models[1], true, &success);
+    ammonite::models::applyTexture(loadedModelIds[0], AMMONITE_DIFFUSE_TEXTURE, models[1], true, &success);
     long int vertexCount = ammonite::models::getVertexCount(loadedModelIds[0]);
 
     if (!success) {

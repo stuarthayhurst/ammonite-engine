@@ -266,7 +266,7 @@ namespace ammonite {
                             ModelLoadInfo modelLoadInfo,
                             bool* externalSuccess) {
       std::vector<models::internal::MeshData>* meshes = &modelObjectData->meshes;
-      std::vector<GLuint>* textureIds = &modelObjectData->textureIds;
+      std::vector<models::internal::TextureIdGroup>* textureIds = &modelObjectData->textureIds;
 
       //Add a new empty mesh to the mesh vector
       meshes->emplace_back();
@@ -308,6 +308,7 @@ namespace ammonite {
       aiMaterial *material = scenePtr->mMaterials[meshPtr->mMaterialIndex];
       aiString localTexturePath;
       std::string fullTexturePath;
+      models::internal::TextureIdGroup textureIdGroup;
 
       if (material->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
         material->GetTexture(aiTextureType_DIFFUSE, 0, &localTexturePath);
@@ -322,11 +323,27 @@ namespace ammonite {
           return;
         }
 
-        textureIds->push_back(textureId);
-      } else {
-        //Add an empty texture to the tracker, to keep pace with meshes
-        textureIds->push_back(0);
+        textureIdGroup.diffuseId = textureId;
       }
+
+      if (material->GetTextureCount(aiTextureType_SPECULAR) > 0) {
+        material->GetTexture(aiTextureType_SPECULAR, 0, &localTexturePath);
+        fullTexturePath = modelLoadInfo.modelDirectory + '/' + localTexturePath.C_Str();
+
+        bool createdTextureSuccess = true;
+        int textureId = ammonite::textures::loadTexture(fullTexturePath.c_str(),
+                                                        modelLoadInfo.srgbTextures,
+                                                        &createdTextureSuccess);
+        if (!createdTextureSuccess) {
+          *externalSuccess = false;
+          return;
+        }
+
+        textureIdGroup.specularId = textureId;
+      }
+
+      //Save texture IDs
+      textureIds->push_back(textureIdGroup);
     }
 
     static void processNode(aiNode* nodePtr, const aiScene* scenePtr,
@@ -549,7 +566,8 @@ namespace ammonite {
         if (modelObjectData->refCount < 1 and modelObjectData->softRefCount < 1) {
           //Reduce reference count on textures
           for (unsigned int i = 0; i < modelObjectData->meshes.size(); i++) {
-            ammonite::textures::deleteTexture(modelObject->textureIds[i]);
+            ammonite::textures::deleteTexture(modelObject->textureIds[i].diffuseId);
+            ammonite::textures::deleteTexture(modelObject->textureIds[i].specularId);
           }
 
           //Destroy the model buffers and position in second tracker layer
@@ -571,7 +589,8 @@ namespace ammonite {
       }
     }
 
-    void applyTexture(int modelId, const char* texturePath, bool srgbTexture, bool* externalSuccess) {
+    void applyTexture(int modelId, AmmoniteEnum textureType, const char* texturePath,
+                      bool srgbTexture, bool* externalSuccess) {
       internal::ModelInfo* modelPtr = modelIdPtrMap[modelId];
       if (modelPtr == nullptr) {
         *externalSuccess = false;
@@ -581,10 +600,21 @@ namespace ammonite {
       //Apply texture to every mesh on the model
       internal::ModelData* modelObjectData = modelPtr->modelData;
       for (unsigned int i = 0; i < modelObjectData->meshes.size(); i++) {
+        GLuint* textureIdPtr;
+        if (textureType == AMMONITE_DIFFUSE_TEXTURE) {
+          textureIdPtr = &modelPtr->textureIds[i].diffuseId;
+        } else if (textureType == AMMONITE_SPECULAR_TEXTURE) {
+          textureIdPtr = &modelPtr->textureIds[i].specularId;
+        } else {
+          std::cerr << ammonite::utils::warning << "Invalid texture type specified" << std::endl;
+          *externalSuccess = false;
+          return;
+        }
+
         //If a texture is already applied, remove it
-        if (modelPtr->textureIds[i] != 0) {
-          ammonite::textures::deleteTexture(modelPtr->textureIds[i]);
-          modelPtr->textureIds[i] = 0;
+        if (*textureIdPtr != 0) {
+          ammonite::textures::deleteTexture(*textureIdPtr);
+          *textureIdPtr = 0;
         }
 
         //Create new texture and apply to the mesh
@@ -595,12 +625,12 @@ namespace ammonite {
           return;
         }
 
-        modelPtr->textureIds[i] = textureId;
+        *textureIdPtr = textureId;
       }
     }
 
-    void applyTexture(int modelId, const char* texturePath, bool* externalSuccess) {
-      applyTexture(modelId, texturePath, ASSUME_SRGB_TEXTURES, externalSuccess);
+    void applyTexture(int modelId, AmmoniteEnum textureType, const char* texturePath, bool* externalSuccess) {
+      applyTexture(modelId, textureType, texturePath, ASSUME_SRGB_TEXTURES, externalSuccess);
     }
 
     //Return the number of vertices on a model

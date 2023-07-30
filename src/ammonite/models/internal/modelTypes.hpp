@@ -21,6 +21,11 @@ namespace ammonite {
         glm::vec2 texturePoint;
       };
 
+      struct TextureIdGroup {
+        GLuint diffuseId = 0;
+        GLuint specularId = 0;
+      };
+
       struct MeshData {
         std::vector<VertexData> meshData;
         std::vector<unsigned int> indices;
@@ -34,7 +39,7 @@ namespace ammonite {
         int refCount = 1;
         int softRefCount = 0;
         std::vector<MeshData> meshes;
-        std::vector<GLuint> textureIds;
+        std::vector<TextureIdGroup> textureIds;
       };
 
       struct PositionData {
@@ -48,7 +53,7 @@ namespace ammonite {
       struct ModelInfo {
         ModelData* modelData;
         PositionData positionData;
-        std::vector<GLuint> textureIds;
+        std::vector<TextureIdGroup> textureIds;
         short drawMode = 0;
         bool isLoaded = true;
         int lightEmitterId = -1;

@@ -98,7 +98,7 @@ namespace objectFieldDemo {
       //Load model
       loadedModelIds.push_back(ammonite::models::createModel(models[i][0], &success));
       vertexCount += ammonite::models::getVertexCount(loadedModelIds[i]);
-      ammonite::models::applyTexture(loadedModelIds[i], models[i][1], true, &success);
+      ammonite::models::applyTexture(loadedModelIds[i], AMMONITE_DIFFUSE_TEXTURE, models[i][1], true, &success);
 
       //Update loading screen
       ammonite::interface::setLoadingScreenProgress(screenId, float(i + 1) / float(totalModels + 1));
