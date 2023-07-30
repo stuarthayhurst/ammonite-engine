@@ -304,19 +304,20 @@ namespace ammonite {
       }
       newMesh->vertexCount = newMesh->indices.size();
 
-      //Load any diffuse texture given
+      //Fetch material for the mesh
       aiMaterial *material = scenePtr->mMaterials[meshPtr->mMaterialIndex];
+      aiString localTexturePath;
+      std::string fullTexturePath;
+
       if (material->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
-        aiString texturePath;
-        material->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath);
+        material->GetTexture(aiTextureType_DIFFUSE, 0, &localTexturePath);
+        fullTexturePath = modelLoadInfo.modelDirectory + '/' + localTexturePath.C_Str();
 
-        std::string fullTexturePath = modelLoadInfo.modelDirectory + '/' + texturePath.C_Str();
-
-        bool hasCreatedTexture = true;
+        bool createdTextureSuccess = true;
         int textureId = ammonite::textures::loadTexture(fullTexturePath.c_str(),
                                                         modelLoadInfo.srgbTextures,
-                                                        &hasCreatedTexture);
-        if (!hasCreatedTexture) {
+                                                        &createdTextureSuccess);
+        if (!createdTextureSuccess) {
           *externalSuccess = false;
           return;
         }
