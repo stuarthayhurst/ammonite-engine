@@ -1,4 +1,4 @@
-#ifndef SPONZATDEMO
+#ifndef SPONZADEMO
 #define SPONZADEMO
 
 namespace sponzaDemo {
