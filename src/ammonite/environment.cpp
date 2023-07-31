@@ -58,7 +58,8 @@ namespace ammonite {
           //Decide the format of the texture and data
           GLenum internalFormat;
           GLenum dataFormat;
-          if (!ammonite::textures::getTextureFormat(nChannels, srgbTextures, &internalFormat, &dataFormat)) {
+          if (!ammonite::textures::internal::getTextureFormat(nChannels, srgbTextures,
+              &internalFormat, &dataFormat)) {
             //Free image data, destroy texture, set failure and return
             std::cerr << ammonite::utils::warning << "Failed to load '" << texturePaths[i] << "'" << std::endl;
             stbi_image_free(imageData);

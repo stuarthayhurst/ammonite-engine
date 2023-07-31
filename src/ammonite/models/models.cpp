@@ -315,9 +315,9 @@ namespace ammonite {
         fullTexturePath = modelLoadInfo.modelDirectory + '/' + localTexturePath.C_Str();
 
         bool createdTextureSuccess = true;
-        int textureId = ammonite::textures::loadTexture(fullTexturePath.c_str(),
-                                                        modelLoadInfo.srgbTextures,
-                                                        &createdTextureSuccess);
+        int textureId = ammonite::textures::internal::loadTexture(fullTexturePath.c_str(),
+                                                                  modelLoadInfo.srgbTextures,
+                                                                  &createdTextureSuccess);
         if (!createdTextureSuccess) {
           *externalSuccess = false;
           return;
@@ -331,9 +331,9 @@ namespace ammonite {
         fullTexturePath = modelLoadInfo.modelDirectory + '/' + localTexturePath.C_Str();
 
         bool createdTextureSuccess = true;
-        int textureId = ammonite::textures::loadTexture(fullTexturePath.c_str(),
-                                                        modelLoadInfo.srgbTextures,
-                                                        &createdTextureSuccess);
+        int textureId = ammonite::textures::internal::loadTexture(fullTexturePath.c_str(),
+                                                                  modelLoadInfo.srgbTextures,
+                                                                  &createdTextureSuccess);
         if (!createdTextureSuccess) {
           *externalSuccess = false;
           return;
@@ -566,8 +566,8 @@ namespace ammonite {
         if (modelObjectData->refCount < 1 and modelObjectData->softRefCount < 1) {
           //Reduce reference count on textures
           for (unsigned int i = 0; i < modelObjectData->meshes.size(); i++) {
-            ammonite::textures::deleteTexture(modelObject->textureIds[i].diffuseId);
-            ammonite::textures::deleteTexture(modelObject->textureIds[i].specularId);
+            ammonite::textures::internal::deleteTexture(modelObject->textureIds[i].diffuseId);
+            ammonite::textures::internal::deleteTexture(modelObject->textureIds[i].specularId);
           }
 
           //Destroy the model buffers and position in second tracker layer
@@ -613,13 +613,13 @@ namespace ammonite {
 
         //If a texture is already applied, remove it
         if (*textureIdPtr != 0) {
-          ammonite::textures::deleteTexture(*textureIdPtr);
+          ammonite::textures::internal::deleteTexture(*textureIdPtr);
           *textureIdPtr = 0;
         }
 
         //Create new texture and apply to the mesh
         bool hasCreatedTexture = true;
-        int textureId = ammonite::textures::loadTexture(texturePath, srgbTexture, &hasCreatedTexture);
+        int textureId = ammonite::textures::internal::loadTexture(texturePath, srgbTexture, &hasCreatedTexture);
         if (!hasCreatedTexture) {
           *externalSuccess = false;
           return;
