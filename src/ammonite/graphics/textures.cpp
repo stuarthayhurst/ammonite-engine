@@ -12,17 +12,17 @@
 #include "../internal/internalDebug.hpp"
 
 namespace ammonite {
-  namespace {
-    struct TextureInfo {
-      GLuint textureId;
-      int refCount = 1;
-    };
-
-    std::map<std::string, TextureInfo> textureTrackerMap;
-    std::map<GLuint, std::string> textureIdNameMap;
-  }
-
   namespace textures {
+    namespace {
+      struct TextureInfo {
+        GLuint textureId;
+        int refCount = 1;
+      };
+
+      std::map<std::string, TextureInfo> textureTrackerMap;
+      std::map<GLuint, std::string> textureIdNameMap;
+    }
+
     namespace internal {
       void deleteTexture(GLuint textureId) {
         //Check the texture has been loaded, and get a textureName
