@@ -96,6 +96,33 @@ namespace ammonite {
       return false;
     }
 
+    static GLenum attemptIdentifyShaderType(const char* shaderPath) {
+      std::string shaderPathString = std::string(shaderPath);
+
+      std::map<std::string, GLenum> shaderMatches = {
+        {"vert", GL_VERTEX_SHADER},
+        {"frag", GL_FRAGMENT_SHADER},
+        {"geom", GL_GEOMETRY_SHADER},
+        {"tessc", GL_TESS_CONTROL_SHADER}, {"control", GL_TESS_CONTROL_SHADER},
+        {"tesse", GL_TESS_EVALUATION_SHADER}, {"eval", GL_TESS_EVALUATION_SHADER},
+        {"compute", GL_COMPUTE_SHADER}
+      };
+
+      std::string lowerShaderPath;
+      for (unsigned int i = 0; i < shaderPathString.size(); i++) {
+        lowerShaderPath += std::tolower(shaderPathString[i]);
+      }
+
+      //Try and match the filename to a supported shader
+      for (auto it = shaderMatches.begin(); it != shaderMatches.end(); it++) {
+        if (lowerShaderPath.find(it->first) != std::string::npos) {
+          return it->second;
+        }
+      }
+
+      return GL_FALSE;
+    }
+
     //Set by updateGLCacheSupport(), when GLEW loads
     bool isBinaryCacheSupported = false;
   }
@@ -303,7 +330,8 @@ namespace ammonite {
         {".geom", GL_GEOMETRY_SHADER}, {".gs", GL_GEOMETRY_SHADER},
         {".tessc", GL_TESS_CONTROL_SHADER}, {".tsc", GL_TESS_CONTROL_SHADER},
         {".tesse", GL_TESS_EVALUATION_SHADER}, {".tes", GL_TESS_EVALUATION_SHADER},
-        {".comp", GL_COMPUTE_SHADER}, {".cs", GL_COMPUTE_SHADER}
+        {".comp", GL_COMPUTE_SHADER}, {".cs", GL_COMPUTE_SHADER},
+        {".glsl", GL_FALSE} //Detect generic shaders, attempt to identify
       };
 
       //Find all shaders
@@ -315,6 +343,19 @@ namespace ammonite {
 
         if (shaderExtensions.contains(extension)) {
           GLenum shaderType = shaderExtensions[extension];
+
+          //Shader can't be identified through extension, use filename
+          if (shaderType == GL_FALSE) {
+            GLenum newType = attemptIdentifyShaderType(inputShaderPaths[i]);
+            if (newType == GL_FALSE) {
+              std::cerr << ammonite::utils::warning << "Couldn't identify type of shader '"
+                        << inputShaderPaths[i] << "'" << std::endl;
+              continue;
+            }
+
+            //Found a type, so use it
+            shaderType = newType;
+          }
 
           //Check for compute shader support if needed
           if (shaderType == GL_COMPUTE_SHADER) {
