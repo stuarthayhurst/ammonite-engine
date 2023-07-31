@@ -58,7 +58,7 @@ namespace ammonite {
       //Increase frame counters
       static int frameCount = 0;
       int loadingScreenId = ammonite::interface::internal::getActiveLoadingScreenId();
-      if (loadingScreenId == 0) {
+      if (loadingScreenId == -1) {
         totalFrames++;
         frameCount++;
       }
@@ -73,7 +73,7 @@ namespace ammonite {
       }
 
       //Offload rest of frame drawing to helpers
-      if (loadingScreenId == 0) {
+      if (loadingScreenId == -1) {
         internal::internalDrawFrame();
       } else {
         internal::internalDrawLoadingScreen(loadingScreenId);

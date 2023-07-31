@@ -24,7 +24,7 @@ namespace ammonite {
       float* aspectRatio = ammonite::settings::runtime::internal::getAspectRatioPtr();
 
       //Create map to track cameras, with default camera
-      int totalCameras = 1;
+      int totalUserCameras = 0;
       int activeCameraId = 0;
       std::map<int, Camera> cameraTrackerMap = {{0, camera}};
     }
@@ -81,8 +81,8 @@ namespace ammonite {
 
     int createCamera() {
       //Get an ID for the new camera
-      int cameraId = totalCameras;
-      totalCameras++;
+      totalUserCameras++;
+      int cameraId = totalUserCameras;
 
       //Add the new camera to the tracker
       Camera newCamera;

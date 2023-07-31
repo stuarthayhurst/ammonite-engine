@@ -9,7 +9,7 @@
 namespace ammonite {
   namespace interface {
     namespace {
-      int activeLoadingScreenId = 0;
+      int activeLoadingScreenId = -1;
       int totalLoadingScreens = 0;
       std::map<int, LoadingScreen> loadingScreenTracker;
     }
@@ -40,7 +40,7 @@ namespace ammonite {
       //Set as inactive if the target is active, then delete
       if (loadingScreenTracker.contains(targetScreenId)) {
         if (activeLoadingScreenId == targetScreenId) {
-          activeLoadingScreenId = 0;
+          activeLoadingScreenId = -1;
         }
 
         loadingScreenTracker.erase(targetScreenId);
@@ -53,8 +53,8 @@ namespace ammonite {
       //Change the active loading screen, if it exists
       if (loadingScreenTracker.contains(targetScreenId)) {
         activeLoadingScreenId = targetScreenId;
-      } else if (targetScreenId == 0) {
-        activeLoadingScreenId = 0;
+      } else if (targetScreenId == -1) {
+        activeLoadingScreenId = -1;
       } else {
         std::cerr << ammonite::utils::warning << "Loading screen " << targetScreenId << " doesn't exist" << std::endl;
       }

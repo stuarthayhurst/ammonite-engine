@@ -84,7 +84,7 @@ namespace ammonite {
         if (!data) {
           std::cerr << ammonite::utils::warning << "Failed to load texture '" << texturePath << "'" << std::endl;
           *externalSuccess = false;
-          return 0;
+          return -1;
         }
 
         //Create a texture
@@ -98,7 +98,7 @@ namespace ammonite {
           std::cerr << ammonite::utils::warning << "Failed to load texture '" << texturePath << "'" << std::endl;
           glDeleteTextures(1, &textureId);
           *externalSuccess = false;
-          return 0;
+          return -1;
         }
 
         //Create and fill immutable storage for the texture

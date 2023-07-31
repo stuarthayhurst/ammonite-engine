@@ -22,8 +22,8 @@ namespace ammonite {
       };
 
       struct TextureIdGroup {
-        GLuint diffuseId = 0;
-        GLuint specularId = 0;
+        int diffuseId = -1;
+        int specularId = -1;
       };
 
       struct MeshData {

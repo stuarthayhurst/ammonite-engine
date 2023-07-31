@@ -165,7 +165,7 @@ namespace ammonite {
       } else {
         std::cerr << ammonite::utils::warning << "Failed to open '" << shaderPath << "'" << std::endl;
         *externalSuccess = false;
-        return 0;
+        return -1;
       }
 
       //Provide a shader source and compile the shader
@@ -190,7 +190,7 @@ namespace ammonite {
         //Clean up and exit
         glDeleteShader(shaderId);
         *externalSuccess = false;
-        return 0;
+        return -1;
       }
 
       return shaderId;
@@ -209,7 +209,7 @@ namespace ammonite {
 
       if (!checkProgram(programId)) {
         *externalSuccess = false;
-        return 0;
+        return -1;
       }
 
       //Detach and remove all passed shader ids
@@ -307,7 +307,7 @@ namespace ammonite {
         for (int i = 0; i < shaderCount; i++) {
           glDeleteShader(shaderIds[shaderCount]);
         }
-        return 0;
+        return -1;
       }
 
       //Cache the binary if enabled
@@ -402,7 +402,7 @@ namespace ammonite {
       } catch (const std::filesystem::filesystem_error&) {
         *externalSuccess = false;
         std::cerr << ammonite::utils::warning << "Failed to load '" << directoryPath << "'" << std::endl;
-        return 0;
+        return -1;
       }
 
       //Find files to send to next stage

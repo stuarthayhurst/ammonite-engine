@@ -518,7 +518,7 @@ namespace ammonite {
           //Set texture for regular shading pass
           if (renderMode == AMMONITE_RENDER_PASS) {
             glBindTextureUnit(0, drawObject->textureIds[i].diffuseId);
-            if (drawObject->textureIds[i].specularId != 0) {
+            if (drawObject->textureIds[i].specularId != -1) {
               glBindTextureUnit(1, drawObject->textureIds[i].specularId);
             }
           }
@@ -761,7 +761,7 @@ namespace ammonite {
 
         //Clear depth and colour (if no skybox is used)
         int activeSkybox = ammonite::environment::skybox::getActiveSkybox();
-        if (activeSkybox == 0) {
+        if (activeSkybox == -1) {
           glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         } else {
           glClear(GL_DEPTH_BUFFER_BIT);
@@ -797,7 +797,7 @@ namespace ammonite {
         internal::setWireframe(false);
 
         //Draw the skybox
-        if (activeSkybox != 0) {
+        if (activeSkybox != -1) {
           drawSkybox(activeSkybox);
         }
 

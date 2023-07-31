@@ -180,7 +180,7 @@ int main(int argc, char* argv[]) {
   bool cameraToggleHeld = false;
 
   //Set the camera to the start position
-  ammonite::camera::setPosition(0, glm::vec3(0.0f, 0.0f, 5.0f));
+  ammonite::camera::setPosition(cameraIds[0], glm::vec3(0.0f, 0.0f, 5.0f));
   ammonite::camera::setPosition(cameraIds[1], glm::vec3(0.0f, 0.0f, 2.0f));
 
   //Engine loaded, delete the loading screen

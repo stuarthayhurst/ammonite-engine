@@ -600,7 +600,7 @@ namespace ammonite {
       //Apply texture to every mesh on the model
       internal::ModelData* modelObjectData = modelPtr->modelData;
       for (unsigned int i = 0; i < modelObjectData->meshes.size(); i++) {
-        GLuint* textureIdPtr;
+        int* textureIdPtr;
         if (textureType == AMMONITE_DIFFUSE_TEXTURE) {
           textureIdPtr = &modelPtr->textureIds[i].diffuseId;
         } else if (textureType == AMMONITE_SPECULAR_TEXTURE) {
@@ -612,9 +612,9 @@ namespace ammonite {
         }
 
         //If a texture is already applied, remove it
-        if (*textureIdPtr != 0) {
+        if (*textureIdPtr != -1) {
           ammonite::textures::internal::deleteTexture(*textureIdPtr);
-          *textureIdPtr = 0;
+          *textureIdPtr = -1;
         }
 
         //Create new texture and apply to the mesh

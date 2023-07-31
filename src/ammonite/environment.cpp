@@ -20,7 +20,7 @@ namespace ammonite {
     namespace {
       //Tracker for loaded skyboxes
       std::vector<int> skyboxTracker;
-      int activeSkybox = 0;
+      int activeSkybox = -1;
     }
 
     namespace skybox {
@@ -66,7 +66,7 @@ namespace ammonite {
             glDeleteTextures(1, &textureId);
 
             *externalSuccess = false;
-            return 0;
+            return -1;
           }
 
           //Only create texture storage once
@@ -86,7 +86,7 @@ namespace ammonite {
             glDeleteTextures(1, &textureId);
 
             *externalSuccess = false;
-            return 0;
+            return -1;
           }
         }
 
@@ -114,7 +114,7 @@ namespace ammonite {
         } catch (const std::filesystem::filesystem_error&) {
             *externalSuccess = false;
             std::cerr << ammonite::utils::warning << "Failed to load '" << directoryPath << "'" << std::endl;
-            return 0;
+            return -1;
         }
 
         //Find files to send to next stage
@@ -128,7 +128,7 @@ namespace ammonite {
         if (faces.size() < 6) {
           *externalSuccess = false;
           std::cerr << ammonite::utils::warning << "Failed to load '" << directoryPath << "'" << std::endl;
-          return 0;
+          return -1;
         }
 
         //Repack faces
@@ -155,7 +155,7 @@ namespace ammonite {
           } else {
             *externalSuccess = false;
             std::cerr << ammonite::utils::warning << "Failed to load '" << directoryPath << "'" << std::endl;
-            return 0;
+            return -1;
           }
 
           //Break if we've found all the faces
@@ -186,7 +186,7 @@ namespace ammonite {
 
           //If the active skybox is the target to delete, unset it
           if (activeSkybox == skyboxId) {
-            activeSkybox = 0;
+            activeSkybox = -1;
           }
         }
       }
