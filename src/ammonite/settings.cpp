@@ -140,7 +140,7 @@ namespace ammonite {
           int shadowRes = 1024;
           float renderResMultiplier = 1.0f;
           int antialiasingSamples = 0;
-          float farPlane = 25.0f;
+          float shadowFarPlane = 25.0f;
           bool gammaCorrection = false;
         } graphics;
       }
@@ -164,7 +164,7 @@ namespace ammonite {
         }
 
         float* getShadowFarPlanePtr() {
-          return &graphics.farPlane;
+          return &graphics.shadowFarPlane;
         }
 
         bool* getGammaCorrectionPtr() {
@@ -213,12 +213,12 @@ namespace ammonite {
         return graphics.antialiasingSamples;
       }
 
-      void setShadowFarPlane(float farPlane) {
-        graphics.farPlane = farPlane;
+      void setShadowFarPlane(float shadowFarPlane) {
+        graphics.shadowFarPlane = shadowFarPlane;
       }
 
-      float getShadowfarPlane() {
-        return graphics.farPlane;
+      float getShadowFarPlane() {
+        return graphics.shadowFarPlane;
       }
 
       void setGammaCorrection(bool gammaCorrection) {

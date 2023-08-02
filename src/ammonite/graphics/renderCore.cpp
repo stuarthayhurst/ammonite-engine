@@ -50,7 +50,7 @@ namespace ammonite {
         GLuint normalMatrixId;
         GLuint ambientLightId;
         GLuint cameraPosId;
-        GLuint farPlaneId;
+        GLuint shadowFarPlaneId;
         GLuint lightCountId;
         GLuint diffuseSamplerId;
         GLuint specularSamplerId;
@@ -66,7 +66,7 @@ namespace ammonite {
       struct {
         GLuint shaderId;
         GLuint modelMatrixId;
-        GLuint farPlaneId;
+        GLuint shadowFarPlaneId;
         GLuint depthLightPosId;
         GLuint depthShadowIndex;
       } depthShader;
@@ -208,7 +208,7 @@ namespace ammonite {
           modelShader.normalMatrixId = glGetUniformLocation(modelShader.shaderId, "normalMatrix");
           modelShader.ambientLightId = glGetUniformLocation(modelShader.shaderId, "ambientLight");
           modelShader.cameraPosId = glGetUniformLocation(modelShader.shaderId, "cameraPos");
-          modelShader.farPlaneId = glGetUniformLocation(modelShader.shaderId, "farPlane");
+          modelShader.shadowFarPlaneId = glGetUniformLocation(modelShader.shaderId, "shadowFarPlane");
           modelShader.lightCountId = glGetUniformLocation(modelShader.shaderId, "lightCount");
           modelShader.diffuseSamplerId = glGetUniformLocation(modelShader.shaderId, "diffuseSampler");
           modelShader.specularSamplerId = glGetUniformLocation(modelShader.shaderId, "specularSampler");
@@ -218,7 +218,7 @@ namespace ammonite {
           lightShader.lightIndexId = glGetUniformLocation(lightShader.shaderId, "lightIndex");
 
           depthShader.modelMatrixId = glGetUniformLocation(depthShader.shaderId, "modelMatrix");
-          depthShader.farPlaneId = glGetUniformLocation(depthShader.shaderId, "farPlane");
+          depthShader.shadowFarPlaneId = glGetUniformLocation(depthShader.shaderId, "shadowFarPlane");
           depthShader.depthLightPosId = glGetUniformLocation(depthShader.shaderId, "lightPos");
           depthShader.depthShadowIndex = glGetUniformLocation(depthShader.shaderId, "shadowMapIndex");
 
@@ -705,8 +705,8 @@ namespace ammonite {
         internal::prepareScreen(depthMapFBO, *shadowResPtr, *shadowResPtr, true);
 
         //Pass uniforms that don't change between light sources
-        static float* farPlanePtr = ammonite::settings::graphics::internal::getShadowFarPlanePtr();
-        glUniform1f(depthShader.farPlaneId, *farPlanePtr);
+        static float* shadowFarPlanePtr = ammonite::settings::graphics::internal::getShadowFarPlanePtr();
+        glUniform1f(depthShader.shadowFarPlaneId, *shadowFarPlanePtr);
 
         //Clear existing depth values
         glClear(GL_DEPTH_BUFFER_BIT);
@@ -781,7 +781,7 @@ namespace ammonite {
         //Pass uniforms and render regular models
         glUniform3fv(modelShader.ambientLightId, 1, glm::value_ptr(ambientLight));
         glUniform3fv(modelShader.cameraPosId, 1, glm::value_ptr(cameraPosition));
-        glUniform1f(modelShader.farPlaneId, *farPlanePtr);
+        glUniform1f(modelShader.shadowFarPlaneId, *shadowFarPlanePtr);
         glUniform1i(modelShader.lightCountId, activeLights);
         drawModels(AMMONITE_RENDER_PASS);
 

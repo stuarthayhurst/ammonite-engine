@@ -31,7 +31,7 @@ namespace ammonite {
       void setShadowRes(int shadowRes);
       void setRenderResMultiplier(float renderRes);
       void setAntialiasingSamples(int samples);
-      void setShadowFarPlane(float farPlane);
+      void setShadowFarPlane(float shadowFarPlane);
       void setGammaCorrection(bool gammaCorrection);
 
       bool getVsync();

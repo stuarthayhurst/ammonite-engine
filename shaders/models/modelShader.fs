@@ -29,13 +29,13 @@ uniform sampler2D specularSampler;
 uniform samplerCubeArrayShadow shadowCubeMap;
 uniform vec3 ambientLight;
 uniform vec3 cameraPos;
-uniform float farPlane;
+uniform float shadowFarPlane;
 uniform int lightCount;
 
 float calcShadow(int layer, vec3 fragPos, vec3 lightPos) {
   //Get depth of current fragment
   vec3 lightToFrag = fragPos - lightPos;
-  float currentDepth = length(lightToFrag) / farPlane;
+  float currentDepth = length(lightToFrag) / shadowFarPlane;
 
   float bias = 0.01f;
   return 1.0f - texture(shadowCubeMap, vec4(lightToFrag, layer), currentDepth - bias).r;
