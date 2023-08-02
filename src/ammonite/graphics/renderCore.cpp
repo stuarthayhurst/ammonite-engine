@@ -109,8 +109,8 @@ namespace ammonite {
       GLuint colourRenderBufferId = 0;
       GLuint colourBufferMultisampleFBO;
 
-      glm::mat4* viewMatrix = ammonite::camera::matrices::getViewMatrixPtr();
-      glm::mat4* projectionMatrix = ammonite::camera::matrices::getProjectionMatrixPtr();
+      glm::mat4* viewMatrix = ammonite::camera::internal::getViewMatrixPtr();
+      glm::mat4* projectionMatrix = ammonite::camera::internal::getProjectionMatrixPtr();
 
       //Get the light trackers
       std::map<int, ammonite::lighting::internal::LightSource>* lightTrackerMap = ammonite::lighting::internal::getLightTrackerPtr();

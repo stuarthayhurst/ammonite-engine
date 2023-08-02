@@ -221,7 +221,7 @@ namespace ammonite {
 
       void setRenderFarPlane(float renderFarPlane) {
         graphics.renderFarPlane = renderFarPlane;
-        ammonite::camera::matrices::calcMatrices();
+        ammonite::camera::internal::calcMatrices();
       }
 
       float getRenderFarPlane() {

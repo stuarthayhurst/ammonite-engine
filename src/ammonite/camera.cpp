@@ -29,8 +29,8 @@ namespace ammonite {
       std::map<int, Camera> cameraTrackerMap = {{0, camera}};
     }
 
-    //Pointer methods exposed internally
-    namespace matrices {
+    //Pointer and update methods exposed internally
+    namespace internal {
       glm::mat4* getViewMatrixPtr() {
         return &viewMatrix;
       }
@@ -76,7 +76,7 @@ namespace ammonite {
       //If the camera exists, set as active
       if (cameraTrackerMap.contains(cameraId)) {
         activeCameraId = cameraId;
-        matrices::calcMatrices();
+        internal::calcMatrices();
       }
     }
 
@@ -157,7 +157,7 @@ namespace ammonite {
       //Find the target camera and update position
       if (cameraTrackerMap.contains(cameraId)) {
         cameraTrackerMap[cameraId].position = newPosition;
-        matrices::calcMatrices();
+        internal::calcMatrices();
       }
     }
 
@@ -166,7 +166,7 @@ namespace ammonite {
       //Find the target camera and update horizontal angle
       if (cameraTrackerMap.contains(cameraId)) {
         cameraTrackerMap[cameraId].horizontalAngle = newHorizontal;
-        matrices::calcMatrices();
+        internal::calcMatrices();
       }
     }
 
@@ -175,7 +175,7 @@ namespace ammonite {
       //Find the target camera and update vertical angle
       if (cameraTrackerMap.contains(cameraId)) {
         cameraTrackerMap[cameraId].verticalAngle = newVertical;
-        matrices::calcMatrices();
+       internal::calcMatrices();
       }
     }
 
@@ -184,7 +184,7 @@ namespace ammonite {
       //Find the target camera and update field of view
       if (cameraTrackerMap.contains(cameraId)) {
         cameraTrackerMap[cameraId].fov = newFov;
-        matrices::calcMatrices();
+        internal::calcMatrices();
       }
     }
   }
