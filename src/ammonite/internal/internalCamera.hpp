@@ -12,6 +12,7 @@ namespace ammonite {
     namespace matrices {
       glm::mat4* getViewMatrixPtr();
       glm::mat4* getProjectionMatrixPtr();
+      void calcMatrices();
     }
   }
 }

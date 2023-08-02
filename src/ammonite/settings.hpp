@@ -31,6 +31,7 @@ namespace ammonite {
       void setShadowRes(int shadowRes);
       void setRenderResMultiplier(float renderRes);
       void setAntialiasingSamples(int samples);
+      void setRenderFarPlane(float renderFarPlane);
       void setShadowFarPlane(float shadowFarPlane);
       void setGammaCorrection(bool gammaCorrection);
 
@@ -39,6 +40,7 @@ namespace ammonite {
       int getShadowRes();
       float setRenderResMultiplier();
       int setAntialiasingSamples();
+      float getRenderFarPlane();
       float getShadowFarPlane();
       bool getGammaCorrection();
     }

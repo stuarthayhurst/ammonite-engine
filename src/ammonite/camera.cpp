@@ -60,7 +60,8 @@ namespace ammonite {
         glm::vec3 up = glm::cross(right, direction);
 
         //Calculate the projection matrix from FoV, aspect ratio and display range
-        projectionMatrix = glm::perspective(glm::radians(activeCamera.fov), *aspectRatio, 0.1f, 100.0f);
+        float* renderFarPlanePtr = ammonite::settings::graphics::internal::getRenderFarPlanePtr();
+        projectionMatrix = glm::perspective(glm::radians(activeCamera.fov), *aspectRatio, 0.1f, *renderFarPlanePtr);
 
         //Calculate view matrix from position, where it's looking, and relative up
         viewMatrix = glm::lookAt(activeCamera.position, activeCamera.position + direction, up);

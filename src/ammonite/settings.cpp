@@ -1,6 +1,7 @@
 #include <GLFW/glfw3.h>
 
 #include "internal/internalDebug.hpp"
+#include "internal/internalCamera.hpp"
 
 namespace ammonite {
   namespace settings {
@@ -140,6 +141,7 @@ namespace ammonite {
           int shadowRes = 1024;
           float renderResMultiplier = 1.0f;
           int antialiasingSamples = 0;
+          float renderFarPlane = 100.0f;
           float shadowFarPlane = 25.0f;
           bool gammaCorrection = false;
         } graphics;
@@ -161,6 +163,10 @@ namespace ammonite {
 
         int* getAntialiasingSamplesPtr() {
           return &graphics.antialiasingSamples;
+        }
+
+        float* getRenderFarPlanePtr() {
+          return &graphics.renderFarPlane;
         }
 
         float* getShadowFarPlanePtr() {
@@ -211,6 +217,15 @@ namespace ammonite {
 
       int getAntialiasingSamples() {
         return graphics.antialiasingSamples;
+      }
+
+      void setRenderFarPlane(float renderFarPlane) {
+        graphics.renderFarPlane = renderFarPlane;
+        ammonite::camera::matrices::calcMatrices();
+      }
+
+      float getRenderFarPlane() {
+        return graphics.renderFarPlane;
       }
 
       void setShadowFarPlane(float shadowFarPlane) {

@@ -30,6 +30,7 @@ namespace ammonite {
         int* getShadowResPtr();
         float* getRenderResMultiplierPtr();
         int* getAntialiasingSamplesPtr();
+        float* getRenderFarPlanePtr();
         float* getShadowFarPlanePtr();
         bool* getGammaCorrectionPtr();
       }
