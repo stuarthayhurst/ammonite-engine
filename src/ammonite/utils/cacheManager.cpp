@@ -5,10 +5,8 @@
 #include <sstream>
 #include <functional>
 
-#include "../internal/fileManager.hpp"
+#include "internal/fileManager.hpp"
 #include "../utils/logging.hpp"
-
-#include "../internal/internalDebug.hpp"
 
 namespace ammonite {
   namespace utils {
@@ -101,7 +99,7 @@ namespace ammonite {
 
               //Get filesize and time of last modification of the shader source
               long long int filesize = 0, modificationTime = 0;
-              if (!ammonite::utils::files::getFileMetadata(filePaths[i], &filesize, &modificationTime)) {
+              if (!ammonite::utils::internal::getFileMetadata(filePaths[i], &filesize, &modificationTime)) {
                 //Failed to get the metadata
                 isCacheValid = false;
                 break;

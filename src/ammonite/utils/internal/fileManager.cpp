@@ -2,11 +2,9 @@
 #include <string>
 #include <chrono>
 
-#include "internalDebug.hpp"
-
 namespace ammonite {
   namespace utils {
-    namespace files {
+    namespace internal {
       void deleteFile(std::string filePath) {
         if (std::filesystem::exists(filePath)) {
           std::remove(filePath.c_str());

@@ -9,12 +9,10 @@
 
 #include <GL/glew.h>
 
-#include "../internal/fileManager.hpp"
+#include "../utils/internal/fileManager.hpp"
 #include "../utils/logging.hpp"
 #include "../utils/extension.hpp"
 #include "../utils/cacheManager.hpp"
-
-#include "../internal/internalDebug.hpp"
 
 namespace ammonite {
   //Static helper functions
@@ -23,8 +21,8 @@ namespace ammonite {
       //Delete the cache and cacheinfo files
       std::cout << ammonite::utils::status << "Clearing '" << cacheFilePath << "'" << std::endl;
 
-      ammonite::utils::files::deleteFile(cacheFilePath);
-      ammonite::utils::files::deleteFile(cacheFilePath + "info");
+      ammonite::utils::internal::deleteFile(cacheFilePath);
+      ammonite::utils::internal::deleteFile(cacheFilePath + "info");
     }
 
     static void cacheProgram(const GLuint programId, const char* shaderPaths[], const int shaderCount) {
@@ -60,7 +58,7 @@ namespace ammonite {
       if (binaryInfo.is_open()) {
         for (int i = 0; i < shaderCount; i++) {
           long long int filesize = 0, modificationTime = 0;
-          ammonite::utils::files::getFileMetadata(shaderPaths[i], &filesize, &modificationTime);
+          ammonite::utils::internal::getFileMetadata(shaderPaths[i], &filesize, &modificationTime);
 
           binaryInfo << "input;" << shaderPaths[i] << ";" << filesize << ";" << modificationTime << "\n";
         }
