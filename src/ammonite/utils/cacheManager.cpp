@@ -5,7 +5,7 @@
 #include <sstream>
 #include <functional>
 
-#include "internal/fileManager.hpp"
+#include "internal/internalFileManager.hpp"
 #include "../utils/logging.hpp"
 
 namespace ammonite {

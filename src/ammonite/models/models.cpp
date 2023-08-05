@@ -20,7 +20,7 @@
 #include "internal/modelTypes.hpp"
 
 #include "../lighting/internal/lightTracker.hpp"
-#include "../graphics/internal/textures.hpp"
+#include "../graphics/internal/internalTextures.hpp"
 #include "../utils/logging.hpp"
 
 #include "../internal/internalDebug.hpp"
