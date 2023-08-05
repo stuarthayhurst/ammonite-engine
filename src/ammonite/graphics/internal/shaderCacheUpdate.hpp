@@ -7,7 +7,9 @@
 
 namespace ammonite {
   namespace shaders {
-    void updateGLCacheSupport();
+    namespace internal {
+      void updateGLCacheSupport();
+    }
   }
 }
 

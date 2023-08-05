@@ -75,7 +75,7 @@ namespace ammonite {
         glfwSetWindowSizeCallback(window, window_size_callback);
 
         //Prompt shader cache setup
-        ammonite::shaders::updateGLCacheSupport();
+        ammonite::shaders::internal::updateGLCacheSupport();
 
         return true;
       }

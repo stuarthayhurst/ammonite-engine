@@ -129,21 +129,23 @@ namespace ammonite {
 
   //Internally exposed only
   namespace shaders {
-    void updateGLCacheSupport() {
-      //Get number of supported formats
-      GLint numBinaryFormats = 0;
-      glGetIntegerv(GL_NUM_PROGRAM_BINARY_FORMATS, &numBinaryFormats);
+    namespace internal {
+      void updateGLCacheSupport() {
+        //Get number of supported formats
+        GLint numBinaryFormats = 0;
+        glGetIntegerv(GL_NUM_PROGRAM_BINARY_FORMATS, &numBinaryFormats);
 
-      //Check support for collecting the program binary
-      if (!ammonite::utils::checkExtension("GL_ARB_get_program_binary", "GL_VERSION_4_1")) {
-        std::cerr << ammonite::utils::warning << "Program caching unsupported" << std::endl;
-        isBinaryCacheSupported = false;
-      } else if (numBinaryFormats < 1) {
-        std::cerr << ammonite::utils::warning << "Program caching unsupported (no supported formats)" << std::endl;
-        isBinaryCacheSupported = false;
+        //Check support for collecting the program binary
+        if (!ammonite::utils::checkExtension("GL_ARB_get_program_binary", "GL_VERSION_4_1")) {
+          std::cerr << ammonite::utils::warning << "Program caching unsupported" << std::endl;
+          isBinaryCacheSupported = false;
+        } else if (numBinaryFormats < 1) {
+          std::cerr << ammonite::utils::warning << "Program caching unsupported (no supported formats)" << std::endl;
+          isBinaryCacheSupported = false;
+        }
+
+        isBinaryCacheSupported = true;
       }
-
-      isBinaryCacheSupported = true;
     }
   }
 
