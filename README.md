@@ -25,18 +25,14 @@
   - `make library`
   - `sudo make install`
 
-## Choosing a demo:
+## Running a demo:
   - `make build` will compile the library and all demos on the current branch
   - Demos can be listed with `./launch.sh --demo`
   - Run a specific demo with `./launch.sh --demo [DEMO]`
     - For example: `./launch.sh --demo object-field`
-  - Screenshots of some demos can be found at the end of the README
-
-## Building + running a demo:
-  - `make clean` will clean the build area, to start from fresh
-  - Run `make build` to build the demo
     - Running the binary directly will only work if `libammonite` is installed to the system
-  - Run `./launch.sh` to launch the demo, from within the project itself
+  - `make clean` will clean the build area, to start from fresh
+  - Screenshots of some demos can be found at the end of the README
 
 ## Options:
   - Compiled demos have a few arguments supported:
