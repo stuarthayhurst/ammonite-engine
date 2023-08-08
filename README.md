@@ -5,8 +5,12 @@
 ## Ammonite Engine
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://paypal.me/stuartahayhurst)
   - A simple OpenGL based graphics engine, built to learn C++ and graphics programming
-  - Despite the project being for learning any contributions are still welcome
+  - Despite the project being for learning, any contributions are still welcome
     - If you found this project interesting, any donations are greatly appreciated :)
+
+## Features:
+  - Model loading, using `libassimp`
+  - Transparency, animations, terrain, PBR, physics and 2D support are planned for the future
 
 ## Requirements:
   - A `c++20` compatible compiler (`g++ 10+`)
