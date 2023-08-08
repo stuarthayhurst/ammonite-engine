@@ -10,7 +10,8 @@
 
 ## Features:
   - Model loading, using `libassimp`
-  - Transparency, animations, terrain, PBR, physics and 2D support are planned for the future
+  - Transparency, animations, terrain, PBR and 2D support are planned for the future
+  - A physics system and sound system are also planned
 
 ## Requirements:
   - A `c++20` compatible compiler (`g++ 10+`)
