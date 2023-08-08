@@ -65,8 +65,13 @@ vec3 calcLight(LightSource lightSource, vec3 normal, vec3 fragPos, vec3 lightDir
 
 void main() {
   //Base colour of the fragment
-  vec3 materialColour = texture(diffuseSampler, fragData.texCoord).rgb;
+  vec4 materialColour = texture(diffuseSampler, fragData.texCoord);
   vec3 lightColour = vec3(0.0f);
+
+  //Discard transparent fragments
+  if (materialColour.a != 1.0f) {
+    discard;
+  }
 
   //Calculate lighting influence from each light source
   for (int i = 0; i < lightCount; i++) {
@@ -79,5 +84,5 @@ void main() {
   }
 
   //Final fragment colour, from ambient, diffuse, specular and shadow components
-  outputColour = (ambientLight + lightColour) * materialColour;
+  outputColour = (ambientLight + lightColour) * vec3(materialColour);
 }
