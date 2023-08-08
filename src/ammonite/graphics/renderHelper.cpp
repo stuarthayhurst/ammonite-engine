@@ -34,18 +34,18 @@ namespace ammonite {
         //Wait until next frame should be prepared
         static float* frameLimitPtr = ammonite::settings::graphics::internal::getFrameLimitPtr();
         if (*frameLimitPtr != 0.0f) {
-          //Length of microsleep and allowable error
-          static const double sleepInterval = 1.0 / 100000;
-          static const double maxError = (sleepInterval) * 2.0f;
-          static const auto sleepLength = std::chrono::nanoseconds(int(std::floor(sleepInterval * 1000000000.0)));
+          //Length of allowable error in seconds
+          static const double maxError = (1.0 / 50000);
 
           double const targetFrameTime = 1.0 / *frameLimitPtr;
           double spareTime = targetFrameTime - targetFrameTimer.getTime();
 
-          //Sleep for short intervals until the frametime budget is gone
-          while (spareTime > maxError) {
-            std::this_thread::sleep_for(sleepLength);
+          //Sleep for successively shorter intervals until the frametime budget is gone
+          while (targetFrameTime - targetFrameTimer.getTime() > maxError) {
             spareTime = targetFrameTime - targetFrameTimer.getTime();
+            const auto sleepLength = std::chrono::nanoseconds(
+                                     int(std::floor(spareTime * 0.05 * 1000000000.0)));
+            std::this_thread::sleep_for(sleepLength);
           }
         }
 
