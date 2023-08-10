@@ -1,6 +1,7 @@
 #include <vector>
 #include <iostream>
 #include <ctime>
+#include <cmath>
 
 #include "../ammonite/ammonite.hpp"
 
