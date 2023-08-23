@@ -101,6 +101,11 @@ namespace ammonite {
     }
 
     void requestContextType(AmmoniteEnum contextType) {
+      if (window != NULL) {
+        std::cerr << ammonite::utils::warning << "Window already created, ignoring context type request" << std::endl;
+        return;
+      }
+
       switch (contextType) {
       case AMMONITE_DEFAULT_CONTEXT:
       case AMMONITE_NO_ERROR_CONTEXT:
