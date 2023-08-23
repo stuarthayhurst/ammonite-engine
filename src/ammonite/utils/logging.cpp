@@ -2,8 +2,8 @@
 
 namespace ammonite {
   namespace utils {
-    Error error;
-    Warning warning;
-    Status status;
+    Output error(std::cerr, "ERROR: ");
+    Output warning(std::cerr, "WARNING: ");
+    Output status(std::cout, "STATUS: ");
   }
 }
