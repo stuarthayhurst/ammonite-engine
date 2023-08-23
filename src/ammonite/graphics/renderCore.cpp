@@ -184,7 +184,7 @@ namespace ammonite {
           bool success = true;
           for (int i = 0; i < extensionCount; i++) {
             if (!ammonite::utils::checkExtension(extensions[i][0], extensions[i][1])) {
-              std::cerr << ammonite::utils::error << extensions[i][2] << " unsupported" << std::endl;
+              ammonite::utils::error << extensions[i][2] << " unsupported" << std::endl;
               success = false;
               (*failureCount)++;
             }
@@ -192,7 +192,7 @@ namespace ammonite {
 
           //Check minimum OpenGL version is supported
           if (!glewIsSupported("GL_VERSION_3_2")) {
-            std::cerr << ammonite::utils::error << "OpenGL 3.2 unsupported" << std::endl;
+            ammonite::utils::error << "OpenGL 3.2 unsupported" << std::endl;
             success = false;
             (*failureCount)++;
           }
@@ -420,7 +420,7 @@ namespace ammonite {
         //Check multisampled framebuffer
         if (sampleCount != 0) {
           if (glCheckNamedFramebufferStatus(colourBufferMultisampleFBO, GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-            std::cerr << ammonite::utils::warning << "Incomplete multisampled render framebuffer" << std::endl;
+            ammonite::utils::warning << "Incomplete multisampled render framebuffer" << std::endl;
           } else {
             ammoniteInternalDebug << "Created new multisampled render framebuffer (" << renderWidth << " x " << renderHeight << "), samples: x" << sampleCount << std::endl;
           }
@@ -428,7 +428,7 @@ namespace ammonite {
 
         //Check regular framebuffer
         if (glCheckNamedFramebufferStatus(screenQuadFBO, GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-          std::cerr << ammonite::utils::warning << "Incomplete render framebuffer" << std::endl;
+          ammonite::utils::warning << "Incomplete render framebuffer" << std::endl;
         } else {
           ammoniteInternalDebug << "Created new render framebuffer (" << renderWidth << " x " << renderHeight << ")" << std::endl;
         }
@@ -510,7 +510,7 @@ namespace ammonite {
           break;
         case AMMONITE_DATA_REFRESH:
           //How did we get here?
-          std::cerr << ammonite::utils::error << "drawModel() called with AMMONITE_DATA_REFRESH" << std::endl;
+          ammonite::utils::error << "drawModel() called with AMMONITE_DATA_REFRESH" << std::endl;
           break;
         }
 
@@ -670,7 +670,7 @@ namespace ammonite {
           sampleCount = std::min(requestedSamples, maxSampleCount);
 
           if (sampleCount < requestedSamples) {
-            std::cerr << ammonite::utils::warning << "Ignoring request for " << requestedSamples << " samples, using implementation limit of " << maxSampleCount << std::endl;
+            ammonite::utils::warning << "Ignoring request for " << requestedSamples << " samples, using implementation limit of " << maxSampleCount << std::endl;
             *samplesPtr = sampleCount;
           }
 
@@ -737,7 +737,7 @@ namespace ammonite {
 
           //Check framebuffer status
           if (glCheckNamedFramebufferStatus(depthMapFBO, GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-            std::cerr << ammonite::utils::warning << "Incomplete depth framebuffer" << std::endl;
+            ammonite::utils::warning << "Incomplete depth framebuffer" << std::endl;
           }
 
           //Pass shadow transform matrices to depth shader

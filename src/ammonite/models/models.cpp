@@ -288,7 +288,7 @@ namespace ammonite {
           vertexData.texturePoint.x = meshPtr->mTextureCoords[0][i].x;
           vertexData.texturePoint.y = meshPtr->mTextureCoords[0][i].y;
         } else {
-          std::cerr << ammonite::utils::warning << "Missing texture coord data" << std::endl;
+          ammonite::utils::warning << "Missing texture coord data" << std::endl;
           vertexData.texturePoint = glm::vec2(0.0f);
         }
 
@@ -380,7 +380,7 @@ namespace ammonite {
 
       //Check model loaded correctly
       if (!scenePtr || scenePtr->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scenePtr->mRootNode) {
-        std::cerr << ammonite::utils::warning << importer.GetErrorString() << std::endl;
+        ammonite::utils::warning << importer.GetErrorString() << std::endl;
         *externalSuccess = false;
         return;
       }
@@ -584,7 +584,7 @@ namespace ammonite {
         } else if (inactiveModelTracker.hasModel(modelId)) {
           inactiveModelTracker.deleteModel(modelId);
         } else {
-          std::cerr << ammonite::utils::warning << "Potential memory leak, couldn't delete model" << std::endl;
+          ammonite::utils::warning << "Potential memory leak, couldn't delete model" << std::endl;
         }
       }
     }
@@ -606,7 +606,7 @@ namespace ammonite {
         } else if (textureType == AMMONITE_SPECULAR_TEXTURE) {
           textureIdPtr = &modelPtr->textureIds[i].specularId;
         } else {
-          std::cerr << ammonite::utils::warning << "Invalid texture type specified" << std::endl;
+          ammonite::utils::warning << "Invalid texture type specified" << std::endl;
           *externalSuccess = false;
           return;
         }

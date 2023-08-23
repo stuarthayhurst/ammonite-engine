@@ -41,7 +41,7 @@ namespace ammonite {
       void enableDebug() {
         //Check support for OpenGL debugging
         if (!ammonite::utils::checkExtension("GL_KHR_debug", "GL_VERSION_4_3")) {
-          std::cerr << ammonite::utils::error << "OpenGL debugging unsupported" << std::endl;
+          ammonite::utils::error << "OpenGL debugging unsupported" << std::endl;
           return;
         }
 

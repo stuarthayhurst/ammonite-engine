@@ -19,7 +19,7 @@ namespace ammonite {
   namespace {
     static void deleteCacheFile(std::string cacheFilePath) {
       //Delete the cache and cacheinfo files
-      std::cout << ammonite::utils::status << "Clearing '" << cacheFilePath << "'" << std::endl;
+      ammonite::utils::status << "Clearing '" << cacheFilePath << "'" << std::endl;
 
       ammonite::utils::internal::deleteFile(cacheFilePath);
       ammonite::utils::internal::deleteFile(cacheFilePath + "info");
@@ -29,7 +29,7 @@ namespace ammonite {
       std::string cacheFilePath = ammonite::utils::cache::requestNewCache(shaderPaths, shaderCount);
       std::string cacheFileInfoPath = cacheFilePath + "info";
 
-      std::cout << ammonite::utils::status << "Caching '" << cacheFilePath << "'" << std::endl;
+      ammonite::utils::status << "Caching '" << cacheFilePath << "'" << std::endl;
       int binaryLength;
       GLenum binaryFormat;
 
@@ -39,7 +39,7 @@ namespace ammonite {
       glGetProgramBinary(programId, binaryLength, NULL, &binaryFormat, &binaryData);
 
       if (binaryLength == 0) {
-        std::cerr << ammonite::utils::warning << "Failed to cache '" << cacheFilePath << "'" << std::endl;
+        ammonite::utils::warning << "Failed to cache '" << cacheFilePath << "'" << std::endl;
         return;
       }
 
@@ -48,7 +48,7 @@ namespace ammonite {
       if (binarySave.is_open()) {
         binarySave.write(&binaryData[0], binaryLength);
       } else {
-        std::cerr << ammonite::utils::warning << "Failed to cache '" << cacheFilePath << "'" << std::endl;
+        ammonite::utils::warning << "Failed to cache '" << cacheFilePath << "'" << std::endl;
         deleteCacheFile(cacheFilePath);
         return;
       }
@@ -68,7 +68,7 @@ namespace ammonite {
 
         binaryInfo.close();
       } else {
-        std::cerr << ammonite::utils::warning << "Failed to cache '" << cacheFileInfoPath << "'" << std::endl;
+        ammonite::utils::warning << "Failed to cache '" << cacheFileInfoPath << "'" << std::endl;
         deleteCacheFile(cacheFilePath);
       }
     }
@@ -89,7 +89,7 @@ namespace ammonite {
       std::vector<GLchar> errorLog(maxLength);
       glGetProgramInfoLog(programId, maxLength, &maxLength, &errorLog[0]);
       //Extra std::endl used to work around Intel driver bug
-      std::cerr << ammonite::utils::warning << &errorLog[0] << std::endl << std::endl;
+      ammonite::utils::warning << &errorLog[0] << std::endl << std::endl;
 
       return false;
     }
@@ -135,10 +135,10 @@ namespace ammonite {
 
         //Check support for collecting the program binary
         if (!ammonite::utils::checkExtension("GL_ARB_get_program_binary", "GL_VERSION_4_1")) {
-          std::cerr << ammonite::utils::warning << "Program caching unsupported" << std::endl;
+          ammonite::utils::warning << "Program caching unsupported" << std::endl;
           isBinaryCacheSupported = false;
         } else if (numBinaryFormats < 1) {
-          std::cerr << ammonite::utils::warning << "Program caching unsupported (no supported formats)" << std::endl;
+          ammonite::utils::warning << "Program caching unsupported (no supported formats)" << std::endl;
           isBinaryCacheSupported = false;
         }
 
@@ -163,7 +163,7 @@ namespace ammonite {
         shaderCode = sstr.str();
         shaderCodeStream.close();
       } else {
-        std::cerr << ammonite::utils::warning << "Failed to open '" << shaderPath << "'" << std::endl;
+        ammonite::utils::warning << "Failed to open '" << shaderPath << "'" << std::endl;
         *externalSuccess = false;
         return -1;
       }
@@ -184,8 +184,8 @@ namespace ammonite {
 
         std::vector<GLchar> errorLog(maxLength);
         glGetShaderInfoLog(shaderId, maxLength, &maxLength, &errorLog[0]);
-        std::cerr << ammonite::utils::warning << "\n" << shaderPath << ":" << std::endl;
-        std::cerr << ammonite::utils::warning << &errorLog[0] << std::endl;
+        ammonite::utils::warning << "\n" << shaderPath << ":" << std::endl;
+        ammonite::utils::warning << &errorLog[0] << std::endl;
 
         //Clean up and exit
         glDeleteShader(shaderId);
@@ -280,7 +280,7 @@ namespace ammonite {
           if (checkProgram(programId)) {
             return programId;
           } else {
-            std::cerr << ammonite::utils::warning << "Failed to process '" << cacheFilePath << "'" << std::endl;
+            ammonite::utils::warning << "Failed to process '" << cacheFilePath << "'" << std::endl;
             deleteCacheFile(cacheFilePath);
           }
         } else {
@@ -348,7 +348,7 @@ namespace ammonite {
           if (shaderType == GL_FALSE) {
             GLenum newType = attemptIdentifyShaderType(inputShaderPaths[i]);
             if (newType == GL_FALSE) {
-              std::cerr << ammonite::utils::warning << "Couldn't identify type of shader '"
+              ammonite::utils::warning << "Couldn't identify type of shader '"
                         << inputShaderPaths[i] << "'" << std::endl;
               continue;
             }
@@ -360,7 +360,7 @@ namespace ammonite {
           //Check for compute shader support if needed
           if (shaderType == GL_COMPUTE_SHADER) {
             if (!ammonite::utils::checkExtension("GL_ARB_compute_shader", "GL_VERSION_4_3")) {
-              std::cerr << ammonite::utils::warning << "Compute shaders unsupported" << std::endl;
+              ammonite::utils::warning << "Compute shaders unsupported" << std::endl;
               continue;
             }
           }
@@ -368,7 +368,7 @@ namespace ammonite {
           //Check for tessellation shader support if needed
           if (shaderType == GL_TESS_CONTROL_SHADER or shaderType == GL_TESS_EVALUATION_SHADER) {
             if (!ammonite::utils::checkExtension("GL_ARB_tessellation_shader", "GL_VERSION_4_0")) {
-              std::cerr << ammonite::utils::warning << "Tessellation shaders unsupported" << std::endl;
+              ammonite::utils::warning << "Tessellation shaders unsupported" << std::endl;
               continue;
             }
           }
@@ -401,7 +401,7 @@ namespace ammonite {
         it = std::filesystem::directory_iterator{shaderDir};
       } catch (const std::filesystem::filesystem_error&) {
         *externalSuccess = false;
-        std::cerr << ammonite::utils::warning << "Failed to load '" << directoryPath << "'" << std::endl;
+        ammonite::utils::warning << "Failed to load '" << directoryPath << "'" << std::endl;
         return -1;
       }
 

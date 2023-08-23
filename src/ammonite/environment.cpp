@@ -59,7 +59,7 @@ namespace ammonite {
           if (!ammonite::textures::internal::getTextureFormat(nChannels, srgbTextures,
               &internalFormat, &dataFormat)) {
             //Free image data, destroy texture, set failure and return
-            std::cerr << ammonite::utils::warning << "Failed to load '" << texturePaths[i] << "'" << std::endl;
+            ammonite::utils::warning << "Failed to load '" << texturePaths[i] << "'" << std::endl;
             stbi_image_free(imageData);
             glDeleteTextures(1, &textureId);
 
@@ -79,7 +79,7 @@ namespace ammonite {
             stbi_image_free(imageData);
           } else {
             //Free image data, destroy texture, set failure and return
-            std::cerr << ammonite::utils::warning << "Failed to load '" << texturePaths[i] << "'" << std::endl;
+            ammonite::utils::warning << "Failed to load '" << texturePaths[i] << "'" << std::endl;
             stbi_image_free(imageData);
             glDeleteTextures(1, &textureId);
 
@@ -111,7 +111,7 @@ namespace ammonite {
           it = std::filesystem::directory_iterator{skyboxDir};
         } catch (const std::filesystem::filesystem_error&) {
             *externalSuccess = false;
-            std::cerr << ammonite::utils::warning << "Failed to load '" << directoryPath << "'" << std::endl;
+            ammonite::utils::warning << "Failed to load '" << directoryPath << "'" << std::endl;
             return -1;
         }
 
@@ -125,7 +125,7 @@ namespace ammonite {
         //Check we have at least 6 faces
         if (faces.size() < 6) {
           *externalSuccess = false;
-          std::cerr << ammonite::utils::warning << "Failed to load '" << directoryPath << "'" << std::endl;
+          ammonite::utils::warning << "Failed to load '" << directoryPath << "'" << std::endl;
           return -1;
         }
 
@@ -152,7 +152,7 @@ namespace ammonite {
             targetFace++;
           } else {
             *externalSuccess = false;
-            std::cerr << ammonite::utils::warning << "Failed to load '" << directoryPath << "'" << std::endl;
+            ammonite::utils::warning << "Failed to load '" << directoryPath << "'" << std::endl;
             return -1;
           }
 

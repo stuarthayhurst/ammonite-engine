@@ -42,7 +42,7 @@ namespace ammonite {
       bool setupGlfw() {
         //Setup GLFW
         if (!glfwInit()) {
-          std::cerr << ammonite::utils::error << "Failed to initialize GLFW" << std::endl;
+          ammonite::utils::error << "Failed to initialize GLFW" << std::endl;
           return false;
         }
 
@@ -67,7 +67,7 @@ namespace ammonite {
       bool setupGlew(GLFWwindow* window) {
         glewExperimental = GL_TRUE;
         if (glewInit() != GLEW_OK) {
-          std::cerr << ammonite::utils::error << "Failed to initialize GLEW" << std::endl;
+          ammonite::utils::error << "Failed to initialize GLEW" << std::endl;
           return false;
         }
 
@@ -102,7 +102,7 @@ namespace ammonite {
 
     void requestContextType(AmmoniteEnum contextType) {
       if (window != NULL) {
-        std::cerr << ammonite::utils::warning << "Window already created, ignoring context type request" << std::endl;
+        ammonite::utils::warning << "Window already created, ignoring context type request" << std::endl;
         return;
       }
 
@@ -125,7 +125,7 @@ namespace ammonite {
 
       window = glfwCreateWindow(width, height, title, NULL, NULL);
       if (window == NULL) {
-        std::cerr << ammonite::utils::error << "Failed to open window" << std::endl;
+        ammonite::utils::error << "Failed to open window" << std::endl;
         glfwTerminate();
         return nullptr;
       }
@@ -166,7 +166,7 @@ namespace ammonite {
           }
         }
       } catch (const std::filesystem::filesystem_error&) {
-        std::cerr << ammonite::utils::warning << "Couldn't open '" << iconDirPath << "'" << std::endl;
+        ammonite::utils::warning << "Couldn't open '" << iconDirPath << "'" << std::endl;
         return;
       }
 

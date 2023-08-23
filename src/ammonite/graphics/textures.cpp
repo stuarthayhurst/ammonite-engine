@@ -82,7 +82,7 @@ namespace ammonite {
         unsigned char* data = stbi_load(texturePath, &width, &height, &nChannels, 0);
 
         if (!data) {
-          std::cerr << ammonite::utils::warning << "Failed to load texture '" << texturePath << "'" << std::endl;
+          ammonite::utils::warning << "Failed to load texture '" << texturePath << "'" << std::endl;
           *externalSuccess = false;
           return -1;
         }
@@ -95,7 +95,7 @@ namespace ammonite {
         GLenum internalFormat;
         GLenum dataFormat;
         if (!getTextureFormat(nChannels, srgbTexture, &internalFormat, &dataFormat)) {
-          std::cerr << ammonite::utils::warning << "Failed to load texture '" << texturePath << "'" << std::endl;
+          ammonite::utils::warning << "Failed to load texture '" << texturePath << "'" << std::endl;
           glDeleteTextures(1, &textureId);
           *externalSuccess = false;
           return -1;

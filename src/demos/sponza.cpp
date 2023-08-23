@@ -69,7 +69,7 @@ namespace sponzaDemo {
     if (success) {
       ammonite::environment::skybox::setActiveSkybox(skyboxId);
     } else {
-      std::cerr << ammonite::utils::warning << "Skybox failed to load" << std::endl;
+      ammonite::utils::warning << "Skybox failed to load" << std::endl;
     }
 
     std::cout << "STATUS: Loaded " << vertexCount << " vertices" << std::endl;

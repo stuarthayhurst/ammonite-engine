@@ -45,7 +45,7 @@ namespace ammonite {
 
         loadingScreenTracker.erase(targetScreenId);
       } else {
-        std::cerr << ammonite::utils::warning << "Loading screen " << targetScreenId << " doesn't exist" << std::endl;
+        ammonite::utils::warning << "Loading screen " << targetScreenId << " doesn't exist" << std::endl;
       }
     }
 
@@ -56,7 +56,7 @@ namespace ammonite {
       } else if (targetScreenId == -1) {
         activeLoadingScreenId = -1;
       } else {
-        std::cerr << ammonite::utils::warning << "Loading screen " << targetScreenId << " doesn't exist" << std::endl;
+        ammonite::utils::warning << "Loading screen " << targetScreenId << " doesn't exist" << std::endl;
       }
     }
 
@@ -68,7 +68,7 @@ namespace ammonite {
       if (loadingScreenTracker.contains(targetScreenId)) {
         loadingScreenTracker[targetScreenId].progress = progress;
       } else {
-        std::cerr << ammonite::utils::warning << "Loading screen " << targetScreenId << " doesn't exist" << std::endl;
+        ammonite::utils::warning << "Loading screen " << targetScreenId << " doesn't exist" << std::endl;
       }
     }
 
@@ -78,7 +78,7 @@ namespace ammonite {
         loadingScreenTracker[targetScreenId].height = height;
         loadingScreenTracker[targetScreenId].heightOffset = heightOffset;
       } else {
-        std::cerr << ammonite::utils::warning << "Loading screen " << targetScreenId << " doesn't exist" << std::endl;
+        ammonite::utils::warning << "Loading screen " << targetScreenId << " doesn't exist" << std::endl;
       }
     }
 
@@ -88,7 +88,7 @@ namespace ammonite {
         loadingScreenTracker[targetScreenId].trackColour = trackColour;
         loadingScreenTracker[targetScreenId].progressColour = progressColour;
       } else {
-        std::cerr << ammonite::utils::warning << "Loading screen " << targetScreenId << " doesn't exist" << std::endl;
+        ammonite::utils::warning << "Loading screen " << targetScreenId << " doesn't exist" << std::endl;
       }
     }
 

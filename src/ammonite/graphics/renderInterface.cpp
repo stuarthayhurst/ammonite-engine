@@ -30,7 +30,7 @@ namespace ammonite {
         //Check GPU supported required extensions
         int failureCount = 0;
         if (!internal::checkGPUCapabilities(&failureCount)) {
-          std::cerr << ammonite::utils::error << failureCount << " required extension(s) unsupported" << std::endl;
+          ammonite::utils::error << failureCount << " required extension(s) unsupported" << std::endl;
           *externalSuccess = false;
           return;
         }
@@ -42,7 +42,7 @@ namespace ammonite {
         internal::setupOpenGLObjects();
 
         //Output time taken to load renderer
-        std::cout << ammonite::utils::status << "Loaded renderer in " << loadTimer.getTime() << "s" << std::endl;
+        ammonite::utils::status << "Loaded renderer in " << loadTimer.getTime() << "s" << std::endl;
       }
     }
 
