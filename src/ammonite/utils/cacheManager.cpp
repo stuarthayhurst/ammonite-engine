@@ -18,7 +18,8 @@ namespace ammonite {
 
       namespace {
         //Hash input filenames together to create a unique cache string
-        static std::string generateCacheString(const char* inputNames[], const int inputCount) {
+        static std::string generateCacheString(const char* inputNames[],
+                                               const int inputCount) {
           std::string inputString = "";
           for (int i = 0; i < inputCount; i++) {
             inputString += std::string(inputNames[i]) + std::string(";");
@@ -33,13 +34,15 @@ namespace ammonite {
           return std::string(dataCacheDir + generateCacheString(filePaths, fileCount) + ".cache");
         }
 
-        std::string requestCachedData(const char* filePaths[], const int fileCount, bool* found) {
+        std::string requestCachedData(const char* filePaths[],
+                                      const int fileCount, bool* found) {
           //Generate path to cache file from cache string
           std::string cacheFilePath = requestNewCache(filePaths, fileCount);
           std::string cacheInfoFilePath = cacheFilePath + "info";
 
           //Check cache and info file exist
-          if (!std::filesystem::exists(cacheFilePath) or !std::filesystem::exists(cacheInfoFilePath)) {
+          if (!std::filesystem::exists(cacheFilePath) or
+              !std::filesystem::exists(cacheInfoFilePath)) {
             *found = false;
             return std::string("");
           }
@@ -68,14 +71,16 @@ namespace ammonite {
 
                 //Get filesize and time of last modification of the shader source
                 long long int filesize = 0, modificationTime = 0;
-                if (!ammonite::utils::internal::getFileMetadata(filePaths[i], &filesize, &modificationTime)) {
+                if (!ammonite::utils::internal::getFileMetadata(filePaths[i],
+                    &filesize, &modificationTime)) {
                   //Failed to get the metadata
                   isCacheValid = false;
                   break;
                 }
 
                 try {
-                  if (std::stoi(strings[2]) != filesize or std::stoi(strings[3]) != modificationTime) {
+                  if (std::stoi(strings[2]) != filesize or
+                      std::stoi(strings[3]) != modificationTime) {
                     //Shader source code has changed, invalidate
                     isCacheValid = false;
                     break;
@@ -96,7 +101,6 @@ namespace ammonite {
             //Failed to open the cache info
             isCacheValid = false;
           }
-
 
           //If cache failed to validate, set found and return nothing
           if (!isCacheValid) {
