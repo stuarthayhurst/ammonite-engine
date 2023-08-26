@@ -6,17 +6,17 @@
 
 namespace ammonite {
   namespace utils {
-    class Output {
+    class OutputHelper {
     private:
       std::ostream& outputStream;
       std::string prefix;
       bool hasFlushed = true;
 
     public:
-      Output(std::ostream& output, std::string pre):outputStream(output) {
+      OutputHelper(std::ostream& output, std::string pre):outputStream(output) {
         prefix = pre;
       }
-      template<typename T> Output& operator << (T&& x) {
+      template<typename T> OutputHelper& operator << (T&& x) {
         if (hasFlushed) {
           outputStream << prefix << x;
           hasFlushed = false;
@@ -27,16 +27,16 @@ namespace ammonite {
       }
 
       //Handle std::endl
-      Output& operator << (std::ostream& (*)(std::ostream&)) {
+      OutputHelper& operator << (std::ostream& (*)(std::ostream&)) {
         outputStream << std::endl;
         hasFlushed = true;
         return *this;
       }
     };
 
-    extern Output error;
-    extern Output warning;
-    extern Output status;
+    extern OutputHelper error;
+    extern OutputHelper warning;
+    extern OutputHelper status;
   }
 }
 

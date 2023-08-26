@@ -7,7 +7,7 @@
 #include "logging.hpp"
 
 #ifdef DEBUG
-  ammonite::utils::Output ammoniteInternalDebug(std::cout, "DEBUG: ");
+  ammonite::utils::OutputHelper ammoniteInternalDebug(std::cout, "DEBUG: ");
 #endif
 
 namespace ammonite {

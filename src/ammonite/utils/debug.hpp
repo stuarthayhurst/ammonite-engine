@@ -4,7 +4,7 @@
 //Output sent to ammoniteInternalDebug will disappear unless DEBUG is set
 #ifdef DEBUG
   #include "logging.hpp"
-  extern ammonite::utils::Output ammoniteInternalDebug;
+  extern ammonite::utils::OutputHelper ammoniteInternalDebug;
 #else
   #define ammoniteInternalDebug \
   if(false) std::cout
