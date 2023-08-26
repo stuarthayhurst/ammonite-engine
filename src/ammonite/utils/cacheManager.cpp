@@ -30,14 +30,14 @@ namespace ammonite {
       }
 
       namespace internal {
-        std::string requestNewCache(const char* filePaths[], const int fileCount) {
+        std::string requestNewCachePath(const char* filePaths[], const int fileCount) {
           return std::string(dataCacheDir + generateCacheString(filePaths, fileCount) + ".cache");
         }
 
-        std::string requestCachedData(const char* filePaths[],
+        std::string requestCachedDataPath(const char* filePaths[],
                                       const int fileCount, bool* found) {
           //Generate path to cache file from cache string
-          std::string cacheFilePath = requestNewCache(filePaths, fileCount);
+          std::string cacheFilePath = requestNewCachePath(filePaths, fileCount);
           std::string cacheInfoFilePath = cacheFilePath + "info";
 
           //Check cache and info file exist

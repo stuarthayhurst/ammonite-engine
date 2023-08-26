@@ -28,7 +28,7 @@ namespace ammonite {
     }
 
     static void cacheProgram(const GLuint programId, const char* shaderPaths[], const int shaderCount) {
-      std::string cacheFilePath = ammonite::utils::cache::internal::requestNewCache(shaderPaths, shaderCount);
+      std::string cacheFilePath = ammonite::utils::cache::internal::requestNewCachePath(shaderPaths, shaderCount);
       std::string cacheFileInfoPath = cacheFilePath + "info";
 
       ammonite::utils::status << "Caching '" << cacheFilePath << "'" << std::endl;
@@ -233,7 +233,7 @@ namespace ammonite {
 
       if (isCacheSupported) {
         bool cacheValid = false;
-        std::string cacheFilePath = ammonite::utils::cache::internal::requestCachedData(shaderPaths, shaderCount, &cacheValid);
+        std::string cacheFilePath = ammonite::utils::cache::internal::requestCachedDataPath(shaderPaths, shaderCount, &cacheValid);
         std::string cacheFileInfoPath = cacheFilePath + "info";
 
         //Attempt to get the shader format and size
