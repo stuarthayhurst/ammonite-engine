@@ -7,8 +7,6 @@
 
 #include "internal/internalSettings.hpp"
 
-#include "internal/internalDebug.hpp"
-
 namespace ammonite {
   namespace camera {
     namespace {

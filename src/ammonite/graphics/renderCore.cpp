@@ -30,8 +30,7 @@
 
 #include "../utils/extension.hpp"
 #include "../utils/logging.hpp"
-
-#include "../internal/internalDebug.hpp"
+#include "../utils/debug.hpp"
 
 /*
  - Implement core rendering for 3D graphics

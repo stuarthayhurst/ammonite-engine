@@ -1,6 +1,5 @@
 #include <GLFW/glfw3.h>
 
-#include "internal/internalDebug.hpp"
 #include "internal/internalCamera.hpp"
 
 namespace ammonite {

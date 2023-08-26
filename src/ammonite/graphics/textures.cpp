@@ -9,8 +9,6 @@
 
 #include "../utils/logging.hpp"
 
-#include "../internal/internalDebug.hpp"
-
 namespace ammonite {
   namespace textures {
     namespace {

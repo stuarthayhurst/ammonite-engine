@@ -3,7 +3,6 @@
 #include <GLFW/glfw3.h>
 
 #include "../constants.hpp"
-#include "../internal/internalDebug.hpp"
 
 namespace ammonite {
   namespace utils {

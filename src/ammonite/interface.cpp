@@ -4,7 +4,6 @@
 #include "internal/interfaceTracker.hpp"
 
 #include "utils/logging.hpp"
-#include "internal/internalDebug.hpp"
 
 namespace ammonite {
   namespace interface {

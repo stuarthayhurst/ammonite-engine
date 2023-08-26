@@ -13,8 +13,6 @@
 #include "../windowManager.hpp"
 #include "timer.hpp"
 
-#include "../internal/internalDebug.hpp"
-
 namespace ammonite {
   namespace utils {
     namespace controls {

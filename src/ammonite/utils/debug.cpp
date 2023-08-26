@@ -6,8 +6,6 @@
 #include "extension.hpp"
 #include "logging.hpp"
 
-#include "../internal/internalDebug.hpp"
-
 namespace ammonite {
   namespace utils {
     namespace {

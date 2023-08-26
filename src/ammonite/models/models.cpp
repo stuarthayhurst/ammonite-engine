@@ -23,8 +23,6 @@
 #include "../graphics/internal/internalTextures.hpp"
 #include "../utils/logging.hpp"
 
-#include "../internal/internalDebug.hpp"
-
 //Constants for texture loading assumptions
 #define ASSUME_FLIP_UVS true
 #define ASSUME_SRGB_TEXTURES false

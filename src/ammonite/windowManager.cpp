@@ -13,8 +13,6 @@
 #include "utils/logging.hpp"
 #include "constants.hpp"
 
-#include "internal/internalDebug.hpp"
-
 namespace ammonite {
   namespace window {
     namespace {

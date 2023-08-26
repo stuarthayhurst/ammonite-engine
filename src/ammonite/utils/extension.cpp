@@ -1,7 +1,7 @@
 #include <iostream>
 #include <GL/glew.h>
 
-#include "../internal/internalDebug.hpp"
+#include "debug.hpp"
 
 namespace ammonite {
   namespace utils {
