@@ -5,7 +5,7 @@
 
 namespace ammonite {
   namespace utils {
-    bool checkExtension(const char extension[], const char version[]) {
+    bool checkExtension(const char* extension, const char* version) {
       if (glewIsSupported(extension) or glewIsSupported(version)) {
         //Extension supported, either explicitly or by version
         ammoniteInternalDebug << extension << " supported (" << version << ")" << std::endl;
@@ -18,7 +18,7 @@ namespace ammonite {
     }
 
     //Allow checking for extensions without a fallback version
-    bool checkExtension(const char extension[]) {
+    bool checkExtension(const char* extension) {
       if (glewIsSupported(extension)) {
         //Extension supported
         ammoniteInternalDebug << extension << " supported" << std::endl;
