@@ -10,6 +10,8 @@
 #include <GL/glew.h>
 
 #include "../utils/internal/internalFileManager.hpp"
+#include "../utils/internal/internalCacheManager.hpp"
+
 #include "../utils/logging.hpp"
 #include "../utils/extension.hpp"
 #include "../utils/cacheManager.hpp"
@@ -26,7 +28,7 @@ namespace ammonite {
     }
 
     static void cacheProgram(const GLuint programId, const char* shaderPaths[], const int shaderCount) {
-      std::string cacheFilePath = ammonite::utils::cache::requestNewCache(shaderPaths, shaderCount);
+      std::string cacheFilePath = ammonite::utils::cache::internal::requestNewCache(shaderPaths, shaderCount);
       std::string cacheFileInfoPath = cacheFilePath + "info";
 
       ammonite::utils::status << "Caching '" << cacheFilePath << "'" << std::endl;
@@ -231,7 +233,7 @@ namespace ammonite {
 
       if (isCacheSupported) {
         bool cacheValid = false;
-        std::string cacheFilePath = ammonite::utils::cache::requestCachedData(shaderPaths, shaderCount, &cacheValid);
+        std::string cacheFilePath = ammonite::utils::cache::internal::requestCachedData(shaderPaths, shaderCount, &cacheValid);
         std::string cacheFileInfoPath = cacheFilePath + "info";
 
         //Attempt to get the shader format and size
