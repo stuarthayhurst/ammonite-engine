@@ -11,6 +11,7 @@
 #include "internal/internalSettings.hpp"
 #include "graphics/internal/shaderCacheUpdate.hpp"
 #include "utils/logging.hpp"
+#include "utils/debug.hpp"
 #include "constants.hpp"
 
 namespace ammonite {
@@ -53,8 +54,10 @@ namespace ammonite {
 
         //Set requested context type
         if (requestedContextType == AMMONITE_NO_ERROR_CONTEXT) {
+          ammoniteInternalDebug << "Creating window with AMMONITE_NO_ERROR_CONTEXT" << std::endl;
           glfwWindowHint(GLFW_CONTEXT_NO_ERROR, GLFW_TRUE);
         } else if (requestedContextType == AMMONITE_DEBUG_CONTEXT) {
+          ammoniteInternalDebug << "Creating window with AMMONITE_DEBUG_CONTEXT" << std::endl;
           glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
         }
 
@@ -111,6 +114,7 @@ namespace ammonite {
         requestedContextType = contextType;
         return;
       default:
+        ammonite::utils::warning << "Unknown context type '" << contextType << "' requested" << std::endl;
         return;
       }
     }
