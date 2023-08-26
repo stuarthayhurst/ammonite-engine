@@ -1,9 +1,9 @@
+#ifndef MODELTYPES
+#define MODELTYPES
+
 /* Internally exposed header:
  - Define data structures for models
 */
-
-#ifndef MODELTYPES
-#define MODELTYPES
 
 #include <vector>
 #include <string>

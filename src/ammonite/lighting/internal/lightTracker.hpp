@@ -1,9 +1,9 @@
+#ifndef LIGHTTRACKER
+#define LIGHTTRACKER
+
 /* Internally exposed header:
  - Define data structures for lights
 */
-
-#ifndef LIGHTTRACKER
-#define LIGHTTRACKER
 
 #include <map>
 #include <glm/glm.hpp>

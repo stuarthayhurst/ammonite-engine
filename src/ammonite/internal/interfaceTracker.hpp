@@ -1,13 +1,13 @@
 #ifndef INTERNALINTERFACE
 #define INTERNALINTERFACE
 
-#include <map>
-
-#include <glm/glm.hpp>
-
 /* Internally exposed header:
  - Allow access to loading screen tracker internally
 */
+
+#include <map>
+
+#include <glm/glm.hpp>
 
 namespace ammonite {
   namespace interface {

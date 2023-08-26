@@ -1,10 +1,10 @@
+#ifndef LIGHTTYPES
+#define LIGHTTYPES
+
 /* Internally exposed header:
  - Allow access to light tracker internally
  - Allow access to light transforms internally
 */
-
-#ifndef LIGHTTYPES
-#define LIGHTTYPES
 
 #include <glm/glm.hpp>
 

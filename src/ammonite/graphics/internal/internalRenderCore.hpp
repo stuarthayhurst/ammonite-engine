@@ -1,9 +1,9 @@
+#ifndef INTERNALRENDERERCORE
+#define INTERNALRENDERERCORE
+
 /* Internally exposed header:
  - Expose rendering core to render interface
 */
-
-#ifndef INTERNALRENDERERCORE
-#define INTERNALRENDERERCORE
 
 #include <GLFW/glfw3.h>
 

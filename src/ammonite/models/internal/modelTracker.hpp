@@ -1,9 +1,9 @@
+#ifndef MODELTRACKER
+#define MODELTRACKER
+
 /* Internally exposed header:
  - Functions for direct access to model structures
 */
-
-#ifndef MODELTRACKER
-#define MODELTRACKER
 
 #include "modelTypes.hpp"
 #include "../../constants.hpp"

@@ -1,5 +1,5 @@
-#ifndef INTERNALSHADERCACHEUPDATE
-#define INTERNALSHADERCACHEUPDATE
+#ifndef INTERNALSHADERS
+#define INTERNALSHADERS
 
 /* Internally exposed header:
  - Allow window manager to prompt checking for cache support

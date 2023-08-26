@@ -1,13 +1,13 @@
 #ifndef INTERNALKEYBINDS
 #define INTERNALKEYBINDS
 
-#include <map>
-
-#include "../constants.hpp"
-
 /* Internally exposed header:
  - Allow access to keybind tracker internally
 */
+
+#include <map>
+
+#include "../constants.hpp"
 
 namespace ammonite {
   namespace utils {

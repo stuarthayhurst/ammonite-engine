@@ -1,5 +1,9 @@
-#ifndef TEXTURE
-#define TEXTURE
+#ifndef INTERNALTEXTURE
+#define INTERNALTEXTURE
+
+/* Internally exposed header:
+ - Expose texture handling methods internally
+*/
 
 #include <GL/glew.h>
 
