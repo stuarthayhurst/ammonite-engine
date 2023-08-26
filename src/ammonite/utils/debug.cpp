@@ -6,6 +6,10 @@
 #include "extension.hpp"
 #include "logging.hpp"
 
+#ifdef DEBUG
+  ammonite::utils::Output ammoniteInternalDebug(std::cout, "DEBUG: ");
+#endif
+
 namespace ammonite {
   namespace utils {
     namespace {
