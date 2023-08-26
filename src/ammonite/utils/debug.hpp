@@ -7,7 +7,7 @@
   extern ammonite::utils::Output ammoniteInternalDebug;
 #else
   #define ammoniteInternalDebug \
-  if(true); else std::cout
+  if(false) std::cout
 #endif
 
 #ifdef DEBUG
