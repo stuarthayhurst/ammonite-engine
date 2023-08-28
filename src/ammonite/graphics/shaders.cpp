@@ -116,7 +116,7 @@ namespace ammonite {
 
       //Try and match the filename to a supported shader
       for (auto it = shaderMatches.begin(); it != shaderMatches.end(); it++) {
-        if (lowerShaderPath.find(it->first) != std::string::npos) {
+        if (lowerShaderPath.contains(it->first)) {
           return it->second;
         }
       }

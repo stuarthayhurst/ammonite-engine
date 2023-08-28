@@ -140,7 +140,7 @@ namespace ammonite {
           int foundIndex = -1;
           for (unsigned int i = 0; i < faces.size(); i++) {
             //Check if the current face is the desired face
-            if (faces[i].find(faceOrder[targetFace]) != std::string::npos) {
+            if (faces[i].contains(faceOrder[targetFace])) {
               foundIndex = i;
               break;
             }
