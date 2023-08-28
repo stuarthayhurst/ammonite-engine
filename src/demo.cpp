@@ -109,10 +109,8 @@ int main(int argc, char* argv[]) {
 
 #ifdef DEBUG
   ammonite::window::requestContextType(AMMONITE_DEBUG_CONTEXT);
-#else
-  #ifdef FAST
-    ammonite::window::requestContextType(AMMONITE_NO_ERROR_CONTEXT);
-  #endif
+#elifdef FAST
+  ammonite::window::requestContextType(AMMONITE_NO_ERROR_CONTEXT);
 #endif
 
   //Create the window
