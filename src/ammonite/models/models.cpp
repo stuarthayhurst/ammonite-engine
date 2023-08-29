@@ -443,7 +443,7 @@ namespace ammonite {
         if (!hasCreatedObject) {
           modelDataMap.erase(modelObject.modelName);
           *externalSuccess = false;
-          return 0;
+          return -1;
         }
 
         //Create buffers from loaded data
@@ -477,7 +477,7 @@ namespace ammonite {
       //Get the model and check it exists
       models::internal::ModelInfo* oldModelObject = modelIdPtrMap[modelId];
       if (oldModelObject == nullptr) {
-        return 0;
+        return -1;
       }
 
       //Copy model data
