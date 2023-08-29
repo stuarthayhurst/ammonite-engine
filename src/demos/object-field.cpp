@@ -108,7 +108,6 @@ namespace objectFieldDemo {
 
     if (!success) {
       demoExit();
-
       return -1;
     }
 

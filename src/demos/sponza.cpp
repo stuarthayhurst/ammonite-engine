@@ -57,7 +57,6 @@ namespace sponzaDemo {
 
     if (!success) {
       demoExit();
-
       return -1;
     }
 

@@ -57,7 +57,6 @@ namespace defaultDemo {
 
     if (!success) {
       demoExit();
-
       return -1;
     }
 
