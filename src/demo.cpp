@@ -211,6 +211,19 @@ int main(int argc, char* argv[]) {
       lastInputToggleState = inputToggleState;
     }
 
+    //Handle fullscreen toggle
+    static int lastScreenToggleState = GLFW_RELEASE;
+    int screenToggleState = glfwGetKey(windowPtr, GLFW_KEY_F11);
+    if (lastScreenToggleState != screenToggleState) {
+      if (lastScreenToggleState == GLFW_RELEASE) {
+        int fullscreen = ammonite::window::getFullscreen();
+        std::cout << fullscreen << std::endl;
+        ammonite::window::setFullscreen(!fullscreen);
+      }
+
+      lastScreenToggleState = screenToggleState;
+    }
+
     //Cycle camera when pressed
     if (glfwGetKey(windowPtr, GLFW_KEY_B) != GLFW_PRESS) {
       cameraToggleHeld = false;
