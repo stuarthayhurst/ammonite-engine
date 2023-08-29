@@ -217,7 +217,6 @@ int main(int argc, char* argv[]) {
     if (lastScreenToggleState != screenToggleState) {
       if (lastScreenToggleState == GLFW_RELEASE) {
         int fullscreen = ammonite::window::getFullscreen();
-        std::cout << fullscreen << std::endl;
         ammonite::window::setFullscreen(!fullscreen);
       }
 
