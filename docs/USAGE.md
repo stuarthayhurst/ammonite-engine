@@ -2,6 +2,13 @@
   - Some basic usage can be found here, with much better coverage planned in future
   - This is mostly a staging ground for information that won't be automatically generated from source files
 
+## Return codes:
+  - Failures return `-1`
+  - Successes return `0`
+  - Object IDs start at `1`, and are specific to each object type
+    - This means a camera, light source and model can all share ID `1`
+    - Cameras technically start at `0`, as the default camera has ID `0`
+
 ## Model draw modes:
   - `ammonite::models::draw::setDrawMode(modelId, drawMode)` takes 2 arguments, a model ID and a draw mode
     - `modelId` is the model to modify the draw mode of
