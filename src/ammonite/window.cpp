@@ -1,6 +1,7 @@
 #include <string>
 #include <vector>
 #include <filesystem>
+#include <algorithm>
 
 #include <GLFW/glfw3.h>
 #include <stb/stb_image.h>
@@ -11,6 +12,7 @@
 #include "utils/debug.hpp"
 #include "utils/logging.hpp"
 #include "constants.hpp"
+#include "settings.hpp"
 
 #define DEFAULT_TITLE "Ammonite Window"
 
@@ -18,6 +20,41 @@ namespace ammonite {
   namespace window {
     namespace {
       GLFWwindow* windowPtr;
+      bool isFullscreen = false;
+    }
+
+    namespace {
+      static GLFWmonitor* getCurrentMonitor() {
+        int monitorCount;
+        GLFWmonitor **monitors = glfwGetMonitors(&monitorCount);
+
+        //Get window position and size
+        int wx, wy, ww, wh;
+        glfwGetWindowPos(windowPtr, &wx, &wy);
+        glfwGetWindowSize(windowPtr, &ww, &wh);
+
+        //Find which monitor the window overlaps most with
+        int bestOverlap = 0;
+        GLFWmonitor *bestMonitor = nullptr;
+        for (int i = 0; i < monitorCount; i++) {
+          int mx, my, mw, mh;
+          const GLFWvidmode* mode = glfwGetVideoMode(monitors[i]);
+          glfwGetMonitorPos(monitors[i], &mx, &my);
+          mw = mode->width;
+          mh = mode->height;
+
+          int overlap =
+            std::max(0, std::min(wx + ww, mx + mw) - std::max(wx, mx)) *
+            std::max(0, std::min(wy + wh, my + mh) - std::max(wy, my));
+
+          if (bestOverlap < overlap) {
+            bestOverlap = overlap;
+            bestMonitor = monitors[i];
+          }
+        }
+
+        return bestMonitor;
+      }
     }
 
     GLFWwindow* getWindowPtr() {
@@ -120,6 +157,41 @@ namespace ammonite {
       for (unsigned int i = 0; i < pngFiles.size(); i++) {
         stbi_image_free(images[i].pixels);
       }
+    }
+
+    bool getFullscreen() {
+      return isFullscreen;
+    }
+
+    int getMonitors(GLFWmonitor*** monitorsPtr) {
+      int monitorCount;
+      *monitorsPtr = glfwGetMonitors(&monitorCount);
+      return monitorCount;
+    }
+
+    void setFullscreenMonitor(GLFWmonitor* monitor) {
+      const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+      int width = mode->width;
+      int height = mode->height;
+
+      //Set fullscreen
+      glfwSetWindowMonitor(windowPtr, monitor, 0, 0, width, height, GLFW_DONT_CARE);
+    }
+
+    void setFullscreen(bool fullscreen) {
+      if (fullscreen == isFullscreen) {
+        return;
+      }
+
+      //Set window to windowed mode
+      if (!fullscreen) {
+        int width = ammonite::settings::runtime::getWidth();
+        int height = ammonite::settings::runtime::getHeight();
+        glfwSetWindowMonitor(windowPtr, NULL, 0, 0, width, height, GLFW_DONT_CARE);
+      }
+
+      //Fullscreen on current monitor
+      setFullscreenMonitor(getCurrentMonitor());
     }
   }
 }

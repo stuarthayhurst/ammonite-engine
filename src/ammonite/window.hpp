@@ -15,6 +15,12 @@ namespace ammonite {
 
     void setTitle(const char* title);
     void useIconDir(const char* iconDirPath);
+
+    bool getFullscreen();
+    int getMonitors(GLFWmonitor*** monitorsPtr);
+
+    void setFullscreenMonitor(GLFWmonitor* monitor);
+    void setFullscreen(bool fullscreen);
   }
 }
 
