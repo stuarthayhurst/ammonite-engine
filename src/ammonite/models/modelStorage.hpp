@@ -1,6 +1,8 @@
 #ifndef MODELSTORAGE
 #define MODELSTORAGE
 
+#include "../constants.hpp"
+
 namespace ammonite {
   namespace models {
     int createModel(const char* objectPath, bool* externalSuccess);
