@@ -176,6 +176,7 @@ namespace ammonite {
 
       //Set fullscreen
       glfwSetWindowMonitor(windowPtr, monitor, 0, 0, width, height, GLFW_DONT_CARE);
+      isFullscreen = true;
     }
 
     void setFullscreen(bool fullscreen) {
@@ -187,7 +188,18 @@ namespace ammonite {
       if (!fullscreen) {
         int width = ammonite::settings::runtime::getWidth();
         int height = ammonite::settings::runtime::getHeight();
-        glfwSetWindowMonitor(windowPtr, NULL, 0, 0, width, height, GLFW_DONT_CARE);
+        int x = 0, y = 0;
+
+        //Get the current monitor to window to
+        GLFWmonitor* currentMonitor = glfwGetWindowMonitor(windowPtr);
+        if (currentMonitor != nullptr) {
+          glfwGetMonitorPos(currentMonitor, &x, &y);
+        }
+
+        glfwSetWindowMonitor(windowPtr, NULL, x, y, width, height, GLFW_DONT_CARE);
+
+        isFullscreen = false;
+        return;
       }
 
       //Fullscreen on current monitor
