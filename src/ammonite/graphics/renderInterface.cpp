@@ -4,7 +4,7 @@
 
 #include "../utils/timer.hpp"
 #include "../utils/logging.hpp"
-#include "../windowManager.hpp"
+#include "../core/windowManager.hpp"
 
 #include "internal/internalRenderCore.hpp"
 #include "../internal/interfaceTracker.hpp"
@@ -25,7 +25,7 @@ namespace ammonite {
         //Start a timer to measure load time
         ammonite::utils::Timer loadTimer;
 
-        GLFWwindow* window = ammonite::window::getWindowPtr();
+        GLFWwindow* window = ammonite::window::internal::getWindowPtr();
 
         //Check GPU supported required extensions
         int failureCount = 0;

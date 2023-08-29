@@ -10,7 +10,7 @@
 #include "../internal/keybindTracker.hpp"
 #include "../constants.hpp"
 #include "../camera.hpp"
-#include "../windowManager.hpp"
+#include "../core/windowManager.hpp"
 #include "timer.hpp"
 
 namespace ammonite {
@@ -141,7 +141,7 @@ namespace ammonite {
 
       void setupControls() {
         //Connect window pointer
-        window = ammonite::window::getWindowPtr();
+        window = ammonite::window::internal::getWindowPtr();
 
         //Set mouse callbacks
         glfwSetScrollCallback(window, scroll_callback);

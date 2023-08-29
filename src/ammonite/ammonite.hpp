@@ -19,7 +19,7 @@
 #include "environment.hpp"
 #include "interface.hpp"
 
-#include "windowManager.hpp"
+#include "window.hpp"
 
 #include "graphics/shaders.hpp"
 #include "graphics/renderInterface.hpp"

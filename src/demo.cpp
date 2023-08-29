@@ -54,7 +54,7 @@ void cleanUp(int modelCount, std::vector<int> loadedModelIds) {
   for (int i = 0; i < modelCount; i++) {
     ammonite::models::deleteModel(loadedModelIds[i]);
   }
-  ammonite::window::setup::destroyGlfw();
+  ammonite::window::destroyWindow();
 }
 
 int main(int argc, char* argv[]) {
@@ -116,10 +116,10 @@ int main(int argc, char* argv[]) {
 #endif
 
   //Create the window
-  auto window = ammonite::window::setupWindow(1024, 768, "OpenGL Experiments");
-  if (window == NULL) {
+  if (ammonite::window::createWindow(1024, 768, "OpenGL Experiments") == -1) {
     return EXIT_FAILURE;
   }
+  GLFWwindow* windowPtr = ammonite::window::getWindowPtr();
 
   //Set an icon
   ammonite::window::useIconDir("assets/icons/");
@@ -156,7 +156,7 @@ int main(int argc, char* argv[]) {
   //Renderer failed to initialise, clean up and exit
   if (!success) {
     std::cerr << "ERROR: Failed to initialise renderer, exiting" << std::endl;
-    ammonite::window::setup::destroyGlfw();
+    ammonite::window::destroyWindow();
     return EXIT_FAILURE;
   }
 
@@ -170,7 +170,7 @@ int main(int argc, char* argv[]) {
   if (postRendererInit != nullptr) {
     if (postRendererInit() == -1) {
       std::cerr << "ERROR: Failed to set up demo, exiting" << std::endl;
-      ammonite::window::setup::destroyGlfw();
+      ammonite::window::destroyWindow();
       return EXIT_FAILURE;
     }
   }
@@ -202,7 +202,7 @@ int main(int argc, char* argv[]) {
 
     //Handle toggling input focus
     static int lastInputToggleState = GLFW_RELEASE;
-    int inputToggleState = glfwGetKey(window, GLFW_KEY_C);
+    int inputToggleState = glfwGetKey(windowPtr, GLFW_KEY_C);
     if (lastInputToggleState != inputToggleState) {
       if (lastInputToggleState == GLFW_RELEASE) {
         ammonite::utils::controls::setInputFocus(!ammonite::utils::controls::getInputFocus());
@@ -212,7 +212,7 @@ int main(int argc, char* argv[]) {
     }
 
     //Cycle camera when pressed
-    if (glfwGetKey(window, GLFW_KEY_B) != GLFW_PRESS) {
+    if (glfwGetKey(windowPtr, GLFW_KEY_B) != GLFW_PRESS) {
       cameraToggleHeld = false;
     } else if (!cameraToggleHeld) {
       cameraToggleHeld = true;
@@ -222,7 +222,7 @@ int main(int argc, char* argv[]) {
 
     //Handle toggling focal depth
     static int lastFocalToggleState = GLFW_RELEASE;
-    int focalToggleState = glfwGetKey(window, GLFW_KEY_Z);
+    int focalToggleState = glfwGetKey(windowPtr, GLFW_KEY_Z);
     if (lastFocalToggleState != focalToggleState) {
       if (lastFocalToggleState == GLFW_RELEASE) {
         ammonite::settings::graphics::post::setFocalDepthEnabled(
@@ -234,9 +234,9 @@ int main(int argc, char* argv[]) {
 
     //Get direction of focal depth change
     float sign = 0.0f;
-    if (glfwGetKey(window, GLFW_KEY_RIGHT_BRACKET) == GLFW_PRESS) {
+    if (glfwGetKey(windowPtr, GLFW_KEY_RIGHT_BRACKET) == GLFW_PRESS) {
       sign = 1.0f;
-    } else if (glfwGetKey(window, GLFW_KEY_LEFT_BRACKET) == GLFW_PRESS) {
+    } else if (glfwGetKey(windowPtr, GLFW_KEY_LEFT_BRACKET) == GLFW_PRESS) {
       sign = -1.0f;
     }
 
@@ -278,7 +278,7 @@ int main(int argc, char* argv[]) {
       cleanExit = false;
       std::cerr << "ERROR: Failed to clean up, exiting" << std::endl;
     }
-    ammonite::window::setup::destroyGlfw();
+    ammonite::window::destroyWindow();
 
     if (!cleanExit) {
       return EXIT_FAILURE;

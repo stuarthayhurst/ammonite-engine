@@ -42,7 +42,7 @@ namespace objectFieldDemo {
   }
 
   namespace {
-    GLFWwindow* window;
+    GLFWwindow* windowPtr;
 
     std::vector<int> loadedModelIds;
     int modelCount = 0;
@@ -74,7 +74,7 @@ namespace objectFieldDemo {
 
   int postRendererInit() {
     int screenId = ammonite::interface::getActiveLoadingScreen();
-    window = ammonite::window::getWindowPtr();
+    windowPtr = ammonite::window::getWindowPtr();
 
     //Hold data for randomised cube positions
     glm::vec3 cubeData[cubeCount + 1][3] = {
@@ -255,7 +255,7 @@ namespace objectFieldDemo {
 
     //Spawn object
     static bool spawnToggleHeld = false;
-    if (glfwGetKey(window, GLFW_KEY_F) != GLFW_PRESS) {
+    if (glfwGetKey(windowPtr, GLFW_KEY_F) != GLFW_PRESS) {
       spawnToggleHeld = false;
     } else if (!spawnToggleHeld) {
       spawnToggleHeld = true;
