@@ -196,7 +196,7 @@ namespace ammonite {
           glfwGetMonitorPos(currentMonitor, &x, &y);
         }
 
-        glfwSetWindowMonitor(windowPtr, NULL, x, y, width, height, GLFW_DONT_CARE);
+        glfwSetWindowMonitor(windowPtr, NULL, ++x, ++y, width, height, GLFW_DONT_CARE);
 
         isFullscreen = false;
         return;
