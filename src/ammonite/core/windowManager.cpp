@@ -12,7 +12,7 @@ namespace ammonite {
   namespace window {
     namespace internal {
       namespace {
-        GLFWwindow* windowPtr;
+        GLFWwindow* windowPtr = nullptr;
         AmmoniteEnum requestedContextType = AMMONITE_DEFAULT_CONTEXT;
 
         //Callback to update height and width on window resize

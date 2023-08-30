@@ -19,7 +19,7 @@
 namespace ammonite {
   namespace window {
     namespace {
-      GLFWwindow* windowPtr;
+      GLFWwindow* windowPtr = nullptr;
       bool isFullscreen = false;
     }
 
