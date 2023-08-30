@@ -7,6 +7,7 @@
 #include <stb/stb_image.h>
 
 #include "core/windowManager.hpp"
+#include "core/inputManager.hpp"
 #include "graphics/internal/internalShaders.hpp"
 
 #include "utils/debug.hpp"
@@ -104,6 +105,7 @@ namespace ammonite {
 
       //Setup input for window
       internal::setupGlfwInput();
+      ammonite::input::internal::setupCallback(windowPtr);
 
       return 0;
     }

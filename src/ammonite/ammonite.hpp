@@ -24,6 +24,7 @@
 #include "camera.hpp"
 #include "constants.hpp"
 #include "environment.hpp"
+#include "input.hpp"
 #include "interface.hpp"
 #include "settings.hpp"
 #include "window.hpp"
