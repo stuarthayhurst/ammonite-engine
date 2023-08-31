@@ -14,7 +14,7 @@
   - A physics system and sound system are also planned
 
 ## Requirements:
-  - A `c++20` compatible compiler (`g++ 10+`)
+  - A `c++23` compatible compiler (`g++ 12+` / `clang 17+`)
     - An OpenMP supported compiler + libraries installed
   - An OpenGL 4.5+ compatible driver
   - Alternatively, an OpenGL 3.2+ driver supporting the following extensions can be used

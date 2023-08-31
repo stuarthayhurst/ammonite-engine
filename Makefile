@@ -28,7 +28,7 @@ HELPER_OBJECTS = $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.o,$(HELPER_OBJECTS_SO
 DEMO_OBJECTS = $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.o,$(DEMO_OBJECTS_SOURCE)))
 
 CXXFLAGS := $(shell pkg-config --cflags $(LIBS)) -fopenmp
-CXXFLAGS += -Wall -Wextra -Werror -std=c++20 -flto=auto
+CXXFLAGS += -Wall -Wextra -Werror -std=c++23 -flto=auto
 LDFLAGS := $(shell pkg-config --libs $(LIBS)) -lstdc++ -lm -pthread
 
 ifeq ($(FAST),true)
