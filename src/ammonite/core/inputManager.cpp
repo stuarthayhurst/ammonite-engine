@@ -11,7 +11,6 @@ namespace ammonite {
       namespace {
         struct KeybindData {
           bool toggle;
-          int lastState;
           void(*callback)(int, int, void*);
           void* userPtr;
         };
@@ -51,7 +50,7 @@ namespace ammonite {
 
         //Bundle keybind data and add to tracker
         KeybindData keybindData = {
-          toggle, GLFW_RELEASE, callback, userPtr
+          toggle, callback, userPtr
         };
         keybindMap[keycode] = keybindData;
         return 0;
