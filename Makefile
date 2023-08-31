@@ -14,6 +14,7 @@ AMMONITE_OBJECTS_SOURCE = $(wildcard ./src/ammonite/*.cpp) \
 AMMONITE_HEADER_SOURCE = $(wildcard ./src/ammonite/*.hpp) \
 			 $(wildcard ./src/ammonite/*/*.hpp) \
 			 $(wildcard ./src/ammonite/*/*/*.hpp)
+AMMONITE_HEADER_INSTALL := $(subst src/ammonite,$(HEADER_DIR)/ammonite,$(AMMONITE_HEADER_SOURCE))
 
 HELPER_OBJECTS_SOURCE = $(wildcard ./src/helper/*.cpp)
 HELPER_HEADER_SOURCE = $(wildcard ./src/helper/*.hpp)
@@ -68,7 +69,7 @@ $(OBJECT_DIR)/demo.o: ./src/demo.cpp $(AMMONITE_HEADER_SOURCE) $(HELPER_HEADER_S
 	@mkdir -p "$(OBJECT_DIR)"
 	$(CXX) ./src/demo.cpp -c $(CXXFLAGS) -o "$@"
 
-.PHONY: build debug library headers install uninstall clean cache icons
+.PHONY: build debug library headers install uninstall clean cache icons $(AMMONITE_HEADER_INSTALL)
 build:
 	@$(MAKE) "$(BUILD_DIR)/demo"
 	@if [[ "$(DEBUG)" != "true" ]]; then \
@@ -77,14 +78,16 @@ build:
 debug: clean
 	@DEBUG="true" $(MAKE) build
 library: $(BUILD_DIR)/$(LIBRARY_NAME)
-headers:
-	@cp -rv "./src/ammonite" "$(HEADER_DIR)/"
-	@rm -rfv "$(HEADER_DIR)/ammonite/graphics/internal"
-	@rm -rfv "$(HEADER_DIR)/ammonite/lighting/internal"
-	@rm -rfv "$(HEADER_DIR)/ammonite/models/internal"
-	@rm -rfv "$(HEADER_DIR)/ammonite/utils/internal"
-	@rm -rfv "$(HEADER_DIR)/ammonite/internal"
-	@rm -rfv "$(HEADER_DIR)/ammonite/core"
+headers: $(AMMONITE_HEADER_INSTALL)
+$(AMMONITE_HEADER_INSTALL):
+	@targetFile="/$@"; \
+	targetDir="$$(dirname $$targetFile)"; \
+	origFile="$${targetFile//'$(HEADER_DIR)'/src}"; \
+	if [[ "$$targetDir/" != */internal/* ]] && \
+	   [[ "$$targetDir/" != */core/* ]]; then \
+	  mkdir -p "$$targetDir"; \
+	  cp -v "$$origFile" "$$targetFile"; \
+	fi
 install:
 	@mkdir -p "$(INSTALL_DIR)/ammonite"
 	install "$(BUILD_DIR)/libammonite.so" "$(INSTALL_DIR)/ammonite/$(LIBRARY_NAME)"
