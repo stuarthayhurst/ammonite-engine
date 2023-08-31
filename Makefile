@@ -79,7 +79,12 @@ debug: clean
 library: $(BUILD_DIR)/$(LIBRARY_NAME)
 headers:
 	@cp -rv "./src/ammonite" "$(HEADER_DIR)/"
+	@rm -rfv "$(HEADER_DIR)/ammonite/graphics/internal"
+	@rm -rfv "$(HEADER_DIR)/ammonite/lighting/internal"
+	@rm -rfv "$(HEADER_DIR)/ammonite/models/internal"
+	@rm -rfv "$(HEADER_DIR)/ammonite/utils/internal"
 	@rm -rfv "$(HEADER_DIR)/ammonite/internal"
+	@rm -rfv "$(HEADER_DIR)/ammonite/core"
 install:
 	@mkdir -p "$(INSTALL_DIR)/ammonite"
 	install "$(BUILD_DIR)/libammonite.so" "$(INSTALL_DIR)/ammonite/$(LIBRARY_NAME)"
