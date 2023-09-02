@@ -165,6 +165,10 @@ namespace ammonite {
       return isFullscreen;
     }
 
+    GLFWmonitor* getFullscreenMonitor() {
+      return isFullscreen ? glfwGetWindowMonitor(windowPtr) : nullptr;
+    }
+
     int getMonitors(GLFWmonitor*** monitorsPtr) {
       int monitorCount;
       *monitorsPtr = glfwGetMonitors(&monitorCount);

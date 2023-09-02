@@ -17,6 +17,7 @@ namespace ammonite {
     void useIconDir(const char* iconDirPath);
 
     bool getFullscreen();
+    GLFWmonitor* getFullscreenMonitor();
     int getMonitors(GLFWmonitor*** monitorsPtr);
 
     void setFullscreenMonitor(GLFWmonitor* monitor);
