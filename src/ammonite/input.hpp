@@ -7,6 +7,7 @@ namespace ammonite {
     int registerKeybind(int keycode, void(*callback)(int, int, void*), void* userPtr);
     int registerToggleKeybind(int keycode, void(*callback)(int, int, void*), void* userPtr);
     void unregisterKeybind(int keycode);
+    bool isKeybindRegistered(int keycode);
   }
 }
 

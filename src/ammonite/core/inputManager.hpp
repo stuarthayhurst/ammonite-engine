@@ -10,6 +10,7 @@ namespace ammonite {
       int registerRawKeybind(int keycode, bool toggle,
                              void(*callback)(int, int, void*), void* userPtr);
       void unregisterKeybind(int keycode);
+      bool isKeybindRegistered(int keycode);
     }
   }
 }

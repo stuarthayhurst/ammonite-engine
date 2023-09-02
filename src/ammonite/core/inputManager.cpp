@@ -66,6 +66,10 @@ namespace ammonite {
         //Forget the keybind
         keybindMap.erase(keycode);
       }
+
+      bool isKeybindRegistered(int keycode) {
+        return keybindMap.contains(keycode);
+      }
     }
   }
 }

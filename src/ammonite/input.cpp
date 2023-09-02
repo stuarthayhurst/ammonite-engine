@@ -13,5 +13,9 @@ namespace ammonite {
     void unregisterKeybind(int keycode) {
       internal::unregisterKeybind(keycode);
     }
+
+    bool isKeybindRegistered(int keycode) {
+      return internal::isKeybindRegistered(keycode);
+    }
   }
 }
