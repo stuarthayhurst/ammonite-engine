@@ -8,7 +8,7 @@ namespace ammonite {
     //Callback takes keycode, action, user pointer
     int registerKeybind(int keycode, void(*callback)(int, int, void*), void* userPtr);
     int registerToggleKeybind(int keycode, void(*callback)(int, int, void*), void* userPtr);
-    void unregisterKeybind(int keycode);
+    int unregisterKeybind(int keycode);
     bool isKeybindRegistered(int keycode);
 
     int setEngineKeybind(AmmoniteEnum engineConstant, int keycode);

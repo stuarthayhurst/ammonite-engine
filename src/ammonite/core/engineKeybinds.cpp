@@ -17,6 +17,17 @@ namespace ammonite {
         return keybindTracker.contains(engineKeybind);
       }
 
+      bool isKeybindInternal(int keycode) {
+        //Check all engine keybinds for a match
+        for (auto it = keybindTracker.begin(); it != keybindTracker.end(); it++) {
+          if (it->second == keycode) {
+            return true;
+          }
+        }
+
+        return false;
+      }
+
       int getExistingKeycode(AmmoniteEnum engineKeybind) {
         return keybindTracker[engineKeybind];
       }

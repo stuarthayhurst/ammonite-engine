@@ -16,8 +16,15 @@ namespace ammonite {
       return internal::registerRawKeybind(keycode, true, callback, userPtr);
     }
 
-    void unregisterKeybind(int keycode) {
+    int unregisterKeybind(int keycode) {
+      //Fail if attempting to unregister an engine keybind
+      if (internal::isKeybindInternal(keycode)) {
+        ammoniteInternalDebug << "Failed to unregister keybind, keybind is internal" << std::endl;
+        return -1;
+      }
+
       internal::unregisterKeybind(keycode);
+      return 0;
     }
 
     bool isKeybindRegistered(int keycode) {
