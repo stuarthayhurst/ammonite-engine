@@ -16,7 +16,7 @@ namespace ammonite {
         AmmoniteEnum requestedContextType = AMMONITE_DEFAULT_CONTEXT;
 
         //Callback to update height and width on window resize
-        static void window_size_callback(GLFWwindow*, int width, int height) {
+        static void windowSizeCallback(GLFWwindow*, int width, int height) {
           ammonite::settings::runtime::internal::setWidth(width);
           ammonite::settings::runtime::internal::setHeight(height);
         }
@@ -57,7 +57,7 @@ namespace ammonite {
         }
 
         //Update values when resized
-        glfwSetWindowSizeCallback(windowPtr, window_size_callback);
+        glfwSetWindowSizeCallback(windowPtr, windowSizeCallback);
 
         return 0;
       }

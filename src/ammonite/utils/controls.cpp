@@ -30,7 +30,7 @@ namespace ammonite {
         std::map<AmmoniteEnum, int>* keybindTrackerPtr = ammonite::utils::controls::internal::getKeybindTrackerPtr();
 
         //Increase / decrease FoV on scroll (xoffset is unused)
-        static void scroll_callback(GLFWwindow*, double, double yoffset) {
+        static void scrollCallback(GLFWwindow*, double, double yoffset) {
           if (isInputFocused and isCameraActive) {
             int activeCameraId = ammonite::camera::getActiveCamera();
             float fov = ammonite::camera::getFieldOfView(activeCameraId);
@@ -47,7 +47,7 @@ namespace ammonite {
         }
 
         //Reset FoV on middle click, (modifier bits are unused)
-        static void zoom_reset_callback(GLFWwindow*, int button, int action, int) {
+        static void zoomResetCallback(GLFWwindow*, int button, int action, int) {
           if (isInputFocused and isCameraActive) {
             if (button == GLFW_MOUSE_BUTTON_MIDDLE and action == GLFW_PRESS) {
               ammonite::camera::setFieldOfView(ammonite::camera::getActiveCamera(), 45.0f);
@@ -55,7 +55,7 @@ namespace ammonite {
           }
         }
 
-        static void cursor_position_callback(GLFWwindow*, double xpos, double ypos) {
+        static void cursorPositionCallback(GLFWwindow*, double xpos, double ypos) {
           if (isCameraActive) {
             //Work out distance moved since last movement
             float xoffset = xpos - xposLast;
@@ -97,7 +97,7 @@ namespace ammonite {
           if (isInputFocused) {
             //Hide cursor and start taking mouse input
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-            glfwSetCursorPosCallback(window, cursor_position_callback);
+            glfwSetCursorPosCallback(window, cursorPositionCallback);
             //Reset saved cursor position to avoid a large jump
             glfwGetCursorPos(window, &xposLast, &yposLast);
           } else {
@@ -107,7 +107,7 @@ namespace ammonite {
           }
         }
 
-        static void window_focus_callback(GLFWwindow*, int focused) {
+        static void windowFocusCallback(GLFWwindow*, int focused) {
           //Bind / unbind input with window focus (fixes missing mouse)
           if (!focused) {
             setInputFocusInternal(focused);
@@ -144,12 +144,12 @@ namespace ammonite {
         window = ammonite::window::internal::getWindowPtr();
 
         //Set mouse callbacks
-        glfwSetScrollCallback(window, scroll_callback);
-        glfwSetMouseButtonCallback(window, zoom_reset_callback);
-        glfwSetCursorPosCallback(window, cursor_position_callback);
+        glfwSetScrollCallback(window, scrollCallback);
+        glfwSetMouseButtonCallback(window, zoomResetCallback);
+        glfwSetCursorPosCallback(window, cursorPositionCallback);
 
         //Set callback to update input state on window focus
-        glfwSetWindowFocusCallback(window, window_focus_callback);
+        glfwSetWindowFocusCallback(window, windowFocusCallback);
 
         //Setup initial cursor position
         glfwGetCursorPos(window, &xposLast, &yposLast);
