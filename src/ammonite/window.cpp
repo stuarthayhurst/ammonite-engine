@@ -59,7 +59,7 @@ namespace ammonite {
         return bestMonitor;
       }
 
-      void setCloseWindowCallback(int, int, void* userPtr) {
+      static void setCloseWindowCallback(int, int, void* userPtr) {
         bool* closeWindowPtr = (bool*)userPtr;
         *closeWindowPtr = true;
       }
