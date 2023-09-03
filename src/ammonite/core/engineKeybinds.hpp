@@ -8,7 +8,7 @@ namespace ammonite {
     namespace internal {
       bool isEngineKeybindValid(AmmoniteEnum engineKeybind);
       int getExistingKeycode(AmmoniteEnum engineKeybind);
-      void setEngineKeybind(int keycode, AmmoniteEnum engineKeybind);
+      void setEngineKeybind(AmmoniteEnum engineKeybind, int keycode);
     }
   }
 }

@@ -24,7 +24,7 @@ namespace ammonite {
       return internal::isKeybindRegistered(keycode);
     }
 
-    int setEngineKeybind(int keycode, AmmoniteEnum engineConstant) {
+    int setEngineKeybind(AmmoniteEnum engineConstant, int keycode) {
       //Check engine constant exists in internal store
       if (!internal::isEngineKeybindValid(engineConstant)) {
         ammoniteInternalDebug << "Failed to register keybind, invalid constant" << std::endl;
@@ -44,7 +44,7 @@ namespace ammonite {
       }
 
       //Update saved keybind
-      internal::setEngineKeybind(keycode, engineConstant);
+      internal::setEngineKeybind(engineConstant, keycode);
 
       return 0;
     }

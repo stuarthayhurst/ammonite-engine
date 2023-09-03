@@ -11,7 +11,7 @@ namespace ammonite {
     void unregisterKeybind(int keycode);
     bool isKeybindRegistered(int keycode);
 
-    int setEngineKeybind(int keycode, AmmoniteEnum engineConstant);
+    int setEngineKeybind(AmmoniteEnum engineConstant, int keycode);
   }
 }
 

@@ -21,7 +21,7 @@ namespace ammonite {
         return keybindTracker[engineKeybind];
       }
 
-      void setEngineKeybind(int keycode, AmmoniteEnum engineKeybind) {
+      void setEngineKeybind(AmmoniteEnum engineKeybind, int keycode) {
         keybindTracker[engineKeybind] = keycode;
       }
     }
