@@ -56,15 +56,16 @@ namespace ammonite {
         return 0;
       }
 
-      void unregisterKeybind(int keycode) {
+      int unregisterKeybind(int keycode) {
         //Exit if key wasn't bound
         if (!keybindMap.contains(keycode)) {
           ammoniteInternalDebug << "Can't unregister keycode '" << keycode << "' not registered" << std::endl;
-          return;
+          return -1;
         }
 
         //Forget the keybind
         keybindMap.erase(keycode);
+        return 0;
       }
 
       bool isKeybindRegistered(int keycode) {

@@ -23,8 +23,7 @@ namespace ammonite {
         return -1;
       }
 
-      internal::unregisterKeybind(keycode);
-      return 0;
+      return internal::unregisterKeybind(keycode);
     }
 
     bool isKeybindRegistered(int keycode) {
