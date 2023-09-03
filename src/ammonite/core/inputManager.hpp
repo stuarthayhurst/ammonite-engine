@@ -11,6 +11,7 @@ namespace ammonite {
                              void(*callback)(int, int, void*), void* userPtr);
       void unregisterKeybind(int keycode);
       bool isKeybindRegistered(int keycode);
+      void moveKeybindData(int oldKeybind, int newKeybind);
     }
   }
 }

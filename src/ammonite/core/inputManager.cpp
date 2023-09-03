@@ -70,6 +70,15 @@ namespace ammonite {
       bool isKeybindRegistered(int keycode) {
         return keybindMap.contains(keycode);
       }
+
+      void moveKeybindData(int oldKeycode, int newKeycode) {
+        //Copy keybind data and delete binding
+        KeybindData oldData = keybindMap[oldKeycode];
+        unregisterKeybind(oldKeycode);
+
+        //Register old data with new keycode
+        keybindMap[newKeycode] = oldData;
+      }
     }
   }
 }

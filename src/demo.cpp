@@ -191,7 +191,7 @@ int main(int argc, char* argv[]) {
   ammonite::utils::Timer frameTimer;
 
   //Draw frames until window closed
-  while(ammonite::utils::controls::shouldWindowClose()) {
+  while(!ammonite::window::shouldWindowClose()) {
     //Every second, output the framerate
     if (frameTimer.getTime() >= 1.0f) {
       printMetrics(ammonite::renderer::getFrameTime());

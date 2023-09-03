@@ -8,6 +8,7 @@
 
 #include "core/windowManager.hpp"
 #include "core/inputManager.hpp"
+#include "core/engineKeybinds.hpp"
 #include "graphics/internal/internalShaders.hpp"
 
 #include "utils/debug.hpp"
@@ -22,6 +23,7 @@ namespace ammonite {
     namespace {
       GLFWwindow* windowPtr = nullptr;
       bool isFullscreen = false;
+      bool closeWindow = false;
     }
 
     namespace {
@@ -55,6 +57,11 @@ namespace ammonite {
         }
 
         return bestMonitor;
+      }
+
+      void setCloseWindowCallback(int, int, void* userPtr) {
+        bool* closeWindowPtr = (bool*)userPtr;
+        *closeWindowPtr = true;
       }
     }
 
@@ -107,6 +114,10 @@ namespace ammonite {
       internal::setupGlfwInput();
       ammonite::input::internal::setupCallback(windowPtr);
 
+      //Set keybind for closing window
+      input::internal::registerRawKeybind(input::internal::getExistingKeycode(AMMONITE_EXIT),
+                                          true, setCloseWindowCallback, &closeWindow);
+
       return 0;
     }
 
@@ -116,6 +127,10 @@ namespace ammonite {
 
     void destroyWindow() {
       internal::destroyGlfw();
+    }
+
+    bool shouldWindowClose() {
+      return (closeWindow || glfwWindowShouldClose(windowPtr));
     }
 
     void setTitle(const char* title) {

@@ -1,4 +1,10 @@
+#include <iostream>
+
 #include "core/inputManager.hpp"
+#include "core/engineKeybinds.hpp"
+
+#include "utils/debug.hpp"
+#include "constants.hpp"
 
 namespace ammonite {
   namespace input {
@@ -16,6 +22,31 @@ namespace ammonite {
 
     bool isKeybindRegistered(int keycode) {
       return internal::isKeybindRegistered(keycode);
+    }
+
+    int setEngineKeybind(int keycode, AmmoniteEnum engineConstant) {
+      //Check engine constant exists in internal store
+      if (!internal::isEngineKeybindValid(engineConstant)) {
+        ammoniteInternalDebug << "Failed to register keybind, invalid constant" << std::endl;
+        return -1;
+      }
+
+      //Check new keycode isn't already registered
+      if (internal::isKeybindRegistered(keycode)) {
+        ammoniteInternalDebug << "Failed to register keybind, keycode already registered" << std::endl;
+        return -1;
+      }
+
+      int existingKeycode = internal::getExistingKeycode(engineConstant);
+      if (internal::isKeybindRegistered(existingKeycode)) {
+        //Move old keybind data to new keycode
+        internal::moveKeybindData(existingKeycode, keycode);
+      }
+
+      //Update saved keybind
+      internal::setEngineKeybind(keycode, engineConstant);
+
+      return 0;
     }
   }
 }

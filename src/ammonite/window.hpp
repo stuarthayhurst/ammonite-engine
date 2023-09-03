@@ -13,6 +13,7 @@ namespace ammonite {
     int createWindow(int width, int height);
     void destroyWindow();
 
+    bool shouldWindowClose();
     void setTitle(const char* title);
     void useIconDir(const char* iconDirPath);
 

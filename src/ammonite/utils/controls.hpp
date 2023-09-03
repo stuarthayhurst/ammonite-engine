@@ -13,7 +13,6 @@ namespace ammonite {
       bool getInputFocus();
 
       void setupControls();
-      bool shouldWindowClose();
       void processInput();
     }
   }

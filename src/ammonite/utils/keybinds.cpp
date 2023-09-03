@@ -9,7 +9,6 @@ namespace ammonite {
     namespace controls {
       namespace {
         std::map<AmmoniteEnum, int> keybindTracker = {
-          {AMMONITE_EXIT, GLFW_KEY_ESCAPE},
           {AMMONITE_FORWARD, GLFW_KEY_W},
           {AMMONITE_BACK, GLFW_KEY_S},
           {AMMONITE_UP, GLFW_KEY_SPACE},
