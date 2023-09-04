@@ -108,7 +108,7 @@ namespace ammonite {
       }
 
       //Prompt renderer shader cache support checking
-      ammonite::shaders::internal::updateGLCacheSupport();
+      ammonite::shaders::internal::updateCacheSupport();
 
       //Setup input for window
       internal::setupGlfwInput();

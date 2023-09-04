@@ -124,14 +124,14 @@ namespace ammonite {
       return GL_FALSE;
     }
 
-    //Set by updateGLCacheSupport(), when GLEW loads
+    //Set by updateCacheSupport(), when GLEW loads
     bool isBinaryCacheSupported = false;
   }
 
   //Internally exposed only
   namespace shaders {
     namespace internal {
-      void updateGLCacheSupport() {
+      void updateCacheSupport() {
         //Get number of supported formats
         GLint numBinaryFormats = 0;
         glGetIntegerv(GL_NUM_PROGRAM_BINARY_FORMATS, &numBinaryFormats);
