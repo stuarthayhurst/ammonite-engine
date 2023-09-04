@@ -12,7 +12,6 @@
 
 #include "utils/cacheManager.hpp"
 #include "utils/controls.hpp"
-#include "utils/extension.hpp"
 #include "utils/keybinds.hpp"
 #include "utils/logging.hpp"
 #include "utils/timer.hpp"

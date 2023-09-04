@@ -11,6 +11,7 @@
 #include <GLFW/glfw3.h>
 
 #include "internal/internalRenderHelper.hpp"
+#include "internal/internalExtension.hpp"
 
 #include "../internal/internalSettings.hpp"
 #include "../internal/internalCamera.hpp"
@@ -28,7 +29,6 @@
 #include "../camera.hpp"
 #include "../environment.hpp"
 
-#include "../utils/extension.hpp"
 #include "../utils/logging.hpp"
 #include "../utils/debug.hpp"
 
@@ -182,7 +182,7 @@ namespace ammonite {
 
           bool success = true;
           for (int i = 0; i < extensionCount; i++) {
-            if (!ammonite::utils::checkExtension(extensions[i][0], extensions[i][1])) {
+            if (!graphics::internal::checkExtension(extensions[i][0], extensions[i][1])) {
               ammonite::utils::error << extensions[i][2] << " unsupported" << std::endl;
               success = false;
               (*failureCount)++;
