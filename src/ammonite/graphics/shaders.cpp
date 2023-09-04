@@ -403,7 +403,7 @@ namespace ammonite {
       return createProgram(shaderPaths, shaderTypes, shaderCount, externalSuccess);
     }
 
-    //Load all shaders in a directory and had off to createProgram(paths)
+    //Load all shaders in a directory and hand off to createProgram(paths)
     int loadDirectory(const char* directoryPath, bool* externalSuccess) {
       //Create filesystem directory iterator
       std::filesystem::directory_iterator it;
