@@ -3,7 +3,7 @@
 #include <iostream>
 #include <GL/glew.h>
 
-#include "extension.hpp"
+#include "../graphics/internal/internalExtension.hpp"
 #include "logging.hpp"
 
 #ifdef DEBUG
@@ -42,7 +42,7 @@ namespace ammonite {
     namespace debug {
       void enableDebug() {
         //Check support for OpenGL debugging
-        if (!ammonite::utils::checkExtension("GL_KHR_debug", "GL_VERSION_4_3")) {
+        if (!graphics::internal::checkExtension("GL_KHR_debug", "GL_VERSION_4_3")) {
           ammonite::utils::error << "OpenGL debugging unsupported" << std::endl;
           return;
         }
@@ -51,7 +51,7 @@ namespace ammonite {
          - This isn't used for debugging, but won't be explicitly checked otherwise
          - Handled before engine init, so no output would be shown
         */
-        ammonite::utils::checkExtension("GL_KHR_no_error", "GL_VERSION_4_6");
+        graphics::internal::checkExtension("GL_KHR_no_error", "GL_VERSION_4_6");
 
         //Enable OpenGL debug output
         glEnable(GL_DEBUG_OUTPUT);
