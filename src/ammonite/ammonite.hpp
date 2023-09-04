@@ -2,7 +2,6 @@
 #define AMMONITE
 
 #include "graphics/renderInterface.hpp"
-#include "graphics/shaders.hpp"
 
 #include "lighting/lightInterface.hpp"
 #include "lighting/lightStorage.hpp"

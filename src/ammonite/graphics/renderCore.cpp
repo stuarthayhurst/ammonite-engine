@@ -10,8 +10,9 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include "internal/internalRenderHelper.hpp"
 #include "internal/internalExtension.hpp"
+#include "internal/internalRenderHelper.hpp"
+#include "internal/internalShaders.hpp"
 
 #include "../internal/internalSettings.hpp"
 #include "../internal/internalCamera.hpp"
@@ -24,7 +25,6 @@
 #include "../lighting/lightStorage.hpp"
 #include "../lighting/lightInterface.hpp"
 
-#include "shaders.hpp"
 #include "../constants.hpp"
 #include "../camera.hpp"
 #include "../environment.hpp"
@@ -160,7 +160,9 @@ namespace ammonite {
           const int shaderCount = sizeof(shaderInfo) / sizeof(shaderInfo[0]);
           for (int i = 0; i < shaderCount; i++) {
             std::string shaderLocation = std::string(shaderPath) + shaderInfo[i].shaderDir;
-            *shaderInfo[i].shaderId = ammonite::shaders::loadDirectory(shaderLocation.c_str(), &hasCreatedShaders);
+            *shaderInfo[i].shaderId =
+              ammonite::shaders::internal::loadDirectory(shaderLocation.c_str(),
+                                                         &hasCreatedShaders);
           }
 
           if (!hasCreatedShaders) {
