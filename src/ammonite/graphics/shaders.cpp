@@ -128,28 +128,6 @@ namespace ammonite {
     bool isBinaryCacheSupported = false;
   }
 
-  //Internally exposed only
-  namespace shaders {
-    namespace internal {
-      void updateCacheSupport() {
-        //Get number of supported formats
-        GLint numBinaryFormats = 0;
-        glGetIntegerv(GL_NUM_PROGRAM_BINARY_FORMATS, &numBinaryFormats);
-
-        //Check support for collecting the program binary
-        if (!graphics::internal::checkExtension("GL_ARB_get_program_binary", "GL_VERSION_4_1")) {
-          ammonite::utils::warning << "Program caching unsupported" << std::endl;
-          isBinaryCacheSupported = false;
-        } else if (numBinaryFormats < 1) {
-          ammonite::utils::warning << "Program caching unsupported (no supported formats)" << std::endl;
-          isBinaryCacheSupported = false;
-        }
-
-        isBinaryCacheSupported = true;
-      }
-    }
-  }
-
   //Shader compilation functions, local to this file
   namespace shaders {
     int loadShader(const char* shaderPath, const GLenum shaderType, bool* externalSuccess) {
@@ -199,7 +177,7 @@ namespace ammonite {
       return shaderId;
     }
 
-    int createProgram(GLuint shaderIds[], const int shaderCount, bool* externalSuccess) {
+    int createProgramObject(GLuint shaderIds[], const int shaderCount, bool* externalSuccess) {
       //Create the program
       GLuint programId = glCreateProgram();
 
@@ -224,8 +202,8 @@ namespace ammonite {
       return programId;
     }
 
-    //Attempt to find cached program or hand off to loadShader and createProgram
-    int createProgram(const char* shaderPaths[], const GLenum shaderTypes[],
+    //Attempt to find cached program or hand off to loadShader and createProgramObject
+    int createProgramCached(const char* shaderPaths[], const GLenum shaderTypes[],
                       const int shaderCount, bool* externalSuccess) {
       //Used later as the return value
       GLuint programId;
@@ -308,7 +286,7 @@ namespace ammonite {
 
       //Create the program like normal, as a valid cache wasn't found
       bool hasCreatedProgram = true;
-      programId = createProgram(shaderIds, shaderCount, &hasCreatedProgram);
+      programId = createProgramObject(shaderIds, shaderCount, &hasCreatedProgram);
 
       //Cleanup on failure
       if (!hasCreatedProgram) {
@@ -328,111 +306,131 @@ namespace ammonite {
     }
   }
 
-  //Externally exposed functions
+  //Internally exposed functions
   namespace shaders {
-    //Find shader types and hand off to createProgram(paths, types)
-    int createProgram(const char* inputShaderPaths[],
-                      const int inputShaderCount, bool* externalSuccess) {
-      //Convert file extensions to shader types
-      std::map<std::string, GLenum> shaderExtensions = {
-        {".vert", GL_VERTEX_SHADER}, {".vs", GL_VERTEX_SHADER},
-        {".frag", GL_FRAGMENT_SHADER}, {".fs", GL_FRAGMENT_SHADER},
-        {".geom", GL_GEOMETRY_SHADER}, {".gs", GL_GEOMETRY_SHADER},
-        {".tessc", GL_TESS_CONTROL_SHADER}, {".tsc", GL_TESS_CONTROL_SHADER},
-        {".tesse", GL_TESS_EVALUATION_SHADER}, {".tes", GL_TESS_EVALUATION_SHADER},
-        {".comp", GL_COMPUTE_SHADER}, {".cs", GL_COMPUTE_SHADER},
-        {".glsl", GL_FALSE} //Detect generic shaders, attempt to identify
-      };
+    namespace internal {
+      void updateCacheSupport() {
+        //Get number of supported formats
+        GLint numBinaryFormats = 0;
+        glGetIntegerv(GL_NUM_PROGRAM_BINARY_FORMATS, &numBinaryFormats);
 
-      //Find all shaders
-      std::vector<std::string> shaders(0);
-      std::vector<GLenum> types(0);
-      for (int i = 0; i < inputShaderCount; i++) {
-        std::filesystem::path filePath{inputShaderPaths[i]};
-        std::string extension = filePath.extension();
-
-        if (shaderExtensions.contains(extension)) {
-          GLenum shaderType = shaderExtensions[extension];
-
-          //Shader can't be identified through extension, use filename
-          if (shaderType == GL_FALSE) {
-            GLenum newType = attemptIdentifyShaderType(inputShaderPaths[i]);
-            if (newType == GL_FALSE) {
-              ammonite::utils::warning << "Couldn't identify type of shader '"
-                        << inputShaderPaths[i] << "'" << std::endl;
-              continue;
-            }
-
-            //Found a type, so use it
-            shaderType = newType;
-          }
-
-          //Check for compute shader support if needed
-          if (shaderType == GL_COMPUTE_SHADER) {
-            if (!graphics::internal::checkExtension("GL_ARB_compute_shader", "GL_VERSION_4_3")) {
-              ammonite::utils::warning << "Compute shaders unsupported" << std::endl;
-              continue;
-            }
-          }
-
-          //Check for tessellation shader support if needed
-          if (shaderType == GL_TESS_CONTROL_SHADER or shaderType == GL_TESS_EVALUATION_SHADER) {
-            if (!graphics::internal::checkExtension("GL_ARB_tessellation_shader",
-                                                    "GL_VERSION_4_0")) {
-              ammonite::utils::warning << "Tessellation shaders unsupported" << std::endl;
-              continue;
-            }
-          }
-
-          shaders.push_back(std::string(filePath));
-          types.push_back(shaderType);
+        //Check support for collecting the program binary
+        if (!graphics::internal::checkExtension("GL_ARB_get_program_binary", "GL_VERSION_4_1")) {
+          ammonite::utils::warning << "Program caching unsupported" << std::endl;
+          isBinaryCacheSupported = false;
+        } else if (numBinaryFormats < 1) {
+          ammonite::utils::warning << "Program caching unsupported (no supported formats)" << std::endl;
+          isBinaryCacheSupported = false;
         }
+
+        isBinaryCacheSupported = true;
       }
 
-      //Repack shaders
-      const char* shaderPaths[shaders.size()];
-      GLenum shaderTypes[types.size()];
-      const int shaderCount = sizeof(shaderPaths) / sizeof(shaderPaths[0]);
+      //Find shader types and hand off to createProgramCached(paths, types)
+      int createProgram(const char* inputShaderPaths[],
+                        const int inputShaderCount, bool* externalSuccess) {
+        //Convert file extensions to shader types
+        std::map<std::string, GLenum> shaderExtensions = {
+          {".vert", GL_VERTEX_SHADER}, {".vs", GL_VERTEX_SHADER},
+          {".frag", GL_FRAGMENT_SHADER}, {".fs", GL_FRAGMENT_SHADER},
+          {".geom", GL_GEOMETRY_SHADER}, {".gs", GL_GEOMETRY_SHADER},
+          {".tessc", GL_TESS_CONTROL_SHADER}, {".tsc", GL_TESS_CONTROL_SHADER},
+          {".tesse", GL_TESS_EVALUATION_SHADER}, {".tes", GL_TESS_EVALUATION_SHADER},
+          {".comp", GL_COMPUTE_SHADER}, {".cs", GL_COMPUTE_SHADER},
+          {".glsl", GL_FALSE} //Detect generic shaders, attempt to identify further
+        };
 
-      for (unsigned int i = 0; i < shaders.size(); i++) {
-        shaderPaths[i] = shaders[i].c_str();
-        shaderTypes[i] = types[i];
+        //Find all shaders
+        std::vector<std::string> shaders(0);
+        std::vector<GLenum> types(0);
+        for (int i = 0; i < inputShaderCount; i++) {
+          std::filesystem::path filePath{inputShaderPaths[i]};
+          std::string extension = filePath.extension();
+
+          if (shaderExtensions.contains(extension)) {
+            GLenum shaderType = shaderExtensions[extension];
+
+            //Shader can't be identified through extension, use filename
+            if (shaderType == GL_FALSE) {
+              GLenum newType = attemptIdentifyShaderType(inputShaderPaths[i]);
+              if (newType == GL_FALSE) {
+                ammonite::utils::warning << "Couldn't identify type of shader '"
+                        << inputShaderPaths[i] << "'" << std::endl;
+                continue;
+              }
+
+              //Found a type, so use it
+              shaderType = newType;
+            }
+
+            //Check for compute shader support if needed
+            if (shaderType == GL_COMPUTE_SHADER) {
+              if (!graphics::internal::checkExtension("GL_ARB_compute_shader",
+                                                      "GL_VERSION_4_3")) {
+                ammonite::utils::warning << "Compute shaders unsupported" << std::endl;
+                continue;
+              }
+            }
+
+            //Check for tessellation shader support if needed
+            if (shaderType == GL_TESS_CONTROL_SHADER or shaderType == GL_TESS_EVALUATION_SHADER) {
+              if (!graphics::internal::checkExtension("GL_ARB_tessellation_shader",
+                                                      "GL_VERSION_4_0")) {
+                ammonite::utils::warning << "Tessellation shaders unsupported" << std::endl;
+                continue;
+              }
+            }
+
+            shaders.push_back(std::string(filePath));
+            types.push_back(shaderType);
+          }
+        }
+
+        //Repack shaders
+        const char* shaderPaths[shaders.size()];
+        GLenum shaderTypes[types.size()];
+        const int shaderCount = sizeof(shaderPaths) / sizeof(shaderPaths[0]);
+
+        for (unsigned int i = 0; i < shaders.size(); i++) {
+          shaderPaths[i] = shaders[i].c_str();
+          shaderTypes[i] = types[i];
+        }
+
+        //Create the program and return the ID
+        return createProgramCached(shaderPaths, shaderTypes, shaderCount, externalSuccess);
       }
 
-      //Create the program and return the ID
-      return createProgram(shaderPaths, shaderTypes, shaderCount, externalSuccess);
-    }
+      //Load all shaders in a directory and hand off to createProgram(paths)
+      int loadDirectory(const char* directoryPath, bool* externalSuccess) {
+        //Create filesystem directory iterator
+        std::filesystem::directory_iterator it;
+        try {
+          const std::filesystem::path shaderDir{directoryPath};
+          it = std::filesystem::directory_iterator{shaderDir};
+        } catch (const std::filesystem::filesystem_error&) {
+          *externalSuccess = false;
+          ammonite::utils::warning << "Failed to load '" << directoryPath << "'" << std::endl;
+          return -1;
+        }
 
-    //Load all shaders in a directory and hand off to createProgram(paths)
-    int loadDirectory(const char* directoryPath, bool* externalSuccess) {
-      //Create filesystem directory iterator
-      std::filesystem::directory_iterator it;
-      try {
-        const std::filesystem::path shaderDir{directoryPath};
-        it = std::filesystem::directory_iterator{shaderDir};
-      } catch (const std::filesystem::filesystem_error&) {
-        *externalSuccess = false;
-        ammonite::utils::warning << "Failed to load '" << directoryPath << "'" << std::endl;
-        return -1;
+        //Find files to send to next stage
+        std::vector<std::string> shaders(0);
+        for (auto const& fileName : it) {
+          std::filesystem::path filePath{fileName};
+          shaders.push_back(std::string(filePath));
+        }
+
+        //Repack shaders
+        const char* shaderPaths[shaders.size()];
+        const int shaderCount = sizeof(shaderPaths) / sizeof(shaderPaths[0]);
+
+        for (unsigned int i = 0; i < shaders.size(); i++) {
+          shaderPaths[i] = shaders[i].c_str();
+        }
+
+        //Create the program and return the ID
+        return createProgram(shaderPaths, shaderCount, externalSuccess);
       }
-
-      //Find files to send to next stage
-      std::vector<std::string> shaders(0);
-      for (auto const& fileName : it) {
-        std::filesystem::path filePath{fileName};
-        shaders.push_back(std::string(filePath));
-      }
-
-      //Repack shaders
-      const char* shaderPaths[shaders.size()];
-      const int shaderCount = sizeof(shaderPaths) / sizeof(shaderPaths[0]);
-
-      for (unsigned int i = 0; i < shaders.size(); i++) {
-        shaderPaths[i] = shaders[i].c_str();
-      }
-
-      //Create the program and return the ID
-      return createProgram(shaderPaths, shaderCount, externalSuccess);
     }
   }
 }
