@@ -39,6 +39,50 @@ namespace {
   };
 }
 
+//Struct definitions
+struct CameraData {
+  int cameraIndex;
+  std::vector<int> cameraIds;
+};
+
+//Callbacks
+void inputFocusCallback(int, int, void*) {
+  ammonite::utils::controls::setInputFocus(!ammonite::utils::controls::getInputFocus());
+}
+
+void fullscreenToggleCallback(int, int, void*) {
+  ammonite::window::setFullscreen(!ammonite::window::getFullscreen());
+}
+
+void focalToggleCallback(int, int, void*) {
+  ammonite::settings::graphics::post::setFocalDepthEnabled(
+    !ammonite::settings::graphics::post::getFocalDepthEnabled());
+}
+
+void cameraCycleCallback(int, int, void* userPtr) {
+  CameraData* cameraData = (CameraData*)userPtr;
+  cameraData->cameraIndex = (cameraData->cameraIndex + 1) % cameraData->cameraIds.size();
+  ammonite::camera::setActiveCamera(cameraData->cameraIds[cameraData->cameraIndex]);
+}
+
+void changeFocalDepthCallback(int, int action, void* userPtr) {
+  static ammonite::utils::Timer focalDepthTimer;
+  if (action != GLFW_RELEASE) {
+    float sign = *(float*)userPtr;
+    const float unitsPerSecond = 1.0f;
+    const float focalTimeDelta = focalDepthTimer.getTime();
+    float depth = ammonite::settings::graphics::post::getFocalDepth();
+
+    depth += focalTimeDelta * unitsPerSecond * sign;
+    ammonite::settings::graphics::post::setFocalDepth(depth);
+    focalDepthTimer.unpause();
+  } else {
+    focalDepthTimer.pause();
+  }
+  focalDepthTimer.reset();
+}
+
+//Helpers
 void printMetrics(double frameTime) {
   double frameRate = 0.0;
   if (frameTime != 0.0) {
@@ -50,7 +94,6 @@ void printMetrics(double frameTime) {
 }
 
 void cleanUp(int modelCount, std::vector<int> loadedModelIds) {
-  //Cleanup
   for (int i = 0; i < modelCount; i++) {
     ammonite::models::deleteModel(loadedModelIds[i]);
   }
@@ -117,7 +160,7 @@ int main(int argc, char* argv[]) {
   if (ammonite::window::createWindow(1024, 768, "OpenGL Experiments") == -1) {
     return EXIT_FAILURE;
   }
-  GLFWwindow* windowPtr = ammonite::window::getWindowPtr();
+  ammonite::window::getWindowPtr();
 
   //Set an icon
   ammonite::window::useIconDir("assets/icons/");
@@ -173,14 +216,28 @@ int main(int argc, char* argv[]) {
     }
   }
 
-  //Camera ids
-  int cameraIds[2] = {0, ammonite::camera::createCamera()};
-  int cameraIndex = 0;
-  bool cameraToggleHeld = false;
+  //Camera data store
+  CameraData cameraData;
+  cameraData.cameraIndex = 0;
+  cameraData.cameraIds = {0, ammonite::camera::createCamera()};
 
   //Set the camera to the start position
-  ammonite::camera::setPosition(cameraIds[0], glm::vec3(0.0f, 0.0f, 5.0f));
-  ammonite::camera::setPosition(cameraIds[1], glm::vec3(0.0f, 0.0f, 2.0f));
+  ammonite::camera::setPosition(cameraData.cameraIds[0], glm::vec3(0.0f, 0.0f, 5.0f));
+  ammonite::camera::setPosition(cameraData.cameraIds[1], glm::vec3(0.0f, 0.0f, 2.0f));
+
+  //Set keybinds
+  ammonite::input::registerToggleKeybind(GLFW_KEY_C, inputFocusCallback, nullptr);
+  ammonite::input::registerToggleKeybind(GLFW_KEY_F11, fullscreenToggleCallback, nullptr);
+  ammonite::input::registerToggleKeybind(GLFW_KEY_Z, focalToggleCallback, nullptr);
+  ammonite::input::registerToggleKeybind(GLFW_KEY_B, cameraCycleCallback, &cameraData);
+
+
+  float positive = 1.0f;
+  float negative = -1.0f;
+  ammonite::input::registerKeybind(GLFW_KEY_RIGHT_BRACKET, changeFocalDepthCallback, &positive);
+  ammonite::input::registerKeybind(GLFW_KEY_LEFT_BRACKET, changeFocalDepthCallback, &negative);
+
+
 
   //Engine loaded, delete the loading screen
   ammonite::utils::status << "Loaded demo in " << utilityTimer.getTime() << "s" << std::endl;
@@ -197,70 +254,6 @@ int main(int argc, char* argv[]) {
       printMetrics(ammonite::renderer::getFrameTime());
       frameTimer.reset();
     }
-
-    //Handle toggling input focus
-    static int lastInputToggleState = GLFW_RELEASE;
-    int inputToggleState = glfwGetKey(windowPtr, GLFW_KEY_C);
-    if (lastInputToggleState != inputToggleState) {
-      if (lastInputToggleState == GLFW_RELEASE) {
-        ammonite::utils::controls::setInputFocus(!ammonite::utils::controls::getInputFocus());
-      }
-
-      lastInputToggleState = inputToggleState;
-    }
-
-    //Handle fullscreen toggle
-    static int lastScreenToggleState = GLFW_RELEASE;
-    int screenToggleState = glfwGetKey(windowPtr, GLFW_KEY_F11);
-    if (lastScreenToggleState != screenToggleState) {
-      if (lastScreenToggleState == GLFW_RELEASE) {
-        int fullscreen = ammonite::window::getFullscreen();
-        ammonite::window::setFullscreen(!fullscreen);
-      }
-
-      lastScreenToggleState = screenToggleState;
-    }
-
-    //Cycle camera when pressed
-    if (glfwGetKey(windowPtr, GLFW_KEY_B) != GLFW_PRESS) {
-      cameraToggleHeld = false;
-    } else if (!cameraToggleHeld) {
-      cameraToggleHeld = true;
-      cameraIndex = (cameraIndex + 1) % (sizeof(cameraIds) / sizeof(cameraIds[0]));
-      ammonite::camera::setActiveCamera(cameraIds[cameraIndex]);
-    }
-
-    //Handle toggling focal depth
-    static int lastFocalToggleState = GLFW_RELEASE;
-    int focalToggleState = glfwGetKey(windowPtr, GLFW_KEY_Z);
-    if (lastFocalToggleState != focalToggleState) {
-      if (lastFocalToggleState == GLFW_RELEASE) {
-        ammonite::settings::graphics::post::setFocalDepthEnabled(
-          !ammonite::settings::graphics::post::getFocalDepthEnabled());
-      }
-
-      lastFocalToggleState = focalToggleState;
-    }
-
-    //Get direction of focal depth change
-    float sign = 0.0f;
-    if (glfwGetKey(windowPtr, GLFW_KEY_RIGHT_BRACKET) == GLFW_PRESS) {
-      sign = 1.0f;
-    } else if (glfwGetKey(windowPtr, GLFW_KEY_LEFT_BRACKET) == GLFW_PRESS) {
-      sign = -1.0f;
-    }
-
-    //Update the focal depth, according to press duration
-    static ammonite::utils::Timer focalDepthTimer;
-    if (sign != 0.0f) {
-      const float unitsPerSecond = 1.0f;
-      const float focalTimeDelta = focalDepthTimer.getTime();
-      float depth = ammonite::settings::graphics::post::getFocalDepth();
-
-      depth += focalTimeDelta * unitsPerSecond * sign;
-      ammonite::settings::graphics::post::setFocalDepth(depth);
-    }
-    focalDepthTimer.reset();
 
     //Process new input since last frame
     ammonite::utils::controls::processInput();
