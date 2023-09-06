@@ -6,11 +6,13 @@
 #include <glm/gtc/constants.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "../core/inputManager.hpp"
+#include "../core/windowManager.hpp"
+
 #include "../internal/internalSettings.hpp"
 #include "../internal/keybindTracker.hpp"
 #include "../constants.hpp"
 #include "../camera.hpp"
-#include "../core/windowManager.hpp"
 #include "timer.hpp"
 
 namespace ammonite {
@@ -163,6 +165,9 @@ namespace ammonite {
 
         //Poll GLFW for input
         glfwPollEvents();
+
+        //Run callbacks for keybinds
+        ammonite::input::internal::runCallbacks();
 
         //Get active camera
         int activeCameraId = ammonite::camera::getActiveCamera();
