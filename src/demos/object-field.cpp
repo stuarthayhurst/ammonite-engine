@@ -39,6 +39,23 @@ namespace objectFieldDemo {
         objectData[i][2] = scale;
       }
     }
+
+    void spawnCubeCallback(int, int, void* userPtr) {
+      std::vector<int>* loadedModelIds = (std::vector<int>*)userPtr;
+
+      int activeCameraId = ammonite::camera::getActiveCamera();
+      int modelId = ammonite::models::copyModel((*loadedModelIds)[2]);
+      loadedModelIds->push_back(modelId);
+
+      float horiz = ammonite::camera::getHorizontal(activeCameraId);
+      float vert = ammonite::camera::getVertical(activeCameraId);
+
+      ammonite::models::position::setRotation(modelId, glm::vec3(vert, horiz, 0.0f));
+      ammonite::models::position::setScale(modelId, 0.25f);
+      ammonite::models::position::setPosition(modelId, ammonite::camera::getPosition(activeCameraId));
+
+      std::cout << "Spawned object" << std::endl;
+    }
   }
 
   namespace {
@@ -167,6 +184,9 @@ namespace objectFieldDemo {
     lightData[0].lightOrbitPeriod = 2.0f;
     lightData[1].lightOrbitPeriod = 8.0f;
 
+    //Set keybinds
+    ammonite::input::registerToggleKeybind(GLFW_KEY_F, spawnCubeCallback, &loadedModelIds);
+
     return 0;
   }
 
@@ -250,28 +270,6 @@ namespace objectFieldDemo {
       float lightPositionX = (lightOrbitRadius * std::cos(targetAngleRad)) + lightOrbitNucleus.x;
       float lightPositionY = (-lightOrbitRadius * std::sin(targetAngleRad)) + lightOrbitNucleus.y;
       ammonite::models::position::setPosition(lightData[i].linkedModelId, glm::vec3(lightPositionX, 4.0f, lightPositionY));
-    }
-
-    //Spawn object
-    static bool spawnToggleHeld = false;
-    if (glfwGetKey(windowPtr, GLFW_KEY_F) != GLFW_PRESS) {
-      spawnToggleHeld = false;
-    } else if (!spawnToggleHeld) {
-      spawnToggleHeld = true;
-
-      int activeCameraId = ammonite::camera::getActiveCamera();
-      int modelId = ammonite::models::copyModel(loadedModelIds[2]);
-      loadedModelIds.push_back(modelId);
-
-      float horiz = ammonite::camera::getHorizontal(activeCameraId);
-      float vert = ammonite::camera::getVertical(activeCameraId);
-
-      ammonite::models::position::setRotation(modelId, glm::vec3(vert, horiz, 0.0f));
-      ammonite::models::position::setScale(modelId, 0.25f);
-      ammonite::models::position::setPosition(modelId, ammonite::camera::getPosition(activeCameraId));
-
-      modelCount++;
-      std::cout << "Spawned object" << std::endl;
     }
 
     //Update light and draw the frame
