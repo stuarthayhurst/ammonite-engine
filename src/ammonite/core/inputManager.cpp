@@ -45,7 +45,11 @@ namespace ammonite {
           //Track new state for the keybind
           if (action == GLFW_PRESS) {
             //Track newly pressed keys
-            pressedKeys.push_back(keybindData);
+            if (!heldKeybindMap.contains(keycode)) {
+              pressedKeys.push_back(keybindData);
+            } else {
+              ammoniteInternalDebug << "Keycode '" << keycode << "' already held" << std::endl;
+            }
           } else if (action == GLFW_RELEASE) {
             //Track released keys, remove from held keybind map
             if (heldKeybindMap.contains(keycode)) {
