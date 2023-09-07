@@ -11,6 +11,9 @@ namespace ammonite {
     int unregisterKeybind(int keycode);
     bool isKeybindRegistered(int keycode);
 
+    void setInputFocus(bool active);
+    bool getInputFocus();
+
     int setEngineKeybind(AmmoniteEnum engineConstant, int keycode);
   }
 }

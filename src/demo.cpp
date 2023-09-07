@@ -47,7 +47,7 @@ struct CameraData {
 
 //Callbacks
 void inputFocusCallback(int, int, void*) {
-  ammonite::utils::controls::setInputFocus(!ammonite::utils::controls::getInputFocus());
+  ammonite::input::setInputFocus(!ammonite::input::getInputFocus());
 }
 
 void fullscreenToggleCallback(int, int, void*) {

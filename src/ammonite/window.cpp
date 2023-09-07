@@ -9,6 +9,7 @@
 #include "core/windowManager.hpp"
 #include "core/inputManager.hpp"
 #include "core/engineKeybinds.hpp"
+#include "internal/internalInput.hpp"
 #include "graphics/internal/internalShaders.hpp"
 
 #include "utils/debug.hpp"
@@ -112,7 +113,8 @@ namespace ammonite {
 
       //Setup input for window
       internal::setupGlfwInput();
-      ammonite::input::internal::setupCallback(windowPtr);
+      ammonite::input::internal::setupInputCallback(windowPtr);
+      ammonite::input::internal::setupFocusCallback(windowPtr);
 
       //Set keybind for closing window
       input::internal::registerRawKeybind(input::internal::getExistingKeycode(AMMONITE_EXIT),

@@ -17,6 +17,8 @@ namespace ammonite {
           void* userPtr;
         };
 
+        bool isInputBlocked = false;
+
         //Track bound and held keys
         std::map<int, KeybindData> keybindMap;
         std::map<int, KeybindData*> heldKeybindMap;
@@ -80,8 +82,16 @@ namespace ammonite {
       }
 
       //Link to window and set callback
-      void setupCallback(GLFWwindow* windowPtr) {
+      void setupInputCallback(GLFWwindow* windowPtr) {
         glfwSetKeyCallback(windowPtr, keyCallbackHandler);
+      }
+
+      void setInputBlock(bool inputBlocked) {
+        isInputBlocked = inputBlocked;
+      }
+
+      bool getInputBlock() {
+        return isInputBlocked;
       }
 
       int registerRawKeybind(int keycode, bool toggle,

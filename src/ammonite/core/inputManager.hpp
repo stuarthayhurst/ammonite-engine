@@ -6,8 +6,11 @@
 namespace ammonite {
   namespace input {
     namespace internal {
-      void setupCallback(GLFWwindow* windowPtr);
+      void setupInputCallback(GLFWwindow* windowPtr);
       void runCallbacks();
+
+      void setInputBlock(bool inputBlocked);
+      bool getInputBlock();
 
       int registerRawKeybind(int keycode, bool toggle,
                              void(*callback)(int, int, void*), void* userPtr);

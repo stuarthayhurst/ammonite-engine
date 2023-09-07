@@ -6,11 +6,9 @@ namespace ammonite {
     namespace controls {
       void setCameraActive(bool active);
       void setControlsActive(bool active);
-      void setInputFocus(bool active);
 
       bool getCameraActive();
       bool getControlsActive();
-      bool getInputFocus();
 
       void setupControls();
       void processInput();

@@ -90,10 +90,12 @@ namespace ammonite {
             ammonite::camera::setVertical(activeCameraId, verticalAngle);
           }
         }
+      }
 
+      namespace internal {
         //Helper function to set input state
-        static void setInputFocusInternal(bool newisInputFocused) {
-          isInputFocused = newisInputFocused;
+        void setInputFocus(bool inputFocused) {
+          isInputFocused = inputFocused;
 
           //Hide and unhide cursor as necessary
           if (isInputFocused) {
@@ -108,13 +110,6 @@ namespace ammonite {
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
           }
         }
-
-        static void windowFocusCallback(GLFWwindow*, int focused) {
-          //Bind / unbind input with window focus (fixes missing mouse)
-          if (!focused) {
-            setInputFocusInternal(focused);
-          }
-        }
       }
 
       void setCameraActive(bool active) {
@@ -125,20 +120,12 @@ namespace ammonite {
         isControlActive = active;
       }
 
-      void setInputFocus(bool active) {
-        setInputFocusInternal(active);
-      }
-
       bool getCameraActive() {
         return isCameraActive;
       }
 
       bool getControlsActive() {
         return isControlActive;
-      }
-
-      bool getInputFocus() {
-        return isInputFocused;
       }
 
       void setupControls() {
@@ -149,9 +136,6 @@ namespace ammonite {
         glfwSetScrollCallback(window, scrollCallback);
         glfwSetMouseButtonCallback(window, zoomResetCallback);
         glfwSetCursorPosCallback(window, cursorPositionCallback);
-
-        //Set callback to update input state on window focus
-        glfwSetWindowFocusCallback(window, windowFocusCallback);
 
         //Setup initial cursor position
         glfwGetCursorPos(window, &xposLast, &yposLast);

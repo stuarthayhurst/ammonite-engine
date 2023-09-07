@@ -3,6 +3,8 @@
 #include "core/inputManager.hpp"
 #include "core/engineKeybinds.hpp"
 
+#include "utils/internal/internalControls.hpp"
+
 #include "utils/debug.hpp"
 #include "constants.hpp"
 
@@ -53,6 +55,32 @@ namespace ammonite {
       internal::setEngineKeybind(engineConstant, keycode);
 
       return 0;
+    }
+
+    void setInputFocus(bool active) {
+      internal::setInputBlock(!active);
+      ammonite::utils::controls::internal::setInputFocus(active);
+    }
+
+    bool getInputFocus() {
+      return !internal::getInputBlock();
+    }
+
+    //Callback and setup function
+    namespace internal {
+      namespace {
+        static void windowFocusCallback(GLFWwindow*, int focused) {
+          //Unbind input with window focus (fixes missing mouse)
+          if (!focused) {
+            setInputFocus(focused);
+          }
+        }
+      }
+
+      void setupFocusCallback(GLFWwindow* windowPtr) {
+        //Set callback to update input state on window focus
+        glfwSetWindowFocusCallback(windowPtr, windowFocusCallback);
+      }
     }
   }
 }
