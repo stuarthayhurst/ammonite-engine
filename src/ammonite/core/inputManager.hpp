@@ -12,7 +12,7 @@ namespace ammonite {
       void setInputBlock(bool inputBlocked);
       bool getInputBlock();
 
-      int registerRawKeybind(int keycode, bool toggle,
+      int registerRawKeybind(int keycode, bool allowOverride, bool toggle,
                              void(*callback)(int, int, void*), void* userPtr);
       int unregisterKeybind(int keycode);
       bool isKeybindRegistered(int keycode);

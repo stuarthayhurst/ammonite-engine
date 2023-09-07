@@ -12,6 +12,7 @@ namespace ammonite {
       namespace {
         struct KeybindData {
           int keycode;
+          bool overrideBlock;
           bool toggle;
           void(*callback)(int, int, void*);
           void* userPtr;
@@ -34,15 +35,22 @@ namespace ammonite {
             return;
           }
 
+          KeybindData* keybindData = &keybindMap[keycode];
+
+          if (isInputBlocked && !keybindData->overrideBlock) {
+            ammoniteInternalDebug << "Keycode '" << keycode << "' blocked" << std::endl;
+            return;
+          }
+
           //Track new state for the keybind
           if (action == GLFW_PRESS) {
             //Track newly pressed keys
-            pressedKeys.push_back(&keybindMap[keycode]);
+            pressedKeys.push_back(keybindData);
           } else if (action == GLFW_RELEASE) {
             //Track released keys, remove from held keybind map
             if (heldKeybindMap.contains(keycode)) {
               heldKeybindMap.erase(keycode);
-              releasedKeys.push_back(&keybindMap[keycode]);
+              releasedKeys.push_back(keybindData);
             } else {
               ammoniteInternalDebug << "Keycode '" << keycode << "' wasn't held" << std::endl;
             }
@@ -94,7 +102,7 @@ namespace ammonite {
         return isInputBlocked;
       }
 
-      int registerRawKeybind(int keycode, bool toggle,
+      int registerRawKeybind(int keycode, bool allowOverride, bool toggle,
                              void(*callback)(int, int, void*), void* userPtr) {
         //Check key isn't already bound
         if (keybindMap.contains(keycode)) {
@@ -104,7 +112,7 @@ namespace ammonite {
 
         //Bundle keybind data and add to tracker
         KeybindData keybindData = {
-          keycode, toggle, callback, userPtr
+          keycode, allowOverride, toggle, callback, userPtr
         };
         keybindMap[keycode] = keybindData;
         return 0;

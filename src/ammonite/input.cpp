@@ -8,14 +8,26 @@
 #include "utils/debug.hpp"
 #include "constants.hpp"
 
+#define ALLOW_OVERRIDE_DEFAULT false
+
 namespace ammonite {
   namespace input {
+    int registerKeybind(int keycode, bool allowOverride,
+                        void(*callback)(int, int, void*), void* userPtr) {
+      return internal::registerRawKeybind(keycode, allowOverride, false, callback, userPtr);
+    }
+
     int registerKeybind(int keycode, void(*callback)(int, int, void*), void* userPtr) {
-      return internal::registerRawKeybind(keycode, false, callback, userPtr);
+      return registerKeybind(keycode, ALLOW_OVERRIDE_DEFAULT, callback, userPtr);
+    }
+
+    int registerToggleKeybind(int keycode, bool allowOverride,
+                              void(*callback)(int, int, void*), void* userPtr) {
+      return internal::registerRawKeybind(keycode, allowOverride, true, callback, userPtr);
     }
 
     int registerToggleKeybind(int keycode, void(*callback)(int, int, void*), void* userPtr) {
-      return internal::registerRawKeybind(keycode, true, callback, userPtr);
+      return registerToggleKeybind(keycode, ALLOW_OVERRIDE_DEFAULT, callback, userPtr);
     }
 
     int unregisterKeybind(int keycode) {
