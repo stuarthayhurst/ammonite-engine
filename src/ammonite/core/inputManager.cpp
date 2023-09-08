@@ -72,7 +72,6 @@ namespace ammonite {
           } else if (action == GLFW_RELEASE) {
             //Track released keys, remove from held keybind map
             if (heldKeybindMap.contains(keycode)) {
-              heldKeybindMap.erase(keycode);
               releasedKeys.push_back(keybindData);
             } else {
               ammoniteInternalDebug << "Keycode '" << keycode << "' wasn't held" << std::endl;
@@ -90,6 +89,7 @@ namespace ammonite {
           if (!(keybindData->toggle)) {
             keybindData->callback(keybindData->keycode, GLFW_RELEASE, keybindData->userPtr);
           }
+          heldKeybindMap.erase(keybindData->keycode);
         }
         releasedKeys.clear();
 
