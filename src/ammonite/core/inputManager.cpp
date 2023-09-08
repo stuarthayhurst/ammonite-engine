@@ -4,6 +4,7 @@
 
 #include <GLFW/glfw3.h>
 
+#include "../constants.hpp"
 #include "../utils/debug.hpp"
 
 namespace ammonite {
@@ -12,7 +13,7 @@ namespace ammonite {
       namespace {
         struct KeybindData {
           int keycode;
-          bool overrideBlock;
+          AmmoniteEnum overrideMode;
           bool toggle;
           void(*callback)(int, int, void*);
           void* userPtr;
@@ -37,9 +38,27 @@ namespace ammonite {
 
           KeybindData* keybindData = &keybindMap[keycode];
 
-          if (isInputBlocked && !keybindData->overrideBlock) {
-            ammoniteInternalDebug << "Keycode '" << keycode << "' blocked" << std::endl;
-            return;
+          //Handle input block and override modes
+          if (isInputBlocked) {
+            switch (keybindData->overrideMode) {
+            case AMMONITE_ALLOW_OVERRIDE: //Allow keypress
+              break;
+            case AMMONITE_ALLOW_RELEASE: //Allow keypress if released, and was previously tracked
+              if (action == GLFW_RELEASE && heldKeybindMap.contains(keycode)) {
+                break;
+              } else {
+                ammoniteInternalDebug << "Keycode '" << keycode << "' blocked" << std::endl;
+                return;
+              }
+            case AMMONITE_FORCE_RELEASE: //Reject keypress
+            case AMMONITE_RESPECT_BLOCK:
+              ammoniteInternalDebug << "Keycode '" << keycode << "' blocked" << std::endl;
+              return;
+            default: //Unhandled override, send debug
+              ammoniteInternalDebug << "Keycode '" << keycode
+                                    << "' has unexpected override mode" << std::endl;
+              return;
+            }
           }
 
           //Track new state for the keybind
@@ -75,13 +94,29 @@ namespace ammonite {
         releasedKeys.clear();
 
         //Run callbacks for held keys
+        std::vector<KeybindData*> forceReleaseKeys;
         for (auto it = heldKeybindMap.begin(); it != heldKeybindMap.end(); it++) {
           KeybindData* keybindData = it->second;
+
+          //Queue force release of key if input is blocked and override mode is force release
+          if (isInputBlocked && keybindData->overrideMode == AMMONITE_FORCE_RELEASE) {
+            forceReleaseKeys.push_back(keybindData);
+            continue;
+          }
 
           //Run callback if it's not a toggle keybind
           if (!(keybindData->toggle)) {
             keybindData->callback(keybindData->keycode, GLFW_REPEAT, keybindData->userPtr);
           }
+        }
+
+        //Force release queued keys from last loop
+        for (auto it = forceReleaseKeys.begin(); it != forceReleaseKeys.end(); it++) {
+          KeybindData* keybindData = *it;
+          if (!(keybindData->toggle)) {
+            keybindData->callback(keybindData->keycode, GLFW_RELEASE, keybindData->userPtr);
+          }
+          heldKeybindMap.erase(keybindData->keycode);
         }
 
         //Run callbacks for pressed keys, add to held keybind map
@@ -106,7 +141,7 @@ namespace ammonite {
         return isInputBlocked;
       }
 
-      int registerRawKeybind(int keycode, bool allowOverride, bool toggle,
+      int registerRawKeybind(int keycode, AmmoniteEnum overrideMode, bool toggle,
                              void(*callback)(int, int, void*), void* userPtr) {
         //Check key isn't already bound
         if (keybindMap.contains(keycode)) {
@@ -114,9 +149,15 @@ namespace ammonite {
           return -1;
         }
 
+        //Validate override mode
+        if (overrideMode < AMMONITE_ALLOW_OVERRIDE || overrideMode > AMMONITE_RESPECT_BLOCK) {
+          ammoniteInternalDebug << "Invalid override mode passed" << std::endl;
+          return -1;
+        }
+
         //Bundle keybind data and add to tracker
         KeybindData keybindData = {
-          keycode, allowOverride, toggle, callback, userPtr
+          keycode, overrideMode, toggle, callback, userPtr
         };
         keybindMap[keycode] = keybindData;
         return 0;

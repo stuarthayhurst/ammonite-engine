@@ -118,7 +118,8 @@ namespace ammonite {
 
       //Set keybind for closing window
       input::internal::registerRawKeybind(input::internal::getExistingKeycode(AMMONITE_EXIT),
-                                          true, true, setCloseWindowCallback, &closeWindow);
+                                          AMMONITE_ALLOW_OVERRIDE, true,
+                                          setCloseWindowCallback, &closeWindow);
 
       return 0;
     }

@@ -226,11 +226,11 @@ int main(int argc, char* argv[]) {
   ammonite::camera::setPosition(cameraData.cameraIds[1], glm::vec3(0.0f, 0.0f, 2.0f));
 
   //Set keybinds
-  ammonite::input::registerToggleKeybind(GLFW_KEY_C, true, inputFocusCallback, nullptr);
+  ammonite::input::registerToggleKeybind(GLFW_KEY_C, AMMONITE_ALLOW_OVERRIDE,
+                                         inputFocusCallback, nullptr);
   ammonite::input::registerToggleKeybind(GLFW_KEY_F11, fullscreenToggleCallback, nullptr);
   ammonite::input::registerToggleKeybind(GLFW_KEY_Z, focalToggleCallback, nullptr);
   ammonite::input::registerToggleKeybind(GLFW_KEY_B, cameraCycleCallback, &cameraData);
-
 
   float positive = 1.0f;
   float negative = -1.0f;

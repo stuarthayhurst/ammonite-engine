@@ -28,7 +28,14 @@ enum AmmoniteEnum : unsigned char {
 
   //Texture types
   AMMONITE_DIFFUSE_TEXTURE,
-  AMMONITE_SPECULAR_TEXTURE
+  AMMONITE_SPECULAR_TEXTURE,
+
+  //Keybind input override modes
+  //New entries must go between first and last, or update validation
+  AMMONITE_ALLOW_OVERRIDE,
+  AMMONITE_ALLOW_RELEASE,
+  AMMONITE_FORCE_RELEASE,
+  AMMONITE_RESPECT_BLOCK
 };
 
 #endif
