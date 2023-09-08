@@ -237,8 +237,6 @@ int main(int argc, char* argv[]) {
   ammonite::input::registerKeybind(GLFW_KEY_RIGHT_BRACKET, changeFocalDepthCallback, &positive);
   ammonite::input::registerKeybind(GLFW_KEY_LEFT_BRACKET, changeFocalDepthCallback, &negative);
 
-
-
   //Engine loaded, delete the loading screen
   ammonite::utils::status << "Loaded demo in " << utilityTimer.getTime() << "s" << std::endl;
   ammonite::interface::deleteLoadingScreen(screenId);
