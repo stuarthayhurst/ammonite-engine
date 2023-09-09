@@ -38,6 +38,9 @@ namespace ammonite {
         //Disable compatibility profile
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
+        //Disable deprecated features
+        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
+
         //Set requested context type
         if (requestedContextType == AMMONITE_NO_ERROR_CONTEXT) {
           ammoniteInternalDebug << "Creating window with AMMONITE_NO_ERROR_CONTEXT" << std::endl;
