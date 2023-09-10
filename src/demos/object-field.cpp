@@ -78,6 +78,8 @@ namespace objectFieldDemo {
   }
 
   int demoExit() {
+    ammonite::input::unregisterKeybind(GLFW_KEY_F);
+
     for (unsigned int i = 0; i < loadedModelIds.size(); i++) {
       ammonite::models::deleteModel(loadedModelIds[i]);
     }

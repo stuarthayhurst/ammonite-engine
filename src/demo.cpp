@@ -93,6 +93,15 @@ void printMetrics(double frameTime) {
   std::printf(" (%fms)\n", frameTime * 1000);
 }
 
+void unregisterKeybinds() {
+  ammonite::input::unregisterKeybind(GLFW_KEY_C);
+  ammonite::input::unregisterKeybind(GLFW_KEY_F11);
+  ammonite::input::unregisterKeybind(GLFW_KEY_Z);
+  ammonite::input::unregisterKeybind(GLFW_KEY_B);
+  ammonite::input::unregisterKeybind(GLFW_KEY_RIGHT_BRACKET);
+  ammonite::input::unregisterKeybind(GLFW_KEY_LEFT_BRACKET);
+}
+
 void cleanUp(int modelCount, std::vector<int> loadedModelIds) {
   for (int i = 0; i < modelCount; i++) {
     ammonite::models::deleteModel(loadedModelIds[i]);
@@ -260,6 +269,7 @@ int main(int argc, char* argv[]) {
     if (rendererMainloop != nullptr) {
       if (rendererMainloop() == -1) {
         std::cerr << "ERROR: Failed to run mainloop, exiting" << std::endl;
+        unregisterKeybinds();
         return EXIT_FAILURE;
       }
     }
@@ -273,6 +283,7 @@ int main(int argc, char* argv[]) {
   }
 
   //Clean up and exit
+  unregisterKeybinds();
   if (demoExit != nullptr) {
     bool cleanExit = true;
     if (demoExit() == -1) {
