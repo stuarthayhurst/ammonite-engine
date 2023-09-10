@@ -50,7 +50,7 @@ namespace objectFieldDemo {
       float horiz = ammonite::camera::getHorizontal(activeCameraId);
       float vert = ammonite::camera::getVertical(activeCameraId);
 
-      ammonite::models::position::setRotation(modelId, glm::vec3(vert, horiz, 0.0f));
+      ammonite::models::position::setRotation(modelId, glm::vec3(-vert, horiz, 0.0f));
       ammonite::models::position::setScale(modelId, 0.25f);
       ammonite::models::position::setPosition(modelId, ammonite::camera::getPosition(activeCameraId));
 
