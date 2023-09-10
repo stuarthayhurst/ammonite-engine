@@ -102,13 +102,6 @@ void unregisterKeybinds() {
   ammonite::input::unregisterKeybind(GLFW_KEY_LEFT_BRACKET);
 }
 
-void cleanUp(int modelCount, std::vector<int> loadedModelIds) {
-  for (int i = 0; i < modelCount; i++) {
-    ammonite::models::deleteModel(loadedModelIds[i]);
-  }
-  ammonite::window::destroyWindow();
-}
-
 int main(int argc, char* argv[]) {
   //Handle arguments
   const int showHelp = arguments::searchArgument(argc, argv, "--help", nullptr);
