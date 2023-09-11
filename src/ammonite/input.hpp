@@ -5,7 +5,7 @@
 
 namespace ammonite {
   namespace input {
-    //Callback takes keycode, (allowOverride), action, user pointer
+    //Keybind takes keycode, (overrideMode), action callback, user pointer
     int registerKeybind(int keycode, void(*callback)(int, int, void*), void* userPtr);
     int registerKeybind(int keycode, AmmoniteEnum overrideMode,
                         void(*callback)(int, int, void*), void* userPtr);
