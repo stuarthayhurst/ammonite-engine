@@ -164,6 +164,9 @@ int main(int argc, char* argv[]) {
   }
   ammonite::window::getWindowPtr();
 
+  ammonite::utils::debug::printDriverInfo();
+  std::cout << std::endl;
+
   //Set an icon
   ammonite::window::useIconDir("assets/icons/");
 

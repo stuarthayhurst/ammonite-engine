@@ -24,4 +24,12 @@ namespace ammonite {
 }
 #endif
 
+namespace ammonite {
+  namespace utils {
+    namespace debug {
+      void printDriverInfo();
+    }
+  }
+}
+
 #endif
