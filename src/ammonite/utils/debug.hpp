@@ -14,19 +14,10 @@
   #include <iostream>
 #endif
 
-#ifdef DEBUG
 namespace ammonite {
   namespace utils {
     namespace debug {
       void enableDebug();
-    }
-  }
-}
-#endif
-
-namespace ammonite {
-  namespace utils {
-    namespace debug {
       void printDriverInfo();
     }
   }

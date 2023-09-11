@@ -1,31 +1,13 @@
-#include <GL/glew.h>
 #include <iostream>
+
+#include <GL/glew.h>
+
+#include "../graphics/internal/internalExtension.hpp"
 #include "logging.hpp"
 
 #ifdef DEBUG
-  #include "../graphics/internal/internalExtension.hpp"
-#endif
-
-namespace ammonite {
-  namespace utils {
-    namespace debug {
-      void printDriverInfo() {
-        GLint majorVersion = 0;
-        GLint minorVersion = 0;
-
-        glGetIntegerv(GL_MAJOR_VERSION, &majorVersion);
-        glGetIntegerv(GL_MAJOR_VERSION, &minorVersion);
-
-        ammonite::utils::status << "OpenGL version: " << majorVersion << "." << minorVersion << std::endl;
-        ammonite::utils::status << "OpenGL renderer: " << glGetString(GL_RENDERER) << std::endl;
-        ammonite::utils::status << "OpenGL vendor: " << glGetString(GL_VENDOR) << std::endl;
-      }
-    }
-  }
-}
-
-#ifdef DEBUG
 ammonite::utils::OutputHelper ammoniteInternalDebug(std::cout, "DEBUG: ");
+#endif
 
 namespace ammonite {
   namespace utils {
@@ -74,7 +56,18 @@ namespace ammonite {
         glEnable(GL_DEBUG_OUTPUT);
         glDebugMessageCallback(debugMessageCallback, 0);
       }
+
+      void printDriverInfo() {
+        GLint majorVersion = 0;
+        GLint minorVersion = 0;
+
+        glGetIntegerv(GL_MAJOR_VERSION, &majorVersion);
+        glGetIntegerv(GL_MAJOR_VERSION, &minorVersion);
+
+        ammonite::utils::status << "OpenGL version: " << majorVersion << "." << minorVersion << std::endl;
+        ammonite::utils::status << "OpenGL renderer: " << glGetString(GL_RENDERER) << std::endl;
+        ammonite::utils::status << "OpenGL vendor: " << glGetString(GL_VENDOR) << std::endl;
+      }
     }
   }
 }
-#endif
