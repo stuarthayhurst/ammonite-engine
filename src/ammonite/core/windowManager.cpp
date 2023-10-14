@@ -41,6 +41,9 @@ namespace ammonite {
         //Disable deprecated features
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
 
+        //Set fullscreen input focus behaviour
+        glfwWindowHint(GLFW_AUTO_ICONIFY, GLFW_FALSE);
+
         //Set requested context type
         if (requestedContextType == AMMONITE_NO_ERROR_CONTEXT) {
           ammoniteInternalDebug << "Creating window with AMMONITE_NO_ERROR_CONTEXT" << std::endl;
