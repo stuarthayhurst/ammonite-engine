@@ -94,7 +94,7 @@ void printMetrics(double frameTime) {
 }
 
 void unregisterKeybinds(std::vector<int>* keybindIdsPtr) {
-  for (unsigned int i = 0; i < keybindIdsPtr->size(); i++)
+  for (unsigned int i = 0; i < keybindIdsPtr->size(); i++) {
     ammonite::input::unregisterKeybind((*keybindIdsPtr)[i]);
   }
 }
@@ -232,16 +232,14 @@ int main(int argc, char* argv[]) {
   keybindIds.push_back(ammonite::input::registerToggleKeybind(
                          GLFW_KEY_C, AMMONITE_ALLOW_OVERRIDE, inputFocusCallback, nullptr));
   keybindIds.push_back(ammonite::input::registerToggleKeybind(
-                         GLFW_KEY_F11, fullscreenToggleCallback, nullptr);
+                         GLFW_KEY_F11, fullscreenToggleCallback, nullptr));
   keybindIds.push_back(ammonite::input::registerToggleKeybind(
                          GLFW_KEY_Z, focalToggleCallback, nullptr));
   keybindIds.push_back(ammonite::input::registerToggleKeybind(
                          GLFW_KEY_B, cameraCycleCallback, &cameraData));
 
   //Set keybind for closing window
-  keybindIds.push_back(ammonite::input::registerToggleKeybind(
-                         GLFW_KEY_ESC, AMMONITE_ALLOW_OVERRIDE,
-                         setCloseWindowCallback, &closeWindow));
+  keybindIds.push_back(ammonite::window::registerWindowCloseKeybind(GLFW_KEY_ESCAPE));
 
   float positive = 1.0f;
   float negative = -1.0f;
@@ -273,7 +271,7 @@ int main(int argc, char* argv[]) {
     if (rendererMainloop != nullptr) {
       if (rendererMainloop() == -1) {
         std::cerr << "ERROR: Failed to run mainloop, exiting" << std::endl;
-        unregisterKeybinds();
+        unregisterKeybinds(&keybindIds);
         return EXIT_FAILURE;
       }
     }
@@ -287,7 +285,7 @@ int main(int argc, char* argv[]) {
   }
 
   //Clean up and exit
-  unregisterKeybinds();
+  unregisterKeybinds(&keybindIds);
   if (demoExit != nullptr) {
     bool cleanExit = true;
     if (demoExit() == -1) {

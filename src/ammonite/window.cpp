@@ -130,6 +130,12 @@ namespace ammonite {
       return (closeWindow || glfwWindowShouldClose(windowPtr));
     }
 
+    int registerWindowCloseKeybind(int keycode) {
+      return ammonite::input::internal::registerRawKeybind(
+                         keycode, AMMONITE_ALLOW_OVERRIDE, true,
+                         setCloseWindowCallback, &closeWindow);
+    }
+
     void setTitle(const char* title) {
       if (title != nullptr) {
         glfwSetWindowTitle(windowPtr, title);
