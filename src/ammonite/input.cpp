@@ -1,7 +1,6 @@
 #include <iostream>
 
 #include "core/inputManager.hpp"
-#include "core/engineKeybinds.hpp"
 
 #include "utils/internal/internalControls.hpp"
 
@@ -31,42 +30,11 @@ namespace ammonite {
     }
 
     int unregisterKeybind(int keybindId) {
-      //Fail if attempting to unregister an engine keybind
-      if (internal::isKeybindInternal(keybindId)) {
-        ammoniteInternalDebug << "Failed to unregister keybind, keybind is internal" << std::endl;
-        return -1;
-      }
-
       return internal::unregisterKeybind(keybindId);
     }
 
     bool isKeycodeRegistered(int keycode) {
       return internal::isKeycodeRegistered(keycode);
-    }
-
-    int setEngineKeybind(AmmoniteEnum engineConstant, int keycode) {
-      //Check engine constant exists in internal store
-      if (!internal::isEngineKeybindValid(engineConstant)) {
-        ammoniteInternalDebug << "Failed to register keybind, invalid constant" << std::endl;
-        return -1;
-      }
-
-      //Check new keycode isn't already registered
-      if (internal::isKeycodeRegistered(keycode)) {
-        ammoniteInternalDebug << "Failed to register keybind, keycode already registered" << std::endl;
-        return -1;
-      }
-
-      int existingKeybindId = internal::getExistingKeybindId(engineConstant);
-      if (internal::isKeycodeRegistered(existingKeybindId)) {
-        //Move old keybind data to new keycode
-        internal::moveKeybindData(existingKeybindId, keycode);
-      }
-
-      //Update saved keybind
-      internal::setEngineKeybind(engineConstant, keycode);
-
-      return 0;
     }
 
     void setInputFocus(bool active) {

@@ -238,6 +238,11 @@ int main(int argc, char* argv[]) {
   keybindIds.push_back(ammonite::input::registerToggleKeybind(
                          GLFW_KEY_B, cameraCycleCallback, &cameraData));
 
+  //Set keybind for closing window
+  keybindIds.push_back(ammonite::input::registerToggleKeybind(
+                         GLFW_KEY_ESC, AMMONITE_ALLOW_OVERRIDE,
+                         setCloseWindowCallback, &closeWindow));
+
   float positive = 1.0f;
   float negative = -1.0f;
   keybindIds.push_back(ammonite::input::registerKeybind(

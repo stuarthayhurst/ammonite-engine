@@ -55,7 +55,7 @@ namespace ammonite {
 
           //Iterate over keybinds related to this keycode
           KeycodeState* keycodeState = &keycodeStateMap[keycode];
-          auto keybindMapPtr = &keybindState->keybindIdStateEnumMap;
+          auto keybindMapPtr = &keycodeState->keybindIdStateEnumMap;
           for (auto it = keybindMapPtr->begin(); it != keybindMapPtr->end(); it++) {
             int keybindId = it->first;
             KeycodeStateEnum keycodeStateEnum = it->second;

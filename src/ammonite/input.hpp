@@ -17,8 +17,6 @@ namespace ammonite {
 
     void setInputFocus(bool active);
     bool getInputFocus();
-
-    int setEngineKeybind(AmmoniteEnum engineConstant, int keycode);
   }
 }
 

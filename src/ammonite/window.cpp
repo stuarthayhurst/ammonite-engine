@@ -8,7 +8,6 @@
 
 #include "core/windowManager.hpp"
 #include "core/inputManager.hpp"
-#include "core/engineKeybinds.hpp"
 #include "internal/internalInput.hpp"
 #include "graphics/internal/internalShaders.hpp"
 
@@ -115,11 +114,6 @@ namespace ammonite {
       internal::setupGlfwInput();
       ammonite::input::internal::setupInputCallback(windowPtr);
       ammonite::input::internal::setupFocusCallback(windowPtr);
-
-      //Set keybind for closing window
-      input::internal::registerRawKeybind(input::internal::getExistingKeycode(AMMONITE_EXIT),
-                                          AMMONITE_ALLOW_OVERRIDE, true,
-                                          setCloseWindowCallback, &closeWindow);
 
       return 0;
     }
