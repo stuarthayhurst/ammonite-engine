@@ -19,62 +19,93 @@ namespace ammonite {
           void* userPtr;
         };
 
+        enum KeycodeStateEnum {
+          AMMONITE_HELD,
+          AMMONITE_RELEASED
+        };
+
+        struct KeycodeState {
+          int refCount = 0;
+          std::map<int, KeycodeStateEnum> keybindIdStateEnumMap;
+        };
+
+        struct KeypressInfo {
+          int keycode;
+          int keybindData;
+          KeycodeStateEnum* keycodeStateEnumPtr;
+        };
+
         bool isInputBlocked = false;
 
-        //Track bound and held keys
-        std::map<int, KeybindData> keybindMap;
-        std::map<int, KeybindData*> heldKeybindMap;
+        //Track keybind data and states
+        std::map<int, KeybindData> keybindIdDataMap;
+        std::map<int, KeycodeState> keycodeStateMap;
+        int totalKeybinds = 0;
 
         //Vectors to track pressed and released keys, with a pending callback
-        std::vector<KeybindData*> pressedKeys;
-        std::vector<KeybindData*> releasedKeys;
+        std::vector<KeypressInfo*> pressedKeys;
+        std::vector<KeypressInfo*> releasedKeys;
 
         //Dispatch user defined code to handle keypress
         static void keyCallbackHandler(GLFWwindow*, int keycode, int, int action, int) {
-          if (!keybindMap.contains(keycode)) {
+          if (!keycodeStateMap.contains(keycode)) {
             ammoniteInternalDebug << "Keycode '" << keycode << "' not registered" << std::endl;
             return;
           }
 
-          KeybindData* keybindData = &keybindMap[keycode];
+          //Iterate over keybinds related to this keycode
+          KeycodeState* keycodeState = &keycodeStateMap[keycode];
+          auto keybindMapPtr = &keybindState->keybindIdStateEnumMap;
+          for (auto it = keybindMapPtr->begin(); it != keybindMapPtr->end(); it++) {
+            int keybindId = it->first;
+            KeycodeStateEnum keycodeStateEnum = it->second;
+            KeybindData* keybindData = &keybindIdDataMap[keybindId];
 
-          //Handle input block and override modes
-          if (isInputBlocked) {
-            switch (keybindData->overrideMode) {
-            case AMMONITE_ALLOW_OVERRIDE: //Allow keypress
-              break;
-            case AMMONITE_ALLOW_RELEASE: //Allow keypress if released, and was previously tracked
-              if (action == GLFW_RELEASE && heldKeybindMap.contains(keycode)) {
+            //Handle input block and override modes
+            if (isInputBlocked) {
+              switch (keybindData->overrideMode) {
+              case AMMONITE_ALLOW_OVERRIDE: //Allow keypress
                 break;
-              } else {
+
+              case AMMONITE_ALLOW_RELEASE: //Allow keypress if released, and was previously tracked
+                if (action == GLFW_RELEASE && keycodeStateEnum == AMMONITE_HELD) {
+                  break;
+                } else {
+                  ammoniteInternalDebug << "Keycode '" << keycode << "' blocked" << std::endl;
+                  return;
+                }
+
+              case AMMONITE_FORCE_RELEASE: //Reject keypress
+              case AMMONITE_RESPECT_BLOCK:
                 ammoniteInternalDebug << "Keycode '" << keycode << "' blocked" << std::endl;
                 return;
+              default: //Unhandled override, send debug
+                ammoniteInternalDebug << "Keycode '" << keycode
+                                      << "' has unexpected override mode" << std::endl;
+                return;
               }
-            case AMMONITE_FORCE_RELEASE: //Reject keypress
-            case AMMONITE_RESPECT_BLOCK:
-              ammoniteInternalDebug << "Keycode '" << keycode << "' blocked" << std::endl;
-              return;
-            default: //Unhandled override, send debug
-              ammoniteInternalDebug << "Keycode '" << keycode
-                                    << "' has unexpected override mode" << std::endl;
-              return;
             }
-          }
 
-          //Track new state for the keybind
-          if (action == GLFW_PRESS) {
-            //Track newly pressed keys
-            if (!heldKeybindMap.contains(keycode)) {
-              pressedKeys.push_back(keybindData);
-            } else {
-              ammoniteInternalDebug << "Keycode '" << keycode << "' already held" << std::endl;
-            }
-          } else if (action == GLFW_RELEASE) {
-            //Track released keys, remove from held keybind map
-            if (heldKeybindMap.contains(keycode)) {
-              releasedKeys.push_back(keybindData);
-            } else {
-              ammoniteInternalDebug << "Keycode '" << keycode << "' wasn't held" << std::endl;
+            //Bundle keypress info for later handling
+            KeypressInfo keypressInfo = {
+              keycode, keybindData, &keycodeStateEnum
+            };
+
+            //Track new state for the keybind
+            if (action == GLFW_PRESS) {
+              //Track newly pressed keys
+              if (keycodeStateEnum != AMMONITE_HELD) {
+                pressedKeys.push_back(keypressInfo);
+              } else {
+                ammoniteInternalDebug << "Keycode '" << keycode << "' already held" << std::endl;
+              }
+            } else if (action == GLFW_RELEASE) {
+              //Track released keys
+              if (keycodeStateEnum == AMMONITE_HELD) {
+                releasedKeys.push_back(keypressInfo);
+              } else {
+                ammoniteInternalDebug << "Keycode '" << keycode << "' wasn't held" << std::endl;
+              }
             }
           }
         }
@@ -82,25 +113,41 @@ namespace ammonite {
 
       //Execute callbacks for anything that changed, or is held
       void runCallbacks() {
+//TODO:
+// - In future, this code will have to decide if more conditions are met
+// - When multi-key keybinds are added, all keys must be pressed
+// - Releasing any should trigger a callback
+// - All keys must also be released when force release occurs
+
         //Run callbacks for released keys
         for (auto it = releasedKeys.begin(); it != releasedKeys.end(); it++) {
-          KeybindData* keybindData = *it;
+          KeypressInfo* keypressInfo = *it;
+          KeybindData* keybindData = keypressInfo->keybindData;
+
           //Run callback if it's not a toggle
           if (!(keybindData->toggle)) {
             keybindData->callback(keybindData->keycode, GLFW_RELEASE, keybindData->userPtr);
           }
-          heldKeybindMap.erase(keybindData->keycode);
+          *keypressInfo->keycodeStateEnumPtr = AMMONITE_RELEASED;
         }
         releasedKeys.clear();
 
         //Run callbacks for held keys
         std::vector<KeybindData*> forceReleaseKeys;
-        for (auto it = heldKeybindMap.begin(); it != heldKeybindMap.end(); it++) {
+        for (auto it = keybindIdDataMap.begin(); it != keybindIdDataMap.end(); it++) {
+          int keybindId = it->first;
           KeybindData* keybindData = it->second;
+
+          //Check all keys are held
+          KeycodeStateEnum keycodeState =
+            keycodeStateMap[keybindData->keycode].keybindIdStateEnumMap[keybindId];
+          if (keycodeState != AMMONITE_HELD) {
+            continue;
+          }
 
           //Queue force release of key if input is blocked and override mode is force release
           if (isInputBlocked && keybindData->overrideMode == AMMONITE_FORCE_RELEASE) {
-            forceReleaseKeys.push_back(keybindData);
+            forceReleaseKeys.push_back(keybindId);
             continue;
           }
 
@@ -112,18 +159,21 @@ namespace ammonite {
 
         //Force release queued keys from last loop
         for (auto it = forceReleaseKeys.begin(); it != forceReleaseKeys.end(); it++) {
-          KeybindData* keybindData = *it;
+          int keybindId = *it;
+          KeybindData* keybindData = keybindIdDataMap[keybindId];
           if (!(keybindData->toggle)) {
             keybindData->callback(keybindData->keycode, GLFW_RELEASE, keybindData->userPtr);
           }
-          heldKeybindMap.erase(keybindData->keycode);
+          keycodeStateMap[keybindData->keycode].keybindIdStateEnumMap[keybindId] = AMMONITE_RELEASED;
         }
 
         //Run callbacks for pressed keys, add to held keybind map
         for (auto it = pressedKeys.begin(); it != pressedKeys.end(); it++) {
-          KeybindData* keybindData = *it;
+          KeypressInfo* keypressInfo = *it;
+          KeybindData* keybindData = keypressInfo->keybindData;
+
           keybindData->callback(keybindData->keycode, GLFW_PRESS, keybindData->userPtr);
-          heldKeybindMap[keybindData->keycode] = keybindData;
+          *keypressInfo->keycodeStateEnumPtr = AMMONITE_PRESSED;
         }
         pressedKeys.clear();
       }
@@ -143,54 +193,100 @@ namespace ammonite {
 
       int registerRawKeybind(int keycode, AmmoniteEnum overrideMode, bool toggle,
                              void(*callback)(int, int, void*), void* userPtr) {
-        //Check key isn't already bound
-        if (keybindMap.contains(keycode)) {
-          ammoniteInternalDebug << "Keycode '" << keycode << "' already registered" << std::endl;
-          return -1;
-        }
-
         //Validate override mode
         if (overrideMode < AMMONITE_ALLOW_OVERRIDE || overrideMode > AMMONITE_RESPECT_BLOCK) {
           ammoniteInternalDebug << "Invalid override mode passed" << std::endl;
           return -1;
         }
 
+        int keybindId = ++totalKeybinds;
+
+        //Start tracking keycode states
+        if (!keycodeStateMap.contains(keycode)) {
+          KeycodeState keycodeState = {
+            0, {keybindId, AMMONITE_RELEASED}
+          };
+          keycodeStateMap[keycode] = keycodeState;
+        }
+        keycodeStateMap[keycode].refCount++;
+
+        //Set initial key state
+        keycodeStateMap[keycode].keybindIdStateEnumMap[keybindId] = AMMONITE_RELEASED;
+
         //Bundle keybind data and add to tracker
         KeybindData keybindData = {
           keycode, overrideMode, toggle, callback, userPtr
         };
-        keybindMap[keycode] = keybindData;
-        return 0;
+        keybindIdDataMap[keybindId] = keybindData;
+        return keybindId;
       }
 
-      int unregisterKeybind(int keycode) {
+      int unregisterKeybind(int keybindId) {
         //Exit if key wasn't bound
-        if (!keybindMap.contains(keycode)) {
+        if (!keybindIdDataMap.contains(keybindId)) {
           ammoniteInternalDebug << "Can't unregister keycode '" << keycode << "' not registered" << std::endl;
           return -1;
         }
 
-        //If the key was held, forget it
-        if (heldKeybindMap.contains(keycode)) {
-          heldKeybindMap.erase(keycode);
+        //Stop tracking keycode states
+        int keycode = keybindIdDataMap[keybindId].keycode;
+        if (keycodeStateMap.contains(keycode)) {
+          //Delete keybind id's entry in nested map
+          keycodeStateMap[keycode].keybindIdStateEnumMap.erase(keybindId)
+
+          //Reduce reference counter on keycode state tracker
+          if (keycodeStateMap[keycode].refCount == 1) {
+            keycodeStateMap.erase(keycode);
+          } else {
+            keycodeStateMap[keycode].refCount--;
+          }
+        } else {
+          ammoniteInternalDebug << "Keycode state tracking missing for '" << keycode << std::endl;
         }
 
-        //Forget the keybind
-        keybindMap.erase(keycode);
+        //Forget the keybind data
+        keybindIdDataMap.erase(keybindId);
         return 0;
       }
 
-      bool isKeybindRegistered(int keycode) {
-        return keybindMap.contains(keycode);
+      bool isKeycodeRegistered(int keycode) {
+        return keycodeStateMap.contains(keycode);
       }
 
-      void moveKeybindData(int oldKeycode, int newKeycode) {
-        //Copy keybind data and delete binding
-        KeybindData oldData = keybindMap[oldKeycode];
-        unregisterKeybind(oldKeycode);
+      void moveKeybindData(int keybindId, int newKeycode) {
+//TODO:
+// - This will need a significant rewrite when multi-key keybinds are available
 
-        //Register old data with new keycode
-        keybindMap[newKeycode] = oldData;
+        KeybindData* keybindData = keybindIdDataMap[keybindId];
+
+        //Get old keycode info
+        int oldKeycode = keybindData->keycode;
+        if (oldKeycode == newKeycode) {
+          return;
+        }
+        KeycodeStateEnum oldKeycodeState =
+          keycodeStateMap[oldKeycode].keybindIdStateEnumMap[keybindId];
+
+        //Set new keycode
+        keybindData->keycode = newKeycode;
+
+        //Update new keycode state with old keycode
+        if (!keycodeStateMap.contains(keycode)) {
+          KeycodeState keycodeState = {
+            0, {keybindId, oldKeycodeState}
+          };
+          keycodeStateMap[keycode] = keycodeState;
+        } else {
+          keycodeStateMap[keycode].keybindIdStateEnumMap[keybindId] = oldKeycodeState;
+        }
+        keycodeStateMap[keycode].refCount++;
+
+        //Delete old keycode's data
+        keycodeStateMap[oldKeycode].keybindIdStateEnumMap.erase(keybindId);
+        keycodeStateMap[oldKeycode].refCount--;
+        if (keycodeStateMap[oldKeycode].refCount == 0) {
+          keycodeStateMap.erase(oldKeycode);
+        }
       }
     }
   }

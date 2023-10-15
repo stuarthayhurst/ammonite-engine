@@ -17,7 +17,8 @@ namespace ammonite {
         return keybindTracker.contains(engineKeybind);
       }
 
-      bool isKeybindInternal(int keycode) {
+//Somehow use an id
+      bool isKeybindInternal(int keybindId) {
         //Check all engine keybinds for a match
         for (auto it = keybindTracker.begin(); it != keybindTracker.end(); it++) {
           if (it->second == keycode) {
@@ -28,7 +29,8 @@ namespace ammonite {
         return false;
       }
 
-      int getExistingKeycode(AmmoniteEnum engineKeybind) {
+//return the magic id
+      int getExistingKeybindId(AmmoniteEnum engineKeybind) {
         return keybindTracker[engineKeybind];
       }
 

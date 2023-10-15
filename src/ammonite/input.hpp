@@ -12,8 +12,8 @@ namespace ammonite {
     int registerToggleKeybind(int keycode, AmmoniteEnum overrideMode,
                               void(*callback)(int, int, void*), void* userPtr);
     int registerToggleKeybind(int keycode, void(*callback)(int, int, void*), void* userPtr);
-    int unregisterKeybind(int keycode);
-    bool isKeybindRegistered(int keycode);
+    int unregisterKeybind(int keybindId);
+    bool isKeycodeRegistered(int keycode);
 
     void setInputFocus(bool active);
     bool getInputFocus();
