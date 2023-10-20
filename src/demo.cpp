@@ -93,13 +93,10 @@ void printMetrics(double frameTime) {
   std::printf(" (%fms)\n", frameTime * 1000);
 }
 
-void unregisterKeybinds() {
-  ammonite::input::unregisterKeybind(GLFW_KEY_C);
-  ammonite::input::unregisterKeybind(GLFW_KEY_F11);
-  ammonite::input::unregisterKeybind(GLFW_KEY_Z);
-  ammonite::input::unregisterKeybind(GLFW_KEY_B);
-  ammonite::input::unregisterKeybind(GLFW_KEY_RIGHT_BRACKET);
-  ammonite::input::unregisterKeybind(GLFW_KEY_LEFT_BRACKET);
+void unregisterKeybinds(std::vector<int>* keybindIdsPtr) {
+  for (unsigned int i = 0; i < keybindIdsPtr->size(); i++) {
+    ammonite::input::unregisterKeybind((*keybindIdsPtr)[i]);
+  }
 }
 
 int main(int argc, char* argv[]) {
@@ -231,16 +228,25 @@ int main(int argc, char* argv[]) {
   ammonite::camera::setPosition(cameraData.cameraIds[1], glm::vec3(0.0f, 0.0f, 2.0f));
 
   //Set keybinds
-  ammonite::input::registerToggleKeybind(GLFW_KEY_C, AMMONITE_ALLOW_OVERRIDE,
-                                         inputFocusCallback, nullptr);
-  ammonite::input::registerToggleKeybind(GLFW_KEY_F11, fullscreenToggleCallback, nullptr);
-  ammonite::input::registerToggleKeybind(GLFW_KEY_Z, focalToggleCallback, nullptr);
-  ammonite::input::registerToggleKeybind(GLFW_KEY_B, cameraCycleCallback, &cameraData);
+  std::vector<int> keybindIds;
+  keybindIds.push_back(ammonite::input::registerToggleKeybind(
+                         GLFW_KEY_C, AMMONITE_ALLOW_OVERRIDE, inputFocusCallback, nullptr));
+  keybindIds.push_back(ammonite::input::registerToggleKeybind(
+                         GLFW_KEY_F11, fullscreenToggleCallback, nullptr));
+  keybindIds.push_back(ammonite::input::registerToggleKeybind(
+                         GLFW_KEY_Z, focalToggleCallback, nullptr));
+  keybindIds.push_back(ammonite::input::registerToggleKeybind(
+                         GLFW_KEY_B, cameraCycleCallback, &cameraData));
+
+  //Set keybind for closing window
+  keybindIds.push_back(ammonite::window::registerWindowCloseKeybind(GLFW_KEY_ESCAPE));
 
   float positive = 1.0f;
   float negative = -1.0f;
-  ammonite::input::registerKeybind(GLFW_KEY_RIGHT_BRACKET, changeFocalDepthCallback, &positive);
-  ammonite::input::registerKeybind(GLFW_KEY_LEFT_BRACKET, changeFocalDepthCallback, &negative);
+  keybindIds.push_back(ammonite::input::registerKeybind(
+                         GLFW_KEY_RIGHT_BRACKET, changeFocalDepthCallback, &positive));
+  keybindIds.push_back(ammonite::input::registerKeybind(
+                         GLFW_KEY_LEFT_BRACKET, changeFocalDepthCallback, &negative));
 
   //Engine loaded, delete the loading screen
   ammonite::utils::status << "Loaded demo in " << utilityTimer.getTime() << "s" << std::endl;
@@ -265,7 +271,7 @@ int main(int argc, char* argv[]) {
     if (rendererMainloop != nullptr) {
       if (rendererMainloop() == -1) {
         std::cerr << "ERROR: Failed to run mainloop, exiting" << std::endl;
-        unregisterKeybinds();
+        unregisterKeybinds(&keybindIds);
         return EXIT_FAILURE;
       }
     }
@@ -279,7 +285,7 @@ int main(int argc, char* argv[]) {
   }
 
   //Clean up and exit
-  unregisterKeybinds();
+  unregisterKeybinds(&keybindIds);
   if (demoExit != nullptr) {
     bool cleanExit = true;
     if (demoExit() == -1) {

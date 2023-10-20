@@ -3,7 +3,6 @@
 
 enum AmmoniteEnum : unsigned char {
   //Keybinding constants
-  AMMONITE_EXIT,
   AMMONITE_FORWARD,
   AMMONITE_BACK,
   AMMONITE_UP,

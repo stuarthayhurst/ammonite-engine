@@ -60,6 +60,7 @@ namespace objectFieldDemo {
 
   namespace {
     GLFWwindow* windowPtr;
+    int cubeKeybindId;
 
     std::vector<int> loadedModelIds;
     int modelCount = 0;
@@ -78,7 +79,7 @@ namespace objectFieldDemo {
   }
 
   int demoExit() {
-    ammonite::input::unregisterKeybind(GLFW_KEY_F);
+    ammonite::input::unregisterKeybind(cubeKeybindId);
 
     for (unsigned int i = 0; i < loadedModelIds.size(); i++) {
       ammonite::models::deleteModel(loadedModelIds[i]);
@@ -187,7 +188,8 @@ namespace objectFieldDemo {
     lightData[1].lightOrbitPeriod = 8.0f;
 
     //Set keybinds
-    ammonite::input::registerToggleKeybind(GLFW_KEY_F, spawnCubeCallback, &loadedModelIds);
+    cubeKeybindId = ammonite::input::registerToggleKeybind(
+                          GLFW_KEY_F, spawnCubeCallback, &loadedModelIds);
 
     return 0;
   }

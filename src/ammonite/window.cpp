@@ -8,7 +8,6 @@
 
 #include "core/windowManager.hpp"
 #include "core/inputManager.hpp"
-#include "core/engineKeybinds.hpp"
 #include "internal/internalInput.hpp"
 #include "graphics/internal/internalShaders.hpp"
 
@@ -116,11 +115,6 @@ namespace ammonite {
       ammonite::input::internal::setupInputCallback(windowPtr);
       ammonite::input::internal::setupFocusCallback(windowPtr);
 
-      //Set keybind for closing window
-      input::internal::registerRawKeybind(input::internal::getExistingKeycode(AMMONITE_EXIT),
-                                          AMMONITE_ALLOW_OVERRIDE, true,
-                                          setCloseWindowCallback, &closeWindow);
-
       return 0;
     }
 
@@ -134,6 +128,12 @@ namespace ammonite {
 
     bool shouldWindowClose() {
       return (closeWindow || glfwWindowShouldClose(windowPtr));
+    }
+
+    int registerWindowCloseKeybind(int keycode) {
+      return ammonite::input::internal::registerRawKeybind(
+                         keycode, AMMONITE_ALLOW_OVERRIDE, true,
+                         setCloseWindowCallback, &closeWindow);
     }
 
     void setTitle(const char* title) {
