@@ -40,7 +40,7 @@ namespace objectFieldDemo {
       }
     }
 
-    void spawnCubeCallback(int, int, void* userPtr) {
+    void spawnCubeCallback(std::vector<int>, int, void* userPtr) {
       std::vector<int>* loadedModelIds = (std::vector<int>*)userPtr;
 
       int activeCameraId = ammonite::camera::getActiveCamera();

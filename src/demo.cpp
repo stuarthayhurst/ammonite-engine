@@ -46,26 +46,26 @@ struct CameraData {
 };
 
 //Callbacks
-void inputFocusCallback(int, int, void*) {
+void inputFocusCallback(std::vector<int>, int, void*) {
   ammonite::input::setInputFocus(!ammonite::input::getInputFocus());
 }
 
-void fullscreenToggleCallback(int, int, void*) {
+void fullscreenToggleCallback(std::vector<int>, int, void*) {
   ammonite::window::setFullscreen(!ammonite::window::getFullscreen());
 }
 
-void focalToggleCallback(int, int, void*) {
+void focalToggleCallback(std::vector<int>, int, void*) {
   ammonite::settings::graphics::post::setFocalDepthEnabled(
     !ammonite::settings::graphics::post::getFocalDepthEnabled());
 }
 
-void cameraCycleCallback(int, int, void* userPtr) {
+void cameraCycleCallback(std::vector<int>, int, void* userPtr) {
   CameraData* cameraData = (CameraData*)userPtr;
   cameraData->cameraIndex = (cameraData->cameraIndex + 1) % cameraData->cameraIds.size();
   ammonite::camera::setActiveCamera(cameraData->cameraIds[cameraData->cameraIndex]);
 }
 
-void changeFocalDepthCallback(int, int action, void* userPtr) {
+void changeFocalDepthCallback(std::vector<int>, int action, void* userPtr) {
   static ammonite::utils::Timer focalDepthTimer;
   if (action != GLFW_RELEASE) {
     float sign = *(float*)userPtr;

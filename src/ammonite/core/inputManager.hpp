@@ -1,6 +1,8 @@
 #ifndef INPUTMANAGER
 #define INPUTMANAGER
 
+#include <vector>
+
 #include <GLFW/glfw3.h>
 
 #include "../constants.hpp"
@@ -14,8 +16,9 @@ namespace ammonite {
       void setInputBlock(bool inputBlocked);
       bool getInputBlock();
 
-      int registerRawKeybind(int keycode, AmmoniteEnum overrideMode, bool toggle,
-                             void(*callback)(int, int, void*), void* userPtr);
+      int registerRawKeybind(int keycodes[], int count, AmmoniteEnum overrideMode,
+                             bool toggle, void(*callback)(std::vector<int>, int, void*),
+                             void* userPtr);
       int unregisterKeybind(int keybindId);
       bool isKeycodeRegistered(int keycode);
       void moveKeybindData(int keybindId, int newKeycode);

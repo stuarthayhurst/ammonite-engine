@@ -59,7 +59,7 @@ namespace ammonite {
         return bestMonitor;
       }
 
-      static void setCloseWindowCallback(int, int, void* userPtr) {
+      static void setCloseWindowCallback(std::vector<int>, int, void* userPtr) {
         bool* closeWindowPtr = (bool*)userPtr;
         *closeWindowPtr = true;
       }
@@ -132,7 +132,7 @@ namespace ammonite {
 
     int registerWindowCloseKeybind(int keycode) {
       return ammonite::input::internal::registerRawKeybind(
-                         keycode, AMMONITE_ALLOW_OVERRIDE, true,
+                         &keycode, 1, AMMONITE_ALLOW_OVERRIDE, true,
                          setCloseWindowCallback, &closeWindow);
     }
 
