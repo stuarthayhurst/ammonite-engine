@@ -61,7 +61,7 @@ $(OBJECT_DIR)/helper/%.o: ./src/helper/%.cpp $(HELPER_HEADER_SOURCE)
 	@mkdir -p "$$(dirname $@)"
 	$(CXX) $(subst $(OBJECT_DIR),./src,$(subst .o,.cpp,$(@))) -c $(CXXFLAGS) -o "$@"
 
-$(OBJECT_DIR)/demos/%.o: ./src/demos/%.cpp $(DEMO_HEADER_SOURCE)
+$(OBJECT_DIR)/demos/%.o: ./src/demos/%.cpp $(DEMO_HEADER_SOURCE) $(AMMONITE_HEADER_SOURCE)
 	@mkdir -p "$$(dirname $@)"
 	$(CXX) $(subst $(OBJECT_DIR),./src,$(subst .o,.cpp,$(@))) -c $(CXXFLAGS) -o "$@"
 
