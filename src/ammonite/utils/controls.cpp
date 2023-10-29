@@ -24,6 +24,7 @@ namespace ammonite {
 
         //Used to find x and y mouse offsets
         double xposLast, yposLast;
+        bool ignoreNextCursor = false;
 
         //Current input bind, camera and control states
         bool isInputFocused = true, isCameraActive = true, isControlActive = true;
@@ -67,6 +68,11 @@ namespace ammonite {
             xposLast = xpos;
             yposLast = ypos;
 
+            if (ignoreNextCursor) {
+              ignoreNextCursor = false;
+              return;
+            }
+
             //Get current viewing angles
             int activeCameraId = ammonite::camera::getActiveCamera();
             float horizontalAngle = ammonite::camera::getHorizontal(activeCameraId);
@@ -96,6 +102,9 @@ namespace ammonite {
         //Helper function to set input state
         void setInputFocus(bool inputFocused) {
           isInputFocused = inputFocused;
+
+          //Skip next cursor movement, to avoid huge jumps
+          ignoreNextCursor = true;
 
           //Hide and unhide cursor as necessary
           if (isInputFocused) {
