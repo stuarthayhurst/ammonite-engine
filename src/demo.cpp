@@ -232,7 +232,8 @@ int main(int argc, char* argv[]) {
   keybindIds.push_back(ammonite::input::registerToggleKeybind(
                          GLFW_KEY_C, AMMONITE_ALLOW_OVERRIDE, inputFocusCallback, nullptr));
   keybindIds.push_back(ammonite::input::registerToggleKeybind(
-                         GLFW_KEY_F11, fullscreenToggleCallback, nullptr));
+                         GLFW_KEY_F11, AMMONITE_ALLOW_OVERRIDE,
+                         fullscreenToggleCallback, nullptr));
   keybindIds.push_back(ammonite::input::registerToggleKeybind(
                          GLFW_KEY_Z, focalToggleCallback, nullptr));
   keybindIds.push_back(ammonite::input::registerToggleKeybind(
