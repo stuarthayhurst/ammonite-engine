@@ -246,18 +246,18 @@ namespace ammonite {
         return isInputBlocked;
       }
 
+      //Register a keybind, don't pick own ID to allow an ID to be forced
       int registerRawKeybind(int keycodes[], int count, AmmoniteEnum overrideMode,
-                             bool toggle, void(*callback)(std::vector<int>, int, void*), void* userPtr) {
+                             bool toggle, void(*callback)(std::vector<int>, int, void*),
+                             void* userPtr, int keybindId) {
         //Validate override mode
         if (overrideMode < AMMONITE_ALLOW_OVERRIDE || overrideMode > AMMONITE_RESPECT_BLOCK) {
           ammoniteInternalDebug << "Invalid override mode passed" << std::endl;
           return -1;
         }
 
-        int keybindId = ++totalKeybinds;
-        std::vector<int> keycodeVec;
-
         //Start tracking keycode states
+        std::vector<int> keycodeVec;
         for (int i = 0; i < count; i++) {
           int keycode = keycodes[i];
           keycodeVec.push_back(keycode);
@@ -281,6 +281,17 @@ namespace ammonite {
         };
         keybindIdDataMap[keybindId] = keybindData;
         return keybindId;
+      }
+
+      int registerRawKeybind(int keycodes[], int count, AmmoniteEnum overrideMode,
+                             bool toggle, void(*callback)(std::vector<int>, int, void*),
+                             void* userPtr) {
+        //Generate an ID
+        int keybindId = ++totalKeybinds;
+
+        //Hand off to actual registry
+        return registerRawKeybind(keycodes, count, overrideMode, toggle, callback,
+                                  userPtr, keybindId);
       }
 
       int unregisterKeybind(int keybindId) {
@@ -319,47 +330,30 @@ namespace ammonite {
         return keycodeStateMap.contains(keycode);
       }
 
-
-/* TODO:
- - Needs a significant rewrite for multi-key binds
- - Unused, expose it with a wrapper from input.hpp?
-*/
-
-/*
-      void moveKeybindData(int keybindId, int newKeycode) {
-        KeybindData* keybindData = &keybindIdDataMap[keybindId];
-
-        //Get old keycode info
-        int oldKeycode = keybindData->keycode;
-        if (oldKeycode == newKeycode) {
-          return;
+      int changeKeybindKeycodes(int keybindId, int newKeycodes[], int count) {
+        //Check the keybind exists
+        if (!keybindIdDataMap.contains(keybindId)) {
+          ammoniteInternalDebug << "Can't change keycodes for keybind ID '" << keybindId
+                                << "', not registered" << std::endl;
+          return -1;
         }
-        KeycodeStateEnum oldKeycodeState =
-          keycodeStateMap[oldKeycode].keybindIdStateEnumMap[keybindId];
 
-        //Set new keycode
-        keybindData->keycode = newKeycode;
+        //Save details about the keybind
+        KeybindData keybindData = keybindIdDataMap[keybindId];
+        AmmoniteEnum overrideMode = keybindData.overrideMode;
+        bool toggle = keybindData.toggle;
+        void(*callback)(std::vector<int>, int, void*) = keybindData.callback;
+        void* userPtr = keybindData.userPtr;
 
-        //Update new keycode state with old keycode
-        if (!keycodeStateMap.contains(newKeycode)) {
-          KeycodeState keycodeState;
-          keycodeState.refCount = 0;
-          keycodeState.keybindIdStateEnumMap[keybindId] = oldKeycodeState;
+        //Unregister the keybind
+        unregisterKeybind(keybindId);
 
-          keycodeStateMap[newKeycode] = keycodeState;
-        } else {
-          keycodeStateMap[newKeycode].keybindIdStateEnumMap[keybindId] = oldKeycodeState;
-        }
-        keycodeStateMap[newKeycode].refCount++;
+        //Register the keybind under the same ID, with new keycodes
+        registerRawKeybind(newKeycodes, count, overrideMode, toggle, callback,
+                           userPtr, keybindId);
 
-        //Delete old keycode's data
-        keycodeStateMap[oldKeycode].keybindIdStateEnumMap.erase(keybindId);
-        keycodeStateMap[oldKeycode].refCount--;
-        if (keycodeStateMap[oldKeycode].refCount == 0) {
-          keycodeStateMap.erase(oldKeycode);
-        }
+        return 0;
       }
-      */
     }
   }
 }

@@ -34,6 +34,9 @@ namespace ammonite {
     int unregisterKeybind(int keybindId);
     bool isKeycodeRegistered(int keycode);
 
+    int changeKeybind(int keybindId, int keycodes[], int count);
+    int changeKeybind(int keybindId, int keycode);
+
     void setInputFocus(bool active);
     bool getInputFocus();
   }

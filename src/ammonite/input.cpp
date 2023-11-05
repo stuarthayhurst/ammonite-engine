@@ -83,6 +83,14 @@ namespace ammonite {
       return !internal::getInputBlock();
     }
 
+    int changeKeybind(int keybindId, int keycodes[], int count) {
+      return internal::changeKeybindKeycodes(keybindId, keycodes, count);
+    }
+
+    int changeKeybind(int keybindId, int keycode) {
+      return internal::changeKeybindKeycodes(keybindId, &keycode, 1);
+    }
+
     //Callback and setup function
     namespace internal {
       namespace {
