@@ -141,7 +141,7 @@ namespace ammonite {
 
           //Update the state and possibly run callback
           *(keypressInfo.keycodeStateEnumPtr) = AMMONITE_RELEASED;
-          if (runCallback) {
+          if (runCallback && keybindData->callback != nullptr) {
             keybindData->callback(keybindData->keycodes, GLFW_RELEASE, keybindData->userPtr);
           }
         }
@@ -182,7 +182,7 @@ namespace ammonite {
           }
 
           //Run callback if all keys are held and it's not a toggle keybind
-          if (runCallback && !(keybindData->toggle)) {
+          if (runCallback && keybindData->callback != nullptr && !(keybindData->toggle)) {
             keybindData->callback(keybindData->keycodes, GLFW_REPEAT, keybindData->userPtr);
           }
         }
@@ -193,7 +193,8 @@ namespace ammonite {
           KeybindData* keybindData = forceReleaseInfo.keybindData;
           int keybindId = forceReleaseInfo.keybindId;
 
-          if (forceReleaseInfo.runReleaseCallback && !(keybindData->toggle)) {
+          if (forceReleaseInfo.runReleaseCallback && keybindData->callback != nullptr &&
+              !(keybindData->toggle)) {
             keybindData->callback(keybindData->keycodes, GLFW_RELEASE, keybindData->userPtr);
           }
 
@@ -226,7 +227,7 @@ namespace ammonite {
             }
           }
 
-          if (runCallback) {
+          if (runCallback && keybindData->callback != nullptr) {
             keybindData->callback(keybindData->keycodes, GLFW_PRESS, keybindData->userPtr);
           }
         }
