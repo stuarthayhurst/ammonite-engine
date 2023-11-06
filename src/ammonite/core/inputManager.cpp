@@ -346,9 +346,10 @@ namespace ammonite {
           }
 
           //Remove elements from vector if they're not in the map
-          auto idStateEnumMap = keycodeStateMap[keycodes[i]].keybindIdStateEnumMap;
+          std::map<int, KeycodeStateEnum>* idStateEnumMapPtr =
+            &keycodeStateMap[keycodes[i]].keybindIdStateEnumMap;
           std::erase_if(potentialIds,
-                        [idStateEnumMap](int x) { return !idStateEnumMap.contains(x); });
+                        [idStateEnumMapPtr](int x) { return !idStateEnumMapPtr->contains(x); });
         }
 
         //Return true if any IDs remain
@@ -364,11 +365,11 @@ namespace ammonite {
         }
 
         //Save details about the keybind
-        KeybindData keybindData = keybindIdDataMap[keybindId];
-        AmmoniteEnum overrideMode = keybindData.overrideMode;
-        bool toggle = keybindData.toggle;
-        void(*callback)(std::vector<int>, int, void*) = keybindData.callback;
-        void* userPtr = keybindData.userPtr;
+        KeybindData* keybindData = &keybindIdDataMap[keybindId];
+        AmmoniteEnum overrideMode = keybindData->overrideMode;
+        bool toggle = keybindData->toggle;
+        void(*callback)(std::vector<int>, int, void*) = keybindData->callback;
+        void* userPtr = keybindData->userPtr;
 
         //Unregister the keybind
         unregisterKeybind(keybindId);
