@@ -70,8 +70,14 @@ namespace ammonite {
       return internal::unregisterKeybind(keybindId);
     }
 
+    //Return true if all keys are at least part of the same combo
+    bool isKeycodeRegistered(int keycodes[], int count) {
+      return internal::isKeycodeRegistered(keycodes, count);
+    }
+
+    //Single key variant of the above
     bool isKeycodeRegistered(int keycode) {
-      return internal::isKeycodeRegistered(keycode);
+      return isKeycodeRegistered(&keycode, 1);
     }
 
     void setInputFocus(bool active) {

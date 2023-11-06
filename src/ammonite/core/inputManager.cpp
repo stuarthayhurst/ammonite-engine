@@ -326,8 +326,33 @@ namespace ammonite {
         return 0;
       }
 
-      bool isKeycodeRegistered(int keycode) {
-        return keycodeStateMap.contains(keycode);
+      //Return true if all keys are at least part of the same combo
+      bool isKeycodeRegistered(int keycodes[], int count) {
+        if (count == 0) {
+          return false;
+        }
+
+        //Fill initial list of potential IDs
+        std::vector<int> potentialIds;
+        auto idStateEnumMap = keycodeStateMap[keycodes[0]].keybindIdStateEnumMap;
+        for (auto it = idStateEnumMap.begin(); it != idStateEnumMap.end(); it++) {
+          potentialIds.push_back(it->first);
+        }
+
+        //Iterate over each keycode, and at each step remove IDs that weren't at the last step
+        for (int i = 1; i < count; i++) {
+          if (!keycodeStateMap.contains(keycodes[i])) {
+            return false;
+          }
+
+          //Remove elements from vector if they're not in the map
+          auto idStateEnumMap = keycodeStateMap[keycodes[i]].keybindIdStateEnumMap;
+          std::erase_if(potentialIds,
+                        [idStateEnumMap](int x) { return !idStateEnumMap.contains(x); });
+        }
+
+        //Return true if any IDs remain
+        return potentialIds.size() > 0;
       }
 
       int changeKeybindKeycodes(int keybindId, int newKeycodes[], int count) {

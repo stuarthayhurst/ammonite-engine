@@ -20,7 +20,7 @@ namespace ammonite {
                              bool toggle, void(*callback)(std::vector<int>, int, void*),
                              void* userPtr);
       int unregisterKeybind(int keybindId);
-      bool isKeycodeRegistered(int keycode);
+      bool isKeycodeRegistered(int keycodes[], int count);
       int changeKeybindKeycodes(int keybindId, int newKeycodes[], int count);
     }
   }
