@@ -2,7 +2,7 @@
 
 #include <GLFW/glfw3.h>
 
-#include "../constants.hpp"
+#include "../types.hpp"
 
 namespace ammonite {
   namespace utils {

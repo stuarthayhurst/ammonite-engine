@@ -4,7 +4,7 @@
 
 #include <GLFW/glfw3.h>
 
-#include "../constants.hpp"
+#include "../types.hpp"
 #include "../utils/debug.hpp"
 
 namespace ammonite {

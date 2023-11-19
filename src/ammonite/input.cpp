@@ -6,7 +6,7 @@
 #include "utils/internal/internalControls.hpp"
 
 #include "utils/debug.hpp"
-#include "constants.hpp"
+#include "types.hpp"
 
 #define OVERRIDE_MODE_DEFAULT AMMONITE_FORCE_RELEASE
 

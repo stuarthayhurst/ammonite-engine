@@ -15,7 +15,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/quaternion.hpp>
 
-#include "../constants.hpp"
+#include "../types.hpp"
 
 #include "internal/modelTypes.hpp"
 

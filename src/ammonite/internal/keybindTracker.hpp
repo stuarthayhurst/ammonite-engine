@@ -7,7 +7,7 @@
 
 #include <map>
 
-#include "../constants.hpp"
+#include "../types.hpp"
 
 namespace ammonite {
   namespace utils {

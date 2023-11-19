@@ -3,7 +3,7 @@
 
 #include <vector>
 
-#include "constants.hpp"
+#include "types.hpp"
 
 namespace ammonite {
   namespace input {

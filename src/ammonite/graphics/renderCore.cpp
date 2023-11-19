@@ -25,9 +25,9 @@
 #include "../lighting/lightStorage.hpp"
 #include "../lighting/lightInterface.hpp"
 
-#include "../constants.hpp"
 #include "../camera.hpp"
 #include "../environment.hpp"
+#include "../types.hpp"
 
 #include "../utils/logging.hpp"
 #include "../utils/debug.hpp"

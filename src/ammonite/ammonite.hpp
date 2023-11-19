@@ -17,11 +17,11 @@
 #include "utils/timer.hpp"
 
 #include "camera.hpp"
-#include "constants.hpp"
 #include "environment.hpp"
 #include "input.hpp"
 #include "interface.hpp"
 #include "settings.hpp"
+#include "types.hpp"
 #include "window.hpp"
 
 #endif

@@ -6,7 +6,7 @@
 #include "../internal/internalSettings.hpp"
 
 #include "../utils/debug.hpp"
-#include "../constants.hpp"
+#include "../types.hpp"
 
 namespace ammonite {
   namespace window {

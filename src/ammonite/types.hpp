@@ -1,5 +1,5 @@
-#ifndef CONSTANTS
-#define CONSTANTS
+#ifndef TYPES
+#define TYPES
 
 enum AmmoniteEnum : unsigned char {
   //Keybinding constants

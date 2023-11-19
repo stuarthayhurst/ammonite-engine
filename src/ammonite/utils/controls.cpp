@@ -11,7 +11,7 @@
 
 #include "../internal/internalSettings.hpp"
 #include "../internal/keybindTracker.hpp"
-#include "../constants.hpp"
+#include "../types.hpp"
 #include "../camera.hpp"
 #include "timer.hpp"
 

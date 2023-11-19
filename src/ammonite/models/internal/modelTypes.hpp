@@ -11,7 +11,7 @@
 #include <glm/gtx/quaternion.hpp>
 #include <GL/glew.h>
 
-#include "../../constants.hpp"
+#include "../../types.hpp"
 
 namespace ammonite {
   namespace models {
