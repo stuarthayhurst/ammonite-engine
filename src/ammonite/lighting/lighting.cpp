@@ -134,7 +134,8 @@ namespace ammonite {
 
       //Copy calculated tranforms to map
       for (unsigned int i = 0; i < lightTrackerMap.size(); i++) {
-        memcpy(lightTransformMap[lightTransformIds[i]], lightTransforms[i], sizeof(glm::mat4) * 6);
+        std::memcpy(lightTransformMap[lightTransformIds[i]],
+                    lightTransforms[i], sizeof(glm::mat4) * 6);
       }
 
       //If the light count hasn't changed, sub the data instead of recreating the buffer
