@@ -15,7 +15,7 @@ namespace ammonite {
           std::vector<int> keycodes;
           AmmoniteEnum overrideMode;
           bool toggle;
-          void(*callback)(std::vector<int>, int, void*);
+          AmmoniteKeyCallback callback;
           void* userPtr;
         };
 
@@ -249,7 +249,7 @@ namespace ammonite {
 
       //Register a keybind, don't pick own ID to allow an ID to be forced
       int registerRawKeybind(int keycodes[], int count, AmmoniteEnum overrideMode,
-                             bool toggle, void(*callback)(std::vector<int>, int, void*),
+                             bool toggle, AmmoniteKeyCallback callback,
                              void* userPtr, int keybindId) {
         //Validate override mode
         if (overrideMode < AMMONITE_ALLOW_OVERRIDE || overrideMode > AMMONITE_RESPECT_BLOCK) {
@@ -285,7 +285,7 @@ namespace ammonite {
       }
 
       int registerRawKeybind(int keycodes[], int count, AmmoniteEnum overrideMode,
-                             bool toggle, void(*callback)(std::vector<int>, int, void*),
+                             bool toggle, AmmoniteKeyCallback callback,
                              void* userPtr) {
         //Generate an ID
         int keybindId = ++totalKeybinds;
@@ -369,7 +369,7 @@ namespace ammonite {
         KeybindData* keybindData = &keybindIdDataMap[keybindId];
         AmmoniteEnum overrideMode = keybindData->overrideMode;
         bool toggle = keybindData->toggle;
-        void(*callback)(std::vector<int>, int, void*) = keybindData->callback;
+        AmmoniteKeyCallback callback = keybindData->callback;
         void* userPtr = keybindData->userPtr;
 
         //Unregister the keybind

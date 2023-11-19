@@ -1,6 +1,10 @@
 #ifndef TYPES
 #define TYPES
 
+#include <vector>
+
+typedef void (*AmmoniteKeyCallback)(std::vector<int>, int, void*);
+
 enum AmmoniteEnum : unsigned char {
   //Keybinding constants
   AMMONITE_FORWARD,

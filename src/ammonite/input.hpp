@@ -1,8 +1,6 @@
 #ifndef INPUT
 #define INPUT
 
-#include <vector>
-
 #include "types.hpp"
 
 namespace ammonite {
@@ -13,23 +11,21 @@ namespace ammonite {
 
     //Keybind takes keycodes, count, (overrideMode), action callback, user pointer
     int registerKeybind(int keycodes[], int count,
-                        void(*callback)(std::vector<int>, int, void*), void* userPtr);
+                        AmmoniteKeyCallback callback, void* userPtr);
     int registerKeybind(int keycodes[], int count, AmmoniteEnum overrideMode,
-                        void(*callback)(std::vector<int>, int, void*), void* userPtr);
+                        AmmoniteKeyCallback callback, void* userPtr);
     int registerToggleKeybind(int keycodes[], int count, AmmoniteEnum overrideMode,
-                              void(*callback)(std::vector<int>, int, void*), void* userPtr);
+                              AmmoniteKeyCallback callback, void* userPtr);
     int registerToggleKeybind(int keycodes[], int count,
-                              void(*callback)(std::vector<int>, int, void*), void* userPtr);
+                              AmmoniteKeyCallback callback, void* userPtr);
 
     //Single key variants of the above
-    int registerKeybind(int keycode, void(*callback)(std::vector<int>, int, void*),
-                        void* userPtr);
+    int registerKeybind(int keycode, AmmoniteKeyCallback callback, void* userPtr);
     int registerKeybind(int keycode, AmmoniteEnum overrideMode,
-                        void(*callback)(std::vector<int>, int, void*), void* userPtr);
+                        AmmoniteKeyCallback callback, void* userPtr);
     int registerToggleKeybind(int keycode, AmmoniteEnum overrideMode,
-                              void(*callback)(std::vector<int>, int, void*), void* userPtr);
-    int registerToggleKeybind(int keycode, void(*callback)(std::vector<int>, int, void*),
-                              void* userPtr);
+                              AmmoniteKeyCallback callback, void* userPtr);
+    int registerToggleKeybind(int keycode, AmmoniteKeyCallback callback, void* userPtr);
 
     int unregisterKeybind(int keybindId);
     bool isKeycodeRegistered(int keycodes[], int count);
