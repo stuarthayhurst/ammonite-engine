@@ -4,6 +4,7 @@
 #include <string>
 #include <chrono>
 #include <cmath>
+#include <cstdlib>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -118,6 +119,10 @@ namespace ammonite {
 
       //Get the loading screen tracker
       std::map<int, ammonite::interface::LoadingScreen>* loadingScreenTracker = ammonite::interface::internal::getLoadingScreenTracker();
+
+      //Store model data pointers for regular models and light models
+      ammonite::models::internal::ModelInfo** modelPtrs = nullptr;
+      ammonite::models::internal::ModelInfo** lightModelPtrs = nullptr;
 
       int maxSampleCount = 0;
 
@@ -536,17 +541,15 @@ namespace ammonite {
     static void drawModels(AmmoniteRenderMode renderMode) {
       //Create initial array for model pointers
       static int modelCount = ammonite::models::internal::getModelCount(AMMONITE_MODEL);
-      static ammonite::models::internal::ModelInfo** modelPtrs =
-             new ammonite::models::internal::ModelInfo* [modelCount];
 
       //If requested, create a new array for model pointers
-      if (renderMode == AMMONITE_DATA_REFRESH) {
+      if (renderMode == AMMONITE_DATA_REFRESH || modelPtrs == nullptr) {
         //Replace array with one of the correct size
         modelCount = ammonite::models::internal::getModelCount(AMMONITE_MODEL);
-        ammonite::models::internal::ModelInfo** newArr =
-                new ammonite::models::internal::ModelInfo* [modelCount];
-        delete [] modelPtrs;
-        modelPtrs = newArr;
+        if (modelPtrs != nullptr) {
+          std::free(modelPtrs);
+        }
+        modelPtrs = (ammonite::models::internal::ModelInfo**)std::malloc(sizeof(void*) * modelCount);
 
         //Update saved model pointers and return
         ammonite::models::internal::getModels(AMMONITE_MODEL, modelCount, modelPtrs);
@@ -566,17 +569,15 @@ namespace ammonite {
     static void drawLightModels(AmmoniteRenderMode renderMode) {
       //Create initial array for light model pointers
       static int lightModelCount = ammonite::models::internal::getModelCount(AMMONITE_LIGHT_EMITTER);
-      static ammonite::models::internal::ModelInfo** lightModelPtrs =
-             new ammonite::models::internal::ModelInfo* [lightModelCount];
 
       //If requested, create a new array for light model pointers
-      if (renderMode == AMMONITE_DATA_REFRESH) {
+      if (renderMode == AMMONITE_DATA_REFRESH || lightModelPtrs == nullptr) {
         //Replace array with one of the correct size
         lightModelCount = ammonite::models::internal::getModelCount(AMMONITE_LIGHT_EMITTER);
-        ammonite::models::internal::ModelInfo** newArr =
-                new ammonite::models::internal::ModelInfo* [lightModelCount];
-        delete [] lightModelPtrs;
-        lightModelPtrs = newArr;
+        if (lightModelPtrs != nullptr) {
+          std::free(lightModelPtrs);
+        }
+        lightModelPtrs = (ammonite::models::internal::ModelInfo**)std::malloc(sizeof(void*) * lightModelCount);
 
         //Update saved light model pointers and return
         ammonite::models::internal::getModels(AMMONITE_LIGHT_EMITTER, lightModelCount, lightModelPtrs);
