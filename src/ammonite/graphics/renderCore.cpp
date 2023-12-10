@@ -538,56 +538,37 @@ namespace ammonite {
       }
     }
 
-    static void drawModels(AmmoniteRenderMode renderMode) {
-      //Create initial array for model pointers
-      static int modelCount = ammonite::models::internal::getModelCount(AMMONITE_MODEL);
+    /*
+     - Draw models of a given type, from a cache
+     - Update the cache when given AMMONITE_DATA_REFRESH or a pointer to a null pointer
+    */
+    static void drawModelsCached(ammonite::models::internal::ModelInfo*** modelPtrsPtr,
+                                AmmoniteEnum modelType, AmmoniteRenderMode renderMode) {
+      int modelCount = ammonite::models::internal::getModelCount(modelType);
 
-      //If requested, create a new array for model pointers
-      if (renderMode == AMMONITE_DATA_REFRESH || modelPtrs == nullptr) {
-        //Replace array with one of the correct size
-        modelCount = ammonite::models::internal::getModelCount(AMMONITE_MODEL);
-        if (modelPtrs != nullptr) {
-          std::free(modelPtrs);
+      //Create / update cache for model pointers
+      if (renderMode == AMMONITE_DATA_REFRESH || *modelPtrsPtr == nullptr) {
+        //Free old model cache
+        if (*modelPtrsPtr != nullptr) {
+          std::free(*modelPtrsPtr);
         }
-        modelPtrs = (ammonite::models::internal::ModelInfo**)std::malloc(sizeof(void*) * modelCount);
 
-        //Update saved model pointers and return
-        ammonite::models::internal::getModels(AMMONITE_MODEL, modelCount, modelPtrs);
-        return;
+        //Create and fill / update model pointers cache
+        *modelPtrsPtr = (ammonite::models::internal::ModelInfo**)std::malloc(sizeof(void*) * modelCount);
+        ammonite::models::internal::getModels(modelType, modelCount, *modelPtrsPtr);
+
+        //Return if only refreshing
+        if (renderMode == AMMONITE_DATA_REFRESH) {
+          return;
+        }
       }
 
       //Draw the model pointers
       for (int i = 0; i < modelCount; i++) {
-        drawModel(modelPtrs[i], renderMode);
-      }
-    }
-
-    /*
-     - Identical to drawModels, except it uses AMMONITE_LIGHT_EMITTER
-     - It's done this way to avoid handling both cases in performance critical code
-    */
-    static void drawLightModels(AmmoniteRenderMode renderMode) {
-      //Create initial array for light model pointers
-      static int lightModelCount = ammonite::models::internal::getModelCount(AMMONITE_LIGHT_EMITTER);
-
-      //If requested, create a new array for light model pointers
-      if (renderMode == AMMONITE_DATA_REFRESH || lightModelPtrs == nullptr) {
-        //Replace array with one of the correct size
-        lightModelCount = ammonite::models::internal::getModelCount(AMMONITE_LIGHT_EMITTER);
-        if (lightModelPtrs != nullptr) {
-          std::free(lightModelPtrs);
-        }
-        lightModelPtrs = (ammonite::models::internal::ModelInfo**)std::malloc(sizeof(void*) * lightModelCount);
-
-        //Update saved light model pointers and return
-        ammonite::models::internal::getModels(AMMONITE_LIGHT_EMITTER, lightModelCount, lightModelPtrs);
-        return;
+        drawModel((*modelPtrsPtr)[i], renderMode);
       }
 
-      //Draw the light model pointers
-      for (int i = 0; i < lightModelCount; i++) {
-        drawModel(lightModelPtrs[i], renderMode);
-      }
+      return;
     }
 
     static void drawSkybox(int activeSkyboxId) {
@@ -716,8 +697,8 @@ namespace ammonite {
         //Update cached model pointers, if the models have changed trackers
         static bool* modelsMovedPtr = ammonite::models::internal::getModelsMovedPtr();
         if (*modelsMovedPtr) {
-          drawModels(AMMONITE_DATA_REFRESH);
-          drawLightModels(AMMONITE_DATA_REFRESH);
+          drawModelsCached(&modelPtrs, AMMONITE_MODEL, AMMONITE_DATA_REFRESH);
+          drawModelsCached(&lightModelPtrs, AMMONITE_LIGHT_EMITTER, AMMONITE_DATA_REFRESH);
           *modelsMovedPtr = false;
         }
 
@@ -754,7 +735,7 @@ namespace ammonite {
           glUniform1i(depthShader.depthShadowIndex, shadowCount);
 
           //Render to depth buffer and move to the next light source
-          drawModels(AMMONITE_DEPTH_PASS);
+          drawModelsCached(&modelPtrs, AMMONITE_MODEL, AMMONITE_DEPTH_PASS);
           std::advance(lightIt, 1);
         }
 
@@ -785,14 +766,14 @@ namespace ammonite {
         glUniform3fv(modelShader.cameraPosId, 1, glm::value_ptr(cameraPosition));
         glUniform1f(modelShader.shadowFarPlaneId, *shadowFarPlanePtr);
         glUniform1i(modelShader.lightCountId, activeLights);
-        drawModels(AMMONITE_RENDER_PASS);
+        drawModelsCached(&modelPtrs, AMMONITE_MODEL, AMMONITE_RENDER_PASS);
 
         //Render light emitting models
         int lightModelCount = ammonite::models::internal::getModelCount(AMMONITE_LIGHT_EMITTER);
         if (lightModelCount > 0) {
           //Swap to the light emitter shader and render cached light model pointers
           glUseProgram(lightShader.shaderId);
-          drawLightModels(AMMONITE_EMISSION_PASS);
+          drawModelsCached(&lightModelPtrs, AMMONITE_LIGHT_EMITTER, AMMONITE_EMISSION_PASS);
         }
 
         //Ensure wireframe is disabled
