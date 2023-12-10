@@ -271,6 +271,7 @@ namespace ammonite {
       models::internal::MeshData* newMesh = &meshes->back();
 
       //Fill the mesh with vertex data
+      bool hasWarnedMesh = false;
       for (unsigned int i = 0; i < meshPtr->mNumVertices; i++) {
         models::internal::VertexData vertexData;
 
@@ -286,7 +287,10 @@ namespace ammonite {
           vertexData.texturePoint.x = meshPtr->mTextureCoords[0][i].x;
           vertexData.texturePoint.y = meshPtr->mTextureCoords[0][i].y;
         } else {
-          ammonite::utils::warning << "Missing texture coord data" << std::endl;
+          if (!hasWarnedMesh) {
+            ammonite::utils::warning << "Missing texture coord data for mesh" << std::endl;
+            hasWarnedMesh = true;
+          }
           vertexData.texturePoint = glm::vec2(0.0f);
         }
 
