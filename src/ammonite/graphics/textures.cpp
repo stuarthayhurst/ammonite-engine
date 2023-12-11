@@ -95,6 +95,7 @@ namespace ammonite {
         if (!getTextureFormat(nChannels, srgbTexture, &internalFormat, &dataFormat)) {
           ammonite::utils::warning << "Failed to load texture '" << texturePath << "'" << std::endl;
           glDeleteTextures(1, &textureId);
+          stbi_image_free(data);
           *externalSuccess = false;
           return -1;
         }
