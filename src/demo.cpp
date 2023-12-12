@@ -250,7 +250,7 @@ int main(int argc, char* argv[]) {
                          GLFW_KEY_LEFT_BRACKET, changeFocalDepthCallback, &negative));
 
   //Engine loaded, delete the loading screen
-  ammonite::utils::status << "Loaded demo in " << utilityTimer.getTime() << "s" << std::endl;
+  ammonite::utils::status << "Loaded demo in " << utilityTimer.getTime() << "s\n" << std::endl;
   ammonite::interface::deleteLoadingScreen(screenId);
 
   //Create and reset timers for performance metrics
