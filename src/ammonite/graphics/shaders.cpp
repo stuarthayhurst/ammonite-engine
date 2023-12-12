@@ -90,10 +90,11 @@ namespace ammonite {
       GLint maxLength = 0;
       glGetProgramiv(programId, GL_INFO_LOG_LENGTH, &maxLength);
 
-      GLchar errorLogBuffer[maxLength] = {0};
+      //Not strictly required, but add an extra byte to be safe
+      GLchar errorLogBuffer[++maxLength] = {0};
       glGetProgramInfoLog(programId, maxLength, &maxLength, errorLogBuffer);
-      //Extra std::endl used to work around Intel driver bug
-      ammonite::utils::warning << (char*)errorLogBuffer << std::endl << std::endl;
+      ammonite::utils::warning << "Failed to link shader program (ID " << programId \
+                               << "):\n" << (char*)errorLogBuffer << std::endl;
 
       return false;
     }
@@ -164,10 +165,11 @@ namespace ammonite {
         GLint maxLength = 0;
         glGetShaderiv(shaderId, GL_INFO_LOG_LENGTH, &maxLength);
 
-        GLchar errorLogBuffer[maxLength] = {0};
+        //Not strictly required, but add an extra byte to be safe
+        GLchar errorLogBuffer[++maxLength] = {0};
         glGetShaderInfoLog(shaderId, maxLength, &maxLength, errorLogBuffer);
-        ammonite::utils::warning << "\n" << shaderPath << ":" << std::endl;
-        ammonite::utils::warning << (char*)errorLogBuffer << std::endl;
+        ammonite::utils::warning << shaderPath << ":\n" \
+                                 << (char*)errorLogBuffer << std::endl;
 
         //Clean up and exit
         glDeleteShader(shaderId);
