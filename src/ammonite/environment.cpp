@@ -1,7 +1,8 @@
-#include <vector>
 #include <algorithm>
 #include <filesystem>
 #include <iostream>
+#include <set>
+#include <vector>
 
 #include <stb/stb_image.h>
 #include <GL/glew.h>
@@ -17,7 +18,7 @@ namespace ammonite {
   namespace environment {
     namespace {
       //Tracker for loaded skyboxes
-      std::vector<int> skyboxTracker;
+      std::set<int> skyboxTracker;
       int activeSkybox = -1;
     }
 
@@ -28,7 +29,7 @@ namespace ammonite {
 
       void setActiveSkybox(int skyboxId) {
         //Set the passed skybox to active if it exists
-        if (std::find(skyboxTracker.begin(), skyboxTracker.end(), skyboxId) != skyboxTracker.end()) {
+        if (skyboxTracker.contains(skyboxId)) {
           activeSkybox = skyboxId;
         }
       }
@@ -94,7 +95,7 @@ namespace ammonite {
         glTextureParameteri(textureId, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glTextureParameteri(textureId, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-        skyboxTracker.push_back(textureId);
+        skyboxTracker.insert(textureId);
         return textureId;
       }
 
@@ -172,11 +173,10 @@ namespace ammonite {
       }
 
       void deleteSkybox(int skyboxId) {
-        //Check the skybox exists
-        auto skyboxIt = std::find(skyboxTracker.begin(), skyboxTracker.end(), skyboxId);
-        if (skyboxIt != skyboxTracker.end()) {
-          //Delete from vector
-          skyboxTracker.erase(skyboxIt);
+        //Check the skybox exists and remove
+        if (skyboxTracker.contains(skyboxId)) {
+          //Delete from set
+          skyboxTracker.erase(skyboxId);
 
           //Delete skybox
           GLuint skyboxTextureId = skyboxId;
