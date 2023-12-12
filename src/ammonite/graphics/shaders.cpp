@@ -91,8 +91,9 @@ namespace ammonite {
       glGetProgramiv(programId, GL_INFO_LOG_LENGTH, &maxLength);
 
       //Not strictly required, but add an extra byte to be safe
-      GLchar errorLogBuffer[++maxLength] = {0};
+      GLchar errorLogBuffer[++maxLength];
       glGetProgramInfoLog(programId, maxLength, &maxLength, errorLogBuffer);
+      errorLogBuffer[maxLength] = '\0';
       ammonite::utils::warning << "Failed to link shader program (ID " << programId \
                                << "):\n" << (char*)errorLogBuffer << std::endl;
 
@@ -166,8 +167,9 @@ namespace ammonite {
         glGetShaderiv(shaderId, GL_INFO_LOG_LENGTH, &maxLength);
 
         //Not strictly required, but add an extra byte to be safe
-        GLchar errorLogBuffer[++maxLength] = {0};
+        GLchar errorLogBuffer[++maxLength];
         glGetShaderInfoLog(shaderId, maxLength, &maxLength, errorLogBuffer);
+        errorLogBuffer[maxLength] = '\0';
         ammonite::utils::warning << shaderPath << ":\n" \
                                  << (char*)errorLogBuffer << std::endl;
 
