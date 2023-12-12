@@ -91,8 +91,8 @@ namespace ammonite {
         ammonite::settings::runtime::internal::setWidth(width);
         ammonite::settings::runtime::internal::setHeight(height);
 
-        windowPtr = glfwCreateWindow(width, height, title, NULL, NULL);
-        if (windowPtr == NULL) {
+        windowPtr = glfwCreateWindow(width, height, title, nullptr, nullptr);
+        if (windowPtr == nullptr) {
           glfwTerminate();
           return nullptr;
         }

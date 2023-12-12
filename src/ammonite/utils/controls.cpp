@@ -115,7 +115,7 @@ namespace ammonite {
             glfwGetCursorPos(window, &xposLast, &yposLast);
           } else {
             //Remove callback and restore cursor
-            glfwSetCursorPosCallback(window, NULL);
+            glfwSetCursorPosCallback(window, nullptr);
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
           }
         }

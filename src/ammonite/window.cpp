@@ -70,7 +70,7 @@ namespace ammonite {
     }
 
     void requestContextType(AmmoniteEnum contextType) {
-      if (windowPtr != NULL) {
+      if (windowPtr != nullptr) {
         ammonite::utils::warning << "Window already created, ignoring context type request" << std::endl;
         return;
       }
@@ -220,7 +220,7 @@ namespace ammonite {
           glfwGetMonitorPos(currentMonitor, &x, &y);
         }
 
-        glfwSetWindowMonitor(windowPtr, NULL, ++x, ++y, width, height, GLFW_DONT_CARE);
+        glfwSetWindowMonitor(windowPtr, nullptr, ++x, ++y, width, height, GLFW_DONT_CARE);
 
         isFullscreen = false;
         return;

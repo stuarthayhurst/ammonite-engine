@@ -39,7 +39,7 @@ namespace ammonite {
       //Get binary length and data of linked program
       glGetProgramiv(programId, GL_PROGRAM_BINARY_LENGTH, &binaryLength);
       char binaryData[binaryLength];
-      glGetProgramBinary(programId, binaryLength, NULL, &binaryFormat, &binaryData);
+      glGetProgramBinary(programId, binaryLength, nullptr, &binaryFormat, &binaryData);
 
       if (binaryLength == 0) {
         ammonite::utils::warning << "Failed to cache '" << cacheFilePath << "'" << std::endl;
@@ -154,7 +154,7 @@ namespace ammonite {
 
       //Provide a shader source and compile the shader
       const char* shaderCodePointer = shaderCode.c_str();
-      glShaderSource(shaderId, 1, &shaderCodePointer, NULL);
+      glShaderSource(shaderId, 1, &shaderCodePointer, nullptr);
       glCompileShader(shaderId);
 
       //Test whether the shader compiled
