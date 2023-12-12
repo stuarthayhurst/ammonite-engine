@@ -81,18 +81,19 @@ namespace ammonite {
       GLint success = GL_FALSE;
       glGetProgramiv(programId, GL_LINK_STATUS, &success);
 
-      //If the program failed to link, print a log
+      //If the program linked successfully, return
       if (success == GL_TRUE) {
         return true;
       }
 
+      //Otherwise, print a log
       GLint maxLength = 0;
       glGetProgramiv(programId, GL_INFO_LOG_LENGTH, &maxLength);
 
-      std::vector<GLchar> errorLog(maxLength);
-      glGetProgramInfoLog(programId, maxLength, &maxLength, &errorLog[0]);
+      GLchar errorLogBuffer[maxLength] = {0};
+      glGetProgramInfoLog(programId, maxLength, &maxLength, errorLogBuffer);
       //Extra std::endl used to work around Intel driver bug
-      ammonite::utils::warning << &errorLog[0] << std::endl << std::endl;
+      ammonite::utils::warning << (char*)errorLogBuffer << std::endl << std::endl;
 
       return false;
     }
@@ -163,10 +164,10 @@ namespace ammonite {
         GLint maxLength = 0;
         glGetShaderiv(shaderId, GL_INFO_LOG_LENGTH, &maxLength);
 
-        std::vector<GLchar> errorLog(maxLength);
-        glGetShaderInfoLog(shaderId, maxLength, &maxLength, &errorLog[0]);
+        GLchar errorLogBuffer[maxLength] = {0};
+        glGetShaderInfoLog(shaderId, maxLength, &maxLength, errorLogBuffer);
         ammonite::utils::warning << "\n" << shaderPath << ":" << std::endl;
-        ammonite::utils::warning << &errorLog[0] << std::endl;
+        ammonite::utils::warning << (char*)errorLogBuffer << std::endl;
 
         //Clean up and exit
         glDeleteShader(shaderId);
