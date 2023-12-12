@@ -1,7 +1,7 @@
 #ifndef AMMONITE
 #define AMMONITE
 
-#include "graphics/renderInterface.hpp"
+#include "graphics/renderer.hpp"
 
 #include "lighting/lightInterface.hpp"
 #include "lighting/lightStorage.hpp"

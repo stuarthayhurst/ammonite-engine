@@ -2,7 +2,7 @@
 
 #include <GL/glew.h>
 
-#include "../graphics/internal/internalExtension.hpp"
+#include "../graphics/internal/internalExtensions.hpp"
 #include "logging.hpp"
 
 #ifdef DEBUG

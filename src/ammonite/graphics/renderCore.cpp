@@ -11,7 +11,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include "internal/internalExtension.hpp"
+#include "internal/internalExtensions.hpp"
 #include "internal/internalRenderHelper.hpp"
 #include "internal/internalShaders.hpp"
 

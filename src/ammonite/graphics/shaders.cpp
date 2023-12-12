@@ -9,7 +9,7 @@
 
 #include <GL/glew.h>
 
-#include "internal/internalExtension.hpp"
+#include "internal/internalExtensions.hpp"
 #include "../utils/internal/internalFileManager.hpp"
 #include "../utils/internal/internalCacheManager.hpp"
 
