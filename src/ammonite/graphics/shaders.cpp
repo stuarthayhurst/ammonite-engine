@@ -283,19 +283,29 @@ namespace ammonite {
 
       //Since cache wasn't available, generate fresh shaders
       GLuint shaderIds[shaderCount];
+      bool hasCreatedShaders = true;
       for (int i = 0; i < shaderCount; i++) {
         shaderIds[i] = loadShader(shaderPaths[i], shaderTypes[i], externalSuccess);
+        if (shaderIds[i] == unsigned(-1)) {
+          hasCreatedShaders = false;
+          break;
+        }
       }
 
       //Create the program like normal, as a valid cache wasn't found
-      bool hasCreatedProgram = true;
-      programId = createProgramObject(shaderIds, shaderCount, &hasCreatedProgram);
+      bool hasCreatedProgram = false;
+      if (hasCreatedShaders) {
+        hasCreatedProgram = true;
+        programId = createProgramObject(shaderIds, shaderCount, &hasCreatedProgram);
+      }
 
       //Cleanup on failure
-      if (!hasCreatedProgram) {
+      if (!hasCreatedProgram || !hasCreatedShaders) {
         *externalSuccess = false;
         for (int i = 0; i < shaderCount; i++) {
-          glDeleteShader(shaderIds[shaderCount]);
+          if (shaderIds[shaderCount] != unsigned(-1)) {
+            glDeleteShader(shaderIds[shaderCount]);
+          }
         }
         return -1;
       }
