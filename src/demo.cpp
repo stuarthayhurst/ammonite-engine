@@ -159,7 +159,6 @@ int main(int argc, char* argv[]) {
   if (ammonite::window::createWindow(1024, 768, "OpenGL Experiments") == -1) {
     return EXIT_FAILURE;
   }
-  ammonite::window::getWindowPtr();
 
   ammonite::utils::debug::printDriverInfo();
   std::cout << std::endl;
