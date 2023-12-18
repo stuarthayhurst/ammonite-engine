@@ -24,6 +24,13 @@ namespace ammonite {
       GLFWwindow* windowPtr = nullptr;
       bool isFullscreen = false;
       bool closeWindow = false;
+
+      struct WindowGeom {
+        int width = 0;
+        int height = 0;
+        int xPos = 0;
+        int yPos = 0;
+      } lastWindowGeom;
     }
 
     namespace {
@@ -62,6 +69,21 @@ namespace ammonite {
       static void setCloseWindowCallback(std::vector<int>, int, void* userPtr) {
         bool* closeWindowPtr = (bool*)userPtr;
         *closeWindowPtr = true;
+      }
+
+      static void storeWindowGeometry() {
+        //Get window frame size, content size and position
+        int frameLeft = 0, frameRight = 0, frameTop = 0, frameBottom = 0;
+        glfwGetWindowFrameSize(windowPtr, &frameLeft, &frameTop,
+                               &frameRight, &frameBottom);
+        glfwGetWindowSize(windowPtr, &lastWindowGeom.width, &lastWindowGeom.height);
+        glfwGetWindowPos(windowPtr, &lastWindowGeom.xPos, &lastWindowGeom.yPos);
+
+        //Apply frame dimension corrections
+        lastWindowGeom.width += frameLeft + frameRight;
+        lastWindowGeom.height += frameTop + frameBottom;
+        lastWindowGeom.xPos -= frameLeft;
+        lastWindowGeom.yPos -= frameTop;
       }
     }
 
@@ -243,26 +265,18 @@ namespace ammonite {
         return;
       }
 
-      //Set window to windowed mode
-      if (!fullscreen) {
-        int width = ammonite::settings::runtime::getWidth();
-        int height = ammonite::settings::runtime::getHeight();
-        int x = 0, y = 0;
-
-        //Get the current monitor to window to
-        GLFWmonitor* currentMonitor = glfwGetWindowMonitor(windowPtr);
-        if (currentMonitor != nullptr) {
-          glfwGetMonitorPos(currentMonitor, &x, &y);
-        }
-
-        glfwSetWindowMonitor(windowPtr, nullptr, ++x, ++y, width, height, GLFW_DONT_CARE);
+      //Handle new window mode
+      if (fullscreen) {
+        //Store windowed geometry and then fullscreen
+        storeWindowGeometry();
+        setFullscreenMonitor(getCurrentMonitor());
+      } else {
+        //Set window to windowed mode, using last geometry
+        glfwSetWindowMonitor(windowPtr, nullptr, lastWindowGeom.xPos, lastWindowGeom.yPos,
+                             lastWindowGeom.width, lastWindowGeom.height, GLFW_DONT_CARE);
 
         isFullscreen = false;
-        return;
       }
-
-      //Fullscreen on current monitor
-      setFullscreenMonitor(getCurrentMonitor());
     }
   }
 }
