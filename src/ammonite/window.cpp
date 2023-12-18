@@ -144,7 +144,50 @@ namespace ammonite {
       }
     }
 
+    void useIcons(const char* iconPaths[], int iconCount) {
+      if (iconPaths == nullptr) {
+        ammonite::utils::warning << "Failed to load icons (nullptr)" << std::endl;
+        return;
+      }
+
+      //Read image data
+      GLFWimage images[iconCount];
+      for (unsigned int i = 0; i < (unsigned)iconCount; i++) {
+        if (iconPaths[i] == nullptr) {
+          ammonite::utils::warning << "Failed to load icon (nullptr)" << std::endl;
+          return;
+        }
+
+        images[i].pixels = stbi_load(iconPaths[i], &images[i].width,
+                                     &images[i].height, nullptr, 4);
+
+        if (images[i].pixels == nullptr) {
+          ammonite::utils::warning << "Failed to load '" << iconPaths[i] << "'" << std::endl;
+          return;
+        }
+      }
+
+      //Pass icons to glfw
+      if (iconCount != 0) {
+        glfwSetWindowIcon(windowPtr, iconCount, images);
+      }
+
+      //Free the data
+      for (int i = 0; i < iconCount; i++) {
+        stbi_image_free(images[i].pixels);
+      }
+    }
+
+    void useIcon(const char* iconPath) {
+      useIcons(&iconPath, 1);
+    }
+
     void useIconDir(const char* iconDirPath) {
+      if (iconDirPath == nullptr) {
+        ammonite::utils::warning << "Failed to load icon directory (nullptr)" << std::endl;
+        return;
+      }
+
       //Attempt to add all png files to a vector
       std::vector<std::string> pngFiles(0);
       try {
@@ -162,21 +205,13 @@ namespace ammonite {
         return;
       }
 
-      //Read image data
-      GLFWimage images[pngFiles.size()];
+      const char* iconPaths[pngFiles.size()];
       for (unsigned int i = 0; i < pngFiles.size(); i++) {
-        images[i].pixels = stbi_load(pngFiles[i].c_str(), &images[i].width, &images[i].height, nullptr, 4);
+        iconPaths[i] = pngFiles[i].c_str();
       }
 
-      //Pass icons to glfw
-      if (pngFiles.size() != 0) {
-        glfwSetWindowIcon(windowPtr, pngFiles.size(), images);
-      }
-
-      //Free the data
-      for (unsigned int i = 0; i < pngFiles.size(); i++) {
-        stbi_image_free(images[i].pixels);
-      }
+      //Hand off to another icon handler
+      useIcons(iconPaths, pngFiles.size());
     }
 
     bool getFullscreen() {

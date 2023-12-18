@@ -155,16 +155,14 @@ int main(int argc, char* argv[]) {
   ammonite::window::requestContextType(AMMONITE_NO_ERROR_CONTEXT);
 #endif
 
-  //Create the window
+  //Setup window and icon
   if (ammonite::window::createWindow(1024, 768, "OpenGL Experiments") == -1) {
     return EXIT_FAILURE;
   }
+  ammonite::window::useIconDir("assets/icons/");
 
   ammonite::utils::debug::printDriverInfo();
   std::cout << std::endl;
-
-  //Set an icon
-  ammonite::window::useIconDir("assets/icons/");
 
   //Set vsync (disable if benchmarking)
   if (useVsync == "false" or useBenchmark) {
