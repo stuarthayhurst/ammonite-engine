@@ -1,7 +1,7 @@
 #include <algorithm>
 #include <filesystem>
 #include <iostream>
-#include <set>
+#include <unordered_set>
 #include <vector>
 
 #include <stb/stb_image.h>
@@ -18,7 +18,7 @@ namespace ammonite {
   namespace environment {
     namespace {
       //Tracker for loaded skyboxes
-      std::set<int> skyboxTracker;
+      std::unordered_set<int> skyboxTracker;
       int activeSkybox = -1;
     }
 
