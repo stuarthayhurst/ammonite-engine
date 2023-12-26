@@ -28,15 +28,15 @@ namespace ammonite {
         //Swap buffers
         glfwSwapBuffers(window);
 
-        //Figure out time budget remaining
-        static ammonite::utils::Timer targetFrameTimer;
-
         //Wait until next frame should be prepared
+        static ammonite::utils::Timer targetFrameTimer;
         static float* frameLimitPtr = ammonite::settings::graphics::internal::getFrameLimitPtr();
-        if (*frameLimitPtr != 0.0f) {
-          //Length of allowable error in seconds
-          static const double maxError = (1.0 / 50000);
+        if (*frameLimitPtr > 1.0f) {
+          //Initial length of allowable error in seconds
+          static double maxError = (1.0 / 50000.0);
+          #define errorAdjustCoeff 1.01
 
+          //Figure out time budget remaining
           double const targetFrameTime = 1.0 / *frameLimitPtr;
           double spareTime = targetFrameTime - targetFrameTimer.getTime();
 
@@ -46,6 +46,14 @@ namespace ammonite {
             const auto sleepLength = std::chrono::nanoseconds(
                                      int(std::floor(spareTime * 0.05 * 1000000000.0)));
             std::this_thread::sleep_for(sleepLength);
+          }
+
+          //Adjust maxError to provide a closer framerate limit
+          const double currTime = targetFrameTimer.getTime();
+          if (currTime < targetFrameTime) {
+            maxError *= (1.0 / errorAdjustCoeff);
+          } else if (currTime > targetFrameTime) {
+            maxError *= (errorAdjustCoeff);
           }
         }
 
