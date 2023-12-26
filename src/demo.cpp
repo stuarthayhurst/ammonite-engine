@@ -82,6 +82,24 @@ void changeFocalDepthCallback(std::vector<int>, int action, void* userPtr) {
   focalDepthTimer.reset();
 }
 
+void changeFrameRateCallback(std::vector<int>, int action, void* userPtr) {
+  static ammonite::utils::Timer frameRateTimer;
+  if (action != GLFW_RELEASE) {
+    float sign = *(float*)userPtr;
+    const float unitsPerSecond = 10.0f;
+    const float frameTimeDelta = frameRateTimer.getTime();
+    float frameRate = ammonite::settings::graphics::getFrameLimit();
+
+    frameRate += frameTimeDelta * unitsPerSecond * sign;
+    std::cout << "STATUS: Set framerate to " << frameRate << " fps" << std::endl;
+    ammonite::settings::graphics::setFrameLimit(frameRate);
+    frameRateTimer.unpause();
+  } else {
+    frameRateTimer.pause();
+  }
+  frameRateTimer.reset();
+}
+
 //Helpers
 void printMetrics(double frameTime) {
   double frameRate = 0.0;
@@ -239,12 +257,19 @@ int main(int argc, char* argv[]) {
   //Set keybind for closing window
   keybindIds.push_back(ammonite::window::registerWindowCloseKeybind(GLFW_KEY_ESCAPE));
 
+  //Set keybinds to adjust focal depth
   float positive = 1.0f;
   float negative = -1.0f;
   keybindIds.push_back(ammonite::input::registerKeybind(
                          GLFW_KEY_RIGHT_BRACKET, changeFocalDepthCallback, &positive));
   keybindIds.push_back(ammonite::input::registerKeybind(
                          GLFW_KEY_LEFT_BRACKET, changeFocalDepthCallback, &negative));
+
+  //Set keybinds to adjust framerate limit
+  keybindIds.push_back(ammonite::input::registerKeybind(
+                         GLFW_KEY_UP, changeFrameRateCallback, &positive));
+  keybindIds.push_back(ammonite::input::registerKeybind(
+                         GLFW_KEY_DOWN, changeFrameRateCallback, &negative));
 
   //Engine loaded, delete the loading screen
   ammonite::utils::status << "Loaded demo in " << utilityTimer.getTime() << "s\n" << std::endl;
