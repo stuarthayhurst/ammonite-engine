@@ -187,7 +187,8 @@ namespace ammonite {
       }
 
       void setFrameLimit(float frameLimit) {
-        graphics.frameLimit = frameLimit;
+        //Override with 0 if given a negative
+        graphics.frameLimit = frameLimit > 0.0 ? frameLimit : 0;
       }
 
       float getFrameLimit() {
