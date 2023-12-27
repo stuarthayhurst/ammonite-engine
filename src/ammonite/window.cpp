@@ -236,6 +236,27 @@ namespace ammonite {
       useIcons(iconPaths, pngFiles.size());
     }
 
+    void setWindowGeometry(int width, int height, int xPos, int yPos) {
+      //Don't allow setting window geometry for fullscreen windows
+      if (isFullscreen) {
+        return;
+      }
+
+      //Update the geometry of the window
+      glfwSetWindowPos(windowPtr, xPos, yPos);
+      glfwSetWindowSize(windowPtr, width, height);
+    }
+
+    void getWindowGeometry(int* width, int* height, int* xPos, int* yPos) {
+      //Don't allow querying window geometry for fullscreen windows
+      if (isFullscreen) {
+        return;
+      }
+
+      glfwGetWindowSize(windowPtr, width, height);
+      glfwGetWindowPos(windowPtr, xPos, yPos);
+    }
+
     bool getFullscreen() {
       return isFullscreen;
     }
