@@ -89,7 +89,7 @@ namespace ammonite {
         GLint maxTextureSize = 0;
         glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
         if (width > maxTextureSize || height > maxTextureSize) {
-          ammonite::utils::warning << "Attempted to load texture of unsupported size (" << width << "x" << height << ")" << std::endl;
+          ammonite::utils::warning << "Attempted to load texture of unsupported size (" << width << " x " << height << ")" << std::endl;
           ammonite::utils::warning << "Failed to load texture '" << texturePath << "'" << std::endl;
           stbi_image_free(data);
           *externalSuccess = false;
