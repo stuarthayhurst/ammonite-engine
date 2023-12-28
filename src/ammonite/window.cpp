@@ -261,6 +261,12 @@ namespace ammonite {
         yPos += frameTop;
       }
 
+      if (width < 0 || height < 0) {
+        ammonite::utils::warning << "Window dimensions can't be negative (requested " \
+                                 << width << " x " << height << ")" << std::endl;
+        return;
+      }
+
       //Update the geometry of the window
       glfwSetWindowPos(windowPtr, xPos, yPos);
       glfwSetWindowSize(windowPtr, width, height);
