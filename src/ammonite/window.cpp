@@ -71,19 +71,24 @@ namespace ammonite {
         *closeWindowPtr = true;
       }
 
-      static void storeWindowGeometry() {
+      static void storeWindowGeometry(WindowGeom* storage, bool useDecoratedSize,
+                                      bool useDecoratedPos) {
         //Get window frame size, content size and position
         int frameLeft = 0, frameRight = 0, frameTop = 0, frameBottom = 0;
         glfwGetWindowFrameSize(windowPtr, &frameLeft, &frameTop,
                                &frameRight, &frameBottom);
-        glfwGetWindowSize(windowPtr, &lastWindowGeom.width, &lastWindowGeom.height);
-        glfwGetWindowPos(windowPtr, &lastWindowGeom.xPos, &lastWindowGeom.yPos);
+        glfwGetWindowSize(windowPtr, &storage->width, &storage->height);
+        glfwGetWindowPos(windowPtr, &storage->xPos, &storage->yPos);
 
         //Apply frame dimension corrections
-        lastWindowGeom.width += frameLeft + frameRight;
-        lastWindowGeom.height += frameTop + frameBottom;
-        lastWindowGeom.xPos -= frameLeft;
-        lastWindowGeom.yPos -= frameTop;
+        if (useDecoratedSize) {
+          storage->width += frameLeft + frameRight;
+          storage->height += frameTop + frameBottom;
+        }
+        if (useDecoratedPos) {
+          storage->xPos -= frameLeft;
+          storage->yPos -= frameTop;
+        }
       }
     }
 
@@ -236,25 +241,43 @@ namespace ammonite {
       useIcons(iconPaths, pngFiles.size());
     }
 
+    //Set decorated window size and position
     void setWindowGeometry(int width, int height, int xPos, int yPos) {
       //Don't allow setting window geometry for fullscreen windows
       if (isFullscreen) {
         return;
       }
 
+      //Get window frame size
+      int frameLeft = 0, frameRight = 0, frameTop = 0, frameBottom = 0;
+      glfwGetWindowFrameSize(windowPtr, &frameLeft, &frameTop,
+                             &frameRight, &frameBottom);
+
+      //Apply frame dimension corrections
+      width -= frameLeft + frameRight;
+      height -= frameTop + frameBottom;
+      xPos += frameLeft;
+      yPos += frameTop;
+
       //Update the geometry of the window
       glfwSetWindowPos(windowPtr, xPos, yPos);
       glfwSetWindowSize(windowPtr, width, height);
     }
 
+    //Set pointers to values for a decorated window
     void getWindowGeometry(int* width, int* height, int* xPos, int* yPos) {
       //Don't allow querying window geometry for fullscreen windows
       if (isFullscreen) {
         return;
       }
 
-      glfwGetWindowSize(windowPtr, width, height);
-      glfwGetWindowPos(windowPtr, xPos, yPos);
+      WindowGeom tempStorage;
+      storeWindowGeometry(&tempStorage, true, true);
+
+      *width = tempStorage.width;
+      *height = tempStorage.height;
+      *xPos = tempStorage.xPos;
+      *yPos = tempStorage.yPos;
     }
 
     bool getFullscreen() {
@@ -289,7 +312,7 @@ namespace ammonite {
       //Handle new window mode
       if (fullscreen) {
         //Store windowed geometry and then fullscreen
-        storeWindowGeometry();
+        storeWindowGeometry(&lastWindowGeom, true, true);
         setFullscreenMonitor(getCurrentMonitor());
       } else {
         //Set window to windowed mode, using last geometry
