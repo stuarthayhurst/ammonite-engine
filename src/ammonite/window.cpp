@@ -280,6 +280,14 @@ namespace ammonite {
       *yPos = tempStorage.yPos;
     }
 
+    void setWindowResizable(bool resizable) {
+      glfwSetWindowAttrib(windowPtr, GLFW_RESIZABLE, resizable);
+    }
+
+    bool getWindowResizable() {
+      return glfwGetWindowAttrib(windowPtr, GLFW_RESIZABLE);
+    }
+
     bool getFullscreen() {
       return isFullscreen;
     }

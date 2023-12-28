@@ -23,6 +23,9 @@ namespace ammonite {
     void setWindowGeometry(int width, int height, int xPos, int yPos);
     void getWindowGeometry(int* width, int* height, int* xPos, int* yPos);
 
+    void setWindowResizable(bool resizable);
+    void getWindowResizable();
+
     bool getFullscreen();
     GLFWmonitor* getFullscreenMonitor();
     int getMonitors(GLFWmonitor*** monitorsPtr);
