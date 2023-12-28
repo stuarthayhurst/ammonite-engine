@@ -20,8 +20,8 @@ namespace ammonite {
     void useIcon(const char* iconPath);
     void useIconDir(const char* iconDirPath);
 
-    void setWindowGeometry(int width, int height, int xPos, int yPos);
-    void getWindowGeometry(int* width, int* height, int* xPos, int* yPos);
+    void setWindowGeometry(int width, int height, int xPos, int yPos, bool useDecoratedPos);
+    void getWindowGeometry(int* width, int* height, int* xPos, int* yPos, bool useDecoratedPos);
 
     void setWindowResizable(bool resizable);
     void getWindowResizable();
