@@ -1,7 +1,7 @@
-#ifndef DEFAULTDEMO
-#define DEFAULTDEMO
+#ifndef MONKEYDEMO
+#define MONKEYTDEMO
 
-namespace defaultDemo {
+namespace monkeyDemo {
   int preRendererInit();
   int postRendererInit();
   int rendererMainloop();

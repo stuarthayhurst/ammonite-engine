@@ -5,7 +5,7 @@
 
 #include "../ammonite/ammonite.hpp"
 
-namespace defaultDemo {
+namespace monkeyDemo {
   namespace {
     std::vector<int> loadedModelIds;
   }

@@ -11,9 +11,9 @@
 #include "ammonite/ammonite.hpp"
 #include "helper/argHandler.hpp"
 
-#include "demos/default.hpp"
 #include "demos/object-field.hpp"
 #include "demos/many-cubes.hpp"
+#include "demos/monkey.hpp"
 #include "demos/sponza.hpp"
 
 #define EXPAND_DEMO(DEMO_NAME, NAMESPACE) {std::string(DEMO_NAME), {NAMESPACE::preRendererInit,\
@@ -32,9 +32,9 @@ namespace {
   };
 
   std::map<std::string, DemoFunctions> demoFunctionMap = {
-    EXPAND_DEMO("default", defaultDemo),
     EXPAND_DEMO("object-field", objectFieldDemo),
     EXPAND_DEMO("many-cubes", manyCubesDemo),
+    EXPAND_DEMO("monkey", monkeyDemo),
     EXPAND_DEMO("sponza", sponzaDemo)
   };
 }
@@ -156,7 +156,7 @@ int main(int argc, char* argv[]) {
     if (demoName != "") {
       std::cerr << "WARNING: Invalid demo '" << demoName << "', using default instead" << std::endl;
     }
-    demoName = std::string("default");
+    demoName = std::string("object-field");
   }
 
   DemoFunctionType preRendererInit = demoFunctionMap[demoName].preRendererInit;
