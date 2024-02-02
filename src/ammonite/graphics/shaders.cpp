@@ -189,15 +189,16 @@ namespace ammonite {
 
       glLinkProgram(programId);
 
-      if (!checkProgram(programId)) {
-        *externalSuccess = false;
-        return -1;
-      }
-
       //Detach and remove all passed shader ids
       for (int i = 0; i < shaderCount; i++) {
         glDetachShader(programId, shaderIds[i]);
         glDeleteShader(shaderIds[i]);
+      }
+
+      if (!checkProgram(programId)) {
+        glDeleteProgram(programId);
+        *externalSuccess = false;
+        return -1;
       }
 
       return programId;
@@ -265,6 +266,7 @@ namespace ammonite {
             return programId;
           } else {
             ammonite::utils::warning << "Failed to process '" << cacheFilePath << "'" << std::endl;
+            glDeleteProgram(programId);
             deleteCacheFile(cacheFilePath);
           }
         } else {
