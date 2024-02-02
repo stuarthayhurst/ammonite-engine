@@ -1,5 +1,5 @@
 #ifndef MONKEYDEMO
-#define MONKEYTDEMO
+#define MONKEYDEMO
 
 namespace monkeyDemo {
   int preRendererInit();
