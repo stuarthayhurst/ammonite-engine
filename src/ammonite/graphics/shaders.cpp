@@ -24,13 +24,11 @@ namespace ammonite {
       ammonite::utils::status << "Clearing '" << cacheFilePath << "'" << std::endl;
 
       ammonite::utils::internal::deleteFile(cacheFilePath);
-      ammonite::utils::internal::deleteFile(cacheFilePath + "info");
     }
 
     static void cacheProgram(const GLuint programId, const char* shaderPaths[], const int shaderCount) {
       std::string cacheFilePath =
         ammonite::utils::cache::internal::requestNewCachePath(shaderPaths, shaderCount);
-      std::string cacheFileInfoPath = cacheFilePath + "info";
 
       ammonite::utils::status << "Caching '" << cacheFilePath << "'" << std::endl;
       int binaryLength;
@@ -46,32 +44,25 @@ namespace ammonite {
         return;
       }
 
-      //Write the binary to cache directory
-      std::ofstream binarySave(cacheFilePath, std::ios::binary);
-      if (binarySave.is_open()) {
-        binarySave.write(&binaryData[0], binaryLength);
-      } else {
-        ammonite::utils::warning << "Failed to cache '" << cacheFilePath << "'" << std::endl;
-        deleteCacheFile(cacheFilePath);
-        return;
-      }
-
-      //Write the cache info to cache directory
-      std::ofstream binaryInfo(cacheFileInfoPath);
-      if (binaryInfo.is_open()) {
+      //Write the cache info and data to cache file
+      std::ofstream cacheFile(cacheFilePath, std::ios::binary);
+      if (cacheFile.is_open()) {
         for (int i = 0; i < shaderCount; i++) {
           long long int filesize = 0, modificationTime = 0;
           ammonite::utils::internal::getFileMetadata(shaderPaths[i], &filesize, &modificationTime);
 
-          binaryInfo << "input;" << shaderPaths[i] << ";" << filesize << ";" << modificationTime << "\n";
+          cacheFile << "input;" << shaderPaths[i] << ";" << filesize << ";" << modificationTime << "\n";
         }
 
-        binaryInfo << binaryFormat << "\n";
-        binaryInfo << binaryLength << "\n";
+        cacheFile << binaryFormat << "\n";
+        cacheFile << binaryLength << "\n";
 
-        binaryInfo.close();
+        //Write the data
+        cacheFile.write(&binaryData[0], binaryLength);
+
+        cacheFile.close();
       } else {
-        ammonite::utils::warning << "Failed to cache '" << cacheFileInfoPath << "'" << std::endl;
+        ammonite::utils::warning << "Failed to cache '" << cacheFilePath << "'" << std::endl;
         deleteCacheFile(cacheFilePath);
       }
     }
@@ -223,36 +214,33 @@ namespace ammonite {
           ammonite::utils::cache::internal::requestCachedDataPath(shaderPaths,
                                                                   shaderCount,
                                                                   &cacheValid);
-        std::string cacheFileInfoPath = cacheFilePath + "info";
 
         //Attempt to get the shader format and size
         GLenum cachedBinaryFormat = 0;
         GLsizei cachedBinaryLength = 0;
 
+        std::ifstream cacheFile(cacheFilePath, std::ios::binary);
         if (cacheValid) {
           std::string line;
-          std::ifstream cacheInfoFile(cacheFileInfoPath);
-          if (cacheInfoFile.is_open()) {
+          if (cacheFile.is_open()) {
             try {
-              //Skip input files
+              //Skip input files, as they're handled by the cache manager
               for (int i = 0; i < shaderCount; i++) {
-                getline(cacheInfoFile, line);
+                getline(cacheFile, line);
               }
 
               //Get the binary format
-              getline(cacheInfoFile, line);
+              getline(cacheFile, line);
               cachedBinaryFormat = std::stoi(line);
 
               //Get the length of the binary
-              getline(cacheInfoFile, line);
+              getline(cacheFile, line);
               cachedBinaryLength = std::stoi(line);
             } catch (const std::out_of_range&) {
               cacheValid = false;
             } catch (const std::invalid_argument&) {
               cacheValid = false;
             }
-
-            cacheInfoFile.close();
           }
         }
 
@@ -260,8 +248,7 @@ namespace ammonite {
         if (cacheValid) {
           //Read the cached data from file
           char cachedBinaryData[cachedBinaryLength];
-          std::ifstream input(cacheFilePath, std::ios::binary);
-          input.read(&cachedBinaryData[0], cachedBinaryLength);
+          cacheFile.read(&cachedBinaryData[0], cachedBinaryLength);
 
           //Load the cached binary data
           programId = glCreateProgram();
@@ -281,6 +268,7 @@ namespace ammonite {
             deleteCacheFile(cacheFilePath);
           }
         }
+        cacheFile.close();
       }
 
       //Since cache wasn't available, generate fresh shaders

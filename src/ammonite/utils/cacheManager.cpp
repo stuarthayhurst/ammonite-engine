@@ -38,11 +38,9 @@ namespace ammonite {
                                       const int fileCount, bool* found) {
           //Generate path to cache file from cache string
           std::string cacheFilePath = requestNewCachePath(filePaths, fileCount);
-          std::string cacheInfoFilePath = cacheFilePath + "info";
 
-          //Check cache and info file exist
-          if (!std::filesystem::exists(cacheFilePath) or
-              !std::filesystem::exists(cacheInfoFilePath)) {
+          //Check cache file exists
+          if (!std::filesystem::exists(cacheFilePath)) {
             *found = false;
             return std::string("");
           }
@@ -50,12 +48,12 @@ namespace ammonite {
           //Validate filesizes and timestamps for each input file
           bool isCacheValid = true;
           std::string line;
-          std::ifstream cacheInfoFile(cacheInfoFilePath);
-          if (cacheInfoFile.is_open()) {
+          std::ifstream cacheFile(cacheFilePath);
+          if (cacheFile.is_open()) {
             for (int i = 0; i < fileCount; i++) {
               //Get expected filename, filesize and timestamp
               std::vector<std::string> strings;
-              getline(cacheInfoFile, line);
+              getline(cacheFile, line);
               std::stringstream rawLine(line);
 
               while (getline(rawLine, line, ';')) {
@@ -96,7 +94,7 @@ namespace ammonite {
               }
             }
 
-            cacheInfoFile.close();
+            cacheFile.close();
           } else {
             //Failed to open the cache info
             isCacheValid = false;
