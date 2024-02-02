@@ -59,6 +59,17 @@ void focalToggleCallback(std::vector<int>, int, void*) {
     !ammonite::settings::graphics::post::getFocalDepthEnabled());
 }
 
+void sprintToggleCallback(std::vector<int>, int action, void*) {
+  float movementSpeed = 0.0f;
+  if (action == GLFW_REPEAT) {
+    return;
+  }
+
+  movementSpeed = ammonite::settings::controls::getMovementSpeed();
+  movementSpeed *= (action == GLFW_PRESS) ? 2.0f : (1.0f / 2.0f);
+  ammonite::settings::controls::setMovementSpeed(movementSpeed);
+}
+
 void cameraCycleCallback(std::vector<int>, int, void* userPtr) {
   CameraData* cameraData = (CameraData*)userPtr;
   cameraData->cameraIndex = (cameraData->cameraIndex + 1) % cameraData->cameraIds.size();
@@ -251,6 +262,8 @@ int main(int argc, char* argv[]) {
                          fullscreenToggleCallback, nullptr));
   keybindIds.push_back(ammonite::input::registerToggleKeybind(
                          GLFW_KEY_Z, focalToggleCallback, nullptr));
+  keybindIds.push_back(ammonite::input::registerKeybind(
+                         GLFW_KEY_LEFT_CONTROL, sprintToggleCallback, nullptr));
   keybindIds.push_back(ammonite::input::registerToggleKeybind(
                          GLFW_KEY_B, cameraCycleCallback, &cameraData));
 
