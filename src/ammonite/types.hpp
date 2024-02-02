@@ -3,7 +3,7 @@
 
 #include <vector>
 
-typedef void (*AmmoniteKeyCallback)(std::vector<int>, int, void*);
+typedef void (*AmmoniteKeyCallback)(std::vector<int> keycode, int action, void* userPtr);
 
 enum AmmoniteEnum : unsigned char {
   //Keybinding constants
