@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <queue>
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
@@ -104,17 +105,27 @@ namespace ammonite {
           textureIds->push_back(textureIdGroup);
         }
 
-        static void processNode(aiNode* nodePtr, const aiScene* scenePtr,
-                                models::internal::ModelData* modelObjectData,
-                                ModelLoadInfo modelLoadInfo, bool* externalSuccess) {
-          for (unsigned int i = 0; i < nodePtr->mNumMeshes; i++) {
-            processMesh(scenePtr->mMeshes[nodePtr->mMeshes[i]], scenePtr, modelObjectData,
-                        modelLoadInfo, externalSuccess);
-          }
+        static void processNodes(const aiScene* scenePtr,
+                               models::internal::ModelData* modelObjectData,
+                               ModelLoadInfo modelLoadInfo, bool* externalSuccess) {
+          std::queue<aiNode*> nodePtrQueue;
+          nodePtrQueue.push(scenePtr->mRootNode);
 
-          for (unsigned int i = 0; i < nodePtr->mNumChildren; i++) {
-            processNode(nodePtr->mChildren[i], scenePtr, modelObjectData,
-                        modelLoadInfo, externalSuccess);
+          //Process root node, then process any more connected to it
+          while (!nodePtrQueue.empty()) {
+            aiNode* nodePtr = nodePtrQueue.front();
+            nodePtrQueue.pop();
+
+            //Process meshes
+            for (unsigned int i = 0; i < nodePtr->mNumMeshes; i++) {
+              processMesh(scenePtr->mMeshes[nodePtr->mMeshes[i]], scenePtr, modelObjectData,
+                          modelLoadInfo, externalSuccess);
+            }
+
+            //Add connected nodes to queue
+            for (unsigned int i = 0; i < nodePtr->mNumChildren; i++) {
+              nodePtrQueue.push(nodePtr->mChildren[i]);
+            }
           }
         }
       }
@@ -146,7 +157,7 @@ namespace ammonite {
         }
 
         //Recursively process nodes
-        processNode(scenePtr->mRootNode, scenePtr, modelObjectData, modelLoadInfo, externalSuccess);
+        processNodes(scenePtr, modelObjectData, modelLoadInfo, externalSuccess);
       }
     }
   }
