@@ -1,7 +1,6 @@
 #include <vector>
 #include <iostream>
-
-#include <string.h>
+#include <cstring>
 
 #include "../ammonite/ammonite.hpp"
 
@@ -46,7 +45,7 @@ namespace monkeyDemo {
 
       //Sum vertices and load texture if given
       vertexCount += ammonite::models::getVertexCount(loadedModelIds[i]);
-      if (strcmp(models[i][1], "")) {
+      if (std::strcmp(models[i][1], "")) {
         ammonite::models::applyTexture(loadedModelIds[i], AMMONITE_DIFFUSE_TEXTURE, models[i][1], true, &success);
       }
 
