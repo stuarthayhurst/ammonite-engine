@@ -21,6 +21,7 @@
 #include "input.hpp"
 #include "interface.hpp"
 #include "settings.hpp"
+#include "thread.hpp"
 #include "types.hpp"
 #include "window.hpp"
 

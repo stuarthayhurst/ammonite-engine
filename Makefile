@@ -45,6 +45,10 @@ $(BUILD_DIR)/demo: $(BUILD_DIR)/$(LIBRARY_NAME) $(HELPER_OBJECTS) $(DEMO_OBJECTS
 	@mkdir -p "$(BUILD_DIR)"
 	$(CXX) -o "$(BUILD_DIR)/demo" $(HELPER_OBJECTS) $(DEMO_OBJECTS) $(OBJECT_DIR)/demo.o $(CXXFLAGS) "-L$(BUILD_DIR)" -lammonite $(LDFLAGS)
 
+$(BUILD_DIR)/threadDemo: $(BUILD_DIR)/$(LIBRARY_NAME) $(OBJECT_DIR)/threadDemo.o
+	@mkdir -p "$(BUILD_DIR)"
+	$(CXX) -o "$(BUILD_DIR)/threadDemo" $(OBJECT_DIR)/threadDemo.o $(CXXFLAGS) "-L$(BUILD_DIR)" -lammonite $(LDFLAGS)
+
 $(BUILD_DIR)/libammonite.so: $(AMMONITE_OBJECTS)
 	@mkdir -p "$(OBJECT_DIR)"
 	$(CXX) -shared -o "$@" $(AMMONITE_OBJECTS) $(CXXFLAGS) "-Wl,-soname,$(LIBRARY_NAME)"
@@ -68,12 +72,20 @@ $(OBJECT_DIR)/demos/%.o: ./src/demos/%.cpp $(DEMO_HEADER_SOURCE) $(AMMONITE_HEAD
 $(OBJECT_DIR)/demo.o: ./src/demo.cpp $(AMMONITE_HEADER_SOURCE) $(HELPER_HEADER_SOURCE)
 	@mkdir -p "$(OBJECT_DIR)"
 	$(CXX) ./src/demo.cpp -c $(CXXFLAGS) -o "$@"
+$(OBJECT_DIR)/threadDemo.o: ./src/threadDemo.cpp $(AMMONITE_HEADER_SOURCE)
+	@mkdir -p "$(OBJECT_DIR)"
+	$(CXX) ./src/threadDemo.cpp -c $(CXXFLAGS) -o "$@"
 
-.PHONY: build debug library headers install uninstall clean cache icons $(AMMONITE_HEADER_INSTALL)
+.PHONY: build debug library headers install uninstall clean cache icons threads $(AMMONITE_HEADER_INSTALL)
 build:
 	@$(MAKE) "$(BUILD_DIR)/demo"
 	@if [[ "$(DEBUG)" != "true" ]]; then \
 	  strip --strip-unneeded "$(BUILD_DIR)/libammonite.so" "$(BUILD_DIR)/demo"; \
+	fi
+threads:
+	@$(MAKE) "$(BUILD_DIR)/threadDemo"
+	@if [[ "$(DEBUG)" != "true" ]]; then \
+	  strip --strip-unneeded "$(BUILD_DIR)/libammonite.so" "$(BUILD_DIR)/threadDemo"; \
 	fi
 debug: clean
 	@DEBUG="true" $(MAKE) build
