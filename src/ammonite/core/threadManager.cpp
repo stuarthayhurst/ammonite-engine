@@ -110,6 +110,48 @@ namespace ammonite {
         wakePool.notify_one();
       }
 
+      //Specialised variants to submit multiple jobs
+      void submitMultiple(AmmoniteWork work, int newJobs) {
+        workQueueMutex.lock();
+        for (int i = 0; i < newJobs; i++) {
+          workQueue.push({work, nullptr, nullptr});
+          jobCount++;
+          wakePool.notify_one();
+        }
+        workQueueMutex.unlock();
+      }
+
+      void submitMultipleUser(AmmoniteWork work, void** userPtrs, int newJobs) {
+        workQueueMutex.lock();
+        for (int i = 0; i < newJobs; i++) {
+          workQueue.push({work, userPtrs[i], nullptr});
+          jobCount++;
+          wakePool.notify_one();
+        }
+        workQueueMutex.unlock();
+      }
+
+      void submitMultipleComp(AmmoniteWork work, std::atomic_flag* completions, int newJobs) {
+        workQueueMutex.lock();
+        for (int i = 0; i < newJobs; i++) {
+          workQueue.push({work, nullptr, completions + i});
+          jobCount++;
+          wakePool.notify_one();
+        }
+        workQueueMutex.unlock();
+      }
+
+      void submitMultipleUserComp(AmmoniteWork work, void** userPtrs,
+                                  std::atomic_flag* completions, int newJobs) {
+        workQueueMutex.lock();
+        for (int i = 0; i < newJobs; i++) {
+          workQueue.push({work, userPtrs[i], completions + i});
+          jobCount++;
+          wakePool.notify_one();
+        }
+        workQueueMutex.unlock();
+      }
+
       //Create thread pool, existing work will begin executing
       int createThreadPool(unsigned int extraThreads) {
         //Exit if thread pool already exists

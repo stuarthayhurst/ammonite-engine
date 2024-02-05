@@ -15,6 +15,12 @@ namespace ammonite {
       void destroyThreadPool();
 
       void submitWork(AmmoniteWork work, void* userPtr, std::atomic_flag* completion);
+      void submitMultiple(AmmoniteWork work, int jobCount);
+      void submitMultipleUser(AmmoniteWork work, void** userPtrs, int jobCount);
+      void submitMultipleComp(AmmoniteWork work, std::atomic_flag* completions, int jobCount);
+      void submitMultipleUserComp(AmmoniteWork work, void** userPtrs, std::atomic_flag* completions,
+                                  int jobCount);
+
       void blockThreads(bool sync);
       void unblockThreads(bool sync);
     }

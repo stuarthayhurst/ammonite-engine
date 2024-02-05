@@ -27,9 +27,7 @@ int main() {
   //Submit 300000 fast 'jobs'
   long long int numJobs = 300000;
   std::atomic_flag* syncs = (std::atomic_flag*)std::malloc(sizeof(std::atomic_flag) * numJobs);
-  for (int i = 0; i < numJobs; i++) {
-    ammonite::thread::submitWork(shortTask, nullptr, &syncs[i]);
-  }
+  ammonite::thread::submitMultiple(shortTask, nullptr, syncs, numJobs);
   std::cout << "Submitted in " << runTimer.getTime() << "s" << std::endl;
 
   //Wait for work to complete
