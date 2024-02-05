@@ -1,17 +1,13 @@
+#include <atomic>
+#include <thread>
+#include <chrono>
 #include <cstdlib>
+#include <iostream>
 
 #include "ammonite/ammonite.hpp"
 #include "ammonite/core/threadManager.hpp"
 
-#include <atomic>
-
-#include <thread>
-#include <chrono>
-#include <iostream>
-
-
-
-void shortTask(void*) {
+static void shortTask(void*) {
   return;
 }
 
@@ -32,13 +28,13 @@ int main() {
   for (int i = 0; i < numJobs; i++) {
     ammonite::thread::submitWork(shortTask, nullptr, &syncs[i]);
   }
+  std::cout << "Submitted in " << runTimer.getTime() << "s" << std::endl;
 
   //Wait for work to complete
   for (int i = 0; i < numJobs; i++) {
     ammonite::thread::waitWorkComplete(&syncs[i]);
   }
   std::free(syncs);
-
   std::cout << "Completed in " << runTimer.getTime() << "s" << std::endl;
 
   //Clean up and exit
