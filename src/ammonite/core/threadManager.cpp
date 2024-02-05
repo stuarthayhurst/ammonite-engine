@@ -36,7 +36,6 @@ namespace ammonite {
 
         std::queue<WorkItem> workQueue;
         std::mutex workQueueMutex;
-        std::mutex blockSubmitMutex;
         std::atomic<int> jobCount{};
       }
 
@@ -97,24 +96,20 @@ namespace ammonite {
       void submitWork(AmmoniteWork work, void* userPtr, std::atomic_flag* completion) {
         //Initialise the completion atomic
         if (completion != nullptr) {
-          completion->clear();;
+          completion->clear();
         }
-
-        //Block other jobs from being submitted
-        blockSubmitMutex.lock();
 
         //Safely add work to the queue
         workQueueMutex.lock();
         workQueue.push({work, userPtr, completion});
         workQueueMutex.unlock();
 
-        blockSubmitMutex.unlock();
-
         //Increase job count, wake a sleeping thread
         jobCount++;
         wakePool.notify_one();
       }
 
+      //Create thread pool, existing work will begin executing
       int createThreadPool(unsigned int extraThreads) {
         //Exit if thread pool already exists
         if (extraThreadCount != 0) {
@@ -146,10 +141,9 @@ namespace ammonite {
         return 0;
       }
 
+      //Jobs submitted at the same time may execute, but the threads will block after
+      //Guarantees work submitted after won't begin yet
       void blockThreads(bool sync) {
-        //Block new jobs from being submitted
-        blockSubmitMutex.lock();
-
         //Submit a job for each thread that waits for the trigger
         unblockThreadsTrigger.clear();
         workQueueMutex.lock();
@@ -167,7 +161,7 @@ namespace ammonite {
         }
       }
 
-      void unblockThreads(bool sync, bool actuallyUnblock) {
+      void unblockThreads(bool sync) {
         //Unblock threads and wake them up
         unblockThreadsTrigger.test_and_set();
         unblockThreadsTrigger.notify_all();
@@ -175,22 +169,18 @@ namespace ammonite {
         if (sync) {
           threadsUnblockedFlag.wait(false);
         }
-
-        //Allow new jobs to be submitted
-        if (actuallyUnblock) {
-          blockSubmitMutex.unlock();
-        }
       }
 
+      //Finish work already in the queue and kill the threads
       void destroyThreadPool() {
-        //Finish existing work and block new work
+        //Finish existing work and block new work from starting
         blockThreads(true);
 
         //Kill all threads when they wake up
         stayAlive = false;
 
         //Unlock threads and wake them up
-        unblockThreads(true, false);
+        unblockThreads(true);
 
         //Wait until all threads are done
         for (unsigned int i = 0; i < extraThreadCount; i++) {
@@ -200,7 +190,6 @@ namespace ammonite {
         //Reset remaining data
         delete[] threadPool;
         extraThreadCount = 0;
-        blockSubmitMutex.unlock();
       }
     }
   }

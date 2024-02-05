@@ -32,11 +32,11 @@ namespace ammonite {
     }
 
     void unblockThreadsAsync() {
-      internal::unblockThreads(false, true);
+      internal::unblockThreads(false);
     }
 
     void unblockThreadsSync() {
-      internal::unblockThreads(true, true);
+      internal::unblockThreads(true);
     }
   }
 }

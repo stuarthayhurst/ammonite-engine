@@ -16,7 +16,7 @@ namespace ammonite {
 
       void submitWork(AmmoniteWork work, void* userPtr, std::atomic_flag* completion);
       void blockThreads(bool sync);
-      void unblockThreads(bool sync, bool actuallyUnblock);
+      void unblockThreads(bool sync);
     }
   }
 }
