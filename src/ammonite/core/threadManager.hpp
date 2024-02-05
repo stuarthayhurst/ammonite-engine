@@ -21,4 +21,14 @@ namespace ammonite {
   }
 }
 
+#ifdef DEBUG
+namespace ammonite {
+  namespace thread {
+    namespace internal {
+      bool debugCheckRemainingWork(bool verbose);
+    }
+  }
+}
+#endif
+
 #endif

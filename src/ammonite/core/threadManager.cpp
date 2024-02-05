@@ -4,6 +4,7 @@
 #include <thread>
 
 #include "../types.hpp"
+#include "../utils/debug.hpp"
 
 #define MAX_EXTRA_THREADS 512
 
@@ -171,6 +172,31 @@ namespace ammonite {
         }
       }
 
+#ifdef DEBUG
+      bool debugCheckRemainingWork(bool verbose) {
+        bool issuesFound = false;
+
+        workQueueMutex.lock();
+        if (workQueue.size() != 0) {
+          issuesFound = true;
+          if (verbose) {
+            ammoniteInternalDebug << "WARNING: Work queue not empty" << std::endl;
+          }
+        }
+
+        if (workQueue.size() != (unsigned)jobCount) {
+          issuesFound = true;
+          if (verbose) {
+            ammoniteInternalDebug << "WARNING: Work queue size and job count don't match" \
+                                  << std::endl;
+          }
+        }
+        workQueueMutex.unlock();
+
+        return issuesFound;
+      }
+#endif
+
       //Finish work already in the queue and kill the threads
       void destroyThreadPool() {
         //Finish existing work and block new work from starting
@@ -186,6 +212,14 @@ namespace ammonite {
         for (unsigned int i = 0; i < extraThreadCount; i++) {
           threadPool[i].thread.join();
         }
+
+/* In debug mode, check that the queue is empty, and matches the job counter
+ - If it doesn't, it's not technically a bug, but in practice it will be, as work
+   that was expected to be finished wasn't
+*/
+#ifdef DEBUG
+        debugCheckRemainingWork(true);
+#endif
 
         //Reset remaining data
         delete[] threadPool;

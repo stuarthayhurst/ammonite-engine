@@ -12,7 +12,9 @@ static void shortTask(void*) {
 }
 
 int main() {
+  bool passed = true;
   ammonite::utils::Timer runTimer;
+
   if (ammonite::thread::internal::createThreadPool(0) == -1) {
     ammonite::utils::error << "Failed to create thread pool, exiting" << std::endl;
     return EXIT_FAILURE;
@@ -39,5 +41,13 @@ int main() {
 
   //Clean up and exit
   ammonite::thread::internal::destroyThreadPool();
-  return EXIT_SUCCESS;
+
+  //Check work queue is empty, and job counter is also 0 (debug mode)
+#ifdef DEBUG
+  if (ammonite::thread::internal::debugCheckRemainingWork(false)) {
+    passed = false;
+  }
+#endif
+
+  return passed ? EXIT_SUCCESS : EXIT_FAILURE;
 }
