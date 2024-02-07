@@ -5,6 +5,7 @@
 
 #include "../types.hpp"
 #include "../utils/debug.hpp"
+#include "../utils/logging.hpp"
 
 #define MAX_EXTRA_THREADS 512
 
@@ -252,7 +253,11 @@ namespace ammonite {
 
         //Wait until all threads are done
         for (unsigned int i = 0; i < extraThreadCount; i++) {
-          threadPool[i].thread.join();
+          try {
+            threadPool[i].thread.join();
+          } catch (const std::system_error&) {
+            ammonite::utils::warning << "Failed to join thread " << i  << " while destroying thread pool" << std::endl;
+          }
         }
 
 /* In debug mode, check that the queue is empty, and matches the job counter
