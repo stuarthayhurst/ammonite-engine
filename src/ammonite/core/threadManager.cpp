@@ -251,6 +251,14 @@ namespace ammonite {
                                   << workQueue.size() << " vs " << jobCount << ")" << std::endl;
           }
         }
+
+        if (jobCount < 0) {
+          issuesFound = true;
+          if (verbose) {
+            ammoniteInternalDebug << "WARNING: Job count is negative (" \
+                                  << jobCount << ")" << std::endl;
+          }
+        }
         workQueueMutex.unlock();
 
         return issuesFound;
