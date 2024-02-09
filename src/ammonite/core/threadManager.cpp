@@ -239,15 +239,16 @@ namespace ammonite {
         if (workQueue.size() != 0) {
           issuesFound = true;
           if (verbose) {
-            ammoniteInternalDebug << "WARNING: Work queue not empty" << std::endl;
+            ammoniteInternalDebug << "WARNING: Work queue not empty (" << workQueue.size() \
+                                  << " jobs left)" << std::endl;
           }
         }
 
         if (workQueue.size() != (unsigned)jobCount) {
           issuesFound = true;
           if (verbose) {
-            ammoniteInternalDebug << "WARNING: Work queue size and job count don't match" \
-                                  << std::endl;
+            ammoniteInternalDebug << "WARNING: Work queue size and job count don't match (" \
+                                  << workQueue.size() << " vs " << jobCount << ")" << std::endl;
           }
         }
         workQueueMutex.unlock();
