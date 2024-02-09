@@ -1,0 +1,45 @@
+# This workflow will build and test the thread pool
+name: Thread pool test
+
+on:
+  push:
+    branches: '**'
+  pull_request:
+    branches: '**'
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install build dependencies
+      run: |
+        wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+        echo "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-17 main" | sudo tee -a /etc/apt/sources.list
+        sudo apt-get update
+        sudo apt-get install --no-install-recommends make pkg-config build-essential
+        sudo apt-get install --no-install-recommends g++-12 libgomp1 clang-17 libomp-17-dev
+        sudo apt-get install --no-install-recommends inkscape optipng
+        sudo apt-get install --no-install-recommends libglm-dev libglfw3-dev libglew-dev libstb-dev libassimp-dev
+        sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-12 10000
+        sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-17 10000
+        sudo update-alternatives --set g++ /usr/bin/g++-12
+        sudo update-alternatives --set clang++ /usr/bin/clang++-17
+
+    - name: (g++) Test thread demo build target
+      run: |
+        make clean
+        CXX="g++" DEBUG="true" make threads -j$(nproc)
+
+    - name: (g++) Test built thread demo
+      run: |
+        ./launch.sh --threads
+
+    - name: (clang++) Test thread demo build target
+      run: |
+        make clean
+        CXX="clang++" DEBUG="true" make threads -j$(nproc)
+
+    - name: (clang++) Test built thread demo
+      run: |
+        ./launch.sh --threads
