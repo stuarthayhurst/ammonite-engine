@@ -259,6 +259,14 @@ namespace ammonite {
                                   << jobCount << ")" << std::endl;
           }
         }
+
+        if (blockBalance != 0) {
+          issuesFound = true;
+          if (verbose) {
+            ammoniteInternalDebug << "WARNING: Blocking is unbalanced (" \
+                                  << blockBalance << ")" << std::endl;
+          }
+        }
         workQueueMutex.unlock();
 
         return issuesFound;
