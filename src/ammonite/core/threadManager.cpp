@@ -37,11 +37,11 @@ namespace ammonite {
         std::atomic<unsigned int> blockedThreadCount;
         //0 when an unblock starts, 1 when a block starts
         //Any other value means the system is broken
-        std::atomic<int> blockBalance;
+        std::atomic<int> blockBalance = 0;
 
         std::queue<WorkItem> workQueue;
         std::mutex workQueueMutex;
-        std::atomic<int> jobCount{};
+        std::atomic<int> jobCount = 0;
       }
 
       namespace {
@@ -184,7 +184,6 @@ namespace ammonite {
         unblockThreadsTrigger.test_and_set();
         threadsUnblockedFlag.test_and_set();
         blockedThreadCount = 0;
-        blockBalance = 0;
         extraThreadCount = extraThreads;
         return 0;
       }
