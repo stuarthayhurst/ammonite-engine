@@ -273,7 +273,8 @@ namespace ammonite {
           try {
             threadPool[i].thread.join();
           } catch (const std::system_error&) {
-            ammonite::utils::warning << "Failed to join thread " << i  << " while destroying thread pool" << std::endl;
+            ammonite::utils::warning << "Failed to join thread " << i \
+                                     << " while destroying thread pool" << std::endl;
           }
         }
 
