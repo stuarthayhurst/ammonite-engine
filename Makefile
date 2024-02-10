@@ -79,8 +79,9 @@ $(OBJECT_DIR)/threadDemo.o: ./src/threadDemo.cpp $(AMMONITE_HEADER_SOURCE)
 	@mkdir -p "$(OBJECT_DIR)"
 	$(CXX) ./src/threadDemo.cpp -c $(CXXFLAGS) -o "$@"
 
-.PHONY: build debug library headers install uninstall clean cache icons threads $(AMMONITE_HEADER_INSTALL)
-build: $(BUILD_DIR)/demo
+.PHONY: build demo threads debug library headers install uninstall clean cache icons $(AMMONITE_HEADER_INSTALL)
+build: demo threads
+demo: $(BUILD_DIR)/demo
 	@if [[ "$(DEBUG)" != "true" ]]; then \
 	  strip --strip-unneeded "$(BUILD_DIR)/demo"; \
 	fi

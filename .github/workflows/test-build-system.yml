@@ -44,7 +44,7 @@ jobs:
 
     - name: (g++) Check built objects are present
       run: |
-        ls build/demo build/libammonite.so
+        ls build/demo build/threadDemo build/libammonite.so
 
     - name: Clean build area
       run: |
@@ -64,7 +64,7 @@ jobs:
 
     - name: (clang++) Check built objects are present
       run: |
-        ls build/demo build/libammonite.so
+        ls build/demo build/threadDemo build/libammonite.so
 
     - name: Test library install target
       run: |

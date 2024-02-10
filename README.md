@@ -55,10 +55,11 @@
 
 ## Build system:
   - ### Targets:
-    - `build`, `debug`, `library` and `threads` support building on multiple cores with `-jX`
-    - `make build` - Builds demo binary, a working demonstration of the renderer
+    - `build`, `debug`, `library`, `demo` and `threads` support `-j[CORE COUNT]`
+    - `make build` - Builds the demo and thread demo
     - `make debug` - Cleans build directory, then runs `make build` in debug mode
     - `make library` - Builds `build/libammonite.so`
+    - `make demo` - Builds a demo binary, a working demonstration of the renderer
     - `make threads` - Builds a test program for the thread pool
     - `make install` - Installs `libammonite.so` to system directories
       - The install path can be configured, by setting the environment variable `INSTALL_DIR`
