@@ -78,5 +78,9 @@ namespace ammonite {
     void unblockThreadsSync() {
       internal::unblockThreads(true);
     }
+
+    void finishWork() {
+      internal::finishWork();
+    }
   }
 }

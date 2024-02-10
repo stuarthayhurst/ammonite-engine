@@ -16,6 +16,7 @@ namespace ammonite {
     void blockThreadsSync();
     void unblockThreadsSync();
     void unblockThreadsAsync();
+    void finishWork();
   }
 }
 

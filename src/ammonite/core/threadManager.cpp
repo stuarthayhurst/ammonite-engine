@@ -230,6 +230,13 @@ namespace ammonite {
         }
       }
 
+      void finishWork() {
+        //Unblock if blocked, block threads then wait for completion
+        unblockThreads(true);
+        blockThreads(true);
+        unblockThreads(true);
+      }
+
 #ifdef DEBUG
       bool debugCheckRemainingWork(bool verbose) {
         bool issuesFound = false;

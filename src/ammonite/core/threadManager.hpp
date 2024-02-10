@@ -23,6 +23,7 @@ namespace ammonite {
 
       void blockThreads(bool sync);
       void unblockThreads(bool sync);
+      void finishWork();
     }
   }
 }
