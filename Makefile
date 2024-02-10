@@ -52,6 +52,9 @@ $(BUILD_DIR)/threadDemo: $(BUILD_DIR)/$(LIBRARY_NAME) $(OBJECT_DIR)/threadDemo.o
 $(BUILD_DIR)/libammonite.so: $(AMMONITE_OBJECTS)
 	@mkdir -p "$(OBJECT_DIR)"
 	$(CXX) -shared -o "$@" $(AMMONITE_OBJECTS) $(CXXFLAGS) "-Wl,-soname,$(LIBRARY_NAME)"
+	@if [[ "$(DEBUG)" != "true" ]]; then \
+	  strip --strip-unneeded "$(BUILD_DIR)/libammonite.so"; \
+	fi
 
 $(BUILD_DIR)/$(LIBRARY_NAME): $(BUILD_DIR)/libammonite.so
 	@rm -fv "$(BUILD_DIR)/$(LIBRARY_NAME)"
@@ -77,15 +80,13 @@ $(OBJECT_DIR)/threadDemo.o: ./src/threadDemo.cpp $(AMMONITE_HEADER_SOURCE)
 	$(CXX) ./src/threadDemo.cpp -c $(CXXFLAGS) -o "$@"
 
 .PHONY: build debug library headers install uninstall clean cache icons threads $(AMMONITE_HEADER_INSTALL)
-build:
-	@$(MAKE) "$(BUILD_DIR)/demo"
+build: $(BUILD_DIR)/demo
 	@if [[ "$(DEBUG)" != "true" ]]; then \
-	  strip --strip-unneeded "$(BUILD_DIR)/libammonite.so" "$(BUILD_DIR)/demo"; \
+	  strip --strip-unneeded "$(BUILD_DIR)/demo"; \
 	fi
-threads:
-	@$(MAKE) "$(BUILD_DIR)/threadDemo"
+threads: $(BUILD_DIR)/threadDemo
 	@if [[ "$(DEBUG)" != "true" ]]; then \
-	  strip --strip-unneeded "$(BUILD_DIR)/libammonite.so" "$(BUILD_DIR)/threadDemo"; \
+	  strip --strip-unneeded "$(BUILD_DIR)/threadDemo"; \
 	fi
 debug: clean
 	@DEBUG="true" $(MAKE) build
