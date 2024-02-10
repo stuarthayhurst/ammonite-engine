@@ -178,10 +178,11 @@ namespace ammonite {
       }
 
       //Read image data
-      GLFWimage images[iconCount];
+      GLFWimage* images = new GLFWimage[iconCount];
       for (unsigned int i = 0; i < (unsigned)iconCount; i++) {
         if (iconPaths[i] == nullptr) {
           ammonite::utils::warning << "Failed to load icon (nullptr)" << std::endl;
+          delete[] images;
           return;
         }
 
@@ -190,6 +191,7 @@ namespace ammonite {
 
         if (images[i].pixels == nullptr) {
           ammonite::utils::warning << "Failed to load '" << iconPaths[i] << "'" << std::endl;
+          delete[] images;
           return;
         }
       }
@@ -203,6 +205,7 @@ namespace ammonite {
       for (int i = 0; i < iconCount; i++) {
         stbi_image_free(images[i].pixels);
       }
+      delete[] images;
     }
 
     void useIcon(const char* iconPath) {
@@ -232,13 +235,14 @@ namespace ammonite {
         return;
       }
 
-      const char* iconPaths[pngFiles.size()];
+      const char** iconPaths = new const char*[pngFiles.size()];
       for (unsigned int i = 0; i < pngFiles.size(); i++) {
         iconPaths[i] = pngFiles[i].c_str();
       }
 
       //Hand off to another icon handler
       useIcons(iconPaths, pngFiles.size());
+      delete [] iconPaths;
     }
 
     //Set decorated window size and position

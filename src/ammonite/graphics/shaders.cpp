@@ -37,13 +37,13 @@ namespace ammonite {
 
       //Get binary length and data of linked program
       glGetProgramiv(programId, GL_PROGRAM_BINARY_LENGTH, &binaryLength);
-      char binaryData[binaryLength];
-      glGetProgramBinary(programId, binaryLength, nullptr, &binaryFormat, &binaryData);
-
       if (binaryLength == 0) {
         ammonite::utils::warning << "Failed to cache '" << cacheFilePath << "'" << std::endl;
         return;
       }
+
+      char* binaryData = new char[binaryLength];
+      glGetProgramBinary(programId, binaryLength, nullptr, &binaryFormat, binaryData);
 
       //Write the cache info and data to cache file
       std::ofstream cacheFile(cacheFilePath, std::ios::binary);
@@ -60,13 +60,15 @@ namespace ammonite {
         cacheFile << binaryLength << "\n";
 
         //Write the data
-        cacheFile.write(&binaryData[0], binaryLength);
+        cacheFile.write(binaryData, binaryLength);
 
         cacheFile.close();
       } else {
         ammonite::utils::warning << "Failed to cache '" << cacheFilePath << "'" << std::endl;
         deleteCacheFile(cacheFilePath);
       }
+
+      delete [] binaryData;
     }
 
     static bool checkProgram(GLuint programId) {
@@ -84,12 +86,13 @@ namespace ammonite {
       glGetProgramiv(programId, GL_INFO_LOG_LENGTH, &maxLength);
 
       //Not strictly required, but add an extra byte to be safe
-      GLchar errorLogBuffer[++maxLength];
+      GLchar* errorLogBuffer = new GLchar[++maxLength];
       glGetProgramInfoLog(programId, maxLength, &maxLength, errorLogBuffer);
       errorLogBuffer[maxLength] = '\0';
       ammonite::utils::warning << "Failed to link shader program (ID " << programId \
                                << "):\n" << (char*)errorLogBuffer << std::endl;
 
+      delete [] errorLogBuffer;
       return false;
     }
 
@@ -161,13 +164,14 @@ namespace ammonite {
         glGetShaderiv(shaderId, GL_INFO_LOG_LENGTH, &maxLength);
 
         //Not strictly required, but add an extra byte to be safe
-        GLchar errorLogBuffer[++maxLength];
+        GLchar* errorLogBuffer = new GLchar[++maxLength];
         glGetShaderInfoLog(shaderId, maxLength, &maxLength, errorLogBuffer);
         errorLogBuffer[maxLength] = '\0';
         ammonite::utils::warning << shaderPath << ":\n" \
                                  << (char*)errorLogBuffer << std::endl;
 
         //Clean up and exit
+        delete [] errorLogBuffer;
         glDeleteShader(shaderId);
         *externalSuccess = false;
         return -1;
@@ -253,13 +257,14 @@ namespace ammonite {
         //If cache is still valid, attempt to use it
         if (cacheValid) {
           //Read the cached data from file
-          char cachedBinaryData[cachedBinaryLength];
-          cacheFile.read(&cachedBinaryData[0], cachedBinaryLength);
+          char* cachedBinaryData = new char[cachedBinaryLength];
+          cacheFile.read(cachedBinaryData, cachedBinaryLength);
 
           //Load the cached binary data
           programId = glCreateProgram();
           glProgramBinary(programId, cachedBinaryFormat,
                           cachedBinaryData, cachedBinaryLength);
+          delete [] cachedBinaryData;
 
           //Return the program ID, unless the cache was faulty, then delete and carry on
           if (checkProgram(programId)) {
@@ -279,7 +284,7 @@ namespace ammonite {
       }
 
       //Since cache wasn't available, generate fresh shaders
-      GLuint shaderIds[shaderCount];
+      GLuint* shaderIds = new GLuint[shaderCount];
       bool hasCreatedShaders = true;
       for (int i = 0; i < shaderCount; i++) {
         shaderIds[i] = loadShader(shaderPaths[i], shaderTypes[i], externalSuccess);
@@ -304,8 +309,10 @@ namespace ammonite {
             glDeleteShader(shaderIds[shaderCount]);
           }
         }
+        delete [] shaderIds;
         return -1;
       }
+      delete [] shaderIds;
 
       //Cache the binary if enabled
       if (isCacheSupported) {
@@ -398,9 +405,9 @@ namespace ammonite {
         }
 
         //Repack shaders
-        const char* shaderPaths[shaders.size()];
-        GLenum shaderTypes[types.size()];
-        const int shaderCount = sizeof(shaderPaths) / sizeof(shaderPaths[0]);
+        const int shaderCount = shaders.size();
+        const char** shaderPaths = new const char*[shaderCount];
+        GLenum* shaderTypes = new GLenum[shaderCount];
 
         for (unsigned int i = 0; i < shaders.size(); i++) {
           shaderPaths[i] = shaders[i].c_str();
@@ -408,7 +415,11 @@ namespace ammonite {
         }
 
         //Create the program and return the ID
-        return createProgramCached(shaderPaths, shaderTypes, shaderCount, externalSuccess);
+        int programId = createProgramCached(shaderPaths, shaderTypes,
+                                            shaderCount, externalSuccess);
+        delete [] shaderTypes;
+        delete [] shaderPaths;
+        return programId;
       }
 
       //Load all shaders in a directory and hand off to createProgram(paths)
@@ -432,15 +443,17 @@ namespace ammonite {
         }
 
         //Repack shaders
-        const char* shaderPaths[shaders.size()];
-        const int shaderCount = sizeof(shaderPaths) / sizeof(shaderPaths[0]);
+        const int shaderCount = shaders.size();
+        const char** shaderPaths = new const char*[shaderCount];
 
         for (unsigned int i = 0; i < shaders.size(); i++) {
           shaderPaths[i] = shaders[i].c_str();
         }
 
         //Create the program and return the ID
-        return createProgram(shaderPaths, shaderCount, externalSuccess);
+        int programId = createProgram(shaderPaths, shaderCount, externalSuccess);
+        delete [] shaderPaths;
+        return programId;
       }
     }
   }

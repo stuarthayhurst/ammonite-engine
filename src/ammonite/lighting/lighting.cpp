@@ -73,7 +73,7 @@ namespace ammonite {
         glm::vec4 diffuse;
         glm::vec4 specular;
         glm::vec4 power;
-      } shaderData[lightTrackerMap.size()];
+      };
 
       //Use 1 thread per 20 light sources, up to hardware maximum
       unsigned int threadCount = std::ceil(lightTrackerMap.size() / 20);
@@ -94,10 +94,12 @@ namespace ammonite {
       glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), 1.0f, 0.0f, *farPlanePtr);
 
       //Hold all calculated light / shadow transformation matrices
-      glm::mat4 lightTransforms[lightTrackerMap.size()][6];
-      int lightTransformIds[lightTrackerMap.size()];
+      glm::mat4(*lightTransforms)[6] = new glm::mat4[lightTrackerMap.size()][6];
+      int* lightTransformIds = new int[lightTrackerMap.size()];
 
       //Repack light sources into ShaderData (uses vec4s for OpenGL)
+      ShaderLightSource* shaderData = new ShaderLightSource[lightTrackerMap.size()];
+      int shaderDataSize = lightTrackerMap.size() * sizeof(ShaderLightSource);
       #pragma omp parallel for
       for (unsigned int i = 0; i < lightTrackerMap.size(); i++) {
         //Repacking light sources
@@ -137,10 +139,12 @@ namespace ammonite {
         std::memcpy(lightTransformMap[lightTransformIds[i]],
                     lightTransforms[i], sizeof(glm::mat4) * 6);
       }
+      delete [] lightTransforms;
+      delete [] lightTransformIds;
 
       //If the light count hasn't changed, sub the data instead of recreating the buffer
       if (prevLightCount == lightTrackerMap.size()) {
-        glNamedBufferSubData(lightDataId, 0, sizeof(shaderData), &shaderData);
+        glNamedBufferSubData(lightDataId, 0, shaderDataSize, shaderData);
       } else {
         //If the buffer already exists, destroy it
         if (lightDataId != 0) {
@@ -149,8 +153,9 @@ namespace ammonite {
 
         //Add the shader data to a shader storage buffer object
         glCreateBuffers(1, &lightDataId);
-        glNamedBufferData(lightDataId, sizeof(shaderData), &shaderData, GL_STATIC_DRAW);
+        glNamedBufferData(lightDataId, shaderDataSize, shaderData, GL_STATIC_DRAW);
       }
+      delete [] shaderData;
 
       //Use the lighting shader storage buffer
       glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, lightDataId);
