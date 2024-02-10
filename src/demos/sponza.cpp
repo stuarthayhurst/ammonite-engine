@@ -84,6 +84,12 @@ namespace sponzaDemo {
     ammonite::lighting::updateLightSources();
     ammonite::lighting::setAmbientLight(glm::vec3(0.1f, 0.1f, 0.1f));
 
+    //Set the camera position
+    int cameraId = ammonite::camera::getActiveCamera();
+    ammonite::camera::setPosition(cameraId, glm::vec3(5.0f, 1.5f, 0.0f));
+    ammonite::camera::setHorizontal(cameraId, glm::radians(270.0f));
+    ammonite::camera::setVertical(cameraId, glm::radians(10.0f));
+
     return 0;
   }
 

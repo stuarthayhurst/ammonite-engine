@@ -84,6 +84,12 @@ namespace monkeyDemo {
     ammonite::lighting::updateLightSources();
     ammonite::lighting::setAmbientLight(glm::vec3(0.1f, 0.1f, 0.1f));
 
+    //Set the camera position
+    int cameraId = ammonite::camera::getActiveCamera();
+    ammonite::camera::setPosition(cameraId, glm::vec3(0.0f, 0.0f, 5.0f));
+    ammonite::camera::setHorizontal(cameraId, glm::radians(180.0f));
+    ammonite::camera::setVertical(cameraId, glm::radians(0.0f));
+
     return 0;
   }
 

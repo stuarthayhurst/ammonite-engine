@@ -82,6 +82,12 @@ namespace manyCubesDemo {
       ammonite::lighting::properties::setColour(lightSourceIds[i], glm::vec3(red, green, blue));
     }
 
+    //Set the camera position
+    int cameraId = ammonite::camera::getActiveCamera();
+    ammonite::camera::setPosition(cameraId, glm::vec3(0.0f, 12.0f, 0.0f));
+    ammonite::camera::setHorizontal(cameraId, glm::radians(45.0f));
+    ammonite::camera::setVertical(cameraId, glm::radians(-20.0f));
+
     return 0;
   }
 

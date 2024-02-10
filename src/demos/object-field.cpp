@@ -52,7 +52,8 @@ namespace objectFieldDemo {
 
       ammonite::models::position::setRotation(modelId, glm::vec3(-vert, horiz, 0.0f));
       ammonite::models::position::setScale(modelId, 0.25f);
-      ammonite::models::position::setPosition(modelId, ammonite::camera::getPosition(activeCameraId));
+      ammonite::models::position::setPosition(modelId,
+                                              ammonite::camera::getPosition(activeCameraId));
 
       std::cout << "Spawned object" << std::endl;
     }
@@ -190,6 +191,12 @@ namespace objectFieldDemo {
     //Set keybinds
     cubeKeybindId = ammonite::input::registerToggleKeybind(
                           GLFW_KEY_F, spawnCubeCallback, &loadedModelIds);
+
+    //Set the camera position
+    int cameraId = ammonite::camera::getActiveCamera();
+    ammonite::camera::setPosition(cameraId, glm::vec3(7.5f, 7.5f, 7.5f));
+    ammonite::camera::setHorizontal(cameraId, glm::radians(225.0f));
+    ammonite::camera::setVertical(cameraId, glm::radians(-20.0f));
 
     return 0;
   }

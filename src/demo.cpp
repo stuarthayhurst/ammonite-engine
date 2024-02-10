@@ -249,8 +249,7 @@ int main(int argc, char* argv[]) {
   cameraData.cameraIndex = 0;
   cameraData.cameraIds = {0, ammonite::camera::createCamera()};
 
-  //Set the camera to the start position
-  ammonite::camera::setPosition(cameraData.cameraIds[0], glm::vec3(0.0f, 0.0f, 5.0f));
+  //Set the non-default camera to the start position
   ammonite::camera::setPosition(cameraData.cameraIds[1], glm::vec3(0.0f, 0.0f, 2.0f));
 
   //Set keybinds
