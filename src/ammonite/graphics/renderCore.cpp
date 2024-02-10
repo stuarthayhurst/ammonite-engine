@@ -550,11 +550,11 @@ namespace ammonite {
       if (renderMode == AMMONITE_DATA_REFRESH || *modelPtrsPtr == nullptr) {
         //Free old model cache
         if (*modelPtrsPtr != nullptr) {
-          std::free(*modelPtrsPtr);
+          delete [] *modelPtrsPtr;
         }
 
         //Create and fill / update model pointers cache
-        *modelPtrsPtr = (ammonite::models::internal::ModelInfo**)std::malloc(sizeof(void*) * modelCount);
+        *modelPtrsPtr = new ammonite::models::internal::ModelInfo*[modelCount];
         ammonite::models::internal::getModels(modelType, modelCount, *modelPtrsPtr);
 
         //Return if only refreshing

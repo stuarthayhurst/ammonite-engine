@@ -25,13 +25,13 @@ if (ammonite::thread::internal::createThreadPool((THREADS)) == -1) { \
 #endif
 
 #define PREP_SYNC(jobCount, syncs) \
-std::atomic_flag* syncs = (std::atomic_flag*)std::malloc(sizeof(std::atomic_flag) * (jobCount));
+std::atomic_flag* syncs = new std::atomic_flag[(jobCount)];
 
 #define SYNC_THREADS(jobCount, syncs) \
 for (int i = 0; i < (jobCount); i++) { \
   ammonite::thread::waitWorkComplete(&(syncs)[i]); \
 } \
-std::free((syncs));
+delete [] (syncs);
 
 #define INIT_TIMERS \
 ammonite::utils::Timer submitTimer; \
