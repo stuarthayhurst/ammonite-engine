@@ -17,7 +17,7 @@ if (ammonite::thread::internal::createThreadPool((THREADS)) == -1) { \
   #define DESTROY_THREAD_POOL \
   ammonite::thread::internal::destroyThreadPool(); \
     if (ammonite::thread::internal::debugCheckRemainingWork(false)) { \
-      return false; \
+      passed = false; \
     }
 #else
   #define DESTROY_THREAD_POOL \
@@ -51,17 +51,31 @@ runTimer.reset(); \
 totalTimer.reset();
 
 #define SUBMIT_JOBS \
+bool passed = true; \
+int* values = new int[jobCount]{}; \
 for (int i = 0; i < jobCount; i++) { \
-  ammonite::thread::submitWork(shortTask, nullptr, nullptr); \
+  ammonite::thread::submitWork(shortTask, &values[i], nullptr); \
 }
 
 #define SUBMIT_SYNC_JOBS \
+bool passed = true; \
+int* values = new int[jobCount]{}; \
 for (int i = 0; i < jobCount; i++) { \
-  ammonite::thread::submitWork(shortTask, nullptr, &syncs[i]); \
+  ammonite::thread::submitWork(shortTask, &values[i], &syncs[i]); \
 }
 
-static void shortTask(void*) {
-  return;
+#define VERIFY_WORK \
+for (int i = 0; i < jobCount; i++) { \
+  if (values[i] != 1) { \
+    passed = false; \
+    ammonite::utils::error << "Failed to verify work" << std::endl; \
+    break; \
+  } \
+} \
+delete [] values;
+
+static void shortTask(void* userPtr) {
+  *(int*)userPtr = 1;
 }
 
 namespace {
@@ -78,9 +92,10 @@ namespace {
     //Finish work
     SYNC_THREADS(jobCount, syncs)
     FINISH_TIMERS
+    VERIFY_WORK
 
     DESTROY_THREAD_POOL
-    return true;
+    return passed;
   }
 
   static bool testCreateSubmitBlockUnblockDestroy(int jobCount) {
@@ -96,9 +111,10 @@ namespace {
     ammonite::thread::blockThreadsSync();
     ammonite::thread::unblockThreadsSync();
     FINISH_TIMERS
+    VERIFY_WORK
 
     DESTROY_THREAD_POOL
-    return true;
+    return passed;
   }
 
   static bool testCreateSubmitDestroy(int jobCount) {
@@ -113,8 +129,9 @@ namespace {
     //Finish work
     DESTROY_THREAD_POOL
     FINISH_TIMERS
+    VERIFY_WORK
 
-    return true;
+    return passed;
   }
 
   static bool testCreateBlockSubmitUnblockWaitDestroy(int jobCount) {
@@ -133,9 +150,10 @@ namespace {
     ammonite::thread::unblockThreadsSync();
     SYNC_THREADS(jobCount, syncs)
     FINISH_TIMERS
+    VERIFY_WORK
 
     DESTROY_THREAD_POOL
-    return true;
+    return passed;
   }
 
   static bool testSubmitCreateWaitDestroy(int jobCount) {
@@ -154,9 +172,10 @@ namespace {
     //Finish work
     SYNC_THREADS(jobCount, syncs)
     FINISH_TIMERS
+    VERIFY_WORK
 
     DESTROY_THREAD_POOL
-    return true;
+    return passed;
   }
 }
 
@@ -171,7 +190,8 @@ namespace {
 
     SUBMIT_JOBS
     DESTROY_THREAD_POOL
-    return true;
+    VERIFY_WORK
+    return passed;
   }
 
   static bool testCreateBlockBlockUnblockSubmitDestroy(int jobCount) {
@@ -183,7 +203,8 @@ namespace {
 
     SUBMIT_JOBS
     DESTROY_THREAD_POOL
-    return true;
+    VERIFY_WORK
+    return passed;
   }
 
   static bool testCreateBlockBlockSubmitUnblockDestroy(int jobCount) {
@@ -196,7 +217,8 @@ namespace {
     ammonite::thread::unblockThreadsSync();
 
     DESTROY_THREAD_POOL
-    return true;
+    VERIFY_WORK
+    return passed;
   }
 
   static bool testCreateBlockBlockSubmitDestroy(int jobCount) {
@@ -207,7 +229,8 @@ namespace {
 
     SUBMIT_JOBS
     DESTROY_THREAD_POOL
-    return true;
+    VERIFY_WORK
+    return passed;
   }
 
   static bool testCreateBlockUnblockUnblockSubmitDestroy(int jobCount) {
@@ -219,7 +242,8 @@ namespace {
 
     SUBMIT_JOBS
     DESTROY_THREAD_POOL
-    return true;
+    VERIFY_WORK
+    return passed;
   }
 
   static bool testCreateUnblockSubmitDestroy(int jobCount) {
@@ -229,7 +253,8 @@ namespace {
 
     SUBMIT_JOBS
     DESTROY_THREAD_POOL
-    return true;
+    VERIFY_WORK
+    return passed;
   }
 }
 
