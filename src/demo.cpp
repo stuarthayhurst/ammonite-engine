@@ -185,7 +185,7 @@ int main(int argc, char* argv[]) {
 #endif
 
   //Setup window and icon
-  if (ammonite::window::createWindow(1024, 768, "OpenGL Experiments") == -1) {
+  if (ammonite::window::createWindow(1024, 768, "Ammonite Engine") == -1) {
     return EXIT_FAILURE;
   }
   ammonite::window::useIconDir("assets/icons/");
