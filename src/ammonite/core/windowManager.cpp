@@ -5,8 +5,8 @@
 
 #include "../internal/internalSettings.hpp"
 
+#include "../enums.hpp"
 #include "../utils/debug.hpp"
-#include "../types.hpp"
 
 namespace ammonite {
   namespace window {

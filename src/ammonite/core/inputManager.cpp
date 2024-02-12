@@ -4,6 +4,7 @@
 
 #include <GLFW/glfw3.h>
 
+#include "../enums.hpp"
 #include "../types.hpp"
 #include "../utils/debug.hpp"
 

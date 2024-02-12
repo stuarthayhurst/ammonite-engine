@@ -1,7 +1,7 @@
 #ifndef KEYBINDS
 #define KEYBINDS
 
-#include "../types.hpp"
+#include "../enums.hpp"
 
 namespace ammonite {
   namespace utils {

@@ -17,6 +17,7 @@
 #include "utils/timer.hpp"
 
 #include "camera.hpp"
+#include "enums.hpp"
 #include "environment.hpp"
 #include "input.hpp"
 #include "interface.hpp"

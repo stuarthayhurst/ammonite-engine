@@ -27,8 +27,8 @@
 #include "../lighting/lightInterface.hpp"
 
 #include "../camera.hpp"
+#include "../enums.hpp"
 #include "../environment.hpp"
-#include "../types.hpp"
 
 #include "../utils/logging.hpp"
 #include "../utils/debug.hpp"

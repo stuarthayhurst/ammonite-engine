@@ -3,6 +3,7 @@
 #include "core/inputManager.hpp"
 #include "utils/internal/internalControls.hpp"
 #include "utils/debug.hpp"
+#include "enums.hpp"
 #include "types.hpp"
 
 #define OVERRIDE_MODE_DEFAULT AMMONITE_FORCE_RELEASE

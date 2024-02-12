@@ -7,7 +7,7 @@
 
 #include <map>
 
-#include "../types.hpp"
+#include "../enums.hpp"
 
 namespace ammonite {
   namespace utils {

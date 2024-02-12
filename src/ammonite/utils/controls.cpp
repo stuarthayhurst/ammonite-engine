@@ -11,8 +11,8 @@
 
 #include "../internal/internalSettings.hpp"
 #include "../internal/keybindTracker.hpp"
-#include "../types.hpp"
 #include "../camera.hpp"
+#include "../enums.hpp"
 #include "timer.hpp"
 
 namespace ammonite {

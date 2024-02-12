@@ -9,7 +9,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/quaternion.hpp>
 
-#include "../types.hpp"
+#include "../enums.hpp"
 
 #include "internal/modelTypes.hpp"
 #include "internal/modelLoader.hpp"

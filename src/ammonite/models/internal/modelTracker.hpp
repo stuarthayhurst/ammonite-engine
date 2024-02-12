@@ -6,7 +6,7 @@
 */
 
 #include "modelTypes.hpp"
-#include "../../types.hpp"
+#include "../../enums.hpp"
 
 namespace ammonite {
   namespace models {

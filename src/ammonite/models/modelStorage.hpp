@@ -1,7 +1,7 @@
 #ifndef MODELSTORAGE
 #define MODELSTORAGE
 
-#include "../types.hpp"
+#include "../enums.hpp"
 
 namespace ammonite {
   namespace models {
