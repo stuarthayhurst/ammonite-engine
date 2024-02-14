@@ -90,8 +90,10 @@ namespace ammonite {
         return;
       }
 
-      static float* farPlanePtr = ammonite::settings::graphics::internal::getShadowFarPlanePtr();
-      glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), 1.0f, 0.0f, *farPlanePtr);
+      static float* shadowFarPlanePtr =
+        ammonite::settings::graphics::internal::getShadowFarPlanePtr();
+      glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f),
+                                              1.0f, 0.0f, *shadowFarPlanePtr);
 
       if (prevLightCount != lightTrackerMap.size()) {
         if (lightTransforms != nullptr) {
