@@ -114,7 +114,6 @@ namespace manyCubesDemo {
       ammonite::lighting::properties::setGeometry(currLightSourceId, lightSourcePositions[i]);
     }
 
-    ammonite::lighting::updateLightSources();
     ammonite::renderer::drawFrame();
     return 0;
   }

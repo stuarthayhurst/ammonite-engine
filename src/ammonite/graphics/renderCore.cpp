@@ -22,7 +22,7 @@
 #include "../models/internal/modelTracker.hpp"
 
 #include "../lighting/internal/lightTypes.hpp"
-#include "../lighting/internal/lightTracker.hpp"
+#include "../lighting/internal/internalLighting.hpp"
 #include "../lighting/lightStorage.hpp"
 #include "../lighting/lightInterface.hpp"
 

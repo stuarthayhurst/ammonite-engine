@@ -164,6 +164,7 @@ namespace objectFieldDemo {
     int lightIds[2];
     lightIds[0] = ammonite::lighting::createLightSource();
     lightIds[1] = ammonite::lighting::createLightSource();
+    ammonite::lighting::setAmbientLight(glm::vec3(0.1f, 0.1f, 0.1f));
 
     //Adjust light model properties
     ammonite::models::position::setPosition(loadedModelIds[0], glm::vec3(4.0f, 4.0f, 4.0f));
@@ -176,10 +177,6 @@ namespace objectFieldDemo {
     ammonite::lighting::properties::setPower(lightIds[1], 50.0f);
     ammonite::lighting::linkModel(lightIds[0], loadedModelIds[0]);
     ammonite::lighting::linkModel(lightIds[1], loadedModelIds[1]);
-
-    //Update trackers
-    ammonite::lighting::updateLightSources();
-    ammonite::lighting::setAmbientLight(glm::vec3(0.1f, 0.1f, 0.1f));
 
     lightData[0].orbitIndex = 0;
     lightData[1].orbitIndex = 1;
@@ -283,8 +280,7 @@ namespace objectFieldDemo {
       ammonite::models::position::setPosition(lightData[i].linkedModelId, glm::vec3(lightPositionX, 4.0f, lightPositionY));
     }
 
-    //Update light and draw the frame
-    ammonite::lighting::updateLightSources();
+    //Draw the frame
     ammonite::renderer::drawFrame();
     return 0;
   }

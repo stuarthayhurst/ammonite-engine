@@ -81,7 +81,6 @@ namespace monkeyDemo {
     int lightId = ammonite::lighting::createLightSource();
     ammonite::lighting::properties::setPower(lightId, 50.0f);
     ammonite::lighting::linkModel(lightId, loadedModelIds[modelCount - 1]);
-    ammonite::lighting::updateLightSources();
     ammonite::lighting::setAmbientLight(glm::vec3(0.1f, 0.1f, 0.1f));
 
     //Set the camera position

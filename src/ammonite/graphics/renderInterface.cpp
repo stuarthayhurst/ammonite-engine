@@ -8,6 +8,7 @@
 
 #include "internal/internalRenderCore.hpp"
 #include "../internal/interfaceTracker.hpp"
+#include "../lighting/internal/internalLighting.hpp"
 
 /*
  - Externally exposed renderer functions
@@ -73,7 +74,11 @@ namespace ammonite {
       }
 
       //Offload rest of frame drawing to helpers
+      static bool* lightDataChanged = ammonite::lighting::internal::getLightSourcesChangedPtr();
       if (loadingScreenId == -1) {
+        if (*lightDataChanged) {
+          ammonite::lighting::internal::updateLightSources();
+        }
         internal::internalDrawFrame();
       } else {
         internal::internalDrawLoadingScreen(loadingScreenId);

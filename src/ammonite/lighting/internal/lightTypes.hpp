@@ -2,8 +2,7 @@
 #define LIGHTTYPES
 
 /* Internally exposed header:
- - Allow access to light tracker internally
- - Allow access to light transforms internally
+ - Define data structures for lights
 */
 
 #include <glm/glm.hpp>

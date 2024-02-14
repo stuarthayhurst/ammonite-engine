@@ -2,7 +2,9 @@
 #define LIGHTTRACKER
 
 /* Internally exposed header:
- - Define data structures for lights
+ - Allow access to light tracker internally
+ - Allow access to light transforms internally
+ - Allow triggering light sources to be processed for the GPU
 */
 
 #include <map>
@@ -16,8 +18,11 @@ namespace ammonite {
       void unlinkByModel(int modelId);
       LightSource* getLightSourcePtr(int lightId);
 
+      void updateLightSources();
+
       std::map<int, LightSource>* getLightTrackerPtr();
       glm::mat4** getLightTransformsPtr();
+      bool* getLightSourcesChangedPtr();
     }
   }
 }

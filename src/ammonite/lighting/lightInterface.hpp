@@ -5,12 +5,6 @@
 
 namespace ammonite {
   namespace lighting {
-//Fits in both storage and interface, but can only be defined once
-#ifndef UPDATESOURCESCALL
-#define UPDATESOURCESCALL
-    void updateLightSources();
-#endif
-
     glm::vec3 getAmbientLight();
     void setAmbientLight(glm::vec3 newAmbientLight);
 

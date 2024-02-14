@@ -14,7 +14,7 @@
 #include "internal/modelTypes.hpp"
 #include "internal/modelLoader.hpp"
 
-#include "../lighting/internal/lightTracker.hpp"
+#include "../lighting/internal/internalLighting.hpp"
 #include "../graphics/internal/internalTextures.hpp"
 #include "../utils/logging.hpp"
 
@@ -133,6 +133,8 @@ namespace ammonite {
 
     //Track cumulative number of created models
     int totalModels = 0;
+
+    bool* lightSourcesChangedPtr = ammonite::lighting::internal::getLightSourcesChangedPtr();
 
     ModelTracker activeModelTracker(&modelIdPtrMap);
     ModelTracker inactiveModelTracker(&modelIdPtrMap);
@@ -573,6 +575,10 @@ namespace ammonite {
         //Set the position
         modelObject->positionData.translationMatrix = glm::translate(glm::mat4(1.0f), position);
 
+        if (modelObject->lightEmitterId != -1) {
+          *lightSourcesChangedPtr = true;
+        }
+
         //Recalculate model and normal matrices
         calcModelMatrices(&modelObject->positionData);
       }
@@ -586,6 +592,10 @@ namespace ammonite {
 
         //Set the scale
         modelObject->positionData.scaleMatrix = glm::scale(glm::mat4(1.0f), scale);
+
+        if (modelObject->lightEmitterId != -1) {
+          *lightSourcesChangedPtr = true;
+        }
 
         //Recalculate model and normal matrices
         calcModelMatrices(&modelObject->positionData);
@@ -606,6 +616,10 @@ namespace ammonite {
         //Set the rotation
         modelObject->positionData.rotationQuat = glm::quat(rotation) * glm::quat(glm::vec3(0, 0, 0));
 
+        if (modelObject->lightEmitterId != -1) {
+          *lightSourcesChangedPtr = true;
+        }
+
         //Recalculate model and normal matrices
         calcModelMatrices(&modelObject->positionData);
       }
@@ -625,6 +639,10 @@ namespace ammonite {
           modelObject->positionData.translationMatrix,
           translation);
 
+        if (modelObject->lightEmitterId != -1) {
+          *lightSourcesChangedPtr = true;
+        }
+
         //Recalculate model and normal matrices
         calcModelMatrices(&modelObject->positionData);
       }
@@ -640,6 +658,10 @@ namespace ammonite {
         modelObject->positionData.scaleMatrix = glm::scale(
           modelObject->positionData.scaleMatrix,
           scaleVector);
+
+        if (modelObject->lightEmitterId != -1) {
+          *lightSourcesChangedPtr = true;
+        }
 
         //Recalculate model and normal matrices
         calcModelMatrices(&modelObject->positionData);
@@ -659,6 +681,10 @@ namespace ammonite {
 
         //Rotate it
         modelObject->positionData.rotationQuat = glm::quat(rotation) * modelObject->positionData.rotationQuat;
+
+        if (modelObject->lightEmitterId != -1) {
+          *lightSourcesChangedPtr = true;
+        }
 
         //Recalculate model and normal matrices
         calcModelMatrices(&modelObject->positionData);
