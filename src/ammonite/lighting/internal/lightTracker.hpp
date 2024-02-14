@@ -17,7 +17,7 @@ namespace ammonite {
       LightSource* getLightSourcePtr(int lightId);
 
       std::map<int, LightSource>* getLightTrackerPtr();
-      std::map<int, glm::mat4[6]>* getLightTransformsPtr();
+      glm::mat4** getLightTransformsPtr();
     }
   }
 }

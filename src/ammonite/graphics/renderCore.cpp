@@ -114,7 +114,7 @@ namespace ammonite {
 
       //Get the light trackers
       std::map<int, ammonite::lighting::internal::LightSource>* lightTrackerMap = ammonite::lighting::internal::getLightTrackerPtr();
-      std::map<int, glm::mat4[6]>* lightTransformMap = ammonite::lighting::internal::getLightTransformsPtr();
+      glm::mat4** lightTransformsPtr = ammonite::lighting::internal::getLightTransformsPtr();
       unsigned int maxLightCount = 0;
 
       //Get the loading screen tracker
@@ -724,10 +724,12 @@ namespace ammonite {
           }
 
           //Pass shadow transform matrices to depth shader
+          glm::mat4* lightTransformStart = *lightTransformsPtr + lightSource->lightIndex * 6;
           for (int i = 0; i < 6; i++) {
             GLuint shadowMatrixId = glGetUniformLocation(depthShader.shaderId, std::string("shadowMatrices[" + std::to_string(i) + "]").c_str());
             //Fetch the transform from the tracker, and send to the shader
-            glUniformMatrix4fv(shadowMatrixId, 1, GL_FALSE, glm::value_ptr((*lightTransformMap)[lightSource->lightId][i]));
+            glUniformMatrix4fv(shadowMatrixId, 1, GL_FALSE,
+                               glm::value_ptr(lightTransformStart[i]));
           }
 
           //Pass light source specific uniforms

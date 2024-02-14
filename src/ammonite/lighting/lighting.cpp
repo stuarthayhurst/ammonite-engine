@@ -26,7 +26,7 @@ namespace ammonite {
 
     //Track light sources
     std::map<int, lighting::internal::LightSource> lightTrackerMap;
-    std::map<int, glm::mat4[6]> lightTransformMap;
+    glm::mat4* lightTransforms = nullptr;
     unsigned int prevLightCount = 0;
 
     //Track cumulative number of created light sources
@@ -49,8 +49,8 @@ namespace ammonite {
         return &lightTrackerMap;
       }
 
-      std::map<int, glm::mat4[6]>* getLightTransformsPtr() {
-        return &lightTransformMap;
+      glm::mat4** getLightTransformsPtr() {
+        return &lightTransforms;
       }
 
       //Unlink a light source from a model, using only the model ID (doesn't touch the model)
@@ -93,9 +93,12 @@ namespace ammonite {
       static float* farPlanePtr = ammonite::settings::graphics::internal::getShadowFarPlanePtr();
       glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), 1.0f, 0.0f, *farPlanePtr);
 
-      //Hold all calculated light / shadow transformation matrices
-      glm::mat4(*lightTransforms)[6] = new glm::mat4[lightTrackerMap.size()][6];
-      int* lightTransformIds = new int[lightTrackerMap.size()];
+      if (prevLightCount != lightTrackerMap.size()) {
+        if (lightTransforms != nullptr) {
+          delete [] lightTransforms;
+        }
+        lightTransforms = new glm::mat4[lightTrackerMap.size() * 6];
+      }
 
       //Repack light sources into ShaderData (uses vec4s for OpenGL)
       ShaderLightSource* shaderData = new ShaderLightSource[lightTrackerMap.size()];
@@ -106,6 +109,7 @@ namespace ammonite {
         auto lightIt = lightTrackerMap.begin();
         std::advance(lightIt, i);
         auto lightSource = &lightIt->second;
+        lightSource->lightIndex = i;
 
         //Override position for light emitting models, and add to tracker
         if (lightSource->modelId != -1) {
@@ -114,18 +118,18 @@ namespace ammonite {
 
           //Update lightIndex for rendering light emitting models
           auto modelPtr = ammonite::models::internal::getModelPtr(lightSource->modelId);
-          modelPtr->lightIndex = i;
+          modelPtr->lightIndex = lightSource->lightIndex;
         }
 
         //Calculate shadow transforms for shadows
         glm::vec3 lightPos = lightSource->geometry;
-        lightTransformIds[i] = lightSource->lightId;
-        lightTransforms[i][0] = shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));
-        lightTransforms[i][1] = shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));
-        lightTransforms[i][2] = shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0));
-        lightTransforms[i][3] = shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0));
-        lightTransforms[i][4] = shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0));
-        lightTransforms[i][5] = shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0));
+        glm::mat4* transformStart = lightTransforms + (lightSource->lightIndex * 6);
+        transformStart[0] = shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));
+        transformStart[1] = shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));
+        transformStart[2] = shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0));
+        transformStart[3] = shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0));
+        transformStart[4] = shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0));
+        transformStart[5] = shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0));
 
         //Repack lighting information
         shaderData[i].geometry = glm::vec4(lightSource->geometry, 0.0f);
@@ -133,14 +137,6 @@ namespace ammonite {
         shaderData[i].specular = glm::vec4(lightSource->specular, 0.0f);
         shaderData[i].power = glm::vec4(lightSource->power, 0.0f, 0.0f, 0.0f);
       }
-
-      //Copy calculated tranforms to map
-      for (unsigned int i = 0; i < lightTrackerMap.size(); i++) {
-        std::memcpy(lightTransformMap[lightTransformIds[i]],
-                    lightTransforms[i], sizeof(glm::mat4) * 6);
-      }
-      delete [] lightTransforms;
-      delete [] lightTransformIds;
 
       //If the light count hasn't changed, sub the data instead of recreating the buffer
       if (prevLightCount == lightTrackerMap.size()) {
@@ -214,10 +210,11 @@ namespace ammonite {
         lightTrackerMap.erase(lightId);
       }
 
-      //Remove any light transform entry
-      if (lightTransformMap.contains(lightId)) {
-        //Remove the light source tranforms from the tracker
-        lightTransformMap.erase(lightId);
+      if (lightTrackerMap.size() == 0) {
+        if (lightTransforms != nullptr) {
+          delete [] lightTransforms;
+        }
+        lightTransforms = nullptr;
       }
     }
 
