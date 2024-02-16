@@ -68,7 +68,7 @@ for (int i = 0; i < jobCount; i++) { \
 for (int i = 0; i < jobCount; i++) { \
   if (values[i] != 1) { \
     passed = false; \
-    ammonite::utils::error << "Failed to verify work" << std::endl; \
+    ammonite::utils::error << "Failed to verify work (index " << i << ")" << std::endl; \
     break; \
   } \
 } \
@@ -76,6 +76,16 @@ delete [] values;
 
 static void shortTask(void* userPtr) {
   *(int*)userPtr = 1;
+}
+
+struct ResubmitData {
+  int* writePtr;
+  std::atomic_flag* syncPtr;
+};
+
+static void resubmitTask(void* userPtr) {
+  ResubmitData* dataPtr = (ResubmitData*)userPtr;
+  ammonite::thread::submitWork(shortTask, dataPtr->writePtr, dataPtr->syncPtr);
 }
 
 namespace {
@@ -175,6 +185,33 @@ namespace {
     VERIFY_WORK
 
     DESTROY_THREAD_POOL
+    return passed;
+  }
+
+  static bool testNestedJobs(int fullJobCount) {
+    int jobCount = fullJobCount / 2;
+    INIT_TIMERS
+    CREATE_THREAD_POOL(0)
+    PREP_SYNC(jobCount, syncs)
+
+    //Submit nested 'jobs'
+    RESET_TIMERS
+    bool passed = true;
+    int* values = new int[jobCount]{};
+    ResubmitData* data = new ResubmitData[jobCount]{};
+    for (int i = 0; i < jobCount; i++) {
+      data[i].writePtr = &values[i];
+      data[i].syncPtr = &syncs[i];
+      ammonite::thread::submitWork(resubmitTask, &data[i], nullptr);
+    }
+    submitTimer.pause();
+
+    //Finish work
+    SYNC_THREADS(jobCount, syncs)
+    FINISH_TIMERS
+    VERIFY_WORK
+    DESTROY_THREAD_POOL
+
     return passed;
   }
 }
@@ -278,6 +315,9 @@ int main() {
 
   std::cout << "Testing pre-filled queue" << std::endl;
   failed |= !testSubmitCreateWaitDestroy(JOB_COUNT);
+
+  std::cout << "Testing nested jobs" << std::endl;
+  failed |= !testNestedJobs(JOB_COUNT);
 
   //Begin blocking tests
   std::cout << "Testing double block, double unblock" << std::endl;
