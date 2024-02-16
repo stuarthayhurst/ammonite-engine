@@ -190,6 +190,7 @@ namespace ammonite {
 
       //Jobs submitted at the same time may execute, but the threads will block after
       //Guarantees work submitted after won't begin yet
+      //Unsafe to call from multiple threads due to blockBalance
       void blockThreads(bool sync) {
         //Skip blocking if it's already blocked / going to block
         if (blockBalance > 0) {
@@ -214,6 +215,7 @@ namespace ammonite {
         }
       }
 
+      //Unsafe to call from multiple threads due to blockBalance
       void unblockThreads(bool sync) {
         //Only unblock if it's already blocked / blocking
         if (blockBalance == 0) {
