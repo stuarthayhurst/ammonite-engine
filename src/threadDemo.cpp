@@ -50,22 +50,22 @@ submitTimer.reset(); \
 runTimer.reset(); \
 totalTimer.reset();
 
-#define SUBMIT_JOBS \
+#define SUBMIT_JOBS(jobCount) \
 bool passed = true; \
-int* values = new int[jobCount]{}; \
-for (int i = 0; i < jobCount; i++) { \
-  ammonite::thread::submitWork(shortTask, &values[i], nullptr); \
+int* values = new int[(jobCount)]{}; \
+for (int i = 0; i < (jobCount); i++) { \
+  ammonite::thread::submitWork(shortTask, &(values)[i], nullptr); \
 }
 
-#define SUBMIT_SYNC_JOBS \
+#define SUBMIT_SYNC_JOBS(jobCount, syncs) \
 bool passed = true; \
-int* values = new int[jobCount]{}; \
-for (int i = 0; i < jobCount; i++) { \
-  ammonite::thread::submitWork(shortTask, &values[i], &syncs[i]); \
+int* values = new int[(jobCount)]{}; \
+for (int i = 0; i < (jobCount); i++) { \
+  ammonite::thread::submitWork(shortTask, &(values)[i], &(syncs)[i]); \
 }
 
-#define VERIFY_WORK \
-for (int i = 0; i < jobCount; i++) { \
+#define VERIFY_WORK(jobCount) \
+for (int i = 0; i < (jobCount); i++) { \
   if (values[i] != 1) { \
     passed = false; \
     ammonite::utils::error << "Failed to verify work (index " << i << ")" << std::endl; \
@@ -96,13 +96,13 @@ namespace {
 
     //Submit fast 'jobs'
     RESET_TIMERS
-    SUBMIT_SYNC_JOBS
+    SUBMIT_SYNC_JOBS(jobCount, syncs)
     submitTimer.pause();
 
     //Finish work
     SYNC_THREADS(jobCount, syncs)
     FINISH_TIMERS
-    VERIFY_WORK
+    VERIFY_WORK(jobCount)
 
     DESTROY_THREAD_POOL
     return passed;
@@ -114,14 +114,14 @@ namespace {
 
     //Submit fast 'jobs'
     RESET_TIMERS
-    SUBMIT_JOBS
+    SUBMIT_JOBS(jobCount)
     submitTimer.pause();
 
     //Finish work
     ammonite::thread::blockThreadsSync();
     ammonite::thread::unblockThreadsSync();
     FINISH_TIMERS
-    VERIFY_WORK
+    VERIFY_WORK(jobCount)
 
     DESTROY_THREAD_POOL
     return passed;
@@ -133,13 +133,13 @@ namespace {
 
     //Submit fast 'jobs'
     RESET_TIMERS
-    SUBMIT_JOBS
+    SUBMIT_JOBS(jobCount)
     submitTimer.pause();
 
     //Finish work
     DESTROY_THREAD_POOL
     FINISH_TIMERS
-    VERIFY_WORK
+    VERIFY_WORK(jobCount)
 
     return passed;
   }
@@ -153,14 +153,14 @@ namespace {
 
     //Submit fast 'jobs'
     RESET_TIMERS
-    SUBMIT_SYNC_JOBS
+    SUBMIT_SYNC_JOBS(jobCount, syncs)
     submitTimer.pause();
 
     //Finish work
     ammonite::thread::unblockThreadsSync();
     SYNC_THREADS(jobCount, syncs)
     FINISH_TIMERS
-    VERIFY_WORK
+    VERIFY_WORK(jobCount)
 
     DESTROY_THREAD_POOL
     return passed;
@@ -173,7 +173,7 @@ namespace {
     //Submit fast 'jobs'
     submitTimer.reset();
     totalTimer.reset();
-    SUBMIT_SYNC_JOBS
+    SUBMIT_SYNC_JOBS(jobCount, syncs)
     submitTimer.pause();
 
     runTimer.reset();
@@ -182,7 +182,7 @@ namespace {
     //Finish work
     SYNC_THREADS(jobCount, syncs)
     FINISH_TIMERS
-    VERIFY_WORK
+    VERIFY_WORK(jobCount)
 
     DESTROY_THREAD_POOL
     return passed;
@@ -209,7 +209,7 @@ namespace {
     //Finish work
     SYNC_THREADS(jobCount, syncs)
     FINISH_TIMERS
-    VERIFY_WORK
+    VERIFY_WORK(jobCount)
     DESTROY_THREAD_POOL
 
     return passed;
@@ -225,9 +225,9 @@ namespace {
     ammonite::thread::unblockThreadsSync();
     ammonite::thread::unblockThreadsSync();
 
-    SUBMIT_JOBS
+    SUBMIT_JOBS(jobCount)
     DESTROY_THREAD_POOL
-    VERIFY_WORK
+    VERIFY_WORK(jobCount)
     return passed;
   }
 
@@ -238,9 +238,9 @@ namespace {
     ammonite::thread::blockThreadsSync();
     ammonite::thread::unblockThreadsSync();
 
-    SUBMIT_JOBS
+    SUBMIT_JOBS(jobCount)
     DESTROY_THREAD_POOL
-    VERIFY_WORK
+    VERIFY_WORK(jobCount)
     return passed;
   }
 
@@ -250,11 +250,11 @@ namespace {
     ammonite::thread::blockThreadsSync();
     ammonite::thread::blockThreadsSync();
 
-    SUBMIT_JOBS
+    SUBMIT_JOBS(jobCount)
     ammonite::thread::unblockThreadsSync();
 
     DESTROY_THREAD_POOL
-    VERIFY_WORK
+    VERIFY_WORK(jobCount)
     return passed;
   }
 
@@ -264,9 +264,9 @@ namespace {
     ammonite::thread::blockThreadsSync();
     ammonite::thread::blockThreadsSync();
 
-    SUBMIT_JOBS
+    SUBMIT_JOBS(jobCount)
     DESTROY_THREAD_POOL
-    VERIFY_WORK
+    VERIFY_WORK(jobCount)
     return passed;
   }
 
@@ -277,9 +277,9 @@ namespace {
     ammonite::thread::unblockThreadsSync();
     ammonite::thread::unblockThreadsSync();
 
-    SUBMIT_JOBS
+    SUBMIT_JOBS(jobCount)
     DESTROY_THREAD_POOL
-    VERIFY_WORK
+    VERIFY_WORK(jobCount)
     return passed;
   }
 
@@ -288,9 +288,9 @@ namespace {
 
     ammonite::thread::unblockThreadsSync();
 
-    SUBMIT_JOBS
+    SUBMIT_JOBS(jobCount)
     DESTROY_THREAD_POOL
-    VERIFY_WORK
+    VERIFY_WORK(jobCount)
     return passed;
   }
 }
