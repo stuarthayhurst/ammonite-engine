@@ -19,7 +19,7 @@ namespace objectFieldDemo {
       return (delta <= threshold);
     }
 
-    void genRandomPosData(glm::vec3 objectData[][3], int objectCount) {
+    void genRandomPosData(glm::vec3* objectData, int objectCount) {
       std::srand(std::time(nullptr));
       for (int i = 0; i < objectCount; i++) {
         glm::vec3 position, rotation, scale;
@@ -34,9 +34,27 @@ namespace objectFieldDemo {
 
         scale = glm::vec3(std::rand() / float(((RAND_MAX + 1u) / 1.2f)));
 
-        objectData[i][0] = position;
-        objectData[i][1] = rotation;
-        objectData[i][2] = scale;
+        objectData[(i * 3) + 0] = position;
+        objectData[(i * 3) + 1] = rotation;
+        objectData[(i * 3) + 2] = scale;
+      }
+    }
+
+    void genCubesCallback(std::vector<int>, int, void* userPtr) {
+      std::vector<int>* loadedModelIds = (std::vector<int>*)userPtr;
+
+      //Hold data for randomised cube positions
+      int cubeCount = loadedModelIds->size() - 3;
+      glm::vec3* cubeData = new glm::vec3[cubeCount * 3];
+
+      //Generate random position, rotation and scales, skip first item
+      genRandomPosData(cubeData, cubeCount);
+
+      for (int i = 0; i < cubeCount; i++) {
+        //Position the cube
+        ammonite::models::position::setPosition((*loadedModelIds)[i + 3], cubeData[(i * 3) + 0]);
+        ammonite::models::position::setRotation((*loadedModelIds)[i + 3], cubeData[(i * 3) + 1]);
+        ammonite::models::position::setScale((*loadedModelIds)[i + 3], cubeData[(i * 3) + 2]);
       }
     }
 
@@ -62,6 +80,7 @@ namespace objectFieldDemo {
   namespace {
     GLFWwindow* windowPtr;
     int cubeKeybindId;
+    int shuffleKeybindId;
 
     std::vector<int> loadedModelIds;
     int modelCount = 0;
@@ -81,6 +100,7 @@ namespace objectFieldDemo {
 
   int demoExit() {
     ammonite::input::unregisterKeybind(cubeKeybindId);
+    ammonite::input::unregisterKeybind(shuffleKeybindId);
 
     for (unsigned int i = 0; i < loadedModelIds.size(); i++) {
       ammonite::models::deleteModel(loadedModelIds[i]);
@@ -103,7 +123,7 @@ namespace objectFieldDemo {
     };
 
     //Generate random position, rotation and scales, skip first item
-    genRandomPosData(&cubeData[1], cubeCount);
+    genRandomPosData(&cubeData[1][0], cubeCount);
 
     //Load models from a set of objects and textures
     const char* models[][2] = {
@@ -187,7 +207,9 @@ namespace objectFieldDemo {
 
     //Set keybinds
     cubeKeybindId = ammonite::input::registerToggleKeybind(
-                          GLFW_KEY_F, spawnCubeCallback, &loadedModelIds);
+                      GLFW_KEY_F, spawnCubeCallback, &loadedModelIds);
+    shuffleKeybindId = ammonite::input::registerToggleKeybind(
+                      GLFW_KEY_R, genCubesCallback, &loadedModelIds);
 
     //Set the camera position
     int cameraId = ammonite::camera::getActiveCamera();
