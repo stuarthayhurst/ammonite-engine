@@ -25,7 +25,7 @@ namespace objectFieldDemo {
         glm::vec3 position, rotation, scale;
 
         position.x = (std::rand() / float(((RAND_MAX + 1u) / 20))) - 10.0f;
-        position.y = (std::rand() / float(((RAND_MAX + 1u) / 4))) - 3.0f;
+        position.y = (std::rand() / float(((RAND_MAX + 1u) / 3))) - 2.0f;
         position.z = (std::rand() / float(((RAND_MAX + 1u) / 20))) - 10.0f;
 
         rotation.x = std::rand() / float(((RAND_MAX + 1u) / 360));
