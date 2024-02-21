@@ -1,5 +1,6 @@
 #include <atomic>
 #include <condition_variable>
+#include <cstring>
 #include <queue>
 #include <thread>
 
@@ -8,6 +9,79 @@
 #include "../utils/logging.hpp"
 
 #define MAX_EXTRA_THREADS 512
+//Max of 2,097,152 work items
+#define QUEUE_SIZE (2 << 20)
+
+namespace {
+  struct WorkItem {
+    AmmoniteWork work;
+    void* userPtr;
+    std::atomic_flag* completion;
+  };
+
+  class WorkQueue {
+  private:
+    WorkItem* workItems;
+    bool* readyPtr;
+    int queueSize;
+
+    std::atomic<unsigned int> nextWrite = 0;
+    unsigned int nextRead = 0;
+    std::mutex readLock;
+
+  public:
+    WorkQueue(int size) {
+      workItems = new WorkItem[size];
+      readyPtr = new bool[size];
+      std::memset(workItems, 0, size * sizeof(WorkItem));
+      std::memset(readyPtr, 0, size * sizeof(bool));
+      queueSize = size;
+
+      if (((size & (size - 1)) != 0) && size != 0) {
+        ammonite::utils::warning << "Queue size must be a non-zero power of 2, good luck" \
+                                 << std::endl;
+      }
+    }
+
+    ~WorkQueue() {
+      delete [] workItems;
+    }
+
+    WorkItem pop() {
+      readLock.lock();
+      int index = (nextRead) & (queueSize - 1);
+
+      //Return the work item or an empty one
+      if (readyPtr[index]) {
+        nextRead++;
+        readLock.unlock();
+        readyPtr[index] = false;
+        return workItems[index];
+      } else {
+        readLock.unlock();
+        return {nullptr, nullptr, nullptr};
+      }
+    }
+
+    void push(WorkItem work) {
+      int index = (nextWrite++) & (queueSize - 1);
+      workItems[index] = work;
+      readyPtr[index] = true;
+
+#ifdef DEBUG
+      if (this->getSize() > QUEUE_SIZE) {
+        ammonite::utils::warning << "Queue size exceeded, work items lost" \
+                                 << std::endl;
+      }
+#endif
+
+    }
+
+    int getSize() {
+      return nextWrite - nextRead;
+    }
+  };
+}
 
 namespace ammonite {
   namespace thread {
@@ -22,12 +96,6 @@ namespace ammonite {
         std::condition_variable wakePool;
         bool stayAlive = false;
 
-        struct WorkItem {
-          AmmoniteWork work;
-          void* userPtr;
-          std::atomic_flag* completion;
-        };
-
         //Write 'true' to unblockThreadsTrigger to release blocked threads
         std::atomic_flag unblockThreadsTrigger;
         //threadsUnblockedFlag is set to 'true' when all blocked threads are released
@@ -39,8 +107,7 @@ namespace ammonite {
         //Any other value means the system is broken
         std::atomic<int> blockBalance = 0;
 
-        std::queue<WorkItem> workQueue;
-        std::mutex workQueueMutex;
+        WorkQueue* workQueue;
         std::atomic<int> jobCount = 0;
       }
 
@@ -48,14 +115,11 @@ namespace ammonite {
         static void initWorker(ThreadInfo* threadInfo) {
           std::unique_lock<std::mutex> lock(threadInfo->threadLock);
           while (stayAlive) {
-            workQueueMutex.lock();
-            if (!workQueue.empty()) {
-              //Fetch the work
-              WorkItem workItem = workQueue.front();
-              workQueue.pop();
-              workQueueMutex.unlock();
+            //Fetch the work
+            WorkItem workItem = workQueue->pop();
 
-              //Execute the work
+            //Execute the work or sleep
+            if (workItem.work != nullptr) {
               jobCount--;
               workItem.work(workItem.userPtr);
 
@@ -65,7 +129,6 @@ namespace ammonite {
                 workItem.completion->notify_all();
               }
             } else {
-              workQueueMutex.unlock();
               //Sleep until told to wake up
               wakePool.wait(lock, []{ return (!stayAlive or (jobCount > 0)); });
             }
@@ -104,10 +167,8 @@ namespace ammonite {
           completion->clear();
         }
 
-        //Safely add work to the queue
-        workQueueMutex.lock();
-        workQueue.push({work, userPtr, completion});
-        workQueueMutex.unlock();
+        //Add work to the queue
+        workQueue->push({work, userPtr, completion});
 
         //Increase job count, wake a sleeping thread
         jobCount++;
@@ -116,44 +177,36 @@ namespace ammonite {
 
       //Specialised variants to submit multiple jobs
       void submitMultiple(AmmoniteWork work, int newJobs) {
-        workQueueMutex.lock();
         for (int i = 0; i < newJobs; i++) {
-          workQueue.push({work, nullptr, nullptr});
+          workQueue->push({work, nullptr, nullptr});
           jobCount++;
           wakePool.notify_one();
         }
-        workQueueMutex.unlock();
       }
 
       void submitMultipleUser(AmmoniteWork work, void** userPtrs, int newJobs) {
-        workQueueMutex.lock();
         for (int i = 0; i < newJobs; i++) {
-          workQueue.push({work, userPtrs[i], nullptr});
+          workQueue->push({work, userPtrs[i], nullptr});
           jobCount++;
           wakePool.notify_one();
         }
-        workQueueMutex.unlock();
       }
 
       void submitMultipleComp(AmmoniteWork work, std::atomic_flag* completions, int newJobs) {
-        workQueueMutex.lock();
         for (int i = 0; i < newJobs; i++) {
-          workQueue.push({work, nullptr, completions + i});
+          workQueue->push({work, nullptr, completions + i});
           jobCount++;
           wakePool.notify_one();
         }
-        workQueueMutex.unlock();
       }
 
       void submitMultipleUserComp(AmmoniteWork work, void** userPtrs,
                                   std::atomic_flag* completions, int newJobs) {
-        workQueueMutex.lock();
         for (int i = 0; i < newJobs; i++) {
-          workQueue.push({work, userPtrs[i], completions + i});
+          workQueue->push({work, userPtrs[i], completions + i});
           jobCount++;
           wakePool.notify_one();
         }
-        workQueueMutex.unlock();
       }
 
       //Create thread pool, existing work will begin executing
@@ -162,6 +215,9 @@ namespace ammonite {
         if (extraThreadCount != 0) {
           return -1;
         }
+
+        //Create the queue
+        workQueue = new WorkQueue(QUEUE_SIZE);
 
         //Default to creating a worker thread for every hardware thread
         if (extraThreads == 0) {
@@ -200,11 +256,9 @@ namespace ammonite {
 
         //Submit a job for each thread that waits for the trigger
         unblockThreadsTrigger.clear();
-        workQueueMutex.lock();
         for (unsigned int i = 0; i < extraThreadCount; i++) {
-          workQueue.push({blocker, nullptr, nullptr});
+          workQueue->push({blocker, nullptr, nullptr});
         }
-        workQueueMutex.unlock();
 
         //Add to job count and wake all threads
         jobCount += extraThreadCount;
@@ -243,20 +297,19 @@ namespace ammonite {
       bool debugCheckRemainingWork(bool verbose) {
         bool issuesFound = false;
 
-        workQueueMutex.lock();
-        if (workQueue.size() != 0) {
+        if (workQueue->getSize() != 0) {
           issuesFound = true;
           if (verbose) {
-            ammoniteInternalDebug << "WARNING: Work queue not empty (" << workQueue.size() \
+            ammoniteInternalDebug << "WARNING: Work queue not empty (" << workQueue->getSize() \
                                   << " jobs left)" << std::endl;
           }
         }
 
-        if (workQueue.size() != (unsigned)jobCount) {
+        if (workQueue->getSize() != jobCount) {
           issuesFound = true;
           if (verbose) {
             ammoniteInternalDebug << "WARNING: Work queue size and job count don't match (" \
-                                  << workQueue.size() << " vs " << jobCount << ")" << std::endl;
+                                  << workQueue->getSize() << " vs " << jobCount << ")" << std::endl;
           }
         }
 
@@ -275,7 +328,6 @@ namespace ammonite {
                                   << blockBalance << ")" << std::endl;
           }
         }
-        workQueueMutex.unlock();
 
         return issuesFound;
       }
@@ -312,6 +364,7 @@ namespace ammonite {
 #endif
 
         //Reset remaining data
+        delete workQueue;
         delete[] threadPool;
         extraThreadCount = 0;
       }
