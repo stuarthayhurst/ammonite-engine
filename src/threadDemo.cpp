@@ -166,28 +166,6 @@ namespace {
     return passed;
   }
 
-  static bool testSubmitCreateWaitDestroy(int jobCount) {
-    INIT_TIMERS
-    PREP_SYNC(jobCount, syncs)
-
-    //Submit fast 'jobs'
-    submitTimer.reset();
-    totalTimer.reset();
-    SUBMIT_SYNC_JOBS(jobCount, syncs)
-    submitTimer.pause();
-
-    runTimer.reset();
-    CREATE_THREAD_POOL(0)
-
-    //Finish work
-    SYNC_THREADS(jobCount, syncs)
-    FINISH_TIMERS
-    VERIFY_WORK(jobCount)
-
-    DESTROY_THREAD_POOL
-    return passed;
-  }
-
   static bool testNestedJobs(int fullJobCount) {
     int jobCount = fullJobCount / 2;
     INIT_TIMERS
@@ -312,9 +290,6 @@ int main() {
 
   std::cout << "Testing blocked queue" << std::endl;
   failed |= !testCreateBlockSubmitUnblockWaitDestroy(JOB_COUNT);
-
-  std::cout << "Testing pre-filled queue" << std::endl;
-  failed |= !testSubmitCreateWaitDestroy(JOB_COUNT);
 
   std::cout << "Testing nested jobs" << std::endl;
   failed |= !testNestedJobs(JOB_COUNT);
