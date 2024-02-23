@@ -63,9 +63,9 @@ namespace {
       }
     }
 
-    void push(WorkItem work) {
+    void push(WorkItem* workPtr) {
       int index = (nextWrite++) & (queueSize - 1);
-      workItems[index] = work;
+      workItems[index] = *workPtr;
       readyPtr[index] = true;
 
 #ifdef DEBUG
@@ -169,7 +169,8 @@ namespace ammonite {
         }
 
         //Add work to the queue
-        workQueue->push({work, userPtr, completion});
+        WorkItem workItem = {work, userPtr, completion};
+        workQueue->push(&workItem);
 
         //Increase job count, wake a sleeping thread
         jobCount++;
@@ -178,8 +179,9 @@ namespace ammonite {
 
       //Specialised variants to submit multiple jobs
       void submitMultiple(AmmoniteWork work, int newJobs) {
+        WorkItem workItem = {work, nullptr, nullptr};
         for (int i = 0; i < newJobs; i++) {
-          workQueue->push({work, nullptr, nullptr});
+          workQueue->push(&workItem);
           jobCount++;
           wakePool.notify_one();
         }
@@ -187,7 +189,8 @@ namespace ammonite {
 
       void submitMultipleUser(AmmoniteWork work, void** userPtrs, int newJobs) {
         for (int i = 0; i < newJobs; i++) {
-          workQueue->push({work, userPtrs[i], nullptr});
+        WorkItem workItem = {work, userPtrs[i], nullptr};
+          workQueue->push(&workItem);
           jobCount++;
           wakePool.notify_one();
         }
@@ -195,7 +198,8 @@ namespace ammonite {
 
       void submitMultipleComp(AmmoniteWork work, std::atomic_flag* completions, int newJobs) {
         for (int i = 0; i < newJobs; i++) {
-          workQueue->push({work, nullptr, completions + i});
+          WorkItem workItem = {work, nullptr, completions + i};
+          workQueue->push(&workItem);
           jobCount++;
           wakePool.notify_one();
         }
@@ -204,7 +208,8 @@ namespace ammonite {
       void submitMultipleUserComp(AmmoniteWork work, void** userPtrs,
                                   std::atomic_flag* completions, int newJobs) {
         for (int i = 0; i < newJobs; i++) {
-          workQueue->push({work, userPtrs[i], completions + i});
+          WorkItem workItem = {work, userPtrs[i], completions + i};
+          workQueue->push(&workItem);
           jobCount++;
           wakePool.notify_one();
         }
@@ -257,8 +262,9 @@ namespace ammonite {
 
         //Submit a job for each thread that waits for the trigger
         unblockThreadsTrigger.clear();
+        WorkItem blockerItem = {blocker, nullptr, nullptr};
         for (unsigned int i = 0; i < extraThreadCount; i++) {
-          workQueue->push({blocker, nullptr, nullptr});
+          workQueue->push(&blockerItem);
         }
 
         //Add to job count and wake all threads
