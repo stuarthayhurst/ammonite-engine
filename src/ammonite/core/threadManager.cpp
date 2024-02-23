@@ -47,7 +47,7 @@ namespace {
       delete [] workItems;
     }
 
-    WorkItem pop() {
+    void pop(WorkItem* workPtr) {
       readLock.lock();
       int index = (nextRead) & (queueSize - 1);
 
@@ -56,10 +56,10 @@ namespace {
         nextRead++;
         readLock.unlock();
         readyPtr[index] = false;
-        return workItems[index];
+        *workPtr = workItems[index];
       } else {
         readLock.unlock();
-        return {nullptr, nullptr, nullptr};
+        *workPtr = {nullptr, nullptr, nullptr};
       }
     }
 
@@ -116,7 +116,8 @@ namespace ammonite {
           std::unique_lock<std::mutex> lock(threadInfo->threadLock);
           while (stayAlive) {
             //Fetch the work
-            WorkItem workItem = workQueue->pop();
+            WorkItem workItem;
+            workQueue->pop(&workItem);
 
             //Execute the work or sleep
             if (workItem.work != nullptr) {
