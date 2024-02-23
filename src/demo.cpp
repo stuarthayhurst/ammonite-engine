@@ -226,6 +226,7 @@ int main(int argc, char* argv[]) {
   if (!success) {
     std::cerr << "ERROR: Failed to initialise renderer, exiting" << std::endl;
     ammonite::window::destroyWindow();
+    ammonite::renderer::setup::destroyRenderer();
     return EXIT_FAILURE;
   }
 
@@ -240,6 +241,7 @@ int main(int argc, char* argv[]) {
     if (postRendererInit() == -1) {
       std::cerr << "ERROR: Failed to set up demo, exiting" << std::endl;
       ammonite::window::destroyWindow();
+      ammonite::renderer::setup::destroyRenderer();
       return EXIT_FAILURE;
     }
   }
@@ -307,6 +309,8 @@ int main(int argc, char* argv[]) {
       if (rendererMainloop() == -1) {
         std::cerr << "ERROR: Failed to run mainloop, exiting" << std::endl;
         unregisterKeybinds(&keybindIds);
+        ammonite::window::destroyWindow();
+        ammonite::renderer::setup::destroyRenderer();
         return EXIT_FAILURE;
       }
     }
@@ -328,6 +332,7 @@ int main(int argc, char* argv[]) {
       std::cerr << "ERROR: Failed to clean up, exiting" << std::endl;
     }
     ammonite::window::destroyWindow();
+    ammonite::renderer::setup::destroyRenderer();
 
     if (!cleanExit) {
       return EXIT_FAILURE;

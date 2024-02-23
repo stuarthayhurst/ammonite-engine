@@ -5,6 +5,7 @@
 #include "../utils/timer.hpp"
 #include "../utils/logging.hpp"
 #include "../core/windowManager.hpp"
+#include "../core/threadManager.hpp"
 
 #include "internal/internalRenderCore.hpp"
 #include "../internal/interfaceTracker.hpp"
@@ -26,6 +27,13 @@ namespace ammonite {
         //Start a timer to measure load time
         ammonite::utils::Timer loadTimer;
 
+        //Create a thread pool
+        if (ammonite::thread::internal::createThreadPool(0) == -1) { \
+          ammonite::utils::error << "Failed to create thread pool" << std::endl;
+          *externalSuccess = false;
+          return;
+        }
+
         GLFWwindow* window = ammonite::window::internal::getWindowPtr();
 
         //Check GPU supported required extensions
@@ -44,6 +52,10 @@ namespace ammonite {
 
         //Output time taken to load renderer
         ammonite::utils::status << "Loaded renderer in " << loadTimer.getTime() << "s" << std::endl;
+      }
+
+      void destroyRenderer() {
+        ammonite::thread::internal::destroyThreadPool();
       }
     }
 
