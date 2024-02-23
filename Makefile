@@ -27,7 +27,7 @@ AMMONITE_OBJECTS = $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.o,$(AMMONITE_OBJECT
 HELPER_OBJECTS = $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.o,$(HELPER_OBJECTS_SOURCE)))
 DEMO_OBJECTS = $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.o,$(DEMO_OBJECTS_SOURCE)))
 
-CXXFLAGS := $(shell pkg-config --cflags $(LIBS)) -fopenmp
+CXXFLAGS := $(shell pkg-config --cflags $(LIBS))
 CXXFLAGS += -Wall -Wextra -Werror -std=c++23 -flto=auto
 LDFLAGS := $(shell pkg-config --libs $(LIBS)) -lstdc++ -lm -pthread
 

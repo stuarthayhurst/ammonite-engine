@@ -15,7 +15,7 @@
 
 ## Requirements:
   - A `c++23` compatible compiler (`g++ 12+` / `clang 17+`)
-    - An OpenMP supported compiler + libraries installed
+    - All build and runtime dependencies installed
   - An OpenGL 4.5+ compatible driver
   - Alternatively, an OpenGL 3.2+ driver supporting the following extensions can be used
     - `ARB_direct_state_access`
@@ -77,7 +77,7 @@
 ## Dependencies:
   - `make`
   - `pkg-config`
-  - `g++ libgomp1` **OR** `clang libomp-dev`
+  - `g++` **OR** `clang`
     - If using clang, use `CXX="clang++" make [TARGET]`
     - When swapping between different compilers, run `make clean`
   - ### Libraries:

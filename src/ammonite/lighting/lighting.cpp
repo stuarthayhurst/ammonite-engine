@@ -1,3 +1,4 @@
+#include <atomic>
 #include <map>
 #include <vector>
 #include <cstring>
@@ -6,15 +7,14 @@
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 
-#include <omp.h>
-#include <thread>
-
 #include "internal/lightTypes.hpp"
 #include "internal/internalLighting.hpp"
 #include "../internal/internalSettings.hpp"
 
 #include "../models/modelInterface.hpp"
 #include "../models/internal/modelTracker.hpp"
+#include "../thread.hpp"
+#include "../types.hpp"
 
 namespace ammonite {
   namespace {
@@ -32,6 +32,67 @@ namespace ammonite {
 
     //Track cumulative number of created light sources
     int totalLights = 0;
+
+    //Data structure to pass light sources into shader
+    struct ShaderLightSource {
+      glm::vec4 geometry;
+      glm::vec4 diffuse;
+      glm::vec4 specular;
+      glm::vec4 power;
+    };
+
+    //Data used by the light worker
+    struct LightWorkerData {
+      ShaderLightSource* shaderData;
+      glm::mat4* shadowProj;
+      int i;
+    };
+  }
+
+  namespace {
+    static void lightWork(void* userPtr) {
+      int i = ((LightWorkerData*)userPtr)->i;
+      ShaderLightSource* shaderData = ((LightWorkerData*)userPtr)->shaderData;
+      glm::mat4* shadowProj = ((LightWorkerData*)userPtr)->shadowProj;
+
+      //Repacking light sources
+      auto lightIt = lightTrackerMap.begin();
+      std::advance(lightIt, i);
+      auto lightSource = &lightIt->second;
+      lightSource->lightIndex = i;
+
+      //Override position for light emitting models, and add to tracker
+      if (lightSource->modelId != -1) {
+        //Override light position, using linked model
+        lightSource->geometry = ammonite::models::position::getPosition(lightSource->modelId);
+
+        //Update lightIndex for rendering light emitting models
+        auto modelPtr = ammonite::models::internal::getModelPtr(lightSource->modelId);
+        modelPtr->lightIndex = lightSource->lightIndex;
+      }
+
+      //Calculate shadow transforms for shadows
+      glm::vec3 lightPos = lightSource->geometry;
+      glm::mat4* transformStart = lightTransforms + (lightSource->lightIndex * 6);
+      transformStart[0] = *shadowProj *
+        glm::lookAt(lightPos, lightPos + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));
+      transformStart[1] = *shadowProj *
+        glm::lookAt(lightPos, lightPos + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));
+      transformStart[2] = *shadowProj *
+        glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0));
+      transformStart[3] = *shadowProj *
+        glm::lookAt(lightPos, lightPos + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0));
+      transformStart[4] = *shadowProj *
+        glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0));
+      transformStart[5] = *shadowProj *
+        glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0));
+
+      //Repack lighting information
+      shaderData[i].geometry = glm::vec4(lightSource->geometry, 0.0f);
+      shaderData[i].diffuse = glm::vec4(lightSource->diffuse, 0.0f);
+      shaderData[i].specular = glm::vec4(lightSource->specular, 0.0f);
+      shaderData[i].power = glm::vec4(lightSource->power, 0.0f, 0.0f, 0.0f);
+    }
   }
 
   namespace lighting {
@@ -70,23 +131,9 @@ namespace ammonite {
       }
 
       void updateLightSources() {
-        //Data structure to pass light sources into shader
-        struct ShaderLightSource {
-          glm::vec4 geometry;
-          glm::vec4 diffuse;
-          glm::vec4 specular;
-          glm::vec4 power;
-        };
-
-        //Use 1 thread per 20 light sources, up to hardware maximum
-        unsigned int threadCount = std::ceil(lightTrackerMap.size() / 20);
-        threadCount = std::min(threadCount, std::thread::hardware_concurrency());
-
-        omp_set_dynamic(0);
-        omp_set_num_threads(threadCount);
-
         //If no lights remain, unbind and return early
-        if (lightTrackerMap.size() == 0) {
+        unsigned int lightCount = lightTrackerMap.size();
+        if (lightCount == 0) {
           glDeleteBuffers(1, &lightDataId);
           glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, 0);
           lightDataId = 0;
@@ -100,56 +147,30 @@ namespace ammonite {
                                                 1.0f, 0.0f, *shadowFarPlanePtr);
 
         //Resize packed light buffer
-        if (prevLightCount != lightTrackerMap.size()) {
+        if (prevLightCount != lightCount) {
           if (lightTransforms != nullptr) {
             delete [] lightTransforms;
           }
-          lightTransforms = new glm::mat4[lightTrackerMap.size() * 6];
+          lightTransforms = new glm::mat4[lightCount * 6];
         }
 
         //Repack light sources into ShaderData (uses vec4s for OpenGL)
-        ShaderLightSource* shaderData = new ShaderLightSource[lightTrackerMap.size()];
-        int shaderDataSize = lightTrackerMap.size() * sizeof(ShaderLightSource);
-        #pragma omp parallel for
-        for (unsigned int i = 0; i < lightTrackerMap.size(); i++) {
-          //Repacking light sources
-          auto lightIt = lightTrackerMap.begin();
-          std::advance(lightIt, i);
-          auto lightSource = &lightIt->second;
-          lightSource->lightIndex = i;
-
-          //Override position for light emitting models, and add to tracker
-          if (lightSource->modelId != -1) {
-            //Override light position, using linked model
-            lightSource->geometry = ammonite::models::position::getPosition(lightSource->modelId);
-
-            //Update lightIndex for rendering light emitting models
-            auto modelPtr = ammonite::models::internal::getModelPtr(lightSource->modelId);
-            modelPtr->lightIndex = lightSource->lightIndex;
-          }
-
-          //Calculate shadow transforms for shadows
-          glm::vec3 lightPos = lightSource->geometry;
-          glm::mat4* transformStart = lightTransforms + (lightSource->lightIndex * 6);
-          transformStart[0] = shadowProj *
-            glm::lookAt(lightPos, lightPos + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));
-          transformStart[1] = shadowProj *
-            glm::lookAt(lightPos, lightPos + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));
-          transformStart[2] = shadowProj *
-            glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0));
-          transformStart[3] = shadowProj *
-            glm::lookAt(lightPos, lightPos + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0));
-          transformStart[4] = shadowProj *
-            glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0));
-          transformStart[5] = shadowProj *
-            glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0));
-
-          //Repack lighting information
-          shaderData[i].geometry = glm::vec4(lightSource->geometry, 0.0f);
-          shaderData[i].diffuse = glm::vec4(lightSource->diffuse, 0.0f);
-          shaderData[i].specular = glm::vec4(lightSource->specular, 0.0f);
-          shaderData[i].power = glm::vec4(lightSource->power, 0.0f, 0.0f, 0.0f);
+        ShaderLightSource* shaderData = new ShaderLightSource[lightCount];
+        int shaderDataSize = sizeof(ShaderLightSource) * lightCount;
+        std::atomic_flag* syncs = new std::atomic_flag[lightCount];
+        LightWorkerData* workerData = new LightWorkerData[lightCount];
+        for (unsigned int i = 0; i < lightCount; i++) {
+          workerData[i].shaderData = shaderData;
+          workerData[i].shadowProj = &shadowProj;
+          workerData[i].i = i;
+          ammonite::thread::submitWork(lightWork, &workerData[i], &syncs[i]);
         }
+
+        for (unsigned int i = 0; i < lightCount; i++) {
+          ammonite::thread::waitWorkComplete(&syncs[i]);
+        }
+        delete [] syncs;
+        delete [] workerData;
 
         //If the light count hasn't changed, sub the data instead of recreating the buffer
         if (prevLightCount == lightTrackerMap.size()) {

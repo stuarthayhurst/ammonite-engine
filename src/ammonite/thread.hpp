@@ -3,6 +3,8 @@
 
 #include <atomic>
 
+#include "types.hpp"
+
 namespace ammonite {
   namespace thread {
     unsigned int getThreadPoolSize();
