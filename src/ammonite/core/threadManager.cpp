@@ -131,7 +131,7 @@ namespace ammonite {
               }
             } else {
               //Sleep until told to wake up
-              wakePool.wait(lock, []{ return (!stayAlive or (jobCount > 0)); });
+              wakePool.wait(lock, []{ return ((jobCount > 0) or !stayAlive); });
             }
           }
         }
