@@ -74,7 +74,6 @@ namespace {
                                  << std::endl;
       }
 #endif
-
     }
 
     int getSize() {
