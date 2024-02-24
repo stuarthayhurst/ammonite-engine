@@ -86,10 +86,7 @@ namespace ammonite {
     namespace internal {
       namespace {
         unsigned int extraThreadCount = 0;
-        struct ThreadInfo {
-          std::thread thread;
-        };
-        ThreadInfo* threadPool;
+        std::thread* threadPool;
         bool stayAlive = false;
 
         //Write 'true' to unblockThreadsTrigger to release blocked threads
@@ -227,7 +224,7 @@ namespace ammonite {
 
         //Cap at configured thread limit, allocate memory for pool
         extraThreads = (extraThreads > MAX_EXTRA_THREADS) ? MAX_EXTRA_THREADS : extraThreads;
-        threadPool = new ThreadInfo[extraThreads];
+        threadPool = new std::thread[extraThreads];
         if (threadPool == nullptr) {
           return -1;
         }
@@ -235,7 +232,7 @@ namespace ammonite {
         //Create the threads for the pool
         stayAlive = true;
         for (unsigned int i = 0; i < extraThreads; i++) {
-          threadPool[i].thread = std::thread(initWorker);
+          threadPool[i] = std::thread(initWorker);
         }
 
         unblockThreadsTrigger.test_and_set();
@@ -350,7 +347,7 @@ namespace ammonite {
         //Wait until all threads are done
         for (unsigned int i = 0; i < extraThreadCount; i++) {
           try {
-            threadPool[i].thread.join();
+            threadPool[i].join();
           } catch (const std::system_error&) {
             ammonite::utils::warning << "Failed to join thread " << i \
                                      << " while destroying thread pool" << std::endl;
