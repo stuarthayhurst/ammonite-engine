@@ -1,5 +1,4 @@
 #include <atomic>
-#include <condition_variable>
 #include <cstring>
 #include <queue>
 #include <thread>
@@ -89,10 +88,8 @@ namespace ammonite {
         unsigned int extraThreadCount = 0;
         struct ThreadInfo {
           std::thread thread;
-          std::mutex threadLock;
         };
         ThreadInfo* threadPool;
-        std::condition_variable wakePool;
         bool stayAlive = false;
 
         //Write 'true' to unblockThreadsTrigger to release blocked threads
@@ -111,8 +108,7 @@ namespace ammonite {
       }
 
       namespace {
-        static void initWorker(ThreadInfo* threadInfo) {
-          std::unique_lock<std::mutex> lock(threadInfo->threadLock);
+        static void initWorker() {
           while (stayAlive) {
             //Fetch the work
             WorkItem workItem;
@@ -129,8 +125,8 @@ namespace ammonite {
                 workItem.completion->notify_all();
               }
             } else {
-              //Sleep until told to wake up
-              wakePool.wait(lock, []{ return ((jobCount > 0) or !stayAlive); });
+              //Sleep while 0 jobs remain
+              jobCount.wait(0);
             }
           }
         }
@@ -173,7 +169,7 @@ namespace ammonite {
 
         //Increase job count, wake a sleeping thread
         jobCount++;
-        wakePool.notify_one();
+        jobCount.notify_one();
       }
 
       //Specialised variants to submit multiple jobs
@@ -182,7 +178,7 @@ namespace ammonite {
         for (int i = 0; i < newJobs; i++) {
           workQueue->push(&workItem);
           jobCount++;
-          wakePool.notify_one();
+          jobCount.notify_one();
         }
       }
 
@@ -191,7 +187,7 @@ namespace ammonite {
         WorkItem workItem = {work, userPtrs[i], nullptr};
           workQueue->push(&workItem);
           jobCount++;
-          wakePool.notify_one();
+          jobCount.notify_one();
         }
       }
 
@@ -200,7 +196,7 @@ namespace ammonite {
           WorkItem workItem = {work, nullptr, completions + i};
           workQueue->push(&workItem);
           jobCount++;
-          wakePool.notify_one();
+          jobCount.notify_one();
         }
       }
 
@@ -210,7 +206,7 @@ namespace ammonite {
           WorkItem workItem = {work, userPtrs[i], completions + i};
           workQueue->push(&workItem);
           jobCount++;
-          wakePool.notify_one();
+          jobCount.notify_one();
         }
       }
 
@@ -239,7 +235,7 @@ namespace ammonite {
         //Create the threads for the pool
         stayAlive = true;
         for (unsigned int i = 0; i < extraThreads; i++) {
-          threadPool[i].thread = std::thread(initWorker, &threadPool[i]);
+          threadPool[i].thread = std::thread(initWorker);
         }
 
         unblockThreadsTrigger.test_and_set();
@@ -268,7 +264,7 @@ namespace ammonite {
 
         //Add to job count and wake all threads
         jobCount += extraThreadCount;
-        wakePool.notify_all();
+        jobCount.notify_all();
 
         if (sync) {
           threadsUnblockedFlag.wait(true);
