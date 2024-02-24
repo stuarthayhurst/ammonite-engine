@@ -2,6 +2,7 @@
 
 #include <GLFW/glfw3.h>
 
+#include "../utils/debug.hpp"
 #include "../utils/timer.hpp"
 #include "../utils/logging.hpp"
 #include "../core/windowManager.hpp"
@@ -33,6 +34,12 @@ namespace ammonite {
           *externalSuccess = false;
           return;
         }
+
+#ifdef DEBUG
+        ammoniteInternalDebug << "Created thread pool with " \
+                              << ammonite::thread::internal::getThreadPoolSize() \
+                              << " threads" << std::endl;
+#endif
 
         GLFWwindow* window = ammonite::window::internal::getWindowPtr();
 
