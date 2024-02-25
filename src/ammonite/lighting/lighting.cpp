@@ -11,9 +11,9 @@
 #include "internal/internalLighting.hpp"
 #include "../internal/internalSettings.hpp"
 
+#include "../core/threadManager.hpp"
 #include "../models/modelInterface.hpp"
 #include "../models/internal/modelTracker.hpp"
-#include "../thread.hpp"
 #include "../types.hpp"
 
 namespace ammonite {
@@ -163,11 +163,11 @@ namespace ammonite {
           workerData[i].shaderData = shaderData;
           workerData[i].shadowProj = &shadowProj;
           workerData[i].i = i;
-          ammonite::thread::submitWork(lightWork, &workerData[i], &syncs[i]);
+          ammonite::thread::internal::submitWork(lightWork, &workerData[i], &syncs[i]);
         }
 
         for (unsigned int i = 0; i < lightCount; i++) {
-          ammonite::thread::waitWorkComplete(&syncs[i]);
+          syncs[i].wait(false);
         }
         delete [] syncs;
         delete [] workerData;
