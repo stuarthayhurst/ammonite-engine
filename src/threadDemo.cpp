@@ -166,6 +166,35 @@ namespace {
     return passed;
   }
 
+  static bool testQueueLimits() {
+    INIT_TIMERS
+    CREATE_THREAD_POOL(0)
+    int jobCount = (2 << 20);
+    PREP_SYNC(jobCount, syncs)
+
+    //Submit fast 'jobs'
+    RESET_TIMERS
+    SUBMIT_SYNC_JOBS(jobCount, syncs)
+    submitTimer.pause();
+    SYNC_THREADS(jobCount, syncs)
+
+    //Submit second batch
+    syncs = new std::atomic_flag[(jobCount)];
+    values = new int[(jobCount)]{};
+    submitTimer.unpause();
+    for (int i = 0; i < jobCount; i++) { \
+      ammonite::thread::submitWork(shortTask, &(values)[i], &(syncs)[i]); \
+    }
+    submitTimer.pause();
+
+    SYNC_THREADS(jobCount, syncs)
+    FINISH_TIMERS
+    VERIFY_WORK(jobCount)
+
+    DESTROY_THREAD_POOL
+    return passed;
+  }
+
   static bool testNestedJobs(int fullJobCount) {
     int jobCount = fullJobCount / 2;
     INIT_TIMERS
@@ -290,6 +319,9 @@ int main() {
 
   std::cout << "Testing blocked queue" << std::endl;
   failed |= !testCreateBlockSubmitUnblockWaitDestroy(JOB_COUNT);
+
+  std::cout << "Testing queue limits (8x regular)" << std::endl;
+  failed |= !testQueueLimits();
 
   std::cout << "Testing nested jobs" << std::endl;
   failed |= !testNestedJobs(JOB_COUNT);
