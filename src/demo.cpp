@@ -80,7 +80,7 @@ void changeFocalDepthCallback(std::vector<int>, int action, void* userPtr) {
   static ammonite::utils::Timer focalDepthTimer;
   if (action != GLFW_RELEASE) {
     float sign = *(float*)userPtr;
-    const float unitsPerSecond = 1.0f;
+    const float unitsPerSecond = 0.8f;
     const float focalTimeDelta = focalDepthTimer.getTime();
     float depth = ammonite::settings::graphics::post::getFocalDepth();
 

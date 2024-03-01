@@ -10,6 +10,9 @@ uniform bool focalDepthEnabled;
 uniform float focalDepth;
 uniform float blurStrength;
 
+const float nearPlane = 0.1f;
+uniform float farPlane;
+
 void main() {
   if (!focalDepthEnabled) {
     colour = vec4(texture(screenSampler, texCoords));
@@ -17,8 +20,9 @@ void main() {
   }
 
   //Calculate the offset from the focal depth and strength
-  float offset = 1.0 / 300.0;
+  float offset = 1.0 / 75.0;
   float depth = texture(depthSampler, texCoords).x;
+  depth = 1 - nearPlane / (farPlane + nearPlane - depth * (farPlane - nearPlane));
   depth = abs(depth - focalDepth);
   offset *= blurStrength * depth;
 

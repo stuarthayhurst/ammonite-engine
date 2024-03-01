@@ -85,6 +85,7 @@ namespace ammonite {
         GLuint focalDepthId;
         GLuint focalDepthEnabledId;
         GLuint blurStrengthId;
+        GLuint farPlaneId;
       } screenShader;
 
       struct {
@@ -237,6 +238,7 @@ namespace ammonite {
           screenShader.focalDepthId = glGetUniformLocation(screenShader.shaderId, "focalDepth");
           screenShader.focalDepthEnabledId = glGetUniformLocation(screenShader.shaderId, "focalDepthEnabled");
           screenShader.blurStrengthId = glGetUniformLocation(screenShader.shaderId, "blurStrength");
+          screenShader.farPlaneId = glGetUniformLocation(screenShader.shaderId, "farPlane");
 
           loadingShader.progressId = glGetUniformLocation(loadingShader.shaderId, "progress");
           loadingShader.widthId = glGetUniformLocation(loadingShader.shaderId, "width");
@@ -819,11 +821,16 @@ namespace ammonite {
           //Conditionally send data for blur
           glUniform1i(screenShader.focalDepthEnabledId, *focalDepthEnabledPtr);
           if (*focalDepthEnabledPtr) {
-            static float* focalDepthPtr = ammonite::settings::graphics::post::internal::getFocalDepthPtr();
-            static float* blurStrengthPtr = ammonite::settings::graphics::post::internal::getBlurStrengthPtr();
+            static float* focalDepthPtr =
+              ammonite::settings::graphics::post::internal::getFocalDepthPtr();
+            static float* blurStrengthPtr =
+              ammonite::settings::graphics::post::internal::getBlurStrengthPtr();
+            static float* farPlanePtr =
+              ammonite::settings::graphics::internal::getRenderFarPlanePtr();
 
             glUniform1f(screenShader.focalDepthId, *focalDepthPtr);
             glUniform1f(screenShader.blurStrengthId, *blurStrengthPtr);
+            glUniform1f(screenShader.farPlaneId, *farPlanePtr);
             glBindTextureUnit(5, screenQuadDepthTextureId);
           }
 
