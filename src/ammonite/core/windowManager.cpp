@@ -72,7 +72,6 @@ namespace ammonite {
       void setupGlfwInput() {
         glfwSetInputMode(windowPtr, GLFW_STICKY_KEYS, GL_TRUE);
         glfwSetInputMode(windowPtr, GLFW_STICKY_MOUSE_BUTTONS, GL_TRUE);
-        glfwSetInputMode(windowPtr, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
         //Enable raw mouse motion if supported
         if (glfwRawMouseMotionSupported()) {

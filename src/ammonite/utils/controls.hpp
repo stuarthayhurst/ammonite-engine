@@ -8,6 +8,7 @@ namespace ammonite {
       bool getCameraActive();
 
       void setupControls();
+      void releaseControls();
     }
   }
 }

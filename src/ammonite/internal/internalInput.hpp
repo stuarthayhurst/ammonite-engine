@@ -2,7 +2,7 @@
 #define INTERNALINPUT
 
 /* Internally exposed header:
- - Expose function to setup winfow focus callback
+ - Expose function to setup window focus callback
 */
 
 #include <GLFW/glfw3.h>

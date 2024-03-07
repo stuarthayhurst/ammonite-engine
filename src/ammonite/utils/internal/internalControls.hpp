@@ -9,7 +9,7 @@ namespace ammonite {
   namespace utils {
     namespace controls {
       namespace internal {
-        void setInputFocus(bool inputFocused);
+        void setCursorFocus(bool inputFocused);
       }
     }
   }

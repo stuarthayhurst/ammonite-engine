@@ -80,7 +80,7 @@ namespace ammonite {
 
     void setInputFocus(bool active) {
       internal::setInputBlock(!active);
-      ammonite::utils::controls::internal::setInputFocus(active);
+      ammonite::utils::controls::internal::setCursorFocus(active);
     }
 
     bool getInputFocus() {

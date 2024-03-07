@@ -14,7 +14,7 @@ namespace ammonite {
     namespace controls {
       namespace {
         //Window pointer
-        GLFWwindow* window;
+        GLFWwindow* windowPtr;
 
         //Used to find x and y mouse offsets
         double xposLast, yposLast;
@@ -24,6 +24,9 @@ namespace ammonite {
         bool isCameraActive = true;
 
         bool* isInputBlockedPtr = ammonite::input::internal::getInputBlockPtr();
+
+        typedef void (*CursorPositionCallback)(GLFWwindow*, double, double);
+        CursorPositionCallback activeCursorPositionCallback = nullptr;
 
         //Increase / decrease FoV on scroll (xoffset is unused)
         static void scrollCallback(GLFWwindow*, double, double yoffset) {
@@ -71,10 +74,12 @@ namespace ammonite {
             float horizontalAngle = ammonite::camera::getHorizontal(activeCameraId);
             float verticalAngle = ammonite::camera::getVertical(activeCameraId);
 
-            static float* mouseSpeedPtr = ammonite::settings::controls::internal::getMouseSpeedPtr();
+            static float* mouseSpeedPtr =
+              ammonite::settings::controls::internal::getMouseSpeedPtr();
 
             //Update viewing angles ('-' corrects camera inversion)
-            ammonite::camera::setHorizontal(activeCameraId, horizontalAngle - (*mouseSpeedPtr * xoffset));
+            ammonite::camera::setHorizontal(activeCameraId,
+                                            horizontalAngle - (*mouseSpeedPtr * xoffset));
 
             //Only accept vertical angle if it won't create an impossible movement
             float newAngle = verticalAngle - (*mouseSpeedPtr * yoffset);
@@ -93,21 +98,25 @@ namespace ammonite {
 
       namespace internal {
         //Helper function to set input state
-        void setInputFocus(bool inputFocused) {
+        void setCursorFocus(bool inputFocused) {
           //Skip next cursor movement, to avoid huge jumps
           ignoreNextCursor = true;
+
+          if (windowPtr == nullptr) {
+            return;
+          }
 
           //Hide and unhide cursor as necessary
           if (inputFocused) {
             //Hide cursor and start taking mouse input
-            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-            glfwSetCursorPosCallback(window, cursorPositionCallback);
+            glfwSetInputMode(windowPtr, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+            glfwSetCursorPosCallback(windowPtr, activeCursorPositionCallback);
             //Reset saved cursor position to avoid a large jump
-            glfwGetCursorPos(window, &xposLast, &yposLast);
+            glfwGetCursorPos(windowPtr, &xposLast, &yposLast);
           } else {
             //Remove callback and restore cursor
-            glfwSetCursorPosCallback(window, nullptr);
-            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+            glfwSetCursorPosCallback(windowPtr, nullptr);
+            glfwSetInputMode(windowPtr, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
           }
         }
       }
@@ -122,15 +131,29 @@ namespace ammonite {
 
       void setupControls() {
         //Connect window pointer
-        window = ammonite::window::internal::getWindowPtr();
+        windowPtr = ammonite::window::internal::getWindowPtr();
 
-        //Set mouse callbacks
-        glfwSetScrollCallback(window, scrollCallback);
-        glfwSetMouseButtonCallback(window, zoomResetCallback);
-        glfwSetCursorPosCallback(window, cursorPositionCallback);
+        //Prepare cursor
+        ignoreNextCursor = true;
+        glfwSetInputMode(windowPtr, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        glfwGetCursorPos(windowPtr, &xposLast, &yposLast);
 
-        //Setup initial cursor position
-        glfwGetCursorPos(window, &xposLast, &yposLast);
+        //Set mouse control callbacks
+        glfwSetScrollCallback(windowPtr, scrollCallback);
+        glfwSetMouseButtonCallback(windowPtr, zoomResetCallback);
+        glfwSetCursorPosCallback(windowPtr, cursorPositionCallback);
+        activeCursorPositionCallback = cursorPositionCallback;
+      }
+
+      void releaseControls() {
+        glfwSetScrollCallback(windowPtr, nullptr);
+        glfwSetMouseButtonCallback(windowPtr, nullptr);
+        glfwSetCursorPosCallback(windowPtr, nullptr);
+        activeCursorPositionCallback = nullptr;
+
+        glfwSetInputMode(windowPtr, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+
+        windowPtr = nullptr;
       }
     }
   }

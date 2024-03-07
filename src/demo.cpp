@@ -225,6 +225,7 @@ int main(int argc, char* argv[]) {
   //Renderer failed to initialise, clean up and exit
   if (!success) {
     std::cerr << "ERROR: Failed to initialise renderer, exiting" << std::endl;
+    ammonite::utils::controls::releaseControls();
     ammonite::window::destroyWindow();
     ammonite::renderer::setup::destroyRenderer();
     return EXIT_FAILURE;
@@ -240,6 +241,7 @@ int main(int argc, char* argv[]) {
   if (postRendererInit != nullptr) {
     if (postRendererInit() == -1) {
       std::cerr << "ERROR: Failed to set up demo, exiting" << std::endl;
+      ammonite::utils::controls::releaseControls();
       ammonite::window::destroyWindow();
       ammonite::renderer::setup::destroyRenderer();
       return EXIT_FAILURE;
@@ -312,6 +314,7 @@ int main(int argc, char* argv[]) {
         std::cerr << "ERROR: Failed to run mainloop, exiting" << std::endl;
         unregisterKeybinds(&keybindIds);
         ammonite::utils::controls::releaseFreeCamera();
+        ammonite::utils::controls::releaseControls();
         ammonite::window::destroyWindow();
         ammonite::renderer::setup::destroyRenderer();
         return EXIT_FAILURE;
@@ -335,6 +338,7 @@ int main(int argc, char* argv[]) {
       cleanExit = false;
       std::cerr << "ERROR: Failed to clean up, exiting" << std::endl;
     }
+    ammonite::utils::controls::releaseControls();
     ammonite::window::destroyWindow();
     ammonite::renderer::setup::destroyRenderer();
 
