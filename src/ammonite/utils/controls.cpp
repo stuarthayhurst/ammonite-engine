@@ -6,7 +6,6 @@
 #include <glm/gtc/constants.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "../core/inputManager.hpp"
 #include "../core/windowManager.hpp"
 
 #include "../internal/internalSettings.hpp"
@@ -136,15 +135,6 @@ namespace ammonite {
 
         //Setup initial cursor position
         glfwGetCursorPos(window, &xposLast, &yposLast);
-      }
-
-      //Trigger callbacks
-      void processInput() {
-        //Poll GLFW for input
-        glfwPollEvents();
-
-        //Run callbacks for keybinds
-        ammonite::input::internal::runCallbacks();
       }
     }
   }

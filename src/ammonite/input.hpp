@@ -37,6 +37,8 @@ namespace ammonite {
 
     void setInputFocus(bool active);
     bool getInputFocus();
+
+    void updateInput();
   }
 }
 

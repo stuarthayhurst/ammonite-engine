@@ -8,7 +8,6 @@ namespace ammonite {
       bool getCameraActive();
 
       void setupControls();
-      void processInput();
     }
   }
 }

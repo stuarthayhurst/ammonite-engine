@@ -95,6 +95,12 @@ namespace ammonite {
       return internal::changeKeybindKeycodes(keybindId, &keycode, 1);
     }
 
+    void updateInput() {
+        //Poll GLFW for input, run keybind callbacks
+        glfwPollEvents();
+        ammonite::input::internal::runCallbacks();
+    }
+
     //Callback and setup function
     namespace internal {
       namespace {

@@ -304,7 +304,7 @@ int main(int argc, char* argv[]) {
     }
 
     //Process new input since last frame
-    ammonite::utils::controls::processInput();
+    ammonite::input::updateInput();
 
     //Call demo-specific mainloop code
     if (rendererMainloop != nullptr) {
