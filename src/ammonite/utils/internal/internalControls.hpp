@@ -2,7 +2,7 @@
 #define INTERNALCONTROLS
 
 /* Internally exposed header:
- - Expose function to set input focus in controls
+ - Expose function to set cursor focus from input system
 */
 
 namespace ammonite {
