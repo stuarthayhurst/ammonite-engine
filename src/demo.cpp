@@ -250,6 +250,8 @@ int main(int argc, char* argv[]) {
   CameraData cameraData;
   cameraData.cameraIndex = 0;
   cameraData.cameraIds = {0, ammonite::camera::createCamera()};
+  ammonite::utils::controls::setupFreeCamera(GLFW_KEY_W, GLFW_KEY_S,
+    GLFW_KEY_SPACE, GLFW_KEY_LEFT_SHIFT, GLFW_KEY_D, GLFW_KEY_A);
 
   //Set the non-default camera to the start position
   ammonite::camera::setPosition(cameraData.cameraIds[1], glm::vec3(0.0f, 0.0f, 2.0f));
@@ -309,6 +311,7 @@ int main(int argc, char* argv[]) {
       if (rendererMainloop() == -1) {
         std::cerr << "ERROR: Failed to run mainloop, exiting" << std::endl;
         unregisterKeybinds(&keybindIds);
+        ammonite::utils::controls::releaseFreeCamera();
         ammonite::window::destroyWindow();
         ammonite::renderer::setup::destroyRenderer();
         return EXIT_FAILURE;
@@ -325,6 +328,7 @@ int main(int argc, char* argv[]) {
 
   //Clean up and exit
   unregisterKeybinds(&keybindIds);
+  ammonite::utils::controls::releaseFreeCamera();
   if (demoExit != nullptr) {
     bool cleanExit = true;
     if (demoExit() == -1) {

@@ -10,7 +10,6 @@
 #include "../core/windowManager.hpp"
 
 #include "../internal/internalSettings.hpp"
-#include "../internal/keybindTracker.hpp"
 #include "../camera.hpp"
 #include "../enums.hpp"
 #include "timer.hpp"
@@ -27,10 +26,7 @@ namespace ammonite {
         bool ignoreNextCursor = false;
 
         //Current input bind, camera and control states
-        bool isInputFocused = true, isCameraActive = true, isControlActive = true;
-
-        //Access map for keybind stores
-        std::map<AmmoniteEnum, int>* keybindTrackerPtr = ammonite::utils::controls::internal::getKeybindTrackerPtr();
+        bool isInputFocused = true, isCameraActive = true;
 
         //Increase / decrease FoV on scroll (xoffset is unused)
         static void scrollCallback(GLFWwindow*, double, double yoffset) {
@@ -125,16 +121,8 @@ namespace ammonite {
         isCameraActive = active;
       }
 
-      void setControlsActive(bool active) {
-        isControlActive = active;
-      }
-
       bool getCameraActive() {
         return isCameraActive;
-      }
-
-      bool getControlsActive() {
-        return isControlActive;
       }
 
       void setupControls() {
@@ -150,63 +138,13 @@ namespace ammonite {
         glfwGetCursorPos(window, &xposLast, &yposLast);
       }
 
-      //Handle keyboard and mouse movements, calculate matrices
+      //Trigger callbacks
       void processInput() {
-        //Time difference between 2 inputs
-        static ammonite::utils::Timer controlTimer;
-        float deltaTime = controlTimer.getTime();
-
         //Poll GLFW for input
         glfwPollEvents();
 
         //Run callbacks for keybinds
         ammonite::input::internal::runCallbacks();
-
-        //Get active camera
-        int activeCameraId = ammonite::camera::getActiveCamera();
-
-        //Vector for current direction, without vertical component
-        float horizontalAngle = ammonite::camera::getHorizontal(activeCameraId);
-        glm::vec3 horizontalDirection(std::sin(horizontalAngle),
-          0, std::cos(horizontalAngle));
-
-         //Right vector, relative to the camera
-        glm::vec3 right = glm::vec3(std::sin(horizontalAngle - glm::half_pi<float>()),
-          0, std::cos(horizontalAngle - glm::half_pi<float>()));
-
-        //Get the current camera position
-        glm::vec3 position = ammonite::camera::getPosition(activeCameraId);
-
-        static float* movementSpeedPtr = ammonite::settings::controls::internal::getMovementSpeedPtr();
-
-        //Apply movement from inputs
-        if (isInputFocused and isControlActive) {
-          if (glfwGetKey(window, (*keybindTrackerPtr)[AMMONITE_FORWARD]) == GLFW_PRESS) { //Move forward
-            position += horizontalDirection * deltaTime * *movementSpeedPtr;
-          }
-          if (glfwGetKey(window, (*keybindTrackerPtr)[AMMONITE_BACK]) == GLFW_PRESS) { //Move back
-            position -= horizontalDirection * deltaTime * *movementSpeedPtr;
-          }
-          if (glfwGetKey(window, (*keybindTrackerPtr)[AMMONITE_RIGHT]) == GLFW_PRESS) { //Move right
-            position += right * deltaTime * *movementSpeedPtr;
-          }
-          if (glfwGetKey(window, (*keybindTrackerPtr)[AMMONITE_LEFT]) == GLFW_PRESS) { //Move left
-            position -= right * deltaTime * *movementSpeedPtr;
-          }
-
-          if (glfwGetKey(window, (*keybindTrackerPtr)[AMMONITE_UP]) == GLFW_PRESS) { //Move up
-            position += glm::vec3(0, 1, 0) * deltaTime * *movementSpeedPtr;
-          }
-          if (glfwGetKey(window, (*keybindTrackerPtr)[AMMONITE_DOWN]) == GLFW_PRESS) { //Move down
-            position -= glm::vec3(0, 1, 0) * deltaTime * *movementSpeedPtr;
-          }
-        }
-
-        //Update the camera position
-        ammonite::camera::setPosition(activeCameraId, position);
-
-        //Reset time between inputs
-        controlTimer.reset();
       }
     }
   }

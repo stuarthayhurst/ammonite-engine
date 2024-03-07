@@ -2,14 +2,6 @@
 #define ENUMS
 
 enum AmmoniteEnum : unsigned char {
-  //Keybinding constants
-  AMMONITE_FORWARD,
-  AMMONITE_BACK,
-  AMMONITE_UP,
-  AMMONITE_DOWN,
-  AMMONITE_LEFT,
-  AMMONITE_RIGHT,
-
   //Draw modes
   AMMONITE_DRAW_INACTIVE,
   AMMONITE_DRAW_ACTIVE,
