@@ -14,6 +14,7 @@ namespace ammonite {
 
       void setInputBlock(bool inputBlocked);
       bool getInputBlock();
+      bool* getInputBlockPtr();
 
       int registerRawKeybind(int keycodes[], int count, AmmoniteEnum overrideMode,
                              bool toggle, AmmoniteKeyCallback callback, void* userPtr);

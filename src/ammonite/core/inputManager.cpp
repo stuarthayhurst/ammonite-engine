@@ -248,6 +248,10 @@ namespace ammonite {
         return isInputBlocked;
       }
 
+      bool* getInputBlockPtr() {
+        return &isInputBlocked;
+      }
+
       //Register a keybind, don't pick own ID to allow an ID to be forced
       int registerRawKeybind(int keycodes[], int count, AmmoniteEnum overrideMode,
                              bool toggle, AmmoniteKeyCallback callback,

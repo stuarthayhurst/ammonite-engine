@@ -1,6 +1,7 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 
+#include "../core/inputManager.hpp"
 #include "../core/windowManager.hpp"
 
 #include "../internal/internalSettings.hpp"
@@ -19,12 +20,14 @@ namespace ammonite {
         double xposLast, yposLast;
         bool ignoreNextCursor = false;
 
-        //Current input bind, camera and control states
-        bool isInputFocused = true, isCameraActive = true;
+        //Current camera control states
+        bool isCameraActive = true;
+
+        bool* isInputBlockedPtr = ammonite::input::internal::getInputBlockPtr();
 
         //Increase / decrease FoV on scroll (xoffset is unused)
         static void scrollCallback(GLFWwindow*, double, double yoffset) {
-          if (isInputFocused and isCameraActive) {
+          if (!(*isInputBlockedPtr) and isCameraActive) {
             int activeCameraId = ammonite::camera::getActiveCamera();
             float fov = ammonite::camera::getFieldOfView(activeCameraId);
 
@@ -41,7 +44,7 @@ namespace ammonite {
 
         //Reset FoV on middle click, (modifier bits are unused)
         static void zoomResetCallback(GLFWwindow*, int button, int action, int) {
-          if (isInputFocused and isCameraActive) {
+          if (!(*isInputBlockedPtr) and isCameraActive) {
             if (button == GLFW_MOUSE_BUTTON_MIDDLE and action == GLFW_PRESS) {
               ammonite::camera::setFieldOfView(ammonite::camera::getActiveCamera(), 45.0f);
             }
@@ -91,13 +94,11 @@ namespace ammonite {
       namespace internal {
         //Helper function to set input state
         void setInputFocus(bool inputFocused) {
-          isInputFocused = inputFocused;
-
           //Skip next cursor movement, to avoid huge jumps
           ignoreNextCursor = true;
 
           //Hide and unhide cursor as necessary
-          if (isInputFocused) {
+          if (inputFocused) {
             //Hide cursor and start taking mouse input
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
             glfwSetCursorPosCallback(window, cursorPositionCallback);
