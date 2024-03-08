@@ -3,6 +3,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include "../internal/internalCamera.hpp"
 #include "../internal/internalSettings.hpp"
 
 #include "../enums.hpp"
@@ -19,6 +20,7 @@ namespace ammonite {
         static void windowSizeCallback(GLFWwindow*, int width, int height) {
           ammonite::settings::runtime::internal::setWidth(width);
           ammonite::settings::runtime::internal::setHeight(height);
+          ammonite::camera::internal::calcMatrices();
         }
       }
 
