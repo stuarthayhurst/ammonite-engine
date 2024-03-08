@@ -122,9 +122,27 @@ void printMetrics(double frameTime) {
   std::printf(" (%fms)\n", frameTime * 1000);
 }
 
-void unregisterKeybinds(std::vector<int>* keybindIdsPtr) {
-  for (unsigned int i = 0; i < keybindIdsPtr->size(); i++) {
-    ammonite::input::unregisterKeybind((*keybindIdsPtr)[i]);
+#define HAS_SETUP_WINDOW   (1 << 0)
+#define HAS_SETUP_RENDERER (1 << 1)
+#define HAS_SETUP_CONTROLS (1 << 2)
+
+//Clean up anything that was created
+void cleanEngine(int setupBits, std::vector<int>* keybindIdsPtr) {
+  if (setupBits & HAS_SETUP_WINDOW) {
+    ammonite::window::destroyWindow();
+  }
+
+  if (setupBits & HAS_SETUP_RENDERER) {
+    ammonite::renderer::setup::destroyRenderer();
+  }
+
+  if (setupBits & HAS_SETUP_CONTROLS) {
+    ammonite::utils::controls::releaseFreeCamera();
+    if (keybindIdsPtr != nullptr) {
+      for (unsigned int i = 0; i < keybindIdsPtr->size(); i++) {
+        ammonite::input::unregisterKeybind((*keybindIdsPtr)[i]);
+      }
+    }
   }
 }
 
@@ -188,6 +206,7 @@ int main(int argc, char* argv[]) {
   if (ammonite::window::createWindow(1024, 768, "Ammonite Engine") == -1) {
     return EXIT_FAILURE;
   }
+  int setupBits = HAS_SETUP_WINDOW;
   ammonite::window::useIconDir("assets/icons/");
 
   ammonite::utils::debug::printDriverInfo();
@@ -213,6 +232,7 @@ int main(int argc, char* argv[]) {
   bool success = true;
   ammonite::utils::cache::useDataCache("cache");
   ammonite::renderer::setup::setupRenderer("shaders/", &success);
+  setupBits |= HAS_SETUP_RENDERER;
 
   //Graphics settings
   ammonite::settings::graphics::setAntialiasingSamples(4);
@@ -224,8 +244,7 @@ int main(int argc, char* argv[]) {
   //Renderer failed to initialise, clean up and exit
   if (!success) {
     std::cerr << "ERROR: Failed to initialise renderer, exiting" << std::endl;
-    ammonite::window::destroyWindow();
-    ammonite::renderer::setup::destroyRenderer();
+    cleanEngine(setupBits, nullptr);
     return EXIT_FAILURE;
   }
 
@@ -239,8 +258,8 @@ int main(int argc, char* argv[]) {
   if (postRendererInit != nullptr) {
     if (postRendererInit() == -1) {
       std::cerr << "ERROR: Failed to set up demo, exiting" << std::endl;
-      ammonite::window::destroyWindow();
-      ammonite::renderer::setup::destroyRenderer();
+      ammonite::interface::deleteLoadingScreen(screenId);
+      cleanEngine(setupBits, nullptr);
       return EXIT_FAILURE;
     }
   }
@@ -285,6 +304,7 @@ int main(int argc, char* argv[]) {
                          GLFW_KEY_UP, changeFrameRateCallback, &positive));
   keybindIds.push_back(ammonite::input::registerKeybind(
                          GLFW_KEY_DOWN, changeFrameRateCallback, &negative));
+  setupBits |= HAS_SETUP_CONTROLS;
 
   //Engine loaded, delete the loading screen
   ammonite::utils::status << "Loaded demo in " << utilityTimer.getTime() << "s\n" << std::endl;
@@ -309,10 +329,7 @@ int main(int argc, char* argv[]) {
     if (rendererMainloop != nullptr) {
       if (rendererMainloop() == -1) {
         std::cerr << "ERROR: Failed to run mainloop, exiting" << std::endl;
-        unregisterKeybinds(&keybindIds);
-        ammonite::utils::controls::releaseFreeCamera();
-        ammonite::window::destroyWindow();
-        ammonite::renderer::setup::destroyRenderer();
+        cleanEngine(setupBits, &keybindIds);
         return EXIT_FAILURE;
       }
     }
@@ -326,20 +343,17 @@ int main(int argc, char* argv[]) {
   }
 
   //Clean up and exit
-  unregisterKeybinds(&keybindIds);
-  ammonite::utils::controls::releaseFreeCamera();
+  bool cleanExit = true;
   if (demoExit != nullptr) {
-    bool cleanExit = true;
     if (demoExit() == -1) {
       cleanExit = false;
       std::cerr << "ERROR: Failed to clean up, exiting" << std::endl;
     }
-    ammonite::window::destroyWindow();
-    ammonite::renderer::setup::destroyRenderer();
+  }
 
-    if (!cleanExit) {
-      return EXIT_FAILURE;
-    }
+  cleanEngine(setupBits, &keybindIds);
+  if (!cleanExit) {
+    return EXIT_FAILURE;
   }
   return EXIT_SUCCESS;
 }
