@@ -112,7 +112,7 @@ namespace ammonite {
 
     glm::vec3 getDirection(int cameraId) {
       if (cameraTrackerMap.contains(cameraId)) {
-        auto activeCamera = &cameraTrackerMap[cameraId];
+        Camera* activeCamera = &cameraTrackerMap[cameraId];
         glm::vec3 direction = glm::vec3(
           std::cos(activeCamera->verticalAngle) * std::sin(activeCamera->horizontalAngle),
           std::sin(activeCamera->verticalAngle),
