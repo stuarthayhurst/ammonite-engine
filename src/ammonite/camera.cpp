@@ -27,6 +27,16 @@ namespace ammonite {
       std::map<int, Camera> cameraTrackerMap = {{0, defaultCamera}};
     }
 
+    namespace {
+      static glm::vec3 calculateDirection(double vertical, double horizontal) {
+        return glm::vec3(
+          glm::cos(vertical) * glm::sin(horizontal),
+          glm::sin(vertical),
+          glm::cos(vertical) * glm::cos(horizontal)
+        );
+      }
+    }
+
     //Pointer and update methods exposed internally
     namespace internal {
       glm::mat4* getViewMatrixPtr() {
@@ -42,11 +52,8 @@ namespace ammonite {
         Camera activeCamera = cameraTrackerMap[activeCameraId];
 
         //Vector for current direction faced
-        glm::vec3 direction = glm::vec3(
-          glm::cos(activeCamera.verticalAngle) * glm::sin(activeCamera.horizontalAngle),
-          glm::sin(activeCamera.verticalAngle),
-          glm::cos(activeCamera.verticalAngle) * glm::cos(activeCamera.horizontalAngle)
-        );
+        glm::vec3 direction = calculateDirection(activeCamera.verticalAngle,
+                                                 activeCamera.horizontalAngle);
 
         //Right vector, relative to the camera
         glm::vec3 right = glm::vec3(
@@ -112,11 +119,8 @@ namespace ammonite {
     glm::vec3 getDirection(int cameraId) {
       if (cameraTrackerMap.contains(cameraId)) {
         Camera* activeCamera = &cameraTrackerMap[cameraId];
-        glm::vec3 direction = glm::vec3(
-          glm::cos(activeCamera->verticalAngle) * glm::sin(activeCamera->horizontalAngle),
-          glm::sin(activeCamera->verticalAngle),
-          glm::cos(activeCamera->verticalAngle) * glm::cos(activeCamera->horizontalAngle)
-        );
+        glm::vec3 direction = calculateDirection(activeCamera->verticalAngle,
+                                                 activeCamera->horizontalAngle);
         return glm::normalize(direction);
       } else {
         return glm::vec3(0.0f);
