@@ -14,7 +14,7 @@ namespace ammonite {
         glm::vec3 position = glm::vec3(0.0f);
         float horizontalAngle = glm::pi<float>();
         float verticalAngle = 0.0f;
-        float fov = 45.0f;
+        float fov = glm::quarter_pi<float>();
       } camera;
 
       //View and projection matrices
@@ -60,7 +60,7 @@ namespace ammonite {
 
         //Calculate the projection matrix from FoV, aspect ratio and display range
         static float* renderFarPlanePtr = ammonite::settings::graphics::internal::getRenderFarPlanePtr();
-        projectionMatrix = glm::perspective(glm::radians(activeCamera.fov), *aspectRatio, 0.1f, *renderFarPlanePtr);
+        projectionMatrix = glm::perspective(activeCamera.fov, *aspectRatio, 0.1f, *renderFarPlanePtr);
 
         //Calculate view matrix from position, where it's looking, and relative up
         viewMatrix = glm::lookAt(activeCamera.position, activeCamera.position + direction, up);
@@ -142,12 +142,12 @@ namespace ammonite {
       }
     }
 
-    //Get field of view
+    //Get field of view (radians)
     float getFieldOfView(int cameraId) {
       if (cameraTrackerMap.contains(cameraId)) {
         return cameraTrackerMap[cameraId].fov;
       } else {
-        return 45.0f;
+        return glm::quarter_pi<float>();
       }
     }
 
@@ -174,11 +174,11 @@ namespace ammonite {
       //Find the target camera and update vertical angle
       if (cameraTrackerMap.contains(cameraId)) {
         cameraTrackerMap[cameraId].verticalAngle = newVertical;
-       internal::calcMatrices();
+        internal::calcMatrices();
       }
     }
 
-    //Set field of view
+    //Set field of view (radians)
     void setFieldOfView(int cameraId, float newFov) {
       //Find the target camera and update field of view
       if (cameraTrackerMap.contains(cameraId)) {

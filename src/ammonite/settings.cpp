@@ -1,4 +1,5 @@
 #include <GLFW/glfw3.h>
+#include <glm/gtc/constants.hpp>
 
 #include "internal/internalCamera.hpp"
 
@@ -11,7 +12,7 @@ namespace ammonite {
           struct BaseControlSettings {
             const float movementSpeed = 5.0f;
             const float mouseSpeed = 0.005f;
-            const float zoomSpeed = 1.0f;
+            const float zoomSpeed = 0.025f;
           } baseSettings;
 
           struct ControlMultipliers {
@@ -20,7 +21,8 @@ namespace ammonite {
             float zoom = 1.0f;
           } multipliers;
 
-          float fovLimit = 120.0f;
+          //Default to a 120 degree field of view limit
+          float fovLimit = 2 * glm::half_pi<float>() / 3;
 
           //Final sensitivites, exposed through "internal/runtimeSettings.hpp"
           float movementSpeed = baseSettings.movementSpeed;
@@ -63,6 +65,7 @@ namespace ammonite {
         controls.zoomSpeed = controls.baseSettings.zoomSpeed * newZoomSpeed;
       }
 
+      //Radians
       void setFovLimit(float newFovLimit) {
         controls.fovLimit = newFovLimit;
       }
@@ -79,6 +82,7 @@ namespace ammonite {
         return controls.multipliers.zoom;
       }
 
+      //Radians
       float getFovLimit() {
         return controls.fovLimit;
       }

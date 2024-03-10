@@ -134,7 +134,8 @@ namespace ammonite {
       static void zoomResetCallback(GLFWwindow*, int button, int action, int) {
         if (!(*isInputBlockedPtr) and isCameraActive) {
           if (button == GLFW_MOUSE_BUTTON_MIDDLE and action == GLFW_PRESS) {
-            ammonite::camera::setFieldOfView(ammonite::camera::getActiveCamera(), 45.0f);
+            ammonite::camera::setFieldOfView(ammonite::camera::getActiveCamera(),
+                                             glm::quarter_pi<float>());
           }
         }
       }
