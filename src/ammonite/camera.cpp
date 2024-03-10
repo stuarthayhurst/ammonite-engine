@@ -1,5 +1,4 @@
 #include <map>
-#include <cmath>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -44,16 +43,16 @@ namespace ammonite {
 
         //Vector for current direction faced
         glm::vec3 direction = glm::vec3(
-          std::cos(activeCamera.verticalAngle) * std::sin(activeCamera.horizontalAngle),
-          std::sin(activeCamera.verticalAngle),
-          std::cos(activeCamera.verticalAngle) * std::cos(activeCamera.horizontalAngle)
+          glm::cos(activeCamera.verticalAngle) * glm::sin(activeCamera.horizontalAngle),
+          glm::sin(activeCamera.verticalAngle),
+          glm::cos(activeCamera.verticalAngle) * glm::cos(activeCamera.horizontalAngle)
         );
 
         //Right vector, relative to the camera
         glm::vec3 right = glm::vec3(
-          std::sin(activeCamera.horizontalAngle - glm::half_pi<float>()),
+          glm::sin(activeCamera.horizontalAngle - glm::half_pi<float>()),
           0,
-          std::cos(activeCamera.horizontalAngle - glm::half_pi<float>())
+          glm::cos(activeCamera.horizontalAngle - glm::half_pi<float>())
         );
         //Up vector, relative to the camera
         glm::vec3 up = glm::cross(right, direction);
@@ -114,9 +113,9 @@ namespace ammonite {
       if (cameraTrackerMap.contains(cameraId)) {
         Camera* activeCamera = &cameraTrackerMap[cameraId];
         glm::vec3 direction = glm::vec3(
-          std::cos(activeCamera->verticalAngle) * std::sin(activeCamera->horizontalAngle),
-          std::sin(activeCamera->verticalAngle),
-          std::cos(activeCamera->verticalAngle) * std::cos(activeCamera->horizontalAngle)
+          glm::cos(activeCamera->verticalAngle) * glm::sin(activeCamera->horizontalAngle),
+          glm::sin(activeCamera->verticalAngle),
+          glm::cos(activeCamera->verticalAngle) * glm::cos(activeCamera->horizontalAngle)
         );
         return glm::normalize(direction);
       } else {
