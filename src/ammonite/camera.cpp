@@ -15,7 +15,7 @@ namespace ammonite {
         float horizontalAngle = glm::pi<float>();
         float verticalAngle = 0.0f;
         float fov = glm::quarter_pi<float>();
-      } camera;
+      } defaultCamera;
 
       //View and projection matrices
       glm::mat4 viewMatrix;
@@ -25,7 +25,7 @@ namespace ammonite {
       //Create map to track cameras, with default camera
       int totalUserCameras = 0;
       int activeCameraId = 0;
-      std::map<int, Camera> cameraTrackerMap = {{0, camera}};
+      std::map<int, Camera> cameraTrackerMap = {{0, defaultCamera}};
     }
 
     //Pointer and update methods exposed internally
