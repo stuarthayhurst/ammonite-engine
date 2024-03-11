@@ -3,10 +3,12 @@
 
 #include <glm/glm.hpp>
 
+#include "../enums.hpp"
+
 namespace ammonite {
   namespace models {
     namespace draw {
-      void setDrawMode(int modelId, short drawMode);
+      void setDrawMode(int modelId, AmmoniteEnum drawMode);
     }
 
     namespace position {

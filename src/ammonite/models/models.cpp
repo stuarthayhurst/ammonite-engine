@@ -512,7 +512,7 @@ namespace ammonite {
     }
 
     namespace draw {
-      void setDrawMode(int modelId, short drawMode) {
+      void setDrawMode(int modelId, AmmoniteEnum drawMode) {
         internal::ModelInfo* modelPtr = modelIdPtrMap[modelId];
         if (modelPtr != nullptr) {
           if (modelPtr->drawMode == AMMONITE_DRAW_INACTIVE and drawMode != AMMONITE_DRAW_INACTIVE) {
