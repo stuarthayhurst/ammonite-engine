@@ -54,7 +54,7 @@ namespace ammonite {
         ModelData* modelData;
         PositionData positionData;
         std::vector<TextureIdGroup> textureIds;
-        short drawMode = 0;
+        short drawMode = AMMONITE_DRAW_ACTIVE;
         bool isLoaded = true;
         int lightEmitterId = -1;
         int lightIndex = -1;
