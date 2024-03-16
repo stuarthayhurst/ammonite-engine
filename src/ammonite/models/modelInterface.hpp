@@ -7,10 +7,6 @@
 
 namespace ammonite {
   namespace models {
-    namespace draw {
-      void setDrawMode(int modelId, AmmoniteEnum drawMode);
-    }
-
     namespace position {
       glm::vec3 getPosition(int modelId);
       glm::vec3 getScale(int modelId);

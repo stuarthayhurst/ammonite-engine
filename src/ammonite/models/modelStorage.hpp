@@ -18,6 +18,7 @@ namespace ammonite {
     void applyTexture(int modelId, AmmoniteEnum textureType, const char* texturePath,
                       bool srgbTexture, bool* externalSuccess);
     int getVertexCount(int modelId);
+    void setDrawMode(int modelId, AmmoniteEnum drawMode);
   }
 }
 

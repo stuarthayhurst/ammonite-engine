@@ -511,21 +511,19 @@ namespace ammonite {
       return vertexCount;
     }
 
-    namespace draw {
-      void setDrawMode(int modelId, AmmoniteEnum drawMode) {
-        internal::ModelInfo* modelPtr = modelIdPtrMap[modelId];
-        if (modelPtr != nullptr) {
-          if (modelPtr->drawMode == AMMONITE_DRAW_INACTIVE and drawMode != AMMONITE_DRAW_INACTIVE) {
-            //Move from inactive to active tracker
-            moveModelToActive(modelId, modelPtr);
-          } else if (modelPtr->drawMode != AMMONITE_DRAW_INACTIVE and drawMode == AMMONITE_DRAW_INACTIVE) {
-            //Move from active to inactive tracker
-            moveModelToInactive(modelId, modelPtr);
-          }
-
-          //Update draw mode
-          modelIdPtrMap[modelId]->drawMode = drawMode;
+    void setDrawMode(int modelId, AmmoniteEnum drawMode) {
+      internal::ModelInfo* modelPtr = modelIdPtrMap[modelId];
+      if (modelPtr != nullptr) {
+        if (modelPtr->drawMode == AMMONITE_DRAW_INACTIVE and drawMode != AMMONITE_DRAW_INACTIVE) {
+          //Move from inactive to active tracker
+          moveModelToActive(modelId, modelPtr);
+        } else if (modelPtr->drawMode != AMMONITE_DRAW_INACTIVE and drawMode == AMMONITE_DRAW_INACTIVE) {
+          //Move from active to inactive tracker
+          moveModelToInactive(modelId, modelPtr);
         }
+
+        //Update draw mode
+        modelIdPtrMap[modelId]->drawMode = drawMode;
       }
     }
 
