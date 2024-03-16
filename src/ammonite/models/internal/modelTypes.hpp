@@ -37,7 +37,6 @@ namespace ammonite {
 
       struct ModelData {
         int refCount = 1;
-        int softRefCount = 0;
         std::vector<MeshData> meshes;
         std::vector<TextureIdGroup> textureIds;
       };
@@ -55,7 +54,6 @@ namespace ammonite {
         PositionData positionData;
         std::vector<TextureIdGroup> textureIds;
         AmmoniteEnum drawMode = AMMONITE_DRAW_ACTIVE;
-        bool isLoaded = true;
         int lightEmitterId = -1;
         int lightIndex = -1;
         std::string modelName;

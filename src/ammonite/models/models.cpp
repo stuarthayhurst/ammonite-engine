@@ -168,7 +168,7 @@ namespace ammonite {
         //Select the right tracker
         ModelTracker* selectedTracker = &inactiveModelTracker;
         internal::ModelInfo* modelPtr = modelIdPtrMap[modelId];
-        if (modelPtr->isLoaded or modelPtr->drawMode != AMMONITE_DRAW_INACTIVE) {
+        if (modelPtr->drawMode != AMMONITE_DRAW_INACTIVE) {
           selectedTracker = &activeModelTracker;
         }
 
@@ -355,77 +355,17 @@ namespace ammonite {
       return modelObject.modelId;
     }
 
-    void unloadModel(int modelId) {
-      internal::ModelInfo* modelPtr = modelIdPtrMap[modelId];
-      if (modelPtr == nullptr) {
-        return;
-      }
-
-      //If model is loaded and active, move from active to inactive tracker
-      if (modelPtr->isLoaded and modelPtr->drawMode != AMMONITE_DRAW_INACTIVE) {
-        moveModelToInactive(modelId, modelPtr);
-        modelPtr = modelIdPtrMap[modelId];
-      }
-
-      //Check if model is loaded
-      if (modelPtr->isLoaded) {
-        //Set model as unloaded
-        modelPtr->isLoaded = false;
-
-        //Decrease refcount, add a new soft reference
-        modelPtr->modelData->softRefCount++;
-        modelPtr->modelData->refCount--;
-
-        //Unload actual data if no models reference it
-        if (modelPtr->modelData->refCount < 1) {
-          deleteBuffers(modelPtr->modelData);
-        }
-      }
-    }
-
-    void reloadModel(int modelId) {
-      internal::ModelInfo* modelPtr = modelIdPtrMap[modelId];
-      if (modelPtr == nullptr) {
-        return;
-      }
-
-      //If model is unloaded or inactive, move from inactive to active tracker
-      if (!modelPtr->isLoaded or modelPtr->drawMode == AMMONITE_DRAW_INACTIVE) {
-        moveModelToActive(modelId, modelPtr);
-        modelPtr = modelIdPtrMap[modelId];
-      }
-
-      //Check if model is unloaded
-      if (!modelPtr->isLoaded) {
-        //Set model as loaded
-        modelPtr->isLoaded = true;
-
-        //Increase refcount, remove a soft reference
-        modelPtr->modelData->softRefCount--;
-        modelPtr->modelData->refCount++;
-
-        //Upload actual data to the GPU, if it wasn't present
-        if (modelPtr->modelData->refCount == 1) {
-          createBuffers(modelPtr->modelData);
-        }
-      }
-    }
-
     void deleteModel(int modelId) {
       //Check the model actually exists
       if (modelIdPtrMap.contains(modelId)) {
         internal::ModelInfo* modelObject = modelIdPtrMap[modelId];
         internal::ModelData* modelObjectData = modelObject->modelData;
 
-        //Decrease the reference / soft reference count of the model data
-        if (modelObject->isLoaded) {
-          modelObjectData->refCount--;
-        } else {
-          modelObjectData->softRefCount--;
-        }
+        //Decrease the reference count of the model data
+        modelObjectData->refCount--;
 
         //If the model data is now unused, destroy it
-        if (modelObjectData->refCount < 1 and modelObjectData->softRefCount < 1) {
+        if (modelObjectData->refCount < 1) {
           //Reduce reference count on textures
           for (unsigned int i = 0; i < modelObjectData->meshes.size(); i++) {
             ammonite::textures::internal::deleteTexture(modelObject->textureIds[i].diffuseId);
