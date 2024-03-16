@@ -13,9 +13,10 @@ namespace ammonite {
     void unloadModel(int modelId);
     void reloadModel(int modelId);
 
-    void applyTexture(int modelId, AmmoniteEnum textureType, const char* texturePath, bool* externalSuccess);
-    void applyTexture(int modelId, AmmoniteEnum textureType, const char* texturePath, bool srgbTexture,
+    void applyTexture(int modelId, AmmoniteEnum textureType, const char* texturePath,
                       bool* externalSuccess);
+    void applyTexture(int modelId, AmmoniteEnum textureType, const char* texturePath,
+                      bool srgbTexture, bool* externalSuccess);
     int getVertexCount(int modelId);
   }
 }
