@@ -63,6 +63,9 @@ namespace ammonite {
 
       void destroyRenderer() {
         ammonite::thread::internal::destroyThreadPool();
+        internal::deleteShaders();
+        internal::destroyOpenGLObjects();
+        internal::deleteModelCache();
       }
     }
 

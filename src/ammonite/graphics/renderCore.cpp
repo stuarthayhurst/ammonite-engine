@@ -97,6 +97,13 @@ namespace ammonite {
         GLuint progressColourId;
       } loadingShader;
 
+      struct {
+        GLuint skybox;
+        GLuint skyboxElement;
+        GLuint screenQuad;
+        GLuint screenQuadElement;
+      } bufferIds;
+
       GLuint skyboxVertexArrayId;
       GLuint screenQuadVertexArrayId;
 
@@ -175,6 +182,15 @@ namespace ammonite {
             *externalSuccess = false;
           }
           return hasCreatedShaders;
+        }
+
+        void deleteShaders() {
+          glDeleteProgram(modelShader.shaderId);
+          glDeleteProgram(lightShader.shaderId);
+          glDeleteProgram(depthShader.shaderId);
+          glDeleteProgram(skyboxShader.shaderId);
+          glDeleteProgram(screenShader.shaderId);
+          glDeleteProgram(loadingShader.shaderId);
         }
 
         //Check for essential GPU capabilities
@@ -319,13 +335,6 @@ namespace ammonite {
             0, 2, 3
           };
 
-          struct {
-            GLuint skybox;
-            GLuint skyboxElement;
-            GLuint screenQuad;
-            GLuint screenQuadElement;
-          } bufferIds;
-
           //Create vertex and element buffers for the skybox and screen quad
           glCreateBuffers(4, &bufferIds.skybox);
 
@@ -360,6 +369,41 @@ namespace ammonite {
           glVertexArrayAttribBinding(screenQuadVertexArrayId, 1, 1);
 
           glVertexArrayElementBuffer(screenQuadVertexArrayId, bufferIds.screenQuadElement);
+        }
+
+        void destroyOpenGLObjects() {
+          glDeleteFramebuffers(1, &depthMapFBO);
+          glDeleteFramebuffers(1, &colourBufferMultisampleFBO);
+          glDeleteFramebuffers(1, &screenQuadFBO);
+          glDeleteRenderbuffers(1, &depthRenderBufferId);
+
+          glDeleteBuffers(4, &bufferIds.skybox);
+          glDeleteVertexArrays(1, &skyboxVertexArrayId);
+          glDeleteVertexArrays(1, &screenQuadVertexArrayId);
+
+          if (screenQuadTextureId != 0) {
+            glDeleteTextures(1, &screenQuadTextureId);
+            glDeleteTextures(1, &screenQuadDepthTextureId);
+          }
+
+
+          if (colourRenderBufferId != 0) {
+            glDeleteRenderbuffers(1, &colourRenderBufferId);
+          }
+
+          if (depthCubeMapId != 0) {
+            glDeleteTextures(1, &depthCubeMapId);
+          }
+        }
+
+        void deleteModelCache() {
+          if (modelPtrs != nullptr) {
+            delete [] modelPtrs;
+          }
+
+          if (lightModelPtrs != nullptr) {
+            delete [] lightModelPtrs;
+          }
         }
       }
     }
