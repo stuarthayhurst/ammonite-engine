@@ -62,9 +62,9 @@ namespace {
       }
     }
 
-    void push(WorkItem* workPtr) {
+    void push(AmmoniteWork work, void* userPtr, std::atomic_flag* completion) {
       int index = (nextWrite++) & (queueSize - 1);
-      workItems[index] = *workPtr;
+      workItems[index] = {work, userPtr, completion};
       readyPtr[index] = true;
 
 #ifdef DEBUG
@@ -156,8 +156,7 @@ namespace ammonite {
 
       void submitWork(AmmoniteWork work, void* userPtr, std::atomic_flag* completion) {
         //Add work to the queue
-        WorkItem workItem = {work, userPtr, completion};
-        workQueue->push(&workItem);
+        workQueue->push(work, userPtr, completion);
 
         //Increase job count, wake a sleeping thread
         jobCount++;
@@ -166,9 +165,8 @@ namespace ammonite {
 
       //Specialised variants to submit multiple jobs
       void submitMultiple(AmmoniteWork work, int newJobs) {
-        WorkItem workItem = {work, nullptr, nullptr};
         for (int i = 0; i < newJobs; i++) {
-          workQueue->push(&workItem);
+          workQueue->push(work, nullptr, nullptr);
           jobCount++;
           jobCount.notify_one();
         }
@@ -176,8 +174,7 @@ namespace ammonite {
 
       void submitMultipleUser(AmmoniteWork work, void** userPtrs, int newJobs) {
         for (int i = 0; i < newJobs; i++) {
-          WorkItem workItem = {work, userPtrs[i], nullptr};
-          workQueue->push(&workItem);
+          workQueue->push(work, userPtrs[i], nullptr);
           jobCount++;
           jobCount.notify_one();
         }
@@ -185,8 +182,7 @@ namespace ammonite {
 
       void submitMultipleComp(AmmoniteWork work, std::atomic_flag* completions, int newJobs) {
         for (int i = 0; i < newJobs; i++) {
-          WorkItem workItem = {work, nullptr, completions + i};
-          workQueue->push(&workItem);
+          workQueue->push(work, nullptr, completions + i);
           jobCount++;
           jobCount.notify_one();
         }
@@ -195,8 +191,7 @@ namespace ammonite {
       void submitMultipleUserComp(AmmoniteWork work, void** userPtrs,
                                   std::atomic_flag* completions, int newJobs) {
         for (int i = 0; i < newJobs; i++) {
-          WorkItem workItem = {work, userPtrs[i], completions + i};
-          workQueue->push(&workItem);
+          workQueue->push(work, userPtrs[i], completions + i);
           jobCount++;
           jobCount.notify_one();
         }
@@ -249,9 +244,8 @@ namespace ammonite {
 
         //Submit a job for each thread that waits for the trigger
         unblockThreadsTrigger.clear();
-        WorkItem blockerItem = {blocker, nullptr, nullptr};
         for (unsigned int i = 0; i < extraThreadCount; i++) {
-          workQueue->push(&blockerItem);
+          workQueue->push(blocker, nullptr, nullptr);
         }
 
         //Add to job count and wake all threads
