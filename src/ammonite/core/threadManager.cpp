@@ -181,7 +181,7 @@ namespace ammonite {
 
       void submitMultipleUser(AmmoniteWork work, void** userPtrs, int newJobs) {
         for (int i = 0; i < newJobs; i++) {
-        WorkItem workItem = {work, userPtrs[i], nullptr};
+          WorkItem workItem = {work, userPtrs[i], nullptr};
           workQueue->push(&workItem);
           jobCount++;
           jobCount.notify_one();
