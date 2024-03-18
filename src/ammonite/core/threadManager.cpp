@@ -155,11 +155,6 @@ namespace ammonite {
       }
 
       void submitWork(AmmoniteWork work, void* userPtr, std::atomic_flag* completion) {
-        //Initialise the completion atomic
-        if (completion != nullptr) {
-          completion->clear();
-        }
-
         //Add work to the queue
         WorkItem workItem = {work, userPtr, completion};
         workQueue->push(&workItem);

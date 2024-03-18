@@ -157,7 +157,7 @@ namespace ammonite {
         //Repack light sources into ShaderData (uses vec4s for OpenGL)
         ShaderLightSource* shaderData = new ShaderLightSource[lightCount];
         int shaderDataSize = sizeof(ShaderLightSource) * lightCount;
-        std::atomic_flag* syncs = new std::atomic_flag[lightCount];
+        std::atomic_flag* syncs = new std::atomic_flag[lightCount]{ATOMIC_FLAG_INIT};
         LightWorkerData* workerData = new LightWorkerData[lightCount];
         for (unsigned int i = 0; i < lightCount; i++) {
           workerData[i].shaderData = shaderData;

@@ -25,7 +25,7 @@ if (ammonite::thread::internal::createThreadPool((THREADS)) == -1) { \
 #endif
 
 #define PREP_SYNC(jobCount, syncs) \
-std::atomic_flag* syncs = new std::atomic_flag[(jobCount)];
+std::atomic_flag* syncs = new std::atomic_flag[(jobCount)]{ATOMIC_FLAG_INIT};
 
 #define SYNC_THREADS(jobCount, syncs) \
 for (int i = 0; i < (jobCount); i++) { \
@@ -179,7 +179,7 @@ namespace {
     SYNC_THREADS(jobCount, syncs)
 
     //Submit second batch
-    syncs = new std::atomic_flag[(jobCount)];
+    syncs = new std::atomic_flag[(jobCount)]{ATOMIC_FLAG_INIT};
     values = new int[(jobCount)]{};
     submitTimer.unpause();
     for (int i = 0; i < jobCount; i++) { \
