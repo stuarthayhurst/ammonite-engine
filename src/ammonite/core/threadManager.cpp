@@ -327,7 +327,7 @@ namespace ammonite {
         unblockThreads(true);
         blockThreads(true);
 
-        //Kill all threads when the're unblocked wake up
+        //Kill all threads after they're unblocked and wake up
         stayAlive = false;
 
         //Unblock threads and wake them up
