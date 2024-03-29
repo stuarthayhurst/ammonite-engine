@@ -302,7 +302,7 @@ namespace ammonite {
           //Get the max number of lights supported
           maxLightCount = ammonite::lighting::getMaxLightCount();
 
-          const char skyboxVertices[] = {
+          const signed char skyboxVertices[] = {
             -1,  1, -1,
             -1, -1, -1,
              1, -1, -1,
@@ -313,7 +313,7 @@ namespace ammonite {
              1,  1,  1
           };
 
-          const unsigned char skyboxIndices[36] = {
+          const signed char skyboxIndices[36] = {
             0, 1, 2, 2, 3, 0,
             4, 1, 0, 0, 5, 4,
             2, 6, 7, 7, 3, 2,
@@ -323,14 +323,14 @@ namespace ammonite {
           };
 
           //Position and texture coord of screen quad
-          const char screenVertices[16] = {
+          const signed char screenVertices[16] = {
             -1,  1,  0,  1,
             -1, -1,  0,  0,
              1, -1,  1,  0,
              1,  1,  1,  1
           };
 
-          const unsigned char screenIndices[6] = {
+          const signed char screenIndices[6] = {
             0, 1, 2,
             0, 2, 3
           };
@@ -345,7 +345,7 @@ namespace ammonite {
           //Create vertex array object for skybox
           glCreateVertexArrays(1, &skyboxVertexArrayId);
           glEnableVertexArrayAttrib(skyboxVertexArrayId, 0);
-          glVertexArrayVertexBuffer(skyboxVertexArrayId, 0, bufferIds.skybox, 0, 3 * sizeof(char));
+          glVertexArrayVertexBuffer(skyboxVertexArrayId, 0, bufferIds.skybox, 0, 3 * sizeof(signed char));
           glVertexArrayAttribFormat(skyboxVertexArrayId, 0, 3, GL_BYTE, GL_FALSE, 0);
           glVertexArrayAttribBinding(skyboxVertexArrayId, 0, 0);
           glVertexArrayElementBuffer(skyboxVertexArrayId, bufferIds.skyboxElement);
@@ -358,13 +358,13 @@ namespace ammonite {
           glCreateVertexArrays(1, &screenQuadVertexArrayId);
           //Vertex positions
           glEnableVertexArrayAttrib(screenQuadVertexArrayId, 0);
-          glVertexArrayVertexBuffer(screenQuadVertexArrayId, 0, bufferIds.screenQuad, 0, 4 * sizeof(char));
+          glVertexArrayVertexBuffer(screenQuadVertexArrayId, 0, bufferIds.screenQuad, 0, 4 * sizeof(signed char));
           glVertexArrayAttribFormat(screenQuadVertexArrayId, 0, 2, GL_BYTE, GL_FALSE, 0);
           glVertexArrayAttribBinding(screenQuadVertexArrayId, 0, 0);
 
           //Texture coords
           glEnableVertexArrayAttrib(screenQuadVertexArrayId, 1);
-          glVertexArrayVertexBuffer(screenQuadVertexArrayId, 1, bufferIds.screenQuad, 2 * sizeof(char), 4 * sizeof(char));
+          glVertexArrayVertexBuffer(screenQuadVertexArrayId, 1, bufferIds.screenQuad, 2 * sizeof(signed char), 4 * sizeof(signed char));
           glVertexArrayAttribFormat(screenQuadVertexArrayId, 1, 2, GL_BYTE, GL_FALSE, 0);
           glVertexArrayAttribBinding(screenQuadVertexArrayId, 1, 1);
 
