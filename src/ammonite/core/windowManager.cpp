@@ -7,6 +7,7 @@
 #include "../internal/internalSettings.hpp"
 
 #include "../enums.hpp"
+#include "../utils/logging.hpp"
 #include "../utils/debug.hpp"
 
 namespace ammonite {
@@ -60,7 +61,9 @@ namespace ammonite {
 
       int setupGlew() {
         glewExperimental = GL_TRUE;
-        if (glewInit() != GLEW_OK) {
+        GLenum err = glewInit();
+        if (err != GLEW_OK) {
+          ammonite::utils::error << glewGetErrorString(err) << std::endl;
           return -1;
         }
 
