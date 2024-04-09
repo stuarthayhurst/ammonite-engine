@@ -1,7 +1,8 @@
+#include <algorithm>
+#include <filesystem>
+#include <iostream>
 #include <string>
 #include <vector>
-#include <filesystem>
-#include <algorithm>
 
 #include <GLFW/glfw3.h>
 #include <stb/stb_image.h>
@@ -11,7 +12,6 @@
 #include "internal/internalInput.hpp"
 #include "graphics/internal/internalShaders.hpp"
 
-#include "utils/debug.hpp"
 #include "utils/logging.hpp"
 #include "enums.hpp"
 #include "settings.hpp"
