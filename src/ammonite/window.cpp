@@ -27,8 +27,7 @@ namespace ammonite {
 
     namespace {
       static void setCloseWindowCallback(std::vector<int>, int, void* userPtr) {
-        bool* closeWindowPtr = (bool*)userPtr;
-        *closeWindowPtr = true;
+        *(bool*)userPtr = true;
       }
     }
 
