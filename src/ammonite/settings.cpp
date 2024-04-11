@@ -248,45 +248,5 @@ namespace ammonite {
         return graphics.gammaCorrection;
       }
     }
-
-    namespace runtime {
-      namespace {
-        int width = 0, height = 0;
-        float aspectRatio = 0.0f;
-      }
-
-      //Exposed internally only
-      namespace internal {
-        float* getAspectRatioPtr() {
-          return &aspectRatio;
-        }
-
-        int* getWidthPtr() {
-          return &width;
-        }
-
-        int* getHeightPtr() {
-          return &height;
-        }
-
-        void setWidth(int newWidth) {
-          width = newWidth;
-          aspectRatio = float(width) / float(height);
-        }
-
-        void setHeight(int newHeight) {
-          height = newHeight;
-          aspectRatio = float(width) / float(height);
-        }
-      }
-
-      int getWidth() {
-        return width;
-      }
-
-      int getHeight() {
-        return height;
-      }
-    }
   }
 }

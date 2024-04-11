@@ -6,6 +6,8 @@
 
 #include "internal/internalSettings.hpp"
 
+#include "core/windowManager.hpp"
+
 namespace ammonite {
   namespace camera {
     namespace {
@@ -19,7 +21,6 @@ namespace ammonite {
       //View and projection matrices
       glm::mat4 viewMatrix;
       glm::mat4 projectionMatrix;
-      float* aspectRatioPtr = ammonite::settings::runtime::internal::getAspectRatioPtr();
       float* renderFarPlanePtr = ammonite::settings::graphics::internal::getRenderFarPlanePtr();
 
       //Create map to track cameras, with default camera
@@ -66,8 +67,9 @@ namespace ammonite {
         glm::vec3 up = glm::cross(right, direction);
 
         //Calculate the projection matrix from FoV, aspect ratio and display range
+        float aspectRatio = ammonite::window::internal::getAspectRatio();
         projectionMatrix = glm::perspective(activeCamera.fov,
-                                            *aspectRatioPtr, 0.1f, *renderFarPlanePtr);
+                                            aspectRatio, 0.1f, *renderFarPlanePtr);
 
         //Calculate view matrix from position, where it's looking, and relative up
         viewMatrix = glm::lookAt(activeCamera.position, activeCamera.position + direction, up);

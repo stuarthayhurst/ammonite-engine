@@ -19,6 +19,8 @@
 #include "../internal/internalCamera.hpp"
 #include "../internal/interfaceTracker.hpp"
 
+#include "../core/windowManager.hpp"
+
 #include "../models/internal/modelTracker.hpp"
 
 #include "../lighting/internal/lightTypes.hpp"
@@ -386,7 +388,6 @@ namespace ammonite {
             glDeleteTextures(1, &screenQuadDepthTextureId);
           }
 
-
           if (colourRenderBufferId != 0) {
             glDeleteRenderbuffers(1, &colourRenderBufferId);
           }
@@ -661,10 +662,10 @@ namespace ammonite {
 
     namespace internal {
       void internalDrawLoadingScreen(int loadingScreenId) {
-        static int* widthPtr = ammonite::settings::runtime::internal::getWidthPtr();
-        static int* heightPtr = ammonite::settings::runtime::internal::getHeightPtr();
+        int width = ammonite::window::internal::getWidth();
+        int height = ammonite::window::internal::getHeight();
 
-        drawLoadingScreen(loadingScreenId, *widthPtr, *heightPtr);
+        drawLoadingScreen(loadingScreenId, width, height);
 
         //Prepare for next frame
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -673,8 +674,8 @@ namespace ammonite {
 
       void internalDrawFrame() {
         static int lastWidth = 0, lastHeight = 0;
-        static int* widthPtr = ammonite::settings::runtime::internal::getWidthPtr();
-        static int* heightPtr = ammonite::settings::runtime::internal::getHeightPtr();
+        int width = ammonite::window::internal::getWidth();
+        int height = ammonite::window::internal::getHeight();
 
         static float lastRenderResMultiplier = 0.0f;
         static float* renderResMultiplierPtr = ammonite::settings::graphics::internal::getRenderResMultiplierPtr();
@@ -687,10 +688,10 @@ namespace ammonite {
 
         //Recreate the framebuffer if the width, height, resolution multiplier or sample count changes
         static GLuint targetBufferId = 0;
-        if ((lastWidth != *widthPtr) or (lastHeight != *heightPtr) or (lastRenderResMultiplier != *renderResMultiplierPtr) or (lastSamples != *samplesPtr)) {
+        if ((lastWidth != width) or (lastHeight != height) or (lastRenderResMultiplier != *renderResMultiplierPtr) or (lastSamples != *samplesPtr)) {
           //Update values used to determine when to recreate framebuffer
-          lastWidth = *widthPtr;
-          lastHeight = *heightPtr;
+          lastWidth = width;
+          lastHeight = height;
           lastRenderResMultiplier = *renderResMultiplierPtr;
           lastSamples = *samplesPtr;
 
@@ -704,14 +705,14 @@ namespace ammonite {
           }
 
           //Calculate render resolution
-          renderWidth = std::floor(*widthPtr * *renderResMultiplierPtr);
-          renderHeight = std::floor(*heightPtr * *renderResMultiplierPtr);
+          renderWidth = std::floor(width * *renderResMultiplierPtr);
+          renderHeight = std::floor(height * *renderResMultiplierPtr);
 
           //Create or recreate the framebuffers for rendering
           recreateFramebuffers(&targetBufferId, sampleCount, renderWidth, renderHeight);
           checkFramebuffers(renderWidth, renderHeight, sampleCount);
 
-          ammoniteInternalDebug << "Output resolution: " << *widthPtr << " x " << *heightPtr << std::endl;
+          ammoniteInternalDebug << "Output resolution: " << width << " x " << height << std::endl;
         }
 
         //Get shadow resolution and light count, save for next time to avoid cubemap recreation
@@ -851,7 +852,7 @@ namespace ammonite {
 
           If post-processing isn't required or can be avoided, render directly to screen
         */
-        internal::prepareScreen(0, *widthPtr, *heightPtr, false);
+        internal::prepareScreen(0, width, height, false);
         if (isPostRequired) {
           //Resolve multisampling into regular texture
           if (sampleCount != 0) {
@@ -886,7 +887,8 @@ namespace ammonite {
           //Resolve multisampling into default framebuffer
           if (sampleCount != 0) {
             GLbitfield blitBits = GL_COLOR_BUFFER_BIT;
-            glBlitNamedFramebuffer(colourBufferMultisampleFBO, 0, 0, 0, renderWidth, renderHeight, 0, 0, *widthPtr, *heightPtr, blitBits, GL_NEAREST);
+            glBlitNamedFramebuffer(colourBufferMultisampleFBO, 0, 0, 0, renderWidth,
+                                   renderHeight, 0, 0, width, height, blitBits, GL_NEAREST);
           }
         }
 

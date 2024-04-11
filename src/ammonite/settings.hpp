@@ -45,13 +45,6 @@ namespace ammonite {
       bool getGammaCorrection();
     }
   }
-
-  namespace settings {
-    namespace runtime {
-      int getWidth();
-      int getHeight();
-    }
-  }
 }
 
 #endif

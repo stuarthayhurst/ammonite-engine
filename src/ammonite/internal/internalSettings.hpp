@@ -35,18 +35,6 @@ namespace ammonite {
         bool* getGammaCorrectionPtr();
       }
     }
-
-    namespace runtime {
-      namespace internal {
-        float* getAspectRatioPtr();
-        int* getWidthPtr();
-        int* getHeightPtr();
-
-        void setWidth(int width);
-        void setHeight(int height);
-      }
-    }
-
   }
 }
 
