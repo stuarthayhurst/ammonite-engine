@@ -1,8 +1,6 @@
 #include <GLFW/glfw3.h>
 #include <glm/gtc/constants.hpp>
 
-#include "internal/internalCamera.hpp"
-
 namespace ammonite {
   namespace settings {
     namespace controls {
@@ -225,7 +223,6 @@ namespace ammonite {
 
       void setRenderFarPlane(float renderFarPlane) {
         graphics.renderFarPlane = renderFarPlane;
-        ammonite::camera::internal::calcMatrices();
       }
 
       float getRenderFarPlane() {

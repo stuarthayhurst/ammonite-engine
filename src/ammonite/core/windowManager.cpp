@@ -105,7 +105,7 @@ namespace ammonite {
         //Callback to update height and width on window resize
         static void windowSizeCallback(GLFWwindow*, int, int) {
           storeWindowGeometry(&activeWindowGeom, false, true);
-          ammonite::camera::internal::calcMatrices();
+          ammonite::camera::internal::updateMatrices();
         }
       }
 

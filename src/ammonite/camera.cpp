@@ -49,7 +49,7 @@ namespace ammonite {
         return &projectionMatrix;
       }
 
-      void calcMatrices() {
+      void updateMatrices() {
         //Get the active camera
         Camera activeCamera = cameraTrackerMap[activeCameraId];
 
@@ -84,7 +84,6 @@ namespace ammonite {
       //If the camera exists, set as active
       if (cameraTrackerMap.contains(cameraId)) {
         activeCameraId = cameraId;
-        internal::calcMatrices();
       }
     }
 
@@ -162,7 +161,6 @@ namespace ammonite {
       //Find the target camera and update position
       if (cameraTrackerMap.contains(cameraId)) {
         cameraTrackerMap[cameraId].position = newPosition;
-        internal::calcMatrices();
       }
     }
 
@@ -171,7 +169,6 @@ namespace ammonite {
       //Find the target camera and update horizontal angle
       if (cameraTrackerMap.contains(cameraId)) {
         cameraTrackerMap[cameraId].horizontalAngle = newHorizontal;
-        internal::calcMatrices();
       }
     }
 
@@ -180,7 +177,6 @@ namespace ammonite {
       //Find the target camera and update vertical angle
       if (cameraTrackerMap.contains(cameraId)) {
         cameraTrackerMap[cameraId].verticalAngle = newVertical;
-        internal::calcMatrices();
       }
     }
 
@@ -189,7 +185,6 @@ namespace ammonite {
       //Find the target camera and update field of view
       if (cameraTrackerMap.contains(cameraId)) {
         cameraTrackerMap[cameraId].fov = newFov;
-        internal::calcMatrices();
       }
     }
   }

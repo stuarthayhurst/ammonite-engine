@@ -10,6 +10,7 @@
 
 #include "internal/internalRenderCore.hpp"
 #include "../internal/interfaceTracker.hpp"
+#include "../internal/internalCamera.hpp"
 #include "../lighting/internal/internalLighting.hpp"
 
 /*
@@ -101,6 +102,8 @@ namespace ammonite {
         if (*lightDataChanged) {
           ammonite::lighting::internal::updateLightSources();
         }
+
+        ammonite::camera::internal::updateMatrices();
         internal::internalDrawFrame();
       } else {
         internal::internalDrawLoadingScreen(loadingScreenId);
