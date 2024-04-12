@@ -158,9 +158,6 @@ namespace ammonite {
           }
         }
 
-        //Update values when resized
-        glfwSetWindowSizeCallback(windowPtr, windowSizeCallback);
-
         return 0;
       }
 
@@ -174,7 +171,7 @@ namespace ammonite {
           glfwSetInputMode(windowPtr, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
         }
 
-        //Start polling inputs
+        //Initial input poll
         glfwPollEvents();
       }
 
@@ -195,6 +192,9 @@ namespace ammonite {
 
         isWindowFullscreen = false;
         storeWindowGeometry(&activeWindowGeom, false, true);
+
+        //Update stored geometry and matrices when resized
+        glfwSetWindowSizeCallback(windowPtr, windowSizeCallback);
 
         glfwMakeContextCurrent(windowPtr);
         return windowPtr;
