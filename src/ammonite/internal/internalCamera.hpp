@@ -3,7 +3,7 @@
 
 /* Internally exposed header:
  - Allow renderer to request pointers to the view and projection matrices
- - Allow settings to recalculate matrices
+ - Allow renderer to recalculate matrices
 */
 
 #include <glm/glm.hpp>
