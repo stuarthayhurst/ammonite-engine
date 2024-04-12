@@ -215,6 +215,9 @@ namespace ammonite {
             (*failureCount)++;
           }
 
+          //Check for shader caching support
+          ammonite::shaders::internal::updateCacheSupport();
+
           return success;
         }
 

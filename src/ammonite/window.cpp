@@ -10,7 +10,6 @@
 #include "core/windowManager.hpp"
 #include "core/inputManager.hpp"
 #include "internal/internalInput.hpp"
-#include "graphics/internal/internalShaders.hpp"
 
 #include "utils/logging.hpp"
 #include "enums.hpp"
@@ -72,9 +71,6 @@ namespace ammonite {
         ammonite::utils::error << "Failed to initialize GLEW" << std::endl;
         return -1;
       }
-
-      //Prompt renderer shader cache support checking
-      ammonite::shaders::internal::updateCacheSupport();
 
       //Setup input for window
       internal::setupGlfwInput();
