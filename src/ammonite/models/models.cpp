@@ -134,8 +134,6 @@ namespace ammonite {
     //Track cumulative number of created models
     int totalModels = 0;
 
-    bool* lightSourcesChangedPtr = ammonite::lighting::internal::getLightSourcesChangedPtr();
-
     ModelTracker activeModelTracker(&modelIdPtrMap);
     ModelTracker inactiveModelTracker(&modelIdPtrMap);
   }
@@ -514,7 +512,7 @@ namespace ammonite {
         modelObject->positionData.translationMatrix = glm::translate(glm::mat4(1.0f), position);
 
         if (modelObject->lightEmitterId != -1) {
-          *lightSourcesChangedPtr = true;
+          ammonite::lighting::internal::setLightSourcesChanged();
         }
 
         //Recalculate model and normal matrices
@@ -532,7 +530,7 @@ namespace ammonite {
         modelObject->positionData.scaleMatrix = glm::scale(glm::mat4(1.0f), scale);
 
         if (modelObject->lightEmitterId != -1) {
-          *lightSourcesChangedPtr = true;
+          ammonite::lighting::internal::setLightSourcesChanged();
         }
 
         //Recalculate model and normal matrices
@@ -555,7 +553,7 @@ namespace ammonite {
         modelObject->positionData.rotationQuat = glm::quat(rotation) * glm::quat(glm::vec3(0, 0, 0));
 
         if (modelObject->lightEmitterId != -1) {
-          *lightSourcesChangedPtr = true;
+          ammonite::lighting::internal::setLightSourcesChanged();
         }
 
         //Recalculate model and normal matrices
@@ -578,7 +576,7 @@ namespace ammonite {
           translation);
 
         if (modelObject->lightEmitterId != -1) {
-          *lightSourcesChangedPtr = true;
+          ammonite::lighting::internal::setLightSourcesChanged();
         }
 
         //Recalculate model and normal matrices
@@ -598,7 +596,7 @@ namespace ammonite {
           scaleVector);
 
         if (modelObject->lightEmitterId != -1) {
-          *lightSourcesChangedPtr = true;
+          ammonite::lighting::internal::setLightSourcesChanged();
         }
 
         //Recalculate model and normal matrices
@@ -621,7 +619,7 @@ namespace ammonite {
         modelObject->positionData.rotationQuat = glm::quat(rotation) * modelObject->positionData.rotationQuat;
 
         if (modelObject->lightEmitterId != -1) {
-          *lightSourcesChangedPtr = true;
+          ammonite::lighting::internal::setLightSourcesChanged();
         }
 
         //Recalculate model and normal matrices

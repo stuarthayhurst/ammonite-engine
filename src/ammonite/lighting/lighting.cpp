@@ -115,10 +115,6 @@ namespace ammonite {
         return &lightTransforms;
       }
 
-      bool* getLightSourcesChangedPtr() {
-        return &lightSourcesChanged;
-      }
-
       //Unlink a light source from a model, using only the model ID (doesn't touch the model)
       void unlinkByModel(int modelId) {
         //Get the ID of the light attached to the model
@@ -130,7 +126,16 @@ namespace ammonite {
         }
       }
 
+      void setLightSourcesChanged() {
+        lightSourcesChanged = true;
+      }
+
       void updateLightSources() {
+        //If lights haven't changed, skip
+        if (!lightSourcesChanged) {
+          return;
+        }
+
         //If no lights remain, unbind and return early
         unsigned int lightCount = lightTrackerMap.size();
         if (lightCount == 0) {

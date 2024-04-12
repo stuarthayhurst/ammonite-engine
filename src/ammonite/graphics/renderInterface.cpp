@@ -93,12 +93,8 @@ namespace ammonite {
       }
 
       //Offload rest of frame drawing to helpers
-      static bool* lightDataChanged = ammonite::lighting::internal::getLightSourcesChangedPtr();
       if (loadingScreenId == -1) {
-        if (*lightDataChanged) {
-          ammonite::lighting::internal::updateLightSources();
-        }
-
+        ammonite::lighting::internal::updateLightSources();
         ammonite::camera::internal::updateMatrices();
         internal::internalDrawFrame();
       } else {
