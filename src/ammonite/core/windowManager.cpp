@@ -147,8 +147,15 @@ namespace ammonite {
         glewExperimental = GL_TRUE;
         GLenum err = glewInit();
         if (err != GLEW_OK) {
-          ammonite::utils::error << glewGetErrorString(err) << std::endl;
-          return -1;
+          //Workaround for GLEW issues on Wayland
+          int platform = glfwGetPlatform();
+          if (err == GLEW_ERROR_NO_GLX_DISPLAY && platform == GLFW_PLATFORM_WAYLAND) {
+            ammonite::utils::warning << "Wayland detected, ignoring GLEW_ERROR_NO_GLX_DISPLAY" \
+                                     << std::endl;
+          } else {
+            ammonite::utils::error << glewGetErrorString(err) << std::endl;
+            return -1;
+          }
         }
 
         //Update values when resized
