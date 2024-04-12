@@ -42,8 +42,6 @@
 namespace ammonite {
   namespace renderer {
     namespace {
-      GLFWwindow* window;
-
       //Structures to store uniform IDs for the shaders
       struct {
         GLuint shaderId;
@@ -150,11 +148,6 @@ namespace ammonite {
 
     namespace setup {
       namespace internal {
-        //Pass through window pointer
-        void connectWindow(GLFWwindow* newWindow) {
-          window = newWindow;
-        }
-
         //Load required shaders from a path
         bool createShaders(const char* shaderPath, bool* externalSuccess) {
           //Directory and pointer to ID of each shader
@@ -669,7 +662,7 @@ namespace ammonite {
 
         //Prepare for next frame
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        finishFrame(window);
+        finishFrame(ammonite::window::internal::getWindowPtr());
       }
 
       void internalDrawFrame() {
@@ -893,7 +886,7 @@ namespace ammonite {
         }
 
         //Display frame and handle any sleeping required
-        finishFrame(window);
+        finishFrame(ammonite::window::internal::getWindowPtr());
       }
     }
   }

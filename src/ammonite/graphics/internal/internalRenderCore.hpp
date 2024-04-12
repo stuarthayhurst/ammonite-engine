@@ -12,7 +12,6 @@ namespace ammonite {
     namespace setup {
       namespace internal {
         void internalSetupRenderer(GLFWwindow* targetWindow, const char* shaderPath, bool* externalSuccess);
-        void connectWindow(GLFWwindow* newWindow);
 
         bool checkGPUCapabilities(int* failureCount);
         bool createShaders(const char* shaderPath, bool* externalSuccess);

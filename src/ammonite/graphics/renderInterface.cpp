@@ -5,7 +5,6 @@
 #include "../utils/debug.hpp"
 #include "../utils/timer.hpp"
 #include "../utils/logging.hpp"
-#include "../core/windowManager.hpp"
 #include "../core/threadManager.hpp"
 
 #include "internal/internalRenderCore.hpp"
@@ -42,8 +41,6 @@ namespace ammonite {
                               << " threads" << std::endl;
 #endif
 
-        GLFWwindow* window = ammonite::window::internal::getWindowPtr();
-
         //Check GPU supported required extensions
         int failureCount = 0;
         if (!internal::checkGPUCapabilities(&failureCount)) {
@@ -52,7 +49,6 @@ namespace ammonite {
           return;
         }
 
-        internal::connectWindow(window);
         if (!internal::createShaders(shaderPath, externalSuccess)) {
           return;
         }
