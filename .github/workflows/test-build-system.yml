@@ -15,16 +15,16 @@ jobs:
     - name: Install build dependencies
       run: |
         wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-        echo "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-18 main" | sudo tee -a /etc/apt/sources.list
+        echo "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy main" | sudo tee -a /etc/apt/sources.list
         sudo apt-get update
         sudo apt-get install --no-install-recommends make pkg-config build-essential
-        sudo apt-get install --no-install-recommends g++-12 clang-18
+        sudo apt-get install --no-install-recommends g++-12 clang-19
         sudo apt-get install --no-install-recommends inkscape optipng
         sudo apt-get install --no-install-recommends libglm-dev libglfw3-dev libglew-dev libstb-dev libassimp-dev
         sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-12 10000
-        sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-18 10000
+        sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-19 10000
         sudo update-alternatives --set g++ /usr/bin/g++-12
-        sudo update-alternatives --set clang++ /usr/bin/clang++-18
+        sudo update-alternatives --set clang++ /usr/bin/clang++-19
 
     - name: Test icon generation target
       run: |
