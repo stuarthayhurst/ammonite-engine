@@ -30,7 +30,7 @@ namespace ammonite {
         } multipliers;
 
         //Default to a 120 degree field of view limit
-        float fovLimit = 2 * glm::half_pi<float>() / 3;
+        float fovLimit = glm::two_pi<float>() / 3;
 
         //Final sensitivites, exposed through "internal/runtimeSettings.hpp"
         float movementSpeed = baseSettings.movementSpeed;
