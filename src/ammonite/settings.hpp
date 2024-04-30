@@ -3,18 +3,6 @@
 
 namespace ammonite {
   namespace settings {
-    namespace controls {
-      void setMovementSpeed(float newMovementSpeed);
-      void setMouseSpeed(float newMouseSpeed);
-      void setZoomSpeed(float newZoomSpeed);
-      void setFovLimit(float newFovLimit);
-
-      float getMovementSpeed();
-      float getMouseSpeed();
-      float getZoomSpeed();
-      float getFovLimit();
-    }
-
     namespace graphics {
       namespace post {
         void setFocalDepthEnabled(bool enabled);

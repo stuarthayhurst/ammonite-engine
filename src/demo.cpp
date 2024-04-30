@@ -65,9 +65,9 @@ void sprintToggleCallback(std::vector<int>, int action, void*) {
     return;
   }
 
-  movementSpeed = ammonite::settings::controls::getMovementSpeed();
+  movementSpeed = ammonite::utils::controls::settings::getMovementSpeed();
   movementSpeed *= (action == GLFW_PRESS) ? 2.0f : (1.0f / 2.0f);
-  ammonite::settings::controls::setMovementSpeed(movementSpeed);
+  ammonite::utils::controls::settings::setMovementSpeed(movementSpeed);
 }
 
 void cameraCycleCallback(std::vector<int>, int, void* userPtr) {

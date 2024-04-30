@@ -6,11 +6,82 @@
 
 #include "../core/inputManager.hpp"
 #include "../core/windowManager.hpp"
-#include "../internal/internalSettings.hpp"
 
 #include "../camera.hpp"
 #include "../enums.hpp"
 #include "timer.hpp"
+
+//Store and expose controls settings
+namespace ammonite {
+  namespace utils {
+    namespace {
+      //Structure to store base speeds, multipliers and calculated speeds
+      struct ControlSettings {
+        struct BaseControlSettings {
+          const float movementSpeed = 5.0f;
+          const float mouseSpeed = 0.005f;
+          const float zoomSpeed = 0.025f;
+        } baseSettings;
+
+        struct ControlMultipliers {
+          float movement = 1.0f;
+          float mouse = 1.0f;
+          float zoom = 1.0f;
+        } multipliers;
+
+        //Default to a 120 degree field of view limit
+        float fovLimit = 2 * glm::half_pi<float>() / 3;
+
+        //Final sensitivites, exposed through "internal/runtimeSettings.hpp"
+        float movementSpeed = baseSettings.movementSpeed;
+        float mouseSpeed = baseSettings.mouseSpeed;
+        float zoomSpeed = baseSettings.zoomSpeed;
+      } controlSettings;
+    }
+
+    namespace controls {
+      namespace settings {
+        void setMovementSpeed(float newMovementSpeed) {
+          controlSettings.multipliers.movement = newMovementSpeed;
+          controlSettings.movementSpeed = controlSettings.baseSettings.movementSpeed *
+            newMovementSpeed;
+        }
+
+        void setMouseSpeed(float newMouseSpeed) {
+          controlSettings.multipliers.mouse = newMouseSpeed;
+          controlSettings.mouseSpeed = controlSettings.baseSettings.mouseSpeed * newMouseSpeed;
+        }
+
+        void setZoomSpeed(float newZoomSpeed) {
+          controlSettings.multipliers.zoom = newZoomSpeed;
+          controlSettings.zoomSpeed = controlSettings.baseSettings.zoomSpeed * newZoomSpeed;
+        }
+
+        //Radians
+        void setFovLimit(float newFovLimit) {
+          controlSettings.fovLimit = newFovLimit;
+        }
+
+        float getMovementSpeed() {
+          return controlSettings.multipliers.movement;
+        }
+
+        float getMouseSpeed() {
+          return controlSettings.multipliers.mouse;
+        }
+
+        float getZoomSpeed() {
+          return controlSettings.multipliers.zoom;
+        }
+
+        //Radians
+        float getFovLimit() {
+          return controlSettings.fovLimit;
+        }
+      }
+    }
+  }
+}
 
 namespace ammonite {
   namespace utils {
@@ -38,11 +109,6 @@ namespace ammonite {
 
       //Various pointers to other systems, used by callbacks
       bool* isInputBlockedPtr = ammonite::input::internal::getInputBlockPtr();
-      static float* movementSpeedPtr =
-        ammonite::settings::controls::internal::getMovementSpeedPtr();
-      float* zoomSpeedPtr = ammonite::settings::controls::internal::getZoomSpeedPtr();
-      float* fovLimitPtr = ammonite::settings::controls::internal::getFovLimitPtr();
-      float* mouseSpeedPtr = ammonite::settings::controls::internal::getMouseSpeedPtr();
 
       //Mouse position callback data
       double xposLast, yposLast;
@@ -78,7 +144,7 @@ namespace ammonite {
         glm::vec3 position = ammonite::camera::getPosition(activeCameraId);
 
         //Calculate the new position
-        float unitDelta = directionData->directionTimer.getTime() * *movementSpeedPtr;
+        float unitDelta = directionData->directionTimer.getTime() * controlSettings.movementSpeed;
         switch (directionData->directionEnum) {
         case AMMONITE_FORWARD:
           position += horizontalDirection * unitDelta;
@@ -123,8 +189,8 @@ namespace ammonite {
           float fov = ammonite::camera::getFieldOfView(activeCameraId);
 
           //Only zoom if FoV will be between 1 and FoV limit
-          float newFov = fov - (yoffset * *zoomSpeedPtr);
-          if (newFov > 0 and newFov <= *fovLimitPtr) {
+          float newFov = fov - (yoffset * controlSettings.zoomSpeed);
+          if (newFov > 0 and newFov <= controlSettings.fovLimit) {
             ammonite::camera::setFieldOfView(activeCameraId, newFov);
           }
         }
@@ -162,17 +228,17 @@ namespace ammonite {
 
           //Update viewing angles ('-' corrects camera inversion)
           ammonite::camera::setHorizontal(activeCameraId,
-                                          horizontalAngle - (*mouseSpeedPtr * xoffset));
+            horizontalAngle - (controlSettings.mouseSpeed * xoffset));
 
           //Only accept vertical angle if it won't create an impossible movement
-          float newAngle = verticalAngle - (*mouseSpeedPtr * yoffset);
+          float newAngle = verticalAngle - (controlSettings.mouseSpeed * yoffset);
           static const float limit = glm::radians(90.0f);
           if (newAngle > limit) { //Vertical max
             verticalAngle = limit;
           } else if (newAngle < -limit) { //Vertical min
             verticalAngle = -limit;
           } else {
-            verticalAngle += -*mouseSpeedPtr * yoffset;
+            verticalAngle += -controlSettings.mouseSpeed * yoffset;
           }
           ammonite::camera::setVertical(activeCameraId, verticalAngle);
         }

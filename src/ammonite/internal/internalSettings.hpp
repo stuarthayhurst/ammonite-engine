@@ -8,15 +8,6 @@
 
 namespace ammonite {
   namespace settings {
-    namespace controls {
-      namespace internal {
-        float* getMovementSpeedPtr();
-        float* getMouseSpeedPtr();
-        float* getZoomSpeedPtr();
-        float* getFovLimitPtr();
-      }
-    }
-
     namespace graphics {
       namespace post {
         namespace internal {
