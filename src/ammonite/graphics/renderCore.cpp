@@ -15,7 +15,6 @@
 #include "internal/internalRenderHelper.hpp"
 #include "internal/internalShaders.hpp"
 
-#include "../internal/internalSettings.hpp"
 #include "../internal/internalCamera.hpp"
 #include "../internal/interfaceTracker.hpp"
 
@@ -34,6 +33,172 @@
 
 #include "../utils/logging.hpp"
 #include "../utils/debug.hpp"
+
+/*
+ - Store and expose controls settings
+*/
+
+namespace ammonite {
+  namespace renderer {
+    namespace {
+      struct PostSettings {
+        bool focalDepthEnabled = false;
+        float focalDepth = 0.0f;
+        float blurStrength = 1.0f;
+      } postSettings;
+
+      struct GraphicsSettings {
+        bool vsyncEnabled = true;
+        float frameLimit = 0.0f;
+        int shadowRes = 1024;
+        float renderResMultiplier = 1.0f;
+        int antialiasingSamples = 0;
+        float renderFarPlane = 100.0f;
+        float shadowFarPlane = 25.0f;
+        bool gammaCorrection = false;
+      } graphicsSettings;
+    }
+
+    namespace settings {
+      namespace post {
+        namespace internal {
+          bool* getFocalDepthEnabledPtr() {
+            return &postSettings.focalDepthEnabled;
+          }
+
+          float* getFocalDepthPtr() {
+            return &postSettings.focalDepth;
+          }
+
+          float* getBlurStrengthPtr() {
+            return &postSettings.blurStrength;
+          }
+        }
+
+        void setFocalDepthEnabled(bool enabled) {
+          postSettings.focalDepthEnabled = enabled;
+        }
+
+        bool getFocalDepthEnabled() {
+          return postSettings.focalDepthEnabled;
+        }
+
+        void setFocalDepth(float depth) {
+          postSettings.focalDepth = depth;
+        }
+
+        float getFocalDepth() {
+          return postSettings.focalDepth;
+        }
+
+        void setBlurStrength(float strength) {
+          postSettings.blurStrength = strength;
+        }
+
+        float getBlurStrength() {
+          return postSettings.blurStrength;
+        }
+      }
+
+      //Exposed internally only
+      namespace internal {
+        float* getFrameLimitPtr() {
+          return &graphicsSettings.frameLimit;
+        }
+
+        int* getShadowResPtr() {
+          return &graphicsSettings.shadowRes;
+        }
+
+        float* getRenderResMultiplierPtr() {
+          return &graphicsSettings.renderResMultiplier;
+        }
+
+        int* getAntialiasingSamplesPtr() {
+          return &graphicsSettings.antialiasingSamples;
+        }
+
+        float* getRenderFarPlanePtr() {
+          return &graphicsSettings.renderFarPlane;
+        }
+
+        float* getShadowFarPlanePtr() {
+          return &graphicsSettings.shadowFarPlane;
+        }
+
+        bool* getGammaCorrectionPtr() {
+          return &graphicsSettings.gammaCorrection;
+        }
+      }
+
+      void setVsync(bool enabled) {
+        glfwSwapInterval(int(enabled));
+        graphicsSettings.vsyncEnabled = enabled;
+      }
+
+      bool getVsync() {
+        return graphicsSettings.vsyncEnabled;
+      }
+
+      void setFrameLimit(float frameLimit) {
+        //Override with 0 if given a negative
+        graphicsSettings.frameLimit = frameLimit > 0.0 ? frameLimit : 0;
+      }
+
+      float getFrameLimit() {
+        return graphicsSettings.frameLimit;
+      }
+
+      void setShadowRes(int shadowRes) {
+        graphicsSettings.shadowRes = shadowRes;
+      }
+
+      int getShadowRes() {
+        return graphicsSettings.shadowRes;
+      }
+
+      void setRenderResMultiplier(float renderResMultiplier) {
+        graphicsSettings.renderResMultiplier = renderResMultiplier;
+      }
+
+      float getRenderResMultiplier() {
+        return graphicsSettings.renderResMultiplier;
+      }
+
+      void setAntialiasingSamples(int samples) {
+        graphicsSettings.antialiasingSamples = samples;
+      }
+
+      int getAntialiasingSamples() {
+        return graphicsSettings.antialiasingSamples;
+      }
+
+      void setRenderFarPlane(float renderFarPlane) {
+        graphicsSettings.renderFarPlane = renderFarPlane;
+      }
+
+      float getRenderFarPlane() {
+        return graphicsSettings.renderFarPlane;
+      }
+
+      void setShadowFarPlane(float shadowFarPlane) {
+        graphicsSettings.shadowFarPlane = shadowFarPlane;
+      }
+
+      float getShadowFarPlane() {
+        return graphicsSettings.shadowFarPlane;
+      }
+
+      void setGammaCorrection(bool gammaCorrection) {
+        graphicsSettings.gammaCorrection = gammaCorrection;
+      }
+
+      bool getGammaCorrection() {
+        return graphicsSettings.gammaCorrection;
+      }
+    }
+  }
+}
 
 /*
  - Implement core rendering for 3D graphics
@@ -674,10 +839,10 @@ namespace ammonite {
         int height = ammonite::window::internal::getHeight();
 
         static float lastRenderResMultiplier = 0.0f;
-        static float* renderResMultiplierPtr = ammonite::settings::graphics::internal::getRenderResMultiplierPtr();
+        static float* renderResMultiplierPtr = settings::internal::getRenderResMultiplierPtr();
 
         static int lastSamples = 0;
-        static int* samplesPtr = ammonite::settings::graphics::internal::getAntialiasingSamplesPtr();
+        static int* samplesPtr = settings::internal::getAntialiasingSamplesPtr();
         static int sampleCount = *samplesPtr;
 
         static int renderWidth = 0, renderHeight = 0;
@@ -712,7 +877,7 @@ namespace ammonite {
         }
 
         //Get shadow resolution and light count, save for next time to avoid cubemap recreation
-        static int* shadowResPtr = ammonite::settings::graphics::internal::getShadowResPtr();
+        static int* shadowResPtr = settings::internal::getShadowResPtr();
         static int lastShadowRes = 0;
         unsigned int lightCount = lightTrackerMap->size();
         static unsigned int lastLightCount = -1;
@@ -731,7 +896,7 @@ namespace ammonite {
         internal::prepareScreen(depthMapFBO, *shadowResPtr, *shadowResPtr, true);
 
         //Pass uniforms that don't change between light sources
-        static float* shadowFarPlanePtr = ammonite::settings::graphics::internal::getShadowFarPlanePtr();
+        static float* shadowFarPlanePtr = settings::internal::getShadowFarPlanePtr();
         glUniform1f(depthShader.shadowFarPlaneId, *shadowFarPlanePtr);
 
         //Clear existing depth values
@@ -746,7 +911,7 @@ namespace ammonite {
         }
 
         //Use gamma correction if enabled
-        static bool* gammaPtr = ammonite::settings::graphics::internal::getGammaCorrectionPtr();
+        static bool* gammaPtr = settings::internal::getGammaCorrectionPtr();
         if (*gammaPtr) {
           glEnable(GL_FRAMEBUFFER_SRGB);
         } else {
@@ -830,7 +995,7 @@ namespace ammonite {
         }
 
         //Get focal depth status, used to conditionally post-process
-        static bool* focalDepthEnabledPtr = ammonite::settings::graphics::post::internal::getFocalDepthEnabledPtr();
+        static bool* focalDepthEnabledPtr = settings::post::internal::getFocalDepthEnabledPtr();
 
         //Enable post-processor when required, or blit would fail
         bool isPostRequired = *focalDepthEnabledPtr;
@@ -862,12 +1027,9 @@ namespace ammonite {
           //Conditionally send data for blur
           glUniform1i(screenShader.focalDepthEnabledId, *focalDepthEnabledPtr);
           if (*focalDepthEnabledPtr) {
-            static float* focalDepthPtr =
-              ammonite::settings::graphics::post::internal::getFocalDepthPtr();
-            static float* blurStrengthPtr =
-              ammonite::settings::graphics::post::internal::getBlurStrengthPtr();
-            static float* farPlanePtr =
-              ammonite::settings::graphics::internal::getRenderFarPlanePtr();
+            static float* focalDepthPtr = settings::post::internal::getFocalDepthPtr();
+            static float* blurStrengthPtr = settings::post::internal::getBlurStrengthPtr();
+            static float* farPlanePtr = settings::internal::getRenderFarPlanePtr();
 
             glUniform1f(screenShader.focalDepthId, *focalDepthPtr);
             glUniform1f(screenShader.blurStrengthId, *blurStrengthPtr);

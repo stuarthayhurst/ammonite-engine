@@ -4,7 +4,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include "../internal/internalSettings.hpp"
+#include "internal/internalRenderCore.hpp"
 #include "../utils/timer.hpp"
 
 /*
@@ -30,7 +30,7 @@ namespace ammonite {
 
         //Wait until next frame should be prepared
         static ammonite::utils::Timer targetFrameTimer;
-        static float* frameLimitPtr = ammonite::settings::graphics::internal::getFrameLimitPtr();
+        static float* frameLimitPtr = renderer::settings::internal::getFrameLimitPtr();
         if (*frameLimitPtr > 1.0f) {
           //Initial length of allowable error in seconds
           static double maxError = (1.0 / 50000.0);

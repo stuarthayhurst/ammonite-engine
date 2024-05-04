@@ -4,7 +4,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/constants.hpp>
 
-#include "internal/internalSettings.hpp"
+#include "graphics/internal/internalRenderCore.hpp"
 
 #include "core/windowManager.hpp"
 
@@ -21,7 +21,7 @@ namespace ammonite {
       //View and projection matrices
       glm::mat4 viewMatrix;
       glm::mat4 projectionMatrix;
-      float* renderFarPlanePtr = ammonite::settings::graphics::internal::getRenderFarPlanePtr();
+      float* renderFarPlanePtr = ammonite::renderer::settings::internal::getRenderFarPlanePtr();
 
       //Create map to track cameras, with default camera
       int totalUserCameras = 0;

@@ -9,7 +9,7 @@
 
 #include "internal/lightTypes.hpp"
 #include "internal/internalLighting.hpp"
-#include "../internal/internalSettings.hpp"
+#include "../graphics/internal/internalRenderCore.hpp"
 
 #include "../core/threadManager.hpp"
 #include "../models/modelInterface.hpp"
@@ -146,8 +146,7 @@ namespace ammonite {
           return;
         }
 
-        static float* shadowFarPlanePtr =
-          ammonite::settings::graphics::internal::getShadowFarPlanePtr();
+        static float* shadowFarPlanePtr = renderer::settings::internal::getShadowFarPlanePtr();
         glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f),
                                                 1.0f, 0.0f, *shadowFarPlanePtr);
 

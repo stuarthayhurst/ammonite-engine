@@ -13,7 +13,6 @@
 
 #include "utils/logging.hpp"
 #include "enums.hpp"
-#include "settings.hpp"
 
 #define DEFAULT_TITLE "Ammonite Window"
 

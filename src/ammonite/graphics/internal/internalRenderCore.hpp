@@ -3,9 +3,9 @@
 
 /* Internally exposed header:
  - Expose rendering core to render interface
+ - Allow access to internally set settings
+ - Allow access to pointers storing settings values
 */
-
-#include <GLFW/glfw3.h>
 
 namespace ammonite {
   namespace renderer {
@@ -23,6 +23,26 @@ namespace ammonite {
     namespace internal {
       void internalDrawFrame();
       void internalDrawLoadingScreen(int loadingScreenId);
+    }
+
+    namespace settings {
+      namespace post {
+        namespace internal {
+          bool* getFocalDepthEnabledPtr();
+          float* getFocalDepthPtr();
+          float* getBlurStrengthPtr();
+        }
+      }
+
+      namespace internal {
+        float* getFrameLimitPtr();
+        int* getShadowResPtr();
+        float* getRenderResMultiplierPtr();
+        int* getAntialiasingSamplesPtr();
+        float* getRenderFarPlanePtr();
+        float* getShadowFarPlanePtr();
+        bool* getGammaCorrectionPtr();
+      }
     }
   }
 }

@@ -55,8 +55,8 @@ void fullscreenToggleCallback(std::vector<int>, int, void*) {
 }
 
 void focalToggleCallback(std::vector<int>, int, void*) {
-  ammonite::settings::graphics::post::setFocalDepthEnabled(
-    !ammonite::settings::graphics::post::getFocalDepthEnabled());
+  ammonite::renderer::settings::post::setFocalDepthEnabled(
+    !ammonite::renderer::settings::post::getFocalDepthEnabled());
 }
 
 void sprintToggleCallback(std::vector<int>, int action, void*) {
@@ -82,10 +82,10 @@ void changeFocalDepthCallback(std::vector<int>, int action, void* userPtr) {
     float sign = *(float*)userPtr;
     const float unitsPerSecond = 0.8f;
     const float focalTimeDelta = focalDepthTimer.getTime();
-    float depth = ammonite::settings::graphics::post::getFocalDepth();
+    float depth = ammonite::renderer::settings::post::getFocalDepth();
 
     depth += focalTimeDelta * unitsPerSecond * sign;
-    ammonite::settings::graphics::post::setFocalDepth(depth);
+    ammonite::renderer::settings::post::setFocalDepth(depth);
     focalDepthTimer.unpause();
   } else {
     focalDepthTimer.pause();
@@ -99,11 +99,11 @@ void changeFrameRateCallback(std::vector<int>, int action, void* userPtr) {
     float sign = *(float*)userPtr;
     const float unitsPerSecond = 10.0f;
     const float frameTimeDelta = frameRateTimer.getTime();
-    float frameRate = ammonite::settings::graphics::getFrameLimit();
+    float frameRate = ammonite::renderer::settings::getFrameLimit();
 
     frameRate += frameTimeDelta * unitsPerSecond * sign;
     std::cout << "STATUS: Set framerate to " << frameRate << " fps" << std::endl;
-    ammonite::settings::graphics::setFrameLimit(frameRate);
+    ammonite::renderer::settings::setFrameLimit(frameRate);
     frameRateTimer.unpause();
   } else {
     frameRateTimer.pause();
@@ -214,9 +214,9 @@ int main(int argc, char* argv[]) {
 
   //Set vsync (disable if benchmarking)
   if (useVsync == "false" or useBenchmark) {
-    ammonite::settings::graphics::setVsync(false);
+    ammonite::renderer::settings::setVsync(false);
   } else if (useVsync == "true") {
-    ammonite::settings::graphics::setVsync(true);
+    ammonite::renderer::settings::setVsync(true);
   }
 
 #ifdef DEBUG
@@ -235,11 +235,11 @@ int main(int argc, char* argv[]) {
   setupBits |= HAS_SETUP_RENDERER;
 
   //Graphics settings
-  ammonite::settings::graphics::setAntialiasingSamples(4);
-  ammonite::settings::graphics::setGammaCorrection(true);
-  ammonite::settings::graphics::setRenderResMultiplier(1.0f);
-  ammonite::settings::graphics::setShadowRes(1024);
-  ammonite::settings::graphics::setFrameLimit(0.0f);
+  ammonite::renderer::settings::setAntialiasingSamples(4);
+  ammonite::renderer::settings::setGammaCorrection(true);
+  ammonite::renderer::settings::setRenderResMultiplier(1.0f);
+  ammonite::renderer::settings::setShadowRes(1024);
+  ammonite::renderer::settings::setFrameLimit(0.0f);
 
   //Renderer failed to initialise, clean up and exit
   if (!success) {
