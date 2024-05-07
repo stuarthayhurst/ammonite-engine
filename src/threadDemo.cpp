@@ -16,9 +16,9 @@ if (ammonite::thread::internal::createThreadPool((THREADS)) == -1) { \
 #ifdef DEBUG
   #define DESTROY_THREAD_POOL \
   ammonite::thread::internal::destroyThreadPool(); \
-    if (ammonite::thread::internal::debugCheckRemainingWork(false)) { \
-      passed = false; \
-    }
+  if (ammonite::thread::internal::debugCheckRemainingWork(false)) { \
+    passed = false; \
+  }
 #else
   #define DESTROY_THREAD_POOL \
   ammonite::thread::internal::destroyThreadPool();
