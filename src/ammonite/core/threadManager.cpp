@@ -1,6 +1,5 @@
 #include <atomic>
 #include <cstring>
-#include <queue>
 #include <thread>
 
 #include "../types.hpp"
