@@ -171,9 +171,9 @@ namespace ammonite {
         }
       }
 
-      void submitMultipleUser(AmmoniteWork work, void** userPtrs, int newJobs) {
+      void submitMultipleUser(AmmoniteWork work, void** userPtrs, int stride, int newJobs) {
         for (int i = 0; i < newJobs; i++) {
-          workQueue->push(work, userPtrs[i], nullptr);
+          workQueue->push(work, ((char*)userPtrs + (i * stride)), nullptr);
           jobCount++;
           jobCount.notify_one();
         }
@@ -187,10 +187,10 @@ namespace ammonite {
         }
       }
 
-      void submitMultipleUserComp(AmmoniteWork work, void** userPtrs,
+      void submitMultipleUserComp(AmmoniteWork work, void** userPtrs, int stride,
                                   std::atomic_flag* completions, int newJobs) {
         for (int i = 0; i < newJobs; i++) {
-          workQueue->push(work, userPtrs[i], completions + i);
+          workQueue->push(work, ((char*)userPtrs + (i * stride)), completions + i);
           jobCount++;
           jobCount.notify_one();
         }

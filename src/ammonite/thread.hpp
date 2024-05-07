@@ -10,7 +10,7 @@ namespace ammonite {
     unsigned int getThreadPoolSize();
     void submitWork(AmmoniteWork work, void* userPtr);
     void submitWork(AmmoniteWork work, void* userPtr, std::atomic_flag* completion);
-    void submitMultiple(AmmoniteWork work, void** userPtrs,
+    void submitMultiple(AmmoniteWork work, void** userPtrs, int stride,
                         std::atomic_flag* completions, int jobCount);
     void waitWorkComplete(std::atomic_flag* completion);
 

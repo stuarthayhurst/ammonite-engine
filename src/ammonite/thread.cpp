@@ -16,7 +16,7 @@ namespace ammonite {
       internal::submitWork(work, userPtr, completion);
     }
 
-    void submitMultiple(AmmoniteWork work, void** userPtrs,
+    void submitMultiple(AmmoniteWork work, void** userPtrs, int stride,
                         std::atomic_flag* completions, int jobCount) {
       if (userPtrs == nullptr) {
         if (completions == nullptr) {
@@ -26,9 +26,10 @@ namespace ammonite {
         }
       } else {
         if (completions == nullptr) {
-          ammonite::thread::internal::submitMultipleUser(work, userPtrs, jobCount);
+          ammonite::thread::internal::submitMultipleUser(work, userPtrs, stride, jobCount);
         } else {
-          ammonite::thread::internal::submitMultipleUserComp(work, userPtrs, completions, jobCount);
+          ammonite::thread::internal::submitMultipleUserComp(work, userPtrs, stride,
+                                                             completions, jobCount);
         }
       }
     }
