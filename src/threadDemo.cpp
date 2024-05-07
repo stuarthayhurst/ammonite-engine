@@ -221,6 +221,28 @@ namespace {
 
     return passed;
   }
+
+  static bool testSubmitMultiple(int jobCount) {
+    INIT_TIMERS
+    CREATE_THREAD_POOL(0)
+    PREP_SYNC(jobCount, syncs)
+
+    //Submit fast 'jobs'
+    RESET_TIMERS
+    bool passed = true;
+    int* values = new int[jobCount]{};
+    ammonite::thread::submitMultiple(shortTask, (void**)&values[0],
+                                     sizeof(int), &syncs[0], jobCount);
+    submitTimer.pause();
+
+    //Finish work
+    SYNC_THREADS(jobCount, syncs)
+    FINISH_TIMERS
+    VERIFY_WORK(jobCount)
+
+    DESTROY_THREAD_POOL
+    return passed;
+  }
 }
 
 namespace {
@@ -325,6 +347,9 @@ int main() {
 
   std::cout << "Testing nested jobs" << std::endl;
   failed |= !testNestedJobs(JOB_COUNT);
+
+  std::cout << "Testing submit multiple" << std::endl;
+  failed |= !testSubmitMultiple(JOB_COUNT);
 
   //Begin blocking tests
   std::cout << "Testing double block, double unblock" << std::endl;
