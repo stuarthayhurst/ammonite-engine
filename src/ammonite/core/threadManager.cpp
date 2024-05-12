@@ -32,6 +32,30 @@ namespace {
       queueLock.unlock();
     }
 
+    void pushMultiple(AmmoniteWork work, void** userPtrs, int stride,
+                       std::atomic_flag* completions, int count) {
+      queueLock.lock();
+
+      for (int i = 0; i < count; i++) {
+        //Handle user pointers
+        void** userPtr = nullptr;
+        if (userPtrs != nullptr) {
+          userPtr = (void**)((char*)userPtrs + (i * stride));
+        }
+
+        //Handle completions
+        std::atomic_flag* completion = nullptr;
+        if (completions != nullptr) {
+          completion = completions + i;
+        }
+
+        //Add the work to the queue
+        workItems.push({work, userPtr, completion});
+      }
+
+      queueLock.unlock();
+    }
+
     void pop(WorkItem* workItemPtr) {
       queueLock.lock();
 
@@ -142,36 +166,28 @@ namespace ammonite {
 
       //Specialised variants to submit multiple jobs
       void submitMultiple(AmmoniteWork work, int newJobs) {
-        for (int i = 0; i < newJobs; i++) {
-          workQueue->push(work, nullptr, nullptr);
-          jobCount++;
-          jobCount.notify_one();
-        }
+        workQueue->pushMultiple(work, nullptr, 0, nullptr, newJobs);
+        jobCount += newJobs;
+        jobCount.notify_all();
       }
 
       void submitMultipleUser(AmmoniteWork work, void** userPtrs, int stride, int newJobs) {
-        for (int i = 0; i < newJobs; i++) {
-          workQueue->push(work, ((char*)userPtrs + (i * stride)), nullptr);
-          jobCount++;
-          jobCount.notify_one();
-        }
+        workQueue->pushMultiple(work, userPtrs, stride, nullptr, newJobs);
+        jobCount += newJobs;
+        jobCount.notify_all();
       }
 
       void submitMultipleComp(AmmoniteWork work, std::atomic_flag* completions, int newJobs) {
-        for (int i = 0; i < newJobs; i++) {
-          workQueue->push(work, nullptr, completions + i);
-          jobCount++;
-          jobCount.notify_one();
-        }
+        workQueue->pushMultiple(work, nullptr, 0, completions, newJobs);
+        jobCount += newJobs;
+        jobCount.notify_all();
       }
 
       void submitMultipleUserComp(AmmoniteWork work, void** userPtrs, int stride,
                                   std::atomic_flag* completions, int newJobs) {
-        for (int i = 0; i < newJobs; i++) {
-          workQueue->push(work, ((char*)userPtrs + (i * stride)), completions + i);
-          jobCount++;
-          jobCount.notify_one();
-        }
+        workQueue->pushMultiple(work, userPtrs, stride, completions, newJobs);
+        jobCount += newJobs;
+        jobCount.notify_all();
       }
 
       //Create thread pool, existing work will begin executing
