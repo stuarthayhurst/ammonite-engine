@@ -164,27 +164,9 @@ namespace ammonite {
         jobCount.notify_one();
       }
 
-      //Specialised variants to submit multiple jobs
-      void submitMultiple(AmmoniteWork work, int newJobs) {
-        workQueue->pushMultiple(work, nullptr, 0, nullptr, newJobs);
-        jobCount += newJobs;
-        jobCount.notify_all();
-      }
-
-      void submitMultipleUser(AmmoniteWork work, void** userPtrs, int stride, int newJobs) {
-        workQueue->pushMultiple(work, userPtrs, stride, nullptr, newJobs);
-        jobCount += newJobs;
-        jobCount.notify_all();
-      }
-
-      void submitMultipleComp(AmmoniteWork work, std::atomic_flag* completions, int newJobs) {
-        workQueue->pushMultiple(work, nullptr, 0, completions, newJobs);
-        jobCount += newJobs;
-        jobCount.notify_all();
-      }
-
-      void submitMultipleUserComp(AmmoniteWork work, void** userPtrs, int stride,
-                                  std::atomic_flag* completions, int newJobs) {
+      //Submit multiple jobs without locking multiple times
+      void submitMultiple(AmmoniteWork work, void** userPtrs, int stride,
+                          std::atomic_flag* completions, int newJobs) {
         workQueue->pushMultiple(work, userPtrs, stride, completions, newJobs);
         jobCount += newJobs;
         jobCount.notify_all();
