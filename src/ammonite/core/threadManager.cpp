@@ -36,21 +36,27 @@ namespace {
                        std::atomic_flag* completions, int count) {
       queueLock.lock();
 
-      for (int i = 0; i < count; i++) {
-        //Handle user pointers
-        void** userPtr = nullptr;
-        if (userPtrs != nullptr) {
-          userPtr = (void**)((char*)userPtrs + (i * stride));
+      //Avoid running the same checks for every job in the group
+      if (userPtrs == nullptr) {
+        if (completions == nullptr) {
+          for (int i = 0; i < count; i++) {
+            workItems.push({work, nullptr, nullptr});
+          }
+        } else {
+          for (int i = 0; i < count; i++) {
+            workItems.push({work, nullptr, completions + i});
+          }
         }
-
-        //Handle completions
-        std::atomic_flag* completion = nullptr;
-        if (completions != nullptr) {
-          completion = completions + i;
+      } else {
+        if (completions == nullptr) {
+          for (int i = 0; i < count; i++) {
+            workItems.push({work, (void**)((char*)userPtrs + (i * stride)), nullptr});
+          }
+        } else {
+          for (int i = 0; i < count; i++) {
+            workItems.push({work, (void**)((char*)userPtrs + (i * stride)), completions + i});
+          }
         }
-
-        //Add the work to the queue
-        workItems.push({work, userPtr, completion});
       }
 
       queueLock.unlock();
