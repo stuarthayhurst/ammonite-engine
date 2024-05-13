@@ -167,8 +167,10 @@ namespace ammonite {
           workerData[i].shaderData = shaderData;
           workerData[i].shadowProj = &shadowProj;
           workerData[i].i = i;
-          ammonite::thread::internal::submitWork(lightWork, &workerData[i], &syncs[i]);
         }
+        ammonite::thread::internal::submitMultipleUserComp(lightWork, (void**)&workerData[0],
+                                                           sizeof(LightWorkerData),
+                                                           &syncs[0], lightCount);
 
         for (unsigned int i = 0; i < lightCount; i++) {
           syncs[i].wait(false);
