@@ -32,12 +32,12 @@ namespace {
       queueLock.unlock();
     }
 
-    void pushMultiple(AmmoniteWork work, void** userPtrs, int stride,
+    void pushMultiple(AmmoniteWork work, void* userBuffer, int stride,
                        std::atomic_flag* completions, int count) {
       queueLock.lock();
 
       //Avoid running the same checks for every job in the group
-      if (userPtrs == nullptr) {
+      if (userBuffer == nullptr) {
         if (completions == nullptr) {
           for (int i = 0; i < count; i++) {
             workItems.push({work, nullptr, nullptr});
@@ -50,11 +50,11 @@ namespace {
       } else {
         if (completions == nullptr) {
           for (int i = 0; i < count; i++) {
-            workItems.push({work, (void**)((char*)userPtrs + (i * stride)), nullptr});
+            workItems.push({work, (void*)((char*)userBuffer + (i * stride)), nullptr});
           }
         } else {
           for (int i = 0; i < count; i++) {
-            workItems.push({work, (void**)((char*)userPtrs + (i * stride)), completions + i});
+            workItems.push({work, (void*)((char*)userBuffer + (i * stride)), completions + i});
           }
         }
       }
@@ -171,9 +171,9 @@ namespace ammonite {
       }
 
       //Submit multiple jobs without locking multiple times
-      void submitMultiple(AmmoniteWork work, void** userPtrs, int stride,
+      void submitMultiple(AmmoniteWork work, void* userBuffer, int stride,
                           std::atomic_flag* completions, int newJobs) {
-        workQueue->pushMultiple(work, userPtrs, stride, completions, newJobs);
+        workQueue->pushMultiple(work, userBuffer, stride, completions, newJobs);
         jobCount += newJobs;
         jobCount.notify_all();
       }
