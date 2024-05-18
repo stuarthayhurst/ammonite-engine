@@ -1,7 +1,6 @@
 #include <atomic>
 #include <cstring>
 #include <mutex>
-#include <queue>
 #include <thread>
 
 #include "../types.hpp"
@@ -17,63 +16,87 @@ namespace {
     std::atomic_flag* completion;
   };
 
+  struct Node {
+    WorkItem workItem;
+    Node* nextNode;
+  };
+
   class WorkQueue {
   private:
-    std::mutex queueLock;
-    std::queue<WorkItem> workItems;
+    std::mutex readLock;
+    std::mutex writeLock;
+    Node* lastPopped;
+    Node* lastPushed;
 
   public:
+    WorkQueue() {
+      //Start with an empty queue, 1 'old' node
+      lastPushed = new Node;
+      lastPopped = lastPushed;
+      lastPushed->nextNode = nullptr;
+    }
+
+    ~WorkQueue() {
+      //Clear out any remaining nodes
+      WorkItem workItem;
+      do {
+        this->pop(&workItem);
+      } while (workItem.work != nullptr);
+    }
+
     void push(AmmoniteWork work, void* userPtr, std::atomic_flag* completion) {
-      queueLock.lock();
+      //Create the new node, fill with data
+      Node* newNode = new Node;
+      *newNode = {{work, userPtr, completion}, nullptr};
 
-      //Add the work to the queue
-      workItems.push({work, userPtr, completion});
-
-      queueLock.unlock();
+      //Add the node safely to the mode recently added node
+      writeLock.lock();
+      lastPushed->nextNode = newNode;
+      lastPushed = newNode;
+      writeLock.unlock();
     }
 
     void pushMultiple(AmmoniteWork work, void* userBuffer, int stride,
                        std::atomic_flag* completions, int count) {
-      queueLock.lock();
-
       //Avoid running the same checks for every job in the group
       if (userBuffer == nullptr) {
         if (completions == nullptr) {
           for (int i = 0; i < count; i++) {
-            workItems.push({work, nullptr, nullptr});
+            this->push(work, nullptr, nullptr);
           }
         } else {
           for (int i = 0; i < count; i++) {
-            workItems.push({work, nullptr, completions + i});
+            this->push(work, nullptr, completions + i);
           }
         }
       } else {
         if (completions == nullptr) {
           for (int i = 0; i < count; i++) {
-            workItems.push({work, (void*)((char*)userBuffer + (i * stride)), nullptr});
+            this->push(work, (void*)((char*)userBuffer + (i * stride)), nullptr);
           }
         } else {
           for (int i = 0; i < count; i++) {
-            workItems.push({work, (void*)((char*)userBuffer + (i * stride)), completions + i});
+            this->push(work, (void*)((char*)userBuffer + (i * stride)), completions + i);
           }
         }
       }
-
-      queueLock.unlock();
     }
 
     void pop(WorkItem* workItemPtr) {
-      queueLock.lock();
+      //Use the most recently popped node to find the next
+      readLock.lock();
+      Node* nextNode = lastPopped->nextNode;
 
-      //Write the work item to workItemPtr if the queue isn't empty
-      if (workItems.empty()) {
+      //Return if we dont have one, otherwise copy the data and free the old node
+      if (nextNode == nullptr) {
+        readLock.unlock();
         workItemPtr->work = nullptr;
       } else {
-        *workItemPtr = workItems.front();
-        workItems.pop();
+        *workItemPtr = nextNode->workItem;
+        delete lastPopped;
+        lastPopped = nextNode;
+        readLock.unlock();
       }
-
-      queueLock.unlock();
     }
   };
 }
