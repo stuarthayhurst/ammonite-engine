@@ -28,6 +28,17 @@ namespace {
     Node* lastPopped;
     Node* lastPushed;
 
+    //Used when externally locking
+    void pushUnsafe(AmmoniteWork work, void* userPtr, std::atomic_flag* completion) {
+      //Create the new node, fill with data
+      Node* newNode = new Node;
+      *newNode = {{work, userPtr, completion}, nullptr};
+
+      //Add the node unsafely to the mode recently added node
+      lastPushed->nextNode = newNode;
+      lastPushed = newNode;
+    }
+
   public:
     WorkQueue() {
       //Start with an empty queue, 1 'old' node
@@ -58,28 +69,32 @@ namespace {
 
     void pushMultiple(AmmoniteWork work, void* userBuffer, int stride,
                        std::atomic_flag* completions, int count) {
+      writeLock.lock();
+
       //Avoid running the same checks for every job in the group
       if (userBuffer == nullptr) {
         if (completions == nullptr) {
           for (int i = 0; i < count; i++) {
-            this->push(work, nullptr, nullptr);
+            this->pushUnsafe(work, nullptr, nullptr);
           }
         } else {
           for (int i = 0; i < count; i++) {
-            this->push(work, nullptr, completions + i);
+            this->pushUnsafe(work, nullptr, completions + i);
           }
         }
       } else {
         if (completions == nullptr) {
           for (int i = 0; i < count; i++) {
-            this->push(work, (void*)((char*)userBuffer + (i * stride)), nullptr);
+            this->pushUnsafe(work, (void*)((char*)userBuffer + (i * stride)), nullptr);
           }
         } else {
           for (int i = 0; i < count; i++) {
-            this->push(work, (void*)((char*)userBuffer + (i * stride)), completions + i);
+            this->pushUnsafe(work, (void*)((char*)userBuffer + (i * stride)), completions + i);
           }
         }
       }
+
+      writeLock.unlock();
     }
 
     void pop(WorkItem* workItemPtr) {
