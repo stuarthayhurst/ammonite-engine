@@ -102,15 +102,16 @@ namespace {
       readLock.lock();
       Node* nextNode = lastPopped->nextNode;
 
-      //Return if we dont have one, otherwise copy the data and free the old node
-      if (nextNode == nullptr) {
-        readLock.unlock();
-        workItemPtr->work = nullptr;
-      } else {
+      //Copy the data and free the old node, otherwise return if we don't have a new node
+      if (nextNode != nullptr) {
+        Node* oldNode = lastPopped;
         *workItemPtr = nextNode->workItem;
-        delete lastPopped;
         lastPopped = nextNode;
         readLock.unlock();
+        delete oldNode;
+      } else {
+        readLock.unlock();
+        workItemPtr->work = nullptr;
       }
     }
   };
