@@ -31,8 +31,7 @@ namespace {
     //Used when externally locking
     void pushUnsafe(AmmoniteWork work, void* userPtr, std::atomic_flag* completion) {
       //Create the new node, fill with data
-      Node* newNode = new Node;
-      *newNode = {{work, userPtr, completion}, nullptr};
+      Node* newNode = new Node{{work, userPtr, completion}, nullptr};
 
       //Add the node unsafely to the mode recently added node
       lastPushed->nextNode = newNode;
@@ -57,8 +56,7 @@ namespace {
 
     void push(AmmoniteWork work, void* userPtr, std::atomic_flag* completion) {
       //Create the new node, fill with data
-      Node* newNode = new Node;
-      *newNode = {{work, userPtr, completion}, nullptr};
+      Node* newNode = new Node{{work, userPtr, completion}, nullptr};
 
       //Add the node safely to the mode recently added node
       writeLock.lock();
