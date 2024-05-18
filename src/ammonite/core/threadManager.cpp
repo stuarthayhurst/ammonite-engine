@@ -28,16 +28,6 @@ namespace {
     Node* lastPopped;
     Node* lastPushed;
 
-    //Used when externally locking
-    void pushUnsafe(AmmoniteWork work, void* userPtr, std::atomic_flag* completion) {
-      //Create the new node, fill with data
-      Node* newNode = new Node{{work, userPtr, completion}, nullptr};
-
-      //Add the node unsafely to the mode recently added node
-      lastPushed->nextNode = newNode;
-      lastPushed = newNode;
-    }
-
   public:
     WorkQueue() {
       //Start with an empty queue, 1 'old' node
@@ -67,31 +57,41 @@ namespace {
 
     void pushMultiple(AmmoniteWork work, void* userBuffer, int stride,
                        std::atomic_flag* completions, int count) {
-      writeLock.lock();
-
-      //Avoid running the same checks for every job in the group
+      //Generate section of linked list to insert
+      Node sectionStart;
+      Node* sectionPtr = &sectionStart;
       if (userBuffer == nullptr) {
         if (completions == nullptr) {
           for (int i = 0; i < count; i++) {
-            this->pushUnsafe(work, nullptr, nullptr);
+            sectionPtr->nextNode = new Node{{work, nullptr, nullptr}, nullptr};
+            sectionPtr = sectionPtr->nextNode;
           }
         } else {
           for (int i = 0; i < count; i++) {
-            this->pushUnsafe(work, nullptr, completions + i);
+            sectionPtr->nextNode = new Node{{work, nullptr, completions + i}, nullptr};
+            sectionPtr = sectionPtr->nextNode;
           }
         }
       } else {
         if (completions == nullptr) {
           for (int i = 0; i < count; i++) {
-            this->pushUnsafe(work, (void*)((char*)userBuffer + (i * stride)), nullptr);
+            sectionPtr->nextNode = new Node{{work, (void*)((char*)userBuffer + (i * stride)),
+                                      nullptr}, nullptr};
+            sectionPtr = sectionPtr->nextNode;
           }
         } else {
           for (int i = 0; i < count; i++) {
-            this->pushUnsafe(work, (void*)((char*)userBuffer + (i * stride)), completions + i);
+            sectionPtr->nextNode = new Node{{work, (void*)((char*)userBuffer + (i * stride)),
+                                      completions + i}, nullptr};
+            sectionPtr = sectionPtr->nextNode;
           }
         }
       }
 
+      //Insert the generated section safely
+      writeLock.lock();
+      lastPushed->nextNode = sectionStart.nextNode;
+      lastPushed = sectionPtr;
       writeLock.unlock();
     }
 
