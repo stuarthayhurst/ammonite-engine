@@ -75,16 +75,6 @@ namespace {
 
       queueLock.unlock();
     }
-
-    int getSize() {
-      int size;
-
-      queueLock.lock();
-      size = workItems.size();
-      queueLock.unlock();
-
-      return size;
-    }
   };
 }
 
