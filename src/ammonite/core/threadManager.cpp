@@ -24,16 +24,15 @@ namespace {
   class WorkQueue {
   private:
     std::mutex readLock;
-    std::mutex writeLock;
     Node* lastPopped;
-    Node* lastPushed;
+    std::atomic<Node*> lastPushed;
 
   public:
     WorkQueue() {
       //Start with an empty queue, 1 'old' node
       lastPushed = new Node;
       lastPopped = lastPushed;
-      lastPushed->nextNode = nullptr;
+      lastPushed.load()->nextNode = nullptr;
     }
 
     ~WorkQueue() {
@@ -49,10 +48,7 @@ namespace {
       Node* newNode = new Node{{work, userPtr, completion}, nullptr};
 
       //Add the node safely to the mode recently added node
-      writeLock.lock();
-      lastPushed->nextNode = newNode;
-      lastPushed = newNode;
-      writeLock.unlock();
+      lastPushed.exchange(newNode)->nextNode = newNode;
     }
 
     void pushMultiple(AmmoniteWork work, void* userBuffer, int stride,
@@ -88,11 +84,8 @@ namespace {
         }
       }
 
-      //Insert the generated section safely
-      writeLock.lock();
-      lastPushed->nextNode = sectionStart.nextNode;
-      lastPushed = sectionPtr;
-      writeLock.unlock();
+      //Insert the generated section atomically
+      lastPushed.exchange(sectionPtr)->nextNode = sectionStart.nextNode;
     }
 
     void pop(WorkItem* workItemPtr) {
