@@ -47,7 +47,7 @@ namespace {
       //Create the new node, fill with data
       Node* newNode = new Node{{work, userPtr, completion}, nullptr};
 
-      //Add the node safely to the mode recently added node
+      //Atomically add the node to the previous node
       lastPushed.exchange(newNode)->nextNode = newNode;
     }
 
@@ -72,13 +72,13 @@ namespace {
         if (completions == nullptr) {
           for (int i = 0; i < count; i++) {
             sectionPtr->nextNode = new Node{{work, (void*)((char*)userBuffer + (i * stride)),
-                                      nullptr}, nullptr};
+                                             nullptr}, nullptr};
             sectionPtr = sectionPtr->nextNode;
           }
         } else {
           for (int i = 0; i < count; i++) {
             sectionPtr->nextNode = new Node{{work, (void*)((char*)userBuffer + (i * stride)),
-                                      completions + i}, nullptr};
+                                             completions + i}, nullptr};
             sectionPtr = sectionPtr->nextNode;
           }
         }
