@@ -40,6 +40,9 @@ namespace {
       do {
         this->pop(&workItem);
       } while (workItem.work != nullptr);
+
+      //Clear up next free node
+      delete nextPopped;
     }
 
     void push(AmmoniteWork work, void* userPtr, std::atomic_flag* completion) {
@@ -87,6 +90,7 @@ namespace {
       //Insert the generated section atomically
       sectionPtr->nextNode = newNode;
       *(nextPushed.exchange(newNode)) = *sectionStart.nextNode;
+      delete sectionStart.nextNode;
     }
 
     void pop(WorkItem* workItemPtr) {
