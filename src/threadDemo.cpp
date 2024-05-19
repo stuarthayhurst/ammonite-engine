@@ -177,6 +177,7 @@ namespace {
     SUBMIT_SYNC_JOBS(jobCount, syncs)
     submitTimer.pause();
     SYNC_THREADS(jobCount, syncs)
+    VERIFY_WORK(jobCount)
 
     //Submit second batch
     syncs = new std::atomic_flag[(jobCount)]{ATOMIC_FLAG_INIT};
