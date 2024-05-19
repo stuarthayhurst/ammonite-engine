@@ -216,6 +216,7 @@ namespace {
     //Finish work
     SYNC_THREADS(jobCount, syncs)
     FINISH_TIMERS
+    delete [] data;
     VERIFY_WORK(jobCount)
     DESTROY_THREAD_POOL
 
