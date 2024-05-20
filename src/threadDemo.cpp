@@ -166,10 +166,10 @@ namespace {
     return passed;
   }
 
-  static bool testQueueLimits() {
+  static bool testQueueLimits(int jobCount) {
     INIT_TIMERS
     CREATE_THREAD_POOL(0)
-    int jobCount = (2 << 20);
+    jobCount *= 4;
     PREP_SYNC(jobCount, syncs)
 
     //Submit fast 'jobs'
@@ -364,8 +364,8 @@ int main() {
   std::cout << "Testing blocked queue" << std::endl;
   failed |= !testCreateBlockSubmitUnblockWaitDestroy(JOB_COUNT);
 
-  std::cout << "Testing queue limits (8x regular)" << std::endl;
-  failed |= !testQueueLimits();
+  std::cout << "Testing queue limits (8x regular in 2 batches)" << std::endl;
+  failed |= !testQueueLimits(JOB_COUNT);
 
   std::cout << "Testing nested jobs" << std::endl;
   failed |= !testNestedJobs(JOB_COUNT);
