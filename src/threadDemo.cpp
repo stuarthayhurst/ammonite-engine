@@ -373,7 +373,7 @@ int main() {
   std::cout << "Testing submit multiple" << std::endl;
   failed |= !testSubmitMultiple(JOB_COUNT);
 
-  std::cout << "Testing submit multiple, alternative sync" << std::endl;
+  std::cout << "Testing submit multiple, no sync" << std::endl;
   failed |= !testSubmitMultipleNoSync(JOB_COUNT);
 
   //Begin blocking tests
