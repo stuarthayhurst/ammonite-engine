@@ -364,7 +364,7 @@ int main() {
   std::cout << "Testing blocked queue" << std::endl;
   failed |= !testCreateBlockSubmitUnblockWaitDestroy(JOB_COUNT);
 
-  std::cout << "Testing queue limits (8x regular in 2 batches)" << std::endl;
+  std::cout << "Testing queue limits (8x regular over 2 batches)" << std::endl;
   failed |= !testQueueLimits(JOB_COUNT);
 
   std::cout << "Testing nested jobs" << std::endl;
