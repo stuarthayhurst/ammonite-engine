@@ -24,15 +24,14 @@ namespace {
   class WorkQueue {
   private:
     std::mutex readLock;
-    Node* lastPopped;
-    std::atomic<Node*> lastPushed;
+    Node* nextPopped;
+    std::atomic<Node*> nextPushed;
 
   public:
     WorkQueue() {
       //Start with an empty queue, 1 'old' node
-      lastPushed = new Node;
-      lastPopped = lastPushed;
-      lastPushed.load()->nextNode = nullptr;
+      nextPushed = new Node{{nullptr, nullptr, nullptr}, nullptr};
+      nextPopped = nextPushed;
     }
 
     ~WorkQueue() {
@@ -41,19 +40,23 @@ namespace {
       do {
         this->pop(&workItem);
       } while (workItem.work != nullptr);
+
+      //Clear up next free node
+      delete nextPopped;
     }
 
     void push(AmmoniteWork work, void* userPtr, std::atomic_flag* completion) {
-      //Create the new node, fill with data
-      Node* newNode = new Node{{work, userPtr, completion}, nullptr};
+      //Create a new empty node
+      Node* newNode = new Node{{nullptr, nullptr, nullptr}, nullptr};
 
-      //Atomically add the node to the previous node
-      lastPushed.exchange(newNode)->nextNode = newNode;
+      //Atomically the next node to newNode, then fill in the old new node
+      *(nextPushed.exchange(newNode)) = {{work, userPtr, completion}, newNode};
     }
 
     void pushMultiple(AmmoniteWork work, void* userBuffer, int stride,
                        std::atomic_flag* completions, int count) {
       //Generate section of linked list to insert
+      Node* newNode = new Node{{nullptr, nullptr, nullptr}, nullptr};
       Node sectionStart;
       Node* sectionPtr = &sectionStart;
       if (userBuffer == nullptr) {
@@ -85,21 +88,23 @@ namespace {
       }
 
       //Insert the generated section atomically
-      lastPushed.exchange(sectionPtr)->nextNode = sectionStart.nextNode;
+      sectionPtr->nextNode = newNode;
+      *(nextPushed.exchange(newNode)) = *sectionStart.nextNode;
+      delete sectionStart.nextNode;
     }
 
     void pop(WorkItem* workItemPtr) {
       //Use the most recently popped node to find the next
       readLock.lock();
-      Node* nextNode = lastPopped->nextNode;
 
       //Copy the data and free the old node, otherwise return if we don't have a new node
-      if (nextNode != nullptr) {
-        Node* oldNode = lastPopped;
-        *workItemPtr = nextNode->workItem;
-        lastPopped = nextNode;
+      Node* currentNode = nextPopped;
+      if (currentNode->nextNode != nullptr) {
+        nextPopped = nextPopped->nextNode;
         readLock.unlock();
-        delete oldNode;
+
+        *workItemPtr = currentNode->workItem;
+        delete currentNode;
       } else {
         readLock.unlock();
         workItemPtr->work = nullptr;
