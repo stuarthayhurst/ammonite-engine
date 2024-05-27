@@ -16,22 +16,10 @@ namespace ammonite {
       internal::submitWork(work, userPtr, completion);
     }
 
-    void submitMultiple(AmmoniteWork work, void** userPtrs, int stride,
+    //userBuffer and completions may be null
+    void submitMultiple(AmmoniteWork work, void* userBuffer, int stride,
                         std::atomic_flag* completions, int jobCount) {
-      if (userPtrs == nullptr) {
-        if (completions == nullptr) {
-          ammonite::thread::internal::submitMultiple(work, jobCount);
-        } else {
-          ammonite::thread::internal::submitMultipleComp(work, completions, jobCount);
-        }
-      } else {
-        if (completions == nullptr) {
-          ammonite::thread::internal::submitMultipleUser(work, userPtrs, stride, jobCount);
-        } else {
-          ammonite::thread::internal::submitMultipleUserComp(work, userPtrs, stride,
-                                                             completions, jobCount);
-        }
-      }
+      ammonite::thread::internal::submitMultiple(work, userBuffer, stride, completions, jobCount);
     }
 
     void waitWorkComplete(std::atomic_flag* completion) {

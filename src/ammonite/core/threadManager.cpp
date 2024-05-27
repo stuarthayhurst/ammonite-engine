@@ -1,5 +1,7 @@
 #include <atomic>
 #include <cstring>
+#include <mutex>
+#include <queue>
 #include <thread>
 
 #include "../types.hpp"
@@ -7,8 +9,6 @@
 #include "../utils/logging.hpp"
 
 #define MAX_EXTRA_THREADS 512
-//Max of 2,097,152 work items
-#define QUEUE_SIZE (2 << 20)
 
 namespace {
   struct WorkItem {
@@ -19,63 +19,61 @@ namespace {
 
   class WorkQueue {
   private:
-    WorkItem* workItems;
-    bool* readyPtr;
-    int queueSize;
-
-    std::atomic<unsigned int> nextWrite = 0;
-    unsigned int nextRead = 0;
-    std::mutex readLock;
+    std::mutex queueLock;
+    std::queue<WorkItem> workItems;
 
   public:
-    WorkQueue(int size) {
-      workItems = new WorkItem[size];
-      readyPtr = new bool[size];
-      std::memset(workItems, 0, size * sizeof(WorkItem));
-      std::memset(readyPtr, 0, size * sizeof(bool));
-      queueSize = size;
-
-      if (((size & (size - 1)) != 0) && size != 0) {
-        ammonite::utils::warning << "Queue size must be a non-zero power of 2, good luck" \
-                                 << std::endl;
-      }
-    }
-
-    ~WorkQueue() {
-      delete [] workItems;
-    }
-
-    void pop(WorkItem* workPtr) {
-      readLock.lock();
-      int index = (nextRead) & (queueSize - 1);
-
-      //Return the work item or an empty one
-      if (readyPtr[index]) {
-        nextRead++;
-        readLock.unlock();
-        readyPtr[index] = false;
-        *workPtr = workItems[index];
-      } else {
-        readLock.unlock();
-        *workPtr = {nullptr, nullptr, nullptr};
-      }
-    }
-
     void push(AmmoniteWork work, void* userPtr, std::atomic_flag* completion) {
-      int index = (nextWrite++) & (queueSize - 1);
-      workItems[index] = {work, userPtr, completion};
-      readyPtr[index] = true;
+      queueLock.lock();
 
-#ifdef DEBUG
-      if (this->getSize() > QUEUE_SIZE) {
-        ammonite::utils::warning << "Queue size exceeded, work items lost" \
-                                 << std::endl;
-      }
-#endif
+      //Add the work to the queue
+      workItems.push({work, userPtr, completion});
+
+      queueLock.unlock();
     }
 
-    int getSize() {
-      return nextWrite - nextRead;
+    void pushMultiple(AmmoniteWork work, void* userBuffer, int stride,
+                       std::atomic_flag* completions, int count) {
+      queueLock.lock();
+
+      //Avoid running the same checks for every job in the group
+      if (userBuffer == nullptr) {
+        if (completions == nullptr) {
+          for (int i = 0; i < count; i++) {
+            workItems.push({work, nullptr, nullptr});
+          }
+        } else {
+          for (int i = 0; i < count; i++) {
+            workItems.push({work, nullptr, completions + i});
+          }
+        }
+      } else {
+        if (completions == nullptr) {
+          for (int i = 0; i < count; i++) {
+            workItems.push({work, (void*)((char*)userBuffer + (i * stride)), nullptr});
+          }
+        } else {
+          for (int i = 0; i < count; i++) {
+            workItems.push({work, (void*)((char*)userBuffer + (i * stride)), completions + i});
+          }
+        }
+      }
+
+      queueLock.unlock();
+    }
+
+    void pop(WorkItem* workItemPtr) {
+      queueLock.lock();
+
+      //Write the work item to workItemPtr if the queue isn't empty
+      if (workItems.empty()) {
+        workItemPtr->work = nullptr;
+      } else {
+        *workItemPtr = workItems.front();
+        workItems.pop();
+      }
+
+      queueLock.unlock();
     }
   };
 }
@@ -162,38 +160,12 @@ namespace ammonite {
         jobCount.notify_one();
       }
 
-      //Specialised variants to submit multiple jobs
-      void submitMultiple(AmmoniteWork work, int newJobs) {
-        for (int i = 0; i < newJobs; i++) {
-          workQueue->push(work, nullptr, nullptr);
-          jobCount++;
-          jobCount.notify_one();
-        }
-      }
-
-      void submitMultipleUser(AmmoniteWork work, void** userPtrs, int stride, int newJobs) {
-        for (int i = 0; i < newJobs; i++) {
-          workQueue->push(work, ((char*)userPtrs + (i * stride)), nullptr);
-          jobCount++;
-          jobCount.notify_one();
-        }
-      }
-
-      void submitMultipleComp(AmmoniteWork work, std::atomic_flag* completions, int newJobs) {
-        for (int i = 0; i < newJobs; i++) {
-          workQueue->push(work, nullptr, completions + i);
-          jobCount++;
-          jobCount.notify_one();
-        }
-      }
-
-      void submitMultipleUserComp(AmmoniteWork work, void** userPtrs, int stride,
-                                  std::atomic_flag* completions, int newJobs) {
-        for (int i = 0; i < newJobs; i++) {
-          workQueue->push(work, ((char*)userPtrs + (i * stride)), completions + i);
-          jobCount++;
-          jobCount.notify_one();
-        }
+      //Submit multiple jobs without locking multiple times
+      void submitMultiple(AmmoniteWork work, void* userBuffer, int stride,
+                          std::atomic_flag* completions, int newJobs) {
+        workQueue->pushMultiple(work, userBuffer, stride, completions, newJobs);
+        jobCount += newJobs;
+        jobCount.notify_all();
       }
 
       //Create thread pool, existing work will begin executing
@@ -204,7 +176,7 @@ namespace ammonite {
         }
 
         //Create the queue
-        workQueue = new WorkQueue(QUEUE_SIZE);
+        workQueue = new WorkQueue();
 
         //Default to creating a worker thread for every hardware thread
         if (extraThreads == 0) {
@@ -284,26 +256,10 @@ namespace ammonite {
       bool debugCheckRemainingWork(bool verbose) {
         bool issuesFound = false;
 
-        if (workQueue->getSize() != 0) {
+        if (jobCount != 0) {
           issuesFound = true;
           if (verbose) {
-            ammoniteInternalDebug << "WARNING: Work queue not empty (" << workQueue->getSize() \
-                                  << " jobs left)" << std::endl;
-          }
-        }
-
-        if (workQueue->getSize() != jobCount) {
-          issuesFound = true;
-          if (verbose) {
-            ammoniteInternalDebug << "WARNING: Work queue size and job count don't match (" \
-                                  << workQueue->getSize() << " vs " << jobCount << ")" << std::endl;
-          }
-        }
-
-        if (jobCount < 0) {
-          issuesFound = true;
-          if (verbose) {
-            ammoniteInternalDebug << "WARNING: Job count is negative (" \
+            ammoniteInternalDebug << "WARNING: Job count is non-zero (" \
                                   << jobCount << ")" << std::endl;
           }
         }

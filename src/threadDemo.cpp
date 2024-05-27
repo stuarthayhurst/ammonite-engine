@@ -233,7 +233,7 @@ namespace {
     RESET_TIMERS
     bool passed = true;
     int* values = new int[jobCount]{};
-    ammonite::thread::submitMultiple(shortTask, (void**)&values[0],
+    ammonite::thread::submitMultiple(shortTask, (void*)&values[0],
                                      sizeof(int), &syncs[0], jobCount);
     submitTimer.pause();
 
@@ -254,7 +254,7 @@ namespace {
     RESET_TIMERS
     bool passed = true;
     int* values = new int[jobCount]{};
-    ammonite::thread::submitMultiple(shortTask, (void**)&values[0],
+    ammonite::thread::submitMultiple(shortTask, (void*)&values[0],
                                      sizeof(int), nullptr, jobCount);
     submitTimer.pause();
 
