@@ -1,5 +1,4 @@
 #include <atomic>
-#include <cstring>
 #include <semaphore>
 #include <thread>
 
