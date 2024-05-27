@@ -1,7 +1,6 @@
 #include <atomic>
 #include <cstring>
 #include <mutex>
-#include <queue>
 #include <thread>
 
 #include "../types.hpp"
@@ -17,63 +16,94 @@ namespace {
     std::atomic_flag* completion;
   };
 
+  struct Node {
+    WorkItem workItem;
+    Node* nextNode;
+  };
+
   class WorkQueue {
   private:
-    std::mutex queueLock;
-    std::queue<WorkItem> workItems;
+    std::mutex readLock;
+    Node* lastPopped;
+    std::atomic<Node*> lastPushed;
 
   public:
+    WorkQueue() {
+      //Start with an empty queue, 1 'old' node
+      lastPushed = new Node;
+      lastPopped = lastPushed;
+      lastPushed.load()->nextNode = nullptr;
+    }
+
+    ~WorkQueue() {
+      //Clear out any remaining nodes
+      WorkItem workItem;
+      do {
+        this->pop(&workItem);
+      } while (workItem.work != nullptr);
+    }
+
     void push(AmmoniteWork work, void* userPtr, std::atomic_flag* completion) {
-      queueLock.lock();
+      //Create the new node, fill with data
+      Node* newNode = new Node{{work, userPtr, completion}, nullptr};
 
-      //Add the work to the queue
-      workItems.push({work, userPtr, completion});
-
-      queueLock.unlock();
+      //Atomically add the node to the previous node
+      lastPushed.exchange(newNode)->nextNode = newNode;
     }
 
     void pushMultiple(AmmoniteWork work, void* userBuffer, int stride,
                        std::atomic_flag* completions, int count) {
-      queueLock.lock();
-
-      //Avoid running the same checks for every job in the group
+      //Generate section of linked list to insert
+      Node sectionStart;
+      Node* sectionPtr = &sectionStart;
       if (userBuffer == nullptr) {
         if (completions == nullptr) {
           for (int i = 0; i < count; i++) {
-            workItems.push({work, nullptr, nullptr});
+            sectionPtr->nextNode = new Node{{work, nullptr, nullptr}, nullptr};
+            sectionPtr = sectionPtr->nextNode;
           }
         } else {
           for (int i = 0; i < count; i++) {
-            workItems.push({work, nullptr, completions + i});
+            sectionPtr->nextNode = new Node{{work, nullptr, completions + i}, nullptr};
+            sectionPtr = sectionPtr->nextNode;
           }
         }
       } else {
         if (completions == nullptr) {
           for (int i = 0; i < count; i++) {
-            workItems.push({work, (void*)((char*)userBuffer + (i * stride)), nullptr});
+            sectionPtr->nextNode = new Node{{work, (void*)((char*)userBuffer + (i * stride)),
+                                             nullptr}, nullptr};
+            sectionPtr = sectionPtr->nextNode;
           }
         } else {
           for (int i = 0; i < count; i++) {
-            workItems.push({work, (void*)((char*)userBuffer + (i * stride)), completions + i});
+            sectionPtr->nextNode = new Node{{work, (void*)((char*)userBuffer + (i * stride)),
+                                             completions + i}, nullptr};
+            sectionPtr = sectionPtr->nextNode;
           }
         }
       }
 
-      queueLock.unlock();
+      //Insert the generated section atomically
+      lastPushed.exchange(sectionPtr)->nextNode = sectionStart.nextNode;
     }
 
     void pop(WorkItem* workItemPtr) {
-      queueLock.lock();
+      //Use the most recently popped node to find the next
+      readLock.lock();
+      Node* nextNode = lastPopped->nextNode;
 
-      //Write the work item to workItemPtr if the queue isn't empty
-      if (workItems.empty()) {
-        workItemPtr->work = nullptr;
+      //Copy the data and free the old node, otherwise return if we don't have a new node
+      if (nextNode != nullptr) {
+        Node* oldNode = lastPopped;
+        *workItemPtr = nextNode->workItem;
+        lastPopped = nextNode;
+        readLock.unlock();
+        delete oldNode;
       } else {
-        *workItemPtr = workItems.front();
-        workItems.pop();
+        readLock.unlock();
+        workItemPtr->work = nullptr;
       }
-
-      queueLock.unlock();
     }
   };
 }
