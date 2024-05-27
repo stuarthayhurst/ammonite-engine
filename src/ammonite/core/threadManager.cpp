@@ -49,7 +49,7 @@ namespace {
       //Create a new empty node
       Node* newNode = new Node{{nullptr, nullptr, nullptr}, nullptr};
 
-      //Atomically the next node to newNode, then fill in the old new node
+      //Atomically swap the next node with newNode, then fill in the old new node now it's free
       *(nextPushed.exchange(newNode)) = {{work, userPtr, completion}, newNode};
     }
 
