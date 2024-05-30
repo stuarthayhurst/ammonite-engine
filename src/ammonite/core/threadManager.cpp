@@ -17,19 +17,19 @@ namespace {
 
   struct Node {
     WorkItem workItem;
-    Node* nextNode;
+    std::atomic<Node>* nextNode;
   };
 
   class WorkQueue {
   private:
     std::binary_semaphore readSemaphore{1};
-    Node* nextPopped;
-    std::atomic<Node*> nextPushed;
+    std::atomic<Node>* nextPopped;
+    std::atomic<std::atomic<Node>*> nextPushed;
 
   public:
     WorkQueue() {
       //Start with an empty queue, 1 'old' node
-      nextPushed = new Node{{nullptr, nullptr, nullptr}, nullptr};
+      nextPushed = new std::atomic<Node>{{{nullptr, nullptr, nullptr}, nullptr}};
       nextPopped = nextPushed;
     }
 
@@ -46,50 +46,46 @@ namespace {
 
     void push(AmmoniteWork work, void* userPtr, AmmoniteCompletion* completion) {
       //Create a new empty node
-      Node* newNode = new Node{{nullptr, nullptr, nullptr}, nullptr};
+      std::atomic<Node>* newNode = new std::atomic<Node>{{{nullptr, nullptr, nullptr}, nullptr}};
 
       //Atomically swap the next node with newNode, then fill in the old new node now it's free
-      *(nextPushed.exchange(newNode)) = {{work, userPtr, completion}, newNode};
+      (nextPushed.exchange(newNode))->store({{work, userPtr, completion}, newNode});
     }
 
     void pushMultiple(AmmoniteWork work, void* userBuffer, int stride,
                       AmmoniteCompletion* completions, int count) {
       //Generate section of linked list to insert
-      Node* newNode = new Node{{nullptr, nullptr, nullptr}, nullptr};
-      Node sectionStart;
-      Node* sectionPtr = &sectionStart;
+      std::atomic<Node>* newNode = new std::atomic<Node>{{{nullptr, nullptr, nullptr}, nullptr}};
+      std::atomic<Node>* nextNode = newNode;
       if (userBuffer == nullptr) {
         if (completions == nullptr) {
           for (int i = 0; i < count; i++) {
-            sectionPtr->nextNode = new Node{{work, nullptr, nullptr}, nullptr};
-            sectionPtr = sectionPtr->nextNode;
+            nextNode = new std::atomic<Node>{{{work, nullptr, nullptr}, nextNode}};
           }
         } else {
           for (int i = 0; i < count; i++) {
-            sectionPtr->nextNode = new Node{{work, nullptr, completions + i}, nullptr};
-            sectionPtr = sectionPtr->nextNode;
+            nextNode = new std::atomic<Node>{{{work, nullptr, completions + count - (i + 1)}, nextNode}};
           }
         }
       } else {
         if (completions == nullptr) {
           for (int i = 0; i < count; i++) {
-            sectionPtr->nextNode = new Node{{work, (void*)((char*)userBuffer + (i * stride)),
-                                             nullptr}, nullptr};
-            sectionPtr = sectionPtr->nextNode;
+            nextNode = new std::atomic<Node>{{{work,
+              (char*)userBuffer + (count * stride) - ((i + 1) * stride),
+              nullptr}, nextNode}};
           }
         } else {
           for (int i = 0; i < count; i++) {
-            sectionPtr->nextNode = new Node{{work, (void*)((char*)userBuffer + (i * stride)),
-                                             completions + i}, nullptr};
-            sectionPtr = sectionPtr->nextNode;
+            nextNode = new std::atomic<Node>{{{work,
+              (char*)userBuffer + (count * stride) - ((i + 1) * stride),
+              completions + count - (i + 1)}, nextNode}};
           }
         }
       }
 
       //Insert the generated section atomically
-      sectionPtr->nextNode = newNode;
-      *(nextPushed.exchange(newNode)) = *sectionStart.nextNode;
-      delete sectionStart.nextNode;
+      (nextPushed.exchange(newNode))->store(*nextNode);
+      delete nextNode;
     }
 
     void pop(WorkItem* workItemPtr) {
@@ -97,12 +93,13 @@ namespace {
       readSemaphore.acquire();
 
       //Copy the data and free the old node, otherwise return if we don't have a new node
-      Node* currentNode = nextPopped;
-      if (currentNode->nextNode != nullptr) {
-        nextPopped = nextPopped->nextNode;
+      std::atomic<Node>* currentNode = nextPopped;
+      Node currentLoaded = currentNode->load();
+      if (currentLoaded.nextNode != nullptr) {
+        nextPopped = currentLoaded.nextNode;
         readSemaphore.release();
 
-        *workItemPtr = currentNode->workItem;
+        *workItemPtr = currentLoaded.workItem;
         delete currentNode;
       } else {
         readSemaphore.release();
