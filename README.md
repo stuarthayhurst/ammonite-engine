@@ -5,6 +5,7 @@
 ## Ammonite Engine
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://paypal.me/stuartahayhurst)
   - A simple OpenGL based graphics engine, built to learn C++ and graphics programming
+    - This isn't a serious, production-quality engine, please don't treat it as one
   - Despite the project being for learning, any contributions are still welcome
     - If you found this project interesting, any donations are greatly appreciated :)
 
