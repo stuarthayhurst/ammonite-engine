@@ -76,6 +76,7 @@
     - `FAST`: `true / false` - Compiles with `-Ofast -march=native`
 
 ## Dependencies:
+  - Package names are correct for Debian, other distros may vary
   - `make`
   - `pkg-config`
   - `g++` **OR** `clang`
@@ -83,6 +84,7 @@
     - When swapping between different compilers, run `make clean`
   - ### Libraries:
     - `libglm-dev libglfw3-dev libglew-dev libstb-dev libassimp-dev`
+    - `libdecor-0-0 libdecor-0-plugin-1-gtk` are required for Wayland window decorations
   - ### Icons:
     - `inkscape optipng`
 
