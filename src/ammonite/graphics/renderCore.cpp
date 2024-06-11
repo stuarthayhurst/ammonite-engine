@@ -741,7 +741,7 @@ namespace ammonite {
           glBindVertexArray(drawObjectData->meshes[i].vertexArrayId);
 
           //Draw the triangles
-          glDrawElements(mode, drawObjectData->meshes[i].vertexCount, GL_UNSIGNED_INT, nullptr);
+          glDrawElements(mode, drawObjectData->meshes[i].indexCount, GL_UNSIGNED_INT, nullptr);
         }
       }
     }

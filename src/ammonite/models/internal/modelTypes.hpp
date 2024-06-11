@@ -28,9 +28,9 @@ namespace ammonite {
 
       struct MeshData {
         VertexData* meshData = nullptr;
-        int meshDataLength = 0;
-        unsigned int* indices = nullptr;
         int vertexCount = 0;
+        unsigned int* indices = nullptr;
+        int indexCount = 0;
         GLuint vertexBufferId = 0; //vertexBufferId and elementBufferId must stay in this memory layout
         GLuint elementBufferId = 0;
         GLuint vertexArrayId = 0;

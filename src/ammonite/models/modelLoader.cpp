@@ -25,7 +25,7 @@ namespace ammonite {
 
           //Add a new empty mesh to the mesh vector
           models::internal::MeshData* newMesh = &modelObjectData->meshes.emplace_back();
-          newMesh->meshDataLength = meshPtr->mNumVertices;
+          newMesh->vertexCount = meshPtr->mNumVertices;
           newMesh->meshData = new VertexData[meshPtr->mNumVertices];
 
           //Fill the mesh with vertex data
@@ -53,11 +53,11 @@ namespace ammonite {
 
           //Count mesh indices
           for (unsigned int i = 0; i < meshPtr->mNumFaces; i++) {
-            newMesh->vertexCount += meshPtr->mFaces[i].mNumIndices;
+            newMesh->indexCount += meshPtr->mFaces[i].mNumIndices;
           }
 
           //Allocate and fill mesh indices
-          newMesh->indices = new unsigned int[newMesh->vertexCount];
+          newMesh->indices = new unsigned int[newMesh->indexCount];
           int index = 0;
           for (unsigned int i = 0; i < meshPtr->mNumFaces; i++) {
             aiFace face = meshPtr->mFaces[i];

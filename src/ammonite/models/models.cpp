@@ -205,10 +205,10 @@ namespace ammonite {
 
         //Fill interleaved vertex + normal + texture buffer and index buffer
         glNamedBufferData(meshData->vertexBufferId,
-                          meshData->meshDataLength * sizeof(models::internal::VertexData),
+                          meshData->vertexCount * sizeof(models::internal::VertexData),
                           &meshData->meshData[0], GL_STATIC_DRAW);
         glNamedBufferData(meshData->elementBufferId,
-                          meshData->vertexCount * sizeof(unsigned int),
+                          meshData->indexCount * sizeof(unsigned int),
                           &meshData->indices[0], GL_STATIC_DRAW);
 
         //Destroy mesh data early
@@ -454,6 +454,22 @@ namespace ammonite {
 
     void applyTexture(int modelId, AmmoniteEnum textureType, const char* texturePath, bool* externalSuccess) {
       applyTexture(modelId, textureType, texturePath, ASSUME_SRGB_TEXTURES, externalSuccess);
+    }
+
+    //Return the number of indices on a model
+    int getIndexCount(int modelId) {
+      internal::ModelInfo* modelPtr = modelIdPtrMap[modelId];
+      if (modelPtr == nullptr) {
+        return 0;
+      }
+
+      int indexCount = 0;
+      models::internal::ModelData* modelData = modelPtr->modelData;
+      for (unsigned int i = 0; i < modelData->meshes.size(); i++) {
+        indexCount += modelData->meshes[i].indexCount;
+      }
+
+      return indexCount;
     }
 
     //Return the number of vertices on a model
