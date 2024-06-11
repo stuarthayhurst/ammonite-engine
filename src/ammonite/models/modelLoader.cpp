@@ -1,3 +1,4 @@
+#include <cstring>
 #include <iostream>
 #include <vector>
 #include <queue>
@@ -26,42 +27,46 @@ namespace ammonite {
           //Add a new empty mesh to the mesh vector
           meshes->emplace_back();
           models::internal::MeshData* newMesh = &meshes->back();
+          newMesh->meshDataLength = meshPtr->mNumVertices;
+          newMesh->meshData = new VertexData[meshPtr->mNumVertices];
 
           //Fill the mesh with vertex data
           bool hasWarnedMesh = false;
           for (unsigned int i = 0; i < meshPtr->mNumVertices; i++) {
-            models::internal::VertexData vertexData;
+            newMesh->meshData[i].vertex.x = meshPtr->mVertices[i].x;
+            newMesh->meshData[i].vertex.y = meshPtr->mVertices[i].y;
+            newMesh->meshData[i].vertex.z = meshPtr->mVertices[i].z;
 
-            vertexData.vertex.x = meshPtr->mVertices[i].x;
-            vertexData.vertex.y = meshPtr->mVertices[i].y;
-            vertexData.vertex.z = meshPtr->mVertices[i].z;
-
-            vertexData.normal.x = meshPtr->mNormals[i].x;
-            vertexData.normal.y = meshPtr->mNormals[i].y;
-            vertexData.normal.z = meshPtr->mNormals[i].z;
+            newMesh->meshData[i].normal.x = meshPtr->mNormals[i].x;
+            newMesh->meshData[i].normal.y = meshPtr->mNormals[i].y;
+            newMesh->meshData[i].normal.z = meshPtr->mNormals[i].z;
 
             if (meshPtr->mTextureCoords[0]) {
-              vertexData.texturePoint.x = meshPtr->mTextureCoords[0][i].x;
-              vertexData.texturePoint.y = meshPtr->mTextureCoords[0][i].y;
+              newMesh->meshData[i].texturePoint.x = meshPtr->mTextureCoords[0][i].x;
+              newMesh->meshData[i].texturePoint.y = meshPtr->mTextureCoords[0][i].y;
             } else {
               if (!hasWarnedMesh) {
                 ammonite::utils::warning << "Missing texture coord data for mesh" << std::endl;
                 hasWarnedMesh = true;
               }
-              vertexData.texturePoint = glm::vec2(0.0f);
+              newMesh->meshData[i].texturePoint = glm::vec2(0.0f);
             }
-
-            newMesh->meshData.push_back(vertexData);
           }
 
-          //Fill mesh indices
+          //Count mesh indices
+          for (unsigned int i = 0; i < meshPtr->mNumFaces; i++) {
+            newMesh->vertexCount += meshPtr->mFaces[i].mNumIndices;
+          }
+
+          //Allocate and fill mesh indices
+          newMesh->indices = new unsigned int[newMesh->vertexCount];
+          int index = 0;
           for (unsigned int i = 0; i < meshPtr->mNumFaces; i++) {
             aiFace face = meshPtr->mFaces[i];
-            for (unsigned int j = 0; j < face.mNumIndices; j++) {
-              newMesh->indices.push_back(face.mIndices[j]);
-            }
+            std::memcpy(&newMesh->indices[index], &face.mIndices[0],
+                        face.mNumIndices * sizeof(unsigned int));
+            index += face.mNumIndices;
           }
-          newMesh->vertexCount = newMesh->indices.size();
 
           //Fetch material for the mesh
           aiMaterial *material = scenePtr->mMaterials[meshPtr->mMaterialIndex];

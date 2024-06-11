@@ -27,12 +27,13 @@ namespace ammonite {
       };
 
       struct MeshData {
-        std::vector<VertexData> meshData;
-        std::vector<unsigned int> indices;
+        VertexData* meshData = nullptr;
+        int meshDataLength = 0;
+        unsigned int* indices = nullptr;
+        int vertexCount = 0;
         GLuint vertexBufferId = 0; //vertexBufferId and elementBufferId must stay in this memory layout
         GLuint elementBufferId = 0;
         GLuint vertexArrayId = 0;
-        int vertexCount = 0;
       };
 
       struct ModelData {

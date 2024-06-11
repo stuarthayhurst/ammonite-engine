@@ -204,8 +204,18 @@ namespace ammonite {
         glCreateBuffers(2, &meshData->vertexBufferId);
 
         //Fill interleaved vertex + normal + texture buffer and index buffer
-        glNamedBufferData(meshData->vertexBufferId, meshData->meshData.size() * sizeof(models::internal::VertexData), &meshData->meshData[0], GL_STATIC_DRAW);
-        glNamedBufferData(meshData->elementBufferId, meshData->indices.size() * sizeof(unsigned int), &meshData->indices[0], GL_STATIC_DRAW);
+        glNamedBufferData(meshData->vertexBufferId,
+                          meshData->meshDataLength * sizeof(models::internal::VertexData),
+                          &meshData->meshData[0], GL_STATIC_DRAW);
+        glNamedBufferData(meshData->elementBufferId,
+                          meshData->vertexCount * sizeof(unsigned int),
+                          &meshData->indices[0], GL_STATIC_DRAW);
+
+        //Destroy mesh data early
+        delete [] meshData->meshData;
+        delete [] meshData->indices;
+        meshData->meshData = nullptr;
+        meshData->indices = nullptr;
 
         //Create the vertex attribute buffer
         glCreateVertexArrays(1, &meshData->vertexArrayId);
@@ -368,6 +378,19 @@ namespace ammonite {
           for (unsigned int i = 0; i < modelObjectData->meshes.size(); i++) {
             ammonite::textures::internal::deleteTexture(modelObject->textureIds[i].diffuseId);
             ammonite::textures::internal::deleteTexture(modelObject->textureIds[i].specularId);
+          }
+
+          //Free the data if it hasn't been already
+          for (unsigned int i = 0; i < modelObjectData->meshes.size(); i++) {
+            if (modelObjectData->meshes[i].meshData != nullptr) {
+              delete [] modelObjectData->meshes[i].meshData;
+              modelObjectData->meshes[i].meshData = nullptr;
+            }
+
+            if (modelObjectData->meshes[i].indices != nullptr) {
+              delete [] modelObjectData->meshes[i].indices;
+              modelObjectData->meshes[i].indices = nullptr;
+            }
           }
 
           //Destroy the model buffers and position in second tracker layer
