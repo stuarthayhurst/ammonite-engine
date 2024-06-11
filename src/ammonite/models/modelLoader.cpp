@@ -21,12 +21,10 @@ namespace ammonite {
                                 models::internal::ModelData* modelObjectData,
                                 ModelLoadInfo modelLoadInfo,
                                 bool* externalSuccess) {
-          std::vector<models::internal::MeshData>* meshes = &modelObjectData->meshes;
           std::vector<models::internal::TextureIdGroup>* textureIds = &modelObjectData->textureIds;
 
           //Add a new empty mesh to the mesh vector
-          meshes->emplace_back();
-          models::internal::MeshData* newMesh = &meshes->back();
+          models::internal::MeshData* newMesh = &modelObjectData->meshes.emplace_back();
           newMesh->meshDataLength = meshPtr->mNumVertices;
           newMesh->meshData = new VertexData[meshPtr->mNumVertices];
 
