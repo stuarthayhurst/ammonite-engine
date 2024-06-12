@@ -35,13 +35,15 @@ namespace ammonite {
             newMesh->meshData[i].vertex.y = meshPtr->mVertices[i].y;
             newMesh->meshData[i].vertex.z = meshPtr->mVertices[i].z;
 
-            newMesh->meshData[i].normal.x = meshPtr->mNormals[i].x;
-            newMesh->meshData[i].normal.y = meshPtr->mNormals[i].y;
-            newMesh->meshData[i].normal.z = meshPtr->mNormals[i].z;
+            newMesh->meshData[i].vertex = glm::vec3(meshPtr->mVertices[i].x,
+              meshPtr->mVertices[i].y, meshPtr->mVertices[i].z);
+
+            newMesh->meshData[i].normal = glm::vec3(meshPtr->mNormals[i].x,
+              meshPtr->mNormals[i].y, meshPtr->mNormals[i].z);
 
             if (meshPtr->mTextureCoords[0]) {
-              newMesh->meshData[i].texturePoint.x = meshPtr->mTextureCoords[0][i].x;
-              newMesh->meshData[i].texturePoint.y = meshPtr->mTextureCoords[0][i].y;
+              newMesh->meshData[i].texturePoint = glm::vec2(meshPtr->mTextureCoords[0][i].x,
+                meshPtr->mTextureCoords[0][i].y);
             } else {
               if (!hasWarnedMesh) {
                 ammonite::utils::warning << "Missing texture coord data for mesh" << std::endl;
