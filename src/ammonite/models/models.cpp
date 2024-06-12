@@ -1,3 +1,4 @@
+#include <cstddef>
 #include <iostream>
 #include <map>
 #include <string>
@@ -222,23 +223,26 @@ namespace ammonite {
 
         GLuint vaoId = meshData->vertexArrayId;
         GLuint vboId = meshData->vertexBufferId;
-        int stride = 8 * sizeof(float); //(3 + 3 + 2) * bytes per float
+        int stride = sizeof(models::internal::VertexData);
 
         //Vertex attribute
         glEnableVertexArrayAttrib(vaoId, 0);
-        glVertexArrayVertexBuffer(vaoId, 0, vboId, 0, stride);
+        glVertexArrayVertexBuffer(vaoId, 0, vboId,
+                                  offsetof(models::internal::VertexData, vertex), stride);
         glVertexArrayAttribFormat(vaoId, 0, 3, GL_FLOAT, GL_FALSE, 0);
         glVertexArrayAttribBinding(vaoId, 0, 0);
 
         //Normal attribute
         glEnableVertexArrayAttrib(vaoId, 1);
-        glVertexArrayVertexBuffer(vaoId, 1, vboId, 3 * sizeof(float), stride);
+        glVertexArrayVertexBuffer(vaoId, 1, vboId,
+                                  offsetof(models::internal::VertexData, normal), stride);
         glVertexArrayAttribFormat(vaoId, 1, 3, GL_FLOAT, GL_FALSE, 0);
         glVertexArrayAttribBinding(vaoId, 1, 1);
 
         //Texture attribute
         glEnableVertexArrayAttrib(vaoId, 2);
-        glVertexArrayVertexBuffer(vaoId, 2, vboId, 6 * sizeof(float), stride);
+        glVertexArrayVertexBuffer(vaoId, 2, vboId,
+                                  offsetof(models::internal::VertexData, texturePoint), stride);
         glVertexArrayAttribFormat(vaoId, 2, 2, GL_FLOAT, GL_FALSE, 0);
         glVertexArrayAttribBinding(vaoId, 2, 2);
 
