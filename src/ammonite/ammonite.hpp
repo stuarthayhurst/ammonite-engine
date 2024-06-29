@@ -9,7 +9,6 @@
 #include "models/modelInterface.hpp"
 #include "models/modelStorage.hpp"
 
-#include "utils/cacheManager.hpp"
 #include "utils/controls.hpp"
 #include "utils/debug.hpp"
 #include "utils/logging.hpp"

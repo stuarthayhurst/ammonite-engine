@@ -2,10 +2,12 @@
 
 #include <GLFW/glfw3.h>
 
+#include "../core/threadManager.hpp"
+#include "../core/fileManager.hpp"
+
 #include "../utils/debug.hpp"
 #include "../utils/timer.hpp"
 #include "../utils/logging.hpp"
-#include "../core/threadManager.hpp"
 
 #include "internal/internalRenderCore.hpp"
 #include "../internal/interfaceTracker.hpp"
@@ -63,6 +65,10 @@ namespace ammonite {
         internal::deleteShaders();
         internal::destroyOpenGLObjects();
         internal::deleteModelCache();
+      }
+
+      bool useShaderCache(const char* shaderCachePath) {
+        return ammonite::files::internal::useDataCache(std::string(shaderCachePath));
       }
     }
 

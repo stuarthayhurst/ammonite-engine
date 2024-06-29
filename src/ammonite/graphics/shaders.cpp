@@ -1,35 +1,36 @@
-#include <string>
-#include <map>
-#include <vector>
 #include <algorithm>
-#include <iostream>
-#include <fstream>
-#include <sstream>
+#include <cstddef>
 #include <filesystem>
+#include <fstream>
+#include <iostream>
+#include <map>
+#include <sstream>
+#include <string>
+#include <vector>
+
+//Used by shader cache validator
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 
 #include <GL/glew.h>
 
-#include "internal/internalExtensions.hpp"
-#include "../utils/internal/internalFileManager.hpp"
-#include "../utils/internal/internalCacheManager.hpp"
-
+#include "../core/fileManager.hpp"
 #include "../utils/logging.hpp"
-#include "../utils/cacheManager.hpp"
+#include "internal/internalExtensions.hpp"
 
 namespace ammonite {
   //Static helper functions
   namespace {
     static void deleteCacheFile(std::string cacheFilePath) {
-      //Delete the cache and cacheinfo files
+      //Delete the cache file
       ammonite::utils::status << "Clearing '" << cacheFilePath << "'" << std::endl;
-
-      ammonite::utils::internal::deleteFile(cacheFilePath);
+      ammonite::files::internal::deleteFile(cacheFilePath);
     }
 
-    static void cacheProgram(const GLuint programId,
-                             const char* shaderPaths[], const int shaderCount) {
-      std::string cacheFilePath =
-        ammonite::utils::cache::internal::requestNewCachePath(shaderPaths, shaderCount);
+    static void cacheProgram(const GLuint programId, std::string* shaderPaths, int shaderCount) {
+      std::string cacheFilePath = ammonite::files::internal::getCachedFilePath(shaderPaths,
+                                                                               shaderCount);
 
       ammonite::utils::status << "Caching '" << cacheFilePath << "'" << std::endl;
       int binaryLength;
@@ -50,7 +51,7 @@ namespace ammonite {
       if (cacheFile.is_open()) {
         for (int i = 0; i < shaderCount; i++) {
           long long int filesize = 0, modificationTime = 0;
-          ammonite::utils::internal::getFileMetadata(shaderPaths[i], &filesize, &modificationTime);
+          ammonite::files::internal::getFileMetadata(shaderPaths[i], &filesize, &modificationTime);
 
           cacheFile << "input;" << shaderPaths[i] << ";" << filesize << ";" \
                     << modificationTime << "\n";
@@ -96,9 +97,7 @@ namespace ammonite {
       return false;
     }
 
-    static GLenum attemptIdentifyShaderType(const char* shaderPath) {
-      std::string shaderPathString = std::string(shaderPath);
-
+    static GLenum attemptIdentifyShaderType(std::string shaderPath) {
       std::map<std::string, GLenum> shaderMatches = {
         {"vert", GL_VERTEX_SHADER},
         {"frag", GL_FRAGMENT_SHADER},
@@ -109,8 +108,8 @@ namespace ammonite {
       };
 
       std::string lowerShaderPath;
-      for (unsigned int i = 0; i < shaderPathString.size(); i++) {
-        lowerShaderPath += std::tolower(shaderPathString[i]);
+      for (unsigned int i = 0; i < shaderPath.size(); i++) {
+        lowerShaderPath += std::tolower(shaderPath[i]);
       }
 
       //Try and match the filename to a supported shader
@@ -123,14 +122,21 @@ namespace ammonite {
       return GL_FALSE;
     }
 
+    struct CacheInfo {
+      int fileCount;
+      std::string* filePaths;
+      GLenum binaryFormat;
+      GLsizei binaryLength;
+    };
+
     //Set by updateCacheSupport(), when GLEW loads
     bool isBinaryCacheSupported = false;
   }
 
   //Shader compilation and cache functions, local to this file
-  namespace shaders {
+  namespace {
     //Take shader source code, compile it and load it
-    static int loadShader(const char* shaderPath, const GLenum shaderType, bool* externalSuccess) {
+    static int loadShader(std::string shaderPath, const GLenum shaderType, bool* externalSuccess) {
       //Create the shader
       GLuint shaderId = glCreateShader(shaderType);
 
@@ -181,8 +187,8 @@ namespace ammonite {
     }
 
     //Take multiple shader files, hand off to loadShader and create a program
-    static int createProgramObject(GLuint shaderIds[],
-                                   const int shaderCount, bool* externalSuccess) {
+    static int createProgramObject(GLuint shaderIds[], const int shaderCount,
+                                   bool* externalSuccess) {
       //Create the program
       GLuint programId = glCreateProgram();
 
@@ -208,81 +214,105 @@ namespace ammonite {
       return programId;
     }
 
-    //Attempt to find cached program or hand off to loadShader and createProgramObject
-    static int createProgramCached(const char* shaderPaths[], const GLenum shaderTypes[],
-                      const int shaderCount, bool* externalSuccess) {
-      //Used later as the return value
-      GLuint programId;
+    bool validateCache(unsigned char* data, std::size_t size, void* userPtr) {
+      CacheInfo* cacheInfoPtr = (CacheInfo*)userPtr;
+      unsigned char* dataCopy = new unsigned char[size];
+      std::memcpy(dataCopy, data, size);
+      dataCopy[size - 1] = '\0';
 
-      //Check for OpenGL and engine cache support
-      const bool isCacheSupported = isBinaryCacheSupported and
-                                    ammonite::utils::cache::getCacheEnabled();
-
-      if (isCacheSupported) {
-        bool cacheValid = false;
-        std::string cacheFilePath =
-          ammonite::utils::cache::internal::requestCachedDataPath(shaderPaths,
-                                                                  shaderCount,
-                                                                  &cacheValid);
-
-        //Attempt to get the shader format and size
-        GLenum cachedBinaryFormat = 0;
-        GLsizei cachedBinaryLength = 0;
-
-        std::ifstream cacheFile(cacheFilePath, std::ios::binary);
-        if (cacheValid) {
-          std::string line;
-          if (cacheFile.is_open()) {
-            try {
-              //Skip input files, as they're handled by the cache manager
-              for (int i = 0; i < shaderCount; i++) {
-                getline(cacheFile, line);
-              }
-
-              //Get the binary format
-              getline(cacheFile, line);
-              cachedBinaryFormat = std::stoi(line);
-
-              //Get the length of the binary
-              getline(cacheFile, line);
-              cachedBinaryLength = std::stoi(line);
-            } catch (const std::out_of_range&) {
-              cacheValid = false;
-            } catch (const std::invalid_argument&) {
-              cacheValid = false;
-            }
-          }
+      /*
+       - Decide whether the cache file can be used
+       - Uses input files, sizes and timestamps
+      */
+      char* state;
+      int fileCount = 1;
+      char* token = strtok_r((char*)dataCopy, "\n", &state);
+      do {
+        //Give up if token is null, we didn't find enough files
+        if (token == nullptr) {
+          delete [] dataCopy;
+          return false;
         }
 
-        //If cache is still valid, attempt to use it
-        if (cacheValid) {
-          //Read the cached data from file
-          char* cachedBinaryData = new char[cachedBinaryLength];
-          cacheFile.read(cachedBinaryData, cachedBinaryLength);
-
-          //Load the cached binary data
-          programId = glCreateProgram();
-          glProgramBinary(programId, cachedBinaryFormat,
-                          cachedBinaryData, cachedBinaryLength);
-          delete [] cachedBinaryData;
-
-          //Return the program ID, unless the cache was faulty, then delete and carry on
-          if (checkProgram(programId)) {
-            return programId;
-          } else {
-            ammonite::utils::warning << "Failed to process '" << cacheFilePath << "'" << std::endl;
-            glDeleteProgram(programId);
-            deleteCacheFile(cacheFilePath);
-          }
-        } else {
-          //Shader source doesn't match cache, delete the old cache
-          if (cacheFilePath != "") {
-            deleteCacheFile(cacheFilePath);
-          }
+        //Check first token is 'input'
+        std::string currentFilePath = cacheInfoPtr->filePaths[fileCount - 1];
+        char* nestedToken = strtok(token, ";");
+        if ((nestedToken == nullptr) ||
+            (std::string(nestedToken) != std::string("input"))) {
+          delete [] dataCopy;
+          return false;
         }
-        cacheFile.close();
+
+        //Check token matches shader path
+        nestedToken = strtok(nullptr, ";");
+        if ((nestedToken == nullptr) ||
+            (std::string(nestedToken) != currentFilePath)) {
+          delete [] dataCopy;
+          return false;
+        }
+
+        //Get filesize and time of last modification of the shader source
+        long long int filesize = 0, modificationTime = 0;
+        if (!ammonite::files::internal::getFileMetadata(currentFilePath, &filesize,
+                                                        &modificationTime)) {
+          //Failed to get the metadata
+          delete [] dataCopy;
+          return false;
+        }
+
+        //Check token matches file size
+        nestedToken = strtok(nullptr, ";");
+        if ((nestedToken == nullptr) ||
+            (std::atoll(nestedToken) != filesize)) {
+          delete [] dataCopy;
+          return false;
+        }
+
+        //Check token matches timestamp
+        nestedToken = strtok(nullptr, ";");
+        if ((nestedToken == nullptr) ||
+            (std::atoll(nestedToken) != modificationTime)) {
+          delete [] dataCopy;
+          return false;
+        }
+
+        //Get the next line
+        if (cacheInfoPtr->fileCount > fileCount) {
+          token = strtok_r(nullptr, "\n", &state);
+        }
+        fileCount += 1;
+      } while (cacheInfoPtr->fileCount >= fileCount);
+
+      //Find binary format
+      token = strtok_r(nullptr, "\n", &state);
+      if (token != nullptr) {
+        cacheInfoPtr->binaryFormat = std::atoll(token);
+      } else {
+        delete [] dataCopy;
+        return false;
       }
 
+      //Find binary length
+      token = strtok_r(nullptr, "\n", &state);
+      if (token != nullptr) {
+        cacheInfoPtr->binaryLength = std::atoll(token);
+      } else {
+        delete [] dataCopy;
+        return false;
+      }
+
+      if (cacheInfoPtr->binaryFormat == 0 || cacheInfoPtr->binaryLength == 0) {
+        delete [] dataCopy;
+        return false;
+      }
+
+      delete [] dataCopy;
+      return true;
+    }
+
+    //Create a program from shader source with loadShader() and createProgramObject()
+    static int createProgramUncached(std::string* shaderPaths, GLenum* shaderTypes,
+                                     int shaderCount, bool* externalSuccess) {
       //Since cache wasn't available, generate fresh shaders
       GLuint* shaderIds = new GLuint[shaderCount];
       bool hasCreatedShaders = true;
@@ -294,14 +324,15 @@ namespace ammonite {
         }
       }
 
-      //Create the program like normal, as a valid cache wasn't found
+      //Create the program from the shaders
+      GLuint programId;
       bool hasCreatedProgram = false;
       if (hasCreatedShaders) {
         hasCreatedProgram = true;
         programId = createProgramObject(shaderIds, shaderCount, &hasCreatedProgram);
       }
 
-      //Cleanup on failure
+      //Clean up
       if (!hasCreatedProgram || !hasCreatedShaders) {
         *externalSuccess = false;
         for (int i = 0; i < shaderCount; i++) {
@@ -314,8 +345,56 @@ namespace ammonite {
       }
       delete [] shaderIds;
 
-      //Cache the binary if enabled
+      return programId;
+    }
+
+
+    //Attempt to find cached program or hand off to createProgramUncached()
+    static int createProgramCached(std::string* shaderPaths, GLenum* shaderTypes,
+                                   int shaderCount, bool* externalSuccess) {
+      //Check for OpenGL and engine cache support
+      bool isCacheSupported = ammonite::files::internal::getCacheEnabled();
+      isCacheSupported = isCacheSupported && isBinaryCacheSupported;
+
+      //Try and fetch the cache, then try and load it into a program
+      int programId;
       if (isCacheSupported) {
+        std::size_t cacheDataSize;
+        AmmoniteEnum cacheState;
+
+        //Attempt to load the cached program
+        CacheInfo cacheInfo;
+        cacheInfo.fileCount = shaderCount;
+        cacheInfo.filePaths = shaderPaths;
+        std::string cacheFilePath = ammonite::files::internal::getCachedFilePath(shaderPaths,
+                                                                                 shaderCount);
+        unsigned char* cacheData = ammonite::files::internal::getCachedFile(cacheFilePath,
+          validateCache, &cacheDataSize, &cacheState, &cacheInfo);
+        unsigned char* dataStart = cacheData + cacheDataSize - cacheInfo.binaryLength;
+
+        if (cacheState == AMMONITE_CACHE_HIT) {
+          //Load the cached binary data into a program
+          programId = glCreateProgram();
+          glProgramBinary(programId, cacheInfo.binaryFormat, dataStart, cacheInfo.binaryLength);
+          delete [] cacheData;
+
+          //Return the program ID, unless the cache was faulty, then delete and carry on
+          if (checkProgram(programId)) {
+            return programId;
+          } else {
+            ammonite::utils::warning << "Failed to process '" << cacheFilePath \
+                                     << "'" << std::endl;
+            glDeleteProgram(programId);
+            deleteCacheFile(cacheFilePath);
+          }
+        }
+      }
+
+      //Cache wasn't useable, compile a fresh program
+      programId = createProgramUncached(shaderPaths, shaderTypes, shaderCount, externalSuccess);
+
+      //Cache the binary if enabled
+      if (isCacheSupported && programId != -1) {
         cacheProgram(programId, shaderPaths, shaderCount);
       }
 
@@ -345,8 +424,8 @@ namespace ammonite {
       }
 
       //Find shader types and hand off to createProgramCached(paths, types)
-      int createProgram(const char* inputShaderPaths[],
-                        const int inputShaderCount, bool* externalSuccess) {
+      int createProgram(std::string* inputShaderPaths, int inputShaderCount,
+                        bool* externalSuccess) {
         //Convert file extensions to shader types
         std::map<std::string, GLenum> shaderExtensions = {
           {".vert", GL_VERTEX_SHADER}, {".vs", GL_VERTEX_SHADER},
@@ -359,8 +438,8 @@ namespace ammonite {
         };
 
         //Find all shaders
-        std::vector<std::string> shaders(0);
-        std::vector<GLenum> types(0);
+        std::vector<std::string> shaderPaths(0);
+        std::vector<GLenum> shaderTypes(0);
         for (int i = 0; i < inputShaderCount; i++) {
           std::filesystem::path filePath{inputShaderPaths[i]};
           std::string extension = filePath.extension();
@@ -399,30 +478,18 @@ namespace ammonite {
               }
             }
 
-            shaders.push_back(std::string(filePath));
-            types.push_back(shaderType);
+            shaderPaths.push_back(std::string(filePath));
+            shaderTypes.push_back(shaderType);
           }
         }
 
-        //Repack shaders
-        const int shaderCount = shaders.size();
-        const char** shaderPaths = new const char*[shaderCount];
-        GLenum* shaderTypes = new GLenum[shaderCount];
-
-        for (unsigned int i = 0; i < shaders.size(); i++) {
-          shaderPaths[i] = shaders[i].c_str();
-          shaderTypes[i] = types[i];
-        }
-
         //Create the program and return the ID
-        int programId = createProgramCached(shaderPaths, shaderTypes,
-                                            shaderCount, externalSuccess);
-        delete [] shaderTypes;
-        delete [] shaderPaths;
+        int programId = createProgramCached(&shaderPaths[0], &shaderTypes[0],
+                                            shaderPaths.size(), externalSuccess);
         return programId;
       }
 
-      //Load all shaders in a directory and hand off to createProgram(paths)
+      //Load all shaders in a directory and hand off to createProgram()
       int loadDirectory(const char* directoryPath, bool* externalSuccess) {
         //Create filesystem directory iterator
         std::filesystem::directory_iterator it;
@@ -436,23 +503,14 @@ namespace ammonite {
         }
 
         //Find files to send to next stage
-        std::vector<std::string> shaders(0);
+        std::vector<std::string> shaderPaths(0);
         for (auto const& fileName : it) {
           std::filesystem::path filePath{fileName};
-          shaders.push_back(std::string(filePath));
-        }
-
-        //Repack shaders
-        const int shaderCount = shaders.size();
-        const char** shaderPaths = new const char*[shaderCount];
-
-        for (unsigned int i = 0; i < shaders.size(); i++) {
-          shaderPaths[i] = shaders[i].c_str();
+          shaderPaths.push_back(std::string(filePath));
         }
 
         //Create the program and return the ID
-        int programId = createProgram(shaderPaths, shaderCount, externalSuccess);
-        delete [] shaderPaths;
+        int programId = createProgram(&shaderPaths[0], shaderPaths.size(), externalSuccess);
         return programId;
       }
     }
