@@ -113,12 +113,15 @@ namespace ammonite {
           ammonite::utils::warning << "Error while opening '" << filePath \
                                    << "' (" << errno << ")" << std::endl;
         }
-        posix_fadvise(descriptor, 0, 0, POSIX_FADV_SEQUENTIAL);
 
         struct stat statBuf;
         fstat(descriptor, &statBuf);
         *size = statBuf.st_size;
         data = new unsigned char[statBuf.st_size];
+
+        if (posix_fadvise(descriptor, 0, 0, POSIX_FADV_SEQUENTIAL)) {
+          ammonite::utils::warning << "Error while advising kernel, continuing" << std::endl;
+        }
 
         off_t bytesRead = 0;
         while (bytesRead < statBuf.st_size) {
