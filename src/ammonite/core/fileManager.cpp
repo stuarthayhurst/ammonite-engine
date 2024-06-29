@@ -133,7 +133,11 @@ namespace ammonite {
             delete [] data;
             return nullptr;
           }
+
           bytesRead += newBytesRead;
+          if (bytesRead == statBuf.st_size) {
+            break;
+          }
         }
 
         if (bytesRead != statBuf.st_size) {
