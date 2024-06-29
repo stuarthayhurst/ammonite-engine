@@ -118,9 +118,13 @@ namespace ammonite {
         }
         cacheInfoPtr->binaryLength = std::atoll(token);
 
+        //Check fetched binary info
         if (cacheInfoPtr->binaryFormat != 0 && cacheInfoPtr->binaryLength != 0) {
-          delete [] dataCopy;
-          return true;
+          //Sanity check binary size
+          if ((std::size_t)cacheInfoPtr->binaryLength < size && cacheInfoPtr->binaryLength > 0) {
+            delete [] dataCopy;
+            return true;
+          }
         }
 
 failed:
