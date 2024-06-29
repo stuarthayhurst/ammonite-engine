@@ -8,16 +8,12 @@
 #include <string>
 #include <vector>
 
-//Used by shader cache validator
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
-
 #include <GL/glew.h>
 
 #include "../core/fileManager.hpp"
 #include "../utils/logging.hpp"
 #include "internal/internalExtensions.hpp"
+#include "internal/internalShaderValidator.hpp"
 
 namespace ammonite {
   //Static helper functions
@@ -122,13 +118,6 @@ namespace ammonite {
       return GL_FALSE;
     }
 
-    struct CacheInfo {
-      int fileCount;
-      std::string* filePaths;
-      GLenum binaryFormat;
-      GLsizei binaryLength;
-    };
-
     //Set by updateCacheSupport(), when GLEW loads
     bool isBinaryCacheSupported = false;
   }
@@ -214,102 +203,6 @@ namespace ammonite {
       return programId;
     }
 
-    bool validateCache(unsigned char* data, std::size_t size, void* userPtr) {
-      CacheInfo* cacheInfoPtr = (CacheInfo*)userPtr;
-      unsigned char* dataCopy = new unsigned char[size];
-      std::memcpy(dataCopy, data, size);
-      dataCopy[size - 1] = '\0';
-
-      /*
-       - Decide whether the cache file can be used
-       - Uses input files, sizes and timestamps
-      */
-      char* state;
-      int fileCount = 1;
-      char* token = strtok_r((char*)dataCopy, "\n", &state);
-      do {
-        //Give up if token is null, we didn't find enough files
-        if (token == nullptr) {
-          delete [] dataCopy;
-          return false;
-        }
-
-        //Check first token is 'input'
-        std::string currentFilePath = cacheInfoPtr->filePaths[fileCount - 1];
-        char* nestedToken = strtok(token, ";");
-        if ((nestedToken == nullptr) ||
-            (std::string(nestedToken) != std::string("input"))) {
-          delete [] dataCopy;
-          return false;
-        }
-
-        //Check token matches shader path
-        nestedToken = strtok(nullptr, ";");
-        if ((nestedToken == nullptr) ||
-            (std::string(nestedToken) != currentFilePath)) {
-          delete [] dataCopy;
-          return false;
-        }
-
-        //Get filesize and time of last modification of the shader source
-        long long int filesize = 0, modificationTime = 0;
-        if (!ammonite::files::internal::getFileMetadata(currentFilePath, &filesize,
-                                                        &modificationTime)) {
-          //Failed to get the metadata
-          delete [] dataCopy;
-          return false;
-        }
-
-        //Check token matches file size
-        nestedToken = strtok(nullptr, ";");
-        if ((nestedToken == nullptr) ||
-            (std::atoll(nestedToken) != filesize)) {
-          delete [] dataCopy;
-          return false;
-        }
-
-        //Check token matches timestamp
-        nestedToken = strtok(nullptr, ";");
-        if ((nestedToken == nullptr) ||
-            (std::atoll(nestedToken) != modificationTime)) {
-          delete [] dataCopy;
-          return false;
-        }
-
-        //Get the next line
-        if (cacheInfoPtr->fileCount > fileCount) {
-          token = strtok_r(nullptr, "\n", &state);
-        }
-        fileCount += 1;
-      } while (cacheInfoPtr->fileCount >= fileCount);
-
-      //Find binary format
-      token = strtok_r(nullptr, "\n", &state);
-      if (token != nullptr) {
-        cacheInfoPtr->binaryFormat = std::atoll(token);
-      } else {
-        delete [] dataCopy;
-        return false;
-      }
-
-      //Find binary length
-      token = strtok_r(nullptr, "\n", &state);
-      if (token != nullptr) {
-        cacheInfoPtr->binaryLength = std::atoll(token);
-      } else {
-        delete [] dataCopy;
-        return false;
-      }
-
-      if (cacheInfoPtr->binaryFormat == 0 || cacheInfoPtr->binaryLength == 0) {
-        delete [] dataCopy;
-        return false;
-      }
-
-      delete [] dataCopy;
-      return true;
-    }
-
     //Create a program from shader source with loadShader() and createProgramObject()
     static int createProgramUncached(std::string* shaderPaths, GLenum* shaderTypes,
                                      int shaderCount, bool* externalSuccess) {
@@ -363,13 +256,13 @@ namespace ammonite {
         AmmoniteEnum cacheState;
 
         //Attempt to load the cached program
-        CacheInfo cacheInfo;
+        ammonite::shaders::internal::CacheInfo cacheInfo;
         cacheInfo.fileCount = shaderCount;
         cacheInfo.filePaths = shaderPaths;
         std::string cacheFilePath = ammonite::files::internal::getCachedFilePath(shaderPaths,
                                                                                  shaderCount);
         unsigned char* cacheData = ammonite::files::internal::getCachedFile(cacheFilePath,
-          validateCache, &cacheDataSize, &cacheState, &cacheInfo);
+          ammonite::shaders::internal::validateCache, &cacheDataSize, &cacheState, &cacheInfo);
         unsigned char* dataStart = cacheData + cacheDataSize - cacheInfo.binaryLength;
 
         if (cacheState == AMMONITE_CACHE_HIT) {
