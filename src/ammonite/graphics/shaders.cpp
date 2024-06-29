@@ -4,7 +4,6 @@
 #include <fstream>
 #include <iostream>
 #include <map>
-#include <sstream>
 #include <string>
 #include <vector>
 
@@ -129,24 +128,18 @@ namespace ammonite {
       //Create the shader
       GLuint shaderId = glCreateShader(shaderType);
 
-      std::string shaderCode;
-      std::ifstream shaderCodeStream(shaderPath, std::ios::in);
-      std::stringstream sstr;
-
       //Read the shader's source code
-      if (shaderCodeStream.is_open()) {
-        sstr << shaderCodeStream.rdbuf();
-        shaderCode = sstr.str();
-        shaderCodeStream.close();
-      } else {
+      std::size_t shaderCodeSize;
+      char* shaderCodePtr = (char*)ammonite::files::internal::loadFile(shaderPath,
+                                                                       &shaderCodeSize);
+      if (shaderCodePtr == nullptr) {
         ammonite::utils::warning << "Failed to open '" << shaderPath << "'" << std::endl;
         *externalSuccess = false;
         return -1;
       }
 
-      //Provide a shader source and compile the shader
-      const char* shaderCodePointer = shaderCode.c_str();
-      glShaderSource(shaderId, 1, &shaderCodePointer, nullptr);
+      glShaderSource(shaderId, 1, &shaderCodePtr, (int*)&shaderCodeSize);
+      delete [] shaderCodePtr;
       glCompileShader(shaderId);
 
       //Test whether the shader compiled
