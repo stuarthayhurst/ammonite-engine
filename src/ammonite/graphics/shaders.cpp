@@ -89,13 +89,21 @@ namespace ammonite {
         return true;
       }
 
-      //Otherwise, print a log
-      GLint maxLength = 0;
+      //Get length of a log, if available
+      GLsizei maxLength = 0;
       glGetProgramiv(programId, GL_INFO_LOG_LENGTH, &maxLength);
+      if (maxLength == 0) {
+        ammonite::utils::warning << "Failed to link shader program (ID " << programId \
+                                 << "), no log available" << std::endl;
+        return false;
+      }
 
-      //Not strictly required, but add an extra byte to be safe
-      GLchar* errorLogBuffer = new GLchar[++maxLength];
-      glGetProgramInfoLog(programId, maxLength, &maxLength, errorLogBuffer);
+      /*
+       - Fetch and print the log
+       - The extra byte isn't strictly required, but some drivers are buggy
+      */
+      GLchar* errorLogBuffer = new GLchar[maxLength + 1];
+      glGetProgramInfoLog(programId, maxLength, nullptr, errorLogBuffer);
       errorLogBuffer[maxLength] = '\0';
       ammonite::utils::warning << "Failed to link shader program (ID " << programId \
                                << "):\n" << (char*)errorLogBuffer << std::endl;
