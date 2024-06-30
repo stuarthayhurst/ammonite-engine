@@ -80,6 +80,13 @@ namespace ammonite {
           }
         }
 
+        //Check for read and write permissions
+        if (access(targetCachePath.c_str(), R_OK | W_OK)) {
+          ammonite::utils::warning << "Insufficient permissions to use cache directory '" \
+                                   << targetCachePath << "'" << std::endl;
+          return false;
+        }
+
         //Ensure path has a trailing slash
         dataCachePath = targetCachePath;
         if (dataCachePath.back() != '/') {
