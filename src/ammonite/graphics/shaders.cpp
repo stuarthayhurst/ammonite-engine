@@ -246,7 +246,6 @@ namespace ammonite {
       return programId;
     }
 
-
     //Attempt to find cached program or hand off to createProgramUncached()
     static int createProgramCached(std::string* shaderPaths, GLenum* shaderTypes,
                                    int shaderCount, bool* externalSuccess) {
