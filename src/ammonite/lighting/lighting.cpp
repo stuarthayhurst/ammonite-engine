@@ -189,7 +189,7 @@ namespace ammonite {
 
           //Add the shader data to a shader storage buffer object
           glCreateBuffers(1, &lightDataId);
-          glNamedBufferData(lightDataId, shaderDataSize, shaderData, GL_STATIC_DRAW);
+          glNamedBufferData(lightDataId, shaderDataSize, shaderData, GL_DYNAMIC_DRAW);
         }
         delete [] shaderData;
 
