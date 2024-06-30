@@ -79,10 +79,12 @@ namespace ammonite {
       delete [] binaryData;
     }
 
-    static bool checkProgram(GLuint programId) {
+    static bool checkObject(GLuint objectId, const char* actionString, GLenum statusEnum,
+                            void (*objectQuery)(GLuint, GLenum, GLint*),
+                            void (*objectLog)(GLuint, GLsizei, GLsizei*, GLchar*)) {
       //Test whether the program linked
       GLint success = GL_FALSE;
-      glGetProgramiv(programId, GL_LINK_STATUS, &success);
+      objectQuery(objectId, statusEnum, &success);
 
       //If the program linked successfully, return
       if (success == GL_TRUE) {
@@ -91,9 +93,9 @@ namespace ammonite {
 
       //Get length of a log, if available
       GLsizei maxLength = 0;
-      glGetProgramiv(programId, GL_INFO_LOG_LENGTH, &maxLength);
+      objectQuery(objectId, GL_INFO_LOG_LENGTH, &maxLength);
       if (maxLength == 0) {
-        ammonite::utils::warning << "Failed to link shader program (ID " << programId \
+        ammonite::utils::warning << "Failed to " << actionString << " (ID " << objectId \
                                  << "), no log available" << std::endl;
         return false;
       }
@@ -103,46 +105,23 @@ namespace ammonite {
        - The extra byte isn't strictly required, but some drivers are buggy
       */
       GLchar* errorLogBuffer = new GLchar[maxLength + 1];
-      glGetProgramInfoLog(programId, maxLength, nullptr, errorLogBuffer);
+      objectLog(objectId, maxLength, nullptr, errorLogBuffer);
       errorLogBuffer[maxLength] = '\0';
-      ammonite::utils::warning << "Failed to link shader program (ID " << programId \
+      ammonite::utils::warning << "Failed to " << actionString << " (ID " << objectId \
                                << "):\n" << (char*)errorLogBuffer << std::endl;
 
       delete [] errorLogBuffer;
       return false;
     }
 
+    static bool checkProgram(GLuint programId) {
+      return checkObject(programId, "link shader program", GL_LINK_STATUS,
+                         glGetProgramiv, glGetProgramInfoLog);
+    }
+
     static bool checkShader(GLuint shaderId) {
-      //Test whether the shader compiled
-      GLint success = GL_FALSE;
-      glGetShaderiv(shaderId, GL_COMPILE_STATUS, &success);
-
-      //If the shader compiled successfully, return
-      if (success == GL_TRUE) {
-        return true;
-      }
-
-      //Get length of a log, if available
-      GLsizei maxLength = 0;
-      glGetShaderiv(shaderId, GL_INFO_LOG_LENGTH, &maxLength);
-      if (maxLength == 0) {
-        ammonite::utils::warning << "Failed to compile shader stage (ID " << shaderId \
-                                 << "), no log available" << std::endl;
-        return false;
-      }
-
-      /*
-       - Fetch and print the log
-       - The extra byte isn't strictly required, but some drivers are buggy
-      */
-      GLchar* errorLogBuffer = new GLchar[maxLength + 1];
-      glGetShaderInfoLog(shaderId, maxLength, nullptr, errorLogBuffer);
-      errorLogBuffer[maxLength] = '\0';
-      ammonite::utils::warning << "Failed to compile shader stage (ID " << shaderId \
-                               << "):\n" << (char*)errorLogBuffer << std::endl;
-
-      delete [] errorLogBuffer;
-      return false;
+      return checkObject(shaderId, "compile shader stage", GL_COMPILE_STATUS,
+                         glGetShaderiv, glGetShaderInfoLog);
     }
 
     static GLenum attemptIdentifyShaderType(std::string shaderPath) {
@@ -205,8 +184,8 @@ namespace ammonite {
       return shaderId;
     }
 
-    //Take multiple shader files, hand off to loadShader and create a program
-    static int createProgramObject(GLuint shaderIds[], const int shaderCount,
+    //Take multiple shader objects and create a program
+    static int createProgramObject(GLuint* shaderIds, const int shaderCount,
                                    bool* externalSuccess) {
       //Create the program
       GLuint programId = glCreateProgram();
