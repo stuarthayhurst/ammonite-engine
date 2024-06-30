@@ -112,6 +112,7 @@ namespace ammonite {
         if (descriptor == -1) {
           ammonite::utils::warning << "Error while opening '" << filePath \
                                    << "' (" << -errno << ")" << std::endl;
+          return nullptr;
         }
 
         struct stat statBuf;
@@ -165,6 +166,7 @@ namespace ammonite {
         if (descriptor == -1) {
           ammonite::utils::warning << "Error while opening '" << filePath \
                                    << "' (" << -errno << ")" << std::endl;
+          return false;
         }
 
         if (posix_fadvise(descriptor, 0, 0, POSIX_FADV_SEQUENTIAL)) {
