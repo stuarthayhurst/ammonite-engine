@@ -112,6 +112,39 @@ namespace ammonite {
       return false;
     }
 
+    static bool checkShader(GLuint shaderId) {
+      //Test whether the shader compiled
+      GLint success = GL_FALSE;
+      glGetShaderiv(shaderId, GL_COMPILE_STATUS, &success);
+
+      //If the shader compiled successfully, return
+      if (success == GL_TRUE) {
+        return true;
+      }
+
+      //Get length of a log, if available
+      GLsizei maxLength = 0;
+      glGetShaderiv(shaderId, GL_INFO_LOG_LENGTH, &maxLength);
+      if (maxLength == 0) {
+        ammonite::utils::warning << "Failed to compile shader stage (ID " << shaderId \
+                                 << "), no log available" << std::endl;
+        return false;
+      }
+
+      /*
+       - Fetch and print the log
+       - The extra byte isn't strictly required, but some drivers are buggy
+      */
+      GLchar* errorLogBuffer = new GLchar[maxLength + 1];
+      glGetShaderInfoLog(shaderId, maxLength, nullptr, errorLogBuffer);
+      errorLogBuffer[maxLength] = '\0';
+      ammonite::utils::warning << "Failed to compile shader stage (ID " << shaderId \
+                               << "):\n" << (char*)errorLogBuffer << std::endl;
+
+      delete [] errorLogBuffer;
+      return false;
+    }
+
     static GLenum attemptIdentifyShaderType(std::string shaderPath) {
       std::map<std::string, GLenum> shaderMatches = {
         {"vert", GL_VERTEX_SHADER},
@@ -159,27 +192,11 @@ namespace ammonite {
       }
 
       glShaderSource(shaderId, 1, &shaderCodePtr, (int*)&shaderCodeSize);
-      delete [] shaderCodePtr;
       glCompileShader(shaderId);
+      delete [] shaderCodePtr;
 
-      //Test whether the shader compiled
-      GLint success = GL_FALSE;
-      glGetShaderiv(shaderId, GL_COMPILE_STATUS, &success);
-
-      //If the shader failed to compile, print a log
-      if (success == GL_FALSE) {
-        GLint maxLength = 0;
-        glGetShaderiv(shaderId, GL_INFO_LOG_LENGTH, &maxLength);
-
-        //Not strictly required, but add an extra byte to be safe
-        GLchar* errorLogBuffer = new GLchar[++maxLength];
-        glGetShaderInfoLog(shaderId, maxLength, &maxLength, errorLogBuffer);
-        errorLogBuffer[maxLength] = '\0';
-        ammonite::utils::warning << shaderPath << ":\n" \
-                                 << (char*)errorLogBuffer << std::endl;
-
-        //Clean up and exit
-        delete [] errorLogBuffer;
+      //Check whether the shader compiled, log if relevant
+      if (!checkShader(shaderId)) {
         glDeleteShader(shaderId);
         *externalSuccess = false;
         return -1;
@@ -194,11 +211,10 @@ namespace ammonite {
       //Create the program
       GLuint programId = glCreateProgram();
 
-      //Attach all passed shader ids
+      //Attach and link all passed shader ids
       for (int i = 0; i < shaderCount; i++) {
         glAttachShader(programId, shaderIds[i]);
       }
-
       glLinkProgram(programId);
 
       //Detach and remove all passed shader ids
