@@ -111,7 +111,7 @@ namespace ammonite {
         int descriptor = open(filePath.c_str(), O_RDONLY);
         if (descriptor == -1) {
           ammonite::utils::warning << "Error while opening '" << filePath \
-                                   << "' (" << errno << ")" << std::endl;
+                                   << "' (" << -errno << ")" << std::endl;
         }
 
         struct stat statBuf;
@@ -125,13 +125,12 @@ namespace ammonite {
 
         off_t bytesRead = 0;
         while (bytesRead < statBuf.st_size) {
-          off_t newBytesRead = read(descriptor, data + bytesRead,
-                                          statBuf.st_size - bytesRead);
+          off_t newBytesRead = read(descriptor, data + bytesRead, statBuf.st_size - bytesRead);
           if (newBytesRead == 0) {
             break;
           } else if (newBytesRead < 0) {
             ammonite::utils::warning << "Error while reading '" << filePath \
-                                     << "' (" << errno << ")" << std::endl;
+                                     << "' (" << -errno << ")" << std::endl;
             close(descriptor);
             delete [] data;
             return nullptr;
@@ -153,6 +152,52 @@ namespace ammonite {
 
         close(descriptor);
         return data;
+      }
+
+      /*
+       - Write size bytes of data to filePath
+         - Create the file if missing
+         - Erase the file if present
+       - Returns true on success, false on failure
+      */
+      bool writeFile(std::string filePath, unsigned char* data, std::size_t size) {
+        int descriptor = creat(filePath.c_str(), S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH);
+        if (descriptor == -1) {
+          ammonite::utils::warning << "Error while opening '" << filePath \
+                                   << "' (" << -errno << ")" << std::endl;
+        }
+
+        if (posix_fadvise(descriptor, 0, 0, POSIX_FADV_SEQUENTIAL)) {
+          ammonite::utils::warning << "Error while advising kernel, continuing" << std::endl;
+        }
+
+        std::size_t bytesWritten = 0;
+        while (bytesWritten < size) {
+          off_t newBytesWritten = write(descriptor, data + bytesWritten, size - bytesWritten);
+          if (newBytesWritten == 0) {
+            break;
+          } else if (newBytesWritten < 0) {
+            ammonite::utils::warning << "Error while writing to '" << filePath \
+                                     << "' (" << -errno << ")" << std::endl;
+            close(descriptor);
+            return false;
+          }
+
+          bytesWritten += newBytesWritten;
+          if (bytesWritten == size) {
+            break;
+          }
+        }
+
+        if (bytesWritten != size) {
+            ammonite::utils::warning << "Unexpected file size while writing to '" << filePath \
+                                     << "'" << std::endl;
+            close(descriptor);
+            return false;
+        }
+
+        close(descriptor);
+        return true;
       }
 
       /*

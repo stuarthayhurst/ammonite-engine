@@ -1,4 +1,5 @@
 #include <cstddef>
+#include <cstring>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -25,44 +26,57 @@ namespace ammonite {
     static void cacheProgram(const GLuint programId, std::string* shaderPaths, int shaderCount) {
       std::string cacheFilePath = ammonite::files::internal::getCachedFilePath(shaderPaths,
                                                                                shaderCount);
-
       ammonite::utils::status << "Caching '" << cacheFilePath << "'" << std::endl;
-      int binaryLength;
-      GLenum binaryFormat;
 
-      //Get binary length and data of linked program
+      //Get binary length of linked program
+      int binaryLength;
       glGetProgramiv(programId, GL_PROGRAM_BINARY_LENGTH, &binaryLength);
       if (binaryLength == 0) {
         ammonite::utils::warning << "Failed to cache '" << cacheFilePath << "'" << std::endl;
         return;
       }
 
+      //Get binary format and binary data
+      GLenum binaryFormat;
+      int actualBytes = 0;
       char* binaryData = new char[binaryLength];
-      glGetProgramBinary(programId, binaryLength, nullptr, &binaryFormat, binaryData);
+      glGetProgramBinary(programId, binaryLength, &actualBytes, &binaryFormat, binaryData);
+      if (actualBytes != binaryLength) {
+        ammonite::utils::warning << "Program length doesn't match expected length (ID " \
+                                 << programId << ")" << std::endl;
+        delete [] binaryData;
+        return;
+      }
 
-      //Write the cache info and data to cache file
-      std::ofstream cacheFile(cacheFilePath, std::ios::binary);
-      if (cacheFile.is_open()) {
-        for (int i = 0; i < shaderCount; i++) {
-          long long int filesize = 0, modificationTime = 0;
-          ammonite::files::internal::getFileMetadata(shaderPaths[i], &filesize, &modificationTime);
+      //Generate cache info to write
+      std::string extraData;
+      for (int i = 0; i < shaderCount; i++) {
+        long long int filesize = 0, modificationTime = 0;
+        ammonite::files::internal::getFileMetadata(shaderPaths[i], &filesize, &modificationTime);
 
-          cacheFile << "input;" << shaderPaths[i] << ";" << filesize << ";" \
-                    << modificationTime << "\n";
-        }
+        extraData.append("input;" + shaderPaths[i]);
+        extraData.append(";" + std::to_string(filesize));
+        extraData.append(";" + std::to_string(modificationTime) + "\n");
+      }
 
-        cacheFile << binaryFormat << "\n";
-        cacheFile << binaryLength << "\n";
+      extraData.append(std::to_string(binaryFormat) + "\n");
+      extraData.append(std::to_string(binaryLength) + "\n");
 
-        //Write the data
-        cacheFile.write(binaryData, binaryLength);
+      int extraLength = extraData.length();
+      char* fileData = new char[extraLength + binaryLength];
 
-        cacheFile.close();
-      } else {
+      //Write the cache info and binary data to the buffer
+      extraData.copy(fileData, extraLength, 0);
+      std::memcpy(fileData + extraLength, binaryData, binaryLength);
+
+      //Write the cache info and data to the cache file
+      if (!ammonite::files::internal::writeFile(cacheFilePath, (unsigned char*)fileData,
+                                                extraLength + binaryLength)) {
         ammonite::utils::warning << "Failed to cache '" << cacheFilePath << "'" << std::endl;
         deleteCacheFile(cacheFilePath);
       }
 
+      delete [] fileData;
       delete [] binaryData;
     }
 

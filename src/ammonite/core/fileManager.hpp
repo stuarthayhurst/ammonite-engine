@@ -19,6 +19,7 @@ namespace ammonite {
       std::string getCachedFilePath(std::string* filePaths, unsigned int fileCount);
 
       unsigned char* loadFile(std::string filePath, std::size_t* size);
+      bool writeFile(std::string filePath, unsigned char* data, std::size_t size);
       unsigned char* getCachedFile(std::string cacheFilePath, AmmoniteValidator validator,
                                    std::size_t* size, AmmoniteEnum* cacheState, void* userPtr);
     }
