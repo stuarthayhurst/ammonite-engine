@@ -9,74 +9,111 @@
 #include <GL/glew.h>
 
 #include "../core/fileManager.hpp"
+#include "../core/threadManager.hpp"
+
 #include "../utils/logging.hpp"
 #include "internal/internalExtensions.hpp"
 #include "internal/internalShaderValidator.hpp"
 
 namespace ammonite {
-  //Static helper functions
+  //Static helper functions and anonymous data
   namespace {
+    namespace {
+      //Set by updateCacheSupport(), when GLEW loads
+      bool isBinaryCacheSupported = false;
+
+      //Data required by cache worker
+      struct CacheWorkerData {
+        int shaderCount;
+        std::string* shaderPaths;
+        std::string cacheFilePath;
+        GLenum binaryFormat;
+        int binaryLength;
+        char* binaryData;
+      };
+    }
+
     static void deleteCacheFile(std::string cacheFilePath) {
       //Delete the cache file
       ammonite::utils::status << "Clearing '" << cacheFilePath << "'" << std::endl;
       ammonite::files::internal::deleteFile(cacheFilePath);
     }
 
-    static void cacheProgram(const GLuint programId, std::string* shaderPaths, int shaderCount) {
-      std::string cacheFilePath = ammonite::files::internal::getCachedFilePath(shaderPaths,
-                                                                               shaderCount);
-      ammonite::utils::status << "Caching '" << cacheFilePath << "'" << std::endl;
-
-      //Get binary length of linked program
-      int binaryLength;
-      glGetProgramiv(programId, GL_PROGRAM_BINARY_LENGTH, &binaryLength);
-      if (binaryLength == 0) {
-        ammonite::utils::warning << "Failed to cache '" << cacheFilePath << "'" << std::endl;
-        return;
-      }
-
-      //Get binary format and binary data
-      GLenum binaryFormat;
-      int actualBytes = 0;
-      char* binaryData = new char[binaryLength];
-      glGetProgramBinary(programId, binaryLength, &actualBytes, &binaryFormat, binaryData);
-      if (actualBytes != binaryLength) {
-        ammonite::utils::warning << "Program length doesn't match expected length (ID " \
-                                 << programId << ")" << std::endl;
-        delete [] binaryData;
-        return;
-      }
+    //Thread pool work to cache a program
+    static void doCacheWork(void* userPtr) {
+      CacheWorkerData* data = (CacheWorkerData*)userPtr;
 
       //Generate cache info to write
       std::string extraData;
-      for (int i = 0; i < shaderCount; i++) {
+      for (int i = 0; i < data->shaderCount; i++) {
         long long int filesize = 0, modificationTime = 0;
-        ammonite::files::internal::getFileMetadata(shaderPaths[i], &filesize, &modificationTime);
+        ammonite::files::internal::getFileMetadata(data->shaderPaths[i], &filesize,
+                                                   &modificationTime);
 
-        extraData.append("input;" + shaderPaths[i]);
+        extraData.append("input;" + data->shaderPaths[i]);
         extraData.append(";" + std::to_string(filesize));
         extraData.append(";" + std::to_string(modificationTime) + "\n");
       }
 
-      extraData.append(std::to_string(binaryFormat) + "\n");
-      extraData.append(std::to_string(binaryLength) + "\n");
+      extraData.append(std::to_string(data->binaryFormat) + "\n");
+      extraData.append(std::to_string(data->binaryLength) + "\n");
 
       int extraLength = extraData.length();
-      char* fileData = new char[extraLength + binaryLength];
+      char* fileData = new char[extraLength + data->binaryLength];
 
       //Write the cache info and binary data to the buffer
       extraData.copy(fileData, extraLength, 0);
-      std::memcpy(fileData + extraLength, binaryData, binaryLength);
+      std::memcpy(fileData + extraLength, data->binaryData, data->binaryLength);
 
       //Write the cache info and data to the cache file
-      if (!ammonite::files::internal::writeFile(cacheFilePath, (unsigned char*)fileData,
-                                                extraLength + binaryLength)) {
-        ammonite::utils::warning << "Failed to cache '" << cacheFilePath << "'" << std::endl;
-        deleteCacheFile(cacheFilePath);
+      if (!ammonite::files::internal::writeFile(data->cacheFilePath, (unsigned char*)fileData,
+                                                extraLength + data->binaryLength)) {
+        ammonite::utils::warning << "Failed to cache '" << data->cacheFilePath << "'" << std::endl;
+        deleteCacheFile(data->cacheFilePath);
       }
 
       delete [] fileData;
-      delete [] binaryData;
+      delete [] data->binaryData;
+      delete [] data->shaderPaths;
+      delete data;
+    }
+
+    static void cacheProgram(const GLuint programId, std::string* shaderPaths, int shaderCount,
+                             std::string* cacheFilePath) {
+      CacheWorkerData* data = new CacheWorkerData;
+      data->shaderCount = shaderCount;
+
+      data->cacheFilePath = *cacheFilePath;
+      ammonite::utils::status << "Caching '" << data->cacheFilePath << "'" << std::endl;
+
+      //Get binary length of linked program
+      glGetProgramiv(programId, GL_PROGRAM_BINARY_LENGTH, &data->binaryLength);
+      if (data->binaryLength == 0) {
+        ammonite::utils::warning << "Failed to cache '" << data->cacheFilePath << "'" << std::endl;
+        delete data;
+        return;
+      }
+
+      //Get binary format and binary data
+      int actualBytes = 0;
+      data->binaryData = new char[data->binaryLength];
+      glGetProgramBinary(programId, data->binaryLength, &actualBytes, &data->binaryFormat,
+                         data->binaryData);
+      if (actualBytes != data->binaryLength) {
+        ammonite::utils::warning << "Program length doesn't match expected length (ID " \
+                                 << programId << ")" << std::endl;
+        delete [] data->binaryData;
+        delete data;
+        return;
+      }
+
+      //Pack data for writing program cache
+      data->shaderPaths = new std::string[shaderCount];
+      for (int i = 0; i < shaderCount; i++) {
+        data->shaderPaths[i] = shaderPaths[i];
+      }
+
+      ammonite::thread::internal::submitWork(doCacheWork, data, nullptr);
     }
 
     static bool checkObject(GLuint objectId, const char* actionString, GLenum statusEnum,
@@ -148,9 +185,6 @@ namespace ammonite {
 
       return GL_FALSE;
     }
-
-    //Set by updateCacheSupport(), when GLEW loads
-    bool isBinaryCacheSupported = false;
   }
 
   //Shader compilation and cache functions, local to this file
@@ -249,7 +283,7 @@ namespace ammonite {
       return programId;
     }
 
-    //Attempt to find cached program or hand off to createProgramUncached()
+    //Attempt to use a cached program or hand off to createProgramUncached()
     static int createProgramCached(std::string* shaderPaths, GLenum* shaderTypes,
                                    int shaderCount, bool* externalSuccess) {
       //Check for OpenGL and engine cache support
@@ -258,15 +292,14 @@ namespace ammonite {
 
       //Try and fetch the cache, then try and load it into a program
       int programId;
+      std::string cacheFilePath;
       if (isCacheSupported) {
         std::size_t cacheDataSize;
         AmmoniteEnum cacheState;
 
         //Attempt to load the cached program
-        ammonite::shaders::internal::CacheInfo cacheInfo;
-        cacheInfo.fileCount = shaderCount;
-        cacheInfo.filePaths = shaderPaths;
-        std::string cacheFilePath = ammonite::files::internal::getCachedFilePath(shaderPaths,
+        ammonite::shaders::internal::CacheInfo cacheInfo = {shaderCount, shaderPaths, 0, 0};
+        cacheFilePath = ammonite::files::internal::getCachedFilePath(shaderPaths,
                                                                                  shaderCount);
         unsigned char* cacheData = ammonite::files::internal::getCachedFile(cacheFilePath,
           ammonite::shaders::internal::validateCache, &cacheDataSize, &cacheState, &cacheInfo);
@@ -295,7 +328,7 @@ namespace ammonite {
 
       //Cache the binary if enabled
       if (isCacheSupported && programId != -1) {
-        cacheProgram(programId, shaderPaths, shaderCount);
+        cacheProgram(programId, shaderPaths, shaderCount, &cacheFilePath);
       }
 
       return programId;
