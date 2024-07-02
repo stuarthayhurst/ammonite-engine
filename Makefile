@@ -1,5 +1,5 @@
 CXX ?= $(shell command -v g++)
-SHELL = bash
+SHELL = bash -O globstar
 
 LIBS = glm glfw3 glew stb assimp
 BUILD_DIR = build
@@ -8,19 +8,15 @@ INSTALL_DIR ?= /usr/local/lib
 HEADER_DIR ?= /usr/local/include
 LIBRARY_NAME = libammonite.so.1
 
-AMMONITE_OBJECTS_SOURCE = $(wildcard ./src/ammonite/*.cpp) \
-			  $(wildcard ./src/ammonite/*/*.cpp) \
-			  $(wildcard ./src/ammonite/*/*/*.cpp)
-AMMONITE_HEADER_SOURCE = $(wildcard ./src/ammonite/*.hpp) \
-			 $(wildcard ./src/ammonite/*/*.hpp) \
-			 $(wildcard ./src/ammonite/*/*/*.hpp)
+AMMONITE_OBJECTS_SOURCE = $(shell ls ./src/ammonite/**/*.cpp)
+AMMONITE_HEADER_SOURCE = $(shell ls ./src/ammonite/**/*.hpp)
 AMMONITE_HEADER_INSTALL := $(subst src/ammonite,$(HEADER_DIR)/ammonite,$(AMMONITE_HEADER_SOURCE))
 
-HELPER_OBJECTS_SOURCE = $(wildcard ./src/helper/*.cpp)
-HELPER_HEADER_SOURCE = $(wildcard ./src/helper/*.hpp)
+HELPER_OBJECTS_SOURCE = $(shell ls ./src/helper/**/*.cpp)
+HELPER_HEADER_SOURCE = $(shell ls ./src/helper/**/*.hpp)
 
-DEMO_OBJECTS_SOURCE = $(wildcard ./src/demos/*.cpp)
-DEMO_HEADER_SOURCE = $(wildcard ./src/demos/*.hpp)
+DEMO_OBJECTS_SOURCE = $(shell ls ./src/demos/**/*.cpp)
+DEMO_HEADER_SOURCE = $(shell ls ./src/demos/**/*.hpp)
 
 OBJECT_DIR = $(BUILD_DIR)/objects
 AMMONITE_OBJECTS = $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.o,$(AMMONITE_OBJECTS_SOURCE)))
