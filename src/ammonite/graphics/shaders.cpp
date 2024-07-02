@@ -311,6 +311,7 @@ namespace ammonite {
         glGetIntegerv(GL_NUM_PROGRAM_BINARY_FORMATS, &numBinaryFormats);
 
         //Check support for collecting the program binary
+        isBinaryCacheSupported = true;
         if (!graphics::internal::checkExtension("GL_ARB_get_program_binary", "GL_VERSION_4_1")) {
           ammonite::utils::warning << "Program caching unsupported" << std::endl;
           isBinaryCacheSupported = false;
@@ -319,8 +320,6 @@ namespace ammonite {
                                    << std::endl;
           isBinaryCacheSupported = false;
         }
-
-        isBinaryCacheSupported = true;
       }
 
       //Find shader types and hand off to createProgramCached(paths, types)
