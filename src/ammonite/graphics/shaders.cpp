@@ -305,6 +305,7 @@ namespace ammonite {
   //Internally exposed functions
   namespace shaders {
     namespace internal {
+      //Set isBinaryCacheSupported according to OpenGL support
       void updateCacheSupport() {
         //Get number of supported formats
         GLint numBinaryFormats = 0;
@@ -322,7 +323,12 @@ namespace ammonite {
         }
       }
 
-      //Find shader types and hand off to createProgramCached(paths, types)
+      /*
+       - Take an array of shader paths, create a program and return the ID
+         - Shaders with unidentifiable types will be ignored
+       - If possible, load and store a cache
+       - Writes 'false' to externalSuccess on failure and returns -1
+      */
       int createProgram(std::string* inputShaderPaths, int inputShaderCount,
                         bool* externalSuccess) {
         //Convert file extensions to shader types
@@ -388,7 +394,11 @@ namespace ammonite {
         return programId;
       }
 
-      //Load all shaders in a directory and hand off to createProgram()
+      /*
+       - Create a program from shaders in a directory and return the ID
+       - If possible, load and store a cache
+       - Writes 'false' to externalSuccess on failure and returns -1
+      */
       int loadDirectory(const char* directoryPath, bool* externalSuccess) {
         //Create filesystem directory iterator
         std::filesystem::directory_iterator it;
