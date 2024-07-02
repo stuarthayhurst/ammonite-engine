@@ -389,9 +389,8 @@ namespace ammonite {
         }
 
         //Create the program and return the ID
-        int programId = createProgramCached(&shaderPaths[0], &shaderTypes[0],
-                                            shaderPaths.size(), externalSuccess);
-        return programId;
+        return createProgramCached(&shaderPaths[0], &shaderTypes[0], shaderPaths.size(),
+                                   externalSuccess);
       }
 
       /*
@@ -419,8 +418,7 @@ namespace ammonite {
         }
 
         //Create the program and return the ID
-        int programId = createProgram(&shaderPaths[0], shaderPaths.size(), externalSuccess);
-        return programId;
+        return createProgram(&shaderPaths[0], shaderPaths.size(), externalSuccess);
       }
     }
   }
