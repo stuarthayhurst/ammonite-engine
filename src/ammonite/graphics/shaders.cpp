@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cstddef>
 #include <cstring>
 #include <filesystem>
@@ -359,6 +360,7 @@ namespace ammonite {
       /*
        - Take an array of shader paths, create a program and return the ID
          - Shaders with unidentifiable types will be ignored
+         - The order of shaders may be changed without re-caching
        - If possible, load and store a cache
        - Writes 'false' to externalSuccess on failure and returns -1
       */
@@ -420,6 +422,9 @@ namespace ammonite {
             shaderTypes.push_back(shaderType);
           }
         }
+
+        //Ensure shaders don't get rebuilt due to a file order change
+        std::sort(shaderPaths.begin(), shaderPaths.end());
 
         //Create the program and return the ID
         return createProgramCached(&shaderPaths[0], &shaderTypes[0], shaderPaths.size(),
