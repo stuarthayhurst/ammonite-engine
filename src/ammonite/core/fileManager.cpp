@@ -28,7 +28,7 @@ namespace ammonite {
         //Don't use this for security, you'll lose your job
         static std::string generateCacheString(std::string* filePaths,
                                                unsigned int fileCount) {
-          uint8_t output[8] = {0};
+          alignas(uint64_t) uint8_t output[8] = {0};
           uint8_t prev = 0;
 
           /*
