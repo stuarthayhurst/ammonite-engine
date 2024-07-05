@@ -256,8 +256,9 @@ namespace ammonite {
       GLuint* shaderIds = new GLuint[shaderCount];
       bool hasCreatedShaders = true;
       for (int i = 0; i < shaderCount; i++) {
-        shaderIds[i] = loadShader(shaderPaths[i], shaderTypes[i], externalSuccess);
-        if (shaderIds[i] == unsigned(-1)) {
+        bool passed = true;
+        shaderIds[i] = loadShader(shaderPaths[i], shaderTypes[i], &passed);
+        if (!passed) {
           hasCreatedShaders = false;
           break;
         }
