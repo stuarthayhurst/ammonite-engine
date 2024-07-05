@@ -202,7 +202,8 @@ namespace ammonite {
         models::internal::MeshData* meshData = &modelObjectData->meshes[i];
 
         //Create vertex and index buffers
-        glCreateBuffers(2, &meshData->vertexBufferId);
+        glCreateBuffers(1, &meshData->vertexBufferId);
+        glCreateBuffers(1, &meshData->elementBufferId);
 
         //Fill interleaved vertex + normal + texture buffer and index buffer
         glNamedBufferData(meshData->vertexBufferId,
