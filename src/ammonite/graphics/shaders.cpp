@@ -360,8 +360,7 @@ namespace ammonite {
       /*
        - Take an array of shader paths, create a program and return the ID
          - Shaders with unidentifiable types will be ignored
-         - The order of shaders may be changed without re-caching
-       - If possible, load and store a cache
+         - If possible, load and store a cache
        - Writes 'false' to externalSuccess on failure and returns -1
       */
       int createProgram(std::string* inputShaderPaths, int inputShaderCount,
@@ -423,9 +422,6 @@ namespace ammonite {
           }
         }
 
-        //Ensure shaders don't get rebuilt due to a file order change
-        std::sort(shaderPaths.begin(), shaderPaths.end());
-
         //Create the program and return the ID
         return createProgramCached(&shaderPaths[0], &shaderTypes[0], shaderPaths.size(),
                                    externalSuccess);
@@ -433,7 +429,8 @@ namespace ammonite {
 
       /*
        - Create a program from shaders in a directory and return the ID
-       - If possible, load and store a cache
+         - The order of shaders may be changed without re-caching
+         - If possible, load and store a cache
        - Writes 'false' to externalSuccess on failure and returns -1
       */
       int loadDirectory(const char* directoryPath, bool* externalSuccess) {
@@ -454,6 +451,9 @@ namespace ammonite {
           std::filesystem::path filePath{fileName};
           shaderPaths.push_back(std::string(filePath));
         }
+
+        //Ensure shaders don't get rebuilt due to a file order change
+        std::sort(shaderPaths.begin(), shaderPaths.end());
 
         //Create the program and return the ID
         return createProgram(&shaderPaths[0], shaderPaths.size(), externalSuccess);
