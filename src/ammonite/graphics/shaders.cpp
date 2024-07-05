@@ -12,6 +12,7 @@
 #include "../core/fileManager.hpp"
 #include "../core/threadManager.hpp"
 
+#include "../utils/debug.hpp"
 #include "../utils/logging.hpp"
 #include "internal/internalExtensions.hpp"
 #include "internal/internalShaderValidator.hpp"
@@ -205,6 +206,7 @@ namespace ammonite {
         return -1;
       }
 
+      ammoniteInternalDebug << "Compiling '" << shaderPath << "'" << std::endl;
       glShaderSource(shaderId, 1, &shaderCodePtr, (int*)&shaderCodeSize);
       glCompileShader(shaderId);
       delete [] shaderCodePtr;
@@ -237,6 +239,7 @@ namespace ammonite {
         glDeleteShader(shaderIds[i]);
       }
 
+      //Check whether the program linked, log if relevant
       if (!checkProgram(programId)) {
         glDeleteProgram(programId);
         *externalSuccess = false;
