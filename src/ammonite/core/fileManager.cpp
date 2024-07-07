@@ -1,5 +1,6 @@
 #include <cstddef>
 #include <cstdint>
+#include <cstring>
 #include <chrono>
 #include <filesystem>
 #include <string>
@@ -14,6 +15,8 @@
 
 #include "../utils/debug.hpp"
 #include "../utils/logging.hpp"
+
+#include "fileManager.hpp"
 
 namespace ammonite {
   namespace files {
@@ -49,6 +52,112 @@ namespace ammonite {
           }
 
           return std::to_string(*(uint64_t*)output);
+        }
+
+        /*
+         - Similar to strtok_r, except it only supports single character delimiters
+         - Unsafe if called with both input and (save or *save) as nullptr / undefined
+         - save must never be nullptr
+        */
+        static char* parseToken(char* input, char delim, char** save) {
+          //Restore from next byte to search
+          if (input == nullptr) {
+            input = *save;
+          }
+
+          //Programmer error or no more tokens
+          if (*input == '\0') {
+            return nullptr;
+          }
+
+          char* end = input;
+          //Search for delimiter or end of string
+          while (*end != delim && *end != '\0') {
+            end++;
+          }
+
+          //Last token found
+          if (*end == '\0') {
+            return input;
+          }
+
+          //Create a string, save state and return it
+          *end = '\0';
+          *save = end + 1;
+          return input;
+        }
+
+        //Check paths, times and file sizes are correct
+        static AmmoniteEnum validateInputs(std::string* filePaths, unsigned int fileCount,
+                                           unsigned char* extraData, std::size_t extraDataSize) {
+          unsigned char* extraDataCopy = new unsigned char[extraDataSize + 1];
+          std::memcpy(extraDataCopy, extraData, extraDataSize);
+          extraDataCopy[extraDataSize] = '\0';
+
+          /*
+           - Decide whether the cache file can be used
+           - Uses input files, sizes and timestamps
+          */
+          AmmoniteEnum result = AMMONITE_CACHE_INVALID;
+          char* state = nullptr;
+          unsigned int internalFileCount = 1;
+          long long int filesize = 0, modificationTime = 0;
+          char* token = parseToken((char*)extraDataCopy, '\n', &state);
+          do {
+            //Give up if token is null, we didn't find enough files
+            if (token == nullptr) {
+              break;
+            }
+
+            //Check first token is 'input'
+            std::string currentFilePath = filePaths[internalFileCount - 1];
+            char* nestedState = nullptr;
+            char* nestedToken = parseToken(token, ';', &nestedState);
+            if ((nestedToken == nullptr) ||
+                (std::string(nestedToken) != std::string("input"))) {
+              break;
+            }
+
+            //Check token matches shader path
+            nestedToken = parseToken(nullptr, ';', &nestedState);
+            if ((nestedToken == nullptr) || (std::string(nestedToken) != currentFilePath)) {
+              break;
+            }
+
+            //Get filesize and time of last modification of the shader source
+            if (!ammonite::files::internal::getFileMetadata(currentFilePath, &filesize,
+                                                            &modificationTime)) {
+              break;
+            }
+
+            //Check token matches file size
+            nestedToken = parseToken(nullptr, ';', &nestedState);
+            if ((nestedToken == nullptr) || (std::atoll(nestedToken) != filesize)) {
+              break;
+            }
+
+            //Check token matches timestamp
+            nestedToken = parseToken(nullptr, ';', &nestedState);
+            if ((nestedToken == nullptr) || (std::atoll(nestedToken) != modificationTime)) {
+              break;
+            }
+
+            //Get the next line
+            if (fileCount > internalFileCount) {
+              token = parseToken(nullptr, '\n', &state);
+            } else {
+              result = AMMONITE_CACHE_HIT;
+            }
+            internalFileCount += 1;
+          } while (fileCount >= internalFileCount);
+
+          delete [] extraDataCopy;
+          return result;
+        }
+
+        static void deleteCacheFile(std::string filePath) {
+          ammonite::utils::status << "Clearing '" << filePath << "'" << std::endl;
+          deleteFile(filePath);
         }
       }
 
@@ -226,14 +335,20 @@ namespace ammonite {
       }
 
       /*
-       - Attempt to read a cached file, and validate it with validator
-       - If the cache was valid, write to size and cacheState, then return cacheData
+       - Attempt to read a cached file, checking file paths, timestamps and file sizes
+       - If the cache was valid, write to dataSize and cacheState, then return cacheData
          - In this case, cacheData needs to be freed after use
        - If the cache was invalid write to cacheState and return nullptr
-         - In this case, cacheData and size should be ignored, and the cache will be cleared
+         - In this case, cache data, dataSize, *userData and userDataSize should be ignored,
+           and the cache will be cleared
+       - Write the address of any supplied user data to userData, and its size to userDataSize
+         - If userDataSize is 0, no user data was supplied
+         - *userData doesn't need to be freed, it's part of the return value's allocation
       */
-      unsigned char* getCachedFile(std::string cacheFilePath, AmmoniteValidator validator,
-                                   std::size_t* size, AmmoniteEnum* cacheState, void* userPtr) {
+      unsigned char* getCachedFile(std::string cacheFilePath, std::string* filePaths,
+                                   unsigned int fileCount, std::size_t* dataSize,
+                                   unsigned char** userData, std::size_t* userDataSize,
+                                   AmmoniteEnum* cacheState) {
         //Check cache file exists
         if (!std::filesystem::exists(cacheFilePath)) {
           ammoniteInternalDebug << "Couldn't find " << cacheFilePath << std::endl;
@@ -242,16 +357,44 @@ namespace ammonite {
         }
 
         //Attempt to read the cache if it exists, writes to size
-        unsigned char* cacheData = loadFile(cacheFilePath, size);
-        if (cacheData == nullptr) {
+        std::size_t size;
+        std::size_t blockSizes[3];
+        unsigned char* cacheData = loadFile(cacheFilePath, &size);
+        if (cacheData == nullptr || size < sizeof(blockSizes)) {
           ammonite::utils::warning << "Failed to read '" << cacheFilePath << "'" << std::endl;
           *cacheState = AMMONITE_CACHE_MISS;
+
+          //Cache data may or may not have been returned, due to size check
+          if (cacheData != nullptr) {
+            delete [] cacheData;
+            *cacheState = AMMONITE_CACHE_INVALID;
+          }
           return nullptr;
         }
 
-        //Validate the loaded cache
-        if (!validator(cacheData, *size, userPtr)) {
-          ammonite::utils::warning << "Failed to validate '" << cacheFilePath << "'" << std::endl;
+        //Get the sizes and start addresses of the data, user and extra blocks
+        std::memcpy(blockSizes, cacheData + size - sizeof(blockSizes), sizeof(blockSizes));
+        *dataSize = blockSizes[0];
+        *userData = cacheData + blockSizes[0];
+        *userDataSize = blockSizes[1];
+        unsigned char* extraData = *userData + *userDataSize;
+        std::size_t extraDataSize = blockSizes[2] - sizeof(blockSizes);
+
+        //Check size of data is as expected, then validate the loaded cache
+        bool failed = false;
+        if (blockSizes[0] + blockSizes[1] + blockSizes[2] != size) {
+          ammonite::utils::warning << "Incorrect size information for '" << cacheFilePath \
+                                   << "'" << std::endl;
+          failed = true;
+        } else if (validateInputs(filePaths, fileCount, extraData, extraDataSize) !=
+                   AMMONITE_CACHE_HIT) {
+          ammonite::utils::warning << "Failed to validate '" << cacheFilePath \
+                                   << "'" << std::endl;
+          failed = true;
+        }
+
+        //Clean up after a failure
+        if (failed) {
           ammonite::utils::status << "Clearing '" << cacheFilePath << "'" << std::endl;
           deleteFile(cacheFilePath);
 
@@ -262,6 +405,61 @@ namespace ammonite {
 
         *cacheState = AMMONITE_CACHE_HIT;
         return cacheData;
+      }
+
+      /*
+       - Write dataSize bytes of data to cacheFilePath, using filePaths to generate the
+         cache information
+       - Also write userDataSize bytes of userData to the cache file
+       - Returns true on success, false on failure
+      */
+      bool writeCacheFile(std::string cacheFilePath, std::string* filePaths,
+                          unsigned int fileCount, unsigned char* data, std::size_t dataSize,
+                          unsigned char* userData, std::size_t userDataSize) {
+        //Generate data to write
+        std::string extraData;
+        std::size_t blockSizes[3];
+        for (unsigned int i = 0; i < fileCount; i++) {
+          long long int filesize = 0, modificationTime = 0;
+          ammonite::files::internal::getFileMetadata(filePaths[i], &filesize, &modificationTime);
+          extraData.append("input;" + filePaths[i]);
+          extraData.append(";" + std::to_string(filesize));
+          extraData.append(";" + std::to_string(modificationTime) + "\n");
+        }
+
+        std::size_t extraSize = extraData.length();
+        std::size_t totalDataSize = dataSize + userDataSize + extraSize + sizeof(blockSizes);
+        unsigned char* fileData = new unsigned char[totalDataSize];
+
+        //blockSize and its size gets special handling, as it's not written to extraData
+        blockSizes[0] = dataSize;
+        blockSizes[1] = userDataSize;
+        blockSizes[2] = extraSize + sizeof(blockSizes);
+
+        /*
+         - Write the binary data, user data and cache info to the buffer
+         - The structure should be as follows:
+           - Binary cache data block
+           - User data block
+           - Extra data block (for path, timestamp and size validation)
+             - Includes sizes of each block
+        */
+        std::memcpy(fileData, data, dataSize);
+        std::memcpy(fileData + dataSize, userData, userDataSize);
+        extraData.copy((char*)fileData + dataSize + userDataSize, extraSize, 0);
+        std::memcpy(fileData + dataSize + userDataSize + extraSize, blockSizes,
+                    sizeof(blockSizes));
+
+        //Write the data, user data and cache info to the cache file
+        if (!ammonite::files::internal::writeFile(cacheFilePath, fileData, totalDataSize)) {
+          ammonite::utils::warning << "Failed to cache '" << cacheFilePath << "'" << std::endl;
+          deleteCacheFile(cacheFilePath);
+          delete [] fileData;
+          return false;
+        }
+
+        delete [] fileData;
+        return true;
       }
     }
   }

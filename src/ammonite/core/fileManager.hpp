@@ -20,8 +20,13 @@ namespace ammonite {
 
       unsigned char* loadFile(std::string filePath, std::size_t* size);
       bool writeFile(std::string filePath, unsigned char* data, std::size_t size);
-      unsigned char* getCachedFile(std::string cacheFilePath, AmmoniteValidator validator,
-                                   std::size_t* size, AmmoniteEnum* cacheState, void* userPtr);
+      unsigned char* getCachedFile(std::string cacheFilePath, std::string* filePaths,
+                                   unsigned int fileCount, std::size_t* dataSize,
+                                   unsigned char** userData, std::size_t* userDataSize,
+                                   AmmoniteEnum* cacheState);
+      bool writeCacheFile(std::string cacheFilePath, std::string* filePaths,
+                          unsigned int fileCount, unsigned char* data, std::size_t dataSize,
+                          unsigned char* userData, std::size_t userDataSize);
     }
   }
 }

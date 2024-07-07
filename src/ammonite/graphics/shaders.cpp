@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <cstddef>
+#include <cstdlib>
 #include <cstring>
 #include <filesystem>
 #include <iostream>
@@ -15,7 +16,6 @@
 #include "../utils/debug.hpp"
 #include "../utils/logging.hpp"
 #include "internal/internalExtensions.hpp"
-#include "internal/internalShaderValidator.hpp"
 
 namespace ammonite {
   //Static helper functions and anonymous data
@@ -29,52 +29,28 @@ namespace ammonite {
         int shaderCount;
         std::string* shaderPaths;
         std::string cacheFilePath;
-        GLenum binaryFormat;
         int binaryLength;
+        GLenum binaryFormat;
         char* binaryData;
       };
-    }
-
-    static void deleteCacheFile(std::string cacheFilePath) {
-      //Delete the cache file
-      ammonite::utils::status << "Clearing '" << cacheFilePath << "'" << std::endl;
-      ammonite::files::internal::deleteFile(cacheFilePath);
     }
 
     //Thread pool work to cache a program
     static void doCacheWork(void* userPtr) {
       CacheWorkerData* data = (CacheWorkerData*)userPtr;
 
-      //Generate cache info to write
-      std::string extraData;
-      for (int i = 0; i < data->shaderCount; i++) {
-        long long int filesize = 0, modificationTime = 0;
-        ammonite::files::internal::getFileMetadata(data->shaderPaths[i], &filesize,
-                                                   &modificationTime);
+      //Prepare user data required to load the cache again
+      std::string userData = std::to_string(data->binaryFormat) + "\n";
+      std::size_t userDataSize = userData.length();
+      unsigned char* userBuffer = new unsigned char[userDataSize];
+      userData.copy((char*)userBuffer, userDataSize, 0);
 
-        extraData.append("input;" + data->shaderPaths[i]);
-        extraData.append(";" + std::to_string(filesize));
-        extraData.append(";" + std::to_string(modificationTime) + "\n");
-      }
+      //Write the cache file, failure messages are also handled by it
+      ammonite::files::internal::writeCacheFile(data->cacheFilePath, data->shaderPaths,
+        data->shaderCount, (unsigned char*)data->binaryData, data->binaryLength, userBuffer,
+        userDataSize);
 
-      extraData.append(std::to_string(data->binaryFormat) + "\n");
-      extraData.append(std::to_string(data->binaryLength) + "\n");
-
-      int extraLength = extraData.length();
-      char* fileData = new char[extraLength + data->binaryLength];
-
-      //Write the cache info and binary data to the buffer
-      extraData.copy(fileData, extraLength, 0);
-      std::memcpy(fileData + extraLength, data->binaryData, data->binaryLength);
-
-      //Write the cache info and data to the cache file
-      if (!ammonite::files::internal::writeFile(data->cacheFilePath, (unsigned char*)fileData,
-                                                extraLength + data->binaryLength)) {
-        ammonite::utils::warning << "Failed to cache '" << data->cacheFilePath << "'" << std::endl;
-        deleteCacheFile(data->cacheFilePath);
-      }
-
-      delete [] fileData;
+      delete [] userBuffer;
       delete [] data->binaryData;
       delete [] data->shaderPaths;
       delete data;
@@ -109,7 +85,7 @@ namespace ammonite {
         return;
       }
 
-      //Pack data for writing program cache
+      //Pack shader paths into worker data
       data->shaderPaths = new std::string[shaderCount];
       for (int i = 0; i < shaderCount; i++) {
         data->shaderPaths[i] = shaderPaths[i];
@@ -299,21 +275,34 @@ namespace ammonite {
       int programId;
       std::string cacheFilePath;
       if (isCacheSupported) {
+        unsigned char* userData;
         std::size_t cacheDataSize;
+        std::size_t userDataSize;
         AmmoniteEnum cacheState;
 
         //Attempt to load the cached program
-        ammonite::shaders::internal::CacheInfo cacheInfo = {shaderCount, shaderPaths, 0, 0};
-        cacheFilePath = ammonite::files::internal::getCachedFilePath(shaderPaths,
-                                                                                 shaderCount);
+        cacheFilePath = ammonite::files::internal::getCachedFilePath(shaderPaths, shaderCount);
         unsigned char* cacheData = ammonite::files::internal::getCachedFile(cacheFilePath,
-          ammonite::shaders::internal::validateCache, &cacheDataSize, &cacheState, &cacheInfo);
-        unsigned char* dataStart = cacheData + cacheDataSize - cacheInfo.binaryLength;
+          shaderPaths, shaderCount, &cacheDataSize, &userData, &userDataSize, &cacheState);
+
+        //Fetch and validate binary format
+        GLenum binaryFormat = 0;
+        if (cacheState == AMMONITE_CACHE_HIT && userDataSize != 0) {
+          long long rawFormat = std::atoll((char*)userData);
+          binaryFormat = rawFormat;
+
+          if (binaryFormat == 0) {
+            ammonite::utils::warning << "Failed to get binary format for cached program" \
+                                     << std::endl;
+            cacheState = AMMONITE_CACHE_INVALID;
+            delete [] cacheData;
+          }
+        }
 
         if (cacheState == AMMONITE_CACHE_HIT) {
           //Load the cached binary data into a program
           programId = glCreateProgram();
-          glProgramBinary(programId, cacheInfo.binaryFormat, dataStart, cacheInfo.binaryLength);
+          glProgramBinary(programId, binaryFormat, cacheData, cacheDataSize);
           delete [] cacheData;
 
           //Return the program ID, unless the cache was faulty, then delete and carry on
@@ -322,8 +311,9 @@ namespace ammonite {
           } else {
             ammonite::utils::warning << "Failed to process '" << cacheFilePath \
                                      << "'" << std::endl;
+            ammonite::utils::status << "Clearing '" << cacheFilePath << "'" << std::endl;
             glDeleteProgram(programId);
-            deleteCacheFile(cacheFilePath);
+            ammonite::files::internal::deleteFile(cacheFilePath);
           }
         }
       }
