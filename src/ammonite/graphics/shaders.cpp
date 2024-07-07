@@ -24,6 +24,19 @@ namespace ammonite {
       //Set by updateCacheSupport(), when GLEW loads
       bool isBinaryCacheSupported = false;
 
+      //Identify shader types by extensions / contained strings
+      std::map<std::string, GLenum> shaderMatches = {
+        {".vert", GL_VERTEX_SHADER}, {".vs", GL_VERTEX_SHADER}, {"vert", GL_VERTEX_SHADER},
+        {".frag", GL_FRAGMENT_SHADER}, {".fs", GL_FRAGMENT_SHADER}, {"frag", GL_FRAGMENT_SHADER},
+        {".geom", GL_GEOMETRY_SHADER}, {".gs", GL_GEOMETRY_SHADER}, {"geom", GL_GEOMETRY_SHADER},
+        {".tessc", GL_TESS_CONTROL_SHADER}, {".tsc", GL_TESS_CONTROL_SHADER},
+          {"tessc", GL_TESS_CONTROL_SHADER}, {"control", GL_TESS_CONTROL_SHADER},
+        {".tesse", GL_TESS_EVALUATION_SHADER}, {".tes", GL_TESS_EVALUATION_SHADER},
+          {"tesse", GL_TESS_EVALUATION_SHADER}, {"eval", GL_TESS_EVALUATION_SHADER},
+        {".comp", GL_COMPUTE_SHADER}, {".cs", GL_COMPUTE_SHADER}, {"compute", GL_COMPUTE_SHADER},
+        {".glsl", GL_FALSE} //Don't ignore generic shaders
+      };
+
       //Data required by cache worker
       struct CacheWorkerData {
         int shaderCount;
@@ -140,15 +153,6 @@ namespace ammonite {
     }
 
     static GLenum attemptIdentifyShaderType(std::string shaderPath) {
-      std::map<std::string, GLenum> shaderMatches = {
-        {"vert", GL_VERTEX_SHADER},
-        {"frag", GL_FRAGMENT_SHADER},
-        {"geom", GL_GEOMETRY_SHADER},
-        {"tessc", GL_TESS_CONTROL_SHADER}, {"control", GL_TESS_CONTROL_SHADER},
-        {"tesse", GL_TESS_EVALUATION_SHADER}, {"eval", GL_TESS_EVALUATION_SHADER},
-        {"compute", GL_COMPUTE_SHADER}
-      };
-
       std::string lowerShaderPath;
       for (unsigned int i = 0; i < shaderPath.size(); i++) {
         lowerShaderPath += std::tolower(shaderPath[i]);
@@ -157,7 +161,9 @@ namespace ammonite {
       //Try and match the filename to a supported shader
       for (auto it = shaderMatches.begin(); it != shaderMatches.end(); it++) {
         if (lowerShaderPath.contains(it->first)) {
-          return it->second;
+          if (it->second != GL_FALSE) {
+            return it->second;
+          }
         }
       }
 
@@ -359,17 +365,6 @@ namespace ammonite {
       */
       int createProgram(std::string* inputShaderPaths, int inputShaderCount,
                         bool* externalSuccess) {
-        //Convert file extensions to shader types
-        std::map<std::string, GLenum> shaderExtensions = {
-          {".vert", GL_VERTEX_SHADER}, {".vs", GL_VERTEX_SHADER},
-          {".frag", GL_FRAGMENT_SHADER}, {".fs", GL_FRAGMENT_SHADER},
-          {".geom", GL_GEOMETRY_SHADER}, {".gs", GL_GEOMETRY_SHADER},
-          {".tessc", GL_TESS_CONTROL_SHADER}, {".tsc", GL_TESS_CONTROL_SHADER},
-          {".tesse", GL_TESS_EVALUATION_SHADER}, {".tes", GL_TESS_EVALUATION_SHADER},
-          {".comp", GL_COMPUTE_SHADER}, {".cs", GL_COMPUTE_SHADER},
-          {".glsl", GL_FALSE} //Detect generic shaders, attempt to identify further
-        };
-
         //Find all shaders
         std::vector<std::string> shaderPaths(0);
         std::vector<GLenum> shaderTypes(0);
@@ -377,8 +372,8 @@ namespace ammonite {
           std::filesystem::path filePath{inputShaderPaths[i]};
           std::string extension = filePath.extension();
 
-          if (shaderExtensions.contains(extension)) {
-            GLenum shaderType = shaderExtensions[extension];
+          if (shaderMatches.contains(extension)) {
+            GLenum shaderType = shaderMatches[extension];
 
             //Shader can't be identified through extension, use filename
             if (shaderType == GL_FALSE) {
