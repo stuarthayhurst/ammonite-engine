@@ -28,9 +28,9 @@ CXXFLAGS += -Wall -Wextra -Werror -std=c++23 -flto=auto
 LDFLAGS := $(shell pkg-config --libs $(LIBS)) -lstdc++ -lm -latomic -pthread
 
 ifeq ($(FAST),true)
-  CXXFLAGS += -O3 -march=native -DFAST
+  CXXFLAGS += -march=native -DFAST
 else
-  CXXFLAGS += -O2
+  CXXFLAGS += -O3
 endif
 
 ifeq ($(DEBUG),true)
