@@ -6,6 +6,7 @@ namespace ammonite {
     namespace setup {
       void setupRenderer(const char* shaderPath, bool* externalSuccess);
       void destroyRenderer();
+      bool useShaderCache(const char* shaderCachePath);
     }
 
     long long getTotalFrames();

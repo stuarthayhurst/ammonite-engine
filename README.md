@@ -12,11 +12,13 @@
 ## Features:
   - Model loading, using `libassimp`
   - Internal thread pool
+  - Shader program caching
   - Keyboard and mouse input handling
 
 ## Requirements:
   - A `c++23` compatible compiler (`g++ 12+` / `clang 17+`)
     - All build and runtime dependencies installed
+  - A 64-bit Linux system
   - An OpenGL 4.5+ compatible driver
   - Alternatively, an OpenGL 3.2+ driver supporting the following extensions can be used
     - `ARB_direct_state_access`
