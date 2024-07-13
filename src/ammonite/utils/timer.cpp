@@ -14,6 +14,7 @@ namespace ammonite {
       return getNanoTime() - timePoint;
     }
 
+    //Creates a new, running timer
     Timer::Timer() {
       isTimerRunning = true;
       startTime = getNanoTime();
@@ -21,35 +22,33 @@ namespace ammonite {
       offset = 0.0;
     }
 
+    //Returns the length of time the timer has been active
     double Timer::getTime() {
-      double runTime;
-      if (isTimerRunning) {
-        runTime = getNanoTime() - startTime - offset;
-      } else {
-        //If the timer hasn't been unpaused yet, correct for the time
-        runTime = stopTime - startTime - offset;
-      }
-
-      return runTime / 1000000000;
+      //Return the time since last start / stop point, including the offset
+      double runTime = isTimerRunning ? getNanoTime() : stopTime;
+      return (runTime - startTime - offset) / 1000000000;
     }
 
+    //Set the active time on the timer, without changing pause state
     void Timer::setTime(double newTime) {
-      double currentTime = getNanoTime();
-      startTime = currentTime - (newTime * 1000000000);
-      stopTime = currentTime;
+      stopTime = getNanoTime();
+      startTime = stopTime - (newTime * 1000000000);
       offset = 0.0;
     }
 
+    //Returns whether the timer is running or not
     bool Timer::isRunning() {
       return isTimerRunning;
     }
 
+    //Reset the active time to 0, without changing pause state
     void Timer::reset() {
       startTime = getNanoTime();
       stopTime = startTime;
       offset = 0.0;
     }
 
+    //Pause the timer
     void Timer::pause() {
       if (isTimerRunning) {
         stopTime = getNanoTime();
@@ -57,6 +56,7 @@ namespace ammonite {
       }
     }
 
+    //Unpause the timer
     void Timer::unpause() {
       if (!isTimerRunning) {
         offset += getNanoTime() - stopTime;
