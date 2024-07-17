@@ -75,7 +75,7 @@
     - `make cache` - Clears the default runtime binary cache, useful if running into issues with caching
   - ### Flags:
     - `DEBUG`: `true / false` - Compiles the target in debug mode
-    - `FAST`: `true / false` - Compiles with `-Ofast -march=native`
+    - `FAST`: `true / false` - Compiles with `-march=native` and uses a no-error context
 
 ## Dependencies:
   - Package names are correct for Debian, other distros may vary
