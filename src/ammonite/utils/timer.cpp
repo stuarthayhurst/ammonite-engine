@@ -67,15 +67,17 @@ namespace ammonite {
       std::timespec now;
       std::timespec_get(&now, TIME_UTC);
 
+      //Pretend the timer was just stopped right now
+      if (!timerRunning) {
+        stopTime = now;
+      }
+
       //Handle seconds and wrap around nanoseconds
       now.tv_sec -= seconds;
       addNanoseconds(&now, -nanoseconds);
 
-      //Copy adjusted timespec to stores
+      //Save adjusted start time
       startTime = now;
-      if (!timerRunning) {
-        stopTime = startTime;
-      }
     }
 
     //Set the active time on the timer, without changing pause state
