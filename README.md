@@ -118,5 +118,5 @@
    - [Learn OpenGL](https://learnopengl.com/Introduction)
 
 ## License
-  - This project is available under the terms of the GNU Lesser General Public License (v3.0)
-    - These terms can be found in `COPYING` and `COPYING.LESSER`
+  - This project is available under the terms of the MIT License
+    - These terms can be found in `LICENCE.txt`
