@@ -287,8 +287,7 @@ namespace ammonite {
         AmmoniteEnum cacheState;
 
         //Attempt to load the cached program
-        cacheFilePath = ammonite::files::internal::getCachedFilePath(shaderPaths, shaderCount);
-        unsigned char* cacheData = ammonite::files::internal::getCachedFile(cacheFilePath,
+        unsigned char* cacheData = ammonite::files::internal::getCachedFile(&cacheFilePath,
           shaderPaths, shaderCount, &cacheDataSize, &userData, &userDataSize, &cacheState);
 
         //Fetch and validate binary format

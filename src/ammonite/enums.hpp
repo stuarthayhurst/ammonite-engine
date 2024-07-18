@@ -31,7 +31,8 @@ enum AmmoniteEnum : unsigned char {
   //Cache return values
   AMMONITE_CACHE_HIT,
   AMMONITE_CACHE_MISS,
-  AMMONITE_CACHE_INVALID
+  AMMONITE_CACHE_INVALID,
+  AMMONITE_CACHE_COLLISION
 };
 
 #endif
