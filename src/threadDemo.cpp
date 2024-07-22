@@ -25,7 +25,7 @@ if (ammonite::thread::internal::createThreadPool((THREADS)) == -1) { \
 #endif
 
 #define PREP_SYNC(jobCount, syncs) \
-std::atomic_flag* syncs = new std::atomic_flag[(jobCount)]{ATOMIC_FLAG_INIT};
+AmmoniteCompletion* syncs = new AmmoniteCompletion[(jobCount)]{ATOMIC_FLAG_INIT};
 
 #define SYNC_THREADS(jobCount, syncs) \
 for (int i = 0; i < (jobCount); i++) { \
@@ -80,7 +80,7 @@ static void shortTask(void* userPtr) {
 
 struct ResubmitData {
   int* writePtr;
-  std::atomic_flag* syncPtr;
+  AmmoniteCompletion* syncPtr;
 };
 
 static void resubmitTask(void* userPtr) {
@@ -180,7 +180,7 @@ namespace {
     VERIFY_WORK(jobCount)
 
     //Submit second batch
-    syncs = new std::atomic_flag[(jobCount)]{ATOMIC_FLAG_INIT};
+    syncs = new AmmoniteCompletion[(jobCount)]{ATOMIC_FLAG_INIT};
     values = new int[(jobCount)]{};
     submitTimer.unpause();
     for (int i = 0; i < jobCount; i++) { \

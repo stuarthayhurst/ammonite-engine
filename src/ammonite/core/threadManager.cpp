@@ -12,7 +12,7 @@ namespace {
   struct WorkItem {
     AmmoniteWork work;
     void* userPtr;
-    std::atomic_flag* completion;
+    AmmoniteCompletion* completion;
   };
 
   struct Node {
@@ -44,7 +44,7 @@ namespace {
       delete nextPopped;
     }
 
-    void push(AmmoniteWork work, void* userPtr, std::atomic_flag* completion) {
+    void push(AmmoniteWork work, void* userPtr, AmmoniteCompletion* completion) {
       //Create a new empty node
       Node* newNode = new Node{{nullptr, nullptr, nullptr}, nullptr};
 
@@ -53,7 +53,7 @@ namespace {
     }
 
     void pushMultiple(AmmoniteWork work, void* userBuffer, int stride,
-                       std::atomic_flag* completions, int count) {
+                      AmmoniteCompletion* completions, int count) {
       //Generate section of linked list to insert
       Node* newNode = new Node{{nullptr, nullptr, nullptr}, nullptr};
       Node sectionStart;
@@ -185,7 +185,7 @@ namespace ammonite {
         return extraThreadCount;
       }
 
-      void submitWork(AmmoniteWork work, void* userPtr, std::atomic_flag* completion) {
+      void submitWork(AmmoniteWork work, void* userPtr, AmmoniteCompletion* completion) {
         //Add work to the queue
         workQueue->push(work, userPtr, completion);
 
@@ -196,7 +196,7 @@ namespace ammonite {
 
       //Submit multiple jobs without locking multiple times
       void submitMultiple(AmmoniteWork work, void* userBuffer, int stride,
-                          std::atomic_flag* completions, int newJobs) {
+                          AmmoniteCompletion* completions, int newJobs) {
         workQueue->pushMultiple(work, userBuffer, stride, completions, newJobs);
         jobCount += newJobs;
         jobCount.notify_all();

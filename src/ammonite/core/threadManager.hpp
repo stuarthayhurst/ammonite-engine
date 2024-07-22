@@ -1,8 +1,6 @@
 #ifndef THREADMANAGER
 #define THREADMANAGER
 
-#include <atomic>
-
 #include "../types.hpp"
 
 namespace ammonite {
@@ -14,9 +12,9 @@ namespace ammonite {
       int createThreadPool(unsigned int extraThreads);
       void destroyThreadPool();
 
-      void submitWork(AmmoniteWork work, void* userPtr, std::atomic_flag* completion);
+      void submitWork(AmmoniteWork work, void* userPtr, AmmoniteCompletion* completion);
       void submitMultiple(AmmoniteWork work, void* userBuffer, int stride,
-                          std::atomic_flag* completions, int jobCount);
+                          AmmoniteCompletion* completions, int jobCount);
 
       void blockThreads(bool sync);
       void unblockThreads(bool sync);

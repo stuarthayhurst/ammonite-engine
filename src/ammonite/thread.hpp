@@ -1,18 +1,16 @@
 #ifndef THREAD
 #define THREAD
 
-#include <atomic>
-
 #include "types.hpp"
 
 namespace ammonite {
   namespace thread {
     unsigned int getThreadPoolSize();
     void submitWork(AmmoniteWork work, void* userPtr);
-    void submitWork(AmmoniteWork work, void* userPtr, std::atomic_flag* completion);
+    void submitWork(AmmoniteWork work, void* userPtr, AmmoniteCompletion* completion);
     void submitMultiple(AmmoniteWork work, void* userBuffer, int stride,
-                        std::atomic_flag* completions, int jobCount);
-    void waitWorkComplete(std::atomic_flag* completion);
+                        AmmoniteCompletion* completions, int jobCount);
+    void waitWorkComplete(AmmoniteCompletion* completion);
 
     void blockThreadsAsync();
     void blockThreadsSync();

@@ -1,5 +1,4 @@
-#include <atomic>
-
+#include "types.hpp"
 #include "core/threadManager.hpp"
 
 namespace ammonite {
@@ -12,17 +11,17 @@ namespace ammonite {
       internal::submitWork(work, userPtr, nullptr);
     }
 
-    void submitWork(AmmoniteWork work, void* userPtr, std::atomic_flag* completion) {
+    void submitWork(AmmoniteWork work, void* userPtr, AmmoniteCompletion* completion) {
       internal::submitWork(work, userPtr, completion);
     }
 
     //userBuffer and completions may be null
     void submitMultiple(AmmoniteWork work, void* userBuffer, int stride,
-                        std::atomic_flag* completions, int jobCount) {
+                        AmmoniteCompletion* completions, int jobCount) {
       ammonite::thread::internal::submitMultiple(work, userBuffer, stride, completions, jobCount);
     }
 
-    void waitWorkComplete(std::atomic_flag* completion) {
+    void waitWorkComplete(AmmoniteCompletion* completion) {
       //Wait for completion to become true
       if (completion != nullptr) {
         completion->wait(false);
