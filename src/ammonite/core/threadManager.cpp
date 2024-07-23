@@ -6,7 +6,7 @@
 #include "../utils/debug.hpp"
 #include "../utils/logging.hpp"
 
-#define MAX_EXTRA_THREADS 512
+#define MAX_THREADS 512
 
 namespace {
   struct WorkItem {
@@ -116,7 +116,7 @@ namespace ammonite {
   namespace thread {
     namespace internal {
       namespace {
-        unsigned int extraThreadCount = 0;
+        unsigned int poolThreadCount = 0;
         std::thread* threadPool;
         bool stayAlive = false;
 
@@ -162,7 +162,7 @@ namespace ammonite {
         //Wait until unblockThreadsTrigger becomes true
         static void blocker(void*) {
           blockedThreadCount++;
-          if (blockedThreadCount == extraThreadCount) {
+          if (blockedThreadCount == poolThreadCount) {
             threadsUnblockedFlag.clear();
             threadsUnblockedFlag.notify_all();
           }
@@ -182,7 +182,7 @@ namespace ammonite {
       }
 
       unsigned int getThreadPoolSize() {
-        return extraThreadCount;
+        return poolThreadCount;
       }
 
       void submitWork(AmmoniteWork work, void* userPtr, AmmoniteCompletion* completion) {
@@ -203,9 +203,9 @@ namespace ammonite {
       }
 
       //Create thread pool, existing work will begin executing
-      int createThreadPool(unsigned int extraThreads) {
+      int createThreadPool(unsigned int threadCount) {
         //Exit if thread pool already exists
-        if (extraThreadCount != 0) {
+        if (poolThreadCount != 0) {
           return -1;
         }
 
@@ -213,27 +213,27 @@ namespace ammonite {
         workQueue = new WorkQueue();
 
         //Default to creating a worker thread for every hardware thread
-        if (extraThreads == 0) {
-          extraThreads = getHardwareThreadCount();
+        if (threadCount == 0) {
+          threadCount = getHardwareThreadCount();
         }
 
         //Cap at configured thread limit, allocate memory for pool
-        extraThreads = (extraThreads > MAX_EXTRA_THREADS) ? MAX_EXTRA_THREADS : extraThreads;
-        threadPool = new std::thread[extraThreads];
+        threadCount = (threadCount > MAX_THREADS) ? MAX_THREADS : threadCount;
+        threadPool = new std::thread[threadCount];
         if (threadPool == nullptr) {
           return -1;
         }
 
         //Create the threads for the pool
         stayAlive = true;
-        for (unsigned int i = 0; i < extraThreads; i++) {
+        for (unsigned int i = 0; i < threadCount; i++) {
           threadPool[i] = std::thread(initWorker);
         }
 
         unblockThreadsTrigger.test_and_set();
         threadsUnblockedFlag.test_and_set();
         blockedThreadCount = 0;
-        extraThreadCount = extraThreads;
+        poolThreadCount = threadCount;
         return 0;
       }
 
@@ -249,12 +249,12 @@ namespace ammonite {
 
         //Submit a job for each thread that waits for the trigger
         unblockThreadsTrigger.clear();
-        for (unsigned int i = 0; i < extraThreadCount; i++) {
+        for (unsigned int i = 0; i < poolThreadCount; i++) {
           workQueue->push(blocker, nullptr, nullptr);
         }
 
         //Add to job count and wake all threads
-        jobCount += extraThreadCount;
+        jobCount += poolThreadCount;
         jobCount.notify_all();
 
         if (sync) {
@@ -323,7 +323,7 @@ namespace ammonite {
         unblockThreads(true);
 
         //Wait until all threads are done
-        for (unsigned int i = 0; i < extraThreadCount; i++) {
+        for (unsigned int i = 0; i < poolThreadCount; i++) {
           try {
             threadPool[i].join();
           } catch (const std::system_error&) {
@@ -343,7 +343,7 @@ namespace ammonite {
         //Reset remaining data
         delete workQueue;
         delete[] threadPool;
-        extraThreadCount = 0;
+        poolThreadCount = 0;
       }
     }
   }
