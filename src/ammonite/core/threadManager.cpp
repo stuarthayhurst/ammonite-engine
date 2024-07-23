@@ -342,7 +342,7 @@ namespace ammonite {
 
         //Reset remaining data
         delete workQueue;
-        delete[] threadPool;
+        delete [] threadPool;
         poolThreadCount = 0;
       }
     }

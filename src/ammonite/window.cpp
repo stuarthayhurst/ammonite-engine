@@ -116,7 +116,7 @@ namespace ammonite {
       for (unsigned int i = 0; i < (unsigned)iconCount; i++) {
         if (iconPaths[i] == nullptr) {
           ammonite::utils::warning << "Failed to load icon (nullptr)" << std::endl;
-          delete[] images;
+          delete [] images;
           return;
         }
 
@@ -125,7 +125,7 @@ namespace ammonite {
 
         if (images[i].pixels == nullptr) {
           ammonite::utils::warning << "Failed to load '" << iconPaths[i] << "'" << std::endl;
-          delete[] images;
+          delete [] images;
           return;
         }
       }
@@ -139,7 +139,7 @@ namespace ammonite {
       for (int i = 0; i < iconCount; i++) {
         stbi_image_free(images[i].pixels);
       }
-      delete[] images;
+      delete [] images;
     }
 
     void useIcon(const char* iconPath) {
