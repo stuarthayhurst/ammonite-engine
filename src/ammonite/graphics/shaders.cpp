@@ -258,8 +258,8 @@ namespace ammonite {
       if (!hasCreatedProgram || !hasCreatedShaders) {
         *externalSuccess = false;
         for (int i = 0; i < shaderCount; i++) {
-          if (shaderIds[shaderCount] != unsigned(-1)) {
-            glDeleteShader(shaderIds[shaderCount]);
+          if (shaderIds[i] != unsigned(-1)) {
+            glDeleteShader(shaderIds[i]);
           }
         }
         delete [] shaderIds;
