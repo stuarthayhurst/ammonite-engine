@@ -134,13 +134,6 @@ namespace ammonite {
         textureIdNameMap[textureId] = textureString;
         return textureId;
       }
-
-      void copyTexture(GLuint textureId) {
-        //Increase reference count on given texture, if it exists
-        if (textureIdNameMap.contains(textureId)) {
-          textureTrackerMap[textureIdNameMap[textureId]].refCount++;
-        }
-      }
     }
   }
 }
