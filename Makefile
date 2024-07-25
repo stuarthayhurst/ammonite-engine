@@ -1,4 +1,3 @@
-CXX ?= $(shell command -v g++)
 SHELL = bash -O globstar
 
 LIBS = glm glfw3 glew stb assimp
