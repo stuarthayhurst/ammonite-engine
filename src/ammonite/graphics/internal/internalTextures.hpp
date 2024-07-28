@@ -10,9 +10,13 @@
 namespace ammonite {
   namespace textures {
     namespace internal {
-      bool getTextureFormat(int nChannels, bool srgbTexture, GLenum* internalFormat, GLenum* dataFormat);
+      GLuint createTexture(int width, int height, unsigned char* data, GLenum dataFormat,
+                           GLenum textureFormat, int mipmapLevels, bool* externalSuccess);
       GLuint loadTexture(const char* texturePath, bool srgbTexture, bool* externalSuccess);
       void deleteTexture(GLuint textureId);
+
+      bool getTextureFormat(int channels, bool srgbTexture, GLenum* textureFormat,
+                            GLenum* dataFormat);
     }
   }
 }
