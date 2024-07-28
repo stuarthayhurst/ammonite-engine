@@ -381,8 +381,13 @@ namespace ammonite {
         if (modelObjectData->refCount < 1) {
           //Reduce reference count on textures
           for (unsigned int i = 0; i < modelObjectData->meshes.size(); i++) {
-            ammonite::textures::internal::deleteTexture(modelObject->textureIds[i].diffuseId);
-            ammonite::textures::internal::deleteTexture(modelObject->textureIds[i].specularId);
+            if (modelObject->textureIds[i].diffuseId != -1) {
+              ammonite::textures::internal::deleteTexture(modelObject->textureIds[i].diffuseId);
+            }
+
+            if (modelObject->textureIds[i].specularId != -1) {
+              ammonite::textures::internal::deleteTexture(modelObject->textureIds[i].specularId);
+            }
           }
 
           //Free the data if it hasn't been already

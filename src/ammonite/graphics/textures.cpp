@@ -88,7 +88,7 @@ namespace ammonite {
       }
 
       /*
-       - Create a texture with from the data given, return its ID
+       - Create a texture from the data given, return its ID
        - This doesn't generate the mipmaps, but allocates space for them
        - externalSuccess is written to on failure
       */
