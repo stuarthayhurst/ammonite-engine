@@ -94,11 +94,11 @@ namespace ammonite {
 
       /*
        - Create a texture from the data given, return its ID
-       - This doesn't generate the mipmaps, but allocates space for them
+       - This doesn't generate the mipmaps, but allocates space for them (textureLevels)
        - externalSuccess is written to on failure
       */
       GLuint createTexture(int width, int height, unsigned char* data, GLenum dataFormat,
-                           GLenum textureFormat, int mipmapLevels, bool* externalSuccess) {
+                           GLenum textureFormat, int textureLevels, bool* externalSuccess) {
         //Check texture size is within limits
         GLint maxTextureSize = 0;
         glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
@@ -113,7 +113,7 @@ namespace ammonite {
         //Create a texture, its storage, and then fill it
         GLuint textureId;
         glCreateTextures(GL_TEXTURE_2D, 1, &textureId);
-        glTextureStorage2D(textureId, mipmapLevels, textureFormat, width, height);
+        glTextureStorage2D(textureId, textureLevels, textureFormat, width, height);
         glTextureSubImage2D(textureId, 0, 0, 0, width, height, dataFormat, GL_UNSIGNED_BYTE, data);
 
         //Add the texture to the tracker
