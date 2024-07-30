@@ -70,13 +70,16 @@ namespace ammonite {
 
           //Only create texture storage once
           if (!hasCreatedStorage) {
-            glTextureStorage2D(textureId, 1, internalFormat, width, height);
+            glTextureStorage2D(textureId,
+                               ammonite::textures::internal::calculateMipmapLevels(width, height),
+                               internalFormat, width, height);
             hasCreatedStorage = true;
           }
 
           //Fill the texture with each face
           if (imageData) {
-            glTextureSubImage3D(textureId, 0, 0, 0, i, width, height, 1, dataFormat, GL_UNSIGNED_BYTE, imageData);
+            glTextureSubImage3D(textureId, 0, 0, 0, i, width, height, 1, dataFormat,
+                                GL_UNSIGNED_BYTE, imageData);
             stbi_image_free(imageData);
           } else {
             //Free image data, destroy texture, set failure and return
@@ -89,11 +92,12 @@ namespace ammonite {
           }
         }
 
-        glTextureParameteri(textureId, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTextureParameteri(textureId, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
         glTextureParameteri(textureId, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTextureParameteri(textureId, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTextureParameteri(textureId, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glTextureParameteri(textureId, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+        glGenerateTextureMipmap(textureId);
 
         skyboxTracker.insert(textureId);
         return textureId;
