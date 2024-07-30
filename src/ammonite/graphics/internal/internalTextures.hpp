@@ -17,6 +17,7 @@ namespace ammonite {
 
       bool getTextureFormat(int channels, bool srgbTexture, GLenum* textureFormat,
                             GLenum* dataFormat);
+      int calculateMipmapLevels(int width, int height);
     }
   }
 }

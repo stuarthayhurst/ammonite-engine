@@ -60,6 +60,11 @@ namespace ammonite {
         return decideTextureFormat(channels, srgbTexture, textureFormat, dataFormat);
       }
 
+      //Calculate the number of mipmaps levels to use
+      int calculateMipmapLevels(int width, int height) {
+        return std::floor(std::log2(std::max(width, height))) + 1;
+      }
+
       /*
        - Deletes a texture created with createTexture() or loadTexture()
       */
@@ -159,7 +164,7 @@ namespace ammonite {
 
         //Create the texture and free the image data
         bool success = true;
-        int mipmapLevels = std::floor(std::log2(std::max(width, height))) + 1;
+        int mipmapLevels = calculateMipmapLevels(width, height);
         GLuint textureId = createTexture(width, height, data, dataFormat, textureFormat,
                                          mipmapLevels, &success);
         stbi_image_free(data);
