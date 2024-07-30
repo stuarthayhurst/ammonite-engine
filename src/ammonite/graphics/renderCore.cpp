@@ -731,7 +731,12 @@ namespace ammonite {
         for (unsigned int i = 0; i < drawObjectData->meshes.size(); i++) {
           //Set texture for regular shading pass
           if (renderMode == AMMONITE_RENDER_PASS) {
-            glBindTextureUnit(0, drawObject->textureIds[i].diffuseId);
+            if (drawObject->textureIds[i].diffuseId != -1) {
+              glBindTextureUnit(0, drawObject->textureIds[i].diffuseId);
+            } else {
+              ammoniteInternalDebug << "No diffuse texture supplied, skipping" << std::endl;
+            }
+
             if (drawObject->textureIds[i].specularId != -1) {
               glBindTextureUnit(1, drawObject->textureIds[i].specularId);
             }
