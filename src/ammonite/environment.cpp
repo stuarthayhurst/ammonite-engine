@@ -34,7 +34,8 @@ namespace ammonite {
         }
       }
 
-      int createSkybox(const char* texturePaths[6], bool flipTextures, bool srgbTextures, bool* externalSuccess) {
+      int createSkybox(const char* texturePaths[6], bool flipTextures, bool srgbTextures,
+                       bool* externalSuccess) {
         GLuint textureId;
         glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &textureId);
 
@@ -104,7 +105,8 @@ namespace ammonite {
       }
 
       int createSkybox(const char* texturePaths[6], bool* externalSuccess) {
-        return createSkybox(texturePaths, ASSUME_FLIP_FACES, ASSUME_SRGB_TEXTURES, externalSuccess);
+        return createSkybox(texturePaths, ASSUME_FLIP_FACES, ASSUME_SRGB_TEXTURES,
+                            externalSuccess);
       }
 
       int loadDirectory(const char* directoryPath, bool flipTextures,
