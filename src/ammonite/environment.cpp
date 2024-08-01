@@ -118,7 +118,7 @@ namespace ammonite {
           it = std::filesystem::directory_iterator{skyboxDir};
         } catch (const std::filesystem::filesystem_error&) {
             *externalSuccess = false;
-            ammonite::utils::warning << "Failed to load '" << directoryPath << "'" << std::endl;
+            ammonite::utils::warning << "Failed to scan '" << directoryPath << "'" << std::endl;
             return -1;
         }
 
@@ -132,18 +132,17 @@ namespace ammonite {
         //Check we have at least 6 faces
         if (faces.size() < 6) {
           *externalSuccess = false;
-          ammonite::utils::warning << "Failed to load '" << directoryPath << "'" << std::endl;
+          ammonite::utils::warning << "Failed to load '" << directoryPath \
+                                   << "', needs at least 6 faces" << std::endl;
           return -1;
         }
 
-        //Repack faces
-        const int faceCount = 6;
-        const char* skyboxFaces[faceCount];
+        //Select 6 faces using their names
+        const char* skyboxFaces[6];
         std::string faceOrder[6] = {"right", "left", "top", "bottom", "front", "back"};
-
         int targetFace = 0;
-        while (true) {
-          //Look for each face
+        while (targetFace < 6) {
+          //Look for the target face
           int foundIndex = -1;
           for (unsigned int i = 0; i < faces.size(); i++) {
             //Check if the current face is the desired face
@@ -161,11 +160,6 @@ namespace ammonite {
             *externalSuccess = false;
             ammonite::utils::warning << "Failed to load '" << directoryPath << "'" << std::endl;
             return -1;
-          }
-
-          //Break if we've found all the faces
-          if (targetFace == 6) {
-            break;
           }
         }
 
