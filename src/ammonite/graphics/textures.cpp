@@ -15,13 +15,13 @@ namespace ammonite {
     namespace internal {
       namespace {
         struct TextureInfo {
-          std::string path;
+          std::string string;
           GLuint id;
           int refCount;
         };
 
         std::map<GLuint, TextureInfo> idTextureMap;
-        std::map<std::string, TextureInfo*> pathTexturePtrMap;
+        std::map<std::string, TextureInfo*> stringTexturePtrMap;
       }
 
       namespace {
@@ -79,9 +79,9 @@ namespace ammonite {
 
         //Decrease the reference counter, delete the texture if now unused
         if (--textureInfoPtr->refCount <= 0) {
-          //Remove the path entry
-          if (textureInfoPtr->path != "") {
-            pathTexturePtrMap.erase(textureInfoPtr->path);
+          //Remove the string entry
+          if (textureInfoPtr->string != "") {
+            stringTexturePtrMap.erase(textureInfoPtr->string);
           }
 
           //Delete the texture
@@ -137,9 +137,9 @@ namespace ammonite {
       GLuint loadTexture(const char* texturePath, bool flipTexture, bool srgbTexture,
                          bool* externalSuccess) {
         //Check if texture has already been loaded, in the same orientation
-        std::string textureString = std::string(texturePath);
-        if (pathTexturePtrMap.contains(textureString)) {
-          TextureInfo* textureInfo = pathTexturePtrMap[texturePath];
+        std::string textureString = std::string(texturePath) + std::to_string(flipTexture);
+        if (stringTexturePtrMap.contains(textureString)) {
+          TextureInfo* textureInfo = stringTexturePtrMap[textureString];
 
           textureInfo->refCount++;
           return textureInfo->id;
@@ -187,10 +187,10 @@ namespace ammonite {
           return -1;
         }
 
-        //Connect the texture path to the ID and info
+        //Connect the texture string to the ID and info
         TextureInfo* textureInfoPtr = &idTextureMap[textureId];
-        pathTexturePtrMap[textureString] = textureInfoPtr;
-        textureInfoPtr->path = textureString;
+        stringTexturePtrMap[textureString] = textureInfoPtr;
+        textureInfoPtr->string = textureString;
 
         //When magnifying the image, use linear filtering
         glTextureParameteri(textureId, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
