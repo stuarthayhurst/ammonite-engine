@@ -44,7 +44,7 @@ namespace ammonite {
         bool hasCreatedStorage = false;
         for (unsigned int i = 0; i < 6; i++) {
           if (flipTextures) {
-            stbi_set_flip_vertically_on_load(true);
+            stbi_set_flip_vertically_on_load_thread(true);
           }
 
           //Read the image data
@@ -52,7 +52,7 @@ namespace ammonite {
 
           //Disable texture flipping, to avoid interfering with future calls
           if (flipTextures) {
-            stbi_set_flip_vertically_on_load(false);
+            stbi_set_flip_vertically_on_load_thread(false);
           }
 
           //Decide the format of the texture and data
@@ -109,8 +109,8 @@ namespace ammonite {
                             externalSuccess);
       }
 
-      int loadDirectory(const char* directoryPath, bool flipTextures,
-                        bool srgbTextures, bool* externalSuccess) {
+      int loadDirectory(const char* directoryPath, bool flipTextures,  bool srgbTextures,
+                        bool* externalSuccess) {
         //Create filesystem directory iterator
         std::filesystem::directory_iterator it;
         try {

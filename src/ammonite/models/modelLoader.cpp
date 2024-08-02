@@ -80,6 +80,7 @@ namespace ammonite {
 
             bool createdTextureSuccess = true;
             int textureId = ammonite::textures::internal::loadTexture(fullTexturePath.c_str(),
+                                                                      false,
                                                                       modelLoadInfo.srgbTextures,
                                                                       &createdTextureSuccess);
             if (!createdTextureSuccess) {
@@ -96,6 +97,7 @@ namespace ammonite {
 
             bool createdTextureSuccess = true;
             int textureId = ammonite::textures::internal::loadTexture(fullTexturePath.c_str(),
+                                                                      false,
                                                                       modelLoadInfo.srgbTextures,
                                                                       &createdTextureSuccess);
             if (!createdTextureSuccess) {

@@ -17,6 +17,7 @@
 
 ## Requirements:
   - A `c++23` compatible compiler (`g++ 12+` / `clang 17+`)
+    - Toolchain support for thread-local variables
     - All build and runtime dependencies installed
   - A 64-bit Linux system
   - An OpenGL 4.5+ compatible driver

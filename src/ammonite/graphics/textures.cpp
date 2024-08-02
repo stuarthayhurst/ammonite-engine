@@ -129,11 +129,14 @@ namespace ammonite {
       }
 
       /*
-       - Load a texture from a file and return its ID, respecting srgbTexture
+       - Load a texture from a file and return its ID
+         - flipTexture controls whether the texture is flipped or not
+         - srgbTexture controls whether the texture is treated as sRGB
        - Writes false to externalSuccess on failure
       */
-      GLuint loadTexture(const char* texturePath, bool srgbTexture, bool* externalSuccess) {
-        //Check if texture has already been loaded
+      GLuint loadTexture(const char* texturePath, bool flipTexture, bool srgbTexture,
+                         bool* externalSuccess) {
+        //Check if texture has already been loaded, in the same orientation
         std::string textureString = std::string(texturePath);
         if (pathTexturePtrMap.contains(textureString)) {
           TextureInfo* textureInfo = pathTexturePtrMap[texturePath];
@@ -142,9 +145,18 @@ namespace ammonite {
           return textureInfo->id;
         }
 
+        //Handle texture flips
+        if (flipTexture) {
+          stbi_set_flip_vertically_on_load_thread(true);
+        }
+
         //Read image data
         int width, height, nChannels;
         unsigned char* data = stbi_load(texturePath, &width, &height, &nChannels, 0);
+        if (flipTexture) {
+          stbi_set_flip_vertically_on_load_thread(false);
+        }
+
         if (data == nullptr) {
           ammonite::utils::warning << "Failed to load texture '" << texturePath << "'" \
                                    << std::endl;
