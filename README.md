@@ -71,7 +71,7 @@
       - The install path can be configured, by setting the environment variable `HEADER_DIR`
     - `make uninstall` - Removes installed library
       - Custom install locations can be removed using the environment variable `INSTALL_DIR`
-    - `make icons` - Creates `assets/icons/icon.png` from `assets/icons/icon.svg`
+    - `make icons` - Creates `assets/icons/icon-*.png` from `assets/icons/icon.svg`
     - `make clean` - Cleans the build area (`build/`) and default runtime cache (`cache/`)
     - `make cache` - Clears the default runtime binary cache, useful if running into issues with caching
   - ### Flags:

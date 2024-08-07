@@ -110,7 +110,6 @@ clean: cache
 cache:
 	@rm -rfv "$(CACHE_DIR)"
 icons:
-	./scripts/clean-svgs.py
 	for res in 256 128 64 32; do \
 	  inkscape "--export-filename=./assets/icons/icon-$$res.png" -w "$$res" -h "$$res" "./assets/icons/icon.svg" > /dev/null 2>&1; \
 	done
