@@ -56,6 +56,8 @@ namespace objectFieldDemo {
         ammonite::models::position::setRotation((*loadedModelIds)[i + 3], cubeData[(i * 3) + 1]);
         ammonite::models::position::setScale((*loadedModelIds)[i + 3], cubeData[(i * 3) + 2]);
       }
+
+      ammonite::utils::status << "Shuffled cubes" << std::endl;
     }
 
     void spawnCubeCallback(std::vector<int>, int, void* userPtr) {
@@ -73,7 +75,7 @@ namespace objectFieldDemo {
       ammonite::models::position::setPosition(modelId,
                                               ammonite::camera::getPosition(activeCameraId));
 
-      std::cout << "Spawned object" << std::endl;
+      ammonite::utils::status << "Spawned object" << std::endl;
     }
   }
 
@@ -174,7 +176,7 @@ namespace objectFieldDemo {
       ammonite::renderer::drawFrame();
     }
 
-    std::cout << "STATUS: Loaded " << vertexCount << " vertices" << std::endl;
+    ammonite::utils::status << "Loaded " << vertexCount << " vertices" << std::endl;
 
     //Update loading screen
     ammonite::interface::setLoadingScreenProgress(screenId, 1.0f);
