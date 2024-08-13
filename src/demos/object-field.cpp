@@ -57,6 +57,7 @@ namespace objectFieldDemo {
         ammonite::models::position::setScale((*loadedModelIds)[i + 3], cubeData[(i * 3) + 2]);
       }
 
+      delete [] cubeData;
       ammonite::utils::status << "Shuffled cubes" << std::endl;
     }
 
