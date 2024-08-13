@@ -71,7 +71,7 @@ namespace sponzaDemo {
       ammonite::utils::warning << "Skybox failed to load" << std::endl;
     }
 
-    std::cout << "STATUS: Loaded " << vertexCount << " vertices" << std::endl;
+    ammonite::utils::status << "Loaded " << vertexCount << " vertices" << std::endl;
 
     //Update loading screen
     ammonite::interface::setLoadingScreenProgress(screenId, 1.0f);

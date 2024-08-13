@@ -66,7 +66,7 @@ namespace monkeyDemo {
     ammonite::models::position::scaleModel(loadedModelIds[modelCount], 0.25f);
     modelCount++;
 
-    std::cout << "STATUS: Loaded " << vertexCount << " vertices" << std::endl;
+    ammonite::utils::status << "Loaded " << vertexCount << " vertices" << std::endl;
 
     //Update loading screen
     ammonite::interface::setLoadingScreenProgress(screenId, 1.0f);

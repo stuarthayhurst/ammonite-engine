@@ -102,7 +102,7 @@ void changeFrameRateCallback(std::vector<int>, int action, void* userPtr) {
     float frameRate = ammonite::renderer::settings::getFrameLimit();
 
     frameRate += frameTimeDelta * unitsPerSecond * sign;
-    std::cout << "STATUS: Set framerate to " << frameRate << " fps" << std::endl;
+    ammonite::utils::status << "Set framerate to " << frameRate << " fps" << std::endl;
     ammonite::renderer::settings::setFrameLimit(frameRate);
     frameRateTimer.unpause();
   } else {
@@ -183,7 +183,8 @@ int main(int argc, char* argv[]) {
 
   if (!demoFunctionMap.contains(demoName)) {
     if (demoName != "") {
-      std::cerr << "WARNING: Invalid demo '" << demoName << "', using default instead" << std::endl;
+      ammonite::utils::warning << "Invalid demo '" << demoName << "', using default instead" \
+                               << std::endl;
     }
     demoName = std::string("object-field");
   }
@@ -243,7 +244,7 @@ int main(int argc, char* argv[]) {
 
   //Renderer failed to initialise, clean up and exit
   if (!success) {
-    std::cerr << "ERROR: Failed to initialise renderer, exiting" << std::endl;
+    ammonite::utils::error << "Failed to initialise renderer, exiting" << std::endl;
     cleanEngine(setupBits, nullptr);
     return EXIT_FAILURE;
   }
@@ -257,7 +258,7 @@ int main(int argc, char* argv[]) {
   //Call main demo setup
   if (postRendererInit != nullptr) {
     if (postRendererInit() == -1) {
-      std::cerr << "ERROR: Failed to set up demo, exiting" << std::endl;
+      ammonite::utils::error << "Failed to set up demo, exiting" << std::endl;
       ammonite::interface::deleteLoadingScreen(screenId);
       cleanEngine(setupBits, nullptr);
       return EXIT_FAILURE;
@@ -328,7 +329,7 @@ int main(int argc, char* argv[]) {
     //Call demo-specific mainloop code
     if (rendererMainloop != nullptr) {
       if (rendererMainloop() == -1) {
-        std::cerr << "ERROR: Failed to run mainloop, exiting" << std::endl;
+        ammonite::utils::error << "Failed to run mainloop, exiting" << std::endl;
         cleanEngine(setupBits, &keybindIds);
         return EXIT_FAILURE;
       }
@@ -347,7 +348,7 @@ int main(int argc, char* argv[]) {
   if (demoExit != nullptr) {
     if (demoExit() == -1) {
       cleanExit = false;
-      std::cerr << "ERROR: Failed to clean up, exiting" << std::endl;
+      ammonite::utils::error << "Failed to clean up, exiting" << std::endl;
     }
   }
 

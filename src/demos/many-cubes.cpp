@@ -56,7 +56,7 @@ namespace manyCubesDemo {
       ammonite::renderer::drawFrame();
     }
 
-    std::cout << "STATUS: Loaded " << vertexCount << " vertices" << std::endl;
+    ammonite::utils::status << "Loaded " << vertexCount << " vertices" << std::endl;
 
     //Update loading screen
     ammonite::interface::setLoadingScreenProgress(screenId, 1.0f);
