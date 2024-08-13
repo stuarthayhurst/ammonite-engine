@@ -20,7 +20,6 @@ namespace objectFieldDemo {
     }
 
     void genRandomPosData(glm::vec3* objectData, int objectCount) {
-      std::srand(std::time(nullptr));
       for (int i = 0; i < objectCount; i++) {
         glm::vec3 position, rotation, scale;
 
@@ -126,6 +125,7 @@ namespace objectFieldDemo {
     };
 
     //Generate random position, rotation and scales, skip first item
+    std::srand(std::time(nullptr));
     genRandomPosData(&cubeData[1][0], cubeCount);
 
     //Load models from a set of objects and textures
