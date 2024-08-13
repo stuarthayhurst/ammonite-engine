@@ -142,10 +142,12 @@ namespace objectFieldDemo {
       //Load model
       loadedModelIds.push_back(ammonite::models::createModel(models[i][0], &success));
       vertexCount += ammonite::models::getVertexCount(loadedModelIds[i]);
-      ammonite::models::applyTexture(loadedModelIds[i], AMMONITE_DIFFUSE_TEXTURE, models[i][1], true, &success);
+      ammonite::models::applyTexture(loadedModelIds[i], AMMONITE_DIFFUSE_TEXTURE,
+                                     models[i][1], true, &success);
 
       //Update loading screen
-      ammonite::interface::setLoadingScreenProgress(screenId, float(i + 1) / float(totalModels + 1));
+      ammonite::interface::setLoadingScreenProgress(screenId,
+        float(i + 1) / float(totalModels + 1));
       ammonite::renderer::drawFrame();
     }
 
@@ -172,7 +174,8 @@ namespace objectFieldDemo {
       ammonite::models::position::setScale(loadedModelIds[targetIndex], cubeData[i][2]);
 
       //Update loading screen
-      ammonite::interface::setLoadingScreenProgress(screenId, ((float)modelCount) / ((float)(totalModels) + 1.0f));
+      ammonite::interface::setLoadingScreenProgress(screenId,
+        ((float)modelCount) / ((float)(totalModels) + 1.0f));
       ammonite::renderer::drawFrame();
     }
 
@@ -266,11 +269,13 @@ namespace objectFieldDemo {
       //Decide if the light is within the region to swap orbits
       int swapTarget = -1;
       int swapWindowNum = 0;
-      if (isWithinThresholdDeg(targetAngleDeg, swapAngles[lightData[i].orbitIndex][0], threshold)) {
+      if (isWithinThresholdDeg(targetAngleDeg, swapAngles[lightData[i].orbitIndex][0],
+                               threshold)) {
         swapTarget = swapTargets[lightData[i].orbitIndex][0];
         swapWindowNum = 0;
       }
-      if (isWithinThresholdDeg(targetAngleDeg, swapAngles[lightData[i].orbitIndex][1], threshold)) {
+      if (isWithinThresholdDeg(targetAngleDeg, swapAngles[lightData[i].orbitIndex][1],
+                               threshold)) {
         swapTarget = swapTargets[lightData[i].orbitIndex][1];
         swapWindowNum = 1;
       }
@@ -301,7 +306,8 @@ namespace objectFieldDemo {
       //Calculate and set final position of light
       float lightPositionX = (lightOrbitRadius * std::cos(targetAngleRad)) + lightOrbitNucleus.x;
       float lightPositionY = (-lightOrbitRadius * std::sin(targetAngleRad)) + lightOrbitNucleus.y;
-      ammonite::models::position::setPosition(lightData[i].linkedModelId, glm::vec3(lightPositionX, 4.0f, lightPositionY));
+      ammonite::models::position::setPosition(lightData[i].linkedModelId,
+        glm::vec3(lightPositionX, 4.0f, lightPositionY));
     }
 
     //Draw the frame
