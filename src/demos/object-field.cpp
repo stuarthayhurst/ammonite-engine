@@ -205,26 +205,18 @@ namespace objectFieldDemo {
     ammonite::interface::setLoadingScreenProgress(screenId, 1.0f);
     ammonite::renderer::drawFrame();
 
-    //Create light sources
-    int lightIds[2];
-    lightIds[0] = ammonite::lighting::createLightSource();
-    lightIds[1] = ammonite::lighting::createLightSource();
+    //Setup each light and model
     ammonite::lighting::setAmbientLight(glm::vec3(0.1f, 0.1f, 0.1f));
-
-    //Adjust light model properties
-    ammonite::models::position::setScale(loadedModelIds[0], 0.1f);
-    ammonite::models::position::setScale(loadedModelIds[1], 0.1f);
-
-    //Link to spheres
-    ammonite::lighting::properties::setPower(lightIds[0], 50.0f);
-    ammonite::lighting::properties::setPower(lightIds[1], 50.0f);
-    ammonite::lighting::linkModel(lightIds[0], loadedModelIds[0]);
-    ammonite::lighting::linkModel(lightIds[1], loadedModelIds[1]);
+    for (int i = 0; i < lightCount; i++) {
+      int lightId = ammonite::lighting::createLightSource();
+      ammonite::models::position::setScale(loadedModelIds[i], 0.1f);
+      ammonite::lighting::properties::setPower(lightId, 50.0f);
+      ammonite::lighting::linkModel(lightId, loadedModelIds[i]);
+      lightData[i].linkedModelId = loadedModelIds[i];
+    }
 
     lightData[0].orbitIndex = 0;
     lightData[1].orbitIndex = 1;
-    lightData[0].linkedModelId = loadedModelIds[0];
-    lightData[1].linkedModelId = loadedModelIds[1];
     lightData[0].lightOrbitPeriod = 2.0f;
     lightData[1].lightOrbitPeriod = 8.0f;
     lightData[0].lightOrbitRadius = 5.0f;
