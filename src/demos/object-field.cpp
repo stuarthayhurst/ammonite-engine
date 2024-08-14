@@ -6,19 +6,8 @@
 #include "../ammonite/ammonite.hpp"
 
 namespace objectFieldDemo {
+  //Non-orbit internal functions
   namespace {
-    constexpr bool isWithinThresholdDeg(float angleA, float angleB, float threshold) {
-      float delta = angleA - angleB;
-      if (delta < -180.0f) {
-        delta += 360.0f;
-      } else if (delta > 180.0f) {
-        delta -= 360.0f;
-      }
-
-      delta = std::sqrt(std::pow(delta, 2));
-      return (delta <= threshold);
-    }
-
     void genRandomPosData(glm::vec3* objectData, int objectCount) {
       for (int i = 0; i < objectCount; i++) {
         glm::vec3 position, rotation, scale;
@@ -79,6 +68,32 @@ namespace objectFieldDemo {
     }
   }
 
+  //Orbit handling internal functions
+  namespace {
+    constexpr static bool isWithinThresholdDeg(float angleA, float angleB, float threshold) {
+      float delta = angleA - angleB;
+      if (delta < -180.0f) {
+        delta += 360.0f;
+      } else if (delta > 180.0f) {
+        delta -= 360.0f;
+      }
+
+      delta = std::sqrt(std::pow(delta, 2));
+      return (delta <= threshold);
+    }
+
+    constexpr static glm::vec2 calculateOrbitNucleus(int orbitIndex, float radius) {
+      const glm::vec2 lightOrbitNuclei[4] = {
+        glm::vec2(-radius, -radius),
+        glm::vec2( radius, -radius),
+        glm::vec2(-radius,  radius),
+        glm::vec2( radius,  radius)
+      };
+
+      return lightOrbitNuclei[orbitIndex];
+    }
+  }
+
   namespace {
     GLFWwindow* windowPtr;
     int cubeKeybindId;
@@ -89,10 +104,14 @@ namespace objectFieldDemo {
     const int cubeCount = 30;
 
     struct LightData {
+      //Orbit config
+      float lightOrbitPeriod;
+      float lightOrbitRadius;
+
+      //Orbit save data
       ammonite::utils::Timer lightOrbitTimer;
       bool isOrbitClockwise = false;
       bool lastWindowState = false;
-      float lightOrbitPeriod;
       int orbitIndex;
       int linkedModelId;
     };
@@ -193,8 +212,6 @@ namespace objectFieldDemo {
     ammonite::lighting::setAmbientLight(glm::vec3(0.1f, 0.1f, 0.1f));
 
     //Adjust light model properties
-    ammonite::models::position::setPosition(loadedModelIds[0], glm::vec3(4.0f, 4.0f, 4.0f));
-    ammonite::models::position::setPosition(loadedModelIds[1], glm::vec3(-4.0f, 4.0f, 4.0f));
     ammonite::models::position::setScale(loadedModelIds[0], 0.1f);
     ammonite::models::position::setScale(loadedModelIds[1], 0.1f);
 
@@ -210,6 +227,8 @@ namespace objectFieldDemo {
     lightData[1].linkedModelId = loadedModelIds[1];
     lightData[0].lightOrbitPeriod = 2.0f;
     lightData[1].lightOrbitPeriod = 8.0f;
+    lightData[0].lightOrbitRadius = 5.0f;
+    lightData[1].lightOrbitRadius = 5.0f;
 
     //Set keybinds
     cubeKeybindId = ammonite::input::registerToggleKeybind(
@@ -227,14 +246,6 @@ namespace objectFieldDemo {
   }
 
   int rendererMainloop() {
-    static const float lightOrbitRadius = 5.0f;
-    static const glm::vec2 lightOrbitNuclei[4] = {
-      glm::vec2(-lightOrbitRadius, -lightOrbitRadius),
-      glm::vec2( lightOrbitRadius, -lightOrbitRadius),
-      glm::vec2(-lightOrbitRadius,  lightOrbitRadius),
-      glm::vec2( lightOrbitRadius,  lightOrbitRadius)
-    };
-
     //Structure to store ratios where orbit can change
     static const float swapAngles[4][2] = {
      {360.0f * (0.0f / 4.0f), 360.0f * (3.0f / 4.0f)},
@@ -250,7 +261,8 @@ namespace objectFieldDemo {
     };
 
     for (int i = 0; i < lightCount; i++) {
-      glm::vec2 lightOrbitNucleus = lightOrbitNuclei[lightData[i].orbitIndex];
+      glm::vec2 lightOrbitNucleus = calculateOrbitNucleus(lightData[i].orbitIndex,
+        lightData[i].lightOrbitRadius);
 
       float orbitTime = lightData[i].lightOrbitTimer.getTime();
       if (orbitTime >= lightData[i].lightOrbitPeriod) {
@@ -293,7 +305,8 @@ namespace objectFieldDemo {
             if (lightData[i].isOrbitClockwise) {
               swapAngle = 360.0f - swapAngle;
             }
-            lightData[i].lightOrbitTimer.setTime(((180.0f - swapAngle) / 360.0f) * lightData[i].lightOrbitPeriod);
+            lightData[i].lightOrbitTimer.setTime(((180.0f - swapAngle) / 360.0f) * \
+              lightData[i].lightOrbitPeriod);
 
             //Set new orbit and flip direction
             lightData[i].orbitIndex = swapTarget;
@@ -305,8 +318,10 @@ namespace objectFieldDemo {
       }
 
       //Calculate and set final position of light
-      float lightPositionX = (lightOrbitRadius * std::cos(targetAngleRad)) + lightOrbitNucleus.x;
-      float lightPositionY = (-lightOrbitRadius * std::sin(targetAngleRad)) + lightOrbitNucleus.y;
+      float lightPositionX = (lightData[i].lightOrbitRadius * \
+        std::cos(targetAngleRad)) + lightOrbitNucleus.x;
+      float lightPositionY = (-lightData[i].lightOrbitRadius * \
+        std::sin(targetAngleRad)) + lightOrbitNucleus.y;
       ammonite::models::position::setPosition(lightData[i].linkedModelId,
         glm::vec3(lightPositionX, 4.0f, lightPositionY));
     }
