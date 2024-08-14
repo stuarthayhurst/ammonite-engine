@@ -6,6 +6,32 @@
 #include "../ammonite/ammonite.hpp"
 
 namespace objectFieldDemo {
+  namespace {
+    GLFWwindow* windowPtr;
+    int cubeKeybindId;
+    int shuffleKeybindId;
+
+    std::vector<int> loadedModelIds;
+    int modelCount = 0;
+    const int cubeCount = 30;
+    int floorId;
+
+    struct LightData {
+      //Orbit config
+      float lightOrbitPeriod;
+      float lightOrbitRadius;
+
+      //Orbit save data
+      ammonite::utils::Timer lightOrbitTimer;
+      bool isOrbitClockwise = false;
+      bool lastWindowState = false;
+      int orbitIndex;
+      int linkedModelId;
+    };
+    LightData lightData[2];
+    int lightCount = sizeof(lightData) / sizeof(lightData[0]);
+  }
+
   //Non-orbit internal functions
   namespace {
     void genRandomPosData(glm::vec3* objectData, int objectCount) {
@@ -28,11 +54,10 @@ namespace objectFieldDemo {
       }
     }
 
-    void genCubesCallback(std::vector<int>, int, void* userPtr) {
-      std::vector<int>* loadedModelIds = (std::vector<int>*)userPtr;
-
+    void genCubesCallback(std::vector<int>, int, void*) {
       //Hold data for randomised cube positions
-      int cubeCount = loadedModelIds->size() - 3;
+      int offset = lightCount + 1;
+      int cubeCount = loadedModelIds.size() - offset;
       glm::vec3* cubeData = new glm::vec3[cubeCount * 3];
 
       //Generate random position, rotation and scales, skip first item
@@ -40,21 +65,19 @@ namespace objectFieldDemo {
 
       for (int i = 0; i < cubeCount; i++) {
         //Position the cube
-        ammonite::models::position::setPosition((*loadedModelIds)[i + 3], cubeData[(i * 3) + 0]);
-        ammonite::models::position::setRotation((*loadedModelIds)[i + 3], cubeData[(i * 3) + 1]);
-        ammonite::models::position::setScale((*loadedModelIds)[i + 3], cubeData[(i * 3) + 2]);
+        ammonite::models::position::setPosition(loadedModelIds[i + offset], cubeData[(i * 3) + 0]);
+        ammonite::models::position::setRotation(loadedModelIds[i + offset], cubeData[(i * 3) + 1]);
+        ammonite::models::position::setScale(loadedModelIds[i + offset], cubeData[(i * 3) + 2]);
       }
 
       delete [] cubeData;
       ammonite::utils::status << "Shuffled cubes" << std::endl;
     }
 
-    void spawnCubeCallback(std::vector<int>, int, void* userPtr) {
-      std::vector<int>* loadedModelIds = (std::vector<int>*)userPtr;
-
+    void spawnCubeCallback(std::vector<int>, int, void*) {
       int activeCameraId = ammonite::camera::getActiveCamera();
-      int modelId = ammonite::models::copyModel((*loadedModelIds)[2]);
-      loadedModelIds->push_back(modelId);
+      int modelId = ammonite::models::copyModel(floorId);
+      loadedModelIds.push_back(modelId);
 
       float horiz = ammonite::camera::getHorizontal(activeCameraId);
       float vert = ammonite::camera::getVertical(activeCameraId);
@@ -94,31 +117,6 @@ namespace objectFieldDemo {
     }
   }
 
-  namespace {
-    GLFWwindow* windowPtr;
-    int cubeKeybindId;
-    int shuffleKeybindId;
-
-    std::vector<int> loadedModelIds;
-    int modelCount = 0;
-    const int cubeCount = 30;
-
-    struct LightData {
-      //Orbit config
-      float lightOrbitPeriod;
-      float lightOrbitRadius;
-
-      //Orbit save data
-      ammonite::utils::Timer lightOrbitTimer;
-      bool isOrbitClockwise = false;
-      bool lastWindowState = false;
-      int orbitIndex;
-      int linkedModelId;
-    };
-    LightData lightData[2];
-    int lightCount = sizeof(lightData) / sizeof(lightData[0]);
-  }
-
   int demoExit() {
     ammonite::input::unregisterKeybind(cubeKeybindId);
     ammonite::input::unregisterKeybind(shuffleKeybindId);
@@ -150,26 +148,34 @@ namespace objectFieldDemo {
     //Load models from a set of objects and textures
     const char* models[][2] = {
       {"assets/sphere.obj", "assets/flat.png"},
-      {"assets/sphere.obj", "assets/flat.png"},
       {"assets/cube.obj", "assets/flat.png"}
     };
-    modelCount = sizeof(models) / sizeof(models[0]);
-    int totalModels = modelCount + cubeCount;
+    int totalModels = lightCount + cubeCount;
 
+    //Load light models
     bool success = true;
     long int vertexCount = 0;
-    for (int i = 0; i < modelCount; i++) {
+    for (int i = 0; i < lightCount; i++) {
       //Load model
-      loadedModelIds.push_back(ammonite::models::createModel(models[i][0], &success));
+      loadedModelIds.push_back(ammonite::models::createModel(models[0][0], &success));
       vertexCount += ammonite::models::getVertexCount(loadedModelIds[i]);
       ammonite::models::applyTexture(loadedModelIds[i], AMMONITE_DIFFUSE_TEXTURE,
-                                     models[i][1], true, &success);
+                                     models[0][1], true, &success);
 
       //Update loading screen
+      modelCount++;
       ammonite::interface::setLoadingScreenProgress(screenId,
-        float(i + 1) / float(totalModels + 1));
+        float(modelCount) / float(totalModels));
       ammonite::renderer::drawFrame();
     }
+
+    //Load the floor
+    floorId = ammonite::models::createModel(models[1][0], &success);
+    loadedModelIds.push_back(floorId);
+    vertexCount += ammonite::models::getVertexCount(floorId);
+    ammonite::models::applyTexture(floorId, AMMONITE_DIFFUSE_TEXTURE, models[1][1],
+                                   true, &success);
+    modelCount++;
 
     if (!success) {
       demoExit();
@@ -177,14 +183,14 @@ namespace objectFieldDemo {
     }
 
     //Position the floor
-    ammonite::models::position::setPosition(loadedModelIds[2], cubeData[0][0]);
-    ammonite::models::position::setRotation(loadedModelIds[2], cubeData[0][1]);
-    ammonite::models::position::setScale(loadedModelIds[2], cubeData[0][2]);
+    ammonite::models::position::setPosition(floorId, cubeData[0][0]);
+    ammonite::models::position::setRotation(floorId, cubeData[0][1]);
+    ammonite::models::position::setScale(floorId, cubeData[0][2]);
 
     for (int i = 1; i < cubeCount; i++) {
       //Load the cube
-      int targetIndex = i + 2;
-      loadedModelIds.push_back(ammonite::models::copyModel(loadedModelIds[2]));
+      int targetIndex = i + lightCount;
+      loadedModelIds.push_back(ammonite::models::copyModel(floorId));
       vertexCount += ammonite::models::getVertexCount(loadedModelIds[targetIndex]);
       modelCount++;
 
@@ -195,7 +201,7 @@ namespace objectFieldDemo {
 
       //Update loading screen
       ammonite::interface::setLoadingScreenProgress(screenId,
-        ((float)modelCount) / ((float)(totalModels) + 1.0f));
+        (float)modelCount / (float)totalModels);
       ammonite::renderer::drawFrame();
     }
 
@@ -223,10 +229,9 @@ namespace objectFieldDemo {
     lightData[1].lightOrbitRadius = 5.0f;
 
     //Set keybinds
-    cubeKeybindId = ammonite::input::registerToggleKeybind(
-                      GLFW_KEY_F, spawnCubeCallback, &loadedModelIds);
-    shuffleKeybindId = ammonite::input::registerToggleKeybind(
-                      GLFW_KEY_R, genCubesCallback, &loadedModelIds);
+    cubeKeybindId = ammonite::input::registerToggleKeybind(GLFW_KEY_F, spawnCubeCallback, nullptr);
+    shuffleKeybindId = ammonite::input::registerToggleKeybind(GLFW_KEY_R, genCubesCallback,
+                                                              nullptr);
 
     //Set the camera position
     int cameraId = ammonite::camera::getActiveCamera();
