@@ -287,7 +287,7 @@ namespace objectFieldDemo {
           lightData[i].lastWindowState = true;
 
           //Randomly decide whether or not to change orbits
-          if (rand() > (RAND_MAX / 2)) {
+          if (std::rand() > (RAND_MAX / 2)) {
             //Correct current time relative to new orbit
             float swapAngle = swapAngles[lightData[i].orbitIndex][swapWindowNum];
             if (lightData[i].isOrbitClockwise) {
