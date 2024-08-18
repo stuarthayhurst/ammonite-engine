@@ -128,11 +128,14 @@ namespace objectFieldDemo {
   }
 
   int preRendererInit() {
+    //Set up light config
     lightData[0].lightOrbitPeriod = 2.0f;
     lightData[0].lightOrbitRadius = 5.0f;
-
     lightData[1].lightOrbitPeriod = 8.0f;
     lightData[1].lightOrbitRadius = 5.0f;
+
+    //Prepare the random number generator
+    std::srand(std::time(nullptr));
 
     return 0;
   }
@@ -146,8 +149,7 @@ namespace objectFieldDemo {
       {glm::vec3( 0.0f, -1.0f,  0.0f), glm::vec3(0.0f), glm::vec3(10.0f, 0.1f, 10.0f)},
     };
 
-    //Generate random position, rotation and scales, skip first item
-    std::srand(std::time(nullptr));
+    //Generate random positions, orientations and sizes, skipping first item
     genRandomPosData(&cubeData[1][0], cubeCount);
 
     //Load models from a set of objects and textures
