@@ -39,21 +39,18 @@ namespace objectFieldDemo {
   namespace {
     void genRandomPosData(glm::vec3* objectData, int objectCount) {
       for (int i = 0; i < objectCount; i++) {
-        glm::vec3 position, rotation, scale;
+        //Position
+        objectData[(i * 3) + 0].x = (std::rand() / float(((RAND_MAX + 1u) / 20))) - 10.0f;
+        objectData[(i * 3) + 0].y = (std::rand() / float(((RAND_MAX + 1u) / 3))) - 2.0f;
+        objectData[(i * 3) + 0].z = (std::rand() / float(((RAND_MAX + 1u) / 20))) - 10.0f;
 
-        position.x = (std::rand() / float(((RAND_MAX + 1u) / 20))) - 10.0f;
-        position.y = (std::rand() / float(((RAND_MAX + 1u) / 3))) - 2.0f;
-        position.z = (std::rand() / float(((RAND_MAX + 1u) / 20))) - 10.0f;
+        //Rotation
+        objectData[(i * 3) + 1].x = std::rand() / float(((RAND_MAX + 1u) / 360));
+        objectData[(i * 3) + 1].y = std::rand() / float(((RAND_MAX + 1u) / 360));
+        objectData[(i * 3) + 1].z = std::rand() / float(((RAND_MAX + 1u) / 360));
 
-        rotation.x = std::rand() / float(((RAND_MAX + 1u) / 360));
-        rotation.y = std::rand() / float(((RAND_MAX + 1u) / 360));
-        rotation.z = std::rand() / float(((RAND_MAX + 1u) / 360));
-
-        scale = glm::vec3(std::rand() / float(((RAND_MAX + 1u) / 1.2f)));
-
-        objectData[(i * 3) + 0] = position;
-        objectData[(i * 3) + 1] = rotation;
-        objectData[(i * 3) + 2] = scale;
+        //Scale
+        objectData[(i * 3) + 2] = glm::vec3(std::rand() / float(((RAND_MAX + 1u) / 1.2f)));
       }
     }
 
