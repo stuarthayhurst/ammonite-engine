@@ -27,8 +27,7 @@ namespace objectFieldDemo {
       bool lastWindowState = false;
       int orbitIndex;
       int linkedModelId;
-    };
-    LightData lightData[2];
+    } lightData[2];
     int lightCount = sizeof(lightData) / sizeof(lightData[0]);
   }
 
@@ -129,6 +128,12 @@ namespace objectFieldDemo {
   }
 
   int preRendererInit() {
+    lightData[0].lightOrbitPeriod = 2.0f;
+    lightData[0].lightOrbitRadius = 5.0f;
+
+    lightData[1].lightOrbitPeriod = 8.0f;
+    lightData[1].lightOrbitRadius = 5.0f;
+
     return 0;
   }
 
@@ -223,10 +228,6 @@ namespace objectFieldDemo {
 
     lightData[0].orbitIndex = 0;
     lightData[1].orbitIndex = 1;
-    lightData[0].lightOrbitPeriod = 2.0f;
-    lightData[1].lightOrbitPeriod = 8.0f;
-    lightData[0].lightOrbitRadius = 5.0f;
-    lightData[1].lightOrbitRadius = 5.0f;
 
     //Set keybinds
     cubeKeybindId = ammonite::input::registerToggleKeybind(GLFW_KEY_F, spawnCubeCallback, nullptr);
