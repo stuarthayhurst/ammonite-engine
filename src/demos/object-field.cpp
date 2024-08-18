@@ -17,14 +17,14 @@ namespace objectFieldDemo {
     int floorId;
 
     struct LightData {
-      //Orbit config
-      float lightOrbitPeriod;
-      float lightOrbitRadius;
+      //Light / orbit config
+      float orbitPeriod;
+      float orbitRadius;
       float scale;
       float power;
 
-      //Orbit save data
-      ammonite::utils::Timer lightOrbitTimer;
+      //Light/ orbit save data
+      ammonite::utils::Timer orbitTimer;
       bool isOrbitClockwise = false;
       bool lastWindowState = false;
       int orbitIndex;
@@ -131,13 +131,13 @@ namespace objectFieldDemo {
 
   int preRendererInit() {
     //Set up light config
-    lightData[0].lightOrbitPeriod = 2.0f;
-    lightData[0].lightOrbitRadius = 5.0f;
+    lightData[0].orbitPeriod = 2.0f;
+    lightData[0].orbitRadius = 5.0f;
     lightData[0].scale = 0.1f;
     lightData[0].power = 50.0f;
 
-    lightData[1].lightOrbitPeriod = 8.0f;
-    lightData[1].lightOrbitRadius = 5.0f;
+    lightData[1].orbitPeriod = 8.0f;
+    lightData[1].orbitRadius = 5.0f;
     lightData[1].scale = 0.1f;
     lightData[1].power = 50.0f;
 
@@ -269,21 +269,21 @@ namespace objectFieldDemo {
 
     for (int i = 0; i < lightCount; i++) {
       glm::vec2 lightOrbitNucleus = calculateOrbitNucleus(lightData[i].orbitIndex,
-        lightData[i].lightOrbitRadius);
+        lightData[i].orbitRadius);
 
-      float orbitTime = lightData[i].lightOrbitTimer.getTime();
-      if (orbitTime >= lightData[i].lightOrbitPeriod) {
-        orbitTime -= lightData[i].lightOrbitPeriod;
-        lightData[i].lightOrbitTimer.reset();
+      float orbitTime = lightData[i].orbitTimer.getTime();
+      if (orbitTime >= lightData[i].orbitPeriod) {
+        orbitTime -= lightData[i].orbitPeriod;
+        lightData[i].orbitTimer.reset();
       }
 
       //Use inverse of the time if orbiting backwards
       if (lightData[i].isOrbitClockwise) {
-        orbitTime = lightData[i].lightOrbitPeriod - orbitTime;
+        orbitTime = lightData[i].orbitPeriod - orbitTime;
       }
 
       //Decide where the light source should be
-      float targetAngleDeg = 360.0f * (orbitTime / lightData[i].lightOrbitPeriod);
+      float targetAngleDeg = 360.0f * (orbitTime / lightData[i].orbitPeriod);
       float targetAngleRad = glm::radians(targetAngleDeg);
 
       //Decide if the light is within the region to swap orbits
@@ -312,8 +312,8 @@ namespace objectFieldDemo {
             if (lightData[i].isOrbitClockwise) {
               swapAngle = 360.0f - swapAngle;
             }
-            lightData[i].lightOrbitTimer.setTime(((180.0f - swapAngle) / 360.0f) * \
-              lightData[i].lightOrbitPeriod);
+            lightData[i].orbitTimer.setTime(((180.0f - swapAngle) / 360.0f) * \
+              lightData[i].orbitPeriod);
 
             //Set new orbit and flip direction
             lightData[i].orbitIndex = swapTarget;
@@ -325,9 +325,9 @@ namespace objectFieldDemo {
       }
 
       //Calculate and set final position of light
-      float lightPositionX = (lightData[i].lightOrbitRadius * \
+      float lightPositionX = (lightData[i].orbitRadius * \
         std::cos(targetAngleRad)) + lightOrbitNucleus.x;
-      float lightPositionY = (-lightData[i].lightOrbitRadius * \
+      float lightPositionY = (-lightData[i].orbitRadius * \
         std::sin(targetAngleRad)) + lightOrbitNucleus.y;
       ammonite::models::position::setPosition(lightData[i].linkedModelId,
         glm::vec3(lightPositionX, 4.0f, lightPositionY));
