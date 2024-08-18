@@ -20,6 +20,8 @@ namespace objectFieldDemo {
       //Orbit config
       float lightOrbitPeriod;
       float lightOrbitRadius;
+      float scale;
+      float power;
 
       //Orbit save data
       ammonite::utils::Timer lightOrbitTimer;
@@ -131,8 +133,13 @@ namespace objectFieldDemo {
     //Set up light config
     lightData[0].lightOrbitPeriod = 2.0f;
     lightData[0].lightOrbitRadius = 5.0f;
+    lightData[0].scale = 0.1f;
+    lightData[0].power = 50.0f;
+
     lightData[1].lightOrbitPeriod = 8.0f;
     lightData[1].lightOrbitRadius = 5.0f;
+    lightData[1].scale = 0.1f;
+    lightData[1].power = 50.0f;
 
     //Prepare the random number generator
     std::srand(std::time(nullptr));
@@ -222,8 +229,8 @@ namespace objectFieldDemo {
     ammonite::lighting::setAmbientLight(glm::vec3(0.1f, 0.1f, 0.1f));
     for (int i = 0; i < lightCount; i++) {
       int lightId = ammonite::lighting::createLightSource();
-      ammonite::models::position::setScale(loadedModelIds[i], 0.1f);
-      ammonite::lighting::properties::setPower(lightId, 50.0f);
+      ammonite::models::position::setScale(loadedModelIds[i], lightData[i].scale);
+      ammonite::lighting::properties::setPower(lightId, lightData[i].power);
       ammonite::lighting::linkModel(lightId, loadedModelIds[i]);
       lightData[i].linkedModelId = loadedModelIds[i];
     }
