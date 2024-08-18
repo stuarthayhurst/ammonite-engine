@@ -153,20 +153,16 @@ namespace objectFieldDemo {
     int screenId = ammonite::interface::getActiveLoadingScreen();
     windowPtr = ammonite::window::getWindowPtr();
 
-    //Hold data for randomised cube positions
-    glm::vec3 cubeData[cubeCount + 1][3] = {
-      {glm::vec3( 0.0f, -1.0f,  0.0f), glm::vec3(0.0f), glm::vec3(10.0f, 0.1f, 10.0f)},
-    };
-
     //Generate random positions, orientations and sizes, skipping first item
-    genRandomPosData(&cubeData[1][0], cubeCount);
+    glm::vec3 cubeData[cubeCount][3];
+    genRandomPosData(&cubeData[0][0], cubeCount);
 
     //Load models from a set of objects and textures
     const char* models[][2] = {
       {"assets/sphere.obj", "assets/flat.png"},
       {"assets/cube.obj", "assets/flat.png"}
     };
-    int totalModels = lightCount + cubeCount;
+    int totalModels = lightCount + cubeCount + 1;
 
     //Load light models
     bool success = true;
@@ -199,23 +195,22 @@ namespace objectFieldDemo {
     }
 
     //Position the floor
-    ammonite::models::position::setPosition(floorId, cubeData[0][0]);
-    ammonite::models::position::setRotation(floorId, cubeData[0][1]);
-    ammonite::models::position::setScale(floorId, cubeData[0][2]);
+    ammonite::models::position::setPosition(floorId, glm::vec3(0.0f, -1.0f, 0.0f));
+    ammonite::models::position::setRotation(floorId, glm::vec3(0.0f));
+    ammonite::models::position::setScale(floorId, glm::vec3(10.0f, 0.1f, 10.0f));
 
-    for (int i = 1; i < cubeCount; i++) {
+    for (int i = 0; i < cubeCount; i++) {
       //Load the cube
-      int targetIndex = i + lightCount;
       loadedModelIds.push_back(ammonite::models::copyModel(floorId));
-      vertexCount += ammonite::models::getVertexCount(loadedModelIds[targetIndex]);
-      modelCount++;
+      vertexCount += ammonite::models::getVertexCount(loadedModelIds[modelCount]);
 
       //Position the cube
-      ammonite::models::position::setPosition(loadedModelIds[targetIndex], cubeData[i][0]);
-      ammonite::models::position::setRotation(loadedModelIds[targetIndex], cubeData[i][1]);
-      ammonite::models::position::setScale(loadedModelIds[targetIndex], cubeData[i][2]);
+      ammonite::models::position::setPosition(loadedModelIds[modelCount], cubeData[i][0]);
+      ammonite::models::position::setRotation(loadedModelIds[modelCount], cubeData[i][1]);
+      ammonite::models::position::setScale(loadedModelIds[modelCount], cubeData[i][2]);
 
       //Update loading screen
+      modelCount++;
       ammonite::interface::setLoadingScreenProgress(screenId,
         (float)modelCount / (float)totalModels);
       ammonite::renderer::drawFrame();
