@@ -7,13 +7,11 @@
 
 namespace objectFieldDemo {
   namespace {
+    //IDs and pointer data
     GLFWwindow* windowPtr;
     int cubeKeybindId;
     int shuffleKeybindId;
-
     std::vector<int> loadedModelIds;
-    int modelCount = 0;
-    const int cubeCount = 30;
     int floorId;
 
     struct LightData {
@@ -30,7 +28,11 @@ namespace objectFieldDemo {
       int orbitIndex;
       int linkedModelId;
     } lightData[2];
-    int lightCount = sizeof(lightData) / sizeof(lightData[0]);
+
+    //Model counts
+    const int lightCount = sizeof(lightData) / sizeof(lightData[0]);
+    const int cubeCount = 30;
+    int modelCount = 0;
   }
 
   //Non-orbit internal functions
