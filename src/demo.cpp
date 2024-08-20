@@ -128,14 +128,6 @@ void printMetrics(double frameTime) {
 
 //Clean up anything that was created
 void cleanEngine(int setupBits, std::vector<int>* keybindIdsPtr) {
-  if (setupBits & HAS_SETUP_WINDOW) {
-    ammonite::window::destroyWindow();
-  }
-
-  if (setupBits & HAS_SETUP_RENDERER) {
-    ammonite::renderer::setup::destroyRenderer();
-  }
-
   if (setupBits & HAS_SETUP_CONTROLS) {
     ammonite::utils::controls::releaseFreeCamera();
     if (keybindIdsPtr != nullptr) {
@@ -143,6 +135,14 @@ void cleanEngine(int setupBits, std::vector<int>* keybindIdsPtr) {
         ammonite::input::unregisterKeybind((*keybindIdsPtr)[i]);
       }
     }
+  }
+
+  if (setupBits & HAS_SETUP_RENDERER) {
+    ammonite::renderer::setup::destroyRenderer();
+  }
+
+  if (setupBits & HAS_SETUP_WINDOW) {
+    ammonite::window::destroyWindow();
   }
 }
 
