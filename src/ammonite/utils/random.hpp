@@ -10,6 +10,8 @@ namespace ammonite {
 
     double randomDouble(double lower, double upper);
     double randomDouble(double upper);
+    double randomDoubleClosed(double lower, double upper);
+    double randomDoubleClosed(double upper);
 
     bool randomBool(double probability);
   }
