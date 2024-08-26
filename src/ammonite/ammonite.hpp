@@ -12,6 +12,7 @@
 #include "utils/controls.hpp"
 #include "utils/debug.hpp"
 #include "utils/logging.hpp"
+#include "utils/random.hpp"
 #include "utils/timer.hpp"
 
 #include "camera.hpp"
