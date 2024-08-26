@@ -1,6 +1,5 @@
 #include <vector>
 #include <iostream>
-#include <random>
 
 #include <glm/glm.hpp>
 
@@ -74,10 +73,12 @@ namespace manyCubesDemo {
     ammonite::lighting::setAmbientLight(glm::vec3(0.1f, 0.1f, 0.1f));
     for (int i = 0; i < lightCount; i++) {
       lightSourceIds[i] = ammonite::lighting::createLightSource();
-      lightSourcePositions[i] = glm::vec3((rand() % sideLength), 4.0f, (rand() % sideLength));
-      float red = (rand() % 255 + 0) / 255.0f;
-      float green = (rand() % 255 + 0) / 255.0f;
-      float blue = (rand() % 255 + 0) / 255.0f;
+      lightSourcePositions[i] = glm::vec3(ammonite::utils::randomInt(0, sideLength),
+                                          4.0f,
+                                          ammonite::utils::randomInt(0, sideLength));
+      float red = ammonite::utils::randomDouble(1.0);
+      float green = ammonite::utils::randomDouble(1.0);
+      float blue = ammonite::utils::randomDouble(1.0);
       ammonite::lighting::properties::setPower(lightSourceIds[i], 50.0f);
       ammonite::lighting::properties::setColour(lightSourceIds[i], glm::vec3(red, green, blue));
     }
@@ -98,8 +99,8 @@ namespace manyCubesDemo {
       int currLightSourceId = lightSourceIds[i];
       float x, z;
       while (invalid) {
-        x = (rand() % 200 - 100) / 100.0f;
-        z = (rand() % 200 - 100) / 100.0f;
+        x = ammonite::utils::randomDouble(0.0, 2.0) - 1.0;
+        z = ammonite::utils::randomDouble(0.0, 2.0) - 1.0;
 
         x += lightSourcePositions[i].x;
         z += lightSourcePositions[i].z;
