@@ -301,8 +301,10 @@ namespace objectFieldDemo {
       lightData[i].linkedModelId = loadedModelIds[i];
     }
 
-    lightData[0].orbitIndex = 0;
-    lightData[1].orbitIndex = 1;
+    //Place lights on each orbit
+    for (int i = 0; i < lightCount; i++) {
+      lightData[i].orbitIndex = i % totalNuclei;
+    }
 
     //Set keybinds
     cubeKeybindId = ammonite::input::registerToggleKeybind(GLFW_KEY_F, spawnCubeCallback, nullptr);
