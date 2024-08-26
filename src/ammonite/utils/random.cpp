@@ -9,7 +9,13 @@ namespace ammonite {
       std::default_random_engine engine(r());
     }
 
-    //Return a random integer from the interval [lower, upper]
+    /*
+     - Return a random integer from the interval [lower, upper]
+       - Negative numbers can be returned if returning to a signed type
+       - For example:
+         - (int)randomInt(-1, 1) can return the interval [-1, 1]
+         - (uintmax_t)randomInt(-1, 1) can return UINTMAX_MAX, 0 or 1
+    */
     uintmax_t randomInt(uintmax_t lower, uintmax_t upper) {
       return std::uniform_int_distribution<uintmax_t>{lower, upper}(engine);
     }
@@ -19,7 +25,10 @@ namespace ammonite {
       return std::uniform_int_distribution<uintmax_t>{0, upper}(engine);
     }
 
-    //Return a random double from the interval [lower, upper)
+    /*
+     - Return a random double from the interval [lower, upper)
+       - Negative numbers are supported, without any casts
+    */
     double randomDouble(double lower, double upper) {
       return std::uniform_real_distribution<double>{lower, upper}(engine);
     }

@@ -49,9 +49,9 @@ namespace objectFieldDemo {
     void genRandomPosData(glm::vec3* objectData, int objectCount) {
       for (int i = 0; i < objectCount; i++) {
         //Position;
-        objectData[(i * 3) + 0].x = ammonite::utils::randomDouble(0.0, 20.0) - 10.0;
-        objectData[(i * 3) + 0].y = ammonite::utils::randomDouble(0.0, 3.0) - 2.0;
-        objectData[(i * 3) + 0].z = ammonite::utils::randomDouble(0.0, 20.0) - 10.0;
+        objectData[(i * 3) + 0].x = ammonite::utils::randomDouble(-10.0, 10.0);
+        objectData[(i * 3) + 0].y = ammonite::utils::randomDouble(-2.0, 1.0);
+        objectData[(i * 3) + 0].z = ammonite::utils::randomDouble(-10.0, 10.0);
 
         //Rotation
         objectData[(i * 3) + 1].x = ammonite::utils::randomDouble(0.0, 360.0);

@@ -102,8 +102,8 @@ namespace manyCubesDemo {
       int currLightSourceId = lightSourceIds[i];
       float x, z;
       while (invalid) {
-        x = ammonite::utils::randomDouble(0.0, 2.0) - 1.0;
-        z = ammonite::utils::randomDouble(0.0, 2.0) - 1.0;
+        x = ammonite::utils::randomDouble(-1.0, 1.0);
+        z = ammonite::utils::randomDouble(-1.0, 1.0);
 
         x += lightSourcePositions[i].x;
         z += lightSourcePositions[i].z;
