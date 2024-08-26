@@ -1,6 +1,5 @@
 #include <vector>
 #include <iostream>
-#include <ctime>
 #include <cmath>
 
 #include <glm/glm.hpp>
