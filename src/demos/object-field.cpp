@@ -3,6 +3,9 @@
 #include <ctime>
 #include <cmath>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/constants.hpp>
+
 #include "../ammonite/ammonite.hpp"
 
 namespace objectFieldDemo {
@@ -28,6 +31,13 @@ namespace objectFieldDemo {
       int orbitIndex;
       int linkedModelId;
     } lightData[2];
+
+    //Number of orbits
+    int totalNuclei = 4;
+
+    //2D structures to store indices and ratios for orbit changes
+    int (*orbitSwapTargets)[2] = nullptr;
+    float (*orbitSwapAngles)[2] = nullptr;
 
     //Model counts
     const int lightCount = sizeof(lightData) / sizeof(lightData[0]);
@@ -101,19 +111,72 @@ namespace objectFieldDemo {
         delta -= 360.0f;
       }
 
-      delta = std::sqrt(std::pow(delta, 2));
+      delta = std::abs(delta);
       return (delta <= threshold);
     }
 
-    constexpr static glm::vec2 calculateOrbitNucleus(int orbitIndex, float radius) {
-      const glm::vec2 lightOrbitNuclei[4] = {
-        glm::vec2(-radius, -radius),
-        glm::vec2( radius, -radius),
-        glm::vec2(-radius,  radius),
-        glm::vec2( radius,  radius)
-      };
+    constexpr static glm::vec2 calculateOrbitNucleus(int nucleusCount,
+                                                     int orbitIndex, float radius) {
+      float nucleusAngle = glm::radians((360.0f * orbitIndex) / nucleusCount);
 
-      return lightOrbitNuclei[orbitIndex];
+      //Correct for overlapping orbits
+      float indexOffsetAngle = glm::radians(90.0f - (180.0f / nucleusCount));
+      float opp = glm::pi<float>() - (2 * indexOffsetAngle);
+      float nucleusDistance = radius * 2 * std::sin(indexOffsetAngle) / std::sin(opp);
+
+      return nucleusDistance * glm::vec2(std::sin(nucleusAngle), std::cos(nucleusAngle));
+    }
+
+    /*
+     - Return a 2D array of angles an orbit could swap from
+     - First index has the angle to the previous index
+       - The second index has the angle to the next index
+    */
+    static float* calculateSwapAngles(int nucleusCount) {
+      const float down = 90.0f;
+      const float indexOffsetAngle = 90.0f - (180.0f / nucleusCount);
+
+      float* swapAngles = new float[nucleusCount * 2];
+      for (int nucleus = 0; nucleus < nucleusCount; nucleus++) {
+        int writeIndex = nucleus * 2;
+
+        //Calculate both directions
+        for (int sign = -1; sign <= 1; sign += 2) {
+          //Calculate angle to previous / next index
+          swapAngles[writeIndex] = down - (indexOffsetAngle * sign);
+
+          //Rotate the angle to match index position
+          swapAngles[writeIndex] += (nucleus / (float)nucleusCount) * 360.0f;
+          if (swapAngles[writeIndex] >= 360.0f) {
+            swapAngles[writeIndex] -= 360.0f;
+          } else if (swapAngles[writeIndex] <= 0.0f) {
+            swapAngles[writeIndex] += 360.0f;
+          }
+
+          writeIndex++;
+        }
+      }
+
+      return swapAngles;
+    }
+
+    /*
+     - Return a 2D array of indicies an orbit could swap to
+     - First index points to previous index
+       - The second index points to the next
+    */
+    static int* calculateSwapTargets(int nucleusCount) {
+      int* swapTargets = new int[nucleusCount * 2];
+      for (int nucleus = 0; nucleus < nucleusCount; nucleus++) {
+        int writeIndex = nucleus * 2;
+        swapTargets[writeIndex] = (nucleus - 1) % nucleusCount;
+        if (swapTargets[writeIndex] < 0) {
+          swapTargets[writeIndex] += nucleusCount;
+        }
+        swapTargets[writeIndex + 1] = (nucleus + 1) % nucleusCount;
+      }
+
+      return swapTargets;
     }
   }
 
@@ -123,6 +186,11 @@ namespace objectFieldDemo {
 
     for (unsigned int i = 0; i < loadedModelIds.size(); i++) {
       ammonite::models::deleteModel(loadedModelIds[i]);
+    }
+
+    if (orbitSwapTargets != nullptr) {
+      delete [] orbitSwapTargets;
+      delete [] orbitSwapAngles;
     }
 
     return 0;
@@ -139,6 +207,10 @@ namespace objectFieldDemo {
     lightData[1].orbitRadius = 5.0f;
     lightData[1].scale = 0.1f;
     lightData[1].power = 50.0f;
+
+    //Fill orbit calculation structures
+    orbitSwapTargets = (int(*)[2])calculateSwapTargets(totalNuclei);
+    orbitSwapAngles = (float(*)[2])calculateSwapAngles(totalNuclei);
 
     //Prepare the random number generator
     std::srand(std::time(nullptr));
@@ -247,23 +319,9 @@ namespace objectFieldDemo {
   }
 
   int rendererMainloop() {
-    //Structure to store ratios where orbit can change
-    static const float swapAngles[4][2] = {
-     {360.0f * (0.0f / 4.0f), 360.0f * (3.0f / 4.0f)},
-     {360.0f * (2.0f / 4.0f), 360.0f * (3.0f / 4.0f)},
-     {360.0f * (0.0f / 4.0f), 360.0f * (1.0f / 4.0f)},
-     {360.0f * (1.0f / 4.0f), 360.0f * (2.0f / 4.0f)}
-    };
-
-    //Structure to store indices where orbit can change to
-    static const float threshold = 1.0f;
-    static const int swapTargets[4][2] = {
-     {1, 2}, {0, 3}, {3, 0}, {1, 2}
-    };
-
     for (int i = 0; i < lightCount; i++) {
-      glm::vec2 lightOrbitNucleus = calculateOrbitNucleus(lightData[i].orbitIndex,
-        lightData[i].orbitRadius);
+      glm::vec2 lightOrbitNucleus = calculateOrbitNucleus(totalNuclei,
+        lightData[i].orbitIndex, lightData[i].orbitRadius);
 
       float orbitTime = lightData[i].orbitTimer.getTime();
       if (orbitTime >= lightData[i].orbitPeriod) {
@@ -282,16 +340,17 @@ namespace objectFieldDemo {
 
       //Decide if the light is within the region to swap orbits
       int swapTarget = -1;
-      int swapWindowNum = 0;
-      if (isWithinThresholdDeg(targetAngleDeg, swapAngles[lightData[i].orbitIndex][0],
-                               threshold)) {
-        swapTarget = swapTargets[lightData[i].orbitIndex][0];
-        swapWindowNum = 0;
+      int swapDirection = 0;
+      static const float thresholdDeg = 1.0f;
+      if (isWithinThresholdDeg(targetAngleDeg, orbitSwapAngles[lightData[i].orbitIndex][0],
+                               thresholdDeg)) {
+        swapTarget = orbitSwapTargets[lightData[i].orbitIndex][0];
+        swapDirection = 0;
       }
-      if (isWithinThresholdDeg(targetAngleDeg, swapAngles[lightData[i].orbitIndex][1],
-                               threshold)) {
-        swapTarget = swapTargets[lightData[i].orbitIndex][1];
-        swapWindowNum = 1;
+      if (isWithinThresholdDeg(targetAngleDeg, orbitSwapAngles[lightData[i].orbitIndex][1],
+                               thresholdDeg)) {
+        swapTarget = orbitSwapTargets[lightData[i].orbitIndex][1];
+        swapDirection = 1;
       }
 
       bool isInsideWindow = (swapTarget != -1);
@@ -301,13 +360,12 @@ namespace objectFieldDemo {
 
           //Randomly decide whether or not to change orbits
           if (std::rand() > (RAND_MAX / 2)) {
-            //Correct current time relative to new orbit
-            float swapAngle = swapAngles[lightData[i].orbitIndex][swapWindowNum];
-            if (lightData[i].isOrbitClockwise) {
-              swapAngle = 360.0f - swapAngle;
+            //Set timer for new angle
+            float newAngle = orbitSwapAngles[swapTarget][1 - swapDirection];
+            if (!lightData[i].isOrbitClockwise) {
+              newAngle = 360.0f - newAngle;
             }
-            lightData[i].orbitTimer.setTime(((180.0f - swapAngle) / 360.0f) * \
-              lightData[i].orbitPeriod);
+            lightData[i].orbitTimer.setTime((newAngle / 360.0f) * lightData[i].orbitPeriod);
 
             //Set new orbit and flip direction
             lightData[i].orbitIndex = swapTarget;
