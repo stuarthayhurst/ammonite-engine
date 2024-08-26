@@ -49,18 +49,18 @@ namespace objectFieldDemo {
   namespace {
     void genRandomPosData(glm::vec3* objectData, int objectCount) {
       for (int i = 0; i < objectCount; i++) {
-        //Position
-        objectData[(i * 3) + 0].x = (std::rand() / float(((RAND_MAX + 1u) / 20))) - 10.0f;
-        objectData[(i * 3) + 0].y = (std::rand() / float(((RAND_MAX + 1u) / 3))) - 2.0f;
-        objectData[(i * 3) + 0].z = (std::rand() / float(((RAND_MAX + 1u) / 20))) - 10.0f;
+        //Position;
+        objectData[(i * 3) + 0].x = ammonite::utils::randomDouble(0.0, 20.0) - 10.0;
+        objectData[(i * 3) + 0].y = ammonite::utils::randomDouble(0.0, 3.0) - 2.0;
+        objectData[(i * 3) + 0].z = ammonite::utils::randomDouble(0.0, 20.0) - 10.0;
 
         //Rotation
-        objectData[(i * 3) + 1].x = std::rand() / float(((RAND_MAX + 1u) / 360));
-        objectData[(i * 3) + 1].y = std::rand() / float(((RAND_MAX + 1u) / 360));
-        objectData[(i * 3) + 1].z = std::rand() / float(((RAND_MAX + 1u) / 360));
+        objectData[(i * 3) + 1].x = ammonite::utils::randomDouble(0.0, 360.0);
+        objectData[(i * 3) + 1].y = ammonite::utils::randomDouble(0.0, 360.0);
+        objectData[(i * 3) + 1].z = ammonite::utils::randomDouble(0.0, 360.0);
 
         //Scale
-        objectData[(i * 3) + 2] = glm::vec3(std::rand() / float(((RAND_MAX + 1u) / 1.2f)));
+        objectData[(i * 3) + 2] = glm::vec3(ammonite::utils::randomDouble(0.0, 1.2));
       }
     }
 
@@ -208,9 +208,6 @@ namespace objectFieldDemo {
     orbitSwapTargets = (int(*)[2])calculateSwapTargets(totalNuclei);
     orbitSwapAngles = (float(*)[2])calculateSwapAngles(totalNuclei);
 
-    //Prepare the random number generator
-    std::srand(std::time(nullptr));
-
     return 0;
   }
 
@@ -357,7 +354,7 @@ namespace objectFieldDemo {
           lightData[i].lastWindowState = true;
 
           //Randomly decide whether or not to change orbits
-          if (std::rand() > (RAND_MAX / 2)) {
+          if (ammonite::utils::randomBool(0.5)) {
             //Set timer for new angle
             float newAngle = orbitSwapAngles[swapTarget][1 - swapDirection];
             if (!lightData[i].isOrbitClockwise) {
