@@ -21,8 +21,8 @@ namespace objectFieldDemo {
       //Light / orbit config
       float orbitPeriod;
       float orbitRadius;
-      float scale;
-      float power;
+      float scale = 0.1f;
+      float power = 40.0f;
 
       //Light/ orbit save data
       ammonite::utils::Timer orbitTimer;
@@ -200,13 +200,9 @@ namespace objectFieldDemo {
     //Set up light config
     lightData[0].orbitPeriod = 2.0f;
     lightData[0].orbitRadius = 5.0f;
-    lightData[0].scale = 0.1f;
-    lightData[0].power = 50.0f;
 
     lightData[1].orbitPeriod = 8.0f;
     lightData[1].orbitRadius = 5.0f;
-    lightData[1].scale = 0.1f;
-    lightData[1].power = 50.0f;
 
     //Fill orbit calculation structures
     orbitSwapTargets = (int(*)[2])calculateSwapTargets(totalNuclei);
