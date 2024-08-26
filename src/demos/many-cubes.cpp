@@ -37,7 +37,8 @@ namespace manyCubesDemo {
     //Load cube model
     bool success = true;
     loadedModelIds.push_back(ammonite::models::createModel(models[0], &success));
-    ammonite::models::applyTexture(loadedModelIds[0], AMMONITE_DIFFUSE_TEXTURE, models[1], true, &success);
+    ammonite::models::applyTexture(loadedModelIds[0], AMMONITE_DIFFUSE_TEXTURE, models[1],
+                                   true, &success);
     long int vertexCount = ammonite::models::getVertexCount(loadedModelIds[0]);
 
     if (!success) {
@@ -51,7 +52,8 @@ namespace manyCubesDemo {
       vertexCount += ammonite::models::getVertexCount(loadedModelIds[i]);
 
       //Update loading screen
-      ammonite::interface::setLoadingScreenProgress(screenId, float(i + 1) / float(modelCount + 1));
+      ammonite::interface::setLoadingScreenProgress(screenId,
+                                                    float(i + 1) / float(modelCount + 1));
       ammonite::renderer::drawFrame();
     }
 
@@ -65,7 +67,8 @@ namespace manyCubesDemo {
     sideLength = int(sqrt(modelCount));
     for (int x = 0; x < sideLength; x++) {
       for (int y = 0; y < sideLength; y++) {
-        ammonite::models::position::setPosition(loadedModelIds[(x * sideLength) + y], glm::vec3(2.0f * float(x), 0.0f, 2.0f * float(y)));
+        ammonite::models::position::setPosition(loadedModelIds[(x * sideLength) + y],
+          glm::vec3(2.0f * float(x), 0.0f, 2.0f * float(y)));
       }
     }
 
