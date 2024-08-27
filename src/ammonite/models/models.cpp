@@ -51,7 +51,8 @@ namespace ammonite {
       return modelSelector[modelType]->size();
     }
 
-    void getModels(AmmoniteEnum modelType, int modelCount, ammonite::models::internal::ModelInfo* modelArr[]) {
+    void getModels(AmmoniteEnum modelType, int modelCount,
+                   ammonite::models::internal::ModelInfo* modelArr[]) {
       //Select the right model tracker
       ModelTrackerMap* modelMapPtr = modelSelector[modelType];
 
@@ -146,7 +147,8 @@ namespace ammonite {
         return activeModelTracker.getModelCount(modelType);
       }
 
-      void getModels(AmmoniteEnum modelType, int modelCount, ammonite::models::internal::ModelInfo* modelArr[]) {
+      void getModels(AmmoniteEnum modelType, int modelCount,
+                     ammonite::models::internal::ModelInfo* modelArr[]) {
         activeModelTracker.getModels(modelType, modelCount, modelArr);
       }
 
@@ -463,7 +465,8 @@ namespace ammonite {
       }
     }
 
-    void applyTexture(int modelId, AmmoniteEnum textureType, const char* texturePath, bool* externalSuccess) {
+    void applyTexture(int modelId, AmmoniteEnum textureType, const char* texturePath,
+                      bool* externalSuccess) {
       applyTexture(modelId, textureType, texturePath, ASSUME_SRGB_TEXTURES, externalSuccess);
     }
 
@@ -502,10 +505,12 @@ namespace ammonite {
     void setDrawMode(int modelId, AmmoniteEnum drawMode) {
       internal::ModelInfo* modelPtr = modelIdPtrMap[modelId];
       if (modelPtr != nullptr) {
-        if (modelPtr->drawMode == AMMONITE_DRAW_INACTIVE and drawMode != AMMONITE_DRAW_INACTIVE) {
+        if (modelPtr->drawMode == AMMONITE_DRAW_INACTIVE &&
+            drawMode != AMMONITE_DRAW_INACTIVE) {
           //Move from inactive to active tracker
           moveModelToActive(modelId, modelPtr);
-        } else if (modelPtr->drawMode != AMMONITE_DRAW_INACTIVE and drawMode == AMMONITE_DRAW_INACTIVE) {
+        } else if (modelPtr->drawMode != AMMONITE_DRAW_INACTIVE &&
+                   drawMode == AMMONITE_DRAW_INACTIVE) {
           //Move from active to inactive tracker
           moveModelToInactive(modelId, modelPtr);
         }
@@ -524,7 +529,8 @@ namespace ammonite {
           return glm::vec3(0.0f);
         }
 
-        return glm::vec3(modelObject->positionData.translationMatrix * glm::vec4(glm::vec3(0, 0, 0), 1));
+        return glm::vec3(modelObject->positionData.translationMatrix * \
+          glm::vec4(glm::vec3(0, 0, 0), 1));
       }
 
       glm::vec3 getScale(int modelId) {
@@ -600,7 +606,8 @@ namespace ammonite {
         }
 
         //Set the rotation
-        modelObject->positionData.rotationQuat = glm::quat(rotation) * glm::quat(glm::vec3(0, 0, 0));
+        modelObject->positionData.rotationQuat = glm::quat(rotation) * \
+          glm::quat(glm::vec3(0, 0, 0));
 
         if (modelObject->lightEmitterId != -1) {
           ammonite::lighting::internal::setLightSourcesChanged();
@@ -666,7 +673,8 @@ namespace ammonite {
         }
 
         //Rotate it
-        modelObject->positionData.rotationQuat = glm::quat(rotation) * modelObject->positionData.rotationQuat;
+        modelObject->positionData.rotationQuat = glm::quat(rotation) * \
+          modelObject->positionData.rotationQuat;
 
         if (modelObject->lightEmitterId != -1) {
           ammonite::lighting::internal::setLightSourcesChanged();
