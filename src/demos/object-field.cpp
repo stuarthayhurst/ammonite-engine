@@ -54,9 +54,9 @@ namespace objectFieldDemo {
         objectData[(i * 3) + 0].z = ammonite::utils::randomDouble(-10.0, 10.0);
 
         //Rotation
-        objectData[(i * 3) + 1].x = ammonite::utils::randomDouble(0.0, 360.0);
-        objectData[(i * 3) + 1].y = ammonite::utils::randomDouble(0.0, 360.0);
-        objectData[(i * 3) + 1].z = ammonite::utils::randomDouble(0.0, 360.0);
+        objectData[(i * 3) + 1].x = ammonite::utils::randomDouble(0.0, glm::two_pi<float>());
+        objectData[(i * 3) + 1].y = ammonite::utils::randomDouble(0.0, glm::two_pi<float>());
+        objectData[(i * 3) + 1].z = ammonite::utils::randomDouble(0.0, glm::two_pi<float>());
 
         //Scale
         objectData[(i * 3) + 2] = glm::vec3(ammonite::utils::randomDouble(0.0, 1.2));
