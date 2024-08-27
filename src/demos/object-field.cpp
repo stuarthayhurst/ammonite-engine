@@ -111,8 +111,7 @@ namespace objectFieldDemo {
         delta -= glm::two_pi<float>();
       }
 
-      delta = std::abs(delta);
-      return (delta <= threshold);
+      return (std::abs(delta) <= threshold);
     }
 
     //Return the position of an orbit's centre, so that each orbit in a shape meets the next
@@ -319,10 +318,11 @@ namespace objectFieldDemo {
       glm::vec2 lightOrbitPosition = calculateOrbitPosition(totalOrbits,
         lightData[i].orbitIndex, lightData[i].orbitRadius);
 
+      //Snapshot the time, reset timer if it has overrun
       float orbitTime = lightData[i].orbitTimer.getTime();
       if (orbitTime >= lightData[i].orbitPeriod) {
         orbitTime -= lightData[i].orbitPeriod;
-        lightData[i].orbitTimer.reset();
+        lightData[i].orbitTimer.setTime(orbitTime);
       }
 
       //Use inverse of the time if orbiting backwards
