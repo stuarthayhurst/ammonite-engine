@@ -29,18 +29,19 @@ namespace objectFieldDemo {
       bool lastWindowState = false;
       int orbitIndex;
       int linkedModelId;
-    } lightData[2];
+    };
+    LightData* lightData = nullptr;
+    int lightCount;
 
-    //General orbit config
-    int totalOrbits = 5;
+    //General orbit config / data
     float transferProbability = 0.5f;
+    int totalOrbits;
 
     //2D structures to store indices and ratios for orbit changes
     int (*orbitSwapTargets)[2] = nullptr;
     float (*orbitSwapAngles)[2] = nullptr;
 
     //Model counts
-    const int lightCount = sizeof(lightData) / sizeof(lightData[0]);
     const int cubeCount = 30;
     int modelCount = 0;
   }
@@ -189,7 +190,8 @@ namespace objectFieldDemo {
       ammonite::models::deleteModel(loadedModelIds[i]);
     }
 
-    if (orbitSwapTargets != nullptr) {
+    if (lightData != nullptr) {
+      delete [] lightData;
       delete [] orbitSwapTargets;
       delete [] orbitSwapAngles;
     }
@@ -198,7 +200,14 @@ namespace objectFieldDemo {
   }
 
   int preRendererInit() {
-    //Set light data
+    //Pick number of orbits
+    totalOrbits = 5;
+
+    //Pick number of lights
+    lightCount = 2;
+
+    //Allocate and set light data
+    lightData = new LightData[lightCount];
     for (int i = 0; i < lightCount; i++) {
       lightData[i].orbitPeriod = 2.0f;
       lightData[i].orbitRadius = 4.5f;
