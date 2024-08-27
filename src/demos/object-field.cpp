@@ -21,7 +21,7 @@ namespace objectFieldDemo {
       float orbitPeriod;
       float orbitRadius;
       float scale = 0.1f;
-      float power = 30.0f;
+      float power = 25.0f;
 
       //Light/ orbit save data
       ammonite::utils::Timer orbitTimer;
@@ -201,22 +201,25 @@ namespace objectFieldDemo {
 
   int preRendererInit() {
     //Pick number of orbits
-    totalOrbits = 5;
+    totalOrbits = ammonite::utils::randomInt(3, 8);
 
     //Pick number of lights
-    lightCount = 2;
+    lightCount = ammonite::utils::randomInt(2, totalOrbits);
 
     //Allocate and set light data
     lightData = new LightData[lightCount];
     for (int i = 0; i < lightCount; i++) {
       lightData[i].orbitPeriod = 2.0f;
-      lightData[i].orbitRadius = 4.5f;
+      lightData[i].orbitRadius = 18.0f / totalOrbits;
     }
     lightData[0].orbitPeriod = 8.0f;
 
     //Fill orbit calculation structures
     orbitSwapTargets = (int(*)[2])calculateSwapTargets(totalOrbits);
     orbitSwapAngles = (float(*)[2])calculateSwapAngles(totalOrbits);
+
+    ammonite::utils::status << "Chose " << totalOrbits << " orbits and " << lightCount \
+                            << " lights" << std::endl;
 
     return 0;
   }
@@ -388,7 +391,7 @@ namespace objectFieldDemo {
       float lightPositionY = (-lightData[i].orbitRadius * std::sin(targetAngle)) + \
         lightOrbitPosition.y;
       ammonite::models::position::setPosition(lightData[i].linkedModelId,
-        glm::vec3(lightPositionX, 4.0f, lightPositionY));
+        glm::vec3(lightPositionX, 5.0f, lightPositionY));
     }
 
     //Draw the frame
