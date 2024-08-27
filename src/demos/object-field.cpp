@@ -31,8 +31,9 @@ namespace objectFieldDemo {
       int linkedModelId;
     } lightData[2];
 
-    //Number of orbits
+    //General orbit config
     int totalOrbits = 4;
+    float transferProbability = 0.5f;
 
     //2D structures to store indices and ratios for orbit changes
     int (*orbitSwapTargets)[2] = nullptr;
@@ -197,12 +198,12 @@ namespace objectFieldDemo {
   }
 
   int preRendererInit() {
-    //Set up light config
-    lightData[0].orbitPeriod = 2.0f;
-    lightData[0].orbitRadius = 5.0f;
-
-    lightData[1].orbitPeriod = 8.0f;
-    lightData[1].orbitRadius = 5.0f;
+    //Set light data
+    for (int i = 0; i < lightCount; i++) {
+      lightData[i].orbitPeriod = 2.0f;
+      lightData[i].orbitRadius = 4.5f;
+    }
+    lightData[0].orbitPeriod = 8.0f;
 
     //Fill orbit calculation structures
     orbitSwapTargets = (int(*)[2])calculateSwapTargets(totalOrbits);
@@ -354,7 +355,7 @@ namespace objectFieldDemo {
           lightData[i].lastWindowState = true;
 
           //Randomly decide whether or not to change orbits
-          if (ammonite::utils::randomBool(0.5)) {
+          if (ammonite::utils::randomBool(transferProbability)) {
             //Set timer for new angle
             float newAngle = orbitSwapAngles[swapTarget][1 - swapDirection];
             if (!lightData[i].isOrbitClockwise) {
