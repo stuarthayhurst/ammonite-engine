@@ -37,7 +37,7 @@ namespace ammonite {
 
     //Return a random double from the open interval [0, upper)
     double randomDouble(double upper) {
-      return std::uniform_real_distribution<double>{0, upper}(engine);;
+      return std::uniform_real_distribution<double>{0, upper}(engine);
     }
 
     /*
@@ -52,7 +52,7 @@ namespace ammonite {
     //Return a random double from the closed interval [0, upper]
     double randomDoubleClosed(double upper) {
       return std::uniform_real_distribution<double>{0,
-        std::nextafter(upper, std::numeric_limits<double>::max())}(engine);;
+        std::nextafter(upper, std::numeric_limits<double>::max())}(engine);
     }
 
     /*
