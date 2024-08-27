@@ -32,7 +32,7 @@ namespace objectFieldDemo {
     } lightData[2];
 
     //Number of orbits
-    int totalNuclei = 4;
+    int totalOrbits = 4;
 
     //2D structures to store indices and ratios for orbit changes
     int (*orbitSwapTargets)[2] = nullptr;
@@ -114,12 +114,12 @@ namespace objectFieldDemo {
       return (delta <= threshold);
     }
 
-    constexpr static glm::vec2 calculateOrbitNucleus(int nucleusCount,
-                                                     int orbitIndex, float radius) {
-      float nucleusAngle = glm::radians((360.0f * orbitIndex) / nucleusCount);
+    constexpr static glm::vec2 calculateOrbitPosition(int orbitCount,
+                                                      int orbitIndex, float radius) {
+      float nucleusAngle = glm::radians((360.0f * orbitIndex) / orbitCount);
 
       //Correct for overlapping orbits
-      float indexOffsetAngle = glm::radians(90.0f - (180.0f / nucleusCount));
+      float indexOffsetAngle = glm::radians(90.0f - (180.0f / orbitCount));
       float opp = glm::pi<float>() - (2 * indexOffsetAngle);
       float nucleusDistance = radius * 2 * std::sin(indexOffsetAngle) / std::sin(opp);
 
@@ -131,13 +131,13 @@ namespace objectFieldDemo {
      - First index has the angle to the previous index
        - The second index has the angle to the next index
     */
-    static float* calculateSwapAngles(int nucleusCount) {
+    static float* calculateSwapAngles(int orbitCount) {
       const float down = 90.0f;
-      const float indexOffsetAngle = 90.0f - (180.0f / nucleusCount);
+      const float indexOffsetAngle = 90.0f - (180.0f / orbitCount);
 
-      float* swapAngles = new float[nucleusCount * 2];
-      for (int nucleus = 0; nucleus < nucleusCount; nucleus++) {
-        int writeIndex = nucleus * 2;
+      float* swapAngles = new float[orbitCount * 2];
+      for (int orbit = 0; orbit < orbitCount; orbit++) {
+        int writeIndex = orbit * 2;
 
         //Calculate both directions
         for (int sign = -1; sign <= 1; sign += 2) {
@@ -145,7 +145,7 @@ namespace objectFieldDemo {
           swapAngles[writeIndex] = down - (indexOffsetAngle * sign);
 
           //Rotate the angle to match index position
-          swapAngles[writeIndex] += (nucleus / (float)nucleusCount) * 360.0f;
+          swapAngles[writeIndex] += (orbit / (float)orbitCount) * 360.0f;
           if (swapAngles[writeIndex] >= 360.0f) {
             swapAngles[writeIndex] -= 360.0f;
           } else if (swapAngles[writeIndex] <= 0.0f) {
@@ -164,15 +164,15 @@ namespace objectFieldDemo {
      - First index points to previous index
        - The second index points to the next
     */
-    static int* calculateSwapTargets(int nucleusCount) {
-      int* swapTargets = new int[nucleusCount * 2];
-      for (int nucleus = 0; nucleus < nucleusCount; nucleus++) {
-        int writeIndex = nucleus * 2;
-        swapTargets[writeIndex] = (nucleus - 1) % nucleusCount;
+    static int* calculateSwapTargets(int orbitCount) {
+      int* swapTargets = new int[orbitCount * 2];
+      for (int orbit = 0; orbit < orbitCount; orbit++) {
+        int writeIndex = orbit * 2;
+        swapTargets[writeIndex] = (orbit - 1) % orbitCount;
         if (swapTargets[writeIndex] < 0) {
-          swapTargets[writeIndex] += nucleusCount;
+          swapTargets[writeIndex] += orbitCount;
         }
-        swapTargets[writeIndex + 1] = (nucleus + 1) % nucleusCount;
+        swapTargets[writeIndex + 1] = (orbit + 1) % orbitCount;
       }
 
       return swapTargets;
@@ -204,8 +204,8 @@ namespace objectFieldDemo {
     lightData[1].orbitRadius = 5.0f;
 
     //Fill orbit calculation structures
-    orbitSwapTargets = (int(*)[2])calculateSwapTargets(totalNuclei);
-    orbitSwapAngles = (float(*)[2])calculateSwapAngles(totalNuclei);
+    orbitSwapTargets = (int(*)[2])calculateSwapTargets(totalOrbits);
+    orbitSwapAngles = (float(*)[2])calculateSwapAngles(totalOrbits);
 
     return 0;
   }
@@ -295,7 +295,7 @@ namespace objectFieldDemo {
 
     //Place lights on each orbit
     for (int i = 0; i < lightCount; i++) {
-      lightData[i].orbitIndex = i % totalNuclei;
+      lightData[i].orbitIndex = i % totalOrbits;
     }
 
     //Set keybinds
@@ -314,7 +314,7 @@ namespace objectFieldDemo {
 
   int rendererMainloop() {
     for (int i = 0; i < lightCount; i++) {
-      glm::vec2 lightOrbitNucleus = calculateOrbitNucleus(totalNuclei,
+      glm::vec2 lightOrbitPosition = calculateOrbitPosition(totalOrbits,
         lightData[i].orbitIndex, lightData[i].orbitRadius);
 
       float orbitTime = lightData[i].orbitTimer.getTime();
@@ -372,9 +372,9 @@ namespace objectFieldDemo {
 
       //Calculate and set final position of light
       float lightPositionX = (lightData[i].orbitRadius * \
-        std::cos(targetAngleRad)) + lightOrbitNucleus.x;
+        std::cos(targetAngleRad)) + lightOrbitPosition.x;
       float lightPositionY = (-lightData[i].orbitRadius * \
-        std::sin(targetAngleRad)) + lightOrbitNucleus.y;
+        std::sin(targetAngleRad)) + lightOrbitPosition.y;
       ammonite::models::position::setPosition(lightData[i].linkedModelId,
         glm::vec3(lightPositionX, 4.0f, lightPositionY));
     }
