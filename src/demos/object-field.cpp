@@ -21,7 +21,7 @@ namespace objectFieldDemo {
       float orbitPeriod;
       float orbitRadius;
       float scale = 0.1f;
-      float power = 25.0f;
+      float power = 30.0f;
 
       //Light/ orbit save data
       ammonite::utils::Timer orbitTimer;
@@ -319,9 +319,9 @@ namespace objectFieldDemo {
 
     //Set the camera position
     int cameraId = ammonite::camera::getActiveCamera();
-    ammonite::camera::setPosition(cameraId, glm::vec3(7.5f, 7.5f, 7.5f));
-    ammonite::camera::setHorizontal(cameraId, 5.0f * glm::quarter_pi<float>());
-    ammonite::camera::setVertical(cameraId, -0.3f);
+    ammonite::camera::setPosition(cameraId, glm::vec3(10.0f, 17.0f, 17.0f));
+    ammonite::camera::setHorizontal(cameraId, 4.75f * glm::quarter_pi<float>());
+    ammonite::camera::setVertical(cameraId, -0.7f);
 
     return 0;
   }
