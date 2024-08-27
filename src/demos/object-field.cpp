@@ -102,24 +102,26 @@ namespace objectFieldDemo {
 
   //Orbit handling internal functions
   namespace {
-    constexpr static bool isWithinThresholdDeg(float angleA, float angleB, float threshold) {
+    //Return true if 2 angles are within threshold radians of each other
+    constexpr static bool isWithinThreshold(float angleA, float angleB, float threshold) {
       float delta = angleA - angleB;
-      if (delta < -180.0f) {
-        delta += 360.0f;
-      } else if (delta > 180.0f) {
-        delta -= 360.0f;
+      if (delta < -glm::pi<float>()) {
+        delta += glm::two_pi<float>();
+      } else if (delta > glm::pi<float>()) {
+        delta -= glm::two_pi<float>();
       }
 
       delta = std::abs(delta);
       return (delta <= threshold);
     }
 
-    constexpr static glm::vec2 calculateOrbitPosition(int orbitCount,
-                                                      int orbitIndex, float radius) {
-      float nucleusAngle = glm::radians((360.0f * orbitIndex) / orbitCount);
+    //Return the position of an orbit's centre, so that each orbit in a shape meets the next
+    constexpr static glm::vec2 calculateOrbitPosition(int orbitCount, int orbitIndex,
+                                                      float radius) {
+      float nucleusAngle = (glm::two_pi<float>() * orbitIndex) / orbitCount;
 
       //Correct for overlapping orbits
-      float indexOffsetAngle = glm::radians(90.0f - (180.0f / orbitCount));
+      float indexOffsetAngle = glm::half_pi<float>() - (glm::pi<float>() / orbitCount);
       float opp = glm::pi<float>() - (2 * indexOffsetAngle);
       float nucleusDistance = radius * 2 * std::sin(indexOffsetAngle) / std::sin(opp);
 
@@ -127,13 +129,13 @@ namespace objectFieldDemo {
     }
 
     /*
-     - Return a 2D array of angles an orbit could swap from
+     - Return a 2D array of angles an orbit could swap from, in radians
      - First index has the angle to the previous index
        - The second index has the angle to the next index
     */
     static float* calculateSwapAngles(int orbitCount) {
-      const float down = 90.0f;
-      const float indexOffsetAngle = 90.0f - (180.0f / orbitCount);
+      const float down = glm::half_pi<float>();
+      const float indexOffsetAngle = glm::half_pi<float>() - (glm::pi<float>() / orbitCount);
 
       float* swapAngles = new float[orbitCount * 2];
       for (int orbit = 0; orbit < orbitCount; orbit++) {
@@ -145,11 +147,11 @@ namespace objectFieldDemo {
           swapAngles[writeIndex] = down - (indexOffsetAngle * sign);
 
           //Rotate the angle to match index position
-          swapAngles[writeIndex] += (orbit / (float)orbitCount) * 360.0f;
-          if (swapAngles[writeIndex] >= 360.0f) {
-            swapAngles[writeIndex] -= 360.0f;
+          swapAngles[writeIndex] += (orbit / (float)orbitCount) * glm::two_pi<float>();
+          if (swapAngles[writeIndex] >= glm::two_pi<float>()) {
+            swapAngles[writeIndex] -= glm::two_pi<float>();
           } else if (swapAngles[writeIndex] <= 0.0f) {
-            swapAngles[writeIndex] += 360.0f;
+            swapAngles[writeIndex] += glm::two_pi<float>();
           }
 
           writeIndex++;
@@ -306,8 +308,8 @@ namespace objectFieldDemo {
     //Set the camera position
     int cameraId = ammonite::camera::getActiveCamera();
     ammonite::camera::setPosition(cameraId, glm::vec3(7.5f, 7.5f, 7.5f));
-    ammonite::camera::setHorizontal(cameraId, glm::radians(225.0f));
-    ammonite::camera::setVertical(cameraId, glm::radians(-20.0f));
+    ammonite::camera::setHorizontal(cameraId, 5.0f * glm::quarter_pi<float>());
+    ammonite::camera::setVertical(cameraId, -0.3f);
 
     return 0;
   }
@@ -328,21 +330,20 @@ namespace objectFieldDemo {
         orbitTime = lightData[i].orbitPeriod - orbitTime;
       }
 
-      //Decide where the light source should be
-      float targetAngleDeg = 360.0f * (orbitTime / lightData[i].orbitPeriod);
-      float targetAngleRad = glm::radians(targetAngleDeg);
+      //Decide where the light source's angle, in radians
+      float targetAngle = (orbitTime / lightData[i].orbitPeriod) * glm::two_pi<float>();
 
       //Decide if the light is within the region to swap orbits
       int swapTarget = -1;
       int swapDirection = 0;
-      static const float thresholdDeg = 1.0f;
-      if (isWithinThresholdDeg(targetAngleDeg, orbitSwapAngles[lightData[i].orbitIndex][0],
-                               thresholdDeg)) {
+      const float threshold = 1.0f / 50.0f;
+      if (isWithinThreshold(targetAngle, orbitSwapAngles[lightData[i].orbitIndex][0],
+                            threshold)) {
         swapTarget = orbitSwapTargets[lightData[i].orbitIndex][0];
         swapDirection = 0;
       }
-      if (isWithinThresholdDeg(targetAngleDeg, orbitSwapAngles[lightData[i].orbitIndex][1],
-                               thresholdDeg)) {
+      if (isWithinThreshold(targetAngle, orbitSwapAngles[lightData[i].orbitIndex][1],
+                            threshold)) {
         swapTarget = orbitSwapTargets[lightData[i].orbitIndex][1];
         swapDirection = 1;
       }
@@ -357,9 +358,10 @@ namespace objectFieldDemo {
             //Set timer for new angle
             float newAngle = orbitSwapAngles[swapTarget][1 - swapDirection];
             if (!lightData[i].isOrbitClockwise) {
-              newAngle = 360.0f - newAngle;
+              newAngle = glm::two_pi<float>() - newAngle;
             }
-            lightData[i].orbitTimer.setTime((newAngle / 360.0f) * lightData[i].orbitPeriod);
+            lightData[i].orbitTimer.setTime((newAngle / glm::two_pi<float>()) * \
+              lightData[i].orbitPeriod);
 
             //Set new orbit and flip direction
             lightData[i].orbitIndex = swapTarget;
@@ -371,10 +373,10 @@ namespace objectFieldDemo {
       }
 
       //Calculate and set final position of light
-      float lightPositionX = (lightData[i].orbitRadius * \
-        std::cos(targetAngleRad)) + lightOrbitPosition.x;
-      float lightPositionY = (-lightData[i].orbitRadius * \
-        std::sin(targetAngleRad)) + lightOrbitPosition.y;
+      float lightPositionX = (lightData[i].orbitRadius * std::cos(targetAngle)) + \
+        lightOrbitPosition.x;
+      float lightPositionY = (-lightData[i].orbitRadius * std::sin(targetAngle)) + \
+        lightOrbitPosition.y;
       ammonite::models::position::setPosition(lightData[i].linkedModelId,
         glm::vec3(lightPositionX, 4.0f, lightPositionY));
     }
