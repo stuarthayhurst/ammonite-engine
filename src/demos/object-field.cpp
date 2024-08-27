@@ -46,7 +46,7 @@ namespace objectFieldDemo {
 
   //Non-orbit internal functions
   namespace {
-    void genRandomPosData(glm::vec3* objectData, int objectCount) {
+    static void genRandomPosData(glm::vec3* objectData, int objectCount) {
       for (int i = 0; i < objectCount; i++) {
         //Position;
         objectData[(i * 3) + 0].x = ammonite::utils::randomDouble(-10.0, 10.0);
@@ -63,7 +63,7 @@ namespace objectFieldDemo {
       }
     }
 
-    void genCubesCallback(std::vector<int>, int, void*) {
+    static void genCubesCallback(std::vector<int>, int, void*) {
       //Hold data for randomised cube positions
       int offset = lightCount + 1;
       int cubeCount = loadedModelIds.size() - offset;
@@ -83,7 +83,7 @@ namespace objectFieldDemo {
       ammonite::utils::status << "Shuffled cubes" << std::endl;
     }
 
-    void spawnCubeCallback(std::vector<int>, int, void*) {
+    static void spawnCubeCallback(std::vector<int>, int, void*) {
       int activeCameraId = ammonite::camera::getActiveCamera();
       int modelId = ammonite::models::copyModel(floorId);
       loadedModelIds.push_back(modelId);
