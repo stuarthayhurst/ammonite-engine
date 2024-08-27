@@ -21,7 +21,7 @@ namespace objectFieldDemo {
       float orbitPeriod;
       float orbitRadius;
       float scale = 0.1f;
-      float power = 40.0f;
+      float power = 30.0f;
 
       //Light/ orbit save data
       ammonite::utils::Timer orbitTimer;
@@ -32,7 +32,7 @@ namespace objectFieldDemo {
     } lightData[2];
 
     //General orbit config
-    int totalOrbits = 4;
+    int totalOrbits = 5;
     float transferProbability = 0.5f;
 
     //2D structures to store indices and ratios for orbit changes
