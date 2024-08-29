@@ -12,7 +12,7 @@
 
 ## Build system:
   - ### Targets:
-    - `build`, `debug`, `library`, `demo` and `threads` support `-j[CORE COUNT]`
+    - `build`, `debug`, `library`, `demo`, `threads` and `lint` support `-j[CORE COUNT]`
     - `make build` - Builds the demo and thread demo
     - `make debug` - Cleans build directory, then runs `make build` in debug mode
     - `make library` - Builds `build/libammonite.so`
@@ -25,6 +25,7 @@
     - `make uninstall` - Removes installed library
       - Custom install locations can be removed using the environment variable `INSTALL_DIR`
     - `make icons` - Creates `assets/icons/icon-*.png` from `assets/icons/icon.svg`
+    - `make lint` - Lints the project using `clang-tidy`
     - `make clean` - Cleans the build area (`build/`) and default runtime cache (`cache/`)
     - `make cache` - Clears the default runtime binary cache, useful if running into issues with caching
   - ### Flags:

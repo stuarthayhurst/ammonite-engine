@@ -76,6 +76,8 @@
   - ### Libraries:
     - `libglm-dev libglfw3-dev libglew-dev libstb-dev libassimp-dev`
     - `libdecor-0-0 libdecor-0-plugin-1-gtk` are required for Wayland window decorations
+  - ### Linting:
+    - `clang-tidy`
   - ### Icons:
     - `inkscape optipng`
 
