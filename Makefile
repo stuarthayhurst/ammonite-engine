@@ -17,6 +17,8 @@ HELPER_HEADER_SOURCE = $(shell ls ./src/helper/**/*.hpp)
 DEMO_OBJECTS_SOURCE = $(shell ls ./src/demos/**/*.cpp)
 DEMO_HEADER_SOURCE = $(shell ls ./src/demos/**/*.hpp)
 
+ALL_OBJECTS_SOURCE = $(AMMONITE_OBJECTS_SOURCE) $(HELPER_OBJECTS_SOURCE) $(DEMO_OBJECTS_SOURCE)
+
 OBJECT_DIR = $(BUILD_DIR)/objects
 AMMONITE_OBJECTS = $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.o,$(AMMONITE_OBJECTS_SOURCE)))
 HELPER_OBJECTS = $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.o,$(HELPER_OBJECTS_SOURCE)))
@@ -74,7 +76,14 @@ $(OBJECT_DIR)/threadDemo.o: ./src/threadDemo.cpp $(AMMONITE_HEADER_SOURCE)
 	@mkdir -p "$(OBJECT_DIR)"
 	$(CXX) ./src/threadDemo.cpp -c $(CXXFLAGS) -o "$@"
 
-.PHONY: build demo threads debug library headers install uninstall clean cache icons $(AMMONITE_HEADER_INSTALL)
+$(BUILD_DIR)/compile_flags.txt: $(ALL_OBJECTS_SOURCE)
+	@mkdir -p "$(BUILD_DIR)"
+	@rm -fv "$(BUILD_DIR)/compile_flags.txt"
+	@for arg in $(CXXFLAGS); do \
+		echo $$arg >> "$(BUILD_DIR)/compile_flags.txt"; \
+	done
+
+.PHONY: build demo threads debug library headers install uninstall clean lint cache icons $(AMMONITE_HEADER_INSTALL)
 build: demo threads
 demo: $(BUILD_DIR)/demo
 	@if [[ "$(DEBUG)" != "true" ]]; then \
@@ -107,6 +116,8 @@ uninstall:
 	@if [[ -d "$(HEADER_DIR)/ammonite" ]]; then rm -rf "$(HEADER_DIR)/ammonite"; fi
 clean: cache
 	@rm -rfv "$(BUILD_DIR)"
+lint: $(BUILD_DIR)/compile_flags.txt
+	clang-tidy -p "$(BUILD_DIR)" $(ALL_OBJECTS_SOURCE)
 cache:
 	@rm -rfv "$(CACHE_DIR)"
 icons:
