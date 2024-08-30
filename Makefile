@@ -18,6 +18,7 @@ DEMO_OBJECTS_SOURCE = $(shell ls ./src/demos/**/*.cpp)
 DEMO_HEADER_SOURCE = $(shell ls ./src/demos/**/*.hpp)
 
 ALL_OBJECTS_SOURCE = $(AMMONITE_OBJECTS_SOURCE) $(HELPER_OBJECTS_SOURCE) $(DEMO_OBJECTS_SOURCE)
+LINT_OBJECTS = $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.linted,$(ALL_OBJECTS_SOURCE)))
 
 OBJECT_DIR = $(BUILD_DIR)/objects
 AMMONITE_OBJECTS = $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.o,$(AMMONITE_OBJECTS_SOURCE)))
@@ -82,6 +83,10 @@ $(BUILD_DIR)/compile_flags.txt: $(ALL_OBJECTS_SOURCE)
 	@for arg in $(CXXFLAGS); do \
 		echo $$arg >> "$(BUILD_DIR)/compile_flags.txt"; \
 	done
+$(OBJECT_DIR)/%.linted: ./src/%.cpp
+	clang-tidy -p "$(BUILD_DIR)" $(subst $(OBJECT_DIR),./src,$(subst .linted,.cpp,$(@)))
+	@mkdir -p "$$(dirname $@)"
+	@touch "$@"
 
 .PHONY: build demo threads debug library headers install uninstall clean lint cache icons $(AMMONITE_HEADER_INSTALL)
 build: demo threads
@@ -117,7 +122,7 @@ uninstall:
 clean: cache
 	@rm -rfv "$(BUILD_DIR)"
 lint: $(BUILD_DIR)/compile_flags.txt
-	clang-tidy -p "$(BUILD_DIR)" $(ALL_OBJECTS_SOURCE)
+	@$(MAKE) $(LINT_OBJECTS)
 cache:
 	@rm -rfv "$(CACHE_DIR)"
 icons:
