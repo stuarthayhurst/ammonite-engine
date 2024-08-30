@@ -83,7 +83,7 @@ $(BUILD_DIR)/compile_flags.txt: $(ALL_OBJECTS_SOURCE)
 	@for arg in $(CXXFLAGS); do \
 		echo $$arg >> "$(BUILD_DIR)/compile_flags.txt"; \
 	done
-$(OBJECT_DIR)/%.linted: ./src/%.cpp
+$(OBJECT_DIR)/%.linted: ./src/%.cpp $(BUILD_DIR)/compile_flags.txt
 	clang-tidy -p "$(BUILD_DIR)" $(subst $(OBJECT_DIR),./src,$(subst .linted,.cpp,$(@)))
 	@mkdir -p "$$(dirname $@)"
 	@touch "$@"
@@ -121,8 +121,7 @@ uninstall:
 	@if [[ -d "$(HEADER_DIR)/ammonite" ]]; then rm -rf "$(HEADER_DIR)/ammonite"; fi
 clean: cache
 	@rm -rfv "$(BUILD_DIR)"
-lint: $(BUILD_DIR)/compile_flags.txt
-	@$(MAKE) $(LINT_OBJECTS)
+lint: $(LINT_OBJECTS)
 cache:
 	@rm -rfv "$(CACHE_DIR)"
 icons:
