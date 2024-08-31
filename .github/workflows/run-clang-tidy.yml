@@ -1,3 +1,4 @@
+# This workflow will lint the project using clang-tidy
 name: Clang-tidy linting
 
 on:
@@ -7,7 +8,7 @@ on:
     branches: '**'
 
 jobs:
-  build:
+  lint:
     runs-on: ubuntu-24.04
     steps:
     - uses: actions/checkout@v4

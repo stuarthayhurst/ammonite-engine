@@ -70,6 +70,7 @@
   - Package names are correct for Debian, other distros may vary
   - `make`
   - `pkg-config`
+  - `coreutils`
   - `g++` **OR** `clang`
     - If using clang, use `CXX="clang++" make [TARGET]`
     - When swapping between different compilers, run `make clean`
