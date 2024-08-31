@@ -1,0 +1,23 @@
+name: Clang-tidy linting
+
+on:
+  push:
+    branches: '**'
+  pull_request:
+    branches: '**'
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install build dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install --no-install-recommends make pkg-config build-essential
+        sudo apt-get install --no-install-recommends clang-tidy-18
+        sudo apt-get install --no-install-recommends libglm-dev libglfw3-dev libglew-dev libstb-dev libassimp-dev
+
+    - name: Run the linting target
+      run: |
+        make lint -j$(nproc)
