@@ -89,12 +89,6 @@
   - Some very basic usage information can be found in `docs/USAGE.md`
   - Better documentation is planned in the future
 
-## Notes:
-  - All targets are compiled with `-Wall` and `-Wextra`
-  - Targets are also compiled with `-O3` and `-flto`
-    - This should be fine for 99% of systems, but some may struggle to compile, or produce unstable results
-    - These can be changed by modifying `CXXFLAGS` in `Makefile`
-
 ## Screenshots:
 <p align="center">
   <img src="https://github.com/stuarthayhurst/ammonite/raw/master/docs/demo-1.png" alt="Demo 1">
