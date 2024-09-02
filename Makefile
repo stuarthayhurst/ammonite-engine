@@ -17,7 +17,10 @@ HELPER_HEADER_SOURCE = $(shell ls ./src/helper/**/*.hpp)
 DEMO_OBJECTS_SOURCE = $(shell ls ./src/demos/**/*.cpp)
 DEMO_HEADER_SOURCE = $(shell ls ./src/demos/**/*.hpp)
 
-ALL_OBJECTS_SOURCE = $(AMMONITE_OBJECTS_SOURCE) $(HELPER_OBJECTS_SOURCE) $(DEMO_OBJECTS_SOURCE)
+ROOT_OBJECTS_SOURCE = $(shell ls ./src/*.cpp)
+
+ALL_OBJECTS_SOURCE = $(AMMONITE_OBJECTS_SOURCE) $(HELPER_OBJECTS_SOURCE) $(DEMO_OBJECTS_SOURCE) \
+                     $(ROOT_OBJECTS_SOURCE)
 LINT_OBJECTS = $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.linted,$(ALL_OBJECTS_SOURCE)))
 
 OBJECT_DIR = $(BUILD_DIR)/objects
