@@ -80,7 +80,7 @@ $(OBJECT_DIR)/threadDemo.o: ./src/threadDemo.cpp $(AMMONITE_HEADER_SOURCE)
 	@mkdir -p "$(OBJECT_DIR)"
 	$(CXX) ./src/threadDemo.cpp -c $(CXXFLAGS) -o "$@"
 
-$(BUILD_DIR)/compile_flags.txt: $(ALL_OBJECTS_SOURCE)
+$(BUILD_DIR)/compile_flags.txt: Makefile
 	@mkdir -p "$(BUILD_DIR)"
 	@rm -fv "$(BUILD_DIR)/compile_flags.txt"
 	@for arg in $(CXXFLAGS); do \
