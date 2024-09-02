@@ -83,7 +83,7 @@ $(BUILD_DIR)/compile_flags.txt: $(ALL_OBJECTS_SOURCE)
 	@for arg in $(CXXFLAGS); do \
 		echo $$arg >> "$(BUILD_DIR)/compile_flags.txt"; \
 	done
-$(OBJECT_DIR)/%.linted: ./src/%.cpp $(BUILD_DIR)/compile_flags.txt
+$(OBJECT_DIR)/%.linted: ./src/%.cpp $(BUILD_DIR)/compile_flags.txt .clang-tidy
 	clang-tidy -p "$(BUILD_DIR)" $(subst $(OBJECT_DIR),./src,$(subst .linted,.cpp,$(@)))
 	@mkdir -p "$$(dirname $@)"
 	@touch "$@"
