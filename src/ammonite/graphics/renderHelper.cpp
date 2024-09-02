@@ -36,11 +36,9 @@ namespace ammonite {
           static double maxError = (1.0 / 50000.0);
           #define errorAdjustCoeff 1.01
 
-          //Figure out time budget remaining
-          double const targetFrameTime = 1.0 / *frameLimitPtr;
-          double spareTime = targetFrameTime - targetFrameTimer.getTime();
-
           //Sleep for successively shorter intervals until the frametime budget is gone
+          double spareTime;
+          const double targetFrameTime = 1.0 / *frameLimitPtr;
           while (targetFrameTime - targetFrameTimer.getTime() > maxError) {
             spareTime = targetFrameTime - targetFrameTimer.getTime();
             const auto sleepLength = std::chrono::nanoseconds(
