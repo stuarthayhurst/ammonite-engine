@@ -1,48 +1,52 @@
 # Contributing to Ammonite
 ## Overview:
-  - Your contributions and pull requests are welcome, this project can always use extra help!
-  - In short, to contribute:
-    - Make an issue describing what you're working on
-    - Thoroughly test the contribution
-    - Create a merge request, and make any requested changes
+  - Contributions and pull requests are very welcome, this project can always use extra help
+    - All contributions must be allowed under the license (`LICENCE.md`)
+    - All contributions must abide by the Code of Conduct (`docs/CODE_OF_CONDUCT.md`)
+  - The general process to contribute would be as follows:
+    - Fork the project, optionally create a branch from that
+    - Make your change and write a sensible commit message
+    - Ensure the project builds without any warnings, passes the linter and all workflows pass
+    - Create a merge request, and follow the template
+  - The aim of this document is to provide technical information, not be a general how-to guide
 
-## Working with issues:
-  - If someone else is already working on a reported issue, feel free help them out. Please don't try and commandeer the issue, if you want to work on something on your own, find another issue
-  - Please report large issues before submitting a pull request to fix them
-  - If you are working on your own issue, use that report as a space to track information and progress relating to the issue
-  - If any help is required, please make it known, instead of silently dropping the issue
-    - There's a label to use when help is wanted, to make searching for the issues easier
+## Build system:
+  - ### Targets:
+    - `build`, `debug`, `library`, `demo` and `threads` support `-j[CORE COUNT]`
+    - `make build` - Builds the demo and thread demo
+    - `make debug` - Cleans build directory, then runs `make build` in debug mode
+    - `make library` - Builds `build/libammonite.so`
+    - `make demo` - Builds a demo binary, a working demonstration of the renderer
+    - `make threads` - Builds a test program for the thread pool
+    - `make install` - Installs `libammonite.so` to system directories
+      - The install path can be configured, by setting the environment variable `INSTALL_DIR`
+    - `make headers` - Installs Ammonite headers to the system
+      - The install path can be configured, by setting the environment variable `HEADER_DIR`
+    - `make uninstall` - Removes installed library
+      - Custom install locations can be removed using the environment variable `INSTALL_DIR`
+    - `make icons` - Creates `assets/icons/icon-*.png` from `assets/icons/icon.svg`
+    - `make clean` - Cleans the build area (`build/`) and default runtime cache (`cache/`)
+    - `make cache` - Clears the default runtime binary cache, useful if running into issues with caching
+  - ### Flags:
+    - `DEBUG`: `true / false` - Compiles the target in debug mode
+    - `FAST`: `true / false` - Compiles with `-march=native` and uses a no-error context
+    - `INSTALL_DIR` - Install `libammonite.so` to a different location
+    - `HEADER_DIR` - Install Ammonite headers to a different location
 
-## General changes:
-  - To work on the project, for the repository first, so you can make changes to your copy
-  - Each commit should be a meaningful change, and be functional
-  - When the changes are ready, submit a pull request, as described in a later section
-  - If the changes aren't complete, submit the pull request as a draft instead
-  - Changes may be requested, please don't take them personally, they're just to ensure quality and consistency within the project
+## Debug mode:
+  - To compile in debug mode, use `make debug` or `DEBUG=true make ...`
+    - This enables additional checks and debug output from the engine
+    - It'll also enable graphics API debug warnings, messages and errors
+      - This will use a debug graphics context, if available
+    - Each object is compiled with debugging symbols, and `strip` is skipped
+  - Before swapping back to regular builds, run `make clean`
+  - `make debug` will create a fresh build every time
+  - `DEBUG=true make ...` can be used on any target, and only rebuilds changed objects
+    - If an initial `make clean` isn't used, the build may fail or produce broken results
 
-## Documentation changes:
-  - British English should be used in documentation, as well as consistent styling
-  - Any new dependencies should be documented under the relevant dependency section
-  - Documented information should be updated if the behaviour has changed
-
-## Build system changes:
-  - If the behaviour of a target is modified, it should be documented in `README.md`, under "Build system"
-  - New build system targets should be documented there, and removed targets removed from there as well
-  - New scripts should be placed in `scripts/`, and existing scripts are all located there
-
-## Code changes:
-  - The engine must successfully compile after all changes have been made
-    - If a demo requires code changes to be made, rebase it on your development branch and make the changes
-  - Build system information can be found in `README.md`, under "Build system"
-  - Debugging information can be found in `README.md`, under "Debug mode"
-
-## Submitting a pull request:
-  - When you believe your contribution to be complete, submit a pull request
-    - Follow the template provided when creating a pull request, and fill out relevant information
-    - If the code isn't ready to be merged yet, submit the changes as a draft
-  - Your changes will be reviewed and either given suggestions for changes, or it'll be approved and merged
-  - If possible, please write a summary of changes you made. This makes it easier to make a new release and document the changes
-
-## Other informaton:
-  - ALL changes must be allowed under the license (See `LICENSE.md`)
-  - ALL changes and discussions must abide by the Code of Conduct (`docs/CODE_OF_CONDUCT.md`)
+## Miscellaneous help:
+  - Spellings should use British English for both documentation and code
+  - New or modified build system targets need to be documented in the "Build system" section
+    - Non-development related targets should also be documented in `README.md`
+  - Any scripts should be placed in `scripts/`
+  - Icons should be regenerated using `make icons`

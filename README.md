@@ -7,6 +7,7 @@
   - A simple OpenGL based graphics engine, built to learn C++ and graphics programming
     - This isn't a serious, production-quality engine, please don't treat it as one
   - Despite the project being for learning, any contributions are still welcome
+    - See `docs/CONTRIBUTING.md` to get started
     - If you found this project interesting, any donations are greatly appreciated :)
 
 ## Features:
@@ -51,32 +52,19 @@
     - `--demo [DEMO]`: Launch a specific demo
     - `--vsync`: Enable / disable VSync (`true` / `false`)
 
-## Debug mode:
-  - To compile in debug mode, use `make debug` or `DEBUG=true make ...`
-    - This will compile some extras in the code to help with debugging (every header gets `iostream`)
-    - It will also enable OpenGL debug warnings, messages and errors
-    - Before swapping back to regular builds, run `make clean`
-
 ## Build system:
   - ### Targets:
-    - `build`, `debug`, `library`, `demo` and `threads` support `-j[CORE COUNT]`
+    - `build` and `library` support `-j[CORE COUNT]`
     - `make build` - Builds the demo and thread demo
-    - `make debug` - Cleans build directory, then runs `make build` in debug mode
     - `make library` - Builds `build/libammonite.so`
-    - `make demo` - Builds a demo binary, a working demonstration of the renderer
-    - `make threads` - Builds a test program for the thread pool
     - `make install` - Installs `libammonite.so` to system directories
       - The install path can be configured, by setting the environment variable `INSTALL_DIR`
     - `make headers` - Installs Ammonite headers to the system
       - The install path can be configured, by setting the environment variable `HEADER_DIR`
     - `make uninstall` - Removes installed library
       - Custom install locations can be removed using the environment variable `INSTALL_DIR`
-    - `make icons` - Creates `assets/icons/icon-*.png` from `assets/icons/icon.svg`
     - `make clean` - Cleans the build area (`build/`) and default runtime cache (`cache/`)
-    - `make cache` - Clears the default runtime binary cache, useful if running into issues with caching
-  - ### Flags:
-    - `DEBUG`: `true / false` - Compiles the target in debug mode
-    - `FAST`: `true / false` - Compiles with `-march=native` and uses a no-error context
+  - All targets and optional flags are documented [here](docs/CONTRIBUTING.md#build-system)
 
 ## Dependencies:
   - Package names are correct for Debian, other distros may vary
@@ -100,12 +88,6 @@
 ## Usage:
   - Some very basic usage information can be found in `docs/USAGE.md`
   - Better documentation is planned in the future
-
-## Notes:
-  - All targets are compiled with `-Wall` and `-Wextra`
-  - Targets are also compiled with `-O3` and `-flto`
-    - This should be fine for 99% of systems, but some may struggle to compile, or produce unstable results
-    - These can be changed by modifying `CXXFLAGS` in `Makefile`
 
 ## Screenshots:
 <p align="center">

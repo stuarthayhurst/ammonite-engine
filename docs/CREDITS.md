@@ -1,2 +1,2 @@
 ## Asset attribution:
- - `asset path` - `attribution`
+ - `assets/suzanne.obj` - `'The Blender Monkey'`
