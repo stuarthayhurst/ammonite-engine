@@ -1,0 +1,4 @@
+---
+Checks: '-clang-diagnostic-#pragma-messages'
+WarningsAsErrors: 'true,*'
+---

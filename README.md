@@ -70,12 +70,15 @@
   - Package names are correct for Debian, other distros may vary
   - `make`
   - `pkg-config`
+  - `coreutils`
   - `g++` **OR** `clang`
     - If using clang, use `CXX="clang++" make [TARGET]`
     - When swapping between different compilers, run `make clean`
   - ### Libraries:
     - `libglm-dev libglfw3-dev libglew-dev libstb-dev libassimp-dev`
     - `libdecor-0-0 libdecor-0-plugin-1-gtk` are required for Wayland window decorations
+  - ### Linting:
+    - `clang-tidy`
   - ### Icons:
     - `inkscape optipng`
 

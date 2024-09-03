@@ -63,8 +63,10 @@ namespace ammonite {
           int index = 0;
           for (unsigned int i = 0; i < meshPtr->mNumFaces; i++) {
             aiFace face = meshPtr->mFaces[i];
-            std::memcpy(&newMesh->indices[index], &face.mIndices[0],
-                        face.mNumIndices * sizeof(unsigned int));
+            if (&face.mIndices[0] != nullptr) {
+              std::memcpy(&newMesh->indices[index], &face.mIndices[0],
+                          face.mNumIndices * sizeof(unsigned int));
+            }
             index += face.mNumIndices;
           }
 
