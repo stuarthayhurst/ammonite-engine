@@ -115,6 +115,12 @@ namespace ammonite {
         return &lightTransforms;
       }
 
+      void destroyLightSystem() {
+        if (lightDataId != 0) {
+          glDeleteBuffers(1, &lightDataId);
+        }
+      }
+
       //Unlink a light source from a model, using only the model ID (doesn't touch the model)
       void unlinkByModel(int modelId) {
         //Get the ID of the light attached to the model

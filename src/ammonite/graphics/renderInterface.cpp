@@ -64,6 +64,7 @@ namespace ammonite {
         ammonite::thread::internal::destroyThreadPool();
         internal::deleteShaders();
         internal::destroyOpenGLObjects();
+        lighting::internal::destroyLightSystem();
         internal::deleteModelCache();
       }
 

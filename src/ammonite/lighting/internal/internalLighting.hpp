@@ -20,6 +20,7 @@ namespace ammonite {
 
       void updateLightSources();
       void setLightSourcesChanged();
+      void destroyLightSystem();
 
       std::map<int, LightSource>* getLightTrackerPtr();
       glm::mat4** getLightTransformsPtr();
