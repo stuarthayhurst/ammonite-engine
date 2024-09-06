@@ -43,16 +43,18 @@ namespace ammonite {
 
     //Data used by the light worker
     struct LightWorkerData {
-      ShaderLightSource* shaderData;
       glm::mat4* shadowProj;
       int i;
     };
+
+    ShaderLightSource* shaderData = nullptr;
+    AmmoniteCompletion* syncs = nullptr;
+    LightWorkerData* workerData = nullptr;
   }
 
   namespace {
     static void lightWork(void* userPtr) {
       int i = ((LightWorkerData*)userPtr)->i;
-      ShaderLightSource* shaderData = ((LightWorkerData*)userPtr)->shaderData;
       glm::mat4* shadowProj = ((LightWorkerData*)userPtr)->shadowProj;
 
       //Repacking light sources
@@ -119,6 +121,12 @@ namespace ammonite {
         if (lightDataId != 0) {
           glDeleteBuffers(1, &lightDataId);
         }
+
+        if (shaderData != nullptr) {
+          delete [] shaderData;
+          delete [] syncs;
+          delete [] workerData;
+        }
       }
 
       //Unlink a light source from a model, using only the model ID (doesn't touch the model)
@@ -156,21 +164,28 @@ namespace ammonite {
         glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f),
                                                 1.0f, 0.0f, *shadowFarPlanePtr);
 
-        //Resize packed light buffer
+        //Resize buffers
+        int shaderDataSize = sizeof(ShaderLightSource) * lightCount;
         if (prevLightCount != lightCount) {
           if (lightTransforms != nullptr) {
             delete [] lightTransforms;
+            delete [] shaderData;
+            delete [] syncs;
+            delete [] workerData;
           }
+
           lightTransforms = new glm::mat4[lightCount * 6];
+          shaderData = new ShaderLightSource[lightCount];
+          syncs = new AmmoniteCompletion[lightCount]{ATOMIC_FLAG_INIT};
+          workerData = new LightWorkerData[lightCount];
+        } else {
+          for (unsigned int i = 0; i < lightCount; i++) {
+            syncs[i].clear();
+          }
         }
 
         //Repack light sources into ShaderData (uses vec4s for OpenGL)
-        ShaderLightSource* shaderData = new ShaderLightSource[lightCount];
-        int shaderDataSize = sizeof(ShaderLightSource) * lightCount;
-        AmmoniteCompletion* syncs = new AmmoniteCompletion[lightCount]{ATOMIC_FLAG_INIT};
-        LightWorkerData* workerData = new LightWorkerData[lightCount];
         for (unsigned int i = 0; i < lightCount; i++) {
-          workerData[i].shaderData = shaderData;
           workerData[i].shadowProj = &shadowProj;
           workerData[i].i = i;
         }
@@ -181,8 +196,6 @@ namespace ammonite {
         for (unsigned int i = 0; i < lightCount; i++) {
           syncs[i].wait(false);
         }
-        delete [] syncs;
-        delete [] workerData;
 
         //If the light count hasn't changed, sub the data instead of recreating the buffer
         if (prevLightCount == lightTrackerMap.size()) {
@@ -197,7 +210,6 @@ namespace ammonite {
           glCreateBuffers(1, &lightDataId);
           glNamedBufferData(lightDataId, shaderDataSize, shaderData, GL_DYNAMIC_DRAW);
         }
-        delete [] shaderData;
 
         //Use the lighting shader storage buffer
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, lightDataId);
@@ -266,8 +278,15 @@ namespace ammonite {
       if (lightTrackerMap.size() == 0) {
         if (lightTransforms != nullptr) {
           delete [] lightTransforms;
+          delete [] shaderData;
+          delete [] syncs;
+          delete [] workerData;
         }
+
         lightTransforms = nullptr;
+        shaderData = nullptr;
+        syncs = nullptr;
+        workerData = nullptr;
       }
 
       lightSourcesChanged = true;
