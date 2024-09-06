@@ -11,6 +11,9 @@ namespace ammonite {
     void submitMultiple(AmmoniteWork work, void* userBuffer, int stride,
                         AmmoniteCompletion* completions, int jobCount);
     void waitWorkComplete(AmmoniteCompletion* completion);
+    void waitWorkCompleteUnsafe(AmmoniteCompletion* completion);
+    void resetCompletion(AmmoniteCompletion* completion);
+    void resetCompletionUnsafe(AmmoniteCompletion* completion);
 
     void blockThreadsAsync();
     void blockThreadsSync();

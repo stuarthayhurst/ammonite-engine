@@ -21,11 +21,32 @@ namespace ammonite {
       ammonite::thread::internal::submitMultiple(work, userBuffer, stride, completions, jobCount);
     }
 
+    //Wait for completion to be finished
     void waitWorkComplete(AmmoniteCompletion* completion) {
       //Wait for completion to become true
       if (completion != nullptr) {
         completion->wait(false);
       }
+    }
+
+    //Wait for completion to be finished, without a nullptr check
+    void waitWorkCompleteUnsafe(AmmoniteCompletion* completion) {
+      //Wait for completion to become true
+      completion->wait(false);
+    }
+
+    //Reset completion to be used again
+    void resetCompletion(AmmoniteCompletion* completion) {
+      //Reset the completion to false
+      if (completion != nullptr) {
+        completion->clear();
+      }
+    }
+
+    //Reset completion to be used again, without a nullptr check
+    void resetCompletionUnsafe(AmmoniteCompletion* completion) {
+      //Reset the completion to false
+      completion->clear();
     }
 
     void blockThreadsAsync() {

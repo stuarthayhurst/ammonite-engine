@@ -14,6 +14,7 @@
 #include "../core/threadManager.hpp"
 #include "../models/modelInterface.hpp"
 #include "../models/internal/modelTracker.hpp"
+#include "../thread.hpp"
 #include "../types.hpp"
 
 namespace ammonite {
@@ -180,7 +181,7 @@ namespace ammonite {
           workerData = new LightWorkerData[lightCount];
         } else {
           for (unsigned int i = 0; i < lightCount; i++) {
-            syncs[i].clear();
+            ammonite::thread::resetCompletionUnsafe(syncs + i);
           }
         }
 
@@ -194,7 +195,7 @@ namespace ammonite {
                                                    &syncs[0], lightCount);
 
         for (unsigned int i = 0; i < lightCount; i++) {
-          syncs[i].wait(false);
+          ammonite::thread::waitWorkCompleteUnsafe(syncs + i);
         }
 
         //If the light count hasn't changed, sub the data instead of recreating the buffer
