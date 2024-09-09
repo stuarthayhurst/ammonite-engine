@@ -5,7 +5,6 @@
 #include "../core/threadManager.hpp"
 #include "../core/fileManager.hpp"
 
-#include "../utils/debug.hpp"
 #include "../utils/timer.hpp"
 #include "../utils/logging.hpp"
 
@@ -37,11 +36,9 @@ namespace ammonite {
           return;
         }
 
-#ifdef DEBUG
-        ammoniteInternalDebug << "Created thread pool with " \
-                              << ammonite::thread::internal::getThreadPoolSize() \
-                              << " threads" << std::endl;
-#endif
+        ammonite::utils::status << "Created thread pool with " \
+                                << ammonite::thread::internal::getThreadPoolSize() \
+                                << " threads" << std::endl;
 
         //Check GPU supported required extensions
         int failureCount = 0;
