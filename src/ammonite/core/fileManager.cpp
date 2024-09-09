@@ -30,16 +30,20 @@ namespace ammonite {
       }
 
       namespace {
-        //Don't use this for security, you'll lose your job
+        /*
+         - Hash together fileCount paths from filePaths
+         - Don't use this for security, you'll lose your job
+        */
         static std::string generateCacheString(std::string* filePaths,
                                                unsigned int fileCount) {
           alignas(uint64_t) uint8_t output[8] = {0};
           uint8_t prev = 0;
 
           /*
-           - XOR the first byte of the hash with each character of each path
-           - After each character, sequentially XOR every byte of the hash with the result of
-             the previous XOR
+           - XOR the first byte of the hash with the first character of the first path
+           - Sequentially XOR every byte of the hash with the result of the previous
+             operation of this stage
+           - Repeat this process for every character of every path
           */
           for (unsigned int i = 0; i < fileCount; i++) {
             uint8_t* filePath = (uint8_t*)filePaths[i].c_str();
