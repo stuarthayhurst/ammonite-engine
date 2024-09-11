@@ -10,6 +10,11 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#if defined(__AVX512F__) && defined(__AVX512BW__) && defined(__VAES__) && defined(__BMI2__)
+  #define USE_VAES_AVX512
+  #include <immintrin.h>
+#endif
+
 #include "../enums.hpp"
 #include "../types.hpp"
 
@@ -32,8 +37,36 @@ namespace ammonite {
       namespace {
         /*
          - Hash together fileCount paths from filePaths
+           - Use an AVX-512 + VAES implementation, if supported
+           - The AVX-512 + VAES and generic versions produce different results, but both work
+             - On a Ryzen 7 7700X, the AVX-512 + VAES accelerated version is around 64x faster
          - Don't use this for security, you'll lose your job
         */
+#ifdef USE_VAES_AVX512
+        static std::string generateCacheString(std::string* filePaths, unsigned int fileCount) {
+          __m512i last = _mm512_setzero_epi32();
+          for (unsigned int i = 0; i < fileCount; i++) {
+            uint8_t* filePath = (uint8_t*)filePaths[i].c_str();
+            int pathSize = filePaths[i].length();
+
+            while (pathSize >= 64) {
+              __m512i a = _mm512_loadu_epi8(filePath);
+              last = _mm512_aesenc_epi128(last, a);
+
+              pathSize -= 64;
+              filePath += 64;
+            }
+
+            if (pathSize > 0) {
+              __mmask64 mask = _bzhi_u64(0xFFFFFFFF, pathSize);
+              __m512i a = _mm512_maskz_loadu_epi8(mask, filePath);
+              last = _mm512_aesenc_epi128(last, a);
+            }
+          }
+
+          return std::to_string((uint64_t)_mm512_reduce_add_epi64(last));
+        }
+#else
         static std::string generateCacheString(std::string* filePaths,
                                                unsigned int fileCount) {
           alignas(uint64_t) uint8_t output[8] = {0};
@@ -59,6 +92,7 @@ namespace ammonite {
 
           return std::to_string(*(uint64_t*)output);
         }
+#endif
 
         static std::string getCachedFilePath(std::string* filePaths, unsigned int fileCount) {
           return dataCachePath + generateCacheString(filePaths, fileCount) + std::string(".cache");
