@@ -22,3 +22,11 @@ jobs:
     - name: Run the linting target
       run: |
         make lint -j$(nproc)
+
+    - name: Clean the build area
+      run: |
+        make clean
+
+    - name: Run the linting target in debug mode
+      run: |
+        DEBUG=true make lint -j$(nproc)
