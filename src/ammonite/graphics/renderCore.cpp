@@ -1004,11 +1004,13 @@ namespace ammonite {
 
         //Enable post-processor when required, or blit would fail
         bool isPostRequired = *focalDepthEnabledPtr;
-        if (sampleCount == 0) {
-          //Workaround until non-multisampled rendering is done to an offscreen framebuffer
-          isPostRequired = true;
-        } else if (sampleCount != 0 && *renderResMultiplierPtr != 1.0f) {
-          //Workaround INVALID_OPERATION when scaling a multisampled buffer with a blit
+        if (sampleCount == 0 || *renderResMultiplierPtr != 1.0f) {
+          /*
+           - Workaround until non-multisampled rendering is done to an offscreen framebuffer
+             - sampleCount == 0
+           - Workaround INVALID_OPERATION when scaling a multisampled buffer with a blit
+             - sampleCount != 0 && *renderResMultiplierPtr != 1.0f
+          */
           isPostRequired = true;
         }
 
