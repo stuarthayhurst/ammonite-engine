@@ -77,7 +77,7 @@ namespace ammonite {
 
       //Calculate shadow transforms for shadows
       glm::vec3 lightPos = lightSource->geometry;
-      glm::mat4* transformStart = lightTransforms + (std::size_t)(lightSource->lightIndex * 6);
+      glm::mat4* transformStart = lightTransforms + (std::size_t)(lightSource->lightIndex) * 6;
       transformStart[0] = *shadowProj *
         glm::lookAt(lightPos, lightPos + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));
       transformStart[1] = *shadowProj *
@@ -176,7 +176,7 @@ namespace ammonite {
             delete [] workerData;
           }
 
-          lightTransforms = new glm::mat4[(std::size_t)(lightCount * 6)];
+          lightTransforms = new glm::mat4[(std::size_t)(lightCount) * 6];
           shaderData = new ShaderLightSource[lightCount];
           syncs = new AmmoniteCompletion[lightCount]{ATOMIC_FLAG_INIT};
           workerData = new LightWorkerData[lightCount];

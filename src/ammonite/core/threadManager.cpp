@@ -75,13 +75,13 @@ namespace {
         if (completions == nullptr) {
           for (int i = 0; i < count; i++) {
             sectionPtr->nextNode = new Node{{
-              work, (void*)((char*)userBuffer + (std::size_t)(i * stride)), nullptr}, nullptr};
+              work, (void*)((char*)userBuffer + (std::size_t)(i) * stride), nullptr}, nullptr};
             sectionPtr = sectionPtr->nextNode;
           }
         } else {
           for (int i = 0; i < count; i++) {
             sectionPtr->nextNode = new Node{{
-              work, (void*)((char*)userBuffer + (std::size_t)(i * stride)), completions + i}, nullptr};
+              work, (void*)((char*)userBuffer + (std::size_t)(i) * stride), completions + i}, nullptr};
             sectionPtr = sectionPtr->nextNode;
           }
         }

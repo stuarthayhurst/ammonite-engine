@@ -1,5 +1,6 @@
-#include <vector>
+#include <cstddef>
 #include <iostream>
+#include <vector>
 
 #include <glm/glm.hpp>
 
@@ -67,7 +68,7 @@ namespace manyCubesDemo {
     sideLength = int(sqrt(modelCount));
     for (int x = 0; x < sideLength; x++) {
       for (int y = 0; y < sideLength; y++) {
-        ammonite::models::position::setPosition(loadedModelIds[(x * sideLength) + y],
+        ammonite::models::position::setPosition(loadedModelIds[((std::size_t)x * sideLength) + y],
           glm::vec3(2.0f * float(x), 0.0f, 2.0f * float(y)));
       }
     }

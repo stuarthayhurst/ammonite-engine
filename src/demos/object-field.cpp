@@ -70,16 +70,19 @@ namespace objectFieldDemo {
       //Hold data for randomised cube positions
       int offset = lightCount + 1;
       int cubeCount = loadedModelIds.size() - offset;
-      glm::vec3* cubeData = new glm::vec3[(std::size_t)(cubeCount * 3)];
+      glm::vec3* cubeData = new glm::vec3[(std::size_t)(cubeCount) * 3];
 
       //Generate random position, rotation and scales, skip first item
       genRandomPosData(cubeData, cubeCount);
 
       for (int i = 0; i < cubeCount; i++) {
         //Position the cube
-        ammonite::models::position::setPosition(loadedModelIds[i + offset], cubeData[(i * 3) + 0]);
-        ammonite::models::position::setRotation(loadedModelIds[i + offset], cubeData[(i * 3) + 1]);
-        ammonite::models::position::setScale(loadedModelIds[i + offset], cubeData[(i * 3) + 2]);
+        ammonite::models::position::setPosition(loadedModelIds[(std::size_t)i + offset],
+          cubeData[(i * 3) + 0]);
+        ammonite::models::position::setRotation(loadedModelIds[(std::size_t)i + offset],
+          cubeData[(i * 3) + 1]);
+        ammonite::models::position::setScale(loadedModelIds[(std::size_t)i + offset],
+          cubeData[(i * 3) + 2]);
       }
 
       delete [] cubeData;
@@ -139,7 +142,7 @@ namespace objectFieldDemo {
       const float down = glm::half_pi<float>();
       const float indexOffsetAngle = glm::half_pi<float>() - (glm::pi<float>() / orbitCount);
 
-      float* swapAngles = new float[(std::size_t)(orbitCount * 2)];
+      float* swapAngles = new float[(std::size_t)(orbitCount) * 2];
       for (int orbit = 0; orbit < orbitCount; orbit++) {
         int writeIndex = orbit * 2;
 
@@ -169,7 +172,7 @@ namespace objectFieldDemo {
        - The second index points to the next
     */
     static int* calculateSwapTargets(int orbitCount) {
-      int* swapTargets = new int[(std::size_t)(orbitCount * 2)];
+      int* swapTargets = new int[(std::size_t)(orbitCount) * 2];
       for (int orbit = 0; orbit < orbitCount; orbit++) {
         int writeIndex = orbit * 2;
         swapTargets[writeIndex] = (orbit - 1) % orbitCount;
