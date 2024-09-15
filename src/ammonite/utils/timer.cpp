@@ -1,14 +1,15 @@
-#include <cstdint>
 #include <ctime>
 #include <typeinfo>
 
 #include "timer.hpp"
 
+static_assert(typeid(std::time_t) == typeid(long), "expected time_t to be signed");
+
 namespace ammonite {
   namespace utils {
     namespace {
       //Add nanoseconds to *time, account for wrap-around
-      static void addNanoseconds(std::timespec* time, int_least32_t nanoseconds) {
+      static void addNanoseconds(std::timespec* time, std::time_t nanoseconds) {
         static_assert(typeid(time->tv_nsec) == typeid(long),
                       "expected tv_nsec to be signed");
 
@@ -82,8 +83,8 @@ namespace ammonite {
 
     //Set the active time on the timer, without changing pause state
     void Timer::setTime(double newTime) {
-      std::time_t seconds = newTime;
-      std::time_t nanoseconds = (newTime - seconds) * 1000000000;
+      std::time_t seconds = (std::time_t)newTime;
+      std::time_t nanoseconds = (std::time_t)((newTime - (double)seconds) * 1000000000.0);
 
       //Set the time using seconds and nanoseconds
       setTime(seconds, nanoseconds);
@@ -123,7 +124,7 @@ namespace ammonite {
 
       //Handle seconds and wrap around nanoseconds
       startTime.tv_sec += now.tv_sec - stopTime.tv_sec;
-      int_least32_t nDiff = now.tv_nsec - stopTime.tv_nsec;
+      std::time_t nDiff = now.tv_nsec - stopTime.tv_nsec;
       addNanoseconds(&startTime, nDiff);
 
       timerRunning = true;
