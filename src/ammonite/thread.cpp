@@ -3,7 +3,7 @@
 
 namespace ammonite {
   namespace thread {
-    int getThreadPoolSize() {
+    unsigned int getThreadPoolSize() {
       return internal::getThreadPoolSize();
     }
 
