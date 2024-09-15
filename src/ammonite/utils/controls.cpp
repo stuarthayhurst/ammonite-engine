@@ -121,10 +121,11 @@ namespace ammonite {
     namespace {
       static void keyboardCameraCallback(std::vector<int>, int action, void* userPtr) {
         DirectionData* directionData = (DirectionData*)userPtr;
+        ammonite::utils::Timer* directionTimer = &directionData->directionTimer;
         //If it's an initial key press, start the timer and return
         if (action == GLFW_PRESS) {
-          directionData->directionTimer.reset();
-          directionData->directionTimer.unpause();
+          directionTimer->reset();
+          directionTimer->unpause();
           return;
         }
 
@@ -133,18 +134,18 @@ namespace ammonite {
 
         //Vector for current direction, without vertical component
         float horizontalAngle = ammonite::camera::getHorizontal(activeCameraId);
-        glm::vec3 horizontalDirection(std::sin(horizontalAngle),
-                                      0, std::cos(horizontalAngle));
+        glm::vec3 horizontalDirection(std::sin(horizontalAngle), 0,
+                                      std::cos(horizontalAngle));
 
         //Right vector, relative to the camera
-        glm::vec3 right = glm::vec3(std::sin(horizontalAngle - glm::half_pi<float>()),
-                                    0, std::cos(horizontalAngle - glm::half_pi<float>()));
+        glm::vec3 right = glm::vec3(std::sin(horizontalAngle - glm::half_pi<float>()), 0,
+                                    std::cos(horizontalAngle - glm::half_pi<float>()));
 
         //Get the current camera position
         glm::vec3 position = ammonite::camera::getPosition(activeCameraId);
 
         //Calculate the new position
-        float unitDelta = directionData->directionTimer.getTime() * controlSettings.movementSpeed;
+        float unitDelta = (float)directionTimer->getTime() * controlSettings.movementSpeed;
         switch (directionData->directionEnum) {
         case AMMONITE_FORWARD:
           position += horizontalDirection * unitDelta;
@@ -174,9 +175,9 @@ namespace ammonite {
         //Reset time between inputs
         if (action == GLFW_RELEASE) {
           //If it's a key release, stop the timer
-          directionData->directionTimer.pause();
+          directionTimer->pause();
         }
-        directionData->directionTimer.reset();
+        directionTimer->reset();
       }
     }
 
@@ -189,7 +190,7 @@ namespace ammonite {
           float fov = ammonite::camera::getFieldOfView(activeCameraId);
 
           //Only zoom if FoV will be between 1 and FoV limit
-          float newFov = fov - (yoffset * controlSettings.zoomSpeed);
+          float newFov = fov - ((float)yoffset * controlSettings.zoomSpeed);
           if (newFov > 0 and newFov <= controlSettings.fovLimit) {
             ammonite::camera::setFieldOfView(activeCameraId, newFov);
           }
@@ -209,8 +210,8 @@ namespace ammonite {
       static void cursorPositionCallback(GLFWwindow*, double xpos, double ypos) {
         if (isCameraActive) {
           //Work out distance moved since last movement
-          float xoffset = xpos - xposLast;
-          float yoffset = ypos - yposLast;
+          float xoffset = (float)(xpos - xposLast);
+          float yoffset = (float)(ypos - yposLast);
 
           //Update saved cursor positions
           xposLast = xpos;
