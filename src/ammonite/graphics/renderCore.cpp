@@ -937,7 +937,7 @@ namespace ammonite {
           }
 
           //Pass shadow transform matrices to depth shader
-          glm::mat4* lightTransformStart = *lightTransformsPtr + lightSource->lightIndex * 6;
+          glm::mat4* lightTransformStart = *lightTransformsPtr + (std::size_t)(lightSource->lightIndex * 6);
           for (int i = 0; i < 6; i++) {
             GLuint shadowMatrixId = glGetUniformLocation(depthShader.shaderId, std::string("shadowMatrices[" + std::to_string(i) + "]").c_str());
             //Fetch the transform from the tracker, and send to the shader

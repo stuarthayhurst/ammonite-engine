@@ -1,6 +1,7 @@
-#include <vector>
-#include <iostream>
+#include <cstddef>
 #include <cmath>
+#include <iostream>
+#include <vector>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
@@ -69,7 +70,7 @@ namespace objectFieldDemo {
       //Hold data for randomised cube positions
       int offset = lightCount + 1;
       int cubeCount = loadedModelIds.size() - offset;
-      glm::vec3* cubeData = new glm::vec3[cubeCount * 3];
+      glm::vec3* cubeData = new glm::vec3[(std::size_t)(cubeCount * 3)];
 
       //Generate random position, rotation and scales, skip first item
       genRandomPosData(cubeData, cubeCount);
@@ -138,7 +139,7 @@ namespace objectFieldDemo {
       const float down = glm::half_pi<float>();
       const float indexOffsetAngle = glm::half_pi<float>() - (glm::pi<float>() / orbitCount);
 
-      float* swapAngles = new float[orbitCount * 2];
+      float* swapAngles = new float[(std::size_t)(orbitCount * 2)];
       for (int orbit = 0; orbit < orbitCount; orbit++) {
         int writeIndex = orbit * 2;
 
@@ -168,7 +169,7 @@ namespace objectFieldDemo {
        - The second index points to the next
     */
     static int* calculateSwapTargets(int orbitCount) {
-      int* swapTargets = new int[orbitCount * 2];
+      int* swapTargets = new int[(std::size_t)(orbitCount * 2)];
       for (int orbit = 0; orbit < orbitCount; orbit++) {
         int writeIndex = orbit * 2;
         swapTargets[writeIndex] = (orbit - 1) % orbitCount;

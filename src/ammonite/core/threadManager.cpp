@@ -1,4 +1,5 @@
 #include <atomic>
+#include <cstddef>
 #include <semaphore>
 #include <thread>
 
@@ -73,14 +74,14 @@ namespace {
       } else {
         if (completions == nullptr) {
           for (int i = 0; i < count; i++) {
-            sectionPtr->nextNode = new Node{{work, (void*)((char*)userBuffer + (i * stride)),
-                                             nullptr}, nullptr};
+            sectionPtr->nextNode = new Node{{
+              work, (void*)((char*)userBuffer + (std::size_t)(i * stride)), nullptr}, nullptr};
             sectionPtr = sectionPtr->nextNode;
           }
         } else {
           for (int i = 0; i < count; i++) {
-            sectionPtr->nextNode = new Node{{work, (void*)((char*)userBuffer + (i * stride)),
-                                             completions + i}, nullptr};
+            sectionPtr->nextNode = new Node{{
+              work, (void*)((char*)userBuffer + (std::size_t)(i * stride)), completions + i}, nullptr};
             sectionPtr = sectionPtr->nextNode;
           }
         }
