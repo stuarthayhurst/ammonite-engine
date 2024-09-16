@@ -12,24 +12,33 @@ namespace ammonite {
     }
 
     /*
-     - Return a random integer from the closed interval [lower, upper]
-       - Negative numbers can be returned if returning to a signed type
-       - For example:
-         - (int)randomInt(-1, 1) can return the closed interval [-1, 1]
-         - (uintmax_t)randomInt(-1, 1) can return UINTMAX_MAX, 0 or 1
+     - Return a random unsigned integer from the closed interval [lower, upper]
     */
-    uintmax_t randomInt(uintmax_t lower, uintmax_t upper) {
+    uintmax_t randomUInt(uintmax_t lower, uintmax_t upper) {
       return std::uniform_int_distribution<uintmax_t>{lower, upper}(engine);
     }
 
-    //Return a random integer from the closed interval [0, upper]
-    uintmax_t randomInt(uintmax_t upper) {
+    //Return a random unsigned integer from the closed interval [0, upper]
+    uintmax_t randomUInt(uintmax_t upper) {
       return std::uniform_int_distribution<uintmax_t>{0, upper}(engine);
     }
 
     /*
+     - Return a random integer from the closed interval [lower, upper]
+       - Negative numbers are supported
+    */
+    intmax_t randomInt(intmax_t lower, intmax_t upper) {
+      return std::uniform_int_distribution<intmax_t>{lower, upper}(engine);
+    }
+
+    //Return a random integer from the closed interval [0, upper]
+    intmax_t randomInt(intmax_t upper) {
+      return std::uniform_int_distribution<intmax_t>{0, upper}(engine);
+    }
+
+    /*
      - Return a random double from the open interval [lower, upper)
-       - Negative numbers are supported, without any casts
+       - Negative numbers are supported
     */
     double randomDouble(double lower, double upper) {
       return std::uniform_real_distribution<double>{lower, upper}(engine);
@@ -42,7 +51,7 @@ namespace ammonite {
 
     /*
      - Return a random double from the closed interval [lower, upper]
-       - Negative numbers are supported, without any casts
+       - Negative numbers are supported
     */
     double randomDoubleClosed(double lower, double upper) {
       return std::uniform_real_distribution<double>{lower,
