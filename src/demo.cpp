@@ -21,6 +21,10 @@
                               NAMESPACE::rendererMainloop,\
                               NAMESPACE::demoExit}}
 
+#define HAS_SETUP_WINDOW   (1 << 0)
+#define HAS_SETUP_RENDERER (1 << 1)
+#define HAS_SETUP_CONTROLS (1 << 2)
+
 //Definitions for demo loading
 namespace {
   typedef int (*DemoFunctionType)(void);
@@ -40,109 +44,111 @@ namespace {
 }
 
 //Struct definitions
-struct CameraData {
-  int cameraIndex;
-  std::vector<int> cameraIds;
-};
+namespace {
+  struct CameraData {
+    int cameraIndex;
+    std::vector<int> cameraIds;
+  };
+}
 
 //Callbacks
-void inputFocusCallback(std::vector<int>, int, void*) {
-  ammonite::input::setInputFocus(!ammonite::input::getInputFocus());
-}
-
-void fullscreenToggleCallback(std::vector<int>, int, void*) {
-  ammonite::window::setFullscreen(!ammonite::window::getFullscreen());
-}
-
-void focalToggleCallback(std::vector<int>, int, void*) {
-  ammonite::renderer::settings::post::setFocalDepthEnabled(
-    !ammonite::renderer::settings::post::getFocalDepthEnabled());
-}
-
-void sprintToggleCallback(std::vector<int>, int action, void*) {
-  float movementSpeed = 0.0f;
-  if (action == GLFW_REPEAT) {
-    return;
+namespace {
+  static void inputFocusCallback(std::vector<int>, int, void*) {
+    ammonite::input::setInputFocus(!ammonite::input::getInputFocus());
   }
 
-  movementSpeed = ammonite::utils::controls::settings::getMovementSpeed();
-  movementSpeed *= (action == GLFW_PRESS) ? 2.0f : (1.0f / 2.0f);
-  ammonite::utils::controls::settings::setMovementSpeed(movementSpeed);
-}
-
-void cameraCycleCallback(std::vector<int>, int, void* userPtr) {
-  CameraData* cameraData = (CameraData*)userPtr;
-  cameraData->cameraIndex = (int)((cameraData->cameraIndex + 1) % cameraData->cameraIds.size());
-  ammonite::camera::setActiveCamera(cameraData->cameraIds[cameraData->cameraIndex]);
-}
-
-void changeFocalDepthCallback(std::vector<int>, int action, void* userPtr) {
-  static ammonite::utils::Timer focalDepthTimer;
-  if (action != GLFW_RELEASE) {
-    float sign = *(float*)userPtr;
-    const float unitsPerSecond = 0.8f;
-    const float focalTimeDelta = (float)focalDepthTimer.getTime();
-    float depth = ammonite::renderer::settings::post::getFocalDepth();
-
-    depth += focalTimeDelta * unitsPerSecond * sign;
-    ammonite::renderer::settings::post::setFocalDepth(depth);
-    focalDepthTimer.unpause();
-  } else {
-    focalDepthTimer.pause();
+  static void fullscreenToggleCallback(std::vector<int>, int, void*) {
+    ammonite::window::setFullscreen(!ammonite::window::getFullscreen());
   }
-  focalDepthTimer.reset();
-}
 
-void changeFrameRateCallback(std::vector<int>, int action, void* userPtr) {
-  static ammonite::utils::Timer frameRateTimer;
-  if (action != GLFW_RELEASE) {
-    float sign = *(float*)userPtr;
-    const float unitsPerSecond = 10.0f;
-    const float frameTimeDelta = (float)frameRateTimer.getTime();
-    float frameRate = ammonite::renderer::settings::getFrameLimit();
-
-    frameRate += frameTimeDelta * unitsPerSecond * sign;
-    ammonite::utils::status << "Set framerate to " << frameRate << " fps" << std::endl;
-    ammonite::renderer::settings::setFrameLimit(frameRate);
-    frameRateTimer.unpause();
-  } else {
-    frameRateTimer.pause();
+  static void focalToggleCallback(std::vector<int>, int, void*) {
+    ammonite::renderer::settings::post::setFocalDepthEnabled(
+      !ammonite::renderer::settings::post::getFocalDepthEnabled());
   }
-  frameRateTimer.reset();
+
+  static void sprintToggleCallback(std::vector<int>, int action, void*) {
+    float movementSpeed = 0.0f;
+    if (action == GLFW_REPEAT) {
+      return;
+    }
+
+    movementSpeed = ammonite::utils::controls::settings::getMovementSpeed();
+    movementSpeed *= (action == GLFW_PRESS) ? 2.0f : (1.0f / 2.0f);
+    ammonite::utils::controls::settings::setMovementSpeed(movementSpeed);
+  }
+
+  static void cameraCycleCallback(std::vector<int>, int, void* userPtr) {
+    CameraData* cameraData = (CameraData*)userPtr;
+    cameraData->cameraIndex = (int)((cameraData->cameraIndex + 1) % cameraData->cameraIds.size());
+    ammonite::camera::setActiveCamera(cameraData->cameraIds[cameraData->cameraIndex]);
+  }
+
+  static void changeFocalDepthCallback(std::vector<int>, int action, void* userPtr) {
+    static ammonite::utils::Timer focalDepthTimer;
+    if (action != GLFW_RELEASE) {
+      float sign = *(float*)userPtr;
+      const float unitsPerSecond = 0.8f;
+      const float focalTimeDelta = (float)focalDepthTimer.getTime();
+      float depth = ammonite::renderer::settings::post::getFocalDepth();
+
+      depth += focalTimeDelta * unitsPerSecond * sign;
+      ammonite::renderer::settings::post::setFocalDepth(depth);
+      focalDepthTimer.unpause();
+    } else {
+      focalDepthTimer.pause();
+    }
+    focalDepthTimer.reset();
+  }
+
+  static void changeFrameRateCallback(std::vector<int>, int action, void* userPtr) {
+    static ammonite::utils::Timer frameRateTimer;
+    if (action != GLFW_RELEASE) {
+      float sign = *(float*)userPtr;
+      const float unitsPerSecond = 10.0f;
+      const float frameTimeDelta = (float)frameRateTimer.getTime();
+      float frameRate = ammonite::renderer::settings::getFrameLimit();
+
+      frameRate += frameTimeDelta * unitsPerSecond * sign;
+      ammonite::utils::status << "Set framerate to " << frameRate << " fps" << std::endl;
+      ammonite::renderer::settings::setFrameLimit(frameRate);
+      frameRateTimer.unpause();
+    } else {
+      frameRateTimer.pause();
+    }
+    frameRateTimer.reset();
+  }
 }
 
 //Helpers
-void printMetrics(double frameTime) {
-  double frameRate = 0.0;
-  if (frameTime != 0.0) {
-    frameRate = 1 / frameTime;
+namespace {
+  static void printMetrics(double frameTime) {
+    double frameRate = 0.0;
+    if (frameTime != 0.0) {
+      frameRate = 1 / frameTime;
+    }
+
+    std::printf("%.2f fps", frameRate);
+    std::printf(" (%fms)\n", frameTime * 1000);
   }
 
-  std::printf("%.2f fps", frameRate);
-  std::printf(" (%fms)\n", frameTime * 1000);
-}
-
-#define HAS_SETUP_WINDOW   (1 << 0)
-#define HAS_SETUP_RENDERER (1 << 1)
-#define HAS_SETUP_CONTROLS (1 << 2)
-
-//Clean up anything that was created
-void cleanEngine(int setupBits, std::vector<int>* keybindIdsPtr) {
-  if (setupBits & HAS_SETUP_CONTROLS) {
-    ammonite::utils::controls::releaseFreeCamera();
-    if (keybindIdsPtr != nullptr) {
-      for (unsigned int i = 0; i < keybindIdsPtr->size(); i++) {
-        ammonite::input::unregisterKeybind((*keybindIdsPtr)[i]);
+  //Clean up anything that was created
+  static void cleanEngine(int setupBits, std::vector<int>* keybindIdsPtr) {
+    if (setupBits & HAS_SETUP_CONTROLS) {
+      ammonite::utils::controls::releaseFreeCamera();
+      if (keybindIdsPtr != nullptr) {
+        for (unsigned int i = 0; i < keybindIdsPtr->size(); i++) {
+          ammonite::input::unregisterKeybind((*keybindIdsPtr)[i]);
+        }
       }
     }
-  }
 
-  if (setupBits & HAS_SETUP_RENDERER) {
-    ammonite::renderer::setup::destroyRenderer();
-  }
+    if (setupBits & HAS_SETUP_RENDERER) {
+      ammonite::renderer::setup::destroyRenderer();
+    }
 
-  if (setupBits & HAS_SETUP_WINDOW) {
-    ammonite::window::destroyWindow();
+    if (setupBits & HAS_SETUP_WINDOW) {
+      ammonite::window::destroyWindow();
+    }
   }
 }
 
