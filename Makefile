@@ -87,7 +87,7 @@ $(BUILD_DIR)/compile_flags.txt: Makefile
 		echo $$arg >> "$(BUILD_DIR)/compile_flags.txt"; \
 	done
 $(OBJECT_DIR)/%.linted: ./src/%.cpp $(BUILD_DIR)/compile_flags.txt .clang-tidy
-	clang-tidy -p "$(BUILD_DIR)" $(subst $(OBJECT_DIR),./src,$(subst .linted,.cpp,$(@)))
+	clang-tidy --quiet -p "$(BUILD_DIR)" $(subst $(OBJECT_DIR),./src,$(subst .linted,.cpp,$(@)))
 	@mkdir -p "$$(dirname $@)"
 	@touch "$@"
 
