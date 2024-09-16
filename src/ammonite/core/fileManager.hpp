@@ -2,6 +2,7 @@
 #define FILEMANAGER
 
 #include <cstddef>
+#include <ctime>
 #include <string>
 
 #include "../enums.hpp"
@@ -11,7 +12,7 @@ namespace ammonite {
   namespace files {
     namespace internal {
       void deleteFile(std::string filePath);
-      bool getFileMetadata(std::string filePath, long long int* filesize, long long int* timestamp);
+      bool getFileMetadata(std::string filePath, std::size_t* filesize, std::time_t* timestamp);
 
       bool useDataCache(std::string dataCachePath);
       bool getCacheEnabled();

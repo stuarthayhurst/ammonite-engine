@@ -60,7 +60,7 @@ namespace ammonite {
 
           //Allocate and fill mesh indices
           newMesh->indices = new unsigned int[newMesh->indexCount];
-          int index = 0;
+          unsigned int index = 0;
           for (unsigned int i = 0; i < meshPtr->mNumFaces; i++) {
             aiFace face = meshPtr->mFaces[i];
             if (&face.mIndices[0] != nullptr) {
@@ -81,16 +81,14 @@ namespace ammonite {
             fullTexturePath = modelLoadInfo.modelDirectory + '/' + localTexturePath.C_Str();
 
             bool createdTextureSuccess = true;
-            int textureId = ammonite::textures::internal::loadTexture(fullTexturePath.c_str(),
-                                                                      false,
-                                                                      modelLoadInfo.srgbTextures,
-                                                                      &createdTextureSuccess);
+            unsigned int textureId = ammonite::textures::internal::loadTexture(fullTexturePath.c_str(),
+              false, modelLoadInfo.srgbTextures, &createdTextureSuccess);
             if (!createdTextureSuccess) {
               *externalSuccess = false;
               return;
             }
 
-            textureIdGroup.diffuseId = textureId;
+            textureIdGroup.diffuseId = (int)textureId;
           }
 
           if (material->GetTextureCount(aiTextureType_SPECULAR) > 0) {
@@ -98,16 +96,14 @@ namespace ammonite {
             fullTexturePath = modelLoadInfo.modelDirectory + '/' + localTexturePath.C_Str();
 
             bool createdTextureSuccess = true;
-            int textureId = ammonite::textures::internal::loadTexture(fullTexturePath.c_str(),
-                                                                      false,
-                                                                      modelLoadInfo.srgbTextures,
-                                                                      &createdTextureSuccess);
+            unsigned int textureId = ammonite::textures::internal::loadTexture(fullTexturePath.c_str(),
+              false, modelLoadInfo.srgbTextures, &createdTextureSuccess);
             if (!createdTextureSuccess) {
               *externalSuccess = false;
               return;
             }
 
-            textureIdGroup.specularId = textureId;
+            textureIdGroup.specularId = (int)textureId;
           }
 
           //Save texture IDs

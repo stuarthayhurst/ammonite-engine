@@ -17,7 +17,7 @@ namespace ammonite {
         float power = 1.0f;
         int lightId;
         int modelId = -1;
-        int lightIndex;
+        unsigned int lightIndex;
       };
     }
   }

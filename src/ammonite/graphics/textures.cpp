@@ -62,7 +62,7 @@ namespace ammonite {
 
       //Calculate the number of mipmaps levels to use
       int calculateMipmapLevels(int width, int height) {
-        return std::floor(std::log2(std::max(width, height))) + 1;
+        return (int)std::log2(std::max(width, height)) + 1;
       }
 
       /*

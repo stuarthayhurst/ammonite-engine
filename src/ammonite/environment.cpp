@@ -18,7 +18,7 @@ namespace ammonite {
   namespace environment {
     namespace {
       //Tracker for loaded skyboxes
-      std::unordered_set<int> skyboxTracker;
+      std::unordered_set<unsigned int> skyboxTracker;
       int activeSkybox = -1;
     }
 
@@ -42,7 +42,7 @@ namespace ammonite {
         //Load each face into a cubemap
         int width, height, nChannels;
         bool hasCreatedStorage = false;
-        for (unsigned int i = 0; i < 6; i++) {
+        for (int i = 0; i < 6; i++) {
           if (flipTextures) {
             stbi_set_flip_vertically_on_load_thread(true);
           }
@@ -101,7 +101,7 @@ namespace ammonite {
         glGenerateTextureMipmap(textureId);
 
         skyboxTracker.insert(textureId);
-        return textureId;
+        return (int)textureId;
       }
 
       int createSkybox(const char* texturePaths[6], bool* externalSuccess) {
@@ -147,7 +147,7 @@ namespace ammonite {
           for (unsigned int i = 0; i < faces.size(); i++) {
             //Check if the current face is the desired face
             if (faces[i].contains(faceOrder[targetFace])) {
-              foundIndex = i;
+              foundIndex = (int)i;
               break;
             }
           }

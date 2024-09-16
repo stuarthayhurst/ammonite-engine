@@ -3,14 +3,14 @@
 
 #include "timer.hpp"
 
-static_assert(typeid(std::time_t) == typeid(long), "expected time_t to be signed");
+static_assert(typeid(std::time_t) == typeid(signed long), "expected time_t to be signed");
 
 namespace ammonite {
   namespace utils {
     namespace {
       //Add nanoseconds to *time, account for wrap-around
       static void addNanoseconds(std::timespec* time, std::time_t nanoseconds) {
-        static_assert(typeid(time->tv_nsec) == typeid(long),
+        static_assert(typeid(time->tv_nsec) == typeid(signed long),
                       "expected tv_nsec to be signed");
 
         //Handle negative nanoseconds

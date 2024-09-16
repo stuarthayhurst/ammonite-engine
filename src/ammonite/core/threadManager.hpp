@@ -14,7 +14,7 @@ namespace ammonite {
 
       void submitWork(AmmoniteWork work, void* userPtr, AmmoniteCompletion* completion);
       void submitMultiple(AmmoniteWork work, void* userBuffer, int stride,
-                          AmmoniteCompletion* completions, int jobCount);
+                          AmmoniteCompletion* completions, unsigned int jobCount);
 
       void blockThreads(bool sync);
       void unblockThreads(bool sync);

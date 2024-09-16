@@ -28,9 +28,9 @@ namespace ammonite {
 
       struct MeshData {
         VertexData* meshData = nullptr;
-        int vertexCount = 0;
+        unsigned int vertexCount = 0;
         unsigned int* indices = nullptr;
-        int indexCount = 0;
+        unsigned int indexCount = 0;
         GLuint vertexBufferId = 0;
         GLuint elementBufferId = 0;
         GLuint vertexArrayId = 0;
@@ -56,7 +56,7 @@ namespace ammonite {
         std::vector<TextureIdGroup> textureIds;
         AmmoniteEnum drawMode = AMMONITE_DRAW_ACTIVE;
         int lightEmitterId = -1;
-        int lightIndex = -1;
+        unsigned int lightIndex = -1;
         std::string modelName;
         int modelId;
         AmmoniteEnum modelType = AMMONITE_MODEL;

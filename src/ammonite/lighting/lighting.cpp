@@ -46,7 +46,7 @@ namespace ammonite {
     //Data used by the light worker
     struct LightWorkerData {
       glm::mat4* shadowProj;
-      int i;
+      unsigned int i;
     };
 
     ShaderLightSource* shaderData = nullptr;
@@ -56,13 +56,13 @@ namespace ammonite {
 
   namespace {
     static void lightWork(void* userPtr) {
-      int i = ((LightWorkerData*)userPtr)->i;
+      unsigned int i = ((LightWorkerData*)userPtr)->i;
       glm::mat4* shadowProj = ((LightWorkerData*)userPtr)->shadowProj;
 
       //Repacking light sources
       auto lightIt = lightTrackerMap.begin();
       std::advance(lightIt, i);
-      auto lightSource = &lightIt->second;
+      lighting::internal::LightSource* lightSource = &lightIt->second;
       lightSource->lightIndex = i;
 
       //Override position for light emitting models, and add to tracker
@@ -167,7 +167,7 @@ namespace ammonite {
                                                 1.0f, 0.0f, *shadowFarPlanePtr);
 
         //Resize buffers
-        int shaderDataSize = sizeof(ShaderLightSource) * lightCount;
+        std::size_t shaderDataSize = sizeof(ShaderLightSource) * lightCount;
         if (prevLightCount != lightCount) {
           if (lightTransforms != nullptr) {
             delete [] lightTransforms;
@@ -201,7 +201,7 @@ namespace ammonite {
 
         //If the light count hasn't changed, sub the data instead of recreating the buffer
         if (prevLightCount == lightTrackerMap.size()) {
-          glNamedBufferSubData(lightDataId, 0, shaderDataSize, shaderData);
+          glNamedBufferSubData(lightDataId, 0, (GLsizeiptr)shaderDataSize, shaderData);
         } else {
           //If the buffer already exists, destroy it
           if (lightDataId != 0) {
@@ -210,7 +210,7 @@ namespace ammonite {
 
           //Add the shader data to a shader storage buffer object
           glCreateBuffers(1, &lightDataId);
-          glNamedBufferData(lightDataId, shaderDataSize, shaderData, GL_DYNAMIC_DRAW);
+          glNamedBufferData(lightDataId, (GLsizeiptr)shaderDataSize, shaderData, GL_DYNAMIC_DRAW);
         }
 
         //Use the lighting shader storage buffer

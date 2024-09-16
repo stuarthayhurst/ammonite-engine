@@ -72,7 +72,7 @@ void sprintToggleCallback(std::vector<int>, int action, void*) {
 
 void cameraCycleCallback(std::vector<int>, int, void* userPtr) {
   CameraData* cameraData = (CameraData*)userPtr;
-  cameraData->cameraIndex = (cameraData->cameraIndex + 1) % cameraData->cameraIds.size();
+  cameraData->cameraIndex = (int)((cameraData->cameraIndex + 1) % cameraData->cameraIds.size());
   ammonite::camera::setActiveCamera(cameraData->cameraIds[cameraData->cameraIndex]);
 }
 
@@ -81,7 +81,7 @@ void changeFocalDepthCallback(std::vector<int>, int action, void* userPtr) {
   if (action != GLFW_RELEASE) {
     float sign = *(float*)userPtr;
     const float unitsPerSecond = 0.8f;
-    const float focalTimeDelta = focalDepthTimer.getTime();
+    const float focalTimeDelta = (float)focalDepthTimer.getTime();
     float depth = ammonite::renderer::settings::post::getFocalDepth();
 
     depth += focalTimeDelta * unitsPerSecond * sign;
@@ -98,7 +98,7 @@ void changeFrameRateCallback(std::vector<int>, int action, void* userPtr) {
   if (action != GLFW_RELEASE) {
     float sign = *(float*)userPtr;
     const float unitsPerSecond = 10.0f;
-    const float frameTimeDelta = frameRateTimer.getTime();
+    const float frameTimeDelta = (float)frameRateTimer.getTime();
     float frameRate = ammonite::renderer::settings::getFrameLimit();
 
     frameRate += frameTimeDelta * unitsPerSecond * sign;
@@ -340,7 +340,7 @@ int main(int argc, char* argv[]) {
   if (useBenchmark) {
     std::cout << "\nBenchmark complete:" << std::endl;
     std::cout << "  Average fps: ";
-    printMetrics(utilityTimer.getTime() / ammonite::renderer::getTotalFrames());
+    printMetrics(utilityTimer.getTime() / (double)ammonite::renderer::getTotalFrames());
   }
 
   //Clean up and exit

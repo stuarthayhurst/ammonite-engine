@@ -47,7 +47,7 @@ namespace ammonite {
       modelIdPtrMapPtr = modelIdPtrMapAddr;
     }
 
-    int getModelCount(AmmoniteEnum modelType) {
+    unsigned int getModelCount(AmmoniteEnum modelType) {
       return modelSelector[modelType]->size();
     }
 
@@ -143,7 +143,7 @@ namespace ammonite {
   //Internally exposed model handling methods
   namespace models {
     namespace internal {
-      int getModelCount(AmmoniteEnum modelType) {
+      unsigned int getModelCount(AmmoniteEnum modelType) {
         return activeModelTracker.getModelCount(modelType);
       }
 
@@ -209,10 +209,10 @@ namespace ammonite {
 
         //Fill interleaved vertex + normal + texture buffer and index buffer
         glNamedBufferData(meshData->vertexBufferId,
-                          meshData->vertexCount * sizeof(models::internal::VertexData),
+                          meshData->vertexCount * (long)sizeof(models::internal::VertexData),
                           &meshData->meshData[0], GL_STATIC_DRAW);
         glNamedBufferData(meshData->elementBufferId,
-                          meshData->indexCount * sizeof(unsigned int),
+                          meshData->indexCount * (long)sizeof(unsigned int),
                           &meshData->indices[0], GL_STATIC_DRAW);
 
         //Destroy mesh data early
@@ -454,8 +454,8 @@ namespace ammonite {
 
         //Create new texture and apply to the mesh
         bool hasCreatedTexture = true;
-        int textureId = ammonite::textures::internal::loadTexture(texturePath, false, srgbTexture,
-                                                                  &hasCreatedTexture);
+        int textureId = (int)ammonite::textures::internal::loadTexture(texturePath, false,
+          srgbTexture, &hasCreatedTexture);
         if (!hasCreatedTexture) {
           *externalSuccess = false;
           return;

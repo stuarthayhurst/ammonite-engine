@@ -80,9 +80,9 @@ namespace manyCubesDemo {
       lightSourcePositions[i] = glm::vec3(ammonite::utils::randomInt(0, sideLength),
                                           4.0f,
                                           ammonite::utils::randomInt(0, sideLength));
-      float red = ammonite::utils::randomDouble(1.0);
-      float green = ammonite::utils::randomDouble(1.0);
-      float blue = ammonite::utils::randomDouble(1.0);
+      float red = (float)ammonite::utils::randomDouble(1.0);
+      float green = (float)ammonite::utils::randomDouble(1.0);
+      float blue = (float)ammonite::utils::randomDouble(1.0);
       ammonite::lighting::properties::setPower(lightSourceIds[i], 50.0f);
       ammonite::lighting::properties::setColour(lightSourceIds[i], glm::vec3(red, green, blue));
     }
@@ -103,13 +103,13 @@ namespace manyCubesDemo {
       int currLightSourceId = lightSourceIds[i];
       float x, z;
       while (invalid) {
-        x = ammonite::utils::randomDouble(-1.0, 1.0);
-        z = ammonite::utils::randomDouble(-1.0, 1.0);
+        x = (float)ammonite::utils::randomDouble(-1.0, 1.0);
+        z = (float)ammonite::utils::randomDouble(-1.0, 1.0);
 
         x += lightSourcePositions[i].x;
         z += lightSourcePositions[i].z;
-        if (x >= 0.0f and x <= sideLength) {
-          if (z >= 0.0f and z <= sideLength) {
+        if (x >= 0.0f and x <= (float)sideLength) {
+          if (z >= 0.0f and z <= (float)sideLength) {
             invalid = false;
           }
         }

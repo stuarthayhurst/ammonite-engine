@@ -1,5 +1,6 @@
 #include <atomic>
 #include <cstddef>
+#include <cstdint>
 #include <semaphore>
 #include <thread>
 
@@ -54,32 +55,32 @@ namespace {
     }
 
     void pushMultiple(AmmoniteWork work, void* userBuffer, int stride,
-                      AmmoniteCompletion* completions, int count) {
+                      AmmoniteCompletion* completions, unsigned int count) {
       //Generate section of linked list to insert
       Node* newNode = new Node{{nullptr, nullptr, nullptr}, nullptr};
       Node sectionStart;
       Node* sectionPtr = &sectionStart;
       if (userBuffer == nullptr) {
         if (completions == nullptr) {
-          for (int i = 0; i < count; i++) {
+          for (unsigned int i = 0; i < count; i++) {
             sectionPtr->nextNode = new Node{{work, nullptr, nullptr}, nullptr};
             sectionPtr = sectionPtr->nextNode;
           }
         } else {
-          for (int i = 0; i < count; i++) {
+          for (unsigned int i = 0; i < count; i++) {
             sectionPtr->nextNode = new Node{{work, nullptr, completions + i}, nullptr};
             sectionPtr = sectionPtr->nextNode;
           }
         }
       } else {
         if (completions == nullptr) {
-          for (int i = 0; i < count; i++) {
+          for (unsigned int i = 0; i < count; i++) {
             sectionPtr->nextNode = new Node{{
               work, (void*)((char*)userBuffer + (std::size_t)(i) * stride), nullptr}, nullptr};
             sectionPtr = sectionPtr->nextNode;
           }
         } else {
-          for (int i = 0; i < count; i++) {
+          for (unsigned int i = 0; i < count; i++) {
             sectionPtr->nextNode = new Node{{
               work, (void*)((char*)userBuffer + (std::size_t)(i) * stride), completions + i}, nullptr};
             sectionPtr = sectionPtr->nextNode;
@@ -133,7 +134,7 @@ namespace ammonite {
         std::atomic<int> blockBalance = 0;
 
         WorkQueue* workQueue;
-        std::atomic<int> jobCount = 0;
+        std::atomic<uintmax_t> jobCount = 0;
       }
 
       namespace {
@@ -197,7 +198,7 @@ namespace ammonite {
 
       //Submit multiple jobs without locking multiple times
       void submitMultiple(AmmoniteWork work, void* userBuffer, int stride,
-                          AmmoniteCompletion* completions, int newJobs) {
+                          AmmoniteCompletion* completions, unsigned int newJobs) {
         workQueue->pushMultiple(work, userBuffer, stride, completions, newJobs);
         jobCount += newJobs;
         jobCount.notify_all();

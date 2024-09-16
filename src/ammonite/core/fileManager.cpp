@@ -1,6 +1,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
+#include <ctime>
 #include <chrono>
 #include <filesystem>
 #include <string>
@@ -47,7 +48,7 @@ namespace ammonite {
           __m512i last = _mm512_setzero_epi32();
           for (unsigned int i = 0; i < fileCount; i++) {
             uint8_t* filePath = (uint8_t*)filePaths[i].c_str();
-            int pathSize = filePaths[i].length();
+            int pathSize = (int)filePaths[i].length();
 
             while (pathSize >= 64) {
               __m512i a = _mm512_loadu_epi8(filePath);
@@ -80,7 +81,7 @@ namespace ammonite {
           */
           for (unsigned int i = 0; i < fileCount; i++) {
             uint8_t* filePath = (uint8_t*)filePaths[i].c_str();
-            int pathLength = filePaths[i].length();
+            int pathLength = (int)filePaths[i].length();
             for (int i = 0; i < pathLength; i++) {
               output[0] ^= filePath[i];
               for (int j = 0; j < 8; j++) {
@@ -145,7 +146,8 @@ namespace ammonite {
           AmmoniteEnum result = AMMONITE_CACHE_INVALID;
           char* state = nullptr;
           unsigned int internalFileCount = 1;
-          long long int filesize = 0, modificationTime = 0;
+          std::size_t filesize = 0;
+          std::time_t modificationTime = 0;
           char* token = parseToken((char*)extraDataCopy, '\n', &state);
           do {
             //Give up if token is null, we didn't find enough files
@@ -178,7 +180,7 @@ namespace ammonite {
 
             //Check token matches file size
             nestedToken = parseToken(nullptr, ';', &nestedState);
-            if ((nestedToken == nullptr) || (std::atoll(nestedToken) != filesize)) {
+            if ((nestedToken == nullptr) || ((std::size_t)std::atoll(nestedToken) != filesize)) {
               break;
             }
 
@@ -213,8 +215,7 @@ namespace ammonite {
         }
       }
 
-      bool getFileMetadata(std::string filePath, long long int* filesize,
-                           long long int* timestamp) {
+      bool getFileMetadata(std::string filePath, std::size_t* filesize, std::time_t* timestamp) {
         //Give up if the file doesn't exist
         std::filesystem::path filesystemPath = std::string(filePath);
         if (!std::filesystem::exists(filesystemPath)) {
@@ -493,7 +494,8 @@ namespace ammonite {
         std::string extraData;
         std::size_t blockSizes[3];
         for (unsigned int i = 0; i < fileCount; i++) {
-          long long int filesize = 0, modificationTime = 0;
+          std::size_t filesize = 0;
+          std::time_t modificationTime = 0;
           ammonite::files::internal::getFileMetadata(filePaths[i], &filesize, &modificationTime);
           extraData.append("input;" + filePaths[i]);
           extraData.append(";" + std::to_string(filesize));

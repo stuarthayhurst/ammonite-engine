@@ -105,7 +105,7 @@ namespace ammonite {
       }
     }
 
-    void useIcons(const char* iconPaths[], int iconCount) {
+    void useIcons(const char* iconPaths[], unsigned int iconCount) {
       if (iconPaths == nullptr) {
         ammonite::utils::warning << "Failed to load icons (nullptr)" << std::endl;
         return;
@@ -132,11 +132,11 @@ namespace ammonite {
 
       //Pass icons to glfw
       if (iconCount != 0) {
-        glfwSetWindowIcon(windowPtr, iconCount, images);
+        glfwSetWindowIcon(windowPtr, (int)iconCount, images);
       }
 
       //Free the data
-      for (int i = 0; i < iconCount; i++) {
+      for (unsigned int i = 0; i < iconCount; i++) {
         stbi_image_free(images[i].pixels);
       }
       delete [] images;

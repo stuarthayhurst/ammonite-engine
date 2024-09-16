@@ -155,7 +155,7 @@ namespace ammonite {
     static GLenum attemptIdentifyShaderType(std::string shaderPath) {
       std::string lowerShaderPath;
       for (unsigned int i = 0; i < shaderPath.size(); i++) {
-        lowerShaderPath += std::tolower(shaderPath[i]);
+        lowerShaderPath += (char)std::tolower(shaderPath[i]);
       }
 
       //Try and match the filename to a supported shader

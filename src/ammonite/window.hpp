@@ -16,7 +16,7 @@ namespace ammonite {
     bool shouldWindowClose();
     int registerWindowCloseKeybind(int keycode);
     void setTitle(const char* title);
-    void useIcons(const char* iconPaths[], int iconCount);
+    void useIcons(const char* iconPaths[], unsigned int iconCount);
     void useIcon(const char* iconPath);
     void useIconDir(const char* iconDirPath);
 
