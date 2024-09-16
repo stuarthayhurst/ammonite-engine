@@ -1,4 +1,47 @@
 ---
-Checks: '-clang-diagnostic-#pragma-messages'
+Checks: [
+  '-clang-diagnostic-#pragma-messages',
+  'bugprone-assert-side-effect',
+  'bugprone-assignment-in-if-condition',
+  'bugprone-bad-signal-to-kill-thread',
+  'bugprone-bool-pointer-implicit-conversion',
+  'bugprone-branch-clone',
+  'bugprone-casting-through-void',
+  'bugprone-chained-comparison',
+  'bugprone-compare-pointer-to-member-virtual-function',
+  'bugprone-copy-constructor-init',
+  'bugprone-crtp-constructor-accessibility',
+  'bugprone-dangling-handle',
+  'bugprone-dynamic-static-initializers',
+  'bugprone-empty-catch',
+  'bugprone-exception-escape',
+  'bugprone-fold-init-type',
+  'bugprone-forward-declaration-namespace',
+  'bugprone-forwarding-reference-overload',
+  'bugprone-implicit-widening-of-multiplication-result',
+  'bugprone-inaccurate-erase',
+  'bugprone-inc-dec-in-conditions',
+  'bugprone-incorrect-enable-if',
+  'bugprone-incorrect-roundings',
+  'bugprone-infinite-loop',
+  'bugprone-integer-division',
+  'bugprone-lambda-function-name',
+  'bugprone-macro-parentheses',
+  'bugprone-macro-repeated-side-effects',
+  'bugprone-misplaced-operator-in-strlen-in-alloc',
+  'bugprone-misplaced-pointer-arithmetic-in-alloc',
+  'bugprone-misplaced-widening-cast',
+  'bugprone-move-forwarding-reference',
+  'bugprone-multi-level-implicit-pointer-conversion',
+  'bugprone-multiple-new-in-one-expression',
+  'bugprone-multiple-statement-macro',
+  'bugprone-narrowing-conversions'
+]
+CheckOptions:
+  - key: bugprone-implicit-widening-of-multiplication-result.UseCXXStaticCastsInCppSources
+    value: false
+  - key: bugprone-misplaced-widening-cast.CheckImplicitCasts
+    value: true
 WarningsAsErrors: 'true,*'
+SystemHeaders: 'false'
 ---
