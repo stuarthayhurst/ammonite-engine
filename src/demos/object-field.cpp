@@ -205,10 +205,10 @@ namespace objectFieldDemo {
 
   int preRendererInit() {
     //Pick number of orbits
-    totalOrbits = (int)ammonite::utils::randomInt(3, 8);
+    totalOrbits = ammonite::utils::randomInt(3, 8);
 
     //Pick number of lights
-    lightCount = (int)ammonite::utils::randomInt(2, totalOrbits);
+    lightCount = ammonite::utils::randomInt(2, totalOrbits);
 
     //Allocate and set light data
     lightData = new LightData[lightCount];
