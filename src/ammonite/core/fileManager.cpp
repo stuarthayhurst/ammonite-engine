@@ -70,7 +70,7 @@ namespace ammonite {
 #else
         static std::string generateCacheString(std::string* filePaths,
                                                unsigned int fileCount) {
-          alignas(uint64_t) uint8_t output[8] = {0};
+          alignas(uintmax_t) uint8_t output[sizeof(uintmax_t)] = {0};
           uint8_t prev = 0;
 
           /*
@@ -91,7 +91,7 @@ namespace ammonite {
             }
           }
 
-          return std::to_string(*(uint64_t*)output);
+          return std::to_string(*(uintmax_t*)output);
         }
 #endif
 
