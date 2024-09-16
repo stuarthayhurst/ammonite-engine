@@ -13,6 +13,7 @@
 #include "utils/debug.hpp"
 #include "utils/logging.hpp"
 #include "utils/random.hpp"
+#include "utils/thread.hpp"
 #include "utils/timer.hpp"
 
 #include "camera.hpp"
@@ -20,7 +21,6 @@
 #include "environment.hpp"
 #include "input.hpp"
 #include "interface.hpp"
-#include "thread.hpp"
 #include "types.hpp"
 #include "window.hpp"
 

@@ -29,7 +29,7 @@ AmmoniteCompletion* syncs = new AmmoniteCompletion[(jobCount)]{ATOMIC_FLAG_INIT}
 
 #define SYNC_THREADS(jobCount, syncs) \
 for (int i = 0; i < (jobCount); i++) { \
-  ammonite::thread::waitWorkComplete(&(syncs)[i]); \
+  ammonite::utils::thread::waitWorkComplete(&(syncs)[i]); \
 } \
 delete [] (syncs);
 
@@ -54,14 +54,14 @@ totalTimer.reset();
 bool passed = true; \
 int* values = new int[(jobCount)]{}; \
 for (int i = 0; i < (jobCount); i++) { \
-  ammonite::thread::submitWork(shortTask, &(values)[i], nullptr); \
+  ammonite::utils::thread::submitWork(shortTask, &(values)[i], nullptr); \
 }
 
 #define SUBMIT_SYNC_JOBS(jobCount, syncs) \
 bool passed = true; \
 int* values = new int[(jobCount)]{}; \
 for (int i = 0; i < (jobCount); i++) { \
-  ammonite::thread::submitWork(shortTask, &(values)[i], &(syncs)[i]); \
+  ammonite::utils::thread::submitWork(shortTask, &(values)[i], &(syncs)[i]); \
 }
 
 #define VERIFY_WORK(jobCount) \
@@ -85,7 +85,7 @@ struct ResubmitData {
 
 static void resubmitTask(void* userPtr) {
   ResubmitData* dataPtr = (ResubmitData*)userPtr;
-  ammonite::thread::submitWork(shortTask, dataPtr->writePtr, dataPtr->syncPtr);
+  ammonite::utils::thread::submitWork(shortTask, dataPtr->writePtr, dataPtr->syncPtr);
 }
 
 namespace {
@@ -118,8 +118,8 @@ namespace {
     submitTimer.pause();
 
     //Finish work
-    ammonite::thread::blockThreadsSync();
-    ammonite::thread::unblockThreadsSync();
+    ammonite::utils::thread::blockThreadsSync();
+    ammonite::utils::thread::unblockThreadsSync();
     FINISH_TIMERS
     VERIFY_WORK(jobCount)
 
@@ -149,7 +149,7 @@ namespace {
     CREATE_THREAD_POOL(0)
     PREP_SYNC(jobCount, syncs)
 
-    ammonite::thread::blockThreadsSync();
+    ammonite::utils::thread::blockThreadsSync();
 
     //Submit fast 'jobs'
     RESET_TIMERS
@@ -157,7 +157,7 @@ namespace {
     submitTimer.pause();
 
     //Finish work
-    ammonite::thread::unblockThreadsSync();
+    ammonite::utils::thread::unblockThreadsSync();
     SYNC_THREADS(jobCount, syncs)
     FINISH_TIMERS
     VERIFY_WORK(jobCount)
@@ -184,7 +184,7 @@ namespace {
     values = new int[(jobCount)]{};
     submitTimer.unpause();
     for (int i = 0; i < jobCount; i++) { \
-      ammonite::thread::submitWork(shortTask, &(values)[i], &(syncs)[i]); \
+      ammonite::utils::thread::submitWork(shortTask, &(values)[i], &(syncs)[i]); \
     }
     submitTimer.pause();
 
@@ -210,7 +210,7 @@ namespace {
     for (int i = 0; i < jobCount; i++) {
       data[i].writePtr = &values[i];
       data[i].syncPtr = &syncs[i];
-      ammonite::thread::submitWork(resubmitTask, &data[i], nullptr);
+      ammonite::utils::thread::submitWork(resubmitTask, &data[i], nullptr);
     }
     submitTimer.pause();
 
@@ -233,7 +233,7 @@ namespace {
     RESET_TIMERS
     bool passed = true;
     int* values = new int[jobCount]{};
-    ammonite::thread::submitMultiple(shortTask, (void*)&values[0],
+    ammonite::utils::thread::submitMultiple(shortTask, (void*)&values[0],
                                      sizeof(int), &syncs[0], jobCount);
     submitTimer.pause();
 
@@ -254,7 +254,7 @@ namespace {
     RESET_TIMERS
     bool passed = true;
     int* values = new int[jobCount]{};
-    ammonite::thread::submitMultiple(shortTask, (void*)&values[0],
+    ammonite::utils::thread::submitMultiple(shortTask, (void*)&values[0],
                                      sizeof(int), nullptr, jobCount);
     submitTimer.pause();
 
@@ -271,10 +271,10 @@ namespace {
   static bool testCreateBlockBlockUnblockUnblockSubmitDestroy(int jobCount) {
     CREATE_THREAD_POOL(0)
 
-    ammonite::thread::blockThreadsSync();
-    ammonite::thread::blockThreadsSync();
-    ammonite::thread::unblockThreadsSync();
-    ammonite::thread::unblockThreadsSync();
+    ammonite::utils::thread::blockThreadsSync();
+    ammonite::utils::thread::blockThreadsSync();
+    ammonite::utils::thread::unblockThreadsSync();
+    ammonite::utils::thread::unblockThreadsSync();
 
     SUBMIT_JOBS(jobCount)
     DESTROY_THREAD_POOL
@@ -285,9 +285,9 @@ namespace {
   static bool testCreateBlockBlockUnblockSubmitDestroy(int jobCount) {
     CREATE_THREAD_POOL(0)
 
-    ammonite::thread::blockThreadsSync();
-    ammonite::thread::blockThreadsSync();
-    ammonite::thread::unblockThreadsSync();
+    ammonite::utils::thread::blockThreadsSync();
+    ammonite::utils::thread::blockThreadsSync();
+    ammonite::utils::thread::unblockThreadsSync();
 
     SUBMIT_JOBS(jobCount)
     DESTROY_THREAD_POOL
@@ -298,11 +298,11 @@ namespace {
   static bool testCreateBlockBlockSubmitUnblockDestroy(int jobCount) {
     CREATE_THREAD_POOL(0)
 
-    ammonite::thread::blockThreadsSync();
-    ammonite::thread::blockThreadsSync();
+    ammonite::utils::thread::blockThreadsSync();
+    ammonite::utils::thread::blockThreadsSync();
 
     SUBMIT_JOBS(jobCount)
-    ammonite::thread::unblockThreadsSync();
+    ammonite::utils::thread::unblockThreadsSync();
 
     DESTROY_THREAD_POOL
     VERIFY_WORK(jobCount)
@@ -312,8 +312,8 @@ namespace {
   static bool testCreateBlockBlockSubmitDestroy(int jobCount) {
     CREATE_THREAD_POOL(0)
 
-    ammonite::thread::blockThreadsSync();
-    ammonite::thread::blockThreadsSync();
+    ammonite::utils::thread::blockThreadsSync();
+    ammonite::utils::thread::blockThreadsSync();
 
     SUBMIT_JOBS(jobCount)
     DESTROY_THREAD_POOL
@@ -324,9 +324,9 @@ namespace {
   static bool testCreateBlockUnblockUnblockSubmitDestroy(int jobCount) {
     CREATE_THREAD_POOL(0)
 
-    ammonite::thread::blockThreadsSync();
-    ammonite::thread::unblockThreadsSync();
-    ammonite::thread::unblockThreadsSync();
+    ammonite::utils::thread::blockThreadsSync();
+    ammonite::utils::thread::unblockThreadsSync();
+    ammonite::utils::thread::unblockThreadsSync();
 
     SUBMIT_JOBS(jobCount)
     DESTROY_THREAD_POOL
@@ -337,7 +337,7 @@ namespace {
   static bool testCreateUnblockSubmitDestroy(int jobCount) {
     CREATE_THREAD_POOL(0)
 
-    ammonite::thread::unblockThreadsSync();
+    ammonite::utils::thread::unblockThreadsSync();
 
     SUBMIT_JOBS(jobCount)
     DESTROY_THREAD_POOL
