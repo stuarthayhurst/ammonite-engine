@@ -10,7 +10,7 @@
 #include "../internal/interfaceTracker.hpp"
 #include "../internal/internalCamera.hpp"
 #include "../lighting/internal/internalLighting.hpp"
-#include "../utils/internal/threadManager.hpp"
+#include "../utils/internal/threadPool.hpp"
 
 /*
  - Externally exposed renderer functions

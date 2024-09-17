@@ -3,7 +3,7 @@
 #include <iostream>
 
 #include "ammonite/ammonite.hpp"
-#include "ammonite/utils/internal/threadManager.hpp"
+#include "ammonite/utils/internal/threadPool.hpp"
 
 #define JOB_COUNT (2 << 16)
 
