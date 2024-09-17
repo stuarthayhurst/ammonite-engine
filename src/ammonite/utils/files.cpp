@@ -19,8 +19,8 @@
 #include "../enums.hpp"
 #include "../types.hpp"
 
-#include "../utils/debug.hpp"
-#include "../utils/logging.hpp"
+#include "debug.hpp"
+#include "logging.hpp"
 
 #include "files.hpp"
 

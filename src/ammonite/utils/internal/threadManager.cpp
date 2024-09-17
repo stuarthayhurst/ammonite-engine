@@ -5,8 +5,8 @@
 #include <thread>
 
 #include "../../types.hpp"
-#include "../../utils/debug.hpp"
-#include "../../utils/logging.hpp"
+#include "../debug.hpp"
+#include "../logging.hpp"
 
 #define MAX_THREADS 512
 
