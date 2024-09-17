@@ -15,7 +15,6 @@
 #include "../models/modelInterface.hpp"
 #include "../models/internal/modelTracker.hpp"
 #include "../utils/thread.hpp"
-#include "../utils/internal/threadManager.hpp"
 #include "../types.hpp"
 
 namespace ammonite {
@@ -191,7 +190,7 @@ namespace ammonite {
           workerData[i].shadowProj = &shadowProj;
           workerData[i].i = i;
         }
-        ammonite::thread::internal::submitMultiple(lightWork, (void*)&workerData[0],
+        ammonite::utils::thread::submitMultiple(lightWork, (void*)&workerData[0],
                                                    sizeof(LightWorkerData),
                                                    &syncs[0], lightCount);
 

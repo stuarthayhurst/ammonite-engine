@@ -13,7 +13,7 @@
 #include "../utils/debug.hpp"
 #include "../utils/files.hpp"
 #include "../utils/logging.hpp"
-#include "../utils/internal/threadManager.hpp"
+#include "../utils/thread.hpp"
 #include "internal/internalExtensions.hpp"
 
 namespace ammonite {
@@ -103,7 +103,7 @@ namespace ammonite {
         data->shaderPaths[i] = shaderPaths[i];
       }
 
-      ammonite::thread::internal::submitWork(doCacheWork, data, nullptr);
+      ammonite::utils::thread::submitWork(doCacheWork, data, nullptr);
     }
 
     static bool checkObject(GLuint objectId, const char* actionString, GLenum statusEnum,
