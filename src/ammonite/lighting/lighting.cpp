@@ -12,10 +12,10 @@
 #include "internal/internalLighting.hpp"
 #include "../graphics/internal/internalRenderCore.hpp"
 
-#include "../core/threadManager.hpp"
 #include "../models/modelInterface.hpp"
 #include "../models/internal/modelTracker.hpp"
 #include "../utils/thread.hpp"
+#include "../utils/internal/threadManager.hpp"
 #include "../types.hpp"
 
 namespace ammonite {

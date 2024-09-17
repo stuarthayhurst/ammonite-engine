@@ -4,9 +4,9 @@
 #include <semaphore>
 #include <thread>
 
-#include "../types.hpp"
-#include "../utils/debug.hpp"
-#include "../utils/logging.hpp"
+#include "../../types.hpp"
+#include "../../utils/debug.hpp"
+#include "../../utils/logging.hpp"
 
 #define MAX_THREADS 512
 

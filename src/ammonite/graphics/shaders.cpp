@@ -10,11 +10,10 @@
 
 #include <GL/glew.h>
 
-#include "../core/threadManager.hpp"
-
 #include "../utils/debug.hpp"
 #include "../utils/files.hpp"
 #include "../utils/logging.hpp"
+#include "../utils/internal/threadManager.hpp"
 #include "internal/internalExtensions.hpp"
 
 namespace ammonite {

@@ -1,7 +1,7 @@
 #ifndef THREADMANAGER
 #define THREADMANAGER
 
-#include "../types.hpp"
+#include "../../types.hpp"
 
 namespace ammonite {
   namespace thread {

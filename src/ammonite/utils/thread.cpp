@@ -1,5 +1,5 @@
 #include "../types.hpp"
-#include "../core/threadManager.hpp"
+#include "internal/threadManager.hpp"
 
 namespace ammonite {
   namespace utils {

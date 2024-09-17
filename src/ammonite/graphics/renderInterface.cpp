@@ -2,8 +2,6 @@
 
 #include <GLFW/glfw3.h>
 
-#include "../core/threadManager.hpp"
-
 #include "../utils/files.hpp"
 #include "../utils/logging.hpp"
 #include "../utils/timer.hpp"
@@ -12,6 +10,7 @@
 #include "../internal/interfaceTracker.hpp"
 #include "../internal/internalCamera.hpp"
 #include "../lighting/internal/internalLighting.hpp"
+#include "../utils/internal/threadManager.hpp"
 
 /*
  - Externally exposed renderer functions
