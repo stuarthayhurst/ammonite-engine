@@ -10,10 +10,10 @@
 
 #include <GL/glew.h>
 
-#include "../core/fileManager.hpp"
 #include "../core/threadManager.hpp"
 
 #include "../utils/debug.hpp"
+#include "../utils/files.hpp"
 #include "../utils/logging.hpp"
 #include "internal/internalExtensions.hpp"
 
@@ -59,7 +59,7 @@ namespace ammonite {
       userData.copy((char*)userBuffer, userDataSize, 0);
 
       //Write the cache file, failure messages are also handled by it
-      ammonite::files::internal::writeCacheFile(data->cacheFilePath, data->shaderPaths,
+      ammonite::utils::files::writeCacheFile(data->cacheFilePath, data->shaderPaths,
         data->shaderCount, (unsigned char*)data->binaryData, data->binaryLength, userBuffer,
         userDataSize);
 
@@ -180,7 +180,7 @@ namespace ammonite {
 
       //Read the shader's source code
       std::size_t shaderCodeSize;
-      char* shaderCodePtr = (char*)ammonite::files::internal::loadFile(shaderPath,
+      char* shaderCodePtr = (char*)ammonite::utils::files::loadFile(shaderPath,
                                                                        &shaderCodeSize);
       if (shaderCodePtr == nullptr) {
         ammonite::utils::warning << "Failed to open '" << shaderPath << "'" << std::endl;
@@ -274,7 +274,7 @@ namespace ammonite {
     static int createProgramCached(std::string* shaderPaths, GLenum* shaderTypes,
                                    int shaderCount, bool* externalSuccess) {
       //Check for OpenGL and engine cache support
-      bool isCacheSupported = ammonite::files::internal::getCacheEnabled();
+      bool isCacheSupported = ammonite::utils::files::getCacheEnabled();
       isCacheSupported = isCacheSupported && isBinaryCacheSupported;
 
       //Try and fetch the cache, then try and load it into a program
@@ -287,7 +287,7 @@ namespace ammonite {
         AmmoniteEnum cacheState;
 
         //Attempt to load the cached program
-        unsigned char* cacheData = ammonite::files::internal::getCachedFile(&cacheFilePath,
+        unsigned char* cacheData = ammonite::utils::files::getCachedFile(&cacheFilePath,
           shaderPaths, shaderCount, &cacheDataSize, &userData, &userDataSize, &cacheState);
 
         //Fetch and validate binary format
@@ -318,7 +318,7 @@ namespace ammonite {
                                      << "'" << std::endl;
             ammonite::utils::status << "Clearing '" << cacheFilePath << "'" << std::endl;
             glDeleteProgram(programId);
-            ammonite::files::internal::deleteFile(cacheFilePath);
+            ammonite::utils::files::deleteFile(cacheFilePath);
           }
         }
       }

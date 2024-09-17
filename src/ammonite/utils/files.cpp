@@ -22,13 +22,13 @@
 #include "../utils/debug.hpp"
 #include "../utils/logging.hpp"
 
-#include "fileManager.hpp"
+#include "files.hpp"
 
 #define MAX_LOAD_ATTEMPTS 10
 
 namespace ammonite {
-  namespace files {
-    namespace internal {
+  namespace utils {
+    namespace files {
       namespace {
         //Whether or not this manager is ready for cache use
         bool cacheEnabled = false;
@@ -173,8 +173,8 @@ namespace ammonite {
             }
 
             //Get filesize and time of last modification of the shader source
-            if (!ammonite::files::internal::getFileMetadata(currentFilePath, &filesize,
-                                                            &modificationTime)) {
+            if (!ammonite::utils::files::getFileMetadata(currentFilePath, &filesize,
+                                                         &modificationTime)) {
               break;
             }
 
@@ -496,7 +496,7 @@ namespace ammonite {
         for (unsigned int i = 0; i < fileCount; i++) {
           std::size_t filesize = 0;
           std::time_t modificationTime = 0;
-          ammonite::files::internal::getFileMetadata(filePaths[i], &filesize, &modificationTime);
+          ammonite::utils::files::getFileMetadata(filePaths[i], &filesize, &modificationTime);
           extraData.append("input;" + filePaths[i]);
           extraData.append(";" + std::to_string(filesize));
           extraData.append(";" + std::to_string(modificationTime) + "\n");
@@ -526,7 +526,7 @@ namespace ammonite {
                     sizeof(blockSizes));
 
         //Write the data, user data and cache info to the cache file
-        if (!ammonite::files::internal::writeFile(cacheFilePath, fileData, totalDataSize)) {
+        if (!ammonite::utils::files::writeFile(cacheFilePath, fileData, totalDataSize)) {
           ammonite::utils::warning << "Failed to cache '" << cacheFilePath << "'" << std::endl;
           deleteCacheFile(cacheFilePath);
           delete [] fileData;

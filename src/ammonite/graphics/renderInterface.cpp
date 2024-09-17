@@ -3,10 +3,10 @@
 #include <GLFW/glfw3.h>
 
 #include "../core/threadManager.hpp"
-#include "../core/fileManager.hpp"
 
-#include "../utils/timer.hpp"
+#include "../utils/files.hpp"
 #include "../utils/logging.hpp"
+#include "../utils/timer.hpp"
 
 #include "internal/internalRenderCore.hpp"
 #include "../internal/interfaceTracker.hpp"
@@ -66,7 +66,7 @@ namespace ammonite {
       }
 
       bool useShaderCache(const char* shaderCachePath) {
-        return ammonite::files::internal::useDataCache(std::string(shaderCachePath));
+        return ammonite::utils::files::useDataCache(std::string(shaderCachePath));
       }
     }
 

@@ -9,8 +9,8 @@
 #include "../types.hpp"
 
 namespace ammonite {
-  namespace files {
-    namespace internal {
+  namespace utils {
+    namespace files {
       void deleteFile(std::string filePath);
       bool getFileMetadata(std::string filePath, std::size_t* filesize, std::time_t* timestamp);
 
