@@ -4,21 +4,23 @@
 #include "../../types.hpp"
 
 namespace ammonite {
-  namespace thread {
-    namespace internal {
-      unsigned int getHardwareThreadCount();
-      unsigned int getThreadPoolSize();
+  namespace utils {
+    namespace thread {
+      namespace internal {
+        unsigned int getHardwareThreadCount();
+        unsigned int getThreadPoolSize();
 
-      int createThreadPool(unsigned int extraThreads);
-      void destroyThreadPool();
+        int createThreadPool(unsigned int extraThreads);
+        void destroyThreadPool();
 
-      void submitWork(AmmoniteWork work, void* userPtr, AmmoniteCompletion* completion);
-      void submitMultiple(AmmoniteWork work, void* userBuffer, int stride,
-                          AmmoniteCompletion* completions, unsigned int jobCount);
+        void submitWork(AmmoniteWork work, void* userPtr, AmmoniteCompletion* completion);
+        void submitMultiple(AmmoniteWork work, void* userBuffer, int stride,
+                            AmmoniteCompletion* completions, unsigned int jobCount);
 
-      void blockThreads(bool sync);
-      void unblockThreads(bool sync);
-      void finishWork();
+        void blockThreads(bool sync);
+        void unblockThreads(bool sync);
+        void finishWork();
+      }
     }
   }
 }

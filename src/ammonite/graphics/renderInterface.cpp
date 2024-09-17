@@ -29,14 +29,14 @@ namespace ammonite {
         ammonite::utils::Timer loadTimer;
 
         //Create a thread pool
-        if (ammonite::thread::internal::createThreadPool(0) == -1) { \
+        if (ammonite::utils::thread::internal::createThreadPool(0) == -1) { \
           ammonite::utils::error << "Failed to create thread pool" << std::endl;
           *externalSuccess = false;
           return;
         }
 
         ammonite::utils::status << "Created thread pool with " \
-                                << ammonite::thread::internal::getThreadPoolSize() \
+                                << ammonite::utils::thread::internal::getThreadPoolSize() \
                                 << " threads" << std::endl;
 
         //Check GPU supported required extensions
@@ -57,7 +57,7 @@ namespace ammonite {
       }
 
       void destroyRenderer() {
-        ammonite::thread::internal::destroyThreadPool();
+        ammonite::utils::thread::internal::destroyThreadPool();
         internal::deleteShaders();
         internal::destroyOpenGLObjects();
         lighting::internal::destroyLightSystem();

@@ -9,7 +9,7 @@ namespace ammonite {
           - Returns 0 if the pool doesn't exist
       */
       unsigned int getThreadPoolSize() {
-        return ammonite::thread::internal::getThreadPoolSize();
+        return ammonite::utils::thread::internal::getThreadPoolSize();
       }
 
       /*
@@ -17,7 +17,7 @@ namespace ammonite {
          - userPtr may be a nullptr
       */
       void submitWork(AmmoniteWork work, void* userPtr) {
-        ammonite::thread::internal::submitWork(work, userPtr, nullptr);
+        ammonite::utils::thread::internal::submitWork(work, userPtr, nullptr);
       }
 
       /*
@@ -26,7 +26,7 @@ namespace ammonite {
          - userPtr may be a nullptr
       */
       void submitWork(AmmoniteWork work, void* userPtr, AmmoniteCompletion* completion) {
-        ammonite::thread::internal::submitWork(work, userPtr, completion);
+        ammonite::utils::thread::internal::submitWork(work, userPtr, completion);
       }
 
       /*
@@ -40,7 +40,7 @@ namespace ammonite {
       */
       void submitMultiple(AmmoniteWork work, void* userBuffer, int stride,
                           AmmoniteCompletion* completions, unsigned int jobCount) {
-        ammonite::thread::internal::submitMultiple(work, userBuffer, stride, completions, jobCount);
+        ammonite::utils::thread::internal::submitMultiple(work, userBuffer, stride, completions, jobCount);
       }
 
       //Wait for completion to be finished
@@ -73,27 +73,27 @@ namespace ammonite {
 
       //Block the thread pool from starting newer jobs, return immediately
       void blockThreadsAsync() {
-        ammonite::thread::internal::blockThreads(false);
+        ammonite::utils::thread::internal::blockThreads(false);
       }
 
       //Block the thread pool from starting newer jobs, return after it takes effect
       void blockThreadsSync() {
-        ammonite::thread::internal::blockThreads(true);
+        ammonite::utils::thread::internal::blockThreads(true);
       }
 
       //Unblock the thread pool from starting newer jobs, return immediately
       void unblockThreadsAsync() {
-        ammonite::thread::internal::unblockThreads(false);
+        ammonite::utils::thread::internal::unblockThreads(false);
       }
 
       //Unblock the thread pool from starting newer jobs, return after it takes effect
       void unblockThreadsSync() {
-        ammonite::thread::internal::unblockThreads(true);
+        ammonite::utils::thread::internal::unblockThreads(true);
       }
 
       //Wait until all work in the pool as of the call is finished
       void finishWork() {
-        ammonite::thread::internal::finishWork();
+        ammonite::utils::thread::internal::finishWork();
       }
     }
   }

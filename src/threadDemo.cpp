@@ -8,20 +8,20 @@
 #define JOB_COUNT (2 << 16)
 
 #define CREATE_THREAD_POOL(THREADS) \
-if (ammonite::thread::internal::createThreadPool((THREADS)) == -1) { \
+if (ammonite::utils::thread::internal::createThreadPool((THREADS)) == -1) { \
   ammonite::utils::error << "Failed to create thread pool, exiting" << std::endl; \
   return false; \
 }
 
 #ifdef DEBUG
   #define DESTROY_THREAD_POOL \
-  ammonite::thread::internal::destroyThreadPool(); \
-  if (ammonite::thread::internal::debugCheckRemainingWork(false)) { \
+  ammonite::utils::thread::internal::destroyThreadPool(); \
+  if (ammonite::utils::thread::internal::debugCheckRemainingWork(false)) { \
     passed = false; \
   }
 #else
   #define DESTROY_THREAD_POOL \
-  ammonite::thread::internal::destroyThreadPool();
+  ammonite::utils::thread::internal::destroyThreadPool();
 #endif
 
 #define PREP_SYNC(jobCount, syncs) \
@@ -348,7 +348,7 @@ namespace {
 
 int main() {
   bool failed = false;
-  ammonite::utils::status << ammonite::thread::internal::getHardwareThreadCount() \
+  ammonite::utils::status << ammonite::utils::thread::internal::getHardwareThreadCount() \
                           << " hardware threads detected" << std::endl;
 
   //Begin regular tests
