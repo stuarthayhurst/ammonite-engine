@@ -4,16 +4,16 @@
 #include <glm/gtc/constants.hpp>
 #include <GLFW/glfw3.h>
 
-#include "../core/inputManager.hpp"
-#include "../core/windowManager.hpp"
+#include "core/inputManager.hpp"
+#include "core/windowManager.hpp"
 
-#include "../camera.hpp"
-#include "../enums.hpp"
-#include "timer.hpp"
+#include "camera.hpp"
+#include "enums.hpp"
+#include "utils/timer.hpp"
 
 //Store and expose controls settings
 namespace ammonite {
-  namespace utils {
+  namespace controls {
     namespace {
       //Structure to store base speeds, multipliers and calculated speeds
       struct ControlSettings {
@@ -32,59 +32,57 @@ namespace ammonite {
         //Default to a 120 degree field of view limit
         float fovLimit = glm::two_pi<float>() / 3;
 
-        //Final sensitivites, exposed through "internal/runtimeSettings.hpp"
+        //Final sensitivities, exposed through "internal/runtimeSettings.hpp"
         float movementSpeed = baseSettings.movementSpeed;
         float mouseSpeed = baseSettings.mouseSpeed;
         float zoomSpeed = baseSettings.zoomSpeed;
       } controlSettings;
     }
 
-    namespace controls {
-      namespace settings {
-        void setMovementSpeed(float newMovementSpeed) {
-          controlSettings.multipliers.movement = newMovementSpeed;
-          controlSettings.movementSpeed = controlSettings.baseSettings.movementSpeed *
-            newMovementSpeed;
-        }
+    namespace settings {
+      void setMovementSpeed(float newMovementSpeed) {
+        controlSettings.multipliers.movement = newMovementSpeed;
+        controlSettings.movementSpeed = controlSettings.baseSettings.movementSpeed *
+          newMovementSpeed;
+      }
 
-        void setMouseSpeed(float newMouseSpeed) {
-          controlSettings.multipliers.mouse = newMouseSpeed;
-          controlSettings.mouseSpeed = controlSettings.baseSettings.mouseSpeed * newMouseSpeed;
-        }
+      void setMouseSpeed(float newMouseSpeed) {
+        controlSettings.multipliers.mouse = newMouseSpeed;
+        controlSettings.mouseSpeed = controlSettings.baseSettings.mouseSpeed * newMouseSpeed;
+      }
 
-        void setZoomSpeed(float newZoomSpeed) {
-          controlSettings.multipliers.zoom = newZoomSpeed;
-          controlSettings.zoomSpeed = controlSettings.baseSettings.zoomSpeed * newZoomSpeed;
-        }
+      void setZoomSpeed(float newZoomSpeed) {
+        controlSettings.multipliers.zoom = newZoomSpeed;
+        controlSettings.zoomSpeed = controlSettings.baseSettings.zoomSpeed * newZoomSpeed;
+      }
 
-        //Radians
-        void setFovLimit(float newFovLimit) {
-          controlSettings.fovLimit = newFovLimit;
-        }
+      //Radians
+      void setFovLimit(float newFovLimit) {
+        controlSettings.fovLimit = newFovLimit;
+      }
 
-        float getMovementSpeed() {
-          return controlSettings.multipliers.movement;
-        }
+      float getMovementSpeed() {
+        return controlSettings.multipliers.movement;
+      }
 
-        float getMouseSpeed() {
-          return controlSettings.multipliers.mouse;
-        }
+      float getMouseSpeed() {
+        return controlSettings.multipliers.mouse;
+      }
 
-        float getZoomSpeed() {
-          return controlSettings.multipliers.zoom;
-        }
+      float getZoomSpeed() {
+        return controlSettings.multipliers.zoom;
+      }
 
-        //Radians
-        float getFovLimit() {
-          return controlSettings.fovLimit;
-        }
+      //Radians
+      float getFovLimit() {
+        return controlSettings.fovLimit;
       }
     }
   }
 }
 
 namespace ammonite {
-  namespace utils {
+  namespace controls {
     namespace {
       GLFWwindow* windowPtr = nullptr;
       typedef void (*CursorPositionCallback)(GLFWwindow*, double, double);
@@ -247,128 +245,124 @@ namespace ammonite {
     }
 
     //Internally exposed function to set cursor focus from input system
-    namespace controls {
-      namespace internal {
-        //Helper function to set input state
-        void setCursorFocus(bool inputFocused) {
-          //Skip next cursor movement, to avoid huge jumps
-          ignoreNextCursor = true;
+    namespace internal {
+      //Helper function to set input state
+      void setCursorFocus(bool inputFocused) {
+        //Skip next cursor movement, to avoid huge jumps
+        ignoreNextCursor = true;
 
-          if (windowPtr == nullptr) {
-            return;
-          }
+        if (windowPtr == nullptr) {
+          return;
+        }
 
-          //Hide and unhide cursor as necessary
-          if (inputFocused) {
-            //Hide cursor and start taking mouse input
-            glfwSetInputMode(windowPtr, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-            glfwSetCursorPosCallback(windowPtr, activeCursorPositionCallback);
-            //Reset saved cursor position to avoid a large jump
-            glfwGetCursorPos(windowPtr, &xposLast, &yposLast);
-          } else {
-            //Remove callback and restore cursor
-            glfwSetCursorPosCallback(windowPtr, nullptr);
-            glfwSetInputMode(windowPtr, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-          }
+        //Hide and unhide cursor as necessary
+        if (inputFocused) {
+          //Hide cursor and start taking mouse input
+          glfwSetInputMode(windowPtr, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+          glfwSetCursorPosCallback(windowPtr, activeCursorPositionCallback);
+          //Reset saved cursor position to avoid a large jump
+          glfwGetCursorPos(windowPtr, &xposLast, &yposLast);
+        } else {
+          //Remove callback and restore cursor
+          glfwSetCursorPosCallback(windowPtr, nullptr);
+          glfwSetInputMode(windowPtr, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         }
       }
     }
 
-    namespace controls {
-      void setCameraActive(bool active) {
-        isCameraActive = active;
+    void setCameraActive(bool active) {
+      isCameraActive = active;
+    }
+
+    bool getCameraActive() {
+      return isCameraActive;
+    }
+
+    void setupFreeCamera(int forwardKey, int backKey, int upKey,
+                         int downKey, int rightKey, int leftKey) {
+      //Keyboards controls setup
+      directionData[0].directionEnum = AMMONITE_FORWARD;
+      directionData[1].directionEnum = AMMONITE_BACK;
+      directionData[2].directionEnum = AMMONITE_UP;
+      directionData[3].directionEnum = AMMONITE_DOWN;
+      directionData[4].directionEnum = AMMONITE_RIGHT;
+      directionData[5].directionEnum = AMMONITE_LEFT;
+
+      //Set keyboard callbacks
+      if (forwardKey != -1) {
+        keybindIds[0] = ammonite::input::internal::registerRawKeybind(&forwardKey, 1,
+          AMMONITE_FORCE_RELEASE, false, keyboardCameraCallback, &directionData[0]);
+      }
+      if (backKey != -1) {
+        keybindIds[1] = ammonite::input::internal::registerRawKeybind(&backKey, 1,
+          AMMONITE_FORCE_RELEASE, false, keyboardCameraCallback, &directionData[1]);
+      }
+      if (upKey != -1) {
+        keybindIds[2] = ammonite::input::internal::registerRawKeybind(&upKey, 1,
+          AMMONITE_FORCE_RELEASE, false, keyboardCameraCallback, &directionData[2]);
+      }
+      if (downKey != -1) {
+        keybindIds[3] = ammonite::input::internal::registerRawKeybind(&downKey, 1,
+          AMMONITE_FORCE_RELEASE, false, keyboardCameraCallback, &directionData[3]);
+      }
+      if (rightKey != -1) {
+        keybindIds[4] = ammonite::input::internal::registerRawKeybind(&rightKey, 1,
+          AMMONITE_FORCE_RELEASE, false, keyboardCameraCallback, &directionData[4]);
+      }
+      if (leftKey != -1) {
+        keybindIds[5] = ammonite::input::internal::registerRawKeybind(&leftKey, 1,
+          AMMONITE_FORCE_RELEASE, false, keyboardCameraCallback, &directionData[5]);
       }
 
-      bool getCameraActive() {
-        return isCameraActive;
+      //Mouse controls setup, prepare cursor position and mode
+      ignoreNextCursor = true;
+      windowPtr = ammonite::window::internal::getWindowPtr();
+      glfwSetInputMode(windowPtr, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+      glfwGetCursorPos(windowPtr, &xposLast, &yposLast);
+
+      //Set mouse control callbacks
+      glfwSetScrollCallback(windowPtr, scrollCallback);
+      glfwSetMouseButtonCallback(windowPtr, zoomResetCallback);
+      glfwSetCursorPosCallback(windowPtr, cursorPositionCallback);
+      activeCursorPositionCallback = cursorPositionCallback;
+    }
+
+    void releaseFreeCamera() {
+      //Clean up keybinds
+      if (keybindIds[0] != -1) {
+        ammonite::input::internal::unregisterKeybind(keybindIds[0]);
+        keybindIds[0] = -1;
+      }
+      if (keybindIds[1] != -1) {
+        ammonite::input::internal::unregisterKeybind(keybindIds[1]);
+        keybindIds[1] = -1;
+      }
+      if (keybindIds[2] != -1) {
+        ammonite::input::internal::unregisterKeybind(keybindIds[2]);
+        keybindIds[2] = -1;
+      }
+      if (keybindIds[3] != -1) {
+        ammonite::input::internal::unregisterKeybind(keybindIds[3]);
+        keybindIds[3] = -1;
+      }
+      if (keybindIds[4] != -1) {
+        ammonite::input::internal::unregisterKeybind(keybindIds[4]);
+        keybindIds[4] = -1;
+      }
+      if (keybindIds[5] != -1) {
+        ammonite::input::internal::unregisterKeybind(keybindIds[5]);
+        keybindIds[5] = -1;
       }
 
-      void setupFreeCamera(int forwardKey, int backKey, int upKey,
-                           int downKey, int rightKey, int leftKey) {
-        //Keyboards controls setup
-        directionData[0].directionEnum = AMMONITE_FORWARD;
-        directionData[1].directionEnum = AMMONITE_BACK;
-        directionData[2].directionEnum = AMMONITE_UP;
-        directionData[3].directionEnum = AMMONITE_DOWN;
-        directionData[4].directionEnum = AMMONITE_RIGHT;
-        directionData[5].directionEnum = AMMONITE_LEFT;
+      //Mouse callback clean up
+      glfwSetScrollCallback(windowPtr, nullptr);
+      glfwSetMouseButtonCallback(windowPtr, nullptr);
+      glfwSetCursorPosCallback(windowPtr, nullptr);
+      activeCursorPositionCallback = nullptr;
 
-        //Set keyboard callbacks
-        if (forwardKey != -1) {
-          keybindIds[0] = ammonite::input::internal::registerRawKeybind(&forwardKey, 1,
-            AMMONITE_FORCE_RELEASE, false, keyboardCameraCallback, &directionData[0]);
-        }
-        if (backKey != -1) {
-          keybindIds[1] = ammonite::input::internal::registerRawKeybind(&backKey, 1,
-            AMMONITE_FORCE_RELEASE, false, keyboardCameraCallback, &directionData[1]);
-        }
-        if (upKey != -1) {
-          keybindIds[2] = ammonite::input::internal::registerRawKeybind(&upKey, 1,
-            AMMONITE_FORCE_RELEASE, false, keyboardCameraCallback, &directionData[2]);
-        }
-        if (downKey != -1) {
-          keybindIds[3] = ammonite::input::internal::registerRawKeybind(&downKey, 1,
-            AMMONITE_FORCE_RELEASE, false, keyboardCameraCallback, &directionData[3]);
-        }
-        if (rightKey != -1) {
-          keybindIds[4] = ammonite::input::internal::registerRawKeybind(&rightKey, 1,
-            AMMONITE_FORCE_RELEASE, false, keyboardCameraCallback, &directionData[4]);
-        }
-        if (leftKey != -1) {
-          keybindIds[5] = ammonite::input::internal::registerRawKeybind(&leftKey, 1,
-            AMMONITE_FORCE_RELEASE, false, keyboardCameraCallback, &directionData[5]);
-        }
-
-        //Mouse controls setup, prepare cursor position and mode
-        ignoreNextCursor = true;
-        windowPtr = ammonite::window::internal::getWindowPtr();
-        glfwSetInputMode(windowPtr, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-        glfwGetCursorPos(windowPtr, &xposLast, &yposLast);
-
-        //Set mouse control callbacks
-        glfwSetScrollCallback(windowPtr, scrollCallback);
-        glfwSetMouseButtonCallback(windowPtr, zoomResetCallback);
-        glfwSetCursorPosCallback(windowPtr, cursorPositionCallback);
-        activeCursorPositionCallback = cursorPositionCallback;
-      }
-
-      void releaseFreeCamera() {
-        //Clean up keybinds
-        if (keybindIds[0] != -1) {
-          ammonite::input::internal::unregisterKeybind(keybindIds[0]);
-          keybindIds[0] = -1;
-        }
-        if (keybindIds[1] != -1) {
-          ammonite::input::internal::unregisterKeybind(keybindIds[1]);
-          keybindIds[1] = -1;
-        }
-        if (keybindIds[2] != -1) {
-          ammonite::input::internal::unregisterKeybind(keybindIds[2]);
-          keybindIds[2] = -1;
-        }
-        if (keybindIds[3] != -1) {
-          ammonite::input::internal::unregisterKeybind(keybindIds[3]);
-          keybindIds[3] = -1;
-        }
-        if (keybindIds[4] != -1) {
-          ammonite::input::internal::unregisterKeybind(keybindIds[4]);
-          keybindIds[4] = -1;
-        }
-        if (keybindIds[5] != -1) {
-          ammonite::input::internal::unregisterKeybind(keybindIds[5]);
-          keybindIds[5] = -1;
-        }
-
-        //Mouse callback clean up
-        glfwSetScrollCallback(windowPtr, nullptr);
-        glfwSetMouseButtonCallback(windowPtr, nullptr);
-        glfwSetCursorPosCallback(windowPtr, nullptr);
-        activeCursorPositionCallback = nullptr;
-
-        //Reset input mode and window pointer
-        glfwSetInputMode(windowPtr, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-        windowPtr = nullptr;
-      }
+      //Reset input mode and window pointer
+      glfwSetInputMode(windowPtr, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+      windowPtr = nullptr;
     }
   }
 }

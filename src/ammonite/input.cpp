@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include "core/inputManager.hpp"
-#include "utils/internal/internalControls.hpp"
+#include "internal/internalControls.hpp"
 #include "enums.hpp"
 #include "types.hpp"
 
@@ -79,7 +79,7 @@ namespace ammonite {
 
     void setInputFocus(bool active) {
       internal::setInputBlock(!active);
-      ammonite::utils::controls::internal::setCursorFocus(active);
+      ammonite::controls::internal::setCursorFocus(active);
     }
 
     bool getInputFocus() {

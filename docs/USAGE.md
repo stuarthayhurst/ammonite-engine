@@ -19,7 +19,7 @@
       - `AMMONITE_DRAW_POINTS`: Draws the model as a set of vertices only
 
 ## Keybindings:
-  - `ammonite::utils::controls::setKeybind(engineId, keycode)` takes 2 arguments, the action to rebind, and a key to bind to
+  - `ammonite::controls::setKeybind(engineId, keycode)` takes 2 arguments, the action to rebind, and a key to bind to
     - `keycode` should be a valid [GLFW key token](https://www.glfw.org/docs/3.3/group__keys.html)
     - `engineId` is the action within Ammonite to rebind
       - `AMMONITE_EXIT`: Hints that the engine should be destroyed

@@ -9,7 +9,6 @@
 #include "models/modelInterface.hpp"
 #include "models/modelStorage.hpp"
 
-#include "utils/controls.hpp"
 #include "utils/debug.hpp"
 #include "utils/logging.hpp"
 #include "utils/random.hpp"
@@ -17,6 +16,7 @@
 #include "utils/timer.hpp"
 
 #include "camera.hpp"
+#include "controls.hpp"
 #include "enums.hpp"
 #include "environment.hpp"
 #include "input.hpp"

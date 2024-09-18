@@ -6,11 +6,9 @@
 */
 
 namespace ammonite {
-  namespace utils {
-    namespace controls {
-      namespace internal {
-        void setCursorFocus(bool inputFocused);
-      }
+  namespace controls {
+    namespace internal {
+      void setCursorFocus(bool inputFocused);
     }
   }
 }

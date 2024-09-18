@@ -72,9 +72,9 @@ namespace {
       return;
     }
 
-    movementSpeed = ammonite::utils::controls::settings::getMovementSpeed();
+    movementSpeed = ammonite::controls::settings::getMovementSpeed();
     movementSpeed *= (action == GLFW_PRESS) ? 2.0f : (1.0f / 2.0f);
-    ammonite::utils::controls::settings::setMovementSpeed(movementSpeed);
+    ammonite::controls::settings::setMovementSpeed(movementSpeed);
   }
 
   static void cameraCycleCallback(std::vector<int>, int, void* userPtr) {
@@ -134,7 +134,7 @@ namespace {
   //Clean up anything that was created
   static void cleanEngine(int setupBits, std::vector<int>* keybindIdsPtr) {
     if (setupBits & HAS_SETUP_CONTROLS) {
-      ammonite::utils::controls::releaseFreeCamera();
+      ammonite::controls::releaseFreeCamera();
       if (keybindIdsPtr != nullptr) {
         for (unsigned int i = 0; i < keybindIdsPtr->size(); i++) {
           ammonite::input::unregisterKeybind((*keybindIdsPtr)[i]);
@@ -275,7 +275,7 @@ int main(int argc, char* argv[]) {
   CameraData cameraData;
   cameraData.cameraIndex = 0;
   cameraData.cameraIds = {0, ammonite::camera::createCamera()};
-  ammonite::utils::controls::setupFreeCamera(GLFW_KEY_W, GLFW_KEY_S,
+  ammonite::controls::setupFreeCamera(GLFW_KEY_W, GLFW_KEY_S,
     GLFW_KEY_SPACE, GLFW_KEY_LEFT_SHIFT, GLFW_KEY_D, GLFW_KEY_A);
 
   //Set the non-default camera to the start position
