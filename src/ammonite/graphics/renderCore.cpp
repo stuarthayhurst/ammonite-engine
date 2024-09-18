@@ -17,8 +17,7 @@
 
 #include "../internal/internalCamera.hpp"
 #include "../internal/interfaceTracker.hpp"
-
-#include "../core/windowManager.hpp"
+#include "../internal/windowManager.hpp"
 
 #include "../models/internal/modelTracker.hpp"
 

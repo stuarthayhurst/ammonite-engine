@@ -6,7 +6,7 @@
 
 #include "graphics/internal/internalRenderCore.hpp"
 
-#include "core/windowManager.hpp"
+#include "internal/windowManager.hpp"
 
 namespace ammonite {
   namespace camera {

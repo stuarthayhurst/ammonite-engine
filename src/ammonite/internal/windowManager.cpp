@@ -3,7 +3,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include "../internal/internalCamera.hpp"
+#include "internalCamera.hpp"
 
 #include "../enums.hpp"
 #include "../utils/logging.hpp"

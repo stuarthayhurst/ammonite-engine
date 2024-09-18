@@ -5,7 +5,7 @@
 #include <GLFW/glfw3.h>
 
 #include "core/inputManager.hpp"
-#include "core/windowManager.hpp"
+#include "internal/windowManager.hpp"
 
 #include "camera.hpp"
 #include "enums.hpp"

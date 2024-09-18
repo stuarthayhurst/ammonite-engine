@@ -7,9 +7,9 @@
 #include <GLFW/glfw3.h>
 #include <stb/stb_image.h>
 
-#include "core/windowManager.hpp"
 #include "core/inputManager.hpp"
 #include "internal/internalInput.hpp"
+#include "internal/windowManager.hpp"
 
 #include "utils/logging.hpp"
 #include "enums.hpp"
