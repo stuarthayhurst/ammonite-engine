@@ -109,8 +109,7 @@ $(AMMONITE_HEADER_INSTALL):
 	@targetFile="/$@"; \
 	targetDir="$$(dirname $$targetFile)"; \
 	origFile="$${targetFile//'$(HEADER_DIR)'/src}"; \
-	if [[ "$$targetDir/" != */internal/* ]] && \
-	   [[ "$$targetDir/" != */core/* ]]; then \
+	if [[ "$$targetDir/" != */internal/* ]]; then \
 	  mkdir -p "$$targetDir" && \
 	  cp -v "$$origFile" "$$targetFile"; \
 	fi
