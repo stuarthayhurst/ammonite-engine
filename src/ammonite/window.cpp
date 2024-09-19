@@ -7,7 +7,7 @@
 #include <GLFW/glfw3.h>
 #include <stb/stb_image.h>
 
-#include "core/inputManager.hpp"
+#include "internal/inputManager.hpp"
 #include "internal/internalInput.hpp"
 #include "internal/windowManager.hpp"
 

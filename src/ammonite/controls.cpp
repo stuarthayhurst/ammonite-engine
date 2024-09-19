@@ -4,7 +4,7 @@
 #include <glm/gtc/constants.hpp>
 #include <GLFW/glfw3.h>
 
-#include "core/inputManager.hpp"
+#include "internal/inputManager.hpp"
 #include "internal/windowManager.hpp"
 
 #include "camera.hpp"

@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "core/inputManager.hpp"
+#include "internal/inputManager.hpp"
 #include "internal/internalControls.hpp"
 #include "enums.hpp"
 #include "types.hpp"
