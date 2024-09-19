@@ -141,9 +141,9 @@ namespace ammonite {
       return false;
     }
 
-    static bool checkProgram(GLuint programId) {
-      return checkObject(programId, "link shader program", GL_LINK_STATUS,
-                         glGetProgramiv, glGetProgramInfoLog);
+    static bool checkProgram(GLuint programId, bool isCached) {
+      return checkObject(programId, isCached ? "upload shader program" : "link shader program",
+                         GL_LINK_STATUS, glGetProgramiv, glGetProgramInfoLog);
     }
 
     static bool checkShader(GLuint shaderId) {
@@ -180,7 +180,7 @@ namespace ammonite {
       //Read the shader's source code
       std::size_t shaderCodeSize;
       char* shaderCodePtr = (char*)ammonite::utils::files::loadFile(shaderPath,
-                                                                       &shaderCodeSize);
+                                                                    &shaderCodeSize);
       if (shaderCodePtr == nullptr) {
         ammonite::utils::warning << "Failed to open '" << shaderPath << "'" << std::endl;
         *externalSuccess = false;
@@ -221,7 +221,7 @@ namespace ammonite {
       }
 
       //Check whether the program linked, log if relevant
-      if (!checkProgram(programId)) {
+      if (!checkProgram(programId, false)) {
         glDeleteProgram(programId);
         *externalSuccess = false;
         return -1;
@@ -310,7 +310,7 @@ namespace ammonite {
           delete [] cacheData;
 
           //Return the program ID, unless the cache was faulty, then delete and carry on
-          if (checkProgram(programId)) {
+          if (checkProgram(programId, true)) {
             return programId;
           } else {
             ammonite::utils::warning << "Failed to process '" << cacheFilePath \
