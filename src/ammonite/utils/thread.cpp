@@ -31,16 +31,17 @@ namespace ammonite {
 
       /*
        - Submit multiple jobs to the thread pool, with a user-provided buffer and completions
-         - completions should either be a nullptr or an array of completions
-           - These should be initialised with ATOMIC_FLAG_INIT
          - userBuffer should either be a nullptr, or an array of data to be split between jobs
            - Each job will receive a section according to (userBuffer + job index * stride)
            - stride should by the size of each section to give to a job, in bytes
          - jobCount specifies how many times submit the job
+         - group should either be a nullptr, or an AmmoniteGroup{jobCount}
+         - The return value must be waited on with waitWorkComplete(Unsafe)()
       */
       void submitMultiple(AmmoniteWork work, void* userBuffer, int stride,
-                          AmmoniteCompletion* completions, unsigned int jobCount) {
-        ammonite::utils::thread::internal::submitMultiple(work, userBuffer, stride, completions, jobCount);
+                          AmmoniteGroup* group, unsigned int jobCount) {
+        return ammonite::utils::thread::internal::submitMultiple(work, userBuffer,
+          stride, group, jobCount);
       }
 
       //Wait for completion to be finished
@@ -55,6 +56,24 @@ namespace ammonite {
       void waitWorkCompleteUnsafe(AmmoniteCompletion* completion) {
         //Wait for completion to become true
         completion->wait(false);
+      }
+
+      //Wait for a group to be finished
+      void waitGroupComplete(AmmoniteGroup* group, unsigned int jobCount) {
+        //Wait for group to finish
+        if (group != nullptr) {
+          for (unsigned int i = 0; i < jobCount; i++) {
+            group->acquire();
+          }
+        }
+      }
+
+      //Wait for a group to be finished, without a nullptr check
+      void waitGroupCompleteUnsafe(AmmoniteGroup* group, unsigned int jobCount) {
+        //Wait for group to finish
+        for (unsigned int i = 0; i < jobCount; i++) {
+          group->acquire();
+        }
       }
 
       //Reset completion to be used again

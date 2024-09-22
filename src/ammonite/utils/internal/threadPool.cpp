@@ -15,6 +15,7 @@ namespace {
     AmmoniteWork work;
     void* userPtr;
     AmmoniteCompletion* completion;
+    AmmoniteGroup* group;
   };
 
   struct Node {
@@ -31,7 +32,7 @@ namespace {
   public:
     WorkQueue() {
       //Start with an empty queue, 1 'old' node
-      nextPushed = new Node{{nullptr, nullptr, nullptr}, nullptr};
+      nextPushed = new Node{{nullptr, nullptr, nullptr, nullptr}, nullptr};
       nextPopped = nextPushed;
     }
 
@@ -48,43 +49,28 @@ namespace {
 
     void push(AmmoniteWork work, void* userPtr, AmmoniteCompletion* completion) {
       //Create a new empty node
-      Node* newNode = new Node{{nullptr, nullptr, nullptr}, nullptr};
+      Node* newNode = new Node{{nullptr, nullptr, nullptr, nullptr}, nullptr};
 
       //Atomically swap the next node with newNode, then fill in the old new node now it's free
-      *(nextPushed.exchange(newNode)) = {{work, userPtr, completion}, newNode};
+      *(nextPushed.exchange(newNode)) = {{work, userPtr, completion, nullptr}, newNode};
     }
 
     void pushMultiple(AmmoniteWork work, void* userBuffer, int stride,
-                      AmmoniteCompletion* completions, unsigned int count) {
+                                AmmoniteGroup* group, unsigned int count) {
       //Generate section of linked list to insert
-      Node* newNode = new Node{{nullptr, nullptr, nullptr}, nullptr};
+      Node* newNode = new Node{{nullptr, nullptr, nullptr, nullptr}, nullptr};
       Node sectionStart;
       Node* sectionPtr = &sectionStart;
       if (userBuffer == nullptr) {
-        if (completions == nullptr) {
-          for (unsigned int i = 0; i < count; i++) {
-            sectionPtr->nextNode = new Node{{work, nullptr, nullptr}, nullptr};
-            sectionPtr = sectionPtr->nextNode;
-          }
-        } else {
-          for (unsigned int i = 0; i < count; i++) {
-            sectionPtr->nextNode = new Node{{work, nullptr, completions + i}, nullptr};
-            sectionPtr = sectionPtr->nextNode;
-          }
+        for (unsigned int i = 0; i < count; i++) {
+          sectionPtr->nextNode = new Node{{work, nullptr, nullptr, group}, nullptr};
+          sectionPtr = sectionPtr->nextNode;
         }
       } else {
-        if (completions == nullptr) {
-          for (unsigned int i = 0; i < count; i++) {
-            sectionPtr->nextNode = new Node{{
-              work, (void*)((char*)userBuffer + (std::size_t)(i) * stride), nullptr}, nullptr};
-            sectionPtr = sectionPtr->nextNode;
-          }
-        } else {
-          for (unsigned int i = 0; i < count; i++) {
-            sectionPtr->nextNode = new Node{{
-              work, (void*)((char*)userBuffer + (std::size_t)(i) * stride), completions + i}, nullptr};
-            sectionPtr = sectionPtr->nextNode;
-          }
+        for (unsigned int i = 0; i < count; i++) {
+          sectionPtr->nextNode = new Node{{
+            work, (void*)((char*)userBuffer + (std::size_t)(i) * stride), nullptr, group}, nullptr};
+          sectionPtr = sectionPtr->nextNode;
         }
       }
 
@@ -144,8 +130,10 @@ namespace ammonite {
                 jobCount--;
                 workItem.work(workItem.userPtr);
 
-                //Set the completion, if given
-                if (workItem.completion != nullptr) {
+                //Update the group semaphore or completion, if given
+                if (workItem.group != nullptr) {
+                  workItem.group->release();
+                } else if (workItem.completion != nullptr) {
                   workItem.completion->test_and_set();
                   workItem.completion->notify_all();
                 }
@@ -190,8 +178,8 @@ namespace ammonite {
 
         //Submit multiple jobs without locking multiple times
         void submitMultiple(AmmoniteWork work, void* userBuffer, int stride,
-                            AmmoniteCompletion* completions, unsigned int newJobs) {
-          workQueue->pushMultiple(work, userBuffer, stride, completions, newJobs);
+                                      AmmoniteGroup* group, unsigned int newJobs) {
+          workQueue->pushMultiple(work, userBuffer, stride, group, newJobs);
           jobCount += newJobs;
           jobCount.notify_all();
         }

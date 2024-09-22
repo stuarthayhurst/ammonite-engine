@@ -49,7 +49,6 @@ namespace ammonite {
     };
 
     ShaderLightSource* shaderData = nullptr;
-    AmmoniteCompletion* syncs = nullptr;
     LightWorkerData* workerData = nullptr;
   }
 
@@ -125,7 +124,6 @@ namespace ammonite {
 
         if (shaderData != nullptr) {
           delete [] shaderData;
-          delete [] syncs;
           delete [] workerData;
         }
       }
@@ -171,18 +169,12 @@ namespace ammonite {
           if (lightTransforms != nullptr) {
             delete [] lightTransforms;
             delete [] shaderData;
-            delete [] syncs;
             delete [] workerData;
           }
 
           lightTransforms = new glm::mat4[(std::size_t)(lightCount) * 6];
           shaderData = new ShaderLightSource[lightCount];
-          syncs = new AmmoniteCompletion[lightCount]{ATOMIC_FLAG_INIT};
           workerData = new LightWorkerData[lightCount];
-        } else {
-          for (unsigned int i = 0; i < lightCount; i++) {
-            ammonite::utils::thread::resetCompletionUnsafe(syncs + i);
-          }
         }
 
         //Repack light sources into ShaderData (uses vec4s for OpenGL)
@@ -190,13 +182,10 @@ namespace ammonite {
           workerData[i].shadowProj = &shadowProj;
           workerData[i].i = i;
         }
+        AmmoniteGroup group{0};
         ammonite::utils::thread::submitMultiple(lightWork, (void*)&workerData[0],
-                                                   sizeof(LightWorkerData),
-                                                   &syncs[0], lightCount);
-
-        for (unsigned int i = 0; i < lightCount; i++) {
-          ammonite::utils::thread::waitWorkCompleteUnsafe(syncs + i);
-        }
+          sizeof(LightWorkerData), &group, lightCount);
+        ammonite::utils::thread::waitGroupCompleteUnsafe(&group, lightCount);
 
         //If the light count hasn't changed, sub the data instead of recreating the buffer
         if (prevLightCount == lightTrackerMap.size()) {
@@ -280,13 +269,11 @@ namespace ammonite {
         if (lightTransforms != nullptr) {
           delete [] lightTransforms;
           delete [] shaderData;
-          delete [] syncs;
           delete [] workerData;
         }
 
         lightTransforms = nullptr;
         shaderData = nullptr;
-        syncs = nullptr;
         workerData = nullptr;
       }
 

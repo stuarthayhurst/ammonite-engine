@@ -227,18 +227,18 @@ namespace {
   static bool testSubmitMultiple(int jobCount) {
     INIT_TIMERS
     CREATE_THREAD_POOL(0)
-    PREP_SYNC(jobCount, syncs)
 
     //Submit fast 'jobs'
     RESET_TIMERS
     bool passed = true;
     int* values = new int[jobCount]{};
-    ammonite::utils::thread::submitMultiple(shortTask, (void*)&values[0],
-                                     sizeof(int), &syncs[0], jobCount);
+    AmmoniteGroup group{0};
+    ammonite::utils::thread::submitMultiple(shortTask, (void*)&values[0], sizeof(int),
+      &group, jobCount);
     submitTimer.pause();
 
     //Finish work
-    SYNC_THREADS(jobCount, syncs)
+    ammonite::utils::thread::waitGroupComplete(&group, jobCount);
     FINISH_TIMERS
     VERIFY_WORK(jobCount)
 
