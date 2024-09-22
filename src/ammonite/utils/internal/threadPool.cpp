@@ -123,16 +123,10 @@ namespace ammonite {
           std::thread* threadPool;
           bool stayAlive = false;
 
-          //Write 'true' to unblockThreadsTrigger to release blocked threads
-          std::atomic_flag unblockThreadsTrigger;
-          //threadsUnblockedFlag is set to 'true' when all blocked threads are released
-          //threadsUnblockedFlag is set to 'false' when all blocked threads are blocked
-          //If transitioning between the two, it'll remain at its old value until complete
-          std::atomic_flag threadsUnblockedFlag;
-          std::atomic<unsigned int> blockedThreadCount;
-          //0 when an unblock starts, 1 when a block starts
-          //Any other value means the system is broken
-          std::atomic<int> blockBalance = 0;
+          //Write true / false to threadBlockTrigger to block / unblock threads
+          std::atomic<bool> threadBlockTrigger{false};
+          std::atomic<unsigned int> blockedThreadCount{0};
+          std::atomic<bool> threadsBlocked{false};
 
           WorkQueue* workQueue;
           std::atomic<uintmax_t> jobCount = 0;
@@ -162,20 +156,17 @@ namespace ammonite {
             }
           }
 
-          //Wait until unblockThreadsTrigger becomes true
           static void blocker(void*) {
-            blockedThreadCount++;
-            if (blockedThreadCount == poolThreadCount) {
-              threadsUnblockedFlag.clear();
-              threadsUnblockedFlag.notify_all();
+            if (++blockedThreadCount == poolThreadCount) {
+              threadsBlocked = true;
+              threadsBlocked.notify_all();
             }
 
-            unblockThreadsTrigger.wait(false);
+            threadBlockTrigger.wait(true);
 
-            blockedThreadCount--;
-            if (blockedThreadCount == 0) {
-              threadsUnblockedFlag.test_and_set();
-              threadsUnblockedFlag.notify_all();
+            if (--blockedThreadCount == 0) {
+              threadsBlocked = false;
+              threadsBlocked.notify_all();
             }
           }
         }
@@ -233,60 +224,43 @@ namespace ammonite {
             threadPool[i] = std::thread(initWorker);
           }
 
-          unblockThreadsTrigger.test_and_set();
-          threadsUnblockedFlag.test_and_set();
-          blockedThreadCount = 0;
           poolThreadCount = threadCount;
           return 0;
         }
 
-        //Jobs submitted at the same time may execute, but the threads will block after
-        //Guarantees work submitted after won't begin yet
-        //Unsafe to call from multiple threads due to blockBalance
-        void blockThreads(bool sync) {
-          //Skip blocking if it's already blocked / going to block
-          if (blockBalance > 0) {
-            return;
-          }
-          blockBalance++;
+        /*
+         - Prevent the threads from executing newly submitted jobs
+         - Work submitted after the call returns is guaranteed to be blocked
+         - Return when the block takes effect
+        */
+        void blockThreads() {
+          if (!threadsBlocked) {
+            threadBlockTrigger = true;
+            submitMultiple(blocker, nullptr, 0, nullptr, poolThreadCount);
 
-          //Submit a job for each thread that waits for the trigger
-          unblockThreadsTrigger.clear();
-          for (unsigned int i = 0; i < poolThreadCount; i++) {
-            workQueue->push(blocker, nullptr, nullptr);
-          }
-
-          //Add to job count and wake all threads
-          jobCount += poolThreadCount;
-          jobCount.notify_all();
-
-          if (sync) {
-            threadsUnblockedFlag.wait(true);
+            threadsBlocked.wait(false);
           }
         }
 
-        //Unsafe to call from multiple threads due to blockBalance
-        void unblockThreads(bool sync) {
-          //Only unblock if it's already blocked / blocking
-          if (blockBalance == 0) {
-            return;
-          }
-          blockBalance--;
+        /*
+         - Allow the threads to execute queued jobs
+         - Return when all threads are unblocked
+        */
+        void unblockThreads() {
+          if (threadsBlocked) {
+            threadBlockTrigger = false;
+            threadBlockTrigger.notify_all();
 
-          //Unblock threads and wake them up
-          unblockThreadsTrigger.test_and_set();
-          unblockThreadsTrigger.notify_all();
-
-          if (sync) {
-            threadsUnblockedFlag.wait(false);
+            threadsBlocked.wait(true);
           }
         }
 
+        //Finish all work in the queue as of calling, return when done
         void finishWork() {
           //Unblock if blocked, block threads then wait for completion
-          unblockThreads(true);
-          blockThreads(true);
-          unblockThreads(true);
+          unblockThreads();
+          blockThreads();
+          unblockThreads();
         }
 
 #ifdef DEBUG
@@ -301,14 +275,6 @@ namespace ammonite {
             }
           }
 
-          if (blockBalance != 0) {
-            issuesFound = true;
-            if (verbose) {
-              ammoniteInternalDebug << "WARNING: Blocking is unbalanced (" \
-                                    << blockBalance << ")" << std::endl;
-            }
-          }
-
           return issuesFound;
         }
 #endif
@@ -316,14 +282,14 @@ namespace ammonite {
         //Finish work already in the queue and kill the threads
         void destroyThreadPool() {
           //Finish existing work and block new work from starting
-          unblockThreads(true);
-          blockThreads(true);
+          unblockThreads();
+          blockThreads();
 
           //Kill all threads after they're unblocked and wake up
           stayAlive = false;
 
           //Unblock threads and wake them up
-          unblockThreads(true);
+          unblockThreads();
 
           //Wait until all threads are done
           for (unsigned int i = 0; i < poolThreadCount; i++) {
@@ -335,10 +301,6 @@ namespace ammonite {
             }
           }
 
-/* In debug mode, check that the queue is empty, and matches the job counter
- - If it doesn't, it's not technically a bug, but in practice it will be, as work
-   that was expected to be finished wasn't
-*/
 #ifdef DEBUG
           debugCheckRemainingWork(true);
 #endif

@@ -118,8 +118,8 @@ namespace {
     submitTimer.pause();
 
     //Finish work
-    ammonite::utils::thread::blockThreadsSync();
-    ammonite::utils::thread::unblockThreadsSync();
+    ammonite::utils::thread::blockThreads();
+    ammonite::utils::thread::unblockThreads();
     FINISH_TIMERS
     VERIFY_WORK(jobCount)
 
@@ -149,7 +149,7 @@ namespace {
     CREATE_THREAD_POOL(0)
     PREP_SYNC(jobCount, syncs)
 
-    ammonite::utils::thread::blockThreadsSync();
+    ammonite::utils::thread::blockThreads();
 
     //Submit fast 'jobs'
     RESET_TIMERS
@@ -157,7 +157,7 @@ namespace {
     submitTimer.pause();
 
     //Finish work
-    ammonite::utils::thread::unblockThreadsSync();
+    ammonite::utils::thread::unblockThreads();
     SYNC_THREADS(jobCount, syncs)
     FINISH_TIMERS
     VERIFY_WORK(jobCount)
@@ -271,10 +271,10 @@ namespace {
   static bool testCreateBlockBlockUnblockUnblockSubmitDestroy(int jobCount) {
     CREATE_THREAD_POOL(0)
 
-    ammonite::utils::thread::blockThreadsSync();
-    ammonite::utils::thread::blockThreadsSync();
-    ammonite::utils::thread::unblockThreadsSync();
-    ammonite::utils::thread::unblockThreadsSync();
+    ammonite::utils::thread::blockThreads();
+    ammonite::utils::thread::blockThreads();
+    ammonite::utils::thread::unblockThreads();
+    ammonite::utils::thread::unblockThreads();
 
     SUBMIT_JOBS(jobCount)
     DESTROY_THREAD_POOL
@@ -285,9 +285,9 @@ namespace {
   static bool testCreateBlockBlockUnblockSubmitDestroy(int jobCount) {
     CREATE_THREAD_POOL(0)
 
-    ammonite::utils::thread::blockThreadsSync();
-    ammonite::utils::thread::blockThreadsSync();
-    ammonite::utils::thread::unblockThreadsSync();
+    ammonite::utils::thread::blockThreads();
+    ammonite::utils::thread::blockThreads();
+    ammonite::utils::thread::unblockThreads();
 
     SUBMIT_JOBS(jobCount)
     DESTROY_THREAD_POOL
@@ -298,11 +298,11 @@ namespace {
   static bool testCreateBlockBlockSubmitUnblockDestroy(int jobCount) {
     CREATE_THREAD_POOL(0)
 
-    ammonite::utils::thread::blockThreadsSync();
-    ammonite::utils::thread::blockThreadsSync();
+    ammonite::utils::thread::blockThreads();
+    ammonite::utils::thread::blockThreads();
 
     SUBMIT_JOBS(jobCount)
-    ammonite::utils::thread::unblockThreadsSync();
+    ammonite::utils::thread::unblockThreads();
 
     DESTROY_THREAD_POOL
     VERIFY_WORK(jobCount)
@@ -312,8 +312,8 @@ namespace {
   static bool testCreateBlockBlockSubmitDestroy(int jobCount) {
     CREATE_THREAD_POOL(0)
 
-    ammonite::utils::thread::blockThreadsSync();
-    ammonite::utils::thread::blockThreadsSync();
+    ammonite::utils::thread::blockThreads();
+    ammonite::utils::thread::blockThreads();
 
     SUBMIT_JOBS(jobCount)
     DESTROY_THREAD_POOL
@@ -324,9 +324,9 @@ namespace {
   static bool testCreateBlockUnblockUnblockSubmitDestroy(int jobCount) {
     CREATE_THREAD_POOL(0)
 
-    ammonite::utils::thread::blockThreadsSync();
-    ammonite::utils::thread::unblockThreadsSync();
-    ammonite::utils::thread::unblockThreadsSync();
+    ammonite::utils::thread::blockThreads();
+    ammonite::utils::thread::unblockThreads();
+    ammonite::utils::thread::unblockThreads();
 
     SUBMIT_JOBS(jobCount)
     DESTROY_THREAD_POOL
@@ -337,7 +337,7 @@ namespace {
   static bool testCreateUnblockSubmitDestroy(int jobCount) {
     CREATE_THREAD_POOL(0)
 
-    ammonite::utils::thread::unblockThreadsSync();
+    ammonite::utils::thread::unblockThreads();
 
     SUBMIT_JOBS(jobCount)
     DESTROY_THREAD_POOL

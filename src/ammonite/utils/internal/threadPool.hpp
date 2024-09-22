@@ -17,8 +17,8 @@ namespace ammonite {
         void submitMultiple(AmmoniteWork work, void* userBuffer, int stride,
                             AmmoniteCompletion* completions, unsigned int jobCount);
 
-        void blockThreads(bool sync);
-        void unblockThreads(bool sync);
+        void blockThreads();
+        void unblockThreads();
         void finishWork();
       }
     }
@@ -38,3 +38,4 @@ namespace ammonite {
 #endif
 
 #endif
+

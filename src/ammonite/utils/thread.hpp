@@ -16,13 +16,12 @@ namespace ammonite {
       void resetCompletion(AmmoniteCompletion* completion);
       void resetCompletionUnsafe(AmmoniteCompletion* completion);
 
-      void blockThreadsAsync();
-      void blockThreadsSync();
-      void unblockThreadsSync();
-      void unblockThreadsAsync();
+      void blockThreads();
+      void unblockThreads();
       void finishWork();
     }
   }
 }
 
 #endif
+

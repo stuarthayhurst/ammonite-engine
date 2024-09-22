@@ -71,24 +71,14 @@ namespace ammonite {
         completion->clear();
       }
 
-      //Block the thread pool from starting newer jobs, return immediately
-      void blockThreadsAsync() {
-        ammonite::utils::thread::internal::blockThreads(false);
-      }
-
       //Block the thread pool from starting newer jobs, return after it takes effect
-      void blockThreadsSync() {
-        ammonite::utils::thread::internal::blockThreads(true);
-      }
-
-      //Unblock the thread pool from starting newer jobs, return immediately
-      void unblockThreadsAsync() {
-        ammonite::utils::thread::internal::unblockThreads(false);
+      void blockThreads() {
+        ammonite::utils::thread::internal::blockThreads();
       }
 
       //Unblock the thread pool from starting newer jobs, return after it takes effect
-      void unblockThreadsSync() {
-        ammonite::utils::thread::internal::unblockThreads(true);
+      void unblockThreads() {
+        ammonite::utils::thread::internal::unblockThreads();
       }
 
       //Wait until all work in the pool as of the call is finished
