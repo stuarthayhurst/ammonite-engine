@@ -208,13 +208,13 @@ namespace ammonite {
       //Create the program
       GLuint programId = glCreateProgram();
 
-      //Attach and link all passed shader ids
+      //Attach and link all passed shader IDs
       for (int i = 0; i < shaderCount; i++) {
         glAttachShader(programId, shaderIds[i]);
       }
       glLinkProgram(programId);
 
-      //Detach and remove all passed shader ids
+      //Detach and remove all passed shader IDs
       for (int i = 0; i < shaderCount; i++) {
         glDetachShader(programId, shaderIds[i]);
         glDeleteShader(shaderIds[i]);
@@ -322,7 +322,7 @@ namespace ammonite {
         }
       }
 
-      //Cache wasn't useable, compile a fresh program
+      //Cache wasn't usable, compile a fresh program
       programId = createProgramUncached(shaderPaths, shaderTypes, shaderCount, externalSuccess);
 
       //Cache the binary if enabled

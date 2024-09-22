@@ -137,7 +137,7 @@ namespace ammonite {
 
       void loadObject(const char* objectPath, models::internal::ModelData* modelObjectData,
                       ModelLoadInfo modelLoadInfo, bool* externalSuccess) {
-        //Generate postprocessing flags
+        //Generate post-processing flags
         auto aiProcessFlags = aiProcess_Triangulate |
                               aiProcess_GenNormals |
                               aiProcess_GenUVCoords |

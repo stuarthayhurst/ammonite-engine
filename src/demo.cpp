@@ -332,7 +332,7 @@ int main(int argc, char* argv[]) {
     //Process new input since last frame
     ammonite::input::updateInput();
 
-    //Call demo-specific mainloop code
+    //Call demo-specific main loop code
     if (rendererMainloop != nullptr) {
       if (rendererMainloop() == -1) {
         ammonite::utils::error << "Failed to run mainloop, exiting" << std::endl;

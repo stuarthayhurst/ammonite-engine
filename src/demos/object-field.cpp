@@ -167,7 +167,7 @@ namespace objectFieldDemo {
     }
 
     /*
-     - Return a 2D array of indicies an orbit could swap to
+     - Return a 2D array of indices an orbit could swap to
      - First index points to previous index
        - The second index points to the next
     */

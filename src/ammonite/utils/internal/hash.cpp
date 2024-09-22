@@ -44,7 +44,7 @@ namespace ammonite {
         }
 #else
         std::string generateCacheString(std::string* filePaths,
-                                               unsigned int fileCount) {
+                                        unsigned int fileCount) {
           alignas(uintmax_t) uint8_t output[sizeof(uintmax_t)] = {0};
           uint8_t prev = 0;
 
