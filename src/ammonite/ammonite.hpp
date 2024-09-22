@@ -10,6 +10,7 @@
 #include "models/modelStorage.hpp"
 
 #include "utils/debug.hpp"
+#include "utils/files.hpp"
 #include "utils/logging.hpp"
 #include "utils/random.hpp"
 #include "utils/thread.hpp"

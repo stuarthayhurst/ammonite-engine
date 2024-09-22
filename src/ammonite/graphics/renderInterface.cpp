@@ -63,10 +63,6 @@ namespace ammonite {
         lighting::internal::destroyLightSystem();
         internal::deleteModelCache();
       }
-
-      bool useShaderCache(const char* shaderCachePath) {
-        return ammonite::utils::files::useDataCache(std::string(shaderCachePath));
-      }
     }
 
     long long int getTotalFrames() {

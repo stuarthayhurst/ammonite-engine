@@ -20,7 +20,7 @@ namespace ammonite {
   //Static helper functions and anonymous data
   namespace {
     namespace {
-      //Set by updateCacheSupport(), when GLEW loads
+      //Set by updateCacheSupport(), when renderer is set up
       bool isBinaryCacheSupported = false;
 
       //Identify shader types by extensions / contained strings
