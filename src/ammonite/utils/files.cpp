@@ -172,7 +172,10 @@ namespace ammonite {
         return true;
       }
 
-      //Attempt to setup targetCachePath for caching, and return whether it can be used
+      /*
+       - Attempt to setup targetCachePath for caching, and return whether it can be used
+       - This path will be used for all caches created by the engine, as well as by the user
+      */
       bool useDataCache(std::string targetCachePath) {
         //Attempt to create the cache directory if it doesn't already exist
         if (!std::filesystem::is_directory(targetCachePath)) {
