@@ -1,8 +1,9 @@
 #include <iostream>
 #include <cstdlib>
+#include <map>
+#include <print>
 #include <string>
 #include <vector>
-#include <map>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -127,8 +128,8 @@ namespace {
       frameRate = 1 / frameTime;
     }
 
-    std::printf("%.2f fps", frameRate);
-    std::printf(" (%fms)\n", frameTime * 1000);
+    std::print("{:.2f} fps", frameRate);
+    std::println(" ({:f}ms)", frameTime * 1000);
   }
 
   //Clean up anything that was created
