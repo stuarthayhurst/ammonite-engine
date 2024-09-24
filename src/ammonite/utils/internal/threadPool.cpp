@@ -1,7 +1,7 @@
 #include <atomic>
 #include <cstddef>
 #include <cstdint>
-#include <semaphore>
+#include <mutex>
 #include <thread>
 
 #include "../../types.hpp"
@@ -24,7 +24,7 @@ namespace {
 
   class WorkQueue {
   private:
-    std::binary_semaphore readSemaphore{1};
+    std::mutex readMutex;
     Node* nextPopped;
     std::atomic<Node*> nextPushed;
 
@@ -96,18 +96,18 @@ namespace {
 
     void pop(WorkItem* workItemPtr) {
       //Use the most recently popped node to find the next
-      readSemaphore.acquire();
+      readMutex.lock();
 
       //Copy the data and free the old node, otherwise return if we don't have a new node
       Node* currentNode = nextPopped;
       if (currentNode->nextNode != nullptr) {
         nextPopped = nextPopped->nextNode;
-        readSemaphore.release();
+        readMutex.unlock();
 
         *workItemPtr = currentNode->workItem;
         delete currentNode;
       } else {
-        readSemaphore.release();
+        readMutex.unlock();
         workItemPtr->work = nullptr;
       }
     }
