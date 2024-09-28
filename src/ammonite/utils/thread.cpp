@@ -34,7 +34,7 @@ namespace ammonite {
          - userBuffer should either be a nullptr, or an array of data to be split between jobs
            - Each job will receive a section according to (userBuffer + job index * stride)
            - stride should by the size of each section to give to a job, in bytes
-         - group should either be a nullptr, or an AmmoniteGroup{jobCount}
+         - group should either be a nullptr, or an AmmoniteGroup{0}
          - jobCount specifies how many times submit the job
       */
       void submitMultiple(AmmoniteWork work, void* userBuffer, int stride,
