@@ -2,6 +2,15 @@
 
 buildDir="build"
 
+if [[ "$1" == "--loop" ]]; then
+  target="$buildDir/threadDemo"
+  while true; do
+    if ! LD_LIBRARY_PATH="$buildDir" "$target" "$@"; then
+      exit 1
+    fi
+  done
+fi
+
 if [[ "$1" == "--threads" ]]; then
   target="$buildDir/threadDemo"
 else
