@@ -185,7 +185,7 @@ namespace ammonite {
         AmmoniteGroup group{0};
         ammonite::utils::thread::submitMultiple(lightWork, (void*)&workerData[0],
           sizeof(LightWorkerData), &group, lightCount);
-        ammonite::utils::thread::waitGroupCompleteUnsafe(&group, lightCount);
+        ammonite::utils::thread::waitGroupComplete(&group, lightCount);
 
         //If the light count hasn't changed, sub the data instead of recreating the buffer
         if (prevLightCount == lightTrackerMap.size()) {

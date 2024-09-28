@@ -34,9 +34,8 @@ namespace ammonite {
          - userBuffer should either be a nullptr, or an array of data to be split between jobs
            - Each job will receive a section according to (userBuffer + job index * stride)
            - stride should by the size of each section to give to a job, in bytes
-         - jobCount specifies how many times submit the job
          - group should either be a nullptr, or an AmmoniteGroup{jobCount}
-         - The return value must be waited on with waitWorkComplete(Unsafe)()
+         - jobCount specifies how many times submit the job
       */
       void submitMultiple(AmmoniteWork work, void* userBuffer, int stride,
                           AmmoniteGroup* group, unsigned int jobCount) {
@@ -44,50 +43,18 @@ namespace ammonite {
           stride, group, jobCount);
       }
 
-      //Wait for completion to be finished
+      //Wait for completion to be finished, completion can't be a nullptr
       void waitWorkComplete(AmmoniteCompletion* completion) {
-        //Wait for completion to become true
-        if (completion != nullptr) {
-          completion->wait(false);
-        }
-      }
-
-      //Wait for completion to be finished, without a nullptr check
-      void waitWorkCompleteUnsafe(AmmoniteCompletion* completion) {
         //Wait for completion to become true
         completion->wait(false);
       }
 
-      //Wait for a group to be finished
+      //Wait for a group to be finished, group can't be a nullptr
       void waitGroupComplete(AmmoniteGroup* group, unsigned int jobCount) {
-        //Wait for group to finish
-        if (group != nullptr) {
-          for (unsigned int i = 0; i < jobCount; i++) {
-            group->acquire();
-          }
-        }
-      }
-
-      //Wait for a group to be finished, without a nullptr check
-      void waitGroupCompleteUnsafe(AmmoniteGroup* group, unsigned int jobCount) {
         //Wait for group to finish
         for (unsigned int i = 0; i < jobCount; i++) {
           group->acquire();
         }
-      }
-
-      //Reset completion to be used again
-      void resetCompletion(AmmoniteCompletion* completion) {
-        //Reset the completion to false
-        if (completion != nullptr) {
-          completion->clear();
-        }
-      }
-
-      //Reset completion to be used again, without a nullptr check
-      void resetCompletionUnsafe(AmmoniteCompletion* completion) {
-        //Reset the completion to false
-        completion->clear();
       }
 
       //Block the thread pool from starting newer jobs, return after it takes effect
