@@ -24,15 +24,6 @@ if (ammonite::utils::thread::internal::createThreadPool((THREADS)) == -1) { \
   ammonite::utils::thread::internal::destroyThreadPool();
 #endif
 
-#define PREP_SYNC(jobCount, syncs) \
-AmmoniteCompletion* syncs = new AmmoniteCompletion[(jobCount)]{ATOMIC_FLAG_INIT};
-
-#define SYNC_THREADS(jobCount, syncs) \
-for (int i = 0; i < (jobCount); i++) { \
-  ammonite::utils::thread::waitWorkComplete(&(syncs)[i]); \
-} \
-delete [] (syncs);
-
 #define INIT_TIMERS \
 ammonite::utils::Timer submitTimer; \
 ammonite::utils::Timer runTimer; \
@@ -57,11 +48,11 @@ for (int i = 0; i < (jobCount); i++) { \
   ammonite::utils::thread::submitWork(shortTask, &(values)[i], nullptr); \
 }
 
-#define SUBMIT_SYNC_JOBS(jobCount, syncs) \
+#define SUBMIT_SYNC_JOBS(jobCount, group) \
 bool passed = true; \
 int* values = new int[(jobCount)]{}; \
 for (int i = 0; i < (jobCount); i++) { \
-  ammonite::utils::thread::submitWork(shortTask, &(values)[i], &(syncs)[i]); \
+  ammonite::utils::thread::submitWork(shortTask, &(values)[i], &group); \
 }
 
 #define VERIFY_WORK(jobCount) \
@@ -80,7 +71,7 @@ static void shortTask(void* userPtr) {
 
 struct ResubmitData {
   int* writePtr;
-  AmmoniteCompletion* syncPtr;
+  AmmoniteGroup* syncPtr;
 };
 
 static void resubmitTask(void* userPtr) {
@@ -92,15 +83,15 @@ namespace {
   static bool testCreateSubmitWaitDestroy(int jobCount) {
     INIT_TIMERS
     CREATE_THREAD_POOL(0)
-    PREP_SYNC(jobCount, syncs)
+    AmmoniteGroup group{0};
 
     //Submit fast 'jobs'
     RESET_TIMERS
-    SUBMIT_SYNC_JOBS(jobCount, syncs)
+    SUBMIT_SYNC_JOBS(jobCount, group)
     submitTimer.pause();
 
     //Finish work
-    SYNC_THREADS(jobCount, syncs)
+    ammonite::utils::thread::waitGroupComplete(&group, jobCount);
     FINISH_TIMERS
     VERIFY_WORK(jobCount)
 
@@ -147,18 +138,18 @@ namespace {
   static bool testCreateBlockSubmitUnblockWaitDestroy(int jobCount) {
     INIT_TIMERS
     CREATE_THREAD_POOL(0)
-    PREP_SYNC(jobCount, syncs)
+    AmmoniteGroup group{0};
 
     ammonite::utils::thread::blockThreads();
 
     //Submit fast 'jobs'
     RESET_TIMERS
-    SUBMIT_SYNC_JOBS(jobCount, syncs)
+    SUBMIT_SYNC_JOBS(jobCount, group)
     submitTimer.pause();
 
     //Finish work
     ammonite::utils::thread::unblockThreads();
-    SYNC_THREADS(jobCount, syncs)
+    ammonite::utils::thread::waitGroupComplete(&group, jobCount);
     FINISH_TIMERS
     VERIFY_WORK(jobCount)
 
@@ -170,25 +161,24 @@ namespace {
     INIT_TIMERS
     CREATE_THREAD_POOL(0)
     jobCount *= 4;
-    PREP_SYNC(jobCount, syncs)
+    AmmoniteGroup group{0};
 
     //Submit fast 'jobs'
     RESET_TIMERS
-    SUBMIT_SYNC_JOBS(jobCount, syncs)
+    SUBMIT_SYNC_JOBS(jobCount, group)
     submitTimer.pause();
-    SYNC_THREADS(jobCount, syncs)
+    ammonite::utils::thread::waitGroupComplete(&group, jobCount);
     VERIFY_WORK(jobCount)
 
     //Submit second batch
-    syncs = new AmmoniteCompletion[(jobCount)]{ATOMIC_FLAG_INIT};
     values = new int[(jobCount)]{};
     submitTimer.unpause();
     for (int i = 0; i < jobCount; i++) { \
-      ammonite::utils::thread::submitWork(shortTask, &(values)[i], &(syncs)[i]); \
+      ammonite::utils::thread::submitWork(shortTask, &(values)[i], &group); \
     }
     submitTimer.pause();
 
-    SYNC_THREADS(jobCount, syncs)
+    ammonite::utils::thread::waitGroupComplete(&group, jobCount);
     FINISH_TIMERS
     VERIFY_WORK(jobCount)
 
@@ -200,7 +190,7 @@ namespace {
     int jobCount = fullJobCount / 2;
     INIT_TIMERS
     CREATE_THREAD_POOL(0)
-    PREP_SYNC(jobCount, syncs)
+    AmmoniteGroup group{0};
 
     //Submit nested 'jobs'
     RESET_TIMERS
@@ -209,13 +199,13 @@ namespace {
     ResubmitData* data = new ResubmitData[jobCount]{};
     for (int i = 0; i < jobCount; i++) {
       data[i].writePtr = &values[i];
-      data[i].syncPtr = &syncs[i];
+      data[i].syncPtr = &group;
       ammonite::utils::thread::submitWork(resubmitTask, &data[i], nullptr);
     }
     submitTimer.pause();
 
     //Finish work
-    SYNC_THREADS(jobCount, syncs)
+    ammonite::utils::thread::waitGroupComplete(&group, jobCount);
     FINISH_TIMERS
     delete [] data;
     VERIFY_WORK(jobCount)
@@ -255,7 +245,7 @@ namespace {
     bool passed = true;
     int* values = new int[jobCount]{};
     ammonite::utils::thread::submitMultiple(shortTask, (void*)&values[0],
-                                     sizeof(int), nullptr, jobCount);
+                                            sizeof(int), nullptr, jobCount);
     submitTimer.pause();
 
     //Finish work

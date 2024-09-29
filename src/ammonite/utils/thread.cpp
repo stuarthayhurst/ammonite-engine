@@ -21,16 +21,18 @@ namespace ammonite {
       }
 
       /*
-       - Submit a job to the thread pool, with a user-provided pointer and completion
-         - If completion isn't a nullptr, it should be initialised with ATOMIC_FLAG_INIT
+       - Submit a job to the thread pool, with a user-provided pointer and group
+         - group should either be a nullptr, or an AmmoniteGroup{0}
+           - A group can be used between multiple calls, but waiting on it will block
+             until all work in the group is done
          - userPtr may be a nullptr
       */
-      void submitWork(AmmoniteWork work, void* userPtr, AmmoniteCompletion* completion) {
-        ammonite::utils::thread::internal::submitWork(work, userPtr, completion);
+      void submitWork(AmmoniteWork work, void* userPtr, AmmoniteGroup* group) {
+        ammonite::utils::thread::internal::submitWork(work, userPtr, group);
       }
 
       /*
-       - Submit multiple jobs to the thread pool, with a user-provided buffer and completions
+       - Submit multiple jobs to the thread pool, with a user-provided buffer and group
          - userBuffer should either be a nullptr, or an array of data to be split between jobs
            - Each job will receive a section according to (userBuffer + job index * stride)
            - stride should by the size of each section to give to a job, in bytes
@@ -41,12 +43,6 @@ namespace ammonite {
                           AmmoniteGroup* group, unsigned int jobCount) {
         return ammonite::utils::thread::internal::submitMultiple(work, userBuffer,
           stride, group, jobCount);
-      }
-
-      //Wait for completion to be finished, completion can't be a nullptr
-      void waitWorkComplete(AmmoniteCompletion* completion) {
-        //Wait for completion to become true
-        completion->wait(false);
       }
 
       //Wait for a group to be finished, group can't be a nullptr

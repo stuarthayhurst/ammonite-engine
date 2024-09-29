@@ -14,7 +14,6 @@ namespace {
   struct WorkItem {
     AmmoniteWork work;
     void* userPtr;
-    AmmoniteCompletion* completion;
     AmmoniteGroup* group;
   };
 
@@ -32,7 +31,7 @@ namespace {
   public:
     WorkQueue() {
       //Start with an empty queue, 1 'old' node
-      nextPushed = new Node{{nullptr, nullptr, nullptr, nullptr}, nullptr};
+      nextPushed = new Node{{nullptr, nullptr, nullptr}, nullptr};
       nextPopped = nextPushed;
     }
 
@@ -47,29 +46,29 @@ namespace {
       delete nextPopped;
     }
 
-    void push(AmmoniteWork work, void* userPtr, AmmoniteCompletion* completion) {
+    void push(AmmoniteWork work, void* userPtr, AmmoniteGroup* group) {
       //Create a new empty node
-      Node* newNode = new Node{{nullptr, nullptr, nullptr, nullptr}, nullptr};
+      Node* newNode = new Node{{nullptr, nullptr, nullptr}, nullptr};
 
       //Atomically swap the next node with newNode, then fill in the old new node now it's free
-      *(nextPushed.exchange(newNode)) = {{work, userPtr, completion, nullptr}, newNode};
+      *(nextPushed.exchange(newNode)) = {{work, userPtr, group}, newNode};
     }
 
     void pushMultiple(AmmoniteWork work, void* userBuffer, int stride,
                                 AmmoniteGroup* group, unsigned int count) {
       //Generate section of linked list to insert
-      Node* newNode = new Node{{nullptr, nullptr, nullptr, nullptr}, nullptr};
+      Node* newNode = new Node{{nullptr, nullptr, nullptr}, nullptr};
       Node sectionStart;
       Node* sectionPtr = &sectionStart;
       if (userBuffer == nullptr) {
         for (unsigned int i = 0; i < count; i++) {
-          sectionPtr->nextNode = new Node{{work, nullptr, nullptr, group}, nullptr};
+          sectionPtr->nextNode = new Node{{work, nullptr, group}, nullptr};
           sectionPtr = sectionPtr->nextNode;
         }
       } else {
         for (unsigned int i = 0; i < count; i++) {
           sectionPtr->nextNode = new Node{{
-            work, (void*)((char*)userBuffer + (std::size_t)(i) * stride), nullptr, group}, nullptr};
+            work, (void*)((char*)userBuffer + (std::size_t)(i) * stride), group}, nullptr};
           sectionPtr = sectionPtr->nextNode;
         }
       }
@@ -130,12 +129,9 @@ namespace ammonite {
                 jobCount--;
                 workItem.work(workItem.userPtr);
 
-                //Update the group semaphore or completion, if given
+                //Update the group semaphore, if given
                 if (workItem.group != nullptr) {
                   workItem.group->release();
-                } else if (workItem.completion != nullptr) {
-                  workItem.completion->test_and_set();
-                  workItem.completion->notify_all();
                 }
               } else {
                 //Sleep while 0 jobs remain
@@ -167,9 +163,9 @@ namespace ammonite {
           return poolThreadCount;
         }
 
-        void submitWork(AmmoniteWork work, void* userPtr, AmmoniteCompletion* completion) {
+        void submitWork(AmmoniteWork work, void* userPtr, AmmoniteGroup* group) {
           //Add work to the queue
-          workQueue->push(work, userPtr, completion);
+          workQueue->push(work, userPtr, group);
 
           //Increase job count, wake a sleeping thread
           jobCount++;
