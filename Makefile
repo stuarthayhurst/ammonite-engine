@@ -30,7 +30,7 @@ DEMO_OBJECTS = $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.o,$(DEMO_OBJECTS_SOURCE
 
 CXXFLAGS += $(shell pkg-config --cflags $(LIBS))
 CXXFLAGS += -Wall -Wextra -Werror -std=c++23 -flto=auto
-LDFLAGS := $(shell pkg-config --libs $(LIBS)) -lstdc++ -lm -latomic -pthread
+LDFLAGS := $(shell pkg-config --libs $(LIBS)) -lm -latomic -pthread
 
 ifeq ($(FAST),true)
   CXXFLAGS += -march=native -DFAST
