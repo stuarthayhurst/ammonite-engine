@@ -65,18 +65,35 @@ for (int i = 0; i < (jobCount); i++) { \
 } \
 delete [] values;
 
-static void shortTask(void* userPtr) {
-  *(int*)userPtr = 1;
-}
+namespace {
+  struct ResubmitData {
+    int* writePtr;
+    AmmoniteGroup* syncPtr;
+  };
 
-struct ResubmitData {
-  int* writePtr;
-  AmmoniteGroup* syncPtr;
-};
+  struct ChainData {
+    std::atomic<int> totalSubmitted;
+    int targetSubmitted;
+    AmmoniteWork work;
+    AmmoniteGroup* syncPtr;
+  };
 
-static void resubmitTask(void* userPtr) {
-  ResubmitData* dataPtr = (ResubmitData*)userPtr;
-  ammonite::utils::thread::submitWork(shortTask, dataPtr->writePtr, dataPtr->syncPtr);
+  static void shortTask(void* userPtr) {
+    *(int*)userPtr = 1;
+  }
+
+  static void resubmitTask(void* userPtr) {
+    ResubmitData* dataPtr = (ResubmitData*)userPtr;
+    ammonite::utils::thread::submitWork(shortTask, dataPtr->writePtr, dataPtr->syncPtr);
+  }
+
+  static void chainTask(void* userPtr) {
+    ChainData* dataPtr = (ChainData*)userPtr;
+    if (dataPtr->totalSubmitted != dataPtr->targetSubmitted) {
+      dataPtr->totalSubmitted++;
+      ammonite::utils::thread::submitWork(chainTask, dataPtr, dataPtr->syncPtr);
+    }
+  }
 }
 
 namespace {
@@ -211,6 +228,28 @@ namespace {
     VERIFY_WORK(jobCount)
     DESTROY_THREAD_POOL
 
+    return passed;
+  }
+
+  static bool testChainJobs(int jobCount) {
+    INIT_TIMERS
+    CREATE_THREAD_POOL(0)
+
+    AmmoniteGroup sync{0};
+    ChainData userData = {1, jobCount, chainTask, &sync};
+    ammonite::utils::thread::submitWork(chainTask, &userData, &sync);
+    submitTimer.pause();
+
+    ammonite::utils::thread::waitGroupComplete(&sync, jobCount);
+    FINISH_TIMERS
+
+    bool passed = true;
+    if (userData.totalSubmitted != jobCount) {
+      passed = false;
+      ammonite::utils::error << "Failed to verify work" << std::endl;
+    }
+
+    DESTROY_THREAD_POOL
     return passed;
   }
 
@@ -359,6 +398,9 @@ int main() {
 
   std::cout << "Testing nested jobs" << std::endl;
   failed |= !testNestedJobs(JOB_COUNT);
+
+  std::cout << "Testing chained jobs" << std::endl;
+  failed |= !testChainJobs(JOB_COUNT);
 
   std::cout << "Testing submit multiple" << std::endl;
   failed |= !testSubmitMultiple(JOB_COUNT);
