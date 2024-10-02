@@ -99,22 +99,5 @@ namespace ammonite {
         glfwPollEvents();
         ammonite::input::internal::runCallbacks();
     }
-
-    //Callback and setup function
-    namespace internal {
-      namespace {
-        static void windowFocusCallback(GLFWwindow*, int focused) {
-          //Unbind input with window focus (fixes missing mouse)
-          if (!focused) {
-            setInputFocus(focused);
-          }
-        }
-      }
-
-      void setupFocusCallback(GLFWwindow* windowPtr) {
-        //Set callback to update input state on window focus
-        glfwSetWindowFocusCallback(windowPtr, windowFocusCallback);
-      }
-    }
   }
 }

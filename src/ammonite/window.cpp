@@ -8,10 +8,10 @@
 #include <stb/stb_image.h>
 
 #include "internal/inputManager.hpp"
-#include "internal/internalInput.hpp"
 #include "internal/windowManager.hpp"
 
 #include "utils/logging.hpp"
+#include "input.hpp"
 #include "enums.hpp"
 
 #define DEFAULT_TITLE "Ammonite Window"
@@ -26,6 +26,18 @@ namespace ammonite {
     namespace {
       static void setCloseWindowCallback(std::vector<int>, int, void* userPtr) {
         *(bool*)userPtr = true;
+      }
+
+      static void windowFocusCallback(GLFWwindow*, int focused) {
+        //Unbind input with window focus (fixes missing mouse)
+        if (!focused) {
+          ammonite::input::setInputFocus(focused);
+        }
+      }
+
+      void setFocusCallback(GLFWwindow* windowPtr) {
+        //Set callback to update input state on window focus
+        glfwSetWindowFocusCallback(windowPtr, windowFocusCallback);
       }
     }
 
@@ -74,7 +86,7 @@ namespace ammonite {
       //Setup input for window
       internal::setupGlfwInput();
       ammonite::input::internal::setupInputCallback(windowPtr);
-      ammonite::input::internal::setupFocusCallback(windowPtr);
+      setFocusCallback(windowPtr);
 
       return 0;
     }
