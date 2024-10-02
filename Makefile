@@ -46,9 +46,9 @@ $(BUILD_DIR)/demo: $(BUILD_DIR)/$(LIBRARY_NAME) $(HELPER_OBJECTS) $(DEMO_OBJECTS
 	@mkdir -p "$(BUILD_DIR)"
 	$(CXX) -o "$(BUILD_DIR)/demo" $(HELPER_OBJECTS) $(DEMO_OBJECTS) $(OBJECT_DIR)/demo.o $(CXXFLAGS) "-L$(BUILD_DIR)" -lammonite $(LDFLAGS)
 
-$(BUILD_DIR)/threadDemo: $(BUILD_DIR)/$(LIBRARY_NAME) $(OBJECT_DIR)/threadDemo.o
+$(BUILD_DIR)/threadTest: $(BUILD_DIR)/$(LIBRARY_NAME) $(OBJECT_DIR)/threadTest.o
 	@mkdir -p "$(BUILD_DIR)"
-	$(CXX) -o "$(BUILD_DIR)/threadDemo" $(OBJECT_DIR)/threadDemo.o $(CXXFLAGS) "-L$(BUILD_DIR)" -lammonite $(LDFLAGS)
+	$(CXX) -o "$(BUILD_DIR)/threadTest" $(OBJECT_DIR)/threadTest.o $(CXXFLAGS) "-L$(BUILD_DIR)" -lammonite $(LDFLAGS)
 
 $(BUILD_DIR)/libammonite.so: $(AMMONITE_OBJECTS)
 	@mkdir -p "$(OBJECT_DIR)"
@@ -76,9 +76,9 @@ $(OBJECT_DIR)/demos/%.o: ./src/demos/%.cpp $(DEMO_HEADER_SOURCE) $(AMMONITE_HEAD
 $(OBJECT_DIR)/demo.o: ./src/demo.cpp $(AMMONITE_HEADER_SOURCE) $(HELPER_HEADER_SOURCE)
 	@mkdir -p "$(OBJECT_DIR)"
 	$(CXX) ./src/demo.cpp -c $(CXXFLAGS) -o "$@"
-$(OBJECT_DIR)/threadDemo.o: ./src/threadDemo.cpp $(AMMONITE_HEADER_SOURCE)
+$(OBJECT_DIR)/threadTest.o: ./src/threadTest.cpp $(AMMONITE_HEADER_SOURCE)
 	@mkdir -p "$(OBJECT_DIR)"
-	$(CXX) ./src/threadDemo.cpp -c $(CXXFLAGS) -o "$@"
+	$(CXX) ./src/threadTest.cpp -c $(CXXFLAGS) -o "$@"
 
 $(BUILD_DIR)/compile_flags.txt: Makefile
 	@mkdir -p "$(BUILD_DIR)"
@@ -97,9 +97,9 @@ demo: $(BUILD_DIR)/demo
 	@if [[ "$(DEBUG)" != "true" ]]; then \
 	  strip --strip-unneeded "$(BUILD_DIR)/demo"; \
 	fi
-threads: $(BUILD_DIR)/threadDemo
+threads: $(BUILD_DIR)/threadTest
 	@if [[ "$(DEBUG)" != "true" ]]; then \
-	  strip --strip-unneeded "$(BUILD_DIR)/threadDemo"; \
+	  strip --strip-unneeded "$(BUILD_DIR)/threadTest"; \
 	fi
 debug: clean
 	@DEBUG="true" $(MAKE) build

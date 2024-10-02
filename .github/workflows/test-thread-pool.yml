@@ -31,7 +31,7 @@ jobs:
 
     - name: (g++) (valgrind) Test built thread demo
       run: |
-        LD_LIBRARY_PATH=build valgrind --fair-sched=yes --leak-check=full --show-leak-kinds=all --error-exitcode=1 ./build/threadDemo
+        LD_LIBRARY_PATH=build valgrind --fair-sched=yes --leak-check=full --show-leak-kinds=all --error-exitcode=1 ./build/threadTest
 
     - name: (clang++) Test thread demo build target
       run: |
@@ -40,4 +40,4 @@ jobs:
 
     - name: (clang++) (valgrind) Test built thread demo
       run: |
-        LD_LIBRARY_PATH=build valgrind --fair-sched=yes --leak-check=full --show-leak-kinds=all --error-exitcode=1 ./build/threadDemo
+        LD_LIBRARY_PATH=build valgrind --fair-sched=yes --leak-check=full --show-leak-kinds=all --error-exitcode=1 ./build/threadTest
