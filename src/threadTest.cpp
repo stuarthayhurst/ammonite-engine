@@ -275,6 +275,30 @@ namespace {
     return passed;
   }
 
+  static bool testSubmitMultipleMultiple(int jobCount) {
+    INIT_TIMERS
+    CREATE_THREAD_POOL(0)
+
+    //Submit fast 'jobs'
+    RESET_TIMERS
+    bool passed = true;
+    int* values = new int[jobCount * 4]{};
+    AmmoniteGroup group{0};
+    for (int i = 0; i < 4; i++) {
+      ammonite::utils::thread::submitMultiple(shortTask, (void*)&values[jobCount * i],
+        sizeof(int), &group, jobCount);
+    }
+    submitTimer.pause();
+
+    //Finish work
+    ammonite::utils::thread::waitGroupComplete(&group, jobCount * 4);
+    FINISH_TIMERS
+    VERIFY_WORK(jobCount)
+
+    DESTROY_THREAD_POOL
+    return passed;
+  }
+
   static bool testSubmitMultipleNoSync(int jobCount) {
     INIT_TIMERS
     CREATE_THREAD_POOL(0)
@@ -404,6 +428,9 @@ int main() {
 
   std::cout << "Testing submit multiple" << std::endl;
   failed |= !testSubmitMultiple(JOB_COUNT);
+
+  std::cout << "Testing submit multiple (4x regular over 4 batches)" << std::endl;
+  failed |= !testSubmitMultipleMultiple(JOB_COUNT);
 
   std::cout << "Testing submit multiple, no sync" << std::endl;
   failed |= !testSubmitMultipleNoSync(JOB_COUNT);
