@@ -68,8 +68,8 @@ namespace ammonite {
       delete data;
     }
 
-    static void cacheProgram(const GLuint programId, std::string* shaderPaths, int shaderCount,
-                             std::string* cacheFilePath) {
+    static void cacheProgram(const GLuint programId, std::string* shaderPaths,
+                             unsigned int shaderCount, std::string* cacheFilePath) {
       CacheWorkerData* data = new CacheWorkerData;
       data->shaderCount = shaderCount;
 
@@ -99,7 +99,7 @@ namespace ammonite {
 
       //Pack shader paths into worker data
       data->shaderPaths = new std::string[shaderCount];
-      for (int i = 0; i < shaderCount; i++) {
+      for (unsigned int i = 0; i < shaderCount; i++) {
         data->shaderPaths[i] = shaderPaths[i];
       }
 
