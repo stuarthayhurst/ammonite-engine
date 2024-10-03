@@ -174,7 +174,7 @@ namespace ammonite {
 
         //Submit multiple jobs without locking multiple times
         void submitMultiple(AmmoniteWork work, void* userBuffer, int stride,
-                                      AmmoniteGroup* group, unsigned int newJobs) {
+                            AmmoniteGroup* group, unsigned int newJobs) {
           workQueue->pushMultiple(work, userBuffer, stride, group, newJobs);
           jobCount += newJobs;
           jobCount.notify_all();
