@@ -40,7 +40,13 @@ namespace ammonite {
             }
           }
 
-          return std::to_string((uint64_t)_mm512_reduce_add_epi64(last));
+          uint64_t* values = (uint64_t*)&last;
+          uint64_t result = 0;
+          for (int i = 0; i < 8; i++) {
+            result += values[i];
+          }
+
+          return std::to_string(result);
         }
 #else
         std::string generateCacheString(std::string* filePaths,
