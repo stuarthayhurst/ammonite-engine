@@ -29,13 +29,11 @@ HELPER_OBJECTS = $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.o,$(HELPER_OBJECTS_SO
 DEMO_OBJECTS = $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.o,$(DEMO_OBJECTS_SOURCE)))
 
 CXXFLAGS += $(shell pkg-config --cflags $(LIBS))
-CXXFLAGS += -Wall -Wextra -Werror -std=c++23 -flto=auto
+CXXFLAGS += -Wall -Wextra -Werror -std=c++23 -flto=auto -O3
 LDFLAGS := $(shell pkg-config --libs $(LIBS)) -lm -latomic -pthread
 
 ifeq ($(FAST),true)
   CXXFLAGS += -march=native -DFAST
-else
-  CXXFLAGS += -O3
 endif
 
 ifeq ($(DEBUG),true)
