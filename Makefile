@@ -38,6 +38,10 @@ endif
 
 ifeq ($(DEBUG),true)
   CXXFLAGS += -DDEBUG -g -fsanitize=address,undefined
+  CHECK_LEAKS = true
+endif
+
+ifeq ($(CHECK_LEAKS),true)
   LDFLAGS += -fsanitize=leak
 endif
 
