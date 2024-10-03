@@ -64,9 +64,9 @@ namespace sponzaDemo {
     ammonite::models::position::setPosition(loadedModelIds[modelCount - 1], glm::vec3(0.0f, 20.0f, 0.0f));
     ammonite::models::position::scaleModel(loadedModelIds[modelCount - 1], 0.25f);
 
-    int skyboxId = ammonite::environment::skybox::loadDirectory("assets-experimental/skybox/", &success);
+    int skyboxId = ammonite::skybox::loadDirectory("assets-experimental/skybox/", &success);
     if (success) {
-      ammonite::environment::skybox::setActiveSkybox(skyboxId);
+      ammonite::skybox::setActiveSkybox(skyboxId);
     } else {
       ammonite::utils::warning << "Skybox failed to load" << std::endl;
     }

@@ -28,7 +28,7 @@
 
 #include "../camera.hpp"
 #include "../enums.hpp"
-#include "../environment.hpp"
+#include "../skybox.hpp"
 
 #include "../utils/logging.hpp"
 #include "../utils/debug.hpp"
@@ -957,7 +957,7 @@ namespace ammonite {
         internal::prepareScreen(targetBufferId, renderWidth, renderHeight, true);
 
         //Clear depth and colour (if no skybox is used)
-        int activeSkybox = ammonite::environment::skybox::getActiveSkybox();
+        int activeSkybox = ammonite::skybox::getActiveSkybox();
         if (activeSkybox == -1) {
           glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         } else {
