@@ -39,7 +39,7 @@ else
 endif
 
 ifeq ($(DEBUG),true)
-  CXXFLAGS += -DDEBUG -g
+  CXXFLAGS += -DDEBUG -g -fsanitize=address
 endif
 
 $(BUILD_DIR)/demo: $(BUILD_DIR)/$(LIBRARY_NAME) $(HELPER_OBJECTS) $(DEMO_OBJECTS) $(OBJECT_DIR)/demo.o
