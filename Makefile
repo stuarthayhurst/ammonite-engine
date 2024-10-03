@@ -45,6 +45,10 @@ ifeq ($(CHECK_LEAKS),true)
   LDFLAGS += -fsanitize=leak
 endif
 
+ifeq ($(CHECK_THREADS),true)
+  CXXFLAGS += -fsanitize=thread
+endif
+
 $(BUILD_DIR)/demo: $(BUILD_DIR)/$(LIBRARY_NAME) $(HELPER_OBJECTS) $(DEMO_OBJECTS) $(OBJECT_DIR)/demo.o
 	@mkdir -p "$(BUILD_DIR)"
 	$(CXX) -o "$(BUILD_DIR)/demo" $(HELPER_OBJECTS) $(DEMO_OBJECTS) $(OBJECT_DIR)/demo.o $(CXXFLAGS) "-L$(BUILD_DIR)" -lammonite $(LDFLAGS)

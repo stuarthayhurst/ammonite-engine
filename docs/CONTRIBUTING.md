@@ -33,7 +33,8 @@
     - `FAST`: `true / false` - Compiles with `-march=native` and uses a no-error context
     - `INSTALL_DIR` - Install `libammonite.so` to a different location
     - `HEADER_DIR` - Install Ammonite headers to a different location
-    - `CHECK_LEAKS` - Enables `-fsanitize=leak`
+    - `CHECK_LEAKS` - Enables `-fsanitize=leak` for runtime leak checking
+    - `CHECK_THREADS` - Enables `-fsanitize=thread` for runtime data race checking
 
 ## Debug mode:
   - To compile in debug mode, use `make debug` or `DEBUG=true make ...`
