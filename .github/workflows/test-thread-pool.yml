@@ -40,7 +40,7 @@ jobs:
     - name: (clang++) (DEBUG) Build thread tester
       run: |
         make clean
-        CXX="clang++-14" DEBUG="true" make threads -j$(nproc)
+        CXX="clang++-18" DEBUG="true" make threads -j$(nproc)
 
     - name: (clang++) (DEBUG) Run thread tester
       run: |
@@ -49,7 +49,7 @@ jobs:
     - name: (clang++) (CHECK_THREADS) Build thread tester
       run: |
         make clean
-        CXX="clang++-14" CHECK_THREADS="true" make threads -j$(nproc)
+        CXX="clang++-18" CHECK_THREADS="true" make threads -j$(nproc)
 
     - name: (clang++) (CHECK_THREADS) Run thread tester
       run: |
