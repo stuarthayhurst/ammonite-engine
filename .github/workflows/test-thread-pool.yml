@@ -18,26 +18,39 @@ jobs:
         sudo apt-get install --no-install-recommends make pkg-config build-essential
         sudo apt-get install --no-install-recommends g++-14 clang-18
         sudo apt-get install --no-install-recommends libglm-dev libglfw3-dev libglew-dev libstb-dev libassimp-dev
-        sudo apt-get install --no-install-recommends valgrind
 
-    - name: (g++) Test thread demo build target
+    - name: (g++) (DEBUG) Build thread tester
       run: |
         make clean
         CXX="g++-14" DEBUG="true" make threads -j$(nproc)
 
-    - name: (g++) Test built thread demo
+    - name: (g++) (DEBUG) Run thread tester
       run: |
         ./launch.sh --threads
 
-    - name: (g++) (valgrind) Test built thread demo
-      run: |
-        LD_LIBRARY_PATH=build valgrind --fair-sched=yes --leak-check=full --show-leak-kinds=all --error-exitcode=1 ./build/threadTest
-
-    - name: (clang++) Test thread demo build target
+    - name: (g++) (CHECK_THREADS) Build thread tester
       run: |
         make clean
-        CXX="clang++-18" DEBUG="true" make threads -j$(nproc)
+        CXX="g++-14" CHECK_THREADS="true" make threads -j$(nproc)
 
-    - name: (clang++) (valgrind) Test built thread demo
+    - name: (g++) (CHECK_THREADS) Run thread tester
       run: |
-        LD_LIBRARY_PATH=build valgrind --fair-sched=yes --leak-check=full --show-leak-kinds=all --error-exitcode=1 ./build/threadTest
+        ./launch.sh --threads
+
+    - name: (clang++) (DEBUG) Build thread tester
+      run: |
+        make clean
+        CXX="clang++-14" DEBUG="true" make threads -j$(nproc)
+
+    - name: (clang++) (DEBUG) Run thread tester
+      run: |
+        ./launch.sh --threads
+
+    - name: (clang++) (CHECK_THREADS) Build thread tester
+      run: |
+        make clean
+        CXX="clang++-14" CHECK_THREADS="true" make threads -j$(nproc)
+
+    - name: (clang++) (CHECK_THREADS) Run thread tester
+      run: |
+        ./launch.sh --threads

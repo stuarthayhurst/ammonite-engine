@@ -32,7 +32,7 @@ jobs:
       run: |
         CXX="g++-14" make build -j$(nproc)
 
-    - name: (g++) Test debug demo build target
+    - name: (g++) (DEBUG) Test debug demo build target
       run: |
         CXX="g++-14" make debug -j$(nproc)
 
@@ -52,7 +52,7 @@ jobs:
       run: |
         CXX="clang++-18" make build -j$(nproc)
 
-    - name: (clang++) Test debug demo build target
+    - name: (clang++) (DEBUG) Test debug demo build target
       run: |
         CXX="clang++-18" make debug -j$(nproc)
 

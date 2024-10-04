@@ -27,6 +27,6 @@ jobs:
       run: |
         make clean
 
-    - name: Run the linting target in debug mode
+    - name: (DEBUG) Run the linting target
       run: |
         DEBUG=true make lint -j$(nproc)
