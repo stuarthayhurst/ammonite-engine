@@ -173,7 +173,7 @@ namespace ammonite {
   //Shader compilation and cache functions, local to this file
   namespace {
     //Take shader source code, compile it and load it
-    static int loadShader(std::string shaderPath, const GLenum shaderType, bool* externalSuccess) {
+    static GLuint loadShader(std::string shaderPath, const GLenum shaderType, bool* externalSuccess) {
       //Create the shader
       GLuint shaderId = glCreateShader(shaderType);
 
@@ -203,8 +203,8 @@ namespace ammonite {
     }
 
     //Take multiple shader objects and create a program
-    static int createProgramObject(GLuint* shaderIds, int shaderCount,
-                                   bool* externalSuccess) {
+    static GLuint createProgramObject(GLuint* shaderIds, int shaderCount,
+                                      bool* externalSuccess) {
       //Create the program
       GLuint programId = glCreateProgram();
 
@@ -231,8 +231,8 @@ namespace ammonite {
     }
 
     //Create a program from shader source with loadShader() and createProgramObject()
-    static int createProgramUncached(std::string* shaderPaths, GLenum* shaderTypes,
-                                     unsigned int shaderCount, bool* externalSuccess) {
+    static GLuint createProgramUncached(std::string* shaderPaths, GLenum* shaderTypes,
+                                        unsigned int shaderCount, bool* externalSuccess) {
       //Since cache wasn't available, generate fresh shaders
       GLuint* shaderIds = new GLuint[shaderCount];
       bool hasCreatedShaders = true;
@@ -270,14 +270,14 @@ namespace ammonite {
     }
 
     //Attempt to use a cached program or hand off to createProgramUncached()
-    static int createProgramCached(std::string* shaderPaths, GLenum* shaderTypes,
-                                   unsigned int shaderCount, bool* externalSuccess) {
+    static GLuint createProgramCached(std::string* shaderPaths, GLenum* shaderTypes,
+                                      unsigned int shaderCount, bool* externalSuccess) {
       //Check for OpenGL and engine cache support
       bool isCacheSupported = ammonite::utils::files::getCacheEnabled();
       isCacheSupported = isCacheSupported && isBinaryCacheSupported;
 
       //Try and fetch the cache, then try and load it into a program
-      int programId;
+      GLuint programId;
       std::string cacheFilePath;
       if (isCacheSupported) {
         unsigned char* userData;
@@ -323,10 +323,12 @@ namespace ammonite {
       }
 
       //Cache wasn't usable, compile a fresh program
-      programId = createProgramUncached(shaderPaths, shaderTypes, shaderCount, externalSuccess);
-
-      //Cache the binary if enabled
-      if (isCacheSupported && programId != -1) {
+      bool success = true;
+      programId = createProgramUncached(shaderPaths, shaderTypes, shaderCount, &success);
+      if (!success) {
+        *externalSuccess = false;
+      } else if (isCacheSupported) {
+        //Cache the binary if enabled
         cacheProgram(programId, shaderPaths, shaderCount, &cacheFilePath);
       }
 
@@ -361,8 +363,8 @@ namespace ammonite {
          - If possible, load and store a cache
        - Writes 'false' to externalSuccess on failure and returns -1
       */
-      int createProgram(std::string* inputShaderPaths, unsigned int inputShaderCount,
-                        bool* externalSuccess) {
+      GLuint createProgram(std::string* inputShaderPaths, unsigned int inputShaderCount,
+                           bool* externalSuccess) {
         //Find all shaders
         std::vector<std::string> shaderPaths(0);
         std::vector<GLenum> shaderTypes(0);
@@ -420,7 +422,7 @@ namespace ammonite {
          - If possible, load and store a cache
        - Writes 'false' to externalSuccess on failure and returns -1
       */
-      int loadDirectory(const char* directoryPath, bool* externalSuccess) {
+      GLuint loadDirectory(std::string directoryPath, bool* externalSuccess) {
         //Create filesystem directory iterator
         std::filesystem::directory_iterator it;
         try {

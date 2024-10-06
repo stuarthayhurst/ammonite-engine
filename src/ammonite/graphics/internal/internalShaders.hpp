@@ -8,12 +8,14 @@
 
 #include <string>
 
+#include <GL/glew.h>
+
 namespace ammonite {
   namespace shaders {
     namespace internal {
-      int createProgram(std::string* shaderPaths, unsigned int shaderCount,
-                        bool* externalSuccess);
-      int loadDirectory(const char* directoryPath, bool* externalSuccess);
+      GLuint createProgram(std::string* shaderPaths, unsigned int shaderCount,
+                           bool* externalSuccess);
+      GLuint loadDirectory(std::string directoryPath, bool* externalSuccess);
       void updateCacheSupport();
     }
   }

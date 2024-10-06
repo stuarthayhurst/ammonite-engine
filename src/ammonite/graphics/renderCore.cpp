@@ -333,7 +333,7 @@ namespace ammonite {
           for (int i = 0; i < shaderCount; i++) {
             std::string shaderLocation = std::string(shaderPath) + shaderInfo[i].shaderDir;
             *shaderInfo[i].shaderId =
-              ammonite::shaders::internal::loadDirectory(shaderLocation.c_str(),
+              ammonite::shaders::internal::loadDirectory(shaderLocation,
                                                          &hasCreatedShaders);
           }
 
