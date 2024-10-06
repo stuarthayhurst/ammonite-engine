@@ -98,6 +98,9 @@
 <p align="center">
   <img src="https://github.com/stuarthayhurst/ammonite/raw/master/docs/demo-1.png" alt="Demo 1">
 </p>
+<p align="center">
+  <img src="https://github.com/stuarthayhurst/ammonite/raw/master/docs/demo-2.png" alt="Demo 2">
+</p>
 
 ## Credits:
  - Some models in `assets/` may have been created by third parties, attribution can be found in `docs/CREDITS.md`
