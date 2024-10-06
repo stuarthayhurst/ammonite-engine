@@ -81,7 +81,7 @@ namespace ammonite {
             fullTexturePath = modelLoadInfo.modelDirectory + '/' + localTexturePath.C_Str();
 
             bool createdTextureSuccess = true;
-            unsigned int textureId = ammonite::textures::internal::loadTexture(fullTexturePath.c_str(),
+            unsigned int textureId = ammonite::textures::internal::loadTexture(fullTexturePath,
               false, modelLoadInfo.srgbTextures, &createdTextureSuccess);
             if (!createdTextureSuccess) {
               *externalSuccess = false;
@@ -96,7 +96,7 @@ namespace ammonite {
             fullTexturePath = modelLoadInfo.modelDirectory + '/' + localTexturePath.C_Str();
 
             bool createdTextureSuccess = true;
-            unsigned int textureId = ammonite::textures::internal::loadTexture(fullTexturePath.c_str(),
+            unsigned int textureId = ammonite::textures::internal::loadTexture(fullTexturePath,
               false, modelLoadInfo.srgbTextures, &createdTextureSuccess);
             if (!createdTextureSuccess) {
               *externalSuccess = false;

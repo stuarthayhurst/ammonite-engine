@@ -454,8 +454,8 @@ namespace ammonite {
 
         //Create new texture and apply to the mesh
         bool hasCreatedTexture = true;
-        int textureId = (int)ammonite::textures::internal::loadTexture(texturePath, false,
-          srgbTexture, &hasCreatedTexture);
+        int textureId = (int)ammonite::textures::internal::loadTexture(
+          std::string(texturePath), false, srgbTexture, &hasCreatedTexture);
         if (!hasCreatedTexture) {
           *externalSuccess = false;
           return;

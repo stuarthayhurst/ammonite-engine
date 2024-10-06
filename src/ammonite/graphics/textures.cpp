@@ -134,10 +134,10 @@ namespace ammonite {
          - srgbTexture controls whether the texture is treated as sRGB
        - Writes false to externalSuccess on failure
       */
-      GLuint loadTexture(const char* texturePath, bool flipTexture, bool srgbTexture,
+      GLuint loadTexture(std::string texturePath, bool flipTexture, bool srgbTexture,
                          bool* externalSuccess) {
         //Check if texture has already been loaded, in the same orientation
-        std::string textureString = std::string(texturePath) + std::to_string(flipTexture);
+        std::string textureString = texturePath + std::to_string(flipTexture);
         if (stringTexturePtrMap.contains(textureString)) {
           TextureInfo* textureInfo = stringTexturePtrMap[textureString];
 
@@ -152,7 +152,7 @@ namespace ammonite {
 
         //Read image data
         int width, height, nChannels;
-        unsigned char* data = stbi_load(texturePath, &width, &height, &nChannels, 0);
+        unsigned char* data = stbi_load(texturePath.c_str(), &width, &height, &nChannels, 0);
         if (flipTexture) {
           stbi_set_flip_vertically_on_load_thread(false);
         }
