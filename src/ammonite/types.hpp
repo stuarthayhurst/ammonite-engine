@@ -10,5 +10,6 @@ typedef void (*AmmoniteKeyCallback)(std::vector<int> keycodes, int action, void*
 typedef void (*AmmoniteWork)(void* userPtr);
 
 typedef std::counting_semaphore<INT_MAX> AmmoniteGroup;
+typedef unsigned int AmmoniteId;
 
 #endif
