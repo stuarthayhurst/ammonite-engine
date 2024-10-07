@@ -7,11 +7,13 @@
 
 #include <vector>
 #include <string>
+
 #include <glm/glm.hpp>
 #include <glm/gtx/quaternion.hpp>
 #include <GL/glew.h>
 
 #include "../../enums.hpp"
+#include "../../types.hpp"
 
 namespace ammonite {
   namespace models {
@@ -22,8 +24,8 @@ namespace ammonite {
       };
 
       struct TextureIdGroup {
-        int diffuseId = -1;
-        int specularId = -1;
+        GLuint diffuseId = 0;
+        GLuint specularId = 0;
       };
 
       struct MeshData {
@@ -37,7 +39,7 @@ namespace ammonite {
       };
 
       struct ModelData {
-        int refCount = 1;
+        unsigned int refCount = 1;
         std::vector<MeshData> meshes;
         std::vector<TextureIdGroup> textureIds;
       };
@@ -55,10 +57,10 @@ namespace ammonite {
         PositionData positionData;
         std::vector<TextureIdGroup> textureIds;
         AmmoniteEnum drawMode = AMMONITE_DRAW_ACTIVE;
-        int lightEmitterId = -1;
-        unsigned int lightIndex = -1;
+        AmmoniteId lightEmitterId = 0;
+        unsigned int lightIndex;
         std::string modelName;
-        int modelId;
+        AmmoniteId modelId = 0;
         AmmoniteEnum modelType = AMMONITE_MODEL;
       };
     }

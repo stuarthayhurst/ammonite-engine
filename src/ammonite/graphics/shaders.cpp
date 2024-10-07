@@ -184,7 +184,7 @@ namespace ammonite {
       if (shaderCodePtr == nullptr) {
         ammonite::utils::warning << "Failed to open '" << shaderPath << "'" << std::endl;
         *externalSuccess = false;
-        return -1;
+        return 0;
       }
 
       ammoniteInternalDebug << "Compiling '" << shaderPath << "'" << std::endl;
@@ -196,7 +196,7 @@ namespace ammonite {
       if (!checkShader(shaderId)) {
         glDeleteShader(shaderId);
         *externalSuccess = false;
-        return -1;
+        return 0;
       }
 
       return shaderId;
@@ -224,7 +224,7 @@ namespace ammonite {
       if (!checkProgram(programId, false)) {
         glDeleteProgram(programId);
         *externalSuccess = false;
-        return -1;
+        return 0;
       }
 
       return programId;
@@ -257,12 +257,12 @@ namespace ammonite {
       if (!hasCreatedProgram || !hasCreatedShaders) {
         *externalSuccess = false;
         for (unsigned int i = 0; i < shaderCount; i++) {
-          if (shaderIds[i] != unsigned(-1)) {
+          if (shaderIds[i] != 0) {
             glDeleteShader(shaderIds[i]);
           }
         }
         delete [] shaderIds;
-        return -1;
+        return 0;
       }
       delete [] shaderIds;
 
@@ -361,7 +361,7 @@ namespace ammonite {
        - Take an array of shader paths, create a program and return the ID
          - Shaders with unidentifiable types will be ignored
          - If possible, load and store a cache
-       - Writes 'false' to externalSuccess on failure and returns -1
+       - Writes 'false' to externalSuccess on failure and returns 0
       */
       GLuint createProgram(std::string* inputShaderPaths, unsigned int inputShaderCount,
                            bool* externalSuccess) {
@@ -420,7 +420,7 @@ namespace ammonite {
        - Create a program from shaders in a directory and return the ID
          - The order of shaders may be changed without re-caching
          - If possible, load and store a cache
-       - Writes 'false' to externalSuccess on failure and returns -1
+       - Writes 'false' to externalSuccess on failure and returns 0
       */
       GLuint loadDirectory(std::string directoryPath, bool* externalSuccess) {
         //Create filesystem directory iterator
@@ -431,7 +431,7 @@ namespace ammonite {
         } catch (const std::filesystem::filesystem_error&) {
           *externalSuccess = false;
           ammonite::utils::warning << "Failed to load '" << directoryPath << "'" << std::endl;
-          return -1;
+          return 0;
         }
 
         //Find files to send to next stage

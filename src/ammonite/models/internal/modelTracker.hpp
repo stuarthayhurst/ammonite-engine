@@ -7,6 +7,7 @@
 
 #include "modelTypes.hpp"
 #include "../../enums.hpp"
+#include "../../types.hpp"
 
 namespace ammonite {
   namespace models {
@@ -14,10 +15,10 @@ namespace ammonite {
       unsigned int getModelCount(AmmoniteEnum modelType);
       void getModels(AmmoniteEnum modelType, int modelCount, ModelInfo* modelArr[]);
 
-      ModelInfo* getModelPtr(int modelId);
+      ModelInfo* getModelPtr(AmmoniteId modelId);
       bool* getModelsMovedPtr();
-      void setLightEmitterId(int modelId, int lightEmitterId);
-      int getLightEmitterId(int modelId);
+      void setLightEmitterId(AmmoniteId modelId, AmmoniteId lightEmitterId);
+      AmmoniteId getLightEmitterId(AmmoniteId modelId);
     }
   }
 }

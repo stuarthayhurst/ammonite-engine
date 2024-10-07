@@ -6,7 +6,7 @@
 
 namespace monkeyDemo {
   namespace {
-    std::vector<int> loadedModelIds;
+    std::vector<AmmoniteId> loadedModelIds;
   }
 
   int demoExit() {
@@ -22,18 +22,18 @@ namespace monkeyDemo {
   }
 
   int postRendererInit() {
-    int screenId = ammonite::interface::getActiveLoadingScreen();
+    AmmoniteId screenId = ammonite::interface::getActiveLoadingScreen();
 
     //Load models from a set of objects and textures
     const char* models[][2] = {
       {"assets/suzanne.obj", "assets/gradient.png"},
       {"assets/cube.obj", "assets/flat.png"}
     };
-    int modelCount = sizeof(models) / sizeof(models[0]);
+    unsigned int modelCount = sizeof(models) / sizeof(models[0]);
 
     bool success = true;
-    long int vertexCount = 0;
-    for (int i = 0; i < modelCount; i++) {
+    long unsigned int vertexCount = 0;
+    for (unsigned int i = 0; i < modelCount; i++) {
       //Load model
       loadedModelIds.push_back(ammonite::models::createModel(models[i][0], &success));
 
@@ -78,13 +78,13 @@ namespace monkeyDemo {
     ammonite::models::position::rotateModel(loadedModelIds[0], glm::vec3(0.0f, 0.0f, 0.0f));
 
     //Set light source properties
-    int lightId = ammonite::lighting::createLightSource();
+    AmmoniteId lightId = ammonite::lighting::createLightSource();
     ammonite::lighting::properties::setPower(lightId, 50.0f);
     ammonite::lighting::linkModel(lightId, loadedModelIds[modelCount - 1]);
     ammonite::lighting::setAmbientLight(glm::vec3(0.1f, 0.1f, 0.1f));
 
     //Set the camera position
-    int cameraId = ammonite::camera::getActiveCamera();
+    AmmoniteId cameraId = ammonite::camera::getActiveCamera();
     ammonite::camera::setPosition(cameraId, glm::vec3(0.0f, 0.0f, 5.0f));
     ammonite::camera::setHorizontal(cameraId, glm::radians(180.0f));
     ammonite::camera::setVertical(cameraId, glm::radians(0.0f));

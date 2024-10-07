@@ -48,7 +48,7 @@ namespace {
 namespace {
   struct CameraData {
     int cameraIndex;
-    std::vector<int> cameraIds;
+    std::vector<AmmoniteId> cameraIds;
   };
 }
 
@@ -133,7 +133,7 @@ namespace {
   }
 
   //Clean up anything that was created
-  static void cleanEngine(int setupBits, std::vector<int>* keybindIdsPtr) {
+  static void cleanEngine(unsigned int setupBits, std::vector<AmmoniteId>* keybindIdsPtr) {
     if (setupBits & HAS_SETUP_CONTROLS) {
       ammonite::controls::releaseFreeCamera();
       if (keybindIdsPtr != nullptr) {
@@ -214,7 +214,7 @@ int main(int argc, char* argv[]) {
   if (ammonite::window::createWindow(1024, 768, "Ammonite Engine") == -1) {
     return EXIT_FAILURE;
   }
-  int setupBits = HAS_SETUP_WINDOW;
+  unsigned int setupBits = HAS_SETUP_WINDOW;
   ammonite::window::useIconDir("assets/icons/");
 
   ammonite::utils::debug::printDriverInfo();
@@ -257,7 +257,7 @@ int main(int argc, char* argv[]) {
   }
 
   //Create a loading screen and render initial frame
-  int screenId = ammonite::interface::createLoadingScreen();
+  AmmoniteId screenId = ammonite::interface::createLoadingScreen();
   ammonite::interface::setActiveLoadingScreen(screenId);
   ammonite::interface::setLoadingScreenProgress(screenId, 0.0f);
   ammonite::renderer::drawFrame();
@@ -275,7 +275,7 @@ int main(int argc, char* argv[]) {
   //Camera data store
   CameraData cameraData;
   cameraData.cameraIndex = 0;
-  cameraData.cameraIds = {0, ammonite::camera::createCamera()};
+  cameraData.cameraIds = {1, ammonite::camera::createCamera()};
   ammonite::controls::setupFreeCamera(GLFW_KEY_W, GLFW_KEY_S,
     GLFW_KEY_SPACE, GLFW_KEY_LEFT_SHIFT, GLFW_KEY_D, GLFW_KEY_A);
 
@@ -283,7 +283,7 @@ int main(int argc, char* argv[]) {
   ammonite::camera::setPosition(cameraData.cameraIds[1], glm::vec3(0.0f, 0.0f, 2.0f));
 
   //Set keybinds
-  std::vector<int> keybindIds;
+  std::vector<AmmoniteId> keybindIds;
   keybindIds.push_back(ammonite::input::registerToggleKeybind(
                          GLFW_KEY_C, AMMONITE_ALLOW_OVERRIDE, inputFocusCallback, nullptr));
   keybindIds.push_back(ammonite::input::registerToggleKeybind(

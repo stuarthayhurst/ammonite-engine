@@ -3,24 +3,26 @@
 
 #include <glm/glm.hpp>
 
+#include "types.hpp"
+
 namespace ammonite {
   namespace camera {
-    int createCamera();
-    void deleteCamera(int cameraId);
+    AmmoniteId createCamera();
+    void deleteCamera(AmmoniteId cameraId);
 
-    int getActiveCamera();
-    void setActiveCamera(int cameraId);
+    AmmoniteId getActiveCamera();
+    void setActiveCamera(AmmoniteId cameraId);
 
-    glm::vec3 getPosition(int cameraId);
-    glm::vec3 getDirection(int cameraId);
-    float getHorizontal(int cameraId);
-    float getVertical(int cameraId);
-    float getFieldOfView(int cameraId);
+    glm::vec3 getPosition(AmmoniteId cameraId);
+    glm::vec3 getDirection(AmmoniteId cameraId);
+    float getHorizontal(AmmoniteId cameraId);
+    float getVertical(AmmoniteId cameraId);
+    float getFieldOfView(AmmoniteId cameraId);
 
-    void setPosition(int cameraId, glm::vec3 newPosition);
-    void setHorizontal(int cameraId, float newHorizontal);
-    void setVertical(int cameraId, float newVertical);
-    void setFieldOfView(int cameraId, float newFov);
+    void setPosition(AmmoniteId cameraId, glm::vec3 newPosition);
+    void setHorizontal(AmmoniteId cameraId, float newHorizontal);
+    void setVertical(AmmoniteId cameraId, float newVertical);
+    void setFieldOfView(AmmoniteId cameraId, float newFov);
   }
 }
 

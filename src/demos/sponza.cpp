@@ -7,7 +7,7 @@
 
 namespace sponzaDemo {
   namespace {
-    std::vector<int> loadedModelIds;
+    std::vector<AmmoniteId> loadedModelIds;
   }
 
   int demoExit() {
@@ -23,18 +23,18 @@ namespace sponzaDemo {
   }
 
   int postRendererInit() {
-    int screenId = ammonite::interface::getActiveLoadingScreen();
+    AmmoniteId screenId = ammonite::interface::getActiveLoadingScreen();
 
     //Load models from a set of objects and textures
     const char* models[][2] = {
       {"assets-experimental/intel-assets/main_sponza/NewSponza_Main_glTF_002.gltf", ""},
       {"assets/cube.obj", "assets/flat.png"}
     };
-    int modelCount = sizeof(models) / sizeof(models[0]);
+    unsigned int modelCount = sizeof(models) / sizeof(models[0]);
 
     bool success = true;
-    long int vertexCount = 0;
-    for (int i = 0; i < modelCount; i++) {
+    long unsigned int vertexCount = 0;
+    for (unsigned int i = 0; i < modelCount; i++) {
       //Load model
       loadedModelIds.push_back(ammonite::models::createModel(models[i][0], &success));
 
@@ -64,7 +64,7 @@ namespace sponzaDemo {
     ammonite::models::position::setPosition(loadedModelIds[modelCount - 1], glm::vec3(0.0f, 20.0f, 0.0f));
     ammonite::models::position::scaleModel(loadedModelIds[modelCount - 1], 0.25f);
 
-    int skyboxId = ammonite::skybox::loadDirectory("assets-experimental/skybox/", &success);
+    AmmoniteId skyboxId = ammonite::skybox::loadDirectory("assets-experimental/skybox/", &success);
     if (success) {
       ammonite::skybox::setActiveSkybox(skyboxId);
     } else {
@@ -78,13 +78,13 @@ namespace sponzaDemo {
     ammonite::renderer::drawFrame();
 
     //Set light source properties
-    int lightId = ammonite::lighting::createLightSource();
+    AmmoniteId lightId = ammonite::lighting::createLightSource();
     ammonite::lighting::properties::setPower(lightId, 50.0f);
     ammonite::lighting::linkModel(lightId, loadedModelIds[modelCount - 1]);
     ammonite::lighting::setAmbientLight(glm::vec3(0.1f, 0.1f, 0.1f));
 
     //Set the camera position
-    int cameraId = ammonite::camera::getActiveCamera();
+    AmmoniteId cameraId = ammonite::camera::getActiveCamera();
     ammonite::camera::setPosition(cameraId, glm::vec3(5.0f, 1.5f, 0.0f));
     ammonite::camera::setHorizontal(cameraId, glm::radians(270.0f));
     ammonite::camera::setVertical(cameraId, glm::radians(10.0f));

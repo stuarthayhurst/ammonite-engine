@@ -95,7 +95,7 @@ namespace ammonite {
       /*
        - Create a texture from the data given, return its ID
        - This doesn't generate the mipmaps, but allocates space for them (textureLevels)
-       - externalSuccess is written to on failure
+       - Writes 'false' to externalSuccess on failure and returns 0
       */
       GLuint createTexture(int width, int height, unsigned char* data, GLenum dataFormat,
                            GLenum textureFormat, int textureLevels, bool* externalSuccess) {
@@ -107,7 +107,7 @@ namespace ammonite {
                                    << width << " x " << height << ")" << std::endl;
 
           *externalSuccess = false;
-          return -1;
+          return 0;
         }
 
         //Create a texture, its storage, and then fill it
@@ -121,7 +121,7 @@ namespace ammonite {
           ammonite::utils::warning << "Texture ID (" << textureId \
                                    << ") already exists, not creating texture" << std::endl;
           *externalSuccess = false;
-          return -1;
+          return 0;
         }
         idTextureMap[textureId] = {"", textureId, 1};
 
@@ -132,7 +132,7 @@ namespace ammonite {
        - Load a texture from a file and return its ID
          - flipTexture controls whether the texture is flipped or not
          - srgbTexture controls whether the texture is treated as sRGB
-       - Writes false to externalSuccess on failure
+       - Writes 'false' to externalSuccess on failure and returns 0
       */
       GLuint loadTexture(std::string texturePath, bool flipTexture, bool srgbTexture,
                          bool* externalSuccess) {
@@ -161,7 +161,7 @@ namespace ammonite {
           ammonite::utils::warning << "Failed to load texture '" << texturePath << "'" \
                                    << std::endl;
           *externalSuccess = false;
-          return -1;
+          return 0;
         }
 
         //Decide the format of the texture and data
@@ -171,7 +171,7 @@ namespace ammonite {
                                    << std::endl;
           stbi_image_free(data);
           *externalSuccess = false;
-          return -1;
+          return 0;
         }
 
         //Create the texture and free the image data
@@ -184,7 +184,7 @@ namespace ammonite {
           ammonite::utils::warning << "Failed to load texture '" << texturePath << "'" \
                                    << std::endl;
           *externalSuccess = false;
-          return -1;
+          return 0;
         }
 
         //Connect the texture string to the ID and info

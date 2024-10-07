@@ -3,14 +3,16 @@
 
 #include <glm/glm.hpp>
 
+#include "../types.hpp"
+
 namespace ammonite {
   namespace lighting {
-    int getMaxLightCount();
-    int createLightSource();
-    void deleteLightSource(int lightId);
+    unsigned int getMaxLightCount();
+    AmmoniteId createLightSource();
+    void deleteLightSource(AmmoniteId lightId);
 
-    void linkModel(int lightId, int modelId);
-    void unlinkModel(int lightId);
+    void linkModel(AmmoniteId lightId, AmmoniteId modelId);
+    void unlinkModel(AmmoniteId lightId);
   }
 }
 

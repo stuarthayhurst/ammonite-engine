@@ -3,16 +3,20 @@
 
 #include <glm/glm.hpp>
 
+#include "types.hpp"
+
 namespace ammonite {
   namespace interface {
-    int createLoadingScreen();
-    void deleteLoadingScreen(int targetScreenId);
-    void setActiveLoadingScreen(int targetScreenId);
-    int getActiveLoadingScreen();
+    AmmoniteId createLoadingScreen();
+    void deleteLoadingScreen(AmmoniteId targetScreenId);
+    void setActiveLoadingScreen(AmmoniteId targetScreenId);
+    AmmoniteId getActiveLoadingScreen();
 
-    void setLoadingScreenProgress(int targetScreenId, float progress);
-    void setLoadingScreenGeometry(int targetScreenId, float width, float height, float heightOffset);
-    void setLoadingScreenColours(int targetScreenId, glm::vec3 backgroundColour, glm::vec3 trackColour, glm::vec3 progressColour);
+    void setLoadingScreenProgress(AmmoniteId targetScreenId, float progress);
+    void setLoadingScreenGeometry(AmmoniteId targetScreenId, float width,
+                                  float height, float heightOffset);
+    void setLoadingScreenColours(AmmoniteId targetScreenId, glm::vec3 backgroundColour,
+                                 glm::vec3 trackColour, glm::vec3 progressColour);
   }
 }
 

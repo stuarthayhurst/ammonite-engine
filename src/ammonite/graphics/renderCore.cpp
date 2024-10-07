@@ -285,12 +285,14 @@ namespace ammonite {
       glm::mat4* projectionMatrix = ammonite::camera::internal::getProjectionMatrixPtr();
 
       //Get the light trackers
-      std::map<int, ammonite::lighting::internal::LightSource>* lightTrackerMap = ammonite::lighting::internal::getLightTrackerPtr();
+      std::map<AmmoniteId, ammonite::lighting::internal::LightSource>* lightTrackerMap =
+        ammonite::lighting::internal::getLightTrackerPtr();
       glm::mat4** lightTransformsPtr = ammonite::lighting::internal::getLightTransformsPtr();
       unsigned int maxLightCount = 0;
 
       //Get the loading screen tracker
-      std::map<int, ammonite::interface::LoadingScreen>* loadingScreenTracker = ammonite::interface::internal::getLoadingScreenTracker();
+      std::map<AmmoniteId, ammonite::interface::LoadingScreen>* loadingScreenTracker =
+        ammonite::interface::internal::getLoadingScreenTracker();
 
       //Store model data pointers for regular models and light models
       ammonite::models::internal::ModelInfo** modelPtrs = nullptr;
@@ -313,7 +315,7 @@ namespace ammonite {
     namespace setup {
       namespace internal {
         //Load required shaders from a path
-        bool createShaders(const char* shaderPath, bool* externalSuccess) {
+        bool createShaders(std::string shaderPath, bool* externalSuccess) {
           //Directory and pointer to ID of each shader
           struct {
             std::string shaderDir;
@@ -331,7 +333,7 @@ namespace ammonite {
           bool hasCreatedShaders = true;
           const int shaderCount = sizeof(shaderInfo) / sizeof(shaderInfo[0]);
           for (int i = 0; i < shaderCount; i++) {
-            std::string shaderLocation = std::string(shaderPath) + shaderInfo[i].shaderDir;
+            std::string shaderLocation = shaderPath + shaderInfo[i].shaderDir;
             *shaderInfo[i].shaderId =
               ammonite::shaders::internal::loadDirectory(shaderLocation,
                                                          &hasCreatedShaders);
@@ -730,13 +732,13 @@ namespace ammonite {
         for (unsigned int i = 0; i < drawObjectData->meshes.size(); i++) {
           //Set texture for regular shading pass
           if (renderMode == AMMONITE_RENDER_PASS) {
-            if (drawObject->textureIds[i].diffuseId != -1) {
+            if (drawObject->textureIds[i].diffuseId != 0) {
               glBindTextureUnit(0, drawObject->textureIds[i].diffuseId);
             } else {
               ammoniteInternalDebug << "No diffuse texture supplied, skipping" << std::endl;
             }
 
-            if (drawObject->textureIds[i].specularId != -1) {
+            if (drawObject->textureIds[i].specularId != 0) {
               glBindTextureUnit(1, drawObject->textureIds[i].specularId);
             }
           }
@@ -783,7 +785,7 @@ namespace ammonite {
       return;
     }
 
-    static void drawSkybox(int activeSkyboxId) {
+    static void drawSkybox(AmmoniteId activeSkyboxId) {
       //Swap to skybox shader and pass uniforms
       glUseProgram(skyboxShader.shaderId);
       glUniformMatrix4fv(skyboxShader.viewMatrixId, 1, GL_FALSE, glm::value_ptr(glm::mat4(glm::mat3(*viewMatrix))));
@@ -795,7 +797,7 @@ namespace ammonite {
       glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, nullptr);
     }
 
-    void drawLoadingScreen(int loadingScreenId, int width, int height) {
+    void drawLoadingScreen(AmmoniteId loadingScreenId, int width, int height) {
         //Swap to loading screen shader
         glUseProgram(loadingShader.shaderId);
 
@@ -826,7 +828,7 @@ namespace ammonite {
       }
 
     namespace internal {
-      void internalDrawLoadingScreen(int loadingScreenId) {
+      void internalDrawLoadingScreen(AmmoniteId loadingScreenId) {
         int width = ammonite::window::internal::getWidth();
         int height = ammonite::window::internal::getHeight();
 
@@ -959,7 +961,7 @@ namespace ammonite {
 
         //Clear depth and colour (if no skybox is used)
         int activeSkybox = ammonite::skybox::getActiveSkybox();
-        if (activeSkybox == -1) {
+        if (activeSkybox == 0) {
           glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         } else {
           glClear(GL_DEPTH_BUFFER_BIT);
@@ -995,7 +997,7 @@ namespace ammonite {
         internal::setWireframe(false);
 
         //Draw the skybox
-        if (activeSkybox != -1) {
+        if (activeSkybox != 0) {
           drawSkybox(activeSkybox);
         }
 

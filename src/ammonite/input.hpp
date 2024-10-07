@@ -11,29 +11,29 @@ namespace ammonite {
     */
 
     //Keybind takes keycodes, count, (overrideMode), action callback, user pointer
-    int registerKeybind(int keycodes[], int count,
-                        AmmoniteKeyCallback callback, void* userPtr);
-    int registerKeybind(int keycodes[], int count, AmmoniteEnum overrideMode,
-                        AmmoniteKeyCallback callback, void* userPtr);
-    int registerToggleKeybind(int keycodes[], int count, AmmoniteEnum overrideMode,
-                              AmmoniteKeyCallback callback, void* userPtr);
-    int registerToggleKeybind(int keycodes[], int count,
-                              AmmoniteKeyCallback callback, void* userPtr);
+    AmmoniteId registerKeybind(int keycodes[], int count,
+                               AmmoniteKeyCallback callback, void* userPtr);
+    AmmoniteId registerKeybind(int keycodes[], int count, AmmoniteEnum overrideMode,
+                               AmmoniteKeyCallback callback, void* userPtr);
+    AmmoniteId registerToggleKeybind(int keycodes[], int count, AmmoniteEnum overrideMode,
+                                     AmmoniteKeyCallback callback, void* userPtr);
+    AmmoniteId registerToggleKeybind(int keycodes[], int count,
+                                     AmmoniteKeyCallback callback, void* userPtr);
 
     //Single key variants of the above
-    int registerKeybind(int keycode, AmmoniteKeyCallback callback, void* userPtr);
-    int registerKeybind(int keycode, AmmoniteEnum overrideMode,
-                        AmmoniteKeyCallback callback, void* userPtr);
-    int registerToggleKeybind(int keycode, AmmoniteEnum overrideMode,
-                              AmmoniteKeyCallback callback, void* userPtr);
-    int registerToggleKeybind(int keycode, AmmoniteKeyCallback callback, void* userPtr);
+    AmmoniteId registerKeybind(int keycode, AmmoniteKeyCallback callback, void* userPtr);
+    AmmoniteId registerKeybind(int keycode, AmmoniteEnum overrideMode,
+                               AmmoniteKeyCallback callback, void* userPtr);
+    AmmoniteId registerToggleKeybind(int keycode, AmmoniteEnum overrideMode,
+                                     AmmoniteKeyCallback callback, void* userPtr);
+    AmmoniteId registerToggleKeybind(int keycode, AmmoniteKeyCallback callback, void* userPtr);
 
-    int unregisterKeybind(int keybindId);
+    int unregisterKeybind(AmmoniteId keybindId);
     bool isKeycodeRegistered(int keycodes[], int count);
     bool isKeycodeRegistered(int keycode);
 
-    int changeKeybind(int keybindId, int keycodes[], int count);
-    int changeKeybind(int keybindId, int keycode);
+    int changeKeybind(AmmoniteId keybindId, int keycodes[], int count);
+    int changeKeybind(AmmoniteId keybindId, int keycode);
 
     void setInputFocus(bool active);
     bool getInputFocus();

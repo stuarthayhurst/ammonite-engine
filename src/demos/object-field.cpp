@@ -12,10 +12,10 @@ namespace objectFieldDemo {
   namespace {
     //IDs and pointer data
     GLFWwindow* windowPtr;
-    int cubeKeybindId;
-    int shuffleKeybindId;
-    std::vector<int> loadedModelIds;
-    int floorId;
+    AmmoniteId cubeKeybindId;
+    AmmoniteId shuffleKeybindId;
+    std::vector<AmmoniteId> loadedModelIds;
+    AmmoniteId floorId;
 
     struct LightData {
       //Light / orbit config
@@ -28,29 +28,29 @@ namespace objectFieldDemo {
       ammonite::utils::Timer orbitTimer;
       bool isOrbitClockwise = false;
       bool lastWindowState = false;
-      int orbitIndex;
-      int linkedModelId;
+      unsigned int orbitIndex;
+      AmmoniteId linkedModelId;
     };
     LightData* lightData = nullptr;
-    int lightCount;
+    unsigned int lightCount;
 
     //General orbit config / data
     float transferProbability = 0.5f;
-    int totalOrbits;
+    unsigned int totalOrbits;
 
     //2D structures to store indices and ratios for orbit changes
-    int (*orbitSwapTargets)[2] = nullptr;
+    unsigned int (*orbitSwapTargets)[2] = nullptr;
     float (*orbitSwapAngles)[2] = nullptr;
 
     //Model counts
-    const int cubeCount = 30;
-    int modelCount = 0;
+    const unsigned int cubeCount = 30;
+    unsigned int modelCount = 0;
   }
 
   //Non-orbit internal functions
   namespace {
-    static void genRandomPosData(glm::vec3* objectData, int objectCount) {
-      for (int i = 0; i < objectCount; i++) {
+    static void genRandomPosData(glm::vec3* objectData, unsigned int objectCount) {
+      for (unsigned int i = 0; i < objectCount; i++) {
         //Position;
         objectData[(i * 3) + 0].x = (float)ammonite::utils::randomDouble(-10.0, 10.0);
         objectData[(i * 3) + 0].y = (float)ammonite::utils::randomDouble(-2.0, 1.0);
@@ -68,14 +68,14 @@ namespace objectFieldDemo {
 
     static void genCubesCallback(std::vector<int>, int, void*) {
       //Hold data for randomised cube positions
-      int offset = lightCount + 1;
-      int cubeCount = (int)loadedModelIds.size() - offset;
+      unsigned int offset = lightCount + 1;
+      unsigned int cubeCount = loadedModelIds.size() - offset;
       glm::vec3* cubeData = new glm::vec3[(std::size_t)(cubeCount) * 3];
 
       //Generate random position, rotation and scales, skip first item
       genRandomPosData(cubeData, cubeCount);
 
-      for (int i = 0; i < cubeCount; i++) {
+      for (unsigned int i = 0; i < cubeCount; i++) {
         //Position the cube
         ammonite::models::position::setPosition(loadedModelIds[(std::size_t)i + offset],
           cubeData[(i * 3) + 0]);
@@ -90,8 +90,8 @@ namespace objectFieldDemo {
     }
 
     static void spawnCubeCallback(std::vector<int>, int, void*) {
-      int activeCameraId = ammonite::camera::getActiveCamera();
-      int modelId = ammonite::models::copyModel(floorId);
+      AmmoniteId activeCameraId = ammonite::camera::getActiveCamera();
+      AmmoniteId modelId = ammonite::models::copyModel(floorId);
       loadedModelIds.push_back(modelId);
 
       float horiz = ammonite::camera::getHorizontal(activeCameraId);
@@ -121,8 +121,8 @@ namespace objectFieldDemo {
     }
 
     //Return the position of an orbit's centre, so that each orbit in a shape meets the next
-    constexpr static glm::vec2 calculateOrbitPosition(int orbitCount, int orbitIndex,
-                                                      float radius) {
+    constexpr static glm::vec2 calculateOrbitPosition(unsigned int orbitCount,
+                                                      unsigned int orbitIndex, float radius) {
       float nucleusAngle = (glm::two_pi<float>() * (float)orbitIndex) / (float)orbitCount;
 
       //Correct for overlapping orbits
@@ -138,13 +138,13 @@ namespace objectFieldDemo {
      - First index has the angle to the previous index
        - The second index has the angle to the next index
     */
-    static float* calculateSwapAngles(int orbitCount) {
+    static float* calculateSwapAngles(unsigned int orbitCount) {
       const float down = glm::half_pi<float>();
       const float indexOffsetAngle = glm::half_pi<float>() - (glm::pi<float>() / (float)orbitCount);
 
       float* swapAngles = new float[(std::size_t)(orbitCount) * 2];
-      for (int orbit = 0; orbit < orbitCount; orbit++) {
-        int writeIndex = orbit * 2;
+      for (unsigned int orbit = 0; orbit < orbitCount; orbit++) {
+        unsigned int writeIndex = orbit * 2;
 
         //Calculate both directions
         for (int sign = -1; sign <= 1; sign += 2) {
@@ -171,14 +171,17 @@ namespace objectFieldDemo {
      - First index points to previous index
        - The second index points to the next
     */
-    static int* calculateSwapTargets(int orbitCount) {
-      int* swapTargets = new int[(std::size_t)(orbitCount) * 2];
-      for (int orbit = 0; orbit < orbitCount; orbit++) {
-        int writeIndex = orbit * 2;
-        swapTargets[writeIndex] = (orbit - 1) % orbitCount;
-        if (swapTargets[writeIndex] < 0) {
-          swapTargets[writeIndex] += orbitCount;
+    static unsigned int* calculateSwapTargets(unsigned int orbitCount) {
+      unsigned int* swapTargets = new unsigned int[(std::size_t)(orbitCount) * 2];
+      for (unsigned int orbit = 0; orbit < orbitCount; orbit++) {
+        unsigned int writeIndex = orbit * 2;
+        int swapTarget = ((int)(orbit) - 1) % (int)(orbitCount);
+
+        if (swapTarget < 0) {
+          swapTarget += orbitCount;
         }
+        swapTargets[writeIndex] = swapTarget;
+
         swapTargets[writeIndex + 1] = (orbit + 1) % orbitCount;
       }
 
@@ -212,14 +215,14 @@ namespace objectFieldDemo {
 
     //Allocate and set light data
     lightData = new LightData[lightCount];
-    for (int i = 0; i < lightCount; i++) {
+    for (unsigned int i = 0; i < lightCount; i++) {
       lightData[i].orbitPeriod = 2.0f;
       lightData[i].orbitRadius = 18.0f / (float)totalOrbits;
     }
     lightData[0].orbitPeriod = 8.0f;
 
     //Fill orbit calculation structures
-    orbitSwapTargets = (int(*)[2])calculateSwapTargets(totalOrbits);
+    orbitSwapTargets = (unsigned int(*)[2])calculateSwapTargets(totalOrbits);
     orbitSwapAngles = (float(*)[2])calculateSwapAngles(totalOrbits);
 
     ammonite::utils::status << "Chose " << totalOrbits << " orbits and " << lightCount \
@@ -229,7 +232,7 @@ namespace objectFieldDemo {
   }
 
   int postRendererInit() {
-    int screenId = ammonite::interface::getActiveLoadingScreen();
+    AmmoniteId screenId = ammonite::interface::getActiveLoadingScreen();
     windowPtr = ammonite::window::getWindowPtr();
 
     //Generate random positions, orientations and sizes, skipping first item
@@ -241,12 +244,12 @@ namespace objectFieldDemo {
       {"assets/sphere.obj", "assets/flat.png"},
       {"assets/cube.obj", "assets/flat.png"}
     };
-    int totalModels = lightCount + cubeCount + 1;
+    unsigned int totalModels = lightCount + cubeCount + 1;
 
     //Load light models
     bool success = true;
-    long int vertexCount = 0;
-    for (int i = 0; i < lightCount; i++) {
+    long unsigned int vertexCount = 0;
+    for (unsigned int i = 0; i < lightCount; i++) {
       //Load model
       loadedModelIds.push_back(ammonite::models::createModel(models[0][0], &success));
       vertexCount += ammonite::models::getVertexCount(loadedModelIds[i]);
@@ -278,7 +281,7 @@ namespace objectFieldDemo {
     ammonite::models::position::setRotation(floorId, glm::vec3(0.0f));
     ammonite::models::position::setScale(floorId, glm::vec3(10.0f, 0.1f, 10.0f));
 
-    for (int i = 0; i < cubeCount; i++) {
+    for (unsigned int i = 0; i < cubeCount; i++) {
       //Load the cube
       loadedModelIds.push_back(ammonite::models::copyModel(floorId));
       vertexCount += ammonite::models::getVertexCount(loadedModelIds[modelCount]);
@@ -303,8 +306,8 @@ namespace objectFieldDemo {
 
     //Setup each light and model
     ammonite::lighting::setAmbientLight(glm::vec3(0.1f, 0.1f, 0.1f));
-    for (int i = 0; i < lightCount; i++) {
-      int lightId = ammonite::lighting::createLightSource();
+    for (unsigned int i = 0; i < lightCount; i++) {
+      AmmoniteId lightId = ammonite::lighting::createLightSource();
       ammonite::models::position::setScale(loadedModelIds[i], lightData[i].scale);
       ammonite::lighting::properties::setPower(lightId, lightData[i].power);
       ammonite::lighting::linkModel(lightId, loadedModelIds[i]);
@@ -312,7 +315,7 @@ namespace objectFieldDemo {
     }
 
     //Place lights on each orbit
-    for (int i = 0; i < lightCount; i++) {
+    for (unsigned int i = 0; i < lightCount; i++) {
       lightData[i].orbitIndex = i % totalOrbits;
     }
 
@@ -322,7 +325,7 @@ namespace objectFieldDemo {
                                                               nullptr);
 
     //Set the camera position
-    int cameraId = ammonite::camera::getActiveCamera();
+    AmmoniteId cameraId = ammonite::camera::getActiveCamera();
     ammonite::camera::setPosition(cameraId, glm::vec3(10.0f, 17.0f, 17.0f));
     ammonite::camera::setHorizontal(cameraId, 4.75f * glm::quarter_pi<float>());
     ammonite::camera::setVertical(cameraId, -0.7f);
@@ -331,7 +334,7 @@ namespace objectFieldDemo {
   }
 
   int rendererMainloop() {
-    for (int i = 0; i < lightCount; i++) {
+    for (unsigned int i = 0; i < lightCount; i++) {
       glm::vec2 lightOrbitPosition = calculateOrbitPosition(totalOrbits,
         lightData[i].orbitIndex, lightData[i].orbitRadius);
 
@@ -352,7 +355,7 @@ namespace objectFieldDemo {
 
       //Decide if the light is within the region to swap orbits
       int swapTarget = -1;
-      int swapDirection = 0;
+      unsigned int swapDirection = 0;
       const float threshold = 1.0f / 50.0f;
       if (isWithinThreshold(targetAngle, orbitSwapAngles[lightData[i].orbitIndex][0],
                             threshold)) {

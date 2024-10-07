@@ -1,7 +1,8 @@
 #include <cstring>
 #include <iostream>
-#include <vector>
 #include <queue>
+#include <string>
+#include <vector>
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
@@ -81,7 +82,7 @@ namespace ammonite {
             fullTexturePath = modelLoadInfo.modelDirectory + '/' + localTexturePath.C_Str();
 
             bool createdTextureSuccess = true;
-            unsigned int textureId = ammonite::textures::internal::loadTexture(fullTexturePath,
+            GLuint textureId = ammonite::textures::internal::loadTexture(fullTexturePath,
               false, modelLoadInfo.srgbTextures, &createdTextureSuccess);
             if (!createdTextureSuccess) {
               *externalSuccess = false;
@@ -96,7 +97,7 @@ namespace ammonite {
             fullTexturePath = modelLoadInfo.modelDirectory + '/' + localTexturePath.C_Str();
 
             bool createdTextureSuccess = true;
-            unsigned int textureId = ammonite::textures::internal::loadTexture(fullTexturePath,
+            GLuint textureId = ammonite::textures::internal::loadTexture(fullTexturePath,
               false, modelLoadInfo.srgbTextures, &createdTextureSuccess);
             if (!createdTextureSuccess) {
               *externalSuccess = false;
@@ -135,7 +136,7 @@ namespace ammonite {
         }
       }
 
-      void loadObject(const char* objectPath, models::internal::ModelData* modelObjectData,
+      void loadObject(std::string objectPath, models::internal::ModelData* modelObjectData,
                       ModelLoadInfo modelLoadInfo, bool* externalSuccess) {
         //Generate post-processing flags
         auto aiProcessFlags = aiProcess_Triangulate |
@@ -152,7 +153,7 @@ namespace ammonite {
         }
 
         Assimp::Importer importer;
-        const aiScene* scenePtr = importer.ReadFile(objectPath, aiProcessFlags);
+        const aiScene* scenePtr = importer.ReadFile(objectPath.c_str(), aiProcessFlags);
 
         //Check model loaded correctly
         if (!scenePtr || scenePtr->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scenePtr->mRootNode) {

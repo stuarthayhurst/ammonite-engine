@@ -9,6 +9,8 @@
 
 #include <glm/glm.hpp>
 
+#include "../types.hpp"
+
 namespace ammonite {
   namespace interface {
     struct LoadingScreen {
@@ -22,8 +24,8 @@ namespace ammonite {
     };
 
     namespace internal {
-      std::map<int, LoadingScreen>* getLoadingScreenTracker();
-      int getActiveLoadingScreenId();
+      std::map<AmmoniteId, LoadingScreen>* getLoadingScreenTracker();
+      AmmoniteId getActiveLoadingScreenId();
     }
   }
 }

@@ -7,12 +7,16 @@
  - Allow access to pointers storing settings values
 */
 
+#include <string>
+
+#include "../../types.hpp"
+
 namespace ammonite {
   namespace renderer {
     namespace setup {
       namespace internal {
         bool checkGPUCapabilities(int* failureCount);
-        bool createShaders(const char* shaderPath, bool* externalSuccess);
+        bool createShaders(std::string shaderPath, bool* externalSuccess);
         void setupOpenGLObjects();
         void deleteShaders();
         void destroyOpenGLObjects();
@@ -22,7 +26,7 @@ namespace ammonite {
 
     namespace internal {
       void internalDrawFrame();
-      void internalDrawLoadingScreen(int loadingScreenId);
+      void internalDrawLoadingScreen(AmmoniteId loadingScreenId);
     }
 
     namespace settings {

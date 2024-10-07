@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string>
 
 #include <GLFW/glfw3.h>
 
@@ -12,6 +13,8 @@
 #include "../lighting/internal/internalLighting.hpp"
 #include "../utils/internal/threadPool.hpp"
 
+#include "../types.hpp"
+
 /*
  - Externally exposed renderer functions
 */
@@ -24,7 +27,7 @@ namespace ammonite {
     }
 
     namespace setup {
-      void setupRenderer(const char* shaderPath, bool* externalSuccess) {
+      void setupRenderer(std::string shaderPath, bool* externalSuccess) {
         //Start a timer to measure load time
         ammonite::utils::Timer loadTimer;
 
@@ -76,8 +79,8 @@ namespace ammonite {
     void drawFrame() {
       //Increase frame counters
       static int frameCount = 0;
-      int loadingScreenId = ammonite::interface::internal::getActiveLoadingScreenId();
-      if (loadingScreenId == -1) {
+      AmmoniteId loadingScreenId = ammonite::interface::internal::getActiveLoadingScreenId();
+      if (loadingScreenId == 0) {
         totalFrames++;
         frameCount++;
       }
@@ -92,7 +95,7 @@ namespace ammonite {
       }
 
       //Offload rest of frame drawing to helpers
-      if (loadingScreenId == -1) {
+      if (loadingScreenId == 0) {
         ammonite::lighting::internal::updateLightSources();
         ammonite::camera::internal::updateMatrices();
         internal::internalDrawFrame();

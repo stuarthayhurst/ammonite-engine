@@ -5,8 +5,8 @@
 #include <glm/gtc/constants.hpp>
 
 #include "graphics/internal/internalRenderCore.hpp"
-
 #include "internal/windowManager.hpp"
+#include "types.hpp"
 
 namespace ammonite {
   namespace camera {
@@ -24,9 +24,9 @@ namespace ammonite {
       float* renderFarPlanePtr = ammonite::renderer::settings::internal::getRenderFarPlanePtr();
 
       //Create map to track cameras, with default camera
-      int totalUserCameras = 0;
-      int activeCameraId = 0;
-      std::map<int, Camera> cameraTrackerMap = {{0, defaultCamera}};
+      unsigned int totalUserCameras = 0;
+      AmmoniteId activeCameraId = 1;
+      std::map<AmmoniteId, Camera> cameraTrackerMap = {{1, defaultCamera}};
     }
 
     namespace {
@@ -76,21 +76,21 @@ namespace ammonite {
       }
     }
 
-    int getActiveCamera() {
+    AmmoniteId getActiveCamera() {
       return activeCameraId;
     }
 
-    void setActiveCamera(int cameraId) {
+    void setActiveCamera(AmmoniteId cameraId) {
       //If the camera exists, set as active
       if (cameraTrackerMap.contains(cameraId)) {
         activeCameraId = cameraId;
       }
     }
 
-    int createCamera() {
+    AmmoniteId createCamera() {
       //Get an ID for the new camera
       totalUserCameras++;
-      int cameraId = totalUserCameras;
+      AmmoniteId cameraId = 1 + totalUserCameras;
 
       //Add the new camera to the tracker
       Camera newCamera;
@@ -99,18 +99,20 @@ namespace ammonite {
       return cameraId;
     }
 
-    void deleteCamera(int cameraId) {
+    void deleteCamera(AmmoniteId cameraId) {
       //Delete the camera if present
-      if (cameraTrackerMap.contains(cameraId) and cameraId != 0) {
+      if (cameraTrackerMap.contains(cameraId) and cameraId != 1) {
         cameraTrackerMap.erase(cameraId);
       }
 
       //If the deleted camera was the active camera, reset
-      setActiveCamera(0);
+      if (activeCameraId == cameraId) {
+        setActiveCamera(1);
+      }
     }
 
     //Get position
-    glm::vec3 getPosition(int cameraId) {
+    glm::vec3 getPosition(AmmoniteId cameraId) {
       if (cameraTrackerMap.contains(cameraId)) {
         return cameraTrackerMap[cameraId].position;
       } else {
@@ -118,7 +120,7 @@ namespace ammonite {
       }
     }
 
-    glm::vec3 getDirection(int cameraId) {
+    glm::vec3 getDirection(AmmoniteId cameraId) {
       if (cameraTrackerMap.contains(cameraId)) {
         Camera* activeCamera = &cameraTrackerMap[cameraId];
         glm::vec3 direction = calculateDirection(activeCamera->verticalAngle,
@@ -130,7 +132,7 @@ namespace ammonite {
     }
 
     //Get horizontal angle (radians)
-    float getHorizontal(int cameraId) {
+    float getHorizontal(AmmoniteId cameraId) {
       if (cameraTrackerMap.contains(cameraId)) {
         return cameraTrackerMap[cameraId].horizontalAngle;
       } else {
@@ -139,7 +141,7 @@ namespace ammonite {
     }
 
     //Get vertical angle (radians)
-    float getVertical(int cameraId) {
+    float getVertical(AmmoniteId cameraId) {
       if (cameraTrackerMap.contains(cameraId)) {
         return cameraTrackerMap[cameraId].verticalAngle;
       } else {
@@ -148,7 +150,7 @@ namespace ammonite {
     }
 
     //Get field of view (radians)
-    float getFieldOfView(int cameraId) {
+    float getFieldOfView(AmmoniteId cameraId) {
       if (cameraTrackerMap.contains(cameraId)) {
         return cameraTrackerMap[cameraId].fov;
       } else {
@@ -157,7 +159,7 @@ namespace ammonite {
     }
 
     //Set position
-    void setPosition(int cameraId, glm::vec3 newPosition) {
+    void setPosition(AmmoniteId cameraId, glm::vec3 newPosition) {
       //Find the target camera and update position
       if (cameraTrackerMap.contains(cameraId)) {
         cameraTrackerMap[cameraId].position = newPosition;
@@ -165,7 +167,7 @@ namespace ammonite {
     }
 
     //Set horizontal angle (radians)
-    void setHorizontal(int cameraId, float newHorizontal) {
+    void setHorizontal(AmmoniteId cameraId, float newHorizontal) {
       //Find the target camera and update horizontal angle
       if (cameraTrackerMap.contains(cameraId)) {
         cameraTrackerMap[cameraId].horizontalAngle = newHorizontal;
@@ -173,7 +175,7 @@ namespace ammonite {
     }
 
     //Set vertical angle (radians)
-    void setVertical(int cameraId, float newVertical) {
+    void setVertical(AmmoniteId cameraId, float newVertical) {
       //Find the target camera and update vertical angle
       if (cameraTrackerMap.contains(cameraId)) {
         cameraTrackerMap[cameraId].verticalAngle = newVertical;
@@ -181,7 +183,7 @@ namespace ammonite {
     }
 
     //Set field of view (radians)
-    void setFieldOfView(int cameraId, float newFov) {
+    void setFieldOfView(AmmoniteId cameraId, float newFov) {
       //Find the target camera and update field of view
       if (cameraTrackerMap.contains(cameraId)) {
         cameraTrackerMap[cameraId].fov = newFov;

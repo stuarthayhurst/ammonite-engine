@@ -8,8 +8,9 @@
 #include "internal/windowManager.hpp"
 
 #include "camera.hpp"
-#include "enums.hpp"
 #include "utils/timer.hpp"
+#include "enums.hpp"
+#include "types.hpp"
 
 //Store and expose controls settings
 namespace ammonite {
@@ -103,7 +104,7 @@ namespace ammonite {
         ammonite::utils::Timer directionTimer;
         DirectionEnum directionEnum;
       } directionData[6];
-      int keybindIds[6] = {-1};
+      AmmoniteId keybindIds[6] = {0};
 
       //Various pointers to other systems, used by callbacks
       bool* isInputBlockedPtr = ammonite::input::internal::getInputBlockPtr();
@@ -128,7 +129,7 @@ namespace ammonite {
         }
 
         //Get active camera
-        int activeCameraId = ammonite::camera::getActiveCamera();
+        AmmoniteId activeCameraId = ammonite::camera::getActiveCamera();
 
         //Vector for current direction, without vertical component
         float horizontalAngle = ammonite::camera::getHorizontal(activeCameraId);
@@ -184,7 +185,7 @@ namespace ammonite {
       //Increase / decrease FoV on scroll (xoffset is unused)
       static void scrollCallback(GLFWwindow*, double, double yoffset) {
         if (!(*isInputBlockedPtr) and isCameraActive) {
-          int activeCameraId = ammonite::camera::getActiveCamera();
+          AmmoniteId activeCameraId = ammonite::camera::getActiveCamera();
           float fov = ammonite::camera::getFieldOfView(activeCameraId);
 
           //Only zoom if FoV will be between 1 and FoV limit
@@ -221,7 +222,7 @@ namespace ammonite {
           }
 
           //Get current viewing angles
-          int activeCameraId = ammonite::camera::getActiveCamera();
+          AmmoniteId activeCameraId = ammonite::camera::getActiveCamera();
           float horizontalAngle = ammonite::camera::getHorizontal(activeCameraId);
           float verticalAngle = ammonite::camera::getVertical(activeCameraId);
 
@@ -289,27 +290,27 @@ namespace ammonite {
       directionData[5].directionEnum = AMMONITE_LEFT;
 
       //Set keyboard callbacks
-      if (forwardKey != -1) {
+      if (forwardKey != 0) {
         keybindIds[0] = ammonite::input::internal::registerRawKeybind(&forwardKey, 1,
           AMMONITE_FORCE_RELEASE, false, keyboardCameraCallback, &directionData[0]);
       }
-      if (backKey != -1) {
+      if (backKey != 0) {
         keybindIds[1] = ammonite::input::internal::registerRawKeybind(&backKey, 1,
           AMMONITE_FORCE_RELEASE, false, keyboardCameraCallback, &directionData[1]);
       }
-      if (upKey != -1) {
+      if (upKey != 0) {
         keybindIds[2] = ammonite::input::internal::registerRawKeybind(&upKey, 1,
           AMMONITE_FORCE_RELEASE, false, keyboardCameraCallback, &directionData[2]);
       }
-      if (downKey != -1) {
+      if (downKey != 0) {
         keybindIds[3] = ammonite::input::internal::registerRawKeybind(&downKey, 1,
           AMMONITE_FORCE_RELEASE, false, keyboardCameraCallback, &directionData[3]);
       }
-      if (rightKey != -1) {
+      if (rightKey != 0) {
         keybindIds[4] = ammonite::input::internal::registerRawKeybind(&rightKey, 1,
           AMMONITE_FORCE_RELEASE, false, keyboardCameraCallback, &directionData[4]);
       }
-      if (leftKey != -1) {
+      if (leftKey != 0) {
         keybindIds[5] = ammonite::input::internal::registerRawKeybind(&leftKey, 1,
           AMMONITE_FORCE_RELEASE, false, keyboardCameraCallback, &directionData[5]);
       }
@@ -329,29 +330,29 @@ namespace ammonite {
 
     void releaseFreeCamera() {
       //Clean up keybinds
-      if (keybindIds[0] != -1) {
+      if (keybindIds[0] != 0) {
         ammonite::input::internal::unregisterKeybind(keybindIds[0]);
-        keybindIds[0] = -1;
+        keybindIds[0] = 0;
       }
-      if (keybindIds[1] != -1) {
+      if (keybindIds[1] != 0) {
         ammonite::input::internal::unregisterKeybind(keybindIds[1]);
-        keybindIds[1] = -1;
+        keybindIds[1] = 0;
       }
-      if (keybindIds[2] != -1) {
+      if (keybindIds[2] != 0) {
         ammonite::input::internal::unregisterKeybind(keybindIds[2]);
-        keybindIds[2] = -1;
+        keybindIds[2] = 0;
       }
-      if (keybindIds[3] != -1) {
+      if (keybindIds[3] != 0) {
         ammonite::input::internal::unregisterKeybind(keybindIds[3]);
-        keybindIds[3] = -1;
+        keybindIds[3] = 0;
       }
-      if (keybindIds[4] != -1) {
+      if (keybindIds[4] != 0) {
         ammonite::input::internal::unregisterKeybind(keybindIds[4]);
-        keybindIds[4] = -1;
+        keybindIds[4] = 0;
       }
-      if (keybindIds[5] != -1) {
+      if (keybindIds[5] != 0) {
         ammonite::input::internal::unregisterKeybind(keybindIds[5]);
-        keybindIds[5] = -1;
+        keybindIds[5] = 0;
       }
 
       //Mouse callback clean up

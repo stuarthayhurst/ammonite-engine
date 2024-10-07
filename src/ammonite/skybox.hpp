@@ -1,19 +1,21 @@
-#ifndef ENVIRONMENT
-#define ENVIRONMENT
+#ifndef SKYBOX
+#define SKYBOX
+
+#include "types.hpp"
 
 namespace ammonite {
   namespace skybox {
-    int getActiveSkybox();
-    void setActiveSkybox(int skyboxId);
+    AmmoniteId getActiveSkybox();
+    void setActiveSkybox(AmmoniteId skyboxId);
 
-    int createSkybox(const char* texturePaths[6], bool* externalSuccess);
-    int createSkybox(const char* texturePaths[6], bool flipTextures,
-                     bool srgbTextures, bool* externalSuccess);
-    int loadDirectory(const char* directoryPath, bool* externalSuccess);
-    int loadDirectory(const char* directoryPath, bool flipTextures,
-                      bool srgbTextures, bool* externalSuccess);
+    AmmoniteId createSkybox(std::string texturePaths[6], bool* externalSuccess);
+    AmmoniteId createSkybox(std::string texturePaths[6], bool flipTextures,
+                            bool srgbTextures, bool* externalSuccess);
+    AmmoniteId loadDirectory(std::string directoryPath, bool* externalSuccess);
+    AmmoniteId loadDirectory(std::string directoryPath, bool flipTextures,
+                             bool srgbTextures, bool* externalSuccess);
 
-    void deleteSkybox(int skyboxId);
+    void deleteSkybox(AmmoniteId skyboxId);
   }
 }
 

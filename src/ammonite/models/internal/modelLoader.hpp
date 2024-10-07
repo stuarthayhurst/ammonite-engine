@@ -17,7 +17,7 @@ struct ModelLoadInfo {
 namespace ammonite {
   namespace models {
     namespace internal {
-      void loadObject(const char* objectPath, models::internal::ModelData* modelObjectData,
+      void loadObject(std::string objectPath, models::internal::ModelData* modelObjectData,
                       ModelLoadInfo modelLoadInfo, bool* externalSuccess);
     }
   }

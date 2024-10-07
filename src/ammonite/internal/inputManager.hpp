@@ -16,11 +16,11 @@ namespace ammonite {
       bool getInputBlock();
       bool* getInputBlockPtr();
 
-      int registerRawKeybind(int keycodes[], int count, AmmoniteEnum overrideMode,
-                             bool toggle, AmmoniteKeyCallback callback, void* userPtr);
-      int unregisterKeybind(int keybindId);
+      AmmoniteId registerRawKeybind(int keycodes[], int count, AmmoniteEnum overrideMode,
+                                    bool toggle, AmmoniteKeyCallback callback, void* userPtr);
+      int unregisterKeybind(AmmoniteId keybindId);
       bool isKeycodeRegistered(int keycodes[], int count);
-      int changeKeybindKeycodes(int keybindId, int newKeycodes[], int count);
+      int changeKeybindKeycodes(AmmoniteId keybindId, int newKeycodes[], int count);
     }
   }
 }

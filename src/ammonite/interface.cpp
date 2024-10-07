@@ -4,42 +4,43 @@
 #include "internal/interfaceTracker.hpp"
 
 #include "utils/logging.hpp"
+#include "types.hpp"
 
 namespace ammonite {
   namespace interface {
     namespace {
-      int activeLoadingScreenId = -1;
+      AmmoniteId activeLoadingScreenId = 0;
       int totalLoadingScreens = 0;
-      std::map<int, LoadingScreen> loadingScreenTracker;
+      std::map<AmmoniteId, LoadingScreen> loadingScreenTracker;
     }
 
     //Internally exposed functions
     namespace internal {
-      std::map<int, LoadingScreen>* getLoadingScreenTracker() {
+      std::map<AmmoniteId, LoadingScreen>* getLoadingScreenTracker() {
         return &loadingScreenTracker;
       }
 
-      int getActiveLoadingScreenId() {
+      AmmoniteId getActiveLoadingScreenId() {
         return activeLoadingScreenId;
       }
     }
 
-    int createLoadingScreen() {
+    AmmoniteId createLoadingScreen() {
       totalLoadingScreens++;
 
       //Create and track the loading screen
       LoadingScreen loadingScreen;
-      int screenId = totalLoadingScreens;
+      AmmoniteId screenId = totalLoadingScreens;
       loadingScreenTracker[screenId] = loadingScreen;
 
       return screenId;
     }
 
-    void deleteLoadingScreen(int targetScreenId) {
+    void deleteLoadingScreen(AmmoniteId targetScreenId) {
       //Set as inactive if the target is active, then delete
       if (loadingScreenTracker.contains(targetScreenId)) {
         if (activeLoadingScreenId == targetScreenId) {
-          activeLoadingScreenId = -1;
+          activeLoadingScreenId = 0;
         }
 
         loadingScreenTracker.erase(targetScreenId);
@@ -48,22 +49,22 @@ namespace ammonite {
       }
     }
 
-    void setActiveLoadingScreen(int targetScreenId) {
+    void setActiveLoadingScreen(AmmoniteId targetScreenId) {
       //Change the active loading screen, if it exists
       if (loadingScreenTracker.contains(targetScreenId)) {
         activeLoadingScreenId = targetScreenId;
-      } else if (targetScreenId == -1) {
-        activeLoadingScreenId = -1;
+      } else if (targetScreenId == 0) {
+        activeLoadingScreenId = 0;
       } else {
         ammonite::utils::warning << "Loading screen " << targetScreenId << " doesn't exist" << std::endl;
       }
     }
 
-    int getActiveLoadingScreen() {
+    AmmoniteId getActiveLoadingScreen() {
       return activeLoadingScreenId;
     }
 
-    void setLoadingScreenProgress(int targetScreenId, float progress) {
+    void setLoadingScreenProgress(AmmoniteId targetScreenId, float progress) {
       if (loadingScreenTracker.contains(targetScreenId)) {
         loadingScreenTracker[targetScreenId].progress = progress;
       } else {
@@ -71,7 +72,8 @@ namespace ammonite {
       }
     }
 
-    void setLoadingScreenGeometry(int targetScreenId, float width, float height, float heightOffset) {
+    void setLoadingScreenGeometry(AmmoniteId targetScreenId, float width, float height,
+                                  float heightOffset) {
       if (loadingScreenTracker.contains(targetScreenId)) {
         loadingScreenTracker[targetScreenId].width = width;
         loadingScreenTracker[targetScreenId].height = height;
@@ -81,7 +83,8 @@ namespace ammonite {
       }
     }
 
-    void setLoadingScreenColours(int targetScreenId, glm::vec3 backgroundColour, glm::vec3 trackColour, glm::vec3 progressColour) {
+    void setLoadingScreenColours(AmmoniteId targetScreenId, glm::vec3 backgroundColour,
+                                 glm::vec3 trackColour, glm::vec3 progressColour) {
       if (loadingScreenTracker.contains(targetScreenId)) {
         loadingScreenTracker[targetScreenId].backgroundColour = backgroundColour;
         loadingScreenTracker[targetScreenId].trackColour = trackColour;

@@ -2,21 +2,23 @@
 #define MODELSTORAGE
 
 #include "../enums.hpp"
+#include "../types.hpp"
 
 namespace ammonite {
   namespace models {
-    int createModel(const char* objectPath, bool* externalSuccess);
-    int createModel(const char* objectPath, bool flipTexCoords, bool srgbTextures, bool* externalSuccess);
-    void deleteModel(int modelId);
-    int copyModel(int modelId);
+    AmmoniteId createModel(std::string objectPath, bool* externalSuccess);
+    AmmoniteId createModel(std::string objectPath, bool flipTexCoords, bool srgbTextures,
+                           bool* externalSuccess);
+    void deleteModel(AmmoniteId modelId);
+    AmmoniteId copyModel(AmmoniteId modelId);
 
-    void applyTexture(int modelId, AmmoniteEnum textureType, const char* texturePath,
+    void applyTexture(AmmoniteId modelId, AmmoniteEnum textureType, std::string texturePath,
                       bool* externalSuccess);
-    void applyTexture(int modelId, AmmoniteEnum textureType, const char* texturePath,
+    void applyTexture(AmmoniteId modelId, AmmoniteEnum textureType, std::string texturePath,
                       bool srgbTexture, bool* externalSuccess);
-    int getIndexCount(int modelId);
-    int getVertexCount(int modelId);
-    void setDrawMode(int modelId, AmmoniteEnum drawMode);
+    unsigned int getIndexCount(AmmoniteId modelId);
+    unsigned int getVertexCount(AmmoniteId modelId);
+    void setDrawMode(AmmoniteId modelId, AmmoniteEnum drawMode);
   }
 }
 

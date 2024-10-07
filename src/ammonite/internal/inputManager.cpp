@@ -4,9 +4,9 @@
 
 #include <GLFW/glfw3.h>
 
+#include "../utils/debug.hpp"
 #include "../enums.hpp"
 #include "../types.hpp"
-#include "../utils/debug.hpp"
 
 namespace ammonite {
   namespace input {
@@ -26,13 +26,13 @@ namespace ammonite {
         };
 
         struct KeycodeState {
-          int refCount = 0;
-          std::map<int, KeycodeStateEnum> keybindIdStateEnumMap;
+          unsigned int refCount = 0;
+          std::map<AmmoniteId, KeycodeStateEnum> keybindIdStateEnumMap;
         };
 
         struct KeypressInfo {
           int keycode;
-          int keybindId;
+          AmmoniteId keybindId;
           KeybindData* keybindData;
           KeycodeStateEnum* keycodeStateEnumPtr;
         };
@@ -40,9 +40,9 @@ namespace ammonite {
         bool isInputBlocked = false;
 
         //Track keybind data and states
-        std::map<int, KeybindData> keybindIdDataMap;
+        std::map<AmmoniteId, KeybindData> keybindIdDataMap;
         std::map<int, KeycodeState> keycodeStateMap;
-        int totalKeybinds = 0;
+        unsigned int totalKeybinds = 0;
 
         //Vectors to track pressed and released keys, with a pending callback
         std::vector<KeypressInfo> pressedKeys;
@@ -59,7 +59,7 @@ namespace ammonite {
           KeycodeState* keycodeState = &keycodeStateMap[keycode];
           auto keybindMapPtr = &keycodeState->keybindIdStateEnumMap;
           for (auto it = keybindMapPtr->begin(); it != keybindMapPtr->end(); it++) {
-            int keybindId = it->first;
+            AmmoniteId keybindId = it->first;
             KeycodeStateEnum* keycodeStateEnumPtr = &it->second;
             KeybindData* keybindData = &keybindIdDataMap[keybindId];
 
@@ -119,7 +119,7 @@ namespace ammonite {
         for (auto it = releasedKeys.begin(); it != releasedKeys.end(); it++) {
           KeypressInfo keypressInfo = *it;
           KeybindData* keybindData = keypressInfo.keybindData;
-          int keybindId = keypressInfo.keybindId;
+          AmmoniteId keybindId = keypressInfo.keybindId;
 
           //Skip callback if it's a toggle
           if (keybindData->toggle) {
@@ -150,7 +150,7 @@ namespace ammonite {
 
         //Force releasing keybinds requires the ID and whether all keycodes were held
         struct ForceReleaseInfo {
-          int keybindId;
+          AmmoniteId keybindId;
           KeybindData* keybindData;
           bool runReleaseCallback;
         };
@@ -158,7 +158,7 @@ namespace ammonite {
         //Run callbacks for held keybinds, queue any keys to be force released
         std::vector<ForceReleaseInfo> forceReleaseKeybinds;
         for (auto it = keybindIdDataMap.begin(); it != keybindIdDataMap.end(); it++) {
-          int keybindId = it->first;
+          AmmoniteId keybindId = it->first;
           KeybindData* keybindData = &it->second;
 
 
@@ -192,7 +192,7 @@ namespace ammonite {
         for (auto it = forceReleaseKeybinds.begin(); it != forceReleaseKeybinds.end(); it++) {
           ForceReleaseInfo forceReleaseInfo = *it;
           KeybindData* keybindData = forceReleaseInfo.keybindData;
-          int keybindId = forceReleaseInfo.keybindId;
+          AmmoniteId keybindId = forceReleaseInfo.keybindId;
 
           if (forceReleaseInfo.runReleaseCallback && keybindData->callback != nullptr &&
               !(keybindData->toggle)) {
@@ -211,7 +211,7 @@ namespace ammonite {
         for (auto it = pressedKeys.begin(); it != pressedKeys.end(); it++) {
           KeypressInfo keypressInfo = *it;
           KeybindData* keybindData = keypressInfo.keybindData;
-          int keybindId = keypressInfo.keybindId;
+          AmmoniteId keybindId = keypressInfo.keybindId;
 
           *keypressInfo.keycodeStateEnumPtr = AMMONITE_HELD;
 
@@ -252,14 +252,14 @@ namespace ammonite {
         return &isInputBlocked;
       }
 
-      //Register a keybind, don't pick own ID to allow an ID to be forced
-      int registerRawKeybind(int keycodes[], int count, AmmoniteEnum overrideMode,
-                             bool toggle, AmmoniteKeyCallback callback,
-                             void* userPtr, int keybindId) {
+      //Register a keybind, use passed ID to allow forcing an ID
+      AmmoniteId registerRawKeybind(int keycodes[], int count, AmmoniteEnum overrideMode,
+                                    bool toggle, AmmoniteKeyCallback callback,
+                                    void* userPtr, AmmoniteId keybindId) {
         //Validate override mode
         if (overrideMode < AMMONITE_ALLOW_OVERRIDE || overrideMode > AMMONITE_RESPECT_BLOCK) {
           ammoniteInternalDebug << "Invalid override mode passed" << std::endl;
-          return -1;
+          return 0;
         }
 
         //Start tracking keycode states
@@ -289,18 +289,18 @@ namespace ammonite {
         return keybindId;
       }
 
-      int registerRawKeybind(int keycodes[], int count, AmmoniteEnum overrideMode,
-                             bool toggle, AmmoniteKeyCallback callback,
-                             void* userPtr) {
+      AmmoniteId registerRawKeybind(int keycodes[], int count, AmmoniteEnum overrideMode,
+                                    bool toggle, AmmoniteKeyCallback callback,
+                                    void* userPtr) {
         //Generate an ID
-        int keybindId = ++totalKeybinds;
+        AmmoniteId keybindId = ++totalKeybinds;
 
         //Hand off to actual registry
         return registerRawKeybind(keycodes, count, overrideMode, toggle, callback,
                                   userPtr, keybindId);
       }
 
-      int unregisterKeybind(int keybindId) {
+      int unregisterKeybind(AmmoniteId keybindId) {
         //Exit if keybind doesn't exist
         if (!keybindIdDataMap.contains(keybindId)) {
           ammoniteInternalDebug << "Can't unregister keybind ID '" << keybindId
@@ -339,7 +339,7 @@ namespace ammonite {
         }
 
         //Fill initial list of potential IDs
-        std::vector<int> potentialIds;
+        std::vector<AmmoniteId> potentialIds;
         auto idStateEnumMap = keycodeStateMap[keycodes[0]].keybindIdStateEnumMap;
         for (auto it = idStateEnumMap.begin(); it != idStateEnumMap.end(); it++) {
           potentialIds.push_back(it->first);
@@ -352,17 +352,18 @@ namespace ammonite {
           }
 
           //Remove elements from vector if they're not in the map
-          std::map<int, KeycodeStateEnum>* idStateEnumMapPtr =
+          std::map<AmmoniteId, KeycodeStateEnum>* idStateEnumMapPtr =
             &keycodeStateMap[keycodes[i]].keybindIdStateEnumMap;
-          std::erase_if(potentialIds,
-                        [idStateEnumMapPtr](int x) { return !idStateEnumMapPtr->contains(x); });
+          std::erase_if(potentialIds, [idStateEnumMapPtr](AmmoniteId x) {
+            return !idStateEnumMapPtr->contains(x);
+          });
         }
 
         //Return true if any IDs remain
         return potentialIds.size() > 0;
       }
 
-      int changeKeybindKeycodes(int keybindId, int newKeycodes[], int count) {
+      int changeKeybindKeycodes(AmmoniteId keybindId, int newKeycodes[], int count) {
         //Check the keybind exists
         if (!keybindIdDataMap.contains(keybindId)) {
           ammoniteInternalDebug << "Can't change keycodes for keybind ID '" << keybindId

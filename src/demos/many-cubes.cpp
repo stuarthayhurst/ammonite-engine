@@ -8,11 +8,11 @@
 
 namespace manyCubesDemo {
   namespace {
-    std::vector<int> loadedModelIds;
-    int sideLength = 0;
+    std::vector<AmmoniteId> loadedModelIds;
+    unsigned int sideLength = 0;
 
-    const int lightCount = 50;
-    int lightSourceIds[lightCount];
+    const int unsigned lightCount = 50;
+    AmmoniteId lightSourceIds[lightCount];
     glm::vec3 lightSourcePositions[lightCount];
   }
 
@@ -29,25 +29,25 @@ namespace manyCubesDemo {
   }
 
   int postRendererInit() {
-    int screenId = ammonite::interface::getActiveLoadingScreen();
+    AmmoniteId screenId = ammonite::interface::getActiveLoadingScreen();
 
     //Load models from a set of objects and textures
     const char* models[2] = {"assets/cube.obj", "assets/flat.png"};
-    int modelCount = 10000;
+    unsigned int modelCount = 10000;
 
     //Load cube model
     bool success = true;
     loadedModelIds.push_back(ammonite::models::createModel(models[0], &success));
     ammonite::models::applyTexture(loadedModelIds[0], AMMONITE_DIFFUSE_TEXTURE, models[1],
                                    true, &success);
-    long int vertexCount = ammonite::models::getVertexCount(loadedModelIds[0]);
+    long unsigned int vertexCount = ammonite::models::getVertexCount(loadedModelIds[0]);
 
     if (!success) {
       demoExit();
       return -1;
     }
 
-    for (int i = 1; i < modelCount; i++) {
+    for (unsigned int i = 1; i < modelCount; i++) {
       //Load model and count vertices
       loadedModelIds.push_back(ammonite::models::copyModel(loadedModelIds[0]));
       vertexCount += ammonite::models::getVertexCount(loadedModelIds[i]);
@@ -65,9 +65,9 @@ namespace manyCubesDemo {
     ammonite::renderer::drawFrame();
 
     //Reposition cubes
-    sideLength = int(sqrt(modelCount));
-    for (int x = 0; x < sideLength; x++) {
-      for (int y = 0; y < sideLength; y++) {
+    sideLength = sqrt(modelCount);
+    for (unsigned int x = 0; x < sideLength; x++) {
+      for (unsigned int y = 0; y < sideLength; y++) {
         ammonite::models::position::setPosition(loadedModelIds[((std::size_t)x * sideLength) + y],
           glm::vec3(2.0f * float(x), 0.0f, 2.0f * float(y)));
       }
@@ -75,7 +75,7 @@ namespace manyCubesDemo {
 
     //Create light sources
     ammonite::lighting::setAmbientLight(glm::vec3(0.1f, 0.1f, 0.1f));
-    for (int i = 0; i < lightCount; i++) {
+    for (unsigned int i = 0; i < lightCount; i++) {
       lightSourceIds[i] = ammonite::lighting::createLightSource();
       lightSourcePositions[i] = glm::vec3(ammonite::utils::randomInt(0, sideLength),
                                           4.0f,
@@ -88,7 +88,7 @@ namespace manyCubesDemo {
     }
 
     //Set the camera position
-    int cameraId = ammonite::camera::getActiveCamera();
+    AmmoniteId cameraId = ammonite::camera::getActiveCamera();
     ammonite::camera::setPosition(cameraId, glm::vec3(0.0f, 12.0f, 0.0f));
     ammonite::camera::setHorizontal(cameraId, glm::radians(45.0f));
     ammonite::camera::setVertical(cameraId, glm::radians(-20.0f));
@@ -98,9 +98,9 @@ namespace manyCubesDemo {
 
   int rendererMainloop() {
     //Update light source positions
-    for (int i = 0; i < lightCount; i++) {
+    for (unsigned int i = 0; i < lightCount; i++) {
       bool invalid = true;
-      int currLightSourceId = lightSourceIds[i];
+      AmmoniteId currLightSourceId = lightSourceIds[i];
       float x, z;
       while (invalid) {
         x = (float)ammonite::utils::randomDouble(-1.0, 1.0);

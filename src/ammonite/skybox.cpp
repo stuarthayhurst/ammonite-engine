@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <filesystem>
 #include <iostream>
+#include <string>
 #include <unordered_set>
 #include <vector>
 
@@ -9,6 +10,7 @@
 
 #include "graphics/internal/internalTextures.hpp"
 #include "utils/logging.hpp"
+#include "types.hpp"
 
 //Loading assumptions
 #define ASSUME_FLIP_FACES false
@@ -17,24 +19,30 @@
 namespace ammonite {
   namespace {
     //Tracker for loaded skyboxes
-    std::unordered_set<unsigned int> skyboxTracker;
-    int activeSkybox = -1;
+    std::unordered_set<AmmoniteId> skyboxTracker;
+    AmmoniteId activeSkybox = 0;
   }
 
   namespace skybox {
-    int getActiveSkybox() {
+    AmmoniteId getActiveSkybox() {
       return activeSkybox;
     }
 
-    void setActiveSkybox(int skyboxId) {
+    void setActiveSkybox(AmmoniteId skyboxId) {
       //Set the passed skybox to active if it exists
       if (skyboxTracker.contains(skyboxId)) {
         activeSkybox = skyboxId;
       }
     }
 
-    int createSkybox(const char* texturePaths[6], bool flipTextures, bool srgbTextures,
-                     bool* externalSuccess) {
+    /*
+     - Load 6 textures as a skybox and return its ID
+       - flipTextures controls whether the textures are flipped or not
+       - srgbTextures controls whether the textures are treated as sRGB
+     - Writes 'false' to externalSuccess on failure and returns 0
+    */
+    AmmoniteId createSkybox(std::string texturePaths[6], bool flipTextures,
+                            bool srgbTextures, bool* externalSuccess) {
       GLuint textureId;
       glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &textureId);
 
@@ -47,7 +55,7 @@ namespace ammonite {
         }
 
         //Read the image data
-        unsigned char* imageData = stbi_load(texturePaths[i], &width, &height, &nChannels, 0);
+        unsigned char* imageData = stbi_load(texturePaths[i].c_str(), &width, &height, &nChannels, 0);
 
         //Disable texture flipping, to avoid interfering with future calls
         if (flipTextures) {
@@ -65,7 +73,7 @@ namespace ammonite {
           glDeleteTextures(1, &textureId);
 
           *externalSuccess = false;
-          return -1;
+          return 0;
         }
 
         //Only create texture storage once
@@ -88,7 +96,7 @@ namespace ammonite {
           glDeleteTextures(1, &textureId);
 
           *externalSuccess = false;
-          return -1;
+          return 0;
         }
       }
 
@@ -100,16 +108,26 @@ namespace ammonite {
       glGenerateTextureMipmap(textureId);
 
       skyboxTracker.insert(textureId);
-      return (int)textureId;
+      return textureId;
     }
 
-    int createSkybox(const char* texturePaths[6], bool* externalSuccess) {
+    /*
+     - Load 6 textures as a skybox and return its ID
+     - Writes 'false' to externalSuccess on failure and returns 0
+    */
+    AmmoniteId createSkybox(std::string texturePaths[6], bool* externalSuccess) {
       return createSkybox(texturePaths, ASSUME_FLIP_FACES, ASSUME_SRGB_TEXTURES,
                           externalSuccess);
     }
 
-    int loadDirectory(const char* directoryPath, bool flipTextures,  bool srgbTextures,
-                      bool* externalSuccess) {
+    /*
+     - Load 6 textures from a directory as a skybox and return its ID
+       - flipTextures controls whether the textures are flipped or not
+       - srgbTextures controls whether the textures are treated as sRGB
+     - Writes 'false' to externalSuccess on failure and returns 0
+    */
+    AmmoniteId loadDirectory(std::string directoryPath, bool flipTextures, bool srgbTextures,
+                             bool* externalSuccess) {
       //Create filesystem directory iterator
       std::filesystem::directory_iterator it;
       try {
@@ -118,7 +136,7 @@ namespace ammonite {
       } catch (const std::filesystem::filesystem_error&) {
         *externalSuccess = false;
         ammonite::utils::warning << "Failed to scan '" << directoryPath << "'" << std::endl;
-        return -1;
+        return 0;
       }
 
       //Find files to send to next stage
@@ -133,11 +151,11 @@ namespace ammonite {
         *externalSuccess = false;
         ammonite::utils::warning << "Failed to load '" << directoryPath \
                                  << "', needs at least 6 faces" << std::endl;
-        return -1;
+        return 0;
       }
 
       //Select 6 faces using their names
-      const char* skyboxFaces[6];
+      std::string skyboxFaces[6];
       std::string faceOrder[6] = {"right", "left", "top", "bottom", "front", "back"};
       int targetFace = 0;
       while (targetFace < 6) {
@@ -153,12 +171,12 @@ namespace ammonite {
 
         //Either add the face and repeat / break, or give up
         if (foundIndex != -1) {
-          skyboxFaces[targetFace] = faces[foundIndex].c_str();
+          skyboxFaces[targetFace] = faces[foundIndex];
           targetFace++;
         } else {
           *externalSuccess = false;
           ammonite::utils::warning << "Failed to load '" << directoryPath << "'" << std::endl;
-          return -1;
+          return 0;
         }
       }
 
@@ -166,12 +184,16 @@ namespace ammonite {
       return createSkybox(skyboxFaces, flipTextures, srgbTextures, externalSuccess);
     }
 
-    int loadDirectory(const char* directoryPath, bool* externalSuccess) {
+    /*
+     - Load 6 textures from a directory as a skybox and return its ID
+     - Writes 'false' to externalSuccess on failure and returns 0
+    */
+    AmmoniteId loadDirectory(std::string directoryPath, bool* externalSuccess) {
       return loadDirectory(directoryPath, ASSUME_FLIP_FACES,
                            ASSUME_SRGB_TEXTURES, externalSuccess);
     }
 
-    void deleteSkybox(int skyboxId) {
+    void deleteSkybox(AmmoniteId skyboxId) {
       //Check the skybox exists and remove
       if (skyboxTracker.contains(skyboxId)) {
         //Delete from set
@@ -183,7 +205,7 @@ namespace ammonite {
 
         //If the active skybox is the target to delete, unset it
         if (activeSkybox == skyboxId) {
-          activeSkybox = -1;
+          activeSkybox = 0;
         }
       }
     }
