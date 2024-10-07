@@ -1,8 +1,6 @@
 #include <vector>
 #include <iostream>
 
-#include <string.h>
-
 #include "../ammonite/ammonite.hpp"
 
 namespace sponzaDemo {
@@ -26,7 +24,7 @@ namespace sponzaDemo {
     AmmoniteId screenId = ammonite::interface::getActiveLoadingScreen();
 
     //Load models from a set of objects and textures
-    const char* models[][2] = {
+    std::string models[][2] = {
       {"assets-experimental/intel-assets/main_sponza/NewSponza_Main_glTF_002.gltf", ""},
       {"assets/cube.obj", "assets/flat.png"}
     };
@@ -46,7 +44,7 @@ namespace sponzaDemo {
 
       //Sum vertices and load texture if given
       vertexCount += ammonite::models::getVertexCount(loadedModelIds[i]);
-      if (strcmp(models[i][1], "")) {
+      if (models[i][1] == "") {
         ammonite::models::applyTexture(loadedModelIds[i], AMMONITE_DIFFUSE_TEXTURE, models[i][1], true, &success);
       }
 

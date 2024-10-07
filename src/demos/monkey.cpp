@@ -1,6 +1,5 @@
 #include <vector>
 #include <iostream>
-#include <cstring>
 
 #include "../ammonite/ammonite.hpp"
 
@@ -25,7 +24,7 @@ namespace monkeyDemo {
     AmmoniteId screenId = ammonite::interface::getActiveLoadingScreen();
 
     //Load models from a set of objects and textures
-    const char* models[][2] = {
+    std::string models[][2] = {
       {"assets/suzanne.obj", "assets/gradient.png"},
       {"assets/cube.obj", "assets/flat.png"}
     };
@@ -45,7 +44,7 @@ namespace monkeyDemo {
 
       //Sum vertices and load texture if given
       vertexCount += ammonite::models::getVertexCount(loadedModelIds[i]);
-      if (std::strcmp(models[i][1], "")) {
+      if (models[i][1] == "") {
         ammonite::models::applyTexture(loadedModelIds[i], AMMONITE_DIFFUSE_TEXTURE, models[i][1], true, &success);
       }
 

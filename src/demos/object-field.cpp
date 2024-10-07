@@ -240,7 +240,7 @@ namespace objectFieldDemo {
     genRandomPosData(&cubeData[0][0], cubeCount);
 
     //Load models from a set of objects and textures
-    const char* models[][2] = {
+    std::string models[][2] = {
       {"assets/sphere.obj", "assets/flat.png"},
       {"assets/cube.obj", "assets/flat.png"}
     };
