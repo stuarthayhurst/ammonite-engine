@@ -5,7 +5,9 @@
 ## Return codes:
   - Failures return `-1`
   - Successes return `0`
-  - Object IDs use type `AmmoniteId` start at `1`, and are specific to each object type
+  - Object IDs use type `AmmoniteId`, and are specific to each object type
+    - Valid IDs start at `1`
+    - Unset IDs or failures use `0`
     - This means a camera, light source and model can all share ID `1`
 
 ## Model draw modes:
