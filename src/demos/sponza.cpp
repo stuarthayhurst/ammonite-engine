@@ -39,6 +39,7 @@ namespace sponzaDemo {
       if (!success) {
         //Prevent total failure if models fail
         success = true;
+        ammonite::utils::warning << "Failed to load " << models[i][0] << std::endl;
         continue;
       }
 
