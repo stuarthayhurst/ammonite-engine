@@ -1,6 +1,7 @@
 #include <cstddef>
 #include <cmath>
 #include <iostream>
+#include <string>
 #include <vector>
 
 #include <glm/glm.hpp>

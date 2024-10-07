@@ -1,5 +1,6 @@
-#include <vector>
 #include <iostream>
+#include <string>
+#include <vector>
 
 #include "../ammonite/ammonite.hpp"
 
@@ -45,7 +46,7 @@ namespace sponzaDemo {
 
       //Sum vertices and load texture if given
       vertexCount += ammonite::models::getVertexCount(loadedModelIds[i]);
-      if (models[i][1] == "") {
+      if (models[i][1] != "") {
         ammonite::models::applyTexture(loadedModelIds[i], AMMONITE_DIFFUSE_TEXTURE, models[i][1], true, &success);
       }
 
