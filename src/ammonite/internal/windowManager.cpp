@@ -188,8 +188,8 @@ namespace ammonite {
         requestedContextType = contextType;
       }
 
-      GLFWwindow* createWindow(int width, int height, const char* title) {
-        windowPtr = glfwCreateWindow(width, height, title, nullptr, nullptr);
+      GLFWwindow* createWindow(int width, int height, std::string title) {
+        windowPtr = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
         if (windowPtr == nullptr) {
           glfwTerminate();
           return nullptr;

@@ -1,6 +1,8 @@
 #ifndef WINDOWMANAGER
 #define WINDOWMANAGER
 
+#include <string>
+
 #include <GLFW/glfw3.h>
 
 #include "../enums.hpp"
@@ -14,7 +16,7 @@ namespace ammonite {
       void destroyGlfw();
 
       void setContextType(AmmoniteEnum contextType);
-      GLFWwindow* createWindow(int width, int height, const char* title);
+      GLFWwindow* createWindow(int width, int height, std::string title);
       GLFWwindow* getWindowPtr();
 
       void setWindowGeometry(int width, int height, int xPos, int yPos, bool useDecoratedPos);

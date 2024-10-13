@@ -63,7 +63,7 @@ namespace ammonite {
       }
     }
 
-    int createWindow(int width, int height, const char* title) {
+    int createWindow(int width, int height, std::string title) {
       //Setup GLFW
       if (internal::setupGlfw() == -1) {
         ammonite::utils::error << "Failed to initialize GLFW" << std::endl;
@@ -109,15 +109,11 @@ namespace ammonite {
                          setCloseWindowCallback, &closeWindow);
     }
 
-    void setTitle(const char* title) {
-      if (title != nullptr) {
-        glfwSetWindowTitle(windowPtr, title);
-      } else {
-        glfwSetWindowTitle(windowPtr, DEFAULT_TITLE);
-      }
+    void setTitle(std::string title) {
+      glfwSetWindowTitle(windowPtr, title.c_str());
     }
 
-    void useIcons(const char* iconPaths[], unsigned int iconCount) {
+    void useIcons(std::string* iconPaths, unsigned int iconCount) {
       if (iconPaths == nullptr) {
         ammonite::utils::warning << "Failed to load icons (nullptr)" << std::endl;
         return;
@@ -125,18 +121,17 @@ namespace ammonite {
 
       //Read image data
       GLFWimage* images = new GLFWimage[iconCount];
-      for (unsigned int i = 0; i < (unsigned)iconCount; i++) {
-        if (iconPaths[i] == nullptr) {
-          ammonite::utils::warning << "Failed to load icon (nullptr)" << std::endl;
-          delete [] images;
-          return;
-        }
-
-        images[i].pixels = stbi_load(iconPaths[i], &images[i].width,
+      for (unsigned int i = 0; i < iconCount; i++) {
+        images[i].pixels = stbi_load(iconPaths[i].c_str(), &images[i].width,
                                      &images[i].height, nullptr, 4);
 
         if (images[i].pixels == nullptr) {
           ammonite::utils::warning << "Failed to load '" << iconPaths[i] << "'" << std::endl;
+
+          //Free already loaded images
+          for (unsigned int j = 0; j < i; j++) {
+            stbi_image_free(images[j].pixels);
+          }
           delete [] images;
           return;
         }
@@ -154,16 +149,11 @@ namespace ammonite {
       delete [] images;
     }
 
-    void useIcon(const char* iconPath) {
+    void useIcon(std::string iconPath) {
       useIcons(&iconPath, 1);
     }
 
-    void useIconDir(const char* iconDirPath) {
-      if (iconDirPath == nullptr) {
-        ammonite::utils::warning << "Failed to load icon directory (nullptr)" << std::endl;
-        return;
-      }
-
+    void useIconDir(std::string iconDirPath) {
       //Attempt to add all png files to a vector
       std::vector<std::string> pngFiles(0);
       try {
@@ -181,7 +171,7 @@ namespace ammonite {
         return;
       }
 
-      const char** iconPaths = new const char*[pngFiles.size()];
+      std::string* iconPaths = new std::string[pngFiles.size()];
       for (unsigned int i = 0; i < pngFiles.size(); i++) {
         iconPaths[i] = pngFiles[i].c_str();
       }
