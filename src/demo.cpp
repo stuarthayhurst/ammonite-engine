@@ -153,8 +153,10 @@ namespace {
   }
 }
 
-int main(int argc, char* argv[]) {
+int main(int argc, char** argv) {
   //Handle arguments
+  argc--;
+  argv++;
   const int showHelp = arguments::searchArgument(argc, argv, "--help", nullptr);
   if (showHelp == 1) {
     std::cout << "Program help: \n"

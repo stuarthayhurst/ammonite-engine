@@ -1,7 +1,15 @@
 #include <string>
 
 namespace arguments {
-  int searchArgument(int argc, char* argv[], const char identifier[], std::string* argValuePtr) {
+  /*
+   - Look for identifier in argv
+   - If it's not found, return 0
+   - If it's found and its value (if any) should be ignored, return 1
+   - If it's found and its value shouldn't be ignored, return 1
+     - Additionally, write its value to argValuePtr
+     - If there isn't a value to save, return -1
+  */
+  int searchArgument(int argc, char** argv, std::string identifier, std::string* argValuePtr) {
     for (int i = 0; i < argc; i++) {
       if (argv[i] == std::string(identifier)) {
         //If argument is found and it's a toggle, return true
