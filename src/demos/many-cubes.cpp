@@ -17,19 +17,19 @@ namespace manyCubesDemo {
     glm::vec3 lightSourcePositions[lightCount];
   }
 
-  int demoExit() {
+  bool demoExit() {
     for (unsigned int i = 0; i < loadedModelIds.size(); i++) {
       ammonite::models::deleteModel(loadedModelIds[i]);
     }
 
-    return 0;
+    return true;
   }
 
-  int preRendererInit() {
-    return 0;
+  bool preRendererInit() {
+    return true;
   }
 
-  int postRendererInit() {
+  bool postRendererInit() {
     AmmoniteId screenId = ammonite::interface::getActiveLoadingScreenId();
 
     //Load models from a set of objects and textures
@@ -45,7 +45,7 @@ namespace manyCubesDemo {
 
     if (!success) {
       demoExit();
-      return -1;
+      return false;
     }
 
     for (unsigned int i = 1; i < modelCount; i++) {
@@ -94,10 +94,10 @@ namespace manyCubesDemo {
     ammonite::camera::setHorizontal(cameraId, glm::radians(45.0f));
     ammonite::camera::setVertical(cameraId, glm::radians(-20.0f));
 
-    return 0;
+    return true;
   }
 
-  int rendererMainloop() {
+  bool rendererMainloop() {
     //Update light source positions
     for (unsigned int i = 0; i < lightCount; i++) {
       bool invalid = true;
@@ -121,6 +121,6 @@ namespace manyCubesDemo {
     }
 
     ammonite::renderer::drawFrame();
-    return 0;
+    return true;
   }
 }

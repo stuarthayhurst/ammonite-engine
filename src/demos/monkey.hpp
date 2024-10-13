@@ -2,10 +2,10 @@
 #define MONKEYDEMO
 
 namespace monkeyDemo {
-  int preRendererInit();
-  int postRendererInit();
-  int rendererMainloop();
-  int demoExit();
+  bool preRendererInit();
+  bool postRendererInit();
+  bool rendererMainloop();
+  bool demoExit();
 }
 
 #endif

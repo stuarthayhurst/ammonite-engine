@@ -2,10 +2,10 @@
 #define OBJECTFIELDDEMO
 
 namespace objectFieldDemo {
-  int preRendererInit();
-  int postRendererInit();
-  int rendererMainloop();
-  int demoExit();
+  bool preRendererInit();
+  bool postRendererInit();
+  bool rendererMainloop();
+  bool demoExit();
 }
 
 #endif

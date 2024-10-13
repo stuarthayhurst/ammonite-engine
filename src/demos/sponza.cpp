@@ -9,19 +9,19 @@ namespace sponzaDemo {
     std::vector<AmmoniteId> loadedModelIds;
   }
 
-  int demoExit() {
+  bool demoExit() {
     for (unsigned int i = 0; i < loadedModelIds.size(); i++) {
       ammonite::models::deleteModel(loadedModelIds[i]);
     }
 
-    return 0;
+    return true;
   }
 
-  int preRendererInit() {
-    return 0;
+  bool preRendererInit() {
+    return true;
   }
 
-  int postRendererInit() {
+  bool postRendererInit() {
     AmmoniteId screenId = ammonite::interface::getActiveLoadingScreenId();
 
     //Load models from a set of objects and textures
@@ -57,7 +57,7 @@ namespace sponzaDemo {
 
     if (!success) {
       demoExit();
-      return -1;
+      return false;
     }
 
     //Copy last loaded model
@@ -89,11 +89,11 @@ namespace sponzaDemo {
     ammonite::camera::setHorizontal(cameraId, glm::radians(270.0f));
     ammonite::camera::setVertical(cameraId, glm::radians(10.0f));
 
-    return 0;
+    return true;
   }
 
-  int rendererMainloop() {
+  bool rendererMainloop() {
     ammonite::renderer::drawFrame();
-    return 0;
+    return true;
   }
 }

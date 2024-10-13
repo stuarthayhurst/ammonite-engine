@@ -190,7 +190,7 @@ namespace objectFieldDemo {
     }
   }
 
-  int demoExit() {
+  bool demoExit() {
     ammonite::input::unregisterKeybind(cubeKeybindId);
     ammonite::input::unregisterKeybind(shuffleKeybindId);
 
@@ -204,10 +204,10 @@ namespace objectFieldDemo {
       delete [] orbitSwapAngles;
     }
 
-    return 0;
+    return true;
   }
 
-  int preRendererInit() {
+  bool preRendererInit() {
     //Pick number of orbits
     totalOrbits = ammonite::utils::randomInt(3, 8);
 
@@ -229,10 +229,10 @@ namespace objectFieldDemo {
     ammonite::utils::status << "Chose " << totalOrbits << " orbits and " << lightCount \
                             << " lights" << std::endl;
 
-    return 0;
+    return true;
   }
 
-  int postRendererInit() {
+  bool postRendererInit() {
     AmmoniteId screenId = ammonite::interface::getActiveLoadingScreenId();
     windowPtr = ammonite::window::getWindowPtr();
 
@@ -274,7 +274,7 @@ namespace objectFieldDemo {
 
     if (!success) {
       demoExit();
-      return -1;
+      return false;
     }
 
     //Position the floor
@@ -331,10 +331,10 @@ namespace objectFieldDemo {
     ammonite::camera::setHorizontal(cameraId, 4.75f * glm::quarter_pi<float>());
     ammonite::camera::setVertical(cameraId, -0.7f);
 
-    return 0;
+    return true;
   }
 
-  int rendererMainloop() {
+  bool rendererMainloop() {
     for (unsigned int i = 0; i < lightCount; i++) {
       glm::vec2 lightOrbitPosition = calculateOrbitPosition(totalOrbits,
         lightData[i].orbitIndex, lightData[i].orbitRadius);
@@ -404,6 +404,6 @@ namespace objectFieldDemo {
 
     //Draw the frame
     ammonite::renderer::drawFrame();
-    return 0;
+    return true;
   }
 }

@@ -17,10 +17,9 @@
 #include "demos/monkey.hpp"
 #include "demos/sponza.hpp"
 
-#define EXPAND_DEMO(DEMO_NAME, NAMESPACE) {std::string(DEMO_NAME), {NAMESPACE::preRendererInit,\
-                              NAMESPACE::postRendererInit,\
-                              NAMESPACE::rendererMainloop,\
-                              NAMESPACE::demoExit}}
+#define EXPAND_DEMO(DEMO_NAME, NAMESPACE) {std::string(DEMO_NAME), \
+  {NAMESPACE::preRendererInit, NAMESPACE::postRendererInit, \
+   NAMESPACE::rendererMainloop, NAMESPACE::demoExit}}
 
 #define HAS_SETUP_WINDOW   (1 << 0)
 #define HAS_SETUP_RENDERER (1 << 1)
@@ -28,7 +27,7 @@
 
 //Definitions for demo loading
 namespace {
-  typedef int (*DemoFunctionType)(void);
+  typedef bool (*DemoFunctionType)(void);
   struct DemoFunctions {
     DemoFunctionType preRendererInit;
     DemoFunctionType postRendererInit;
@@ -266,7 +265,7 @@ int main(int argc, char** argv) {
 
   //Call main demo setup
   if (postRendererInit != nullptr) {
-    if (postRendererInit() == -1) {
+    if (!postRendererInit()) {
       ammonite::utils::error << "Failed to set up demo, exiting" << std::endl;
       ammonite::interface::deleteLoadingScreen(screenId);
       cleanEngine(setupBits, nullptr);
@@ -337,7 +336,7 @@ int main(int argc, char** argv) {
 
     //Call demo-specific main loop code
     if (rendererMainloop != nullptr) {
-      if (rendererMainloop() == -1) {
+      if (!rendererMainloop()) {
         ammonite::utils::error << "Failed to run mainloop, exiting" << std::endl;
         cleanEngine(setupBits, &keybindIds);
         return EXIT_FAILURE;
@@ -355,7 +354,7 @@ int main(int argc, char** argv) {
   //Clean up and exit
   bool cleanExit = true;
   if (demoExit != nullptr) {
-    if (demoExit() == -1) {
+    if (!demoExit()) {
       cleanExit = false;
       ammonite::utils::error << "Failed to clean up, exiting" << std::endl;
     }
