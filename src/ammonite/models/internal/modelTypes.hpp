@@ -39,7 +39,7 @@ namespace ammonite {
       };
 
       struct ModelData {
-        unsigned int refCount = 1;
+        unsigned int refCount = 0;
         std::vector<MeshData> meshes;
         std::vector<TextureIdGroup> textureIds;
       };

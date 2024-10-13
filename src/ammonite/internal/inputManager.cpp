@@ -317,10 +317,9 @@ namespace ammonite {
             keycodeStateMap[keycode].keybindIdStateEnumMap.erase(keybindId);
 
             //Reduce reference counter on keycode state tracker
-            if (keycodeStateMap[keycode].refCount == 1) {
+            keycodeStateMap[keycode].refCount--;
+            if (keycodeStateMap[keycode].refCount == 0) {
               keycodeStateMap.erase(keycode);
-            } else {
-              keycodeStateMap[keycode].refCount--;
             }
           } else {
             ammoniteInternalDebug << "Keycode state tracking missing for '" << keycode << std::endl;

@@ -17,7 +17,7 @@ namespace ammonite {
         struct TextureInfo {
           std::string string;
           GLuint id;
-          int refCount;
+          unsigned int refCount = 0;
         };
 
         std::map<GLuint, TextureInfo> idTextureMap;
@@ -78,7 +78,7 @@ namespace ammonite {
         TextureInfo* textureInfoPtr = &idTextureMap[textureId];
 
         //Decrease the reference counter, delete the texture if now unused
-        if (--textureInfoPtr->refCount <= 0) {
+        if (--textureInfoPtr->refCount == 0) {
           //Remove the string entry
           if (textureInfoPtr->string != "") {
             stringTexturePtrMap.erase(textureInfoPtr->string);

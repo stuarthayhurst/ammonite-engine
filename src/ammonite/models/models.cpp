@@ -379,7 +379,7 @@ namespace ammonite {
         modelObjectData->refCount--;
 
         //If the model data is now unused, destroy it
-        if (modelObjectData->refCount < 1) {
+        if (modelObjectData->refCount == 0) {
           //Reduce reference count on textures
           for (unsigned int i = 0; i < modelObjectData->meshes.size(); i++) {
             if (modelObject->textureIds[i].diffuseId != 0) {
