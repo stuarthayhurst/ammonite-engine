@@ -1,6 +1,8 @@
 #ifndef RENDERER
 #define RENDERER
 
+#include <cstdint>
+
 namespace ammonite {
   namespace renderer {
     namespace setup {
@@ -8,7 +10,7 @@ namespace ammonite {
       void destroyRenderer();
     }
 
-    long long unsigned int getTotalFrames();
+    uintmax_t getTotalFrames();
     double getFrameTime();
 
     void drawFrame();

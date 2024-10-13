@@ -1,3 +1,4 @@
+#include <cstdint>
 #include <iostream>
 #include <string>
 
@@ -24,7 +25,7 @@
 namespace ammonite {
   namespace renderer {
     namespace {
-      long long int totalFrames = 0;
+      uintmax_t totalFrames = 0;
       double frameTime = 0.0;
     }
 
@@ -70,7 +71,7 @@ namespace ammonite {
       }
     }
 
-    long long unsigned int getTotalFrames() {
+    uintmax_t getTotalFrames() {
      return totalFrames;
     }
 
