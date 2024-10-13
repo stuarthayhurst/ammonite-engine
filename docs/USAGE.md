@@ -3,8 +3,8 @@
   - This is mostly a staging ground for information that won't be automatically generated from source files
 
 ## Return codes:
-  - Failures return `-1`
-  - Successes return `0`
+  - Successes return `true`
+  - Failures return `false`
   - Object IDs use type `AmmoniteId`, and are specific to each object type
     - Valid IDs start at `1`
     - Unset IDs or failures use `0`
