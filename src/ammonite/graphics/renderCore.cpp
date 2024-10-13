@@ -51,9 +51,9 @@ namespace ammonite {
       struct GraphicsSettings {
         bool vsyncEnabled = true;
         float frameLimit = 0.0f;
-        int shadowRes = 1024;
+        unsigned int shadowRes = 1024;
         float renderResMultiplier = 1.0f;
-        int antialiasingSamples = 0;
+        unsigned int antialiasingSamples = 0;
         float renderFarPlane = 100.0f;
         float shadowFarPlane = 25.0f;
         bool gammaCorrection = false;
@@ -107,7 +107,7 @@ namespace ammonite {
           return &graphicsSettings.frameLimit;
         }
 
-        int* getShadowResPtr() {
+        unsigned int* getShadowResPtr() {
           return &graphicsSettings.shadowRes;
         }
 
@@ -115,7 +115,7 @@ namespace ammonite {
           return &graphicsSettings.renderResMultiplier;
         }
 
-        int* getAntialiasingSamplesPtr() {
+        unsigned int* getAntialiasingSamplesPtr() {
           return &graphicsSettings.antialiasingSamples;
         }
 
@@ -150,11 +150,11 @@ namespace ammonite {
         return graphicsSettings.frameLimit;
       }
 
-      void setShadowRes(int shadowRes) {
+      void setShadowRes(unsigned int shadowRes) {
         graphicsSettings.shadowRes = shadowRes;
       }
 
-      int getShadowRes() {
+      unsigned int getShadowRes() {
         return graphicsSettings.shadowRes;
       }
 
@@ -166,11 +166,11 @@ namespace ammonite {
         return graphicsSettings.renderResMultiplier;
       }
 
-      void setAntialiasingSamples(int samples) {
+      void setAntialiasingSamples(unsigned int samples) {
         graphicsSettings.antialiasingSamples = samples;
       }
 
-      int getAntialiasingSamples() {
+      unsigned int getAntialiasingSamples() {
         return graphicsSettings.antialiasingSamples;
       }
 
@@ -296,7 +296,7 @@ namespace ammonite {
       ammonite::models::internal::ModelInfo** modelPtrs = nullptr;
       ammonite::models::internal::ModelInfo** lightModelPtrs = nullptr;
 
-      int maxSampleCount = 0;
+      GLint maxSampleCount = 0;
 
       //View projection combined matrix
       glm::mat4 viewProjectionMatrix;
@@ -329,8 +329,8 @@ namespace ammonite {
 
           //Load shaders
           bool hasCreatedShaders = true;
-          const int shaderCount = sizeof(shaderInfo) / sizeof(shaderInfo[0]);
-          for (int i = 0; i < shaderCount; i++) {
+          unsigned int shaderCount = sizeof(shaderInfo) / sizeof(shaderInfo[0]);
+          for (unsigned int i = 0; i < shaderCount; i++) {
             std::string shaderLocation = shaderPath + shaderInfo[i].shaderDir;
             *shaderInfo[i].shaderId =
               ammonite::shaders::internal::loadDirectory(shaderLocation,
@@ -353,7 +353,7 @@ namespace ammonite {
         }
 
         //Check for essential GPU capabilities
-        bool checkGPUCapabilities(int* failureCount) {
+        bool checkGPUCapabilities(unsigned int* failureCount) {
           const char* extensions[5][3] = {
             {"GL_ARB_direct_state_access", "GL_VERSION_4_5", "Direct state access"},
             {"GL_ARB_shader_storage_buffer_object", "GL_VERSION_4_3", "Shader Storage Buffer Objects (SSBOs)"},
@@ -361,10 +361,10 @@ namespace ammonite {
             {"GL_ARB_shading_language_420pack", "GL_VERSION_4_2", "GLSL shader version 4.20"},
             {"GL_ARB_texture_cube_map_array", "GL_VERSION_4_0", "Cubemap arrays"}
           };
-          const int extensionCount = sizeof(extensions) / sizeof(extensions[0]);
+          unsigned int extensionCount = sizeof(extensions) / sizeof(extensions[0]);
 
           bool success = true;
-          for (int i = 0; i < extensionCount; i++) {
+          for (unsigned int i = 0; i < extensionCount; i++) {
             if (!graphics::internal::checkExtension(extensions[i][0], extensions[i][1])) {
               ammonite::utils::error << extensions[i][2] << " unsupported" << std::endl;
               success = false;
@@ -575,8 +575,8 @@ namespace ammonite {
       */
 
       //Setup framebuffers for rendering
-      static inline void recreateFramebuffers(GLuint* targetBufferIdPtr, int sampleCount,
-                                            int renderWidth, int renderHeight) {
+      static void recreateFramebuffers(GLuint* targetBufferIdPtr, unsigned int sampleCount,
+                                       unsigned int renderWidth, unsigned int renderHeight) {
         //Delete regular colour and depth storage textures
         if (screenQuadTextureId != 0) {
           glDeleteTextures(1, &screenQuadTextureId);
@@ -605,23 +605,28 @@ namespace ammonite {
 
         if (sampleCount != 0) {
           //Create multisampled renderbuffers for colour and depth
-          glNamedRenderbufferStorageMultisample(colourRenderBufferId, sampleCount, GL_SRGB8, renderWidth, renderHeight);
-          glNamedRenderbufferStorageMultisample(depthRenderBufferId, sampleCount, GL_DEPTH_COMPONENT32, renderWidth, renderHeight);
+          glNamedRenderbufferStorageMultisample(colourRenderBufferId, (GLsizei)sampleCount,
+            GL_SRGB8, (GLsizei)renderWidth, (GLsizei)renderHeight);
+          glNamedRenderbufferStorageMultisample(depthRenderBufferId, (GLsizei)sampleCount,
+            GL_DEPTH_COMPONENT32, (GLsizei)renderWidth, (GLsizei)renderHeight);
 
           //Attach colour and depth renderbuffers to multisampled framebuffer
-          glNamedFramebufferRenderbuffer(colourBufferMultisampleFBO, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, colourRenderBufferId);
-          glNamedFramebufferRenderbuffer(colourBufferMultisampleFBO, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthRenderBufferId);
+          glNamedFramebufferRenderbuffer(colourBufferMultisampleFBO, GL_COLOR_ATTACHMENT0,
+                                         GL_RENDERBUFFER, colourRenderBufferId);
+          glNamedFramebufferRenderbuffer(colourBufferMultisampleFBO, GL_DEPTH_ATTACHMENT,
+                                         GL_RENDERBUFFER, depthRenderBufferId);
         }
 
         //Create texture to store colour data and bind to framebuffer
-        glTextureStorage2D(screenQuadTextureId, 1, GL_SRGB8, renderWidth, renderHeight);
+        glTextureStorage2D(screenQuadTextureId, 1, GL_SRGB8, (GLsizei)renderWidth, (GLsizei)renderHeight);
         glTextureParameteri(screenQuadTextureId, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTextureParameteri(screenQuadTextureId, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTextureParameteri(screenQuadTextureId, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTextureParameteri(screenQuadTextureId, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glNamedFramebufferTexture(screenQuadFBO, GL_COLOR_ATTACHMENT0, screenQuadTextureId, 0);
 
-        glTextureStorage2D(screenQuadDepthTextureId, 1, GL_DEPTH_COMPONENT32, renderWidth, renderHeight);
+        glTextureStorage2D(screenQuadDepthTextureId, 1, GL_DEPTH_COMPONENT32,
+                           (GLsizei)renderWidth, (GLsizei)renderHeight);
         glTextureParameteri(screenQuadDepthTextureId, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTextureParameteri(screenQuadDepthTextureId, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTextureParameteri(screenQuadDepthTextureId, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -629,26 +634,31 @@ namespace ammonite {
         glNamedFramebufferTexture(screenQuadFBO, GL_DEPTH_ATTACHMENT, screenQuadDepthTextureId, 0);
       }
 
-      static void checkFramebuffers(int renderWidth, int renderHeight, int sampleCount) {
+      static void checkFramebuffers(unsigned int renderWidth, unsigned int renderHeight,
+                                    unsigned int sampleCount) {
         //Check multisampled framebuffer
         if (sampleCount != 0) {
-          if (glCheckNamedFramebufferStatus(colourBufferMultisampleFBO, GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+          if (glCheckNamedFramebufferStatus(colourBufferMultisampleFBO, GL_FRAMEBUFFER) !=
+              GL_FRAMEBUFFER_COMPLETE) {
             ammonite::utils::warning << "Incomplete multisampled render framebuffer" << std::endl;
           } else {
-            ammoniteInternalDebug << "Created new multisampled render framebuffer (" << renderWidth << " x " << renderHeight << "), samples: x" << sampleCount << std::endl;
+            ammoniteInternalDebug << "Created new multisampled render framebuffer (" << renderWidth \
+                                  << " x " << renderHeight << "), samples: x" << sampleCount << std::endl;
           }
         }
 
         //Check regular framebuffer
-        if (glCheckNamedFramebufferStatus(screenQuadFBO, GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+        if (glCheckNamedFramebufferStatus(screenQuadFBO, GL_FRAMEBUFFER) !=
+            GL_FRAMEBUFFER_COMPLETE) {
           ammonite::utils::warning << "Incomplete render framebuffer" << std::endl;
         } else {
-          ammoniteInternalDebug << "Created new render framebuffer (" << renderWidth << " x " << renderHeight << ")" << std::endl;
+          ammoniteInternalDebug << "Created new render framebuffer (" << renderWidth << " x " \
+                                << renderHeight << ")" << std::endl;
         }
       }
 
       //Create, configure and bind depth cubemap for shadows
-      static void setupDepthMap(unsigned int lightCount, int shadowRes) {
+      static void setupDepthMap(unsigned int lightCount, unsigned int shadowRes) {
         //Delete the cubemap array if it already exists
         if (depthCubeMapId != 0) {
           glDeleteTextures(1, &depthCubeMapId);
@@ -663,8 +673,9 @@ namespace ammonite {
         }
 
         //Create 6 faces for each light source
-        int depthLayers = std::min(maxLightCount, lightCount) * 6;
-        glTextureStorage3D(depthCubeMapId, 1, GL_DEPTH_COMPONENT32, shadowRes, shadowRes, depthLayers);
+        GLsizei depthLayers = std::min(maxLightCount, lightCount) * 6;
+        glTextureStorage3D(depthCubeMapId, 1, GL_DEPTH_COMPONENT32, (GLsizei)shadowRes,
+                           (GLsizei)shadowRes, depthLayers);
 
         //Set depth texture parameters
         glTextureParameteri(depthCubeMapId, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -756,7 +767,7 @@ namespace ammonite {
     */
     static void drawModelsCached(ammonite::models::internal::ModelInfo*** modelPtrsPtr,
                                 AmmoniteEnum modelType, AmmoniteRenderMode renderMode) {
-      int modelCount = ammonite::models::internal::getModelCount(modelType);
+      unsigned int modelCount = ammonite::models::internal::getModelCount(modelType);
 
       //Create / update cache for model pointers
       if (renderMode == AMMONITE_DATA_REFRESH || *modelPtrsPtr == nullptr) {
@@ -776,7 +787,7 @@ namespace ammonite {
       }
 
       //Draw the model pointers
-      for (int i = 0; i < modelCount; i++) {
+      for (unsigned int i = 0; i < modelCount; i++) {
         drawModel((*modelPtrsPtr)[i], renderMode);
       }
 
@@ -786,8 +797,10 @@ namespace ammonite {
     static void drawSkybox(AmmoniteId activeSkyboxId) {
       //Swap to skybox shader and pass uniforms
       glUseProgram(skyboxShader.shaderId);
-      glUniformMatrix4fv(skyboxShader.viewMatrixId, 1, GL_FALSE, glm::value_ptr(glm::mat4(glm::mat3(*viewMatrix))));
-      glUniformMatrix4fv(skyboxShader.projectionMatrixId, 1, GL_FALSE, glm::value_ptr(*projectionMatrix));
+      glUniformMatrix4fv(skyboxShader.viewMatrixId, 1, GL_FALSE,
+                         glm::value_ptr(glm::mat4(glm::mat3(*viewMatrix))));
+      glUniformMatrix4fv(skyboxShader.projectionMatrixId, 1, GL_FALSE,
+                         glm::value_ptr(*projectionMatrix));
 
       //Prepare and draw the skybox
       glBindVertexArray(skyboxVertexArrayId);
@@ -795,7 +808,8 @@ namespace ammonite {
       glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, nullptr);
     }
 
-    void drawLoadingScreen(AmmoniteId loadingScreenId, int width, int height) {
+    static void drawLoadingScreen(AmmoniteId loadingScreenId, unsigned int width,
+                                  unsigned int height) {
         //Swap to loading screen shader
         glUseProgram(loadingShader.shaderId);
 
@@ -828,8 +842,8 @@ namespace ammonite {
 
     namespace internal {
       void internalDrawLoadingScreen(AmmoniteId loadingScreenId) {
-        int width = ammonite::window::internal::getWidth();
-        int height = ammonite::window::internal::getHeight();
+        unsigned int width = ammonite::window::internal::getWidth();
+        unsigned int height = ammonite::window::internal::getHeight();
 
         drawLoadingScreen(loadingScreenId, width, height);
 
@@ -839,22 +853,24 @@ namespace ammonite {
       }
 
       void internalDrawFrame() {
-        static int lastWidth = 0, lastHeight = 0;
-        int width = ammonite::window::internal::getWidth();
-        int height = ammonite::window::internal::getHeight();
+        static unsigned int lastWidth = 0, lastHeight = 0;
+        unsigned int width = ammonite::window::internal::getWidth();
+        unsigned int height = ammonite::window::internal::getHeight();
 
         static float lastRenderResMultiplier = 0.0f;
         static float* renderResMultiplierPtr = settings::internal::getRenderResMultiplierPtr();
 
-        static int lastSamples = 0;
-        static int* samplesPtr = settings::internal::getAntialiasingSamplesPtr();
-        static int sampleCount = *samplesPtr;
+        static unsigned int lastSamples = 0;
+        static unsigned int* samplesPtr = settings::internal::getAntialiasingSamplesPtr();
+        static unsigned int sampleCount = *samplesPtr;
 
-        static int renderWidth = 0, renderHeight = 0;
+        static unsigned int renderWidth = 0, renderHeight = 0;
 
         //Recreate the framebuffer if the width, height, resolution multiplier or sample count changes
         static GLuint targetBufferId = 0;
-        if ((lastWidth != width) or (lastHeight != height) or (lastRenderResMultiplier != *renderResMultiplierPtr) or (lastSamples != *samplesPtr)) {
+        if ((lastWidth != width) or (lastHeight != height) or
+            (lastRenderResMultiplier != *renderResMultiplierPtr) or
+            (lastSamples != *samplesPtr)) {
           //Update values used to determine when to recreate framebuffer
           lastWidth = width;
           lastHeight = height;
@@ -862,17 +878,19 @@ namespace ammonite {
           lastSamples = *samplesPtr;
 
           //Limit sample count to implementation limit
-          const int requestedSamples = *samplesPtr;
-          sampleCount = std::min(requestedSamples, maxSampleCount);
+          unsigned int requestedSamples = *samplesPtr;
+          sampleCount = std::min(requestedSamples, (unsigned int)maxSampleCount);
 
           if (sampleCount < requestedSamples) {
-            ammonite::utils::warning << "Ignoring request for " << requestedSamples << " samples, using implementation limit of " << maxSampleCount << std::endl;
+            ammonite::utils::warning << "Ignoring request for " << requestedSamples \
+                                     << " samples, using implementation limit of " \
+                                     << maxSampleCount << std::endl;
             *samplesPtr = sampleCount;
           }
 
           //Calculate render resolution
-          renderWidth = std::floor(width * *renderResMultiplierPtr);
-          renderHeight = std::floor(height * *renderResMultiplierPtr);
+          renderWidth = (unsigned int)std::floor(width * *renderResMultiplierPtr);
+          renderHeight = (unsigned int)std::floor(height * *renderResMultiplierPtr);
 
           //Create or recreate the framebuffers for rendering
           recreateFramebuffers(&targetBufferId, sampleCount, renderWidth, renderHeight);
@@ -882,8 +900,8 @@ namespace ammonite {
         }
 
         //Get shadow resolution and light count, save for next time to avoid cubemap recreation
-        static int* shadowResPtr = settings::internal::getShadowResPtr();
-        static int lastShadowRes = 0;
+        static unsigned int* shadowResPtr = settings::internal::getShadowResPtr();
+        static unsigned int lastShadowRes = 0;
         unsigned int lightCount = lightTrackerMap->size();
         static unsigned int lastLightCount = -1;
 
@@ -959,7 +977,7 @@ namespace ammonite {
         internal::prepareScreen(targetBufferId, renderWidth, renderHeight, true);
 
         //Clear depth and colour (if no skybox is used)
-        int activeSkybox = ammonite::skybox::getActiveSkybox();
+        AmmoniteId activeSkybox = ammonite::skybox::getActiveSkybox();
         if (activeSkybox == 0) {
           glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         } else {
@@ -985,7 +1003,7 @@ namespace ammonite {
         drawModelsCached(&modelPtrs, AMMONITE_MODEL, AMMONITE_RENDER_PASS);
 
         //Render light emitting models
-        int lightModelCount = ammonite::models::internal::getModelCount(AMMONITE_LIGHT_EMITTER);
+        unsigned int lightModelCount = ammonite::models::internal::getModelCount(AMMONITE_LIGHT_EMITTER);
         if (lightModelCount > 0) {
           //Swap to the light emitter shader and render cached light model pointers
           glUseProgram(lightShader.shaderId);
@@ -1026,7 +1044,9 @@ namespace ammonite {
           //Resolve multisampling into regular texture
           if (sampleCount != 0) {
             GLbitfield blitBits = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT;
-            glBlitNamedFramebuffer(colourBufferMultisampleFBO, screenQuadFBO, 0, 0, renderWidth, renderHeight, 0, 0, renderWidth, renderHeight, blitBits, GL_NEAREST);
+            glBlitNamedFramebuffer(colourBufferMultisampleFBO, screenQuadFBO, 0, 0,
+                                   renderWidth, renderHeight, 0, 0, renderWidth, renderHeight,
+                                   blitBits, GL_NEAREST);
           }
 
           //Swap to correct shaders

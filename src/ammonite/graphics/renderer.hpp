@@ -8,7 +8,7 @@ namespace ammonite {
       void destroyRenderer();
     }
 
-    long long getTotalFrames();
+    long long unsigned int getTotalFrames();
     double getFrameTime();
 
     void drawFrame();
@@ -26,18 +26,18 @@ namespace ammonite {
 
       void setVsync(bool enabled);
       void setFrameLimit(float frameTarget);
-      void setShadowRes(int shadowRes);
+      void setShadowRes(unsigned int shadowRes);
       void setRenderResMultiplier(float renderRes);
-      void setAntialiasingSamples(int samples);
+      void setAntialiasingSamples(unsigned int samples);
       void setRenderFarPlane(float renderFarPlane);
       void setShadowFarPlane(float shadowFarPlane);
       void setGammaCorrection(bool gammaCorrection);
 
       bool getVsync();
       float getFrameLimit();
-      int getShadowRes();
+      unsigned int getShadowRes();
       float setRenderResMultiplier();
-      int setAntialiasingSamples();
+      unsigned int setAntialiasingSamples();
       float getRenderFarPlane();
       float getShadowFarPlane();
       bool getGammaCorrection();

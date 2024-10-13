@@ -51,15 +51,15 @@ namespace ammonite {
       return modelSelector[modelType]->size();
     }
 
-    void getModels(AmmoniteEnum modelType, int modelCount,
+    void getModels(AmmoniteEnum modelType, unsigned int modelCount,
                    ammonite::models::internal::ModelInfo* modelArr[]) {
       //Select the right model tracker
       ModelTrackerMap* modelMapPtr = modelSelector[modelType];
 
       //Fill modelArr with first number modelCount of items
       auto it = modelMapPtr->begin();
-      modelCount = std::min(modelCount, int(modelMapPtr->size()));
-      for (int i = 0; i < modelCount; i++) {
+      modelCount = std::min(modelCount, (unsigned int)modelMapPtr->size());
+      for (unsigned int i = 0; i < modelCount; i++) {
         modelArr[i] = &it->second;
         std::advance(it, 1);
       }
@@ -147,7 +147,7 @@ namespace ammonite {
         return activeModelTracker.getModelCount(modelType);
       }
 
-      void getModels(AmmoniteEnum modelType, int modelCount,
+      void getModels(AmmoniteEnum modelType, unsigned int modelCount,
                      ammonite::models::internal::ModelInfo* modelArr[]) {
         activeModelTracker.getModels(modelType, modelCount, modelArr);
       }

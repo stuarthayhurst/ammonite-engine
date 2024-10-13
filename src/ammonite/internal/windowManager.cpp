@@ -17,10 +17,10 @@ namespace ammonite {
         AmmoniteEnum requestedContextType = AMMONITE_DEFAULT_CONTEXT;
 
         struct WindowGeom {
-          int width = 0;
-          int height = 0;
-          int xPos = 0;
-          int yPos = 0;
+          unsigned int width = 0;
+          unsigned int height = 0;
+          unsigned int xPos = 0;
+          unsigned int yPos = 0;
           float aspectRatio = 0.0f; //Aspect ratio is always for window content
         };
 
@@ -86,8 +86,13 @@ namespace ammonite {
           int frameLeft = 0, frameRight = 0, frameTop = 0, frameBottom = 0;
           glfwGetWindowFrameSize(windowPtr, &frameLeft, &frameTop,
                                  &frameRight, &frameBottom);
-          glfwGetWindowSize(windowPtr, &storage->width, &storage->height);
-          glfwGetWindowPos(windowPtr, &storage->xPos, &storage->yPos);
+          int width = 0, height = 0, xPos = 0, yPos = 0;
+          glfwGetWindowSize(windowPtr, &width, &height);
+          glfwGetWindowPos(windowPtr, &xPos, &yPos);
+          storage->width = width;
+          storage->height = height;
+          storage->xPos = xPos;
+          storage->yPos = yPos;
 
           storage->aspectRatio = (float)(storage->width) / (float)(storage->height);
 
@@ -188,8 +193,8 @@ namespace ammonite {
         requestedContextType = contextType;
       }
 
-      GLFWwindow* createWindow(int width, int height, std::string title) {
-        windowPtr = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
+      GLFWwindow* createWindow(unsigned int width, unsigned int height, std::string title) {
+        windowPtr = glfwCreateWindow((int)width, (int)height, title.c_str(), nullptr, nullptr);
         if (windowPtr == nullptr) {
           glfwTerminate();
           return nullptr;
@@ -206,7 +211,8 @@ namespace ammonite {
       }
 
       //Set decorated window size and position, for non-fullscreen windows only
-      void setWindowGeometry(int width, int height, int xPos, int yPos, bool useDecoratedPos) {
+      void setWindowGeometry(unsigned int width, unsigned int height, unsigned int xPos,
+                             unsigned int yPos, bool useDecoratedPos) {
         //Don't allow setting window geometry for fullscreen windows
         if (isWindowFullscreen) {
           return;
@@ -225,20 +231,15 @@ namespace ammonite {
           yPos += frameTop;
         }
 
-        if (width < 0 || height < 0) {
-          ammonite::utils::warning << "Window dimensions can't be negative (requested " \
-                                   << width << " x " << height << ")" << std::endl;
-          return;
-        }
-
         //Update the geometry of the window
-        glfwSetWindowPos(windowPtr, xPos, yPos);
-        glfwSetWindowSize(windowPtr, width, height);
+        glfwSetWindowPos(windowPtr, (int)xPos, (int)yPos);
+        glfwSetWindowSize(windowPtr, (int)width, (int)height);
         storeWindowGeometry(&activeWindowGeom, false, true);
       }
 
       //Return geometry information for the active window
-      void getWindowGeometry(int* width, int* height, int* xPos, int* yPos, bool useDecoratedPos) {
+      void getWindowGeometry(unsigned int* width, unsigned int* height, unsigned int* xPos,
+                             unsigned int* yPos, bool useDecoratedPos) {
         WindowGeom tempStorage;
         storeWindowGeometry(&tempStorage, useDecoratedPos, useDecoratedPos);
 
@@ -301,11 +302,11 @@ namespace ammonite {
         return activeWindowGeom.aspectRatio;
       }
 
-      int getWidth() {
+      unsigned int getWidth() {
         return activeWindowGeom.width;
       }
 
-      int getHeight() {
+      unsigned int getHeight() {
         return activeWindowGeom.height;
       }
     }

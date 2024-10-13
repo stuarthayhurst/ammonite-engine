@@ -14,9 +14,10 @@
 namespace ammonite {
   namespace renderer {
     namespace internal {
-      void prepareScreen(int framebufferId, int width, int height, bool depthTest) {
+      void prepareScreen(GLuint framebufferId, unsigned int width,
+                         unsigned int height, bool depthTest) {
         glBindFramebuffer(GL_FRAMEBUFFER, framebufferId);
-        glViewport(0, 0, width, height);
+        glViewport(0, 0, (GLsizei)width, (GLsizei)height);
         if (depthTest) {
           glEnable(GL_DEPTH_TEST);
         } else {

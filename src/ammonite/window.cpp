@@ -63,7 +63,7 @@ namespace ammonite {
       }
     }
 
-    int createWindow(int width, int height, std::string title) {
+    int createWindow(unsigned int width, unsigned int height, std::string title) {
       //Setup GLFW
       if (internal::setupGlfw() == -1) {
         ammonite::utils::error << "Failed to initialize GLFW" << std::endl;
@@ -91,7 +91,7 @@ namespace ammonite {
       return 0;
     }
 
-    int createWindow(int width, int height) {
+    int createWindow(unsigned int width, unsigned int height) {
       return createWindow(width, height, DEFAULT_TITLE);
     }
 
@@ -182,13 +182,15 @@ namespace ammonite {
     }
 
     //Hand off to core window manager
-    void setWindowGeometry(int width, int height, int xPos, int yPos, bool useDecoratedPos) {
+    void setWindowGeometry(unsigned int width, unsigned int height, unsigned int xPos,
+                           unsigned int yPos, bool useDecoratedPos) {
       internal::setWindowGeometry(width, height, xPos, yPos, useDecoratedPos);
     }
 
     //Hand off to core window manager
-    void getWindowGeometry(int* width, int* height, int* xPos, int* yPos, bool useDecoratedPos) {
-      int ignore = 0;
+    void getWindowGeometry(unsigned int* width, unsigned int* height, unsigned int* xPos,
+                           unsigned int* yPos, bool useDecoratedPos) {
+      unsigned int ignore = 0;
       internal::getWindowGeometry((width != nullptr) ? width : &ignore,
                                   (height != nullptr) ? height : &ignore,
                                   (xPos != nullptr) ? xPos : &ignore,

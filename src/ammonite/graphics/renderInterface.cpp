@@ -45,7 +45,7 @@ namespace ammonite {
                                 << " threads" << std::endl;
 
         //Check GPU supported required extensions
-        int failureCount = 0;
+        unsigned int failureCount = 0;
         if (!internal::checkGPUCapabilities(&failureCount)) {
           ammonite::utils::error << failureCount << " required extension(s) unsupported" << std::endl;
           *externalSuccess = false;
@@ -70,7 +70,7 @@ namespace ammonite {
       }
     }
 
-    long long int getTotalFrames() {
+    long long unsigned int getTotalFrames() {
      return totalFrames;
     }
 
@@ -80,7 +80,7 @@ namespace ammonite {
 
     void drawFrame() {
       //Increase frame counters
-      static int frameCount = 0;
+      static int unsigned frameCount = 0;
       AmmoniteId loadingScreenId = ammonite::interface::getActiveLoadingScreenId();
       if (loadingScreenId == 0) {
         totalFrames++;

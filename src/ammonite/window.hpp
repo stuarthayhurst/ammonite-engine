@@ -11,8 +11,8 @@ namespace ammonite {
   namespace window {
     GLFWwindow* getWindowPtr();
     void requestContextType(AmmoniteEnum contextType);
-    int createWindow(int width, int height, std::string title);
-    int createWindow(int width, int height);
+    int createWindow(unsigned int width, unsigned int height, std::string title);
+    int createWindow(unsigned int width, unsigned int height);
     void destroyWindow();
 
     bool shouldWindowClose();
@@ -22,8 +22,10 @@ namespace ammonite {
     void useIcon(std::string iconPath);
     void useIconDir(std::string iconDirPath);
 
-    void setWindowGeometry(int width, int height, int xPos, int yPos, bool useDecoratedPos);
-    void getWindowGeometry(int* width, int* height, int* xPos, int* yPos, bool useDecoratedPos);
+    void setWindowGeometry(unsigned int width, unsigned int height, unsigned int xPos,
+                           unsigned int yPos, bool useDecoratedPos);
+    void getWindowGeometry(unsigned int* width, unsigned int* height, unsigned int* xPos,
+                           unsigned int* yPos, bool useDecoratedPos);
 
     void setWindowResizable(bool resizable);
     void getWindowResizable();

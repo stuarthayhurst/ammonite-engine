@@ -16,19 +16,21 @@ namespace ammonite {
       void destroyGlfw();
 
       void setContextType(AmmoniteEnum contextType);
-      GLFWwindow* createWindow(int width, int height, std::string title);
+      GLFWwindow* createWindow(unsigned int width, unsigned int height, std::string title);
       GLFWwindow* getWindowPtr();
 
-      void setWindowGeometry(int width, int height, int xPos, int yPos, bool useDecoratedPos);
-      void getWindowGeometry(int* width, int* height, int* xPos, int* yPos, bool useDecoratedPos);
+      void setWindowGeometry(unsigned int width, unsigned int height, unsigned int xPos,
+                             unsigned int yPos, bool useDecoratedPos);
+      void getWindowGeometry(unsigned int* width, unsigned int* height, unsigned int* xPos,
+                             unsigned int* yPos, bool useDecoratedPos);
 
       void setFullscreenMonitor(GLFWmonitor* monitor);
       void setFullscreen(bool shouldFullscreen);
       GLFWmonitor* getCurrentMonitor();
       bool getFullscreen();
 
-      int getWidth();
-      int getHeight();
+      unsigned int getWidth();
+      unsigned int getHeight();
       float getAspectRatio();
     }
   }

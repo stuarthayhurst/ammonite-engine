@@ -15,7 +15,7 @@ namespace ammonite {
   namespace renderer {
     namespace setup {
       namespace internal {
-        bool checkGPUCapabilities(int* failureCount);
+        bool checkGPUCapabilities(unsigned int* failureCount);
         bool createShaders(std::string shaderPath, bool* externalSuccess);
         void setupOpenGLObjects();
         void deleteShaders();
@@ -40,9 +40,9 @@ namespace ammonite {
 
       namespace internal {
         float* getFrameLimitPtr();
-        int* getShadowResPtr();
+        unsigned int* getShadowResPtr();
         float* getRenderResMultiplierPtr();
-        int* getAntialiasingSamplesPtr();
+        unsigned int* getAntialiasingSamplesPtr();
         float* getRenderFarPlanePtr();
         float* getShadowFarPlanePtr();
         bool* getGammaCorrectionPtr();

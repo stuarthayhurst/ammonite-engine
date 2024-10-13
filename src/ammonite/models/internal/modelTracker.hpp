@@ -13,7 +13,7 @@ namespace ammonite {
   namespace models {
     namespace internal {
       unsigned int getModelCount(AmmoniteEnum modelType);
-      void getModels(AmmoniteEnum modelType, int modelCount, ModelInfo* modelArr[]);
+      void getModels(AmmoniteEnum modelType, unsigned int modelCount, ModelInfo* modelArr[]);
 
       ModelInfo* getModelPtr(AmmoniteId modelId);
       bool* getModelsMovedPtr();
