@@ -16,8 +16,10 @@
 #include "internal/internalShaders.hpp"
 
 #include "../internal/internalCamera.hpp"
-#include "../internal/interfaceTracker.hpp"
 #include "../internal/windowManager.hpp"
+
+#include "../internal/internalInterface.hpp"
+#include "../interface.hpp"
 
 #include "../models/internal/modelTracker.hpp"
 
@@ -289,10 +291,6 @@ namespace ammonite {
         ammonite::lighting::internal::getLightTrackerPtr();
       glm::mat4** lightTransformsPtr = ammonite::lighting::internal::getLightTransformsPtr();
       unsigned int maxLightCount = 0;
-
-      //Get the loading screen tracker
-      std::map<AmmoniteId, ammonite::interface::LoadingScreen>* loadingScreenTracker =
-        ammonite::interface::internal::getLoadingScreenTracker();
 
       //Store model data pointers for regular models and light models
       ammonite::models::internal::ModelInfo** modelPtrs = nullptr;
@@ -802,28 +800,29 @@ namespace ammonite {
         glUseProgram(loadingShader.shaderId);
 
         //Pass drawing parameters
-        ammonite::interface::LoadingScreen loadingScreen = (*loadingScreenTracker)[loadingScreenId];
-        glUniform1f(loadingShader.widthId, loadingScreen.width);
-        glUniform1f(loadingShader.heightId, loadingScreen.height);
-        glUniform1f(loadingShader.heightOffsetId, loadingScreen.heightOffset);
+        ammonite::interface::LoadingScreen* loadingScreen =
+          ammonite::interface::internal::getLoadingScreenPtr(loadingScreenId);
+        glUniform1f(loadingShader.widthId, loadingScreen->width);
+        glUniform1f(loadingShader.heightId, loadingScreen->height);
+        glUniform1f(loadingShader.heightOffsetId, loadingScreen->heightOffset);
 
         //Prepare viewport and framebuffer
         internal::prepareScreen(0, width, height, false);
 
         //Prepare to draw the screen
-        glm::vec3 backgroundColour = loadingScreen.backgroundColour;
+        glm::vec3 backgroundColour = loadingScreen->backgroundColour;
         glClearColor(backgroundColour.x, backgroundColour.y, backgroundColour.z, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         glBindVertexArray(screenQuadVertexArrayId);
 
         //Draw the track
         glUniform1f(loadingShader.progressId, 1.0f);
-        glUniform3fv(loadingShader.progressColourId, 1, glm::value_ptr(loadingScreen.trackColour));
+        glUniform3fv(loadingShader.progressColourId, 1, glm::value_ptr(loadingScreen->trackColour));
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, nullptr);
 
         //Fill in the bar
-        glUniform1f(loadingShader.progressId, loadingScreen.progress);
-        glUniform3fv(loadingShader.progressColourId, 1, glm::value_ptr(loadingScreen.progressColour));
+        glUniform1f(loadingShader.progressId, loadingScreen->progress);
+        glUniform3fv(loadingShader.progressColourId, 1, glm::value_ptr(loadingScreen->progressColour));
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, nullptr);
       }
 

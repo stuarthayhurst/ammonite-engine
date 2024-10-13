@@ -10,7 +10,7 @@ namespace ammonite {
     AmmoniteId createLoadingScreen();
     void deleteLoadingScreen(AmmoniteId targetScreenId);
     void setActiveLoadingScreen(AmmoniteId targetScreenId);
-    AmmoniteId getActiveLoadingScreen();
+    AmmoniteId getActiveLoadingScreenId();
 
     void setLoadingScreenProgress(AmmoniteId targetScreenId, float progress);
     void setLoadingScreenGeometry(AmmoniteId targetScreenId, float width,

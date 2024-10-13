@@ -7,8 +7,10 @@
 #include "../utils/logging.hpp"
 #include "../utils/timer.hpp"
 
+#include "../internal/internalInterface.hpp"
+#include "../interface.hpp"
+
 #include "internal/internalRenderCore.hpp"
-#include "../internal/interfaceTracker.hpp"
 #include "../internal/internalCamera.hpp"
 #include "../lighting/internal/internalLighting.hpp"
 #include "../utils/internal/threadPool.hpp"
@@ -79,7 +81,7 @@ namespace ammonite {
     void drawFrame() {
       //Increase frame counters
       static int frameCount = 0;
-      AmmoniteId loadingScreenId = ammonite::interface::internal::getActiveLoadingScreenId();
+      AmmoniteId loadingScreenId = ammonite::interface::getActiveLoadingScreenId();
       if (loadingScreenId == 0) {
         totalFrames++;
         frameCount++;

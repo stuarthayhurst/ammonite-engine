@@ -1,7 +1,7 @@
 #include <map>
 #include <iostream>
 
-#include "internal/interfaceTracker.hpp"
+#include "internal/internalInterface.hpp"
 
 #include "utils/logging.hpp"
 #include "types.hpp"
@@ -10,18 +10,14 @@ namespace ammonite {
   namespace interface {
     namespace {
       AmmoniteId activeLoadingScreenId = 0;
-      int totalLoadingScreens = 0;
+      unsigned int totalLoadingScreens = 0;
       std::map<AmmoniteId, LoadingScreen> loadingScreenTracker;
     }
 
     //Internally exposed functions
     namespace internal {
-      std::map<AmmoniteId, LoadingScreen>* getLoadingScreenTracker() {
-        return &loadingScreenTracker;
-      }
-
-      AmmoniteId getActiveLoadingScreenId() {
-        return activeLoadingScreenId;
+      LoadingScreen* getLoadingScreenPtr(AmmoniteId loadingScreenId) {
+        return &loadingScreenTracker[loadingScreenId];
       }
     }
 
@@ -60,7 +56,7 @@ namespace ammonite {
       }
     }
 
-    AmmoniteId getActiveLoadingScreen() {
+    AmmoniteId getActiveLoadingScreenId() {
       return activeLoadingScreenId;
     }
 

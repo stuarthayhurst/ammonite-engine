@@ -30,7 +30,7 @@ namespace manyCubesDemo {
   }
 
   int postRendererInit() {
-    AmmoniteId screenId = ammonite::interface::getActiveLoadingScreen();
+    AmmoniteId screenId = ammonite::interface::getActiveLoadingScreenId();
 
     //Load models from a set of objects and textures
     std::string models[2] = {"assets/cube.obj", "assets/flat.png"};

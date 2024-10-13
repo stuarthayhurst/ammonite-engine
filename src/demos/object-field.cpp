@@ -233,7 +233,7 @@ namespace objectFieldDemo {
   }
 
   int postRendererInit() {
-    AmmoniteId screenId = ammonite::interface::getActiveLoadingScreen();
+    AmmoniteId screenId = ammonite::interface::getActiveLoadingScreenId();
     windowPtr = ammonite::window::getWindowPtr();
 
     //Generate random positions, orientations and sizes, skipping first item

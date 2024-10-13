@@ -2,7 +2,8 @@
 #define INTERNALINTERFACE
 
 /* Internally exposed header:
- - Allow access to loading screen tracker internally
+ - Allow access to loading screen data
+ - Provide the LoadingScreen struct
 */
 
 #include <map>
@@ -24,8 +25,7 @@ namespace ammonite {
     };
 
     namespace internal {
-      std::map<AmmoniteId, LoadingScreen>* getLoadingScreenTracker();
-      AmmoniteId getActiveLoadingScreenId();
+      LoadingScreen* getLoadingScreenPtr(AmmoniteId loadingScreenId);
     }
   }
 }
