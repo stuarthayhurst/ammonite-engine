@@ -1,7 +1,6 @@
 #ifndef TYPES
 #define TYPES
 
-#include <atomic>
 #include <climits>
 #include <semaphore>
 #include <vector>
