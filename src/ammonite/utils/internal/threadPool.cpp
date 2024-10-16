@@ -142,10 +142,10 @@ namespace ammonite {
         }
 
         //Create thread pool, existing work will begin executing
-        int createThreadPool(unsigned int threadCount) {
+        bool createThreadPool(unsigned int threadCount) {
           //Exit if thread pool already exists
           if (poolThreadCount != 0) {
-            return -1;
+            return false;
           }
 
           //Create the queue
@@ -160,7 +160,7 @@ namespace ammonite {
           threadCount = (threadCount > MAX_THREADS) ? MAX_THREADS : threadCount;
           threadPool = new std::thread[threadCount];
           if (threadPool == nullptr) {
-            return -1;
+            return false;
           }
 
           //Create the threads for the pool
@@ -170,7 +170,7 @@ namespace ammonite {
           }
 
           poolThreadCount = threadCount;
-          return 0;
+          return true;
         }
 
         /*

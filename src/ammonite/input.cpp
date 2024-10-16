@@ -63,7 +63,7 @@ namespace ammonite {
       return registerToggleKeybind(keycode, OVERRIDE_MODE_DEFAULT, callback, userPtr);
     }
 
-    int unregisterKeybind(AmmoniteId keybindId) {
+    bool unregisterKeybind(AmmoniteId keybindId) {
       return internal::unregisterKeybind(keybindId);
     }
 
@@ -86,11 +86,11 @@ namespace ammonite {
       return !internal::getInputBlock();
     }
 
-    int changeKeybind(AmmoniteId keybindId, int keycodes[], int count) {
+    bool changeKeybind(AmmoniteId keybindId, int keycodes[], int count) {
       return internal::changeKeybindKeycodes(keybindId, keycodes, count);
     }
 
-    int changeKeybind(AmmoniteId keybindId, int keycode) {
+    bool changeKeybind(AmmoniteId keybindId, int keycode) {
       return internal::changeKeybindKeycodes(keybindId, &keycode, 1);
     }
 

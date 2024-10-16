@@ -10,8 +10,8 @@
 namespace ammonite {
   namespace window {
     namespace internal {
-      int setupGlfw();
-      int setupGlew();
+      bool setupGlfw();
+      bool setupGlew();
       void setupGlfwInput();
       void destroyGlfw();
 

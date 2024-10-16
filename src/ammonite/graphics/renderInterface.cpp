@@ -35,7 +35,7 @@ namespace ammonite {
         ammonite::utils::Timer loadTimer;
 
         //Create a thread pool
-        if (ammonite::utils::thread::internal::createThreadPool(0) == -1) { \
+        if (!ammonite::utils::thread::internal::createThreadPool(0)) { \
           ammonite::utils::error << "Failed to create thread pool" << std::endl;
           *externalSuccess = false;
           return;

@@ -8,7 +8,7 @@
 #define JOB_COUNT (2 << 16)
 
 #define CREATE_THREAD_POOL(THREADS) \
-if (ammonite::utils::thread::internal::createThreadPool((THREADS)) == -1) { \
+if (!ammonite::utils::thread::internal::createThreadPool((THREADS))) { \
   ammonite::utils::error << "Failed to create thread pool, exiting" << std::endl; \
   return false; \
 }

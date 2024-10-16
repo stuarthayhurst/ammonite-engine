@@ -28,12 +28,12 @@ namespace ammonite {
                                      AmmoniteKeyCallback callback, void* userPtr);
     AmmoniteId registerToggleKeybind(int keycode, AmmoniteKeyCallback callback, void* userPtr);
 
-    int unregisterKeybind(AmmoniteId keybindId);
+    bool unregisterKeybind(AmmoniteId keybindId);
     bool isKeycodeRegistered(int keycodes[], int count);
     bool isKeycodeRegistered(int keycode);
 
-    int changeKeybind(AmmoniteId keybindId, int keycodes[], int count);
-    int changeKeybind(AmmoniteId keybindId, int keycode);
+    bool changeKeybind(AmmoniteId keybindId, int keycodes[], int count);
+    bool changeKeybind(AmmoniteId keybindId, int keycode);
 
     void setInputFocus(bool active);
     bool getInputFocus();

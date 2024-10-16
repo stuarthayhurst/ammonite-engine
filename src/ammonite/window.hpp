@@ -6,17 +6,18 @@
 #include <GLFW/glfw3.h>
 
 #include "enums.hpp"
+#include "types.hpp"
 
 namespace ammonite {
   namespace window {
     GLFWwindow* getWindowPtr();
     void requestContextType(AmmoniteEnum contextType);
-    int createWindow(unsigned int width, unsigned int height, std::string title);
-    int createWindow(unsigned int width, unsigned int height);
+    bool createWindow(unsigned int width, unsigned int height, std::string title);
+    bool createWindow(unsigned int width, unsigned int height);
     void destroyWindow();
 
     bool shouldWindowClose();
-    int registerWindowCloseKeybind(int keycode);
+    AmmoniteId registerWindowCloseKeybind(int keycode);
     void setTitle(std::string title);
     void useIcons(std::string* iconPaths, unsigned int iconCount);
     void useIcon(std::string iconPath);

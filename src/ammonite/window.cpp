@@ -63,24 +63,24 @@ namespace ammonite {
       }
     }
 
-    int createWindow(unsigned int width, unsigned int height, std::string title) {
+    bool createWindow(unsigned int width, unsigned int height, std::string title) {
       //Setup GLFW
-      if (internal::setupGlfw() == -1) {
+      if (!internal::setupGlfw()) {
         ammonite::utils::error << "Failed to initialize GLFW" << std::endl;
-        return -1;
+        return false;
       }
 
       //Create window
       windowPtr = internal::createWindow(width, height, title);
       if (windowPtr == nullptr) {
         ammonite::utils::error << "Failed to open window" << std::endl;
-        return -1;
+        return false;
       }
 
       //Setup GLEW
-      if (internal::setupGlew() == -1) {
+      if (!internal::setupGlew()) {
         ammonite::utils::error << "Failed to initialize GLEW" << std::endl;
-        return -1;
+        return false;
       }
 
       //Setup input for window
@@ -88,10 +88,10 @@ namespace ammonite {
       ammonite::input::internal::setupInputCallback(windowPtr);
       setFocusCallback(windowPtr);
 
-      return 0;
+      return true;
     }
 
-    int createWindow(unsigned int width, unsigned int height) {
+    bool createWindow(unsigned int width, unsigned int height) {
       return createWindow(width, height, DEFAULT_TITLE);
     }
 
@@ -103,10 +103,10 @@ namespace ammonite {
       return (closeWindow || glfwWindowShouldClose(windowPtr));
     }
 
-    int registerWindowCloseKeybind(int keycode) {
+    AmmoniteId registerWindowCloseKeybind(int keycode) {
       return ammonite::input::internal::registerRawKeybind(
-                         &keycode, 1, AMMONITE_ALLOW_OVERRIDE, true,
-                         setCloseWindowCallback, &closeWindow);
+        &keycode, 1, AMMONITE_ALLOW_OVERRIDE, true, setCloseWindowCallback,
+        &closeWindow);
     }
 
     void setTitle(std::string title) {

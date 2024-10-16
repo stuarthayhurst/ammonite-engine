@@ -300,12 +300,12 @@ namespace ammonite {
                                   userPtr, keybindId);
       }
 
-      int unregisterKeybind(AmmoniteId keybindId) {
+      bool unregisterKeybind(AmmoniteId keybindId) {
         //Exit if keybind doesn't exist
         if (!keybindIdDataMap.contains(keybindId)) {
           ammoniteInternalDebug << "Can't unregister keybind ID '" << keybindId
                                 << "', not registered" << std::endl;
-          return -1;
+          return false;
         }
 
         //Stop tracking keycode states
@@ -328,7 +328,7 @@ namespace ammonite {
 
         //Forget the keybind data
         keybindIdDataMap.erase(keybindId);
-        return 0;
+        return true;
       }
 
       //Return true if all keys are at least part of the same combo
@@ -362,12 +362,12 @@ namespace ammonite {
         return potentialIds.size() > 0;
       }
 
-      int changeKeybindKeycodes(AmmoniteId keybindId, int newKeycodes[], int count) {
+      bool changeKeybindKeycodes(AmmoniteId keybindId, int newKeycodes[], int count) {
         //Check the keybind exists
         if (!keybindIdDataMap.contains(keybindId)) {
           ammoniteInternalDebug << "Can't change keycodes for keybind ID '" << keybindId
                                 << "', not registered" << std::endl;
-          return -1;
+          return false;
         }
 
         //Save details about the keybind
@@ -384,7 +384,7 @@ namespace ammonite {
         registerRawKeybind(newKeycodes, count, overrideMode, toggle, callback,
                            userPtr, keybindId);
 
-        return 0;
+        return true;
       }
     }
   }

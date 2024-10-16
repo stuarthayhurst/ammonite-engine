@@ -212,7 +212,7 @@ int main(int argc, char** argv) {
 #endif
 
   //Setup window and icon
-  if (ammonite::window::createWindow(1024, 768, "Ammonite Engine") == -1) {
+  if (!ammonite::window::createWindow(1024, 768, "Ammonite Engine")) {
     return EXIT_FAILURE;
   }
   unsigned int setupBits = HAS_SETUP_WINDOW;

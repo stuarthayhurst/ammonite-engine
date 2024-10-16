@@ -18,9 +18,9 @@ namespace ammonite {
 
       AmmoniteId registerRawKeybind(int keycodes[], int count, AmmoniteEnum overrideMode,
                                     bool toggle, AmmoniteKeyCallback callback, void* userPtr);
-      int unregisterKeybind(AmmoniteId keybindId);
+      bool unregisterKeybind(AmmoniteId keybindId);
       bool isKeycodeRegistered(int keycodes[], int count);
-      int changeKeybindKeycodes(AmmoniteId keybindId, int newKeycodes[], int count);
+      bool changeKeybindKeycodes(AmmoniteId keybindId, int newKeycodes[], int count);
     }
   }
 }

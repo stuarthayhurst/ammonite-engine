@@ -10,7 +10,7 @@ namespace ammonite {
         unsigned int getHardwareThreadCount();
         unsigned int getThreadPoolSize();
 
-        int createThreadPool(unsigned int extraThreads);
+        bool createThreadPool(unsigned int extraThreads);
         void destroyThreadPool();
 
         void submitWork(AmmoniteWork work, void* userPtr, AmmoniteGroup* group);

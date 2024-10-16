@@ -118,9 +118,9 @@ namespace ammonite {
         return windowPtr;
       }
 
-      int setupGlfw() {
+      bool setupGlfw() {
         if (!glfwInit()) {
-          return -1;
+          return false;
         }
 
         //Set minimum version to OpenGL 3.2+
@@ -145,10 +145,10 @@ namespace ammonite {
           glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
         }
 
-        return 0;
+        return true;
       }
 
-      int setupGlew() {
+      bool setupGlew() {
         glewExperimental = GL_TRUE;
         GLenum err = glewInit();
         if (err != GLEW_OK) {
@@ -158,17 +158,17 @@ namespace ammonite {
           if (err == GLEW_ERROR_NO_GLX_DISPLAY && platform == GLFW_PLATFORM_WAYLAND) {
             ammonite::utils::warning << "Wayland detected, ignoring GLEW_ERROR_NO_GLX_DISPLAY" \
                                      << std::endl;
-            return 0;
+            return true;
           }
 #else
           #pragma message("GLFW 3.4 unavailable, skipping Wayland checks")
 #endif
 
           ammonite::utils::error << glewGetErrorString(err) << std::endl;
-          return -1;
+          return false;
         }
 
-        return 0;
+        return true;
       }
 
       //Set input and cursor modes for window
