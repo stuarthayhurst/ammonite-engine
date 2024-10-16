@@ -49,9 +49,9 @@ ifeq ($(CHECK_THREADS),true)
   CXXFLAGS += -fsanitize=thread
 endif
 
-$(BUILD_DIR)/demo: $(BUILD_DIR)/$(LIBRARY_NAME) $(HELPER_OBJECTS) $(DEMO_OBJECTS) $(OBJECT_DIR)/demo.o
+$(BUILD_DIR)/demo: $(BUILD_DIR)/$(LIBRARY_NAME) $(HELPER_OBJECTS) $(DEMO_OBJECTS) $(OBJECT_DIR)/demoLoader.o
 	@mkdir -p "$(BUILD_DIR)"
-	$(CXX) -o "$(BUILD_DIR)/demo" $(HELPER_OBJECTS) $(DEMO_OBJECTS) $(OBJECT_DIR)/demo.o $(CXXFLAGS) "-L$(BUILD_DIR)" -lammonite $(LDFLAGS)
+	$(CXX) -o "$(BUILD_DIR)/demo" $(HELPER_OBJECTS) $(DEMO_OBJECTS) $(OBJECT_DIR)/demoLoader.o $(CXXFLAGS) "-L$(BUILD_DIR)" -lammonite $(LDFLAGS)
 
 $(BUILD_DIR)/threadTest: $(BUILD_DIR)/$(LIBRARY_NAME) $(OBJECT_DIR)/threadTest.o
 	@mkdir -p "$(BUILD_DIR)"
@@ -80,9 +80,9 @@ $(OBJECT_DIR)/demos/%.o: ./src/demos/%.cpp $(DEMO_HEADER_SOURCE) $(AMMONITE_HEAD
 	@mkdir -p "$$(dirname $@)"
 	$(CXX) $(subst $(OBJECT_DIR),./src,$(subst .o,.cpp,$(@))) -c $(CXXFLAGS) -o "$@"
 
-$(OBJECT_DIR)/demo.o: ./src/demo.cpp $(AMMONITE_HEADER_SOURCE) $(HELPER_HEADER_SOURCE)
+$(OBJECT_DIR)/demoLoader.o: ./src/demoLoader.cpp $(AMMONITE_HEADER_SOURCE) $(HELPER_HEADER_SOURCE)
 	@mkdir -p "$(OBJECT_DIR)"
-	$(CXX) ./src/demo.cpp -c $(CXXFLAGS) -o "$@"
+	$(CXX) ./src/demoLoader.cpp -c $(CXXFLAGS) -o "$@"
 $(OBJECT_DIR)/threadTest.o: ./src/threadTest.cpp $(AMMONITE_HEADER_SOURCE)
 	@mkdir -p "$(OBJECT_DIR)"
 	$(CXX) ./src/threadTest.cpp -c $(CXXFLAGS) -o "$@"
