@@ -61,8 +61,8 @@ namespace ammonite {
       }
 
       //Calculate the number of mipmaps levels to use
-      int calculateMipmapLevels(int width, int height) {
-        return (int)std::log2(std::max(width, height)) + 1;
+      unsigned int calculateMipmapLevels(int width, int height) {
+        return (unsigned int)std::log2(std::max(width, height)) + 1;
       }
 
       /*
@@ -98,7 +98,7 @@ namespace ammonite {
        - Writes 'false' to externalSuccess on failure and returns 0
       */
       GLuint createTexture(int width, int height, unsigned char* data, GLenum dataFormat,
-                           GLenum textureFormat, int textureLevels, bool* externalSuccess) {
+                           GLenum textureFormat, GLint textureLevels, bool* externalSuccess) {
         //Check texture size is within limits
         GLint maxTextureSize = 0;
         glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
@@ -176,9 +176,9 @@ namespace ammonite {
 
         //Create the texture and free the image data
         bool success = true;
-        int mipmapLevels = calculateMipmapLevels(width, height);
+        unsigned int mipmapLevels = calculateMipmapLevels(width, height);
         GLuint textureId = createTexture(width, height, data, dataFormat, textureFormat,
-                                         mipmapLevels, &success);
+                                         (GLint)mipmapLevels, &success);
         stbi_image_free(data);
         if (!success) {
           ammonite::utils::warning << "Failed to load texture '" << texturePath << "'" \

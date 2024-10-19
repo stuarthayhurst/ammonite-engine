@@ -11,14 +11,14 @@ namespace ammonite {
   namespace textures {
     namespace internal {
       GLuint createTexture(int width, int height, unsigned char* data, GLenum dataFormat,
-                           GLenum textureFormat, int mipmapLevels, bool* externalSuccess);
+                           GLenum textureFormat, GLint mipmapLevels, bool* externalSuccess);
       GLuint loadTexture(std::string texturePath, bool flipTexture, bool srgbTexture,
                          bool* externalSuccess);
       void deleteTexture(GLuint textureId);
 
       bool getTextureFormat(int channels, bool srgbTexture, GLenum* textureFormat,
                             GLenum* dataFormat);
-      int calculateMipmapLevels(int width, int height);
+      unsigned int calculateMipmapLevels(int width, int height);
     }
   }
 }

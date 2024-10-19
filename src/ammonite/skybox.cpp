@@ -79,8 +79,8 @@ namespace ammonite {
         //Only create texture storage once
         if (!hasCreatedStorage) {
           glTextureStorage2D(textureId,
-                             ammonite::textures::internal::calculateMipmapLevels(width, height),
-                             internalFormat, width, height);
+            (GLint)ammonite::textures::internal::calculateMipmapLevels(width, height),
+            internalFormat, width, height);
           hasCreatedStorage = true;
         }
 
