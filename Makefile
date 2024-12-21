@@ -1,7 +1,7 @@
 SHELL = bash -O globstar
 
 LIBS = glm glfw3 glew stb assimp
-BUILD_DIR = build
+BUILD_DIR ?= build
 CACHE_DIR = cache
 INSTALL_DIR ?= /usr/local/lib
 HEADER_DIR ?= /usr/local/include

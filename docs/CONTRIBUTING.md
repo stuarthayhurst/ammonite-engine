@@ -31,6 +31,7 @@
   - ### Flags:
     - `DEBUG`: `true / false` - Compiles the target in debug mode
     - `FAST`: `true / false` - Compiles with `-march=native` and uses a no-error context
+    - `BUILD_DIR` - Use a different directory for temporary build system files
     - `INSTALL_DIR` - Install `libammonite.so` to a different location
     - `HEADER_DIR` - Install Ammonite headers to a different location
     - `CHECK_LEAKS` - Enables `-fsanitize=leak` for runtime leak checking
