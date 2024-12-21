@@ -70,15 +70,15 @@ $(BUILD_DIR)/$(LIBRARY_NAME): $(BUILD_DIR)/libammonite.so
 
 $(OBJECT_DIR)/ammonite/%.o: ./src/ammonite/%.cpp $(AMMONITE_HEADER_SOURCE)
 	@mkdir -p "$$(dirname $@)"
-	$(CXX) $(subst $(OBJECT_DIR),./src,$(subst .o,.cpp,$(@))) -c $(CXXFLAGS) -fpic -o "$@"
+	$(CXX) "$<" -c $(CXXFLAGS) -fpic -o "$@"
 
 $(OBJECT_DIR)/helper/%.o: ./src/helper/%.cpp $(HELPER_HEADER_SOURCE)
 	@mkdir -p "$$(dirname $@)"
-	$(CXX) $(subst $(OBJECT_DIR),./src,$(subst .o,.cpp,$(@))) -c $(CXXFLAGS) -o "$@"
+	$(CXX) "$<" -c $(CXXFLAGS) -o "$@"
 
 $(OBJECT_DIR)/demos/%.o: ./src/demos/%.cpp $(DEMO_HEADER_SOURCE) $(AMMONITE_HEADER_SOURCE)
 	@mkdir -p "$$(dirname $@)"
-	$(CXX) $(subst $(OBJECT_DIR),./src,$(subst .o,.cpp,$(@))) -c $(CXXFLAGS) -o "$@"
+	$(CXX) "$<" -c $(CXXFLAGS) -o "$@"
 
 $(OBJECT_DIR)/demoLoader.o: ./src/demoLoader.cpp $(AMMONITE_HEADER_SOURCE) $(HELPER_HEADER_SOURCE)
 	@mkdir -p "$(OBJECT_DIR)"
@@ -94,7 +94,7 @@ $(BUILD_DIR)/compile_flags.txt: Makefile
 		echo $$arg >> "$(BUILD_DIR)/compile_flags.txt"; \
 	done
 $(OBJECT_DIR)/%.linted: ./src/%.cpp $(BUILD_DIR)/compile_flags.txt .clang-tidy
-	clang-tidy --quiet -p "$(BUILD_DIR)" $(subst $(OBJECT_DIR),./src,$(subst .linted,.cpp,$(@)))
+	clang-tidy --quiet -p "$(BUILD_DIR)" "$<"
 	@mkdir -p "$$(dirname $@)"
 	@touch "$@"
 
