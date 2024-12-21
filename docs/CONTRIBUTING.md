@@ -40,7 +40,7 @@
 ## Debug mode:
   - To compile in debug mode, use `make debug` or `DEBUG=true make ...`
     - This enables additional checks and debug output from the engine
-    - Makes use of `-fsanitize=address,undefined,leak`
+    - Makes use of `-fsanitize=address,undefined,leak` and `-fno-omit-frame-pointer`
     - It'll also enable graphics API debug warnings, messages and errors
       - This will use a debug graphics context, if available
     - Each object is compiled with debugging symbols, and `strip` is skipped
