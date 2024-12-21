@@ -302,7 +302,6 @@ namespace ammonite {
       if (modelDataMap.contains(modelObject.modelName)) {
         //Link to existing model data
         modelObject.modelData = &modelDataMap[modelObject.modelName];
-        modelObject.modelData->refCount++;
       } else {
         //Create empty ModelData object and add to tracker
         internal::ModelData newModelData;
@@ -327,6 +326,7 @@ namespace ammonite {
         //Create buffers from loaded data
         createBuffers(modelObject.modelData);
       }
+      modelObject.modelData->refCount++;
 
       //Load default texture IDs per mesh
       modelObject.textureIds = modelObject.modelData->textureIds;
