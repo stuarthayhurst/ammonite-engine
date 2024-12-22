@@ -39,10 +39,9 @@ namespace ammonite {
      - Load 6 textures as a skybox and return its ID
        - flipTextures controls whether the textures are flipped or not
        - srgbTextures controls whether the textures are treated as sRGB
-     - Writes 'false' to externalSuccess on failure and returns 0
+     - Returns 0 on failure
     */
-    AmmoniteId createSkybox(std::string texturePaths[6], bool flipTextures,
-                            bool srgbTextures, bool* externalSuccess) {
+    AmmoniteId createSkybox(std::string texturePaths[6], bool flipTextures, bool srgbTextures) {
       GLuint textureId;
       glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &textureId);
 
@@ -72,7 +71,6 @@ namespace ammonite {
           stbi_image_free(imageData);
           glDeleteTextures(1, &textureId);
 
-          *externalSuccess = false;
           return 0;
         }
 
@@ -95,7 +93,6 @@ namespace ammonite {
           stbi_image_free(imageData);
           glDeleteTextures(1, &textureId);
 
-          *externalSuccess = false;
           return 0;
         }
       }
@@ -113,28 +110,25 @@ namespace ammonite {
 
     /*
      - Load 6 textures as a skybox and return its ID
-     - Writes 'false' to externalSuccess on failure and returns 0
+     - Returns 0 on failure
     */
-    AmmoniteId createSkybox(std::string texturePaths[6], bool* externalSuccess) {
-      return createSkybox(texturePaths, ASSUME_FLIP_FACES, ASSUME_SRGB_TEXTURES,
-                          externalSuccess);
+    AmmoniteId createSkybox(std::string texturePaths[6]) {
+      return createSkybox(texturePaths, ASSUME_FLIP_FACES, ASSUME_SRGB_TEXTURES);
     }
 
     /*
      - Load 6 textures from a directory as a skybox and return its ID
        - flipTextures controls whether the textures are flipped or not
        - srgbTextures controls whether the textures are treated as sRGB
-     - Writes 'false' to externalSuccess on failure and returns 0
+     - Returns 0 on failure
     */
-    AmmoniteId loadDirectory(std::string directoryPath, bool flipTextures, bool srgbTextures,
-                             bool* externalSuccess) {
+    AmmoniteId loadDirectory(std::string directoryPath, bool flipTextures, bool srgbTextures) {
       //Create filesystem directory iterator
       std::filesystem::directory_iterator it;
       try {
         const std::filesystem::path skyboxDir{directoryPath};
         it = std::filesystem::directory_iterator{skyboxDir};
       } catch (const std::filesystem::filesystem_error&) {
-        *externalSuccess = false;
         ammonite::utils::warning << "Failed to scan '" << directoryPath << "'" << std::endl;
         return 0;
       }
@@ -148,7 +142,6 @@ namespace ammonite {
 
       //Check we have at least 6 faces
       if (faces.size() < 6) {
-        *externalSuccess = false;
         ammonite::utils::warning << "Failed to load '" << directoryPath \
                                  << "', needs at least 6 faces" << std::endl;
         return 0;
@@ -174,23 +167,22 @@ namespace ammonite {
           skyboxFaces[targetFace] = faces[foundIndex];
           targetFace++;
         } else {
-          *externalSuccess = false;
           ammonite::utils::warning << "Failed to load '" << directoryPath << "'" << std::endl;
           return 0;
         }
       }
 
       //Hand off to regular skybox creation
-      return createSkybox(skyboxFaces, flipTextures, srgbTextures, externalSuccess);
+      return createSkybox(skyboxFaces, flipTextures, srgbTextures);
     }
 
     /*
      - Load 6 textures from a directory as a skybox and return its ID
-     - Writes 'false' to externalSuccess on failure and returns 0
+     - Returns 0 on failure
     */
-    AmmoniteId loadDirectory(std::string directoryPath, bool* externalSuccess) {
+    AmmoniteId loadDirectory(std::string directoryPath) {
       return loadDirectory(directoryPath, ASSUME_FLIP_FACES,
-                           ASSUME_SRGB_TEXTURES, externalSuccess);
+                           ASSUME_SRGB_TEXTURES);
     }
 
     void deleteSkybox(AmmoniteId skyboxId) {
