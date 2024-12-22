@@ -80,12 +80,9 @@ $(OBJECT_DIR)/demos/%.o: ./src/demos/%.cpp $(DEMO_HEADER_SOURCE) $(AMMONITE_HEAD
 	@mkdir -p "$$(dirname $@)"
 	$(CXX) "$<" -c $(CXXFLAGS) -o "$@"
 
-$(OBJECT_DIR)/demoLoader.o: ./src/demoLoader.cpp $(AMMONITE_HEADER_SOURCE) $(HELPER_HEADER_SOURCE)
+$(OBJECT_DIR)/%.o: ./src/%.cpp $(AMMONITE_HEADER_SOURCE) $(HELPER_HEADER_SOURCE)
 	@mkdir -p "$(OBJECT_DIR)"
-	$(CXX) ./src/demoLoader.cpp -c $(CXXFLAGS) -o "$@"
-$(OBJECT_DIR)/threadTest.o: ./src/threadTest.cpp $(AMMONITE_HEADER_SOURCE)
-	@mkdir -p "$(OBJECT_DIR)"
-	$(CXX) ./src/threadTest.cpp -c $(CXXFLAGS) -o "$@"
+	$(CXX) "$<" -c $(CXXFLAGS) -o "$@"
 
 $(BUILD_DIR)/compile_flags.txt: Makefile
 	@mkdir -p "$(BUILD_DIR)"
