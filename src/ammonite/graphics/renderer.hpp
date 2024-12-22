@@ -2,6 +2,7 @@
 #define RENDERER
 
 #include <cstdint>
+#include <string>
 
 namespace ammonite {
   namespace renderer {
