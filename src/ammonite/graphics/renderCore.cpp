@@ -326,15 +326,16 @@ namespace ammonite {
             {"screen/", &screenShader.shaderId},
             {"loading/", &loadingShader.shaderId}
           };
+          unsigned int shaderCount = sizeof(shaderInfo) / sizeof(shaderInfo[0]);
 
           //Load shaders
           bool hasCreatedShaders = true;
-          unsigned int shaderCount = sizeof(shaderInfo) / sizeof(shaderInfo[0]);
           for (unsigned int i = 0; i < shaderCount; i++) {
             std::string shaderLocation = shaderPath + shaderInfo[i].shaderDir;
-            *shaderInfo[i].shaderId =
-              ammonite::shaders::internal::loadDirectory(shaderLocation,
-                                                         &hasCreatedShaders);
+            *shaderInfo[i].shaderId = ammonite::shaders::internal::loadDirectory(shaderLocation);
+            if (*shaderInfo[i].shaderId == 0) {
+              hasCreatedShaders = false;
+            }
           }
 
           return hasCreatedShaders;
