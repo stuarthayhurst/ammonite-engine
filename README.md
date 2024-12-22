@@ -71,7 +71,7 @@
 ## Dependencies:
   - Package names are correct for Debian, other distros may vary
   - `make`
-  - `pkg-config`
+  - `pkgconf`
   - `coreutils`
   - `g++` **OR** `clang`
     - If using clang, use `CXX="clang++" make [TARGET]`
