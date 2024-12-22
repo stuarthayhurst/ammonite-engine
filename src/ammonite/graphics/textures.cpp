@@ -95,18 +95,16 @@ namespace ammonite {
       /*
        - Create a texture from the data given, return its ID
        - This doesn't generate the mipmaps, but allocates space for them (textureLevels)
-       - Writes 'false' to externalSuccess on failure and returns 0
+       - Returns 0 on failure
       */
       GLuint createTexture(int width, int height, unsigned char* data, GLenum dataFormat,
-                           GLenum textureFormat, GLint textureLevels, bool* externalSuccess) {
+                           GLenum textureFormat, GLint textureLevels) {
         //Check texture size is within limits
         GLint maxTextureSize = 0;
         glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
         if (width > maxTextureSize || height > maxTextureSize) {
           ammonite::utils::warning << "Attempted to create a texture of unsupported size (" \
                                    << width << " x " << height << ")" << std::endl;
-
-          *externalSuccess = false;
           return 0;
         }
 
@@ -120,7 +118,6 @@ namespace ammonite {
         if (idTextureMap.contains(textureId)) {
           ammonite::utils::warning << "Texture ID (" << textureId \
                                    << ") already exists, not creating texture" << std::endl;
-          *externalSuccess = false;
           return 0;
         }
         idTextureMap[textureId] = {"", textureId, 1};
@@ -132,10 +129,9 @@ namespace ammonite {
        - Load a texture from a file and return its ID
          - flipTexture controls whether the texture is flipped or not
          - srgbTexture controls whether the texture is treated as sRGB
-       - Writes 'false' to externalSuccess on failure and returns 0
+       - Returns 0 on failure
       */
-      GLuint loadTexture(std::string texturePath, bool flipTexture, bool srgbTexture,
-                         bool* externalSuccess) {
+      GLuint loadTexture(std::string texturePath, bool flipTexture, bool srgbTexture) {
         //Check if texture has already been loaded, in the same orientation
         std::string textureString = texturePath + std::to_string(flipTexture);
         if (stringTexturePtrMap.contains(textureString)) {
@@ -160,7 +156,6 @@ namespace ammonite {
         if (data == nullptr) {
           ammonite::utils::warning << "Failed to load texture '" << texturePath << "'" \
                                    << std::endl;
-          *externalSuccess = false;
           return 0;
         }
 
@@ -170,20 +165,17 @@ namespace ammonite {
           ammonite::utils::warning << "Failed to load texture '" << texturePath << "'" \
                                    << std::endl;
           stbi_image_free(data);
-          *externalSuccess = false;
           return 0;
         }
 
         //Create the texture and free the image data
-        bool success = true;
         unsigned int mipmapLevels = calculateMipmapLevels(width, height);
         GLuint textureId = createTexture(width, height, data, dataFormat, textureFormat,
-                                         (GLint)mipmapLevels, &success);
+                                         (GLint)mipmapLevels);
         stbi_image_free(data);
-        if (!success) {
+        if (textureId == 0) {
           ammonite::utils::warning << "Failed to load texture '" << texturePath << "'" \
                                    << std::endl;
-          *externalSuccess = false;
           return 0;
         }
 

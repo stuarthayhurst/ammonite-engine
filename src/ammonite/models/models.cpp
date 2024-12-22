@@ -452,10 +452,9 @@ namespace ammonite {
         }
 
         //Create new texture and apply to the mesh
-        bool hasCreatedTexture = true;
         GLuint textureId = ammonite::textures::internal::loadTexture(texturePath,
-          false, srgbTexture, &hasCreatedTexture);
-        if (!hasCreatedTexture) {
+          false, srgbTexture);
+        if (textureId == 0) {
           *externalSuccess = false;
           return;
         }

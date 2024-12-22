@@ -81,10 +81,9 @@ namespace ammonite {
             material->GetTexture(aiTextureType_DIFFUSE, 0, &localTexturePath);
             fullTexturePath = modelLoadInfo.modelDirectory + '/' + localTexturePath.C_Str();
 
-            bool createdTextureSuccess = true;
             GLuint textureId = ammonite::textures::internal::loadTexture(fullTexturePath,
-              false, modelLoadInfo.srgbTextures, &createdTextureSuccess);
-            if (!createdTextureSuccess) {
+              false, modelLoadInfo.srgbTextures);
+            if (textureId == 0) {
               *externalSuccess = false;
               return;
             }
@@ -96,10 +95,9 @@ namespace ammonite {
             material->GetTexture(aiTextureType_SPECULAR, 0, &localTexturePath);
             fullTexturePath = modelLoadInfo.modelDirectory + '/' + localTexturePath.C_Str();
 
-            bool createdTextureSuccess = true;
             GLuint textureId = ammonite::textures::internal::loadTexture(fullTexturePath,
-              false, modelLoadInfo.srgbTextures, &createdTextureSuccess);
-            if (!createdTextureSuccess) {
+              false, modelLoadInfo.srgbTextures);
+            if (textureId == 0) {
               *externalSuccess = false;
               return;
             }
