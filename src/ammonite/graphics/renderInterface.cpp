@@ -53,7 +53,8 @@ namespace ammonite {
           return;
         }
 
-        if (!internal::createShaders(shaderPath, externalSuccess)) {
+        if (!internal::createShaders(shaderPath)) {
+          *externalSuccess = false;
           return;
         }
         internal::setupOpenGLObjects();

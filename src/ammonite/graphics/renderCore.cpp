@@ -313,7 +313,7 @@ namespace ammonite {
     namespace setup {
       namespace internal {
         //Load required shaders from a path
-        bool createShaders(std::string shaderPath, bool* externalSuccess) {
+        bool createShaders(std::string shaderPath) {
           //Directory and pointer to ID of each shader
           struct {
             std::string shaderDir;
@@ -337,9 +337,6 @@ namespace ammonite {
                                                          &hasCreatedShaders);
           }
 
-          if (!hasCreatedShaders) {
-            *externalSuccess = false;
-          }
           return hasCreatedShaders;
         }
 
