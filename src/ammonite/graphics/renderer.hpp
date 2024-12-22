@@ -6,7 +6,7 @@
 namespace ammonite {
   namespace renderer {
     namespace setup {
-      void setupRenderer(std::string shaderPath, bool* externalSuccess);
+      bool setupRenderer(std::string shaderPath);
       void destroyRenderer();
     }
 

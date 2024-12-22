@@ -238,9 +238,8 @@ int main(int argc, char** argv) {
   }
 
   //Enable engine caching, setup renderer and initialise controls
-  bool success = true;
   ammonite::utils::files::useDataCache("cache/");
-  ammonite::renderer::setup::setupRenderer("shaders/", &success);
+  bool success = ammonite::renderer::setup::setupRenderer("shaders/");
   setupBits |= HAS_SETUP_RENDERER;
 
   //Graphics settings
