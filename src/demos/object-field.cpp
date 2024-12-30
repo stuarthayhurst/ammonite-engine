@@ -252,10 +252,15 @@ namespace objectFieldDemo {
     long unsigned int vertexCount = 0;
     for (unsigned int i = 0; i < lightCount; i++) {
       //Load model
-      loadedModelIds.push_back(ammonite::models::createModel(models[0][0], &success));
+      AmmoniteId modelId = ammonite::models::createModel(models[0][0]);
+      loadedModelIds.push_back(modelId);
       vertexCount += ammonite::models::getVertexCount(loadedModelIds[i]);
-      ammonite::models::applyTexture(loadedModelIds[i], AMMONITE_DIFFUSE_TEXTURE,
-                                     models[0][1], true, &success);
+      success &= ammonite::models::applyTexture(loadedModelIds[i],
+        AMMONITE_DIFFUSE_TEXTURE, models[0][1], true);
+
+      if (modelId == 0) {
+        success = false;
+      }
 
       //Update loading screen
       modelCount++;
@@ -265,14 +270,14 @@ namespace objectFieldDemo {
     }
 
     //Load the floor
-    floorId = ammonite::models::createModel(models[1][0], &success);
+    floorId = ammonite::models::createModel(models[1][0]);
     loadedModelIds.push_back(floorId);
     vertexCount += ammonite::models::getVertexCount(floorId);
-    ammonite::models::applyTexture(floorId, AMMONITE_DIFFUSE_TEXTURE, models[1][1],
-                                   true, &success);
+    success &= ammonite::models::applyTexture(floorId, AMMONITE_DIFFUSE_TEXTURE,
+                                              models[1][1], true);
     modelCount++;
 
-    if (!success) {
+    if (floorId == 0 || !success) {
       demoExit();
       return false;
     }

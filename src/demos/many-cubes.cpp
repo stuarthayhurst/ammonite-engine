@@ -37,13 +37,12 @@ namespace manyCubesDemo {
     unsigned int modelCount = 10000;
 
     //Load cube model
-    bool success = true;
-    loadedModelIds.push_back(ammonite::models::createModel(models[0], &success));
-    ammonite::models::applyTexture(loadedModelIds[0], AMMONITE_DIFFUSE_TEXTURE, models[1],
-                                   true, &success);
+    AmmoniteId modelId = ammonite::models::createModel(models[0]);
+    loadedModelIds.push_back(modelId);
+    bool applied = ammonite::models::applyTexture(loadedModelIds[0], AMMONITE_DIFFUSE_TEXTURE,
+                                                models[1], true);
     long unsigned int vertexCount = ammonite::models::getVertexCount(loadedModelIds[0]);
-
-    if (!success) {
+    if (modelId == 0 || !applied) {
       demoExit();
       return false;
     }
@@ -54,8 +53,8 @@ namespace manyCubesDemo {
       vertexCount += ammonite::models::getVertexCount(loadedModelIds[i]);
 
       //Update loading screen
-      ammonite::interface::setLoadingScreenProgress(screenId,
-                                                    float(i + 1) / float(modelCount + 1));
+      float progress = float(i + 1) / float(modelCount + 1);
+      ammonite::interface::setLoadingScreenProgress(screenId, progress);
       ammonite::renderer::drawFrame();
     }
 

@@ -293,7 +293,7 @@ namespace ammonite {
   //Exposed model handling methods
   namespace models {
     AmmoniteId createModel(std::string objectPath, bool flipTexCoords,
-                    bool srgbTextures, bool* externalSuccess) {
+                    bool srgbTextures) {
       //Create the model
       internal::ModelInfo modelObject;
       modelObject.modelName = objectPath;
@@ -315,12 +315,9 @@ namespace ammonite {
         modelLoadInfo.modelDirectory = objectPath.substr(0, objectPath.find_last_of('/'));
 
         //Fill the model data
-        bool hasCreatedObject = true;
-        internal::loadObject(objectPath, modelObject.modelData, modelLoadInfo, &hasCreatedObject);
-        if (!hasCreatedObject) {
+        if (!internal::loadObject(objectPath, modelObject.modelData, modelLoadInfo)) {
           modelDataMap.erase(modelObject.modelName);
-          *externalSuccess = false;
-          return -1;
+          return 0;
         }
 
         //Create buffers from loaded data
@@ -347,8 +344,8 @@ namespace ammonite {
       return modelObject.modelId;
     }
 
-    AmmoniteId createModel(std::string objectPath, bool* externalSuccess) {
-      return createModel(objectPath, ASSUME_FLIP_UVS, ASSUME_SRGB_TEXTURES, externalSuccess);
+    AmmoniteId createModel(std::string objectPath) {
+      return createModel(objectPath, ASSUME_FLIP_UVS, ASSUME_SRGB_TEXTURES);
     }
 
     AmmoniteId copyModel(AmmoniteId modelId) {
@@ -423,12 +420,11 @@ namespace ammonite {
       }
     }
 
-    void applyTexture(AmmoniteId modelId, AmmoniteEnum textureType, std::string texturePath,
-                      bool srgbTexture, bool* externalSuccess) {
+    bool applyTexture(AmmoniteId modelId, AmmoniteEnum textureType, std::string texturePath,
+                      bool srgbTexture) {
       internal::ModelInfo* modelPtr = modelIdPtrMap[modelId];
       if (modelPtr == nullptr) {
-        *externalSuccess = false;
-        return;
+        return false;
       }
 
       //Apply texture to every mesh on the model
@@ -441,8 +437,7 @@ namespace ammonite {
           textureIdPtr = &modelPtr->textureIds[i].specularId;
         } else {
           ammonite::utils::warning << "Invalid texture type specified" << std::endl;
-          *externalSuccess = false;
-          return;
+          return false;
         }
 
         //If a texture is already applied, remove it
@@ -455,17 +450,17 @@ namespace ammonite {
         GLuint textureId = ammonite::textures::internal::loadTexture(texturePath,
           false, srgbTexture);
         if (textureId == 0) {
-          *externalSuccess = false;
-          return;
+          return false;
         }
 
         *textureIdPtr = textureId;
       }
+
+      return true;
     }
 
-    void applyTexture(AmmoniteId modelId, AmmoniteEnum textureType, std::string texturePath,
-                      bool* externalSuccess) {
-      applyTexture(modelId, textureType, texturePath, ASSUME_SRGB_TEXTURES, externalSuccess);
+    bool applyTexture(AmmoniteId modelId, AmmoniteEnum textureType, std::string texturePath) {
+      return applyTexture(modelId, textureType, texturePath, ASSUME_SRGB_TEXTURES);
     }
 
     //Return the number of indices on a model

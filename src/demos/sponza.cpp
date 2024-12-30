@@ -31,33 +31,31 @@ namespace sponzaDemo {
     };
     unsigned int modelCount = sizeof(models) / sizeof(models[0]);
 
-    bool success = true;
     long unsigned int vertexCount = 0;
     for (unsigned int i = 0; i < modelCount; i++) {
       //Load model
-      loadedModelIds.push_back(ammonite::models::createModel(models[i][0], &success));
+      AmmoniteId modelId = ammonite::models::createModel(models[i][0]);
+      loadedModelIds.push_back(modelId);
 
-      if (!success) {
-        //Prevent total failure if models fail
-        success = true;
-        ammonite::utils::warning << "Failed to load " << models[i][0] << std::endl;
+      //Prevent total failure if a model fails
+      if (modelId == 0) {
+        ammonite::utils::warning << "Failed to load '" << models[i][0] << "'" << std::endl;
         continue;
       }
 
       //Sum vertices and load texture if given
       vertexCount += ammonite::models::getVertexCount(loadedModelIds[i]);
       if (models[i][1] != "") {
-        ammonite::models::applyTexture(loadedModelIds[i], AMMONITE_DIFFUSE_TEXTURE, models[i][1], true, &success);
+        if (!ammonite::models::applyTexture(loadedModelIds[i], AMMONITE_DIFFUSE_TEXTURE,
+                                           models[i][1], true)) {
+          ammonite::utils::warning << "Failed to apply texture '" << models[i][1] \
+                                   << "' to '" << models[i][0] << "'" << std::endl;
+        }
       }
 
       //Update loading screen
       ammonite::interface::setLoadingScreenProgress(screenId, float(i + 1) / float(modelCount + 1));
       ammonite::renderer::drawFrame();
-    }
-
-    if (!success) {
-      demoExit();
-      return false;
     }
 
     //Copy last loaded model

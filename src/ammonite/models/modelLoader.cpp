@@ -18,10 +18,9 @@ namespace ammonite {
   namespace models {
     namespace internal {
       namespace {
-        static void processMesh(aiMesh* meshPtr, const aiScene* scenePtr,
+        static bool processMesh(aiMesh* meshPtr, const aiScene* scenePtr,
                                 models::internal::ModelData* modelObjectData,
-                                ModelLoadInfo modelLoadInfo,
-                                bool* externalSuccess) {
+                                ModelLoadInfo modelLoadInfo) {
           std::vector<models::internal::TextureIdGroup>* textureIds = &modelObjectData->textureIds;
 
           //Add a new empty mesh to the mesh vector
@@ -84,8 +83,7 @@ namespace ammonite {
             GLuint textureId = ammonite::textures::internal::loadTexture(fullTexturePath,
               false, modelLoadInfo.srgbTextures);
             if (textureId == 0) {
-              *externalSuccess = false;
-              return;
+              return false;
             }
 
             textureIdGroup.diffuseId = (int)textureId;
@@ -98,8 +96,7 @@ namespace ammonite {
             GLuint textureId = ammonite::textures::internal::loadTexture(fullTexturePath,
               false, modelLoadInfo.srgbTextures);
             if (textureId == 0) {
-              *externalSuccess = false;
-              return;
+              return false;
             }
 
             textureIdGroup.specularId = (int)textureId;
@@ -107,23 +104,25 @@ namespace ammonite {
 
           //Save texture IDs
           textureIds->push_back(textureIdGroup);
+          return true;
         }
 
-        static void processNodes(const aiScene* scenePtr,
-                               models::internal::ModelData* modelObjectData,
-                               ModelLoadInfo modelLoadInfo, bool* externalSuccess) {
+        static bool processNodes(const aiScene* scenePtr,
+                                 models::internal::ModelData* modelObjectData,
+                                 ModelLoadInfo modelLoadInfo) {
           std::queue<aiNode*> nodePtrQueue;
           nodePtrQueue.push(scenePtr->mRootNode);
 
           //Process root node, then process any more connected to it
+          bool passed = true;
           while (!nodePtrQueue.empty()) {
             aiNode* nodePtr = nodePtrQueue.front();
             nodePtrQueue.pop();
 
             //Process meshes
             for (unsigned int i = 0; i < nodePtr->mNumMeshes; i++) {
-              processMesh(scenePtr->mMeshes[nodePtr->mMeshes[i]], scenePtr, modelObjectData,
-                          modelLoadInfo, externalSuccess);
+              passed &= processMesh(scenePtr->mMeshes[nodePtr->mMeshes[i]], scenePtr,
+                                    modelObjectData, modelLoadInfo);
             }
 
             //Add connected nodes to queue
@@ -131,11 +130,17 @@ namespace ammonite {
               nodePtrQueue.push(nodePtr->mChildren[i]);
             }
           }
+
+          return passed;
         }
       }
 
-      void loadObject(std::string objectPath, models::internal::ModelData* modelObjectData,
-                      ModelLoadInfo modelLoadInfo, bool* externalSuccess) {
+      /*
+       - Load an object from objectPath, using the settings from modelLoadInfo
+       - Store the model's data using the modelObjectData pointer
+      */
+      bool loadObject(std::string objectPath, models::internal::ModelData* modelObjectData,
+                      ModelLoadInfo modelLoadInfo) {
         //Generate post-processing flags
         auto aiProcessFlags = aiProcess_Triangulate |
                               aiProcess_GenNormals |
@@ -156,12 +161,11 @@ namespace ammonite {
         //Check model loaded correctly
         if (!scenePtr || scenePtr->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scenePtr->mRootNode) {
           ammonite::utils::warning << importer.GetErrorString() << std::endl;
-          *externalSuccess = false;
-          return;
+          return false;
         }
 
         //Recursively process nodes
-        processNodes(scenePtr, modelObjectData, modelLoadInfo, externalSuccess);
+        return processNodes(scenePtr, modelObjectData, modelLoadInfo);
       }
     }
   }
