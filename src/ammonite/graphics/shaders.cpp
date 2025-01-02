@@ -201,18 +201,18 @@ namespace ammonite {
     }
 
     //Take multiple shader objects and create a program
-    static GLuint createProgramObject(GLuint* shaderIds, int shaderCount) {
+    static GLuint createProgramObject(GLuint* shaderIds, unsigned int shaderCount) {
       //Create the program
       GLuint programId = glCreateProgram();
 
       //Attach and link all passed shader IDs
-      for (int i = 0; i < shaderCount; i++) {
+      for (unsigned int i = 0; i < shaderCount; i++) {
         glAttachShader(programId, shaderIds[i]);
       }
       glLinkProgram(programId);
 
       //Detach and remove all passed shader IDs
-      for (int i = 0; i < shaderCount; i++) {
+      for (unsigned int i = 0; i < shaderCount; i++) {
         glDetachShader(programId, shaderIds[i]);
         glDeleteShader(shaderIds[i]);
       }
@@ -296,7 +296,7 @@ namespace ammonite {
         if (cacheState == AMMONITE_CACHE_HIT) {
           //Load the cached binary data into a program
           programId = glCreateProgram();
-          glProgramBinary(programId, binaryFormat, cacheData, cacheDataSize);
+          glProgramBinary(programId, binaryFormat, cacheData, (GLsizei)cacheDataSize);
           delete [] cacheData;
 
           //Return the program ID, unless the cache was faulty, then delete and carry on
