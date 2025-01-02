@@ -251,6 +251,8 @@ namespace ammonite {
         for (unsigned int i = 0; i < shaderCount; i++) {
           if (shaderIds[i] != 0) {
             glDeleteShader(shaderIds[i]);
+          } else {
+            break;
           }
         }
       }
@@ -352,6 +354,11 @@ namespace ammonite {
        - Returns 0 on failure
       */
       GLuint createProgram(std::string* inputShaderPaths, unsigned int inputShaderCount) {
+        //Don't attempt to load 0 shaders
+        if (inputShaderCount == 0) {
+          return 0;
+        }
+
         //Find all shaders
         std::vector<std::string> shaderPaths(0);
         std::vector<GLenum> shaderTypes(0);
