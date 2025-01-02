@@ -52,7 +52,7 @@ for (int i = 0; i < (jobCount); i++) { \
 bool passed = true; \
 int* values = new int[(jobCount)]{}; \
 for (int i = 0; i < (jobCount); i++) { \
-  ammonite::utils::thread::submitWork(shortTask, &(values)[i], &group); \
+  ammonite::utils::thread::submitWork(shortTask, &(values)[i], &(group)); \
 }
 
 #define VERIFY_WORK(jobCount) \
