@@ -169,20 +169,22 @@ namespace objectFieldDemo {
 
     /*
      - Return a 2D array of indices an orbit could swap to
-     - First index points to previous index
-       - The second index points to the next
+     - The first index of the pair points to previous swap target index
+     - The second index of the pair points to the next swap target index
     */
     static unsigned int* calculateSwapTargets(unsigned int orbitCount) {
       unsigned int* swapTargets = new unsigned int[(std::size_t)(orbitCount) * 2];
       for (unsigned int orbit = 0; orbit < orbitCount; orbit++) {
         unsigned int writeIndex = orbit * 2;
-        int swapTarget = ((int)(orbit) - 1) % (int)(orbitCount);
 
-        if (swapTarget < 0) {
-          swapTarget += orbitCount;
+        //Find and store the previous index
+        if (orbit == 0) {
+          swapTargets[writeIndex] = orbitCount - 1;
+        } else {
+          swapTargets[writeIndex] = orbit - 1;
         }
-        swapTargets[writeIndex] = swapTarget;
 
+        //Find and store the next index
         swapTargets[writeIndex + 1] = (orbit + 1) % orbitCount;
       }
 
@@ -360,8 +362,8 @@ namespace objectFieldDemo {
       float targetAngle = (orbitTime / lightData[i].orbitPeriod) * glm::two_pi<float>();
 
       //Decide if the light is within the region to swap orbits
-      int swapTarget = -1;
-      unsigned int swapDirection = 0;
+      unsigned int swapTarget = 0;
+      unsigned int swapDirection = 2;
       const float threshold = 1.0f / 50.0f;
       if (isWithinThreshold(targetAngle, orbitSwapAngles[lightData[i].orbitIndex][0],
                             threshold)) {
@@ -374,7 +376,7 @@ namespace objectFieldDemo {
         swapDirection = 1;
       }
 
-      bool isInsideWindow = (swapTarget != -1);
+      bool isInsideWindow = (swapDirection != 2);
       if (isInsideWindow != lightData[i].lastWindowState) {
         if (isInsideWindow) {
           lightData[i].lastWindowState = true;
