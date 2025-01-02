@@ -44,19 +44,19 @@ totalTimer.reset();
 #define SUBMIT_JOBS(jobCount) \
 bool passed = true; \
 int* values = new int[(jobCount)]{}; \
-for (int i = 0; i < (jobCount); i++) { \
+for (unsigned int i = 0; i < (jobCount); i++) { \
   ammonite::utils::thread::submitWork(shortTask, &(values)[i], nullptr); \
 }
 
 #define SUBMIT_SYNC_JOBS(jobCount, group) \
 bool passed = true; \
 int* values = new int[(jobCount)]{}; \
-for (int i = 0; i < (jobCount); i++) { \
+for (unsigned int i = 0; i < (jobCount); i++) { \
   ammonite::utils::thread::submitWork(shortTask, &(values)[i], &(group)); \
 }
 
 #define VERIFY_WORK(jobCount) \
-for (int i = 0; i < (jobCount); i++) { \
+for (unsigned int i = 0; i < (jobCount); i++) { \
   if (values[i] != 1) { \
     passed = false; \
     ammonite::utils::error << "Failed to verify work (index " << i << ")" << std::endl; \
@@ -72,8 +72,8 @@ namespace {
   };
 
   struct ChainData {
-    std::atomic<int> totalSubmitted;
-    int targetSubmitted;
+    std::atomic<unsigned int> totalSubmitted;
+    unsigned int targetSubmitted;
     AmmoniteWork work;
     AmmoniteGroup* syncPtr;
   };
@@ -97,7 +97,7 @@ namespace {
 }
 
 namespace {
-  static bool testCreateSubmitWaitDestroy(int jobCount) {
+  static bool testCreateSubmitWaitDestroy(unsigned int jobCount) {
     INIT_TIMERS
     CREATE_THREAD_POOL(0)
     AmmoniteGroup group{0};
@@ -116,7 +116,7 @@ namespace {
     return passed;
   }
 
-  static bool testCreateSubmitBlockUnblockDestroy(int jobCount) {
+  static bool testCreateSubmitBlockUnblockDestroy(unsigned int jobCount) {
     INIT_TIMERS
     CREATE_THREAD_POOL(0)
 
@@ -135,7 +135,7 @@ namespace {
     return passed;
   }
 
-  static bool testCreateSubmitDestroy(int jobCount) {
+  static bool testCreateSubmitDestroy(unsigned int jobCount) {
     INIT_TIMERS
     CREATE_THREAD_POOL(0)
 
@@ -152,7 +152,7 @@ namespace {
     return passed;
   }
 
-  static bool testCreateBlockSubmitUnblockWaitDestroy(int jobCount) {
+  static bool testCreateBlockSubmitUnblockWaitDestroy(unsigned int jobCount) {
     INIT_TIMERS
     CREATE_THREAD_POOL(0)
     AmmoniteGroup group{0};
@@ -174,7 +174,7 @@ namespace {
     return passed;
   }
 
-  static bool testQueueLimits(int jobCount) {
+  static bool testQueueLimits(unsigned int jobCount) {
     INIT_TIMERS
     CREATE_THREAD_POOL(0)
     jobCount *= 4;
@@ -190,7 +190,7 @@ namespace {
     //Submit second batch
     values = new int[(jobCount)]{};
     submitTimer.unpause();
-    for (int i = 0; i < jobCount; i++) { \
+    for (unsigned int i = 0; i < jobCount; i++) { \
       ammonite::utils::thread::submitWork(shortTask, &(values)[i], &group); \
     }
     submitTimer.pause();
@@ -204,7 +204,7 @@ namespace {
   }
 
   static bool testNestedJobs(int fullJobCount) {
-    int jobCount = fullJobCount / 2;
+    unsigned int jobCount = fullJobCount / 2;
     INIT_TIMERS
     CREATE_THREAD_POOL(0)
     AmmoniteGroup group{0};
@@ -214,7 +214,7 @@ namespace {
     bool passed = true;
     int* values = new int[jobCount]{};
     ResubmitData* data = new ResubmitData[jobCount]{};
-    for (int i = 0; i < jobCount; i++) {
+    for (unsigned int i = 0; i < jobCount; i++) {
       data[i].writePtr = &values[i];
       data[i].syncPtr = &group;
       ammonite::utils::thread::submitWork(resubmitTask, &data[i], nullptr);
@@ -231,7 +231,7 @@ namespace {
     return passed;
   }
 
-  static bool testChainJobs(int jobCount) {
+  static bool testChainJobs(unsigned int jobCount) {
     INIT_TIMERS
     CREATE_THREAD_POOL(0)
 
@@ -253,7 +253,7 @@ namespace {
     return passed;
   }
 
-  static bool testSubmitMultiple(int jobCount) {
+  static bool testSubmitMultiple(unsigned int jobCount) {
     INIT_TIMERS
     CREATE_THREAD_POOL(0)
 
@@ -275,17 +275,17 @@ namespace {
     return passed;
   }
 
-  static bool testSubmitMultipleMultiple(int jobCount) {
+  static bool testSubmitMultipleMultiple(unsigned int jobCount) {
     INIT_TIMERS
     CREATE_THREAD_POOL(0)
 
     //Submit fast 'jobs'
     RESET_TIMERS
     bool passed = true;
-    int* values = new int[jobCount * 4]{};
+    int* values = new int[(std::size_t)jobCount]{};
     AmmoniteGroup group{0};
     for (int i = 0; i < 4; i++) {
-      ammonite::utils::thread::submitMultiple(shortTask, (void*)&values[jobCount * i],
+      ammonite::utils::thread::submitMultiple(shortTask, &values[(std::size_t)jobCount * i],
         sizeof(int), &group, jobCount);
     }
     submitTimer.pause();
@@ -299,7 +299,7 @@ namespace {
     return passed;
   }
 
-  static bool testSubmitMultipleNoSync(int jobCount) {
+  static bool testSubmitMultipleNoSync(unsigned int jobCount) {
     INIT_TIMERS
     CREATE_THREAD_POOL(0)
 
@@ -321,7 +321,7 @@ namespace {
 }
 
 namespace {
-  static bool testCreateBlockBlockUnblockUnblockSubmitDestroy(int jobCount) {
+  static bool testCreateBlockBlockUnblockUnblockSubmitDestroy(unsigned int jobCount) {
     CREATE_THREAD_POOL(0)
 
     ammonite::utils::thread::blockThreads();
@@ -335,7 +335,7 @@ namespace {
     return passed;
   }
 
-  static bool testCreateBlockBlockUnblockSubmitDestroy(int jobCount) {
+  static bool testCreateBlockBlockUnblockSubmitDestroy(unsigned int jobCount) {
     CREATE_THREAD_POOL(0)
 
     ammonite::utils::thread::blockThreads();
@@ -348,7 +348,7 @@ namespace {
     return passed;
   }
 
-  static bool testCreateBlockBlockSubmitUnblockDestroy(int jobCount) {
+  static bool testCreateBlockBlockSubmitUnblockDestroy(unsigned int jobCount) {
     CREATE_THREAD_POOL(0)
 
     ammonite::utils::thread::blockThreads();
@@ -362,7 +362,7 @@ namespace {
     return passed;
   }
 
-  static bool testCreateBlockBlockSubmitDestroy(int jobCount) {
+  static bool testCreateBlockBlockSubmitDestroy(unsigned int jobCount) {
     CREATE_THREAD_POOL(0)
 
     ammonite::utils::thread::blockThreads();
@@ -374,7 +374,7 @@ namespace {
     return passed;
   }
 
-  static bool testCreateBlockUnblockUnblockSubmitDestroy(int jobCount) {
+  static bool testCreateBlockUnblockUnblockSubmitDestroy(unsigned int jobCount) {
     CREATE_THREAD_POOL(0)
 
     ammonite::utils::thread::blockThreads();
@@ -387,7 +387,7 @@ namespace {
     return passed;
   }
 
-  static bool testCreateUnblockSubmitDestroy(int jobCount) {
+  static bool testCreateUnblockSubmitDestroy(unsigned int jobCount) {
     CREATE_THREAD_POOL(0)
 
     ammonite::utils::thread::unblockThreads();
