@@ -211,56 +211,56 @@ namespace ammonite {
       //Structures to store uniform IDs for the shaders
       struct {
         GLuint shaderId;
-        GLuint matrixId;
-        GLuint modelMatrixId;
-        GLuint normalMatrixId;
-        GLuint ambientLightId;
-        GLuint cameraPosId;
-        GLuint shadowFarPlaneId;
-        GLuint lightCountId;
-        GLuint diffuseSamplerId;
-        GLuint specularSamplerId;
-        GLuint shadowCubeMapId;
+        GLint matrixId;
+        GLint modelMatrixId;
+        GLint normalMatrixId;
+        GLint ambientLightId;
+        GLint cameraPosId;
+        GLint shadowFarPlaneId;
+        GLint lightCountId;
+        GLint diffuseSamplerId;
+        GLint specularSamplerId;
+        GLint shadowCubeMapId;
       } modelShader;
 
       struct {
         GLuint shaderId;
-        GLuint lightMatrixId;
-        GLuint lightIndexId;
+        GLint lightMatrixId;
+        GLint lightIndexId;
       } lightShader;
 
       struct {
         GLuint shaderId;
-        GLuint modelMatrixId;
-        GLuint shadowFarPlaneId;
-        GLuint depthLightPosId;
-        GLuint depthShadowIndex;
+        GLint modelMatrixId;
+        GLint shadowFarPlaneId;
+        GLint depthLightPosId;
+        GLint depthShadowIndex;
       } depthShader;
 
       struct {
         GLuint shaderId;
-        GLuint viewMatrixId;
-        GLuint projectionMatrixId;
-        GLuint skyboxSamplerId;
+        GLint viewMatrixId;
+        GLint projectionMatrixId;
+        GLint skyboxSamplerId;
       } skyboxShader;
 
       struct {
         GLuint shaderId;
-        GLuint screenSamplerId;
-        GLuint depthSamplerId;
-        GLuint focalDepthId;
-        GLuint focalDepthEnabledId;
-        GLuint blurStrengthId;
-        GLuint farPlaneId;
+        GLint screenSamplerId;
+        GLint depthSamplerId;
+        GLint focalDepthId;
+        GLint focalDepthEnabledId;
+        GLint blurStrengthId;
+        GLint farPlaneId;
       } screenShader;
 
       struct {
         GLuint shaderId;
-        GLuint progressId;
-        GLuint widthId;
-        GLuint heightId;
-        GLuint heightOffsetId;
-        GLuint progressColourId;
+        GLint progressId;
+        GLint widthId;
+        GLint heightId;
+        GLint heightOffsetId;
+        GLint progressColourId;
       } loadingShader;
 
       struct {
@@ -956,7 +956,7 @@ namespace ammonite {
           glm::mat4* lightTransformStart = *lightTransformsPtr + (std::size_t)(lightSource->lightIndex) * 6;
           for (int i = 0; i < 6; i++) {
             std::string identifier = std::string("shadowMatrices[") + std::to_string(i) + std::string("]");
-            GLuint shadowMatrixId = glGetUniformLocation(depthShader.shaderId, identifier.c_str());
+            GLint shadowMatrixId = glGetUniformLocation(depthShader.shaderId, identifier.c_str());
             //Fetch the transform from the tracker, and send to the shader
             glUniformMatrix4fv(shadowMatrixId, 1, GL_FALSE,
                                glm::value_ptr(lightTransformStart[i]));
