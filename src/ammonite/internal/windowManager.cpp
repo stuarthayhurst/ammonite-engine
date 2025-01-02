@@ -280,8 +280,8 @@ namespace ammonite {
           }
 
           //Set window to windowed mode, using last geometry
-          glfwSetWindowMonitor(windowPtr, nullptr, windowGeomRestore.xPos, windowGeomRestore.yPos,
-                               windowGeomRestore.width, windowGeomRestore.height, GLFW_DONT_CARE);
+          glfwSetWindowMonitor(windowPtr, nullptr, (int)windowGeomRestore.xPos, (int)windowGeomRestore.yPos,
+                               (int)windowGeomRestore.width, (int)windowGeomRestore.height, GLFW_DONT_CARE);
 
           //Update active window geometry
           isWindowFullscreen = false;
