@@ -756,7 +756,8 @@ namespace ammonite {
           glBindVertexArray(drawObjectData->meshes[i].vertexArrayId);
 
           //Draw the triangles
-          glDrawElements(mode, drawObjectData->meshes[i].indexCount, GL_UNSIGNED_INT, nullptr);
+          glDrawElements(mode, (GLsizei)drawObjectData->meshes[i].indexCount,
+                         GL_UNSIGNED_INT, nullptr);
         }
       }
     }
@@ -889,8 +890,8 @@ namespace ammonite {
           }
 
           //Calculate render resolution
-          renderWidth = (unsigned int)std::floor(width * *renderResMultiplierPtr);
-          renderHeight = (unsigned int)std::floor(height * *renderResMultiplierPtr);
+          renderWidth = (unsigned int)((float)width * *renderResMultiplierPtr);
+          renderHeight = (unsigned int)((float)height * *renderResMultiplierPtr);
 
           //Create or recreate the framebuffers for rendering
           recreateFramebuffers(&targetBufferId, sampleCount, renderWidth, renderHeight);
