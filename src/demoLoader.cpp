@@ -152,7 +152,7 @@ namespace {
   }
 }
 
-int main(int argc, char** argv) {
+int main(int argc, char** argv) noexcept(false) {
   //Handle arguments
   argc--;
   argv++;
