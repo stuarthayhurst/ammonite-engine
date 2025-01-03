@@ -282,7 +282,7 @@ namespace {
     //Submit fast 'jobs'
     RESET_TIMERS
     bool passed = true;
-    int* values = new int[(std::size_t)jobCount]{};
+    int* values = new int[(std::size_t)jobCount * 4]{};
     AmmoniteGroup group{0};
     for (int i = 0; i < 4; i++) {
       ammonite::utils::thread::submitMultiple(shortTask, &values[(std::size_t)jobCount * i],
