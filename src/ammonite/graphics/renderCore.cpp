@@ -1046,7 +1046,8 @@ namespace ammonite {
           if (sampleCount != 0) {
             GLbitfield blitBits = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT;
             glBlitNamedFramebuffer(colourBufferMultisampleFBO, screenQuadFBO, 0, 0,
-                                   renderWidth, renderHeight, 0, 0, renderWidth, renderHeight,
+                                   (GLint)renderWidth, (GLint)renderHeight, 0, 0,
+                                   (GLint)renderWidth, (GLint)renderHeight,
                                    blitBits, GL_NEAREST);
           }
 
@@ -1074,8 +1075,9 @@ namespace ammonite {
           //Resolve multisampling into default framebuffer
           if (sampleCount != 0) {
             GLbitfield blitBits = GL_COLOR_BUFFER_BIT;
-            glBlitNamedFramebuffer(colourBufferMultisampleFBO, 0, 0, 0, renderWidth,
-                                   renderHeight, 0, 0, width, height, blitBits, GL_NEAREST);
+            glBlitNamedFramebuffer(colourBufferMultisampleFBO, 0, 0, 0,
+                                   (GLint)renderWidth, (GLint)renderHeight, 0, 0,
+                                   (GLint)width, (GLint)height, blitBits, GL_NEAREST);
           }
         }
 
