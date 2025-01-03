@@ -30,9 +30,9 @@ uniform samplerCubeArrayShadow shadowCubeMap;
 uniform vec3 ambientLight;
 uniform vec3 cameraPos;
 uniform float shadowFarPlane;
-uniform int lightCount;
+uniform uint lightCount;
 
-float calcShadow(int layer, vec3 fragPos, vec3 lightPos) {
+float calcShadow(uint layer, vec3 fragPos, vec3 lightPos) {
   //Get depth of current fragment
   vec3 lightToFrag = fragPos - lightPos;
   float currentDepth = length(lightToFrag) / shadowFarPlane;
@@ -74,7 +74,7 @@ void main() {
   }
 
   //Calculate lighting influence from each light source
-  for (int i = 0; i < lightCount; i++) {
+  for (uint i = 0; i < lightCount; i++) {
     vec3 lightDir = normalize(lightSources[i].geometry - fragData.fragPos);
 
     //Final contribution from the current light source

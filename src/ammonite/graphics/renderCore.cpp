@@ -967,7 +967,7 @@ namespace ammonite {
 
           //Pass light source specific uniforms
           glUniform3fv(depthShader.depthLightPosId, 1, glm::value_ptr(lightPos));
-          glUniform1i(depthShader.depthShadowIndex, shadowCount);
+          glUniform1ui(depthShader.depthShadowIndex, shadowCount);
 
           //Render to depth buffer and move to the next light source
           drawModelsCached(&modelPtrs, AMMONITE_MODEL, AMMONITE_DEPTH_PASS);
@@ -1000,7 +1000,7 @@ namespace ammonite {
         glUniform3fv(modelShader.ambientLightId, 1, glm::value_ptr(ambientLight));
         glUniform3fv(modelShader.cameraPosId, 1, glm::value_ptr(cameraPosition));
         glUniform1f(modelShader.shadowFarPlaneId, *shadowFarPlanePtr);
-        glUniform1i(modelShader.lightCountId, activeLights);
+        glUniform1ui(modelShader.lightCountId, activeLights);
         drawModelsCached(&modelPtrs, AMMONITE_MODEL, AMMONITE_RENDER_PASS);
 
         //Render light emitting models
