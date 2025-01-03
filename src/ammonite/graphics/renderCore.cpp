@@ -5,6 +5,7 @@
 #include <chrono>
 #include <cmath>
 #include <cstdlib>
+#include <utility>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -733,6 +734,7 @@ namespace ammonite {
         case AMMONITE_DATA_REFRESH:
           //How did we get here?
           ammonite::utils::error << "drawModel() called with AMMONITE_DATA_REFRESH" << std::endl;
+          std::unreachable();
           break;
         }
 
