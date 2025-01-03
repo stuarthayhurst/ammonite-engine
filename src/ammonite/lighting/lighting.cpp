@@ -1,9 +1,6 @@
-#include <atomic>
 #include <cstddef>
 #include <map>
-#include <vector>
-#include <cstring>
-#include <cmath>
+#include <utility>
 
 #include <GL/glew.h>
 #include <glm/glm.hpp>
@@ -216,7 +213,7 @@ namespace ammonite {
       //Get the max number of lights supported, from the max layers on a cubemap
       int maxArrayLayers = 0;
       glGetIntegerv(GL_MAX_ARRAY_TEXTURE_LAYERS, &maxArrayLayers);
-      return std::floor(maxArrayLayers / 6);
+      return maxArrayLayers / 6;
     }
 
     AmmoniteId createLightSource() {
