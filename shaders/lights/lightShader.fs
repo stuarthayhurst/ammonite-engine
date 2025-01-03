@@ -14,7 +14,7 @@ layout (std430, binding = 0) buffer LightPropertiesBuffer {
 };
 
 out vec3 colour;
-uniform int lightIndex;
+uniform uint lightIndex;
 
 void main() {
   //Use light source colour as fragment colour

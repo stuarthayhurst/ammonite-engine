@@ -671,7 +671,7 @@ namespace ammonite {
         }
 
         //Create 6 faces for each light source
-        GLsizei depthLayers = std::min(maxLightCount, lightCount) * 6;
+        GLsizei depthLayers = (GLsizei)std::min(maxLightCount, lightCount) * 6;
         glTextureStorage3D(depthCubeMapId, 1, GL_DEPTH_COMPONENT32, (GLsizei)shadowRes,
                            (GLsizei)shadowRes, depthLayers);
 
@@ -728,7 +728,7 @@ namespace ammonite {
         case AMMONITE_EMISSION_PASS:
           mvp = viewProjectionMatrix * modelMatrix;
           glUniformMatrix4fv(lightShader.lightMatrixId, 1, GL_FALSE, glm::value_ptr(mvp));
-          glUniform1i(lightShader.lightIndexId, drawObject->lightIndex);
+          glUniform1ui(lightShader.lightIndexId, drawObject->lightIndex);
           break;
         case AMMONITE_DATA_REFRESH:
           //How did we get here?
