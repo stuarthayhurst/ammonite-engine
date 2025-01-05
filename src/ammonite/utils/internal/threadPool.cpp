@@ -41,7 +41,7 @@ namespace {
         }
       } else {
         for (unsigned int i = 0; i < count; i++) {
-          queue.push({work, (void*)((char*)userBuffer + (std::size_t)(i) * stride), group});
+          queue.push({work, (char*)userBuffer + ((std::size_t)(i) * stride), group});
         }
       }
       queueLock.unlock();

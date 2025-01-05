@@ -180,7 +180,7 @@ namespace ammonite {
           workerData[i].i = i;
         }
         AmmoniteGroup group{0};
-        ammonite::utils::thread::submitMultiple(lightWork, (void*)&workerData[0],
+        ammonite::utils::thread::submitMultiple(lightWork, &workerData[0],
           sizeof(LightWorkerData), &group, lightCount);
         ammonite::utils::thread::waitGroupComplete(&group, lightCount);
 
