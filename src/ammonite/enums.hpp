@@ -1,6 +1,11 @@
 #ifndef ENUMS
 #define ENUMS
 
+//Constants for loading assumptions
+#define ASSUME_FLIP_MODEL_UVS true
+#define ASSUME_FLIP_SKYBOX_FACES false
+#define ASSUME_SRGB_TEXTURES true
+
 enum AmmoniteEnum : unsigned char {
   //Draw modes
   AMMONITE_DRAW_INACTIVE,

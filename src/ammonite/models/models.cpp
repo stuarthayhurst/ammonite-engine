@@ -19,10 +19,6 @@
 #include "../graphics/internal/internalTextures.hpp"
 #include "../utils/logging.hpp"
 
-//Constants for texture loading assumptions
-#define ASSUME_FLIP_UVS true
-#define ASSUME_SRGB_TEXTURES false
-
 //Class definitions
 namespace ammonite {
   typedef std::map<AmmoniteId, ammonite::models::internal::ModelInfo> ModelTrackerMap;
@@ -345,7 +341,7 @@ namespace ammonite {
     }
 
     AmmoniteId createModel(std::string objectPath) {
-      return createModel(objectPath, ASSUME_FLIP_UVS, ASSUME_SRGB_TEXTURES);
+      return createModel(objectPath, ASSUME_FLIP_MODEL_UVS, ASSUME_SRGB_TEXTURES);
     }
 
     AmmoniteId copyModel(AmmoniteId modelId) {

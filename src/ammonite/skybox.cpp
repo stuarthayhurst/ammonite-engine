@@ -11,10 +11,7 @@
 #include "graphics/internal/internalTextures.hpp"
 #include "utils/logging.hpp"
 #include "types.hpp"
-
-//Loading assumptions
-#define ASSUME_FLIP_FACES false
-#define ASSUME_SRGB_TEXTURES false
+#include "enums.hpp"
 
 namespace ammonite {
   namespace {
@@ -113,7 +110,7 @@ namespace ammonite {
      - Returns 0 on failure
     */
     AmmoniteId createSkybox(std::string texturePaths[6]) {
-      return createSkybox(texturePaths, ASSUME_FLIP_FACES, ASSUME_SRGB_TEXTURES);
+      return createSkybox(texturePaths, ASSUME_FLIP_SKYBOX_FACES, ASSUME_SRGB_TEXTURES);
     }
 
     /*
@@ -181,7 +178,7 @@ namespace ammonite {
      - Returns 0 on failure
     */
     AmmoniteId loadDirectory(std::string directoryPath) {
-      return loadDirectory(directoryPath, ASSUME_FLIP_FACES,
+      return loadDirectory(directoryPath, ASSUME_FLIP_SKYBOX_FACES,
                            ASSUME_SRGB_TEXTURES);
     }
 
