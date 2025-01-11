@@ -19,9 +19,9 @@ namespace ammonite {
       //Structure to store base speeds, multipliers and calculated speeds
       struct ControlSettings {
         struct BaseControlSettings {
-          const float movementSpeed = 5.0f;
-          const float mouseSpeed = 0.005f;
-          const float zoomSpeed = 0.025f;
+          float movementSpeed = 5.0f;
+          float mouseSpeed = 0.005f;
+          float zoomSpeed = 0.025f;
         } baseSettings;
 
         struct ControlMultipliers {
