@@ -8,20 +8,22 @@ HEADER_DIR ?= /usr/local/include
 LIBRARY_NAME = libammonite.so.1
 
 AMMONITE_OBJECTS_SOURCE = $(shell ls ./src/ammonite/**/*.cpp)
-AMMONITE_HEADER_SOURCE = $(shell ls ./src/ammonite/**/*.hpp)
-AMMONITE_HEADER_INSTALL := $(subst src/ammonite,$(HEADER_DIR)/ammonite,$(AMMONITE_HEADER_SOURCE))
+AMMONITE_HEADERS_SOURCE = $(shell ls ./src/ammonite/**/*.hpp)
+AMMONITE_HEADER_INSTALL := $(subst src/ammonite,$(HEADER_DIR)/ammonite,$(AMMONITE_HEADERS_SOURCE))
 
 HELPER_OBJECTS_SOURCE = $(shell ls ./src/helper/**/*.cpp)
-HELPER_HEADER_SOURCE = $(shell ls ./src/helper/**/*.hpp)
+HELPER_HEADERS_SOURCE = $(shell ls ./src/helper/**/*.hpp)
 
 DEMO_OBJECTS_SOURCE = $(shell ls ./src/demos/**/*.cpp)
-DEMO_HEADER_SOURCE = $(shell ls ./src/demos/**/*.hpp)
+DEMO_HEADERS_SOURCE = $(shell ls ./src/demos/**/*.hpp)
 
 ROOT_OBJECTS_SOURCE = $(shell ls ./src/*.cpp)
 
 ALL_OBJECTS_SOURCE = $(AMMONITE_OBJECTS_SOURCE) $(HELPER_OBJECTS_SOURCE) $(DEMO_OBJECTS_SOURCE) \
                      $(ROOT_OBJECTS_SOURCE)
-LINT_OBJECTS = $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.linted,$(ALL_OBJECTS_SOURCE)))
+ALL_HEADERS_SOURCE = $(AMMONITE_HEADERS_SOURCE) $(HELPER_HEADERS_SOURCE) $(DEMO_HEADERS_SOURCE)
+LINT_FILES = $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.cpp.linted,$(ALL_OBJECTS_SOURCE)))
+LINT_FILES += $(subst ./src,$(OBJECT_DIR),$(subst .hpp,.hpp.linted,$(ALL_HEADERS_SOURCE)))
 
 OBJECT_DIR = $(BUILD_DIR)/objects
 AMMONITE_OBJECTS = $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.o,$(AMMONITE_OBJECTS_SOURCE)))
@@ -68,19 +70,19 @@ $(BUILD_DIR)/$(LIBRARY_NAME): $(BUILD_DIR)/libammonite.so
 	@rm -fv "$(BUILD_DIR)/$(LIBRARY_NAME)"
 	@ln -sv "libammonite.so" "$(BUILD_DIR)/$(LIBRARY_NAME)"
 
-$(OBJECT_DIR)/ammonite/%.o: ./src/ammonite/%.cpp $(AMMONITE_HEADER_SOURCE)
+$(OBJECT_DIR)/ammonite/%.o: ./src/ammonite/%.cpp $(AMMONITE_HEADERS_SOURCE)
 	@mkdir -p "$$(dirname $@)"
 	$(CXX) "$<" -c $(CXXFLAGS) -fpic -o "$@"
 
-$(OBJECT_DIR)/helper/%.o: ./src/helper/%.cpp $(HELPER_HEADER_SOURCE)
+$(OBJECT_DIR)/helper/%.o: ./src/helper/%.cpp $(HELPER_HEADERS_SOURCE)
 	@mkdir -p "$$(dirname $@)"
 	$(CXX) "$<" -c $(CXXFLAGS) -o "$@"
 
-$(OBJECT_DIR)/demos/%.o: ./src/demos/%.cpp $(DEMO_HEADER_SOURCE) $(AMMONITE_HEADER_SOURCE)
+$(OBJECT_DIR)/demos/%.o: ./src/demos/%.cpp $(DEMO_HEADERS_SOURCE) $(AMMONITE_HEADERS_SOURCE)
 	@mkdir -p "$$(dirname $@)"
 	$(CXX) "$<" -c $(CXXFLAGS) -o "$@"
 
-$(OBJECT_DIR)/%.o: ./src/%.cpp $(AMMONITE_HEADER_SOURCE) $(HELPER_HEADER_SOURCE)
+$(OBJECT_DIR)/%.o: ./src/%.cpp $(AMMONITE_HEADERS_SOURCE) $(HELPER_HEADERS_SOURCE)
 	@mkdir -p "$(OBJECT_DIR)"
 	$(CXX) "$<" -c $(CXXFLAGS) -o "$@"
 
@@ -90,7 +92,7 @@ $(BUILD_DIR)/compile_flags.txt: Makefile
 	@for arg in $(CXXFLAGS); do \
 		echo $$arg >> "$(BUILD_DIR)/compile_flags.txt"; \
 	done
-$(OBJECT_DIR)/%.linted: ./src/%.cpp $(BUILD_DIR)/compile_flags.txt .clang-tidy
+$(OBJECT_DIR)/%.linted: ./src/% $(BUILD_DIR)/compile_flags.txt .clang-tidy
 	clang-tidy --quiet -p "$(BUILD_DIR)" "$<"
 	@mkdir -p "$$(dirname $@)"
 	@touch "$@"
@@ -127,7 +129,7 @@ uninstall:
 	@if [[ -d "$(HEADER_DIR)/ammonite" ]]; then rm -rf "$(HEADER_DIR)/ammonite"; fi
 clean: cache
 	@rm -rfv "$(BUILD_DIR)"
-lint: $(LINT_OBJECTS)
+lint: $(LINT_FILES)
 cache:
 	@rm -rfv "$(CACHE_DIR)"
 icons:
