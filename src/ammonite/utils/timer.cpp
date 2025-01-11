@@ -29,9 +29,8 @@ namespace ammonite {
     }
 
     //Creates a new, running timer
-    Timer::Timer() {
+    Timer::Timer(): timerRunning(true)  {
       std::timespec_get(&startTime, TIME_UTC);
-      timerRunning = true;
     }
 
     //Writes the length of time the timer has been active

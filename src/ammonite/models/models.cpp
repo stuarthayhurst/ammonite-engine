@@ -39,9 +39,7 @@ namespace {
     };
 
   public:
-    ModelTracker(ModelPtrTrackerMap* modelIdPtrMapAddr) {
-      modelIdPtrMapPtr = modelIdPtrMapAddr;
-    }
+    ModelTracker(ModelPtrTrackerMap* modelIdPtrMapAddr): modelIdPtrMapPtr(modelIdPtrMapAddr) {}
 
     unsigned int getModelCount(AmmoniteEnum modelType) {
       return modelSelector[modelType]->size();
