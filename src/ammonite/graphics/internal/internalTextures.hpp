@@ -5,6 +5,8 @@
  - Expose texture handling methods internally
 */
 
+#include <string>
+
 #include <GL/glew.h>
 
 namespace ammonite {

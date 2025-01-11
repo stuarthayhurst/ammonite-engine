@@ -1,6 +1,8 @@
 #ifndef HASH
 #define HASH
 
+#include <string>
+
 namespace ammonite {
   namespace utils {
     namespace files {

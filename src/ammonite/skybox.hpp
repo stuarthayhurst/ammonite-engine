@@ -1,6 +1,8 @@
 #ifndef SKYBOX
 #define SKYBOX
 
+#include <string>
+
 #include "types.hpp"
 
 namespace ammonite {
