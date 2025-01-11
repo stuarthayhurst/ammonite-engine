@@ -20,7 +20,7 @@
 #include "../utils/logging.hpp"
 
 //Class definitions
-namespace ammonite {
+namespace {
   typedef std::map<AmmoniteId, ammonite::models::internal::ModelInfo> ModelTrackerMap;
   typedef std::map<AmmoniteId, ammonite::models::internal::ModelInfo*> ModelPtrTrackerMap;
   typedef std::map<std::string, ammonite::models::internal::ModelData> ModelDataMap;
