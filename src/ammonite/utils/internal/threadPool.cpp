@@ -9,7 +9,7 @@
 #include "../debug.hpp"
 #include "../logging.hpp"
 
-#define MAX_THREADS 512
+constexpr unsigned int MAX_THREADS = 512;
 
 namespace {
   struct WorkItem {

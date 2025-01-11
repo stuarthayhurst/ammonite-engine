@@ -5,8 +5,9 @@
 #include "ammonite/ammonite.hpp"
 #include "ammonite/utils/internal/threadPool.hpp"
 
-#define JOB_COUNT (2 << 16)
+constexpr unsigned int JOB_COUNT = (2 << 16);
 
+//NOLINTBEGIN(cppcoreguidelines-macro-usage)
 #define CREATE_THREAD_POOL(THREADS) \
 if (!ammonite::utils::thread::internal::createThreadPool((THREADS))) { \
   ammonite::utils::error << "Failed to create thread pool, exiting" << std::endl; \
@@ -64,6 +65,7 @@ for (unsigned int i = 0; i < (jobCount); i++) { \
   } \
 } \
 delete [] values;
+//NOLINTEND(cppcoreguidelines-macro-usage)
 
 namespace {
   struct ResubmitData {

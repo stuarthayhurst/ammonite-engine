@@ -35,7 +35,6 @@ namespace ammonite {
         if (*frameLimitPtr > 1.0f) {
           //Initial length of allowable error in seconds
           static double maxError = (1.0 / 50000.0);
-          #define errorAdjustCoeff 1.01
 
           //Sleep for successively shorter intervals until the frametime budget is gone
           const double targetFrameTime = 1.0 / *frameLimitPtr;
@@ -47,6 +46,7 @@ namespace ammonite {
           }
 
           //Adjust maxError to provide a closer framerate limit
+          const double errorAdjustCoeff = 1.01;
           const double currTime = targetFrameTimer.getTime();
           if (currTime < targetFrameTime) {
             maxError *= (1.0 / errorAdjustCoeff);

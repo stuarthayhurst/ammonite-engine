@@ -16,6 +16,7 @@ namespace ammonite {
       OutputHelper(std::ostream& output, std::string pre):outputStream(output) {
         prefix = pre;
       }
+
       template<typename T> OutputHelper& operator << (T&& x) {
         if (hasFlushed) {
           outputStream << prefix << x;

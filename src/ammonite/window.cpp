@@ -14,7 +14,7 @@
 #include "input.hpp"
 #include "enums.hpp"
 
-#define DEFAULT_TITLE "Ammonite Window"
+constexpr std::string DEFAULT_TITLE = "Ammonite Window";
 
 namespace ammonite {
   namespace window {

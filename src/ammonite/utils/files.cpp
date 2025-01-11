@@ -19,7 +19,7 @@
 #include "internal/hash.hpp"
 #include "files.hpp"
 
-#define MAX_LOAD_ATTEMPTS 10
+constexpr unsigned int MAX_LOAD_ATTEMPTS = 10;
 
 namespace ammonite {
   namespace utils {
@@ -338,7 +338,7 @@ namespace ammonite {
 
         //Attempt to load the cache file, try another string on collision
         unsigned char* cacheData = nullptr;
-        int attempts = 0;
+        unsigned int attempts = 0;
         bool collision = true;
         bool failed = false;
         while (collision && attempts < MAX_LOAD_ATTEMPTS) {

@@ -17,9 +17,11 @@
 #include "demos/monkey.hpp"
 #include "demos/sponza.hpp"
 
+//NOLINTBEGIN(cppcoreguidelines-macro-usage)
 #define EXPAND_DEMO(DEMO_NAME, NAMESPACE) {std::string(DEMO_NAME), \
   {NAMESPACE::preRendererInit, NAMESPACE::postRendererInit, \
    NAMESPACE::rendererMainloop, NAMESPACE::demoExit}}
+//NOLINTEND(cppcoreguidelines-macro-usage)
 
 #define HAS_SETUP_WINDOW   (1 << 0)
 #define HAS_SETUP_RENDERER (1 << 1)
