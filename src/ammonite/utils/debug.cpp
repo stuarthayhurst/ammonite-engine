@@ -12,13 +12,15 @@ ammonite::utils::OutputHelper ammoniteInternalDebug(std::cout, "DEBUG: ");
 namespace ammonite {
   namespace utils {
     namespace {
-      static void GLAPIENTRY debugMessageCallback(GLenum, GLenum type, GLuint, GLenum severity, GLsizei, const GLchar* message, const void*) {
+      static void GLAPIENTRY debugMessageCallback(GLenum, GLenum type, GLuint, GLenum severity,
+                                                  GLsizei, const GLchar* message, const void*) {
         std::cerr << "\nGL MESSAGE ";
         switch (severity) {
           case GL_DEBUG_SEVERITY_HIGH: std::cerr << "(High priority): "; break;
           case GL_DEBUG_SEVERITY_MEDIUM: std::cerr << "(Medium priority): "; break;
           case GL_DEBUG_SEVERITY_LOW: std::cerr << "(Low priority): "; break;
           case GL_DEBUG_SEVERITY_NOTIFICATION: std::cerr << "(Notification): "; break;
+          default: std::cerr << "(Unknown severity): "; break;
         }
 
         switch (type) {
@@ -31,6 +33,7 @@ namespace ammonite {
           case GL_DEBUG_TYPE_PUSH_GROUP: std::cerr << "PUSH GROUP"; break;
           case GL_DEBUG_TYPE_POP_GROUP: std::cerr << "POP GROUP"; break;
           case GL_DEBUG_TYPE_OTHER: std::cerr << "OTHER"; break;
+          default: std::cerr << "UNKNOWN"; break;
         }
 
         std::cerr << std::endl;
