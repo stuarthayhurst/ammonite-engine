@@ -86,7 +86,7 @@ namespace ammonite {
           std::size_t filesize = 0;
           std::time_t modificationTime = 0;
           char* token = parseToken((char*)extraDataCopy, '\n', &state);
-          do {
+          while (internalFileCount <= fileCount) {
             //Give up if token is null, we didn't find enough files
             if (token == nullptr) {
               break;
@@ -134,7 +134,7 @@ namespace ammonite {
               result = AMMONITE_CACHE_HIT;
             }
             internalFileCount += 1;
-          } while (fileCount >= internalFileCount);
+          }
 
           delete [] extraDataCopy;
           return result;
@@ -339,9 +339,9 @@ namespace ammonite {
         //Attempt to load the cache file, try another string on collision
         unsigned char* cacheData = nullptr;
         int attempts = 0;
-        bool collision = false;
+        bool collision = true;
         bool failed = false;
-        do {
+        while (collision && attempts < MAX_LOAD_ATTEMPTS) {
           collision = false;
 
           //Check cache file exists
@@ -398,7 +398,7 @@ namespace ammonite {
 
           //Increment attempts, and try again if we had a collision
           attempts++;
-        } while (collision && attempts < MAX_LOAD_ATTEMPTS);
+        }
 
         //Handle too many collision resolution attempts
         if (attempts >= MAX_LOAD_ATTEMPTS && collision) {
