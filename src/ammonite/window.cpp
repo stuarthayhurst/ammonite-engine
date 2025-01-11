@@ -215,7 +215,7 @@ namespace ammonite {
     }
 
     int getMonitors(GLFWmonitor*** monitorsPtr) {
-      int monitorCount;
+      int monitorCount = 0;
       *monitorsPtr = glfwGetMonitors(&monitorCount);
       return monitorCount;
     }

@@ -39,11 +39,10 @@ namespace ammonite {
      - Returns 0 on failure
     */
     AmmoniteId createSkybox(std::string texturePaths[6], bool flipTextures, bool srgbTextures) {
-      GLuint textureId;
+      GLuint textureId = 0;
       glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &textureId);
 
       //Load each face into a cubemap
-      int width, height, nChannels;
       bool hasCreatedStorage = false;
       for (int i = 0; i < 6; i++) {
         if (flipTextures) {
@@ -51,6 +50,7 @@ namespace ammonite {
         }
 
         //Read the image data
+        int width = 0, height = 0, nChannels = 0;
         unsigned char* imageData = stbi_load(texturePaths[i].c_str(), &width, &height, &nChannels, 0);
 
         //Disable texture flipping, to avoid interfering with future calls
@@ -59,8 +59,7 @@ namespace ammonite {
         }
 
         //Decide the format of the texture and data
-        GLenum internalFormat;
-        GLenum dataFormat;
+        GLenum internalFormat = 0, dataFormat = 0;
         if (!ammonite::textures::internal::getTextureFormat(nChannels, srgbTextures,
             &internalFormat, &dataFormat)) {
           //Free image data, destroy texture, set failure and return

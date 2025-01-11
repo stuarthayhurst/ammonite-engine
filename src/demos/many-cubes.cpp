@@ -101,7 +101,7 @@ namespace manyCubesDemo {
     for (unsigned int i = 0; i < lightCount; i++) {
       bool invalid = true;
       AmmoniteId currLightSourceId = lightSourceIds[i];
-      float x, z;
+      float x = 0.0f, z = 0.0f;
       while (invalid) {
         x = (float)ammonite::utils::randomDouble(-1.0, 1.0);
         z = (float)ammonite::utils::randomDouble(-1.0, 1.0);

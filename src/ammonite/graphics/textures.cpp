@@ -109,7 +109,7 @@ namespace ammonite {
         }
 
         //Create a texture, its storage, and then fill it
-        GLuint textureId;
+        GLuint textureId = 0;
         glCreateTextures(GL_TEXTURE_2D, 1, &textureId);
         glTextureStorage2D(textureId, textureLevels, textureFormat, width, height);
         glTextureSubImage2D(textureId, 0, 0, 0, width, height, dataFormat, GL_UNSIGNED_BYTE, data);
@@ -147,7 +147,7 @@ namespace ammonite {
         }
 
         //Read image data
-        int width, height, nChannels;
+        int width = 0, height = 0, nChannels = 0;
         unsigned char* data = stbi_load(texturePath.c_str(), &width, &height, &nChannels, 0);
         if (flipTexture) {
           stbi_set_flip_vertically_on_load_thread(false);
@@ -160,7 +160,7 @@ namespace ammonite {
         }
 
         //Decide the format of the texture and data
-        GLenum textureFormat, dataFormat;
+        GLenum textureFormat = 0, dataFormat = 0;
         if (!decideTextureFormat(nChannels, srgbTexture, &textureFormat, &dataFormat)) {
           ammonite::utils::warning << "Failed to load texture '" << texturePath << "'" \
                                    << std::endl;

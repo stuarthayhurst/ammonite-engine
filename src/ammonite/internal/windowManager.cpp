@@ -33,11 +33,11 @@ namespace ammonite {
 
       namespace {
         static GLFWmonitor* getClosestMonitor() {
-          int monitorCount;
+          int monitorCount = 0;
           GLFWmonitor **monitors = glfwGetMonitors(&monitorCount);
 
           //Get window position and size
-          int wx, wy, ww, wh;
+          int wx = 0, wy = 0, ww = 0, wh = 0;
           glfwGetWindowPos(windowPtr, &wx, &wy);
           glfwGetWindowSize(windowPtr, &ww, &wh);
 
@@ -45,7 +45,7 @@ namespace ammonite {
           int bestOverlap = 0;
           GLFWmonitor *bestMonitor = nullptr;
           for (int i = 0; i < monitorCount; i++) {
-            int mx, my, mw, mh;
+            int mx = 0, my = 0, mw = 0, mh = 0;
             const GLFWvidmode* mode = glfwGetVideoMode(monitors[i]);
             glfwGetMonitorPos(monitors[i], &mx, &my);
             mw = mode->width;

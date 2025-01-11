@@ -178,7 +178,7 @@ namespace ammonite {
       GLuint shaderId = glCreateShader(shaderType);
 
       //Read the shader's source code
-      std::size_t shaderCodeSize;
+      std::size_t shaderCodeSize = 0;
       char* shaderCodePtr = (char*)ammonite::utils::files::loadFile(shaderPath,
                                                                     &shaderCodeSize);
       if (shaderCodePtr == nullptr) {
@@ -269,13 +269,13 @@ namespace ammonite {
       isCacheSupported = isCacheSupported && isBinaryCacheSupported;
 
       //Try and fetch the cache, then try and load it into a program
-      GLuint programId;
+      GLuint programId = 0;
       std::string cacheFilePath;
       if (isCacheSupported) {
-        unsigned char* userData;
-        std::size_t cacheDataSize;
-        std::size_t userDataSize;
-        AmmoniteEnum cacheState;
+        unsigned char* userData = nullptr;
+        std::size_t cacheDataSize = 0;
+        std::size_t userDataSize = 0;
+        AmmoniteEnum cacheState = AMMONITE_CACHE_INVALID;
 
         //Attempt to load the cached program
         unsigned char* cacheData = ammonite::utils::files::getCachedFile(&cacheFilePath,

@@ -352,7 +352,7 @@ namespace ammonite {
           }
 
           //Attempt to read the cache if it exists, writes to size
-          std::size_t size;
+          std::size_t size = 0;
           std::size_t blockSizes[3];
           cacheData = loadFile(*cacheFilePath, &size);
           if (cacheData == nullptr || size < sizeof(blockSizes)) {

@@ -55,8 +55,8 @@ namespace ammonite {
 
     //Returns the length of time the timer has been active
     double Timer::getTime() {
-      std::time_t seconds;
-      std::time_t nanoseconds;
+      std::time_t seconds = 0;
+      std::time_t nanoseconds = 0;
 
       //Get the time and convert it to a double
       getTime(&seconds, &nanoseconds);
