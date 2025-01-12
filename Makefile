@@ -1,4 +1,5 @@
 SHELL = bash -O globstar
+TIDY ?= clang-tidy
 
 LIBS = glm glfw3 glew stb assimp
 BUILD_DIR ?= build
@@ -93,7 +94,7 @@ $(BUILD_DIR)/compile_flags.txt: Makefile
 		echo $$arg >> "$(BUILD_DIR)/compile_flags.txt"; \
 	done
 $(OBJECT_DIR)/%.linted: ./src/% $(BUILD_DIR)/compile_flags.txt .clang-tidy
-	clang-tidy --quiet -p "$(BUILD_DIR)" "$<"
+	$(TIDY) --quiet -p "$(BUILD_DIR)" "$<"
 	@mkdir -p "$$(dirname $@)"
 	@touch "$@"
 

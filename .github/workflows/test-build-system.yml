@@ -14,9 +14,11 @@ jobs:
     - uses: actions/checkout@v4
     - name: Install build dependencies
       run: |
+        wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+        echo "deb http://apt.llvm.org/noble/ llvm-toolchain-noble-19 main" | sudo tee -a /etc/apt/sources.list
         sudo apt-get update
         sudo apt-get install --no-install-recommends make pkg-config build-essential
-        sudo apt-get install --no-install-recommends g++-14 clang-18
+        sudo apt-get install g++-14 clang-19
         sudo apt-get install --no-install-recommends inkscape optipng
         sudo apt-get install --no-install-recommends libglm-dev libglfw3-dev libglew-dev libstb-dev libassimp-dev
 
@@ -46,15 +48,15 @@ jobs:
 
     - name: (clang++) Test shared library build target
       run: |
-        CXX="clang++-18" make library -j$(nproc)
+        CXX="clang++-19" make library -j$(nproc)
 
     - name: (clang++) Test demo build target
       run: |
-        CXX="clang++-18" make build -j$(nproc)
+        CXX="clang++-19" make build -j$(nproc)
 
     - name: (clang++) (DEBUG) Test debug demo build target
       run: |
-        CXX="clang++-18" make debug -j$(nproc)
+        CXX="clang++-19" make debug -j$(nproc)
 
     - name: (clang++) Check built objects are present
       run: |

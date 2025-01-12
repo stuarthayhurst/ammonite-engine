@@ -14,9 +14,11 @@ jobs:
     - uses: actions/checkout@v4
     - name: Install build dependencies
       run: |
+        wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+        echo "deb http://apt.llvm.org/noble/ llvm-toolchain-noble-19 main" | sudo tee -a /etc/apt/sources.list
         sudo apt-get update
         sudo apt-get install --no-install-recommends make pkg-config build-essential
-        sudo apt-get install --no-install-recommends g++-14 clang-18
+        sudo apt-get install g++-14 clang-19
         sudo apt-get install --no-install-recommends libglm-dev libglfw3-dev libglew-dev libstb-dev libassimp-dev
 
     - name: (g++) (DEBUG) Build thread tester
@@ -40,7 +42,7 @@ jobs:
     - name: (clang++) (DEBUG) Build thread tester
       run: |
         make clean
-        CXX="clang++-18" DEBUG="true" make threads -j$(nproc)
+        CXX="clang++-19" DEBUG="true" make threads -j$(nproc)
 
     - name: (clang++) (DEBUG) Run thread tester
       run: |
@@ -49,7 +51,7 @@ jobs:
     - name: (clang++) (CHECK_THREADS) Build thread tester
       run: |
         make clean
-        CXX="clang++-18" CHECK_THREADS="true" make threads -j$(nproc)
+        CXX="clang++-19" CHECK_THREADS="true" make threads -j$(nproc)
 
     - name: (clang++) (CHECK_THREADS) Run thread tester
       run: |

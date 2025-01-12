@@ -36,6 +36,7 @@
     - `HEADER_DIR` - Install Ammonite headers to a different location
     - `CHECK_LEAKS` - Enables `-fsanitize=leak` for runtime leak checking
     - `CHECK_THREADS` - Enables `-fsanitize=thread` for runtime data race checking
+    - `TIDY` - Override default choice for `clang-tidy`
 
 ## Debug mode:
   - To compile in debug mode, use `make debug` or `DEBUG=true make ...`
