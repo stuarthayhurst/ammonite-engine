@@ -1,5 +1,6 @@
 #include <cstddef>
 #include <iostream>
+#include <iterator>
 #include <map>
 #include <string>
 #include <algorithm>
@@ -11,6 +12,7 @@
 #include <glm/gtx/quaternion.hpp>
 
 #include "../enums.hpp"
+#include "../types.hpp"
 
 #include "internal/modelTypes.hpp"
 #include "internal/modelLoader.hpp"

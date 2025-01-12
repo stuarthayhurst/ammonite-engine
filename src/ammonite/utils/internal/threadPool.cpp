@@ -1,8 +1,10 @@
 #include <atomic>
 #include <cstddef>
 #include <cstdint>
+#include <iostream>
 #include <mutex>
 #include <queue>
+#include <system_error>
 #include <thread>
 
 #include "../../types.hpp"

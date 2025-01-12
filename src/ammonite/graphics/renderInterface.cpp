@@ -4,11 +4,9 @@
 
 #include <GLFW/glfw3.h>
 
-#include "../utils/files.hpp"
 #include "../utils/logging.hpp"
 #include "../utils/timer.hpp"
 
-#include "../internal/internalInterface.hpp"
 #include "../interface.hpp"
 
 #include "internal/internalRenderCore.hpp"

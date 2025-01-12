@@ -1,4 +1,3 @@
-#include <algorithm>
 #include <filesystem>
 #include <iostream>
 #include <string>
@@ -13,6 +12,7 @@
 #include "utils/logging.hpp"
 #include "input.hpp"
 #include "enums.hpp"
+#include "types.hpp"
 
 constexpr std::string DEFAULT_TITLE = "Ammonite Window";
 

@@ -1,8 +1,11 @@
 #include <cstddef>
+#include <cstdio>
+#include <cstdlib>
 #include <cstring>
 #include <ctime>
 #include <chrono>
 #include <filesystem>
+#include <iostream>
 #include <string>
 
 #include <errno.h>
@@ -11,7 +14,6 @@
 #include <unistd.h>
 
 #include "../enums.hpp"
-#include "../types.hpp"
 
 #include "debug.hpp"
 #include "logging.hpp"

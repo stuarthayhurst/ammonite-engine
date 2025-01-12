@@ -1,11 +1,12 @@
-#include <iostream>
-#include <map>
-#include <vector>
-#include <string>
-#include <chrono>
+#include <algorithm>
 #include <cmath>
 #include <cstdlib>
+#include <iostream>
+#include <iterator>
+#include <map>
+#include <string>
 #include <utility>
+#include <vector>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -18,11 +19,10 @@
 
 #include "../internal/internalCamera.hpp"
 #include "../internal/windowManager.hpp"
-
 #include "../internal/internalInterface.hpp"
-#include "../interface.hpp"
 
 #include "../models/internal/modelTracker.hpp"
+#include "../models/internal/modelTypes.hpp"
 
 #include "../lighting/internal/lightTypes.hpp"
 #include "../lighting/internal/internalLighting.hpp"
@@ -30,6 +30,7 @@
 #include "../lighting/lightInterface.hpp"
 
 #include "../camera.hpp"
+#include "../types.hpp"
 #include "../enums.hpp"
 #include "../skybox.hpp"
 

@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <cctype>
 #include <cstddef>
 #include <cstdlib>
 #include <cstring>
@@ -10,6 +11,7 @@
 
 #include <GL/glew.h>
 
+#include "../enums.hpp"
 #include "../utils/debug.hpp"
 #include "../utils/files.hpp"
 #include "../utils/logging.hpp"
