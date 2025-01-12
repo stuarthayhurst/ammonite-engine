@@ -1,4 +1,5 @@
 #include <cstddef>
+#include <cstdint>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -241,9 +242,9 @@ namespace ammonite {
           ammonite::utils::warning << "Error while advising kernel, continuing" << std::endl;
         }
 
-        off_t bytesRead = 0;
+        intmax_t bytesRead = 0;
         while (bytesRead < statBuf.st_size) {
-          off_t newBytesRead = read(descriptor, data + bytesRead, statBuf.st_size - bytesRead);
+          intmax_t newBytesRead = read(descriptor, data + bytesRead, statBuf.st_size - bytesRead);
           if (newBytesRead == 0) {
             break;
           } else if (newBytesRead < 0) {
@@ -292,7 +293,7 @@ namespace ammonite {
 
         std::size_t bytesWritten = 0;
         while (bytesWritten < size) {
-          off_t newBytesWritten = write(descriptor, data + bytesWritten, size - bytesWritten);
+          intmax_t newBytesWritten = write(descriptor, data + bytesWritten, size - bytesWritten);
           if (newBytesWritten == 0) {
             break;
           } else if (newBytesWritten < 0) {
