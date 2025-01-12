@@ -6,8 +6,11 @@
 #include "logging.hpp"
 
 #ifdef DEBUG
-//NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
+/*NOLINTBEGIN(cppcoreguidelines-avoid-non-const-global-variables,
+              cppcoreguidelines-interfaces-global-init)*/
 ammonite::utils::OutputHelper ammoniteInternalDebug(std::cout, "DEBUG: ");
+/*NOLINTEND(cppcoreguidelines-avoid-non-const-global-variables,
+            cppcoreguidelines-interfaces-global-init)*/
 #endif
 
 namespace ammonite {
