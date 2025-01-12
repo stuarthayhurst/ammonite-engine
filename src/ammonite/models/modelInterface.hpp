@@ -3,7 +3,6 @@
 
 #include <glm/glm.hpp>
 
-#include "../enums.hpp"
 #include "../types.hpp"
 
 namespace ammonite {

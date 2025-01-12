@@ -2,11 +2,9 @@
 #define INTERNALINTERFACE
 
 /* Internally exposed header:
- - Allow access to loading screen data
+ - Allow access to loading screen data by ID
  - Provide the LoadingScreen struct
 */
-
-#include <map>
 
 #include <glm/glm.hpp>
 

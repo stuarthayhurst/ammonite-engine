@@ -5,8 +5,11 @@
 #include <vector>
 
 #include <assimp/Importer.hpp>
-#include <assimp/scene.h>
+#include <assimp/mesh.h>
+#include <assimp/material.h>
 #include <assimp/postprocess.h>
+#include <assimp/scene.h>
+#include <assimp/types.h>
 
 #include "internal/modelTypes.hpp"
 #include "internal/modelLoader.hpp"
