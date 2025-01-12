@@ -25,17 +25,5 @@ namespace ammonite {
   }
 }
 
-#ifdef DEBUG
-namespace ammonite {
-  namespace utils {
-    namespace thread {
-      namespace internal {
-        bool debugCheckRemainingWork(bool verbose);
-      }
-    }
-  }
-}
-#endif
-
 #endif
 

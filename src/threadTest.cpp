@@ -14,17 +14,6 @@ if (!ammonite::utils::thread::internal::createThreadPool((THREADS))) { \
   return false; \
 }
 
-#ifdef DEBUG
-  #define DESTROY_THREAD_POOL \
-  ammonite::utils::thread::internal::destroyThreadPool(); \
-  if (ammonite::utils::thread::internal::debugCheckRemainingWork(false)) { \
-    passed = false; \
-  }
-#else
-  #define DESTROY_THREAD_POOL \
-  ammonite::utils::thread::internal::destroyThreadPool();
-#endif
-
 #define INIT_TIMERS \
 ammonite::utils::Timer submitTimer; \
 ammonite::utils::Timer runTimer; \
@@ -114,7 +103,7 @@ namespace {
     FINISH_TIMERS
     VERIFY_WORK(jobCount)
 
-    DESTROY_THREAD_POOL
+    ammonite::utils::thread::internal::destroyThreadPool();
     return passed;
   }
 
@@ -133,7 +122,7 @@ namespace {
     FINISH_TIMERS
     VERIFY_WORK(jobCount)
 
-    DESTROY_THREAD_POOL
+    ammonite::utils::thread::internal::destroyThreadPool();
     return passed;
   }
 
@@ -147,7 +136,7 @@ namespace {
     submitTimer.pause();
 
     //Finish work
-    DESTROY_THREAD_POOL
+    ammonite::utils::thread::internal::destroyThreadPool();
     FINISH_TIMERS
     VERIFY_WORK(jobCount)
 
@@ -172,7 +161,7 @@ namespace {
     FINISH_TIMERS
     VERIFY_WORK(jobCount)
 
-    DESTROY_THREAD_POOL
+    ammonite::utils::thread::internal::destroyThreadPool();
     return passed;
   }
 
@@ -201,7 +190,7 @@ namespace {
     FINISH_TIMERS
     VERIFY_WORK(jobCount)
 
-    DESTROY_THREAD_POOL
+    ammonite::utils::thread::internal::destroyThreadPool();
     return passed;
   }
 
@@ -228,7 +217,7 @@ namespace {
     FINISH_TIMERS
     delete [] data;
     VERIFY_WORK(jobCount)
-    DESTROY_THREAD_POOL
+    ammonite::utils::thread::internal::destroyThreadPool();
 
     return passed;
   }
@@ -251,7 +240,7 @@ namespace {
       ammonite::utils::error << "Failed to verify work" << std::endl;
     }
 
-    DESTROY_THREAD_POOL
+    ammonite::utils::thread::internal::destroyThreadPool();
     return passed;
   }
 
@@ -273,7 +262,7 @@ namespace {
     FINISH_TIMERS
     VERIFY_WORK(jobCount)
 
-    DESTROY_THREAD_POOL
+    ammonite::utils::thread::internal::destroyThreadPool();
     return passed;
   }
 
@@ -297,7 +286,7 @@ namespace {
     FINISH_TIMERS
     VERIFY_WORK(jobCount)
 
-    DESTROY_THREAD_POOL
+    ammonite::utils::thread::internal::destroyThreadPool();
     return passed;
   }
 
@@ -314,7 +303,7 @@ namespace {
     submitTimer.pause();
 
     //Finish work
-    DESTROY_THREAD_POOL
+    ammonite::utils::thread::internal::destroyThreadPool();
     FINISH_TIMERS
     VERIFY_WORK(jobCount)
 
@@ -332,7 +321,7 @@ namespace {
     ammonite::utils::thread::unblockThreads();
 
     SUBMIT_JOBS(jobCount)
-    DESTROY_THREAD_POOL
+    ammonite::utils::thread::internal::destroyThreadPool();
     VERIFY_WORK(jobCount)
     return passed;
   }
@@ -345,7 +334,7 @@ namespace {
     ammonite::utils::thread::unblockThreads();
 
     SUBMIT_JOBS(jobCount)
-    DESTROY_THREAD_POOL
+    ammonite::utils::thread::internal::destroyThreadPool();
     VERIFY_WORK(jobCount)
     return passed;
   }
@@ -359,7 +348,7 @@ namespace {
     SUBMIT_JOBS(jobCount)
     ammonite::utils::thread::unblockThreads();
 
-    DESTROY_THREAD_POOL
+    ammonite::utils::thread::internal::destroyThreadPool();
     VERIFY_WORK(jobCount)
     return passed;
   }
@@ -371,7 +360,7 @@ namespace {
     ammonite::utils::thread::blockThreads();
 
     SUBMIT_JOBS(jobCount)
-    DESTROY_THREAD_POOL
+    ammonite::utils::thread::internal::destroyThreadPool();
     VERIFY_WORK(jobCount)
     return passed;
   }
@@ -384,7 +373,7 @@ namespace {
     ammonite::utils::thread::unblockThreads();
 
     SUBMIT_JOBS(jobCount)
-    DESTROY_THREAD_POOL
+    ammonite::utils::thread::internal::destroyThreadPool();
     VERIFY_WORK(jobCount)
     return passed;
   }
@@ -395,7 +384,7 @@ namespace {
     ammonite::utils::thread::unblockThreads();
 
     SUBMIT_JOBS(jobCount)
-    DESTROY_THREAD_POOL
+    ammonite::utils::thread::internal::destroyThreadPool();
     VERIFY_WORK(jobCount)
     return passed;
   }

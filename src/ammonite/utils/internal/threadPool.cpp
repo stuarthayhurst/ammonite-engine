@@ -8,7 +8,6 @@
 #include <thread>
 
 #include "../../types.hpp"
-#include "../debug.hpp"
 #include "../logging.hpp"
 
 constexpr unsigned int MAX_THREADS = 512;
@@ -210,22 +209,6 @@ namespace ammonite {
           unblockThreads();
         }
 
-#ifdef DEBUG
-        bool debugCheckRemainingWork(bool verbose) {
-          bool issuesFound = false;
-
-          if (jobCount != 0) {
-            issuesFound = true;
-            if (verbose) {
-              ammoniteInternalDebug << "WARNING: Job count is non-zero (" \
-                                    << jobCount << ")" << std::endl;
-            }
-          }
-
-          return issuesFound;
-        }
-#endif
-
         //Finish work already in the queue and kill the threads
         void destroyThreadPool() {
           //Finish existing work and block new work from starting
@@ -247,10 +230,6 @@ namespace ammonite {
                                        << " while destroying thread pool" << std::endl;
             }
           }
-
-#ifdef DEBUG
-          debugCheckRemainingWork(true);
-#endif
 
           //Reset remaining data
           delete workQueue;
