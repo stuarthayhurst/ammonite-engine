@@ -81,12 +81,34 @@ Checks: [
   'bugprone-unused-raii',
   'bugprone-unused-return-value',
   'bugprone-use-after-move',
-  'bugprone-virtual-near-miss'
+  'bugprone-virtual-near-miss',
+  'cert-dcl58-cpp',
+  'cert-flp30-c',
+  'cert-mem57-cpp',
+  'cppcoreguidelines-avoid-capturing-lambda-coroutines',
+  'cppcoreguidelines-avoid-const-or-ref-data-members',
+  'cppcoreguidelines-avoid-do-while',
+  'cppcoreguidelines-avoid-goto',
+  'cppcoreguidelines-avoid-non-const-global-variables',
+  'cppcoreguidelines-avoid-reference-coroutine-parameters',
+  'cppcoreguidelines-init-variables',
+  'cppcoreguidelines-interfaces-global-init',
+  'cppcoreguidelines-macro-usage',
+  'cppcoreguidelines-misleading-capture-default-by-value',
+  'cppcoreguidelines-missing-std-forward',
+  'cppcoreguidelines-no-malloc',
+  'cppcoreguidelines-no-suspend-with-lock',
+  'cppcoreguidelines-prefer-member-initializer',
+  'misc-confusable-identifiers',
+  'misc-definitions-in-headers',
+  'misc-header-include-cycle',
 ]
 CheckOptions:
   - key: bugprone-implicit-widening-of-multiplication-result.UseCXXStaticCastsInCppSources
     value: false
   - key: bugprone-misplaced-widening-cast.CheckImplicitCasts
+    value: true
+  - key: cppcoreguidelines-avoid-non-const-global-variables.AllowInternalLinkage
     value: true
 WarningsAsErrors: 'true,*'
 SystemHeaders: 'false'
