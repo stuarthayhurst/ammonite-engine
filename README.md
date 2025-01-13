@@ -17,7 +17,7 @@
   - Keyboard and mouse input handling
 
 ## Requirements:
-  - A `c++23` compatible compiler (`g++ 14+` / `clang 18+`)
+  - A `c++23` compatible compiler (`g++ (14+)` / `clang (18+)`)
     - Toolchain support for thread-local variables
     - All build and runtime dependencies installed
   - A 64-bit Linux system
@@ -80,7 +80,7 @@
     - `libglm-dev libglfw3-dev libglew-dev libstb-dev libassimp-dev`
     - `libdecor-0-0 libdecor-0-plugin-1-gtk` are required for Wayland window decorations
   - ### Linting:
-    - `clang-tidy`
+    - `clang-tidy (19+)`
   - ### Icons:
     - `inkscape optipng`
 
