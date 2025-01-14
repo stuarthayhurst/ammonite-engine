@@ -14,7 +14,6 @@
 namespace objectFieldDemo {
   namespace {
     //IDs and pointer data
-    GLFWwindow* windowPtr;
     AmmoniteId cubeKeybindId;
     AmmoniteId shuffleKeybindId;
     std::vector<AmmoniteId> loadedModelIds;
@@ -238,7 +237,6 @@ namespace objectFieldDemo {
 
   bool postRendererInit() {
     AmmoniteId screenId = ammonite::interface::getActiveLoadingScreenId();
-    windowPtr = ammonite::window::getWindowPtr();
 
     //Generate random positions, orientations and sizes, skipping first item
     glm::vec3 cubeData[cubeCount][3];
