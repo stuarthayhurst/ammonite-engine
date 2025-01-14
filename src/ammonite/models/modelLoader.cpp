@@ -89,7 +89,7 @@ namespace ammonite {
               return false;
             }
 
-            textureIdGroup.diffuseId = (int)textureId;
+            textureIdGroup.diffuseId = textureId;
           }
 
           if (material->GetTextureCount(aiTextureType_SPECULAR) > 0) {
@@ -102,7 +102,7 @@ namespace ammonite {
               return false;
             }
 
-            textureIdGroup.specularId = (int)textureId;
+            textureIdGroup.specularId = textureId;
           }
 
           //Save texture IDs
