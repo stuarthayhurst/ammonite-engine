@@ -5,13 +5,12 @@
 #include <glm/gtc/constants.hpp>
 #include <GLFW/glfw3.h>
 
-#include "internal/inputManager.hpp"
-#include "internal/windowManager.hpp"
-
 #include "camera.hpp"
-#include "utils/timer.hpp"
 #include "enums.hpp"
 #include "types.hpp"
+#include "utils/timer.hpp"
+#include "internal/inputManager.hpp"
+#include "window/window.hpp"
 
 //Store and expose controls settings
 namespace ammonite {

@@ -5,8 +5,8 @@
 #include <glm/gtc/constants.hpp>
 
 #include "graphics/internal/internalRenderCore.hpp"
-#include "internal/windowManager.hpp"
 #include "types.hpp"
+#include "window/window.hpp"
 
 namespace ammonite {
   namespace camera {
@@ -67,7 +67,7 @@ namespace ammonite {
         glm::vec3 up = glm::cross(right, direction);
 
         //Calculate the projection matrix from FoV, aspect ratio and display range
-        float aspectRatio = ammonite::window::internal::getAspectRatio();
+        float aspectRatio = ammonite::window::internal::getGraphicsAspectRatio();
         projectionMatrix = glm::perspective(activeCamera.fov,
                                             aspectRatio, 0.1f, *renderFarPlanePtr);
 

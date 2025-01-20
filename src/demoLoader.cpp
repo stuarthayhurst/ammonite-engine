@@ -119,6 +119,10 @@ namespace {
     }
     frameRateTimer.reset();
   }
+
+  static void closeWindowCallback(std::vector<int>, int, void* userPtr) {
+    *(bool*)userPtr = true;
+  }
 }
 
 //Helpers
@@ -208,9 +212,9 @@ int main(int argc, char** argv) noexcept(false) {
   ammonite::utils::Timer utilityTimer;
 
 #ifdef DEBUG
-  ammonite::window::requestContextType(AMMONITE_DEBUG_CONTEXT);
+  ammonite::renderer::setup::requestContextType(AMMONITE_DEBUG_CONTEXT);
 #elifdef FAST
-  ammonite::window::requestContextType(AMMONITE_NO_ERROR_CONTEXT);
+  ammonite::renderer::setup::requestContextType(AMMONITE_NO_ERROR_CONTEXT);
 #endif
 
   //Setup window and icon
@@ -287,34 +291,36 @@ int main(int argc, char** argv) noexcept(false) {
   //Set keybinds
   std::vector<AmmoniteId> keybindIds;
   keybindIds.push_back(ammonite::input::registerToggleKeybind(
-                         GLFW_KEY_C, AMMONITE_ALLOW_OVERRIDE, inputFocusCallback, nullptr));
+                       GLFW_KEY_C, AMMONITE_ALLOW_OVERRIDE, inputFocusCallback, nullptr));
   keybindIds.push_back(ammonite::input::registerToggleKeybind(
-                         GLFW_KEY_F11, AMMONITE_ALLOW_OVERRIDE,
-                         fullscreenToggleCallback, nullptr));
+                       GLFW_KEY_F11, AMMONITE_ALLOW_OVERRIDE,
+                       fullscreenToggleCallback, nullptr));
   keybindIds.push_back(ammonite::input::registerToggleKeybind(
-                         GLFW_KEY_Z, focalToggleCallback, nullptr));
+                       GLFW_KEY_Z, focalToggleCallback, nullptr));
   keybindIds.push_back(ammonite::input::registerKeybind(
-                         GLFW_KEY_LEFT_CONTROL, sprintToggleCallback, nullptr));
+                       GLFW_KEY_LEFT_CONTROL, sprintToggleCallback, nullptr));
   keybindIds.push_back(ammonite::input::registerToggleKeybind(
-                         GLFW_KEY_B, cameraCycleCallback, &cameraData));
-
-  //Set keybind for closing window
-  keybindIds.push_back(ammonite::window::registerWindowCloseKeybind(GLFW_KEY_ESCAPE));
+                       GLFW_KEY_B, cameraCycleCallback, &cameraData));
 
   //Set keybinds to adjust focal depth
   float positive = 1.0f;
   float negative = -1.0f;
   keybindIds.push_back(ammonite::input::registerKeybind(
-                         GLFW_KEY_RIGHT_BRACKET, changeFocalDepthCallback, &positive));
+                       GLFW_KEY_RIGHT_BRACKET, changeFocalDepthCallback, &positive));
   keybindIds.push_back(ammonite::input::registerKeybind(
-                         GLFW_KEY_LEFT_BRACKET, changeFocalDepthCallback, &negative));
+                       GLFW_KEY_LEFT_BRACKET, changeFocalDepthCallback, &negative));
 
   //Set keybinds to adjust framerate limit
   keybindIds.push_back(ammonite::input::registerKeybind(
-                         GLFW_KEY_UP, changeFrameRateCallback, &positive));
+                       GLFW_KEY_UP, changeFrameRateCallback, &positive));
   keybindIds.push_back(ammonite::input::registerKeybind(
-                         GLFW_KEY_DOWN, changeFrameRateCallback, &negative));
+                       GLFW_KEY_DOWN, changeFrameRateCallback, &negative));
   setupBits |= HAS_SETUP_CONTROLS;
+
+  //Set keybind for closing window
+  bool closeWindow = false;
+  keybindIds.push_back(ammonite::input::registerToggleKeybind(GLFW_KEY_ESCAPE,
+                       AMMONITE_ALLOW_OVERRIDE, closeWindowCallback, &closeWindow));
 
   //Engine loaded, delete the loading screen
   ammonite::utils::status << "Loaded demo in " << utilityTimer.getTime() << "s\n" << std::endl;
@@ -325,7 +331,7 @@ int main(int argc, char** argv) noexcept(false) {
   ammonite::utils::Timer frameTimer;
 
   //Draw frames until window closed
-  while(!ammonite::window::shouldWindowClose()) {
+  while(!closeWindow && !ammonite::window::shouldWindowClose()) {
     //Every second, output the framerate
     if (frameTimer.getTime() >= 1.0f) {
       printMetrics(ammonite::renderer::getFrameTime());

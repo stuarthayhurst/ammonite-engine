@@ -16,6 +16,8 @@
 #include "utils/thread.hpp"
 #include "utils/timer.hpp"
 
+#include "window/window.hpp"
+
 #include "camera.hpp"
 #include "controls.hpp"
 #include "enums.hpp"
@@ -23,6 +25,5 @@
 #include "interface.hpp"
 #include "skybox.hpp"
 #include "types.hpp"
-#include "window.hpp"
 
 #endif

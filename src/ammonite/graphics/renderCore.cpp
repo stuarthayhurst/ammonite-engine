@@ -18,7 +18,6 @@
 #include "internal/internalShaders.hpp"
 
 #include "../internal/internalCamera.hpp"
-#include "../internal/windowManager.hpp"
 #include "../internal/internalInterface.hpp"
 
 #include "../models/internal/modelTracker.hpp"
@@ -28,6 +27,8 @@
 #include "../lighting/internal/internalLighting.hpp"
 #include "../lighting/lightStorage.hpp"
 #include "../lighting/lightInterface.hpp"
+
+#include "../window/window.hpp"
 
 #include "../camera.hpp"
 #include "../types.hpp"
@@ -135,7 +136,6 @@ namespace ammonite {
       }
 
       void setVsync(bool enabled) {
-        glfwSwapInterval(int(enabled));
         graphicsSettings.vsyncEnabled = enabled;
       }
 
@@ -844,20 +844,21 @@ namespace ammonite {
 
     namespace internal {
       void internalDrawLoadingScreen(AmmoniteId loadingScreenId) {
-        unsigned int width = ammonite::window::internal::getWidth();
-        unsigned int height = ammonite::window::internal::getHeight();
+        unsigned int width = ammonite::window::internal::getGraphicsWidth();
+        unsigned int height = ammonite::window::internal::getGraphicsHeight();
 
         drawLoadingScreen(loadingScreenId, width, height);
 
         //Prepare for next frame
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        finishFrame(ammonite::window::internal::getWindowPtr());
+        ammonite::window::internal::showFrame(window::internal::getWindowPtr(),
+          settings::getVsync(), settings::getFrameLimit());
       }
 
       void internalDrawFrame() {
         static unsigned int lastWidth = 0, lastHeight = 0;
-        unsigned int width = ammonite::window::internal::getWidth();
-        unsigned int height = ammonite::window::internal::getHeight();
+        unsigned int width = ammonite::window::internal::getGraphicsWidth();
+        unsigned int height = ammonite::window::internal::getGraphicsHeight();
 
         static float lastRenderResMultiplier = 0.0f;
         static float* renderResMultiplierPtr = settings::internal::getRenderResMultiplierPtr();
@@ -1083,7 +1084,8 @@ namespace ammonite {
         }
 
         //Display frame and handle any sleeping required
-        finishFrame(ammonite::window::internal::getWindowPtr());
+        ammonite::window::internal::showFrame(window::internal::getWindowPtr(),
+          settings::getVsync(), settings::getFrameLimit());
       }
     }
   }

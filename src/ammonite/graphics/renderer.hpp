@@ -4,11 +4,14 @@
 #include <cstdint>
 #include <string>
 
+#include "../enums.hpp"
+
 namespace ammonite {
   namespace renderer {
     namespace setup {
       bool setupRenderer(std::string shaderPath);
       void destroyRenderer();
+      void requestContextType(AmmoniteEnum contextType);
     }
 
     uintmax_t getTotalFrames();

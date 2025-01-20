@@ -6,12 +6,14 @@
 #include "../utils/timer.hpp"
 
 #include "../interface.hpp"
+#include "../window/window.hpp"
 
 #include "internal/internalRenderCore.hpp"
 #include "../internal/internalCamera.hpp"
 #include "../lighting/internal/internalLighting.hpp"
 #include "../utils/internal/threadPool.hpp"
 
+#include "../enums.hpp"
 #include "../types.hpp"
 
 /*
@@ -64,6 +66,19 @@ namespace ammonite {
         internal::destroyOpenGLObjects();
         lighting::internal::destroyLightSystem();
         internal::deleteModelCache();
+      }
+
+      void requestContextType(AmmoniteEnum contextType) {
+        switch (contextType) {
+        case AMMONITE_DEFAULT_CONTEXT:
+        case AMMONITE_NO_ERROR_CONTEXT:
+        case AMMONITE_DEBUG_CONTEXT:
+          ammonite::window::internal::setContextType(contextType);
+          return;
+        default:
+          ammonite::utils::warning << "Unknown context type '" << contextType << "' requested" << std::endl;
+          return;
+        }
       }
     }
 
