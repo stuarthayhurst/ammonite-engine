@@ -6,7 +6,6 @@
 #include <GLFW/glfw3.h>
 
 #include "../enums.hpp"
-#include "../types.hpp"
 
 namespace ammonite {
   namespace window {
