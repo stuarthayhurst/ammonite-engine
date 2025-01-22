@@ -1,5 +1,5 @@
-#ifndef AMMONITE
-#define AMMONITE
+#ifndef AMMONITELEGACY
+#define AMMONITELEGACY
 
 #include "graphics/renderer.hpp"
 
@@ -15,8 +15,6 @@
 #include "utils/random.hpp"
 #include "utils/thread.hpp"
 #include "utils/timer.hpp"
-
-#include "window/window.hpp"
 
 #include "camera.hpp"
 #include "controls.hpp"

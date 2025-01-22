@@ -4,13 +4,14 @@ TIDY ?= clang-tidy
 LIBS = glm glfw3 glew stb assimp
 BUILD_DIR ?= build
 CACHE_DIR = cache
+INCLUDE_DIR = src/include
 INSTALL_DIR ?= /usr/local/lib
 HEADER_DIR ?= /usr/local/include
 LIBRARY_NAME = libammonite.so.1
 
 AMMONITE_OBJECTS_SOURCE = $(shell ls ./src/ammonite/**/*.cpp)
 AMMONITE_HEADERS_SOURCE = $(shell ls ./src/ammonite/**/*.hpp)
-AMMONITE_HEADER_INSTALL := $(subst src/ammonite,$(HEADER_DIR)/ammonite,$(AMMONITE_HEADERS_SOURCE))
+AMMONITE_HEADER_INSTALL := $(subst ./src/ammonite,$(HEADER_DIR)/ammonite,$(AMMONITE_HEADERS_SOURCE))
 
 HELPER_OBJECTS_SOURCE = $(shell ls ./src/helper/**/*.cpp)
 HELPER_HEADERS_SOURCE = $(shell ls ./src/helper/**/*.hpp)
@@ -31,7 +32,8 @@ AMMONITE_OBJECTS = $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.o,$(AMMONITE_OBJECT
 HELPER_OBJECTS = $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.o,$(HELPER_OBJECTS_SOURCE)))
 DEMO_OBJECTS = $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.o,$(DEMO_OBJECTS_SOURCE)))
 
-CXXFLAGS += $(shell pkg-config --cflags $(LIBS))
+ROOT_DIR:=$(dir $(realpath $(firstword $(MAKEFILE_LIST))))
+CXXFLAGS += $(shell pkg-config --cflags $(LIBS)) "-I$(ROOT_DIR)$(INCLUDE_DIR)"
 CXXFLAGS += -Wall -Wextra -Werror -std=c++23 -flto=auto -O3
 LDFLAGS := $(shell pkg-config --libs $(LIBS)) -lm -latomic -pthread
 
@@ -111,14 +113,17 @@ threads: $(BUILD_DIR)/threadTest
 debug: clean
 	@DEBUG="true" $(MAKE) build
 library: $(BUILD_DIR)/$(LIBRARY_NAME)
-headers: $(AMMONITE_HEADER_INSTALL)
+headers:
+	@rm -rf "$(HEADER_DIR)/ammonite"
+	@cp -rv "src/include/ammonite" "$(HEADER_DIR)/ammonite"
+	$(MAKE) $(AMMONITE_HEADER_INSTALL)
 $(AMMONITE_HEADER_INSTALL):
-	@targetFile="/$@"; \
+	@targetFile="$@"; \
 	targetDir="$$(dirname $$targetFile)"; \
 	origFile="$${targetFile//'$(HEADER_DIR)'/src}"; \
 	if [[ "$$targetDir/" != */internal/* ]]; then \
 	  mkdir -p "$$targetDir" && \
-	  cp -v "$$origFile" "$$targetFile"; \
+	  cp -vn "$$origFile" "$$targetFile"; \
 	fi
 install:
 	@mkdir -p "$(INSTALL_DIR)/ammonite"
