@@ -6,10 +6,11 @@
 #include <GLFW/glfw3.h>
 
 #include "../enums.hpp"
+#include "../internal.hpp"
 
 namespace ammonite {
   namespace window {
-    namespace internal {
+    namespace AMMONITE_INTERNAL internal {
       struct ImageData {
         unsigned char* data;
         unsigned int width;
