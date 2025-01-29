@@ -18,10 +18,8 @@
 
 #include "camera.hpp"
 #include "controls.hpp"
-#include "enums.hpp"
 #include "input.hpp"
 #include "interface.hpp"
 #include "skybox.hpp"
-#include "types.hpp"
 
 #endif
