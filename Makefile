@@ -118,6 +118,7 @@ library: $(BUILD_DIR)/$(LIBRARY_NAME)
 headers:
 	@rm -rf "$(HEADER_DIR)/ammonite"
 	@cp -rvL "src/include/ammonite" "$(HEADER_DIR)/ammonite"
+	$(MAKE) $(AMMONITE_HEADER_INSTALL)
 $(AMMONITE_HEADER_INSTALL):
 	@targetFile="$@"; \
 	targetDir="$$(dirname $$targetFile)"; \
