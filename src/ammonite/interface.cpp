@@ -1,7 +1,7 @@
 #include <map>
 #include <iostream>
 
-#include "internal/internalInterface.hpp"
+#include "interface.hpp"
 
 #include "utils/logging.hpp"
 #include "types.hpp"
@@ -11,7 +11,7 @@ namespace ammonite {
     namespace {
       AmmoniteId activeLoadingScreenId = 0;
       unsigned int totalLoadingScreens = 0;
-      std::map<AmmoniteId, LoadingScreen> loadingScreenTracker;
+      std::map<AmmoniteId, internal::LoadingScreen> loadingScreenTracker;
     }
 
     //Internally exposed functions
@@ -25,7 +25,7 @@ namespace ammonite {
       totalLoadingScreens++;
 
       //Create and track the loading screen
-      LoadingScreen loadingScreen;
+      internal::LoadingScreen loadingScreen;
       AmmoniteId screenId = totalLoadingScreens;
       loadingScreenTracker[screenId] = loadingScreen;
 

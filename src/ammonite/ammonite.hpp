@@ -19,6 +19,5 @@
 #include "camera.hpp"
 #include "controls.hpp"
 #include "input.hpp"
-#include "interface.hpp"
 
 #endif

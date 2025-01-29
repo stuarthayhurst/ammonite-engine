@@ -18,7 +18,6 @@
 #include "internal/internalShaders.hpp"
 
 #include "../internal/internalCamera.hpp"
-#include "../internal/internalInterface.hpp"
 
 #include "../models/internal/modelTracker.hpp"
 #include "../models/internal/modelTypes.hpp"
@@ -31,9 +30,10 @@
 #include "../window/window.hpp"
 
 #include "../camera.hpp"
-#include "../types.hpp"
 #include "../enums.hpp"
+#include "../interface.hpp"
 #include "../skybox.hpp"
+#include "../types.hpp"
 
 #include "../utils/logging.hpp"
 #include "../utils/debug.hpp"
@@ -816,8 +816,8 @@ namespace ammonite {
         glUseProgram(loadingShader.shaderId);
 
         //Pass drawing parameters
-        ammonite::interface::LoadingScreen* loadingScreen =
-          ammonite::interface::internal::getLoadingScreenPtr(loadingScreenId);
+        interface::internal::LoadingScreen* loadingScreen =
+          interface::internal::getLoadingScreenPtr(loadingScreenId);
         glUniform1f(loadingShader.widthId, loadingScreen->width);
         glUniform1f(loadingShader.heightId, loadingScreen->height);
         glUniform1f(loadingShader.heightOffsetId, loadingScreen->heightOffset);
