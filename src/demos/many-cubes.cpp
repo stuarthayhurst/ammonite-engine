@@ -6,6 +6,7 @@
 #include <glm/glm.hpp>
 
 #include "../ammonite/ammonite.hpp"
+#include <ammonite/ammonite.hpp>
 
 namespace manyCubesDemo {
   namespace {

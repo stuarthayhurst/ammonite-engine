@@ -10,6 +10,7 @@
 #include <glm/gtc/constants.hpp>
 
 #include "../ammonite/ammonite.hpp"
+#include <ammonite/ammonite.hpp>
 
 namespace objectFieldDemo {
   namespace {

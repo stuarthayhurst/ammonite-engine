@@ -20,6 +20,5 @@
 #include "controls.hpp"
 #include "input.hpp"
 #include "interface.hpp"
-#include "skybox.hpp"
 
 #endif

@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "../ammonite/ammonite.hpp"
+#include <ammonite/ammonite.hpp>
 
 namespace monkeyDemo {
   namespace {
