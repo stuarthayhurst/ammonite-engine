@@ -115,8 +115,7 @@ debug: clean
 library: $(BUILD_DIR)/$(LIBRARY_NAME)
 headers:
 	@rm -rf "$(HEADER_DIR)/ammonite"
-	@cp -rv "src/include/ammonite" "$(HEADER_DIR)/ammonite"
-	$(MAKE) $(AMMONITE_HEADER_INSTALL)
+	@cp -rvL "src/include/ammonite" "$(HEADER_DIR)/ammonite"
 $(AMMONITE_HEADER_INSTALL):
 	@targetFile="$@"; \
 	targetDir="$$(dirname $$targetFile)"; \
