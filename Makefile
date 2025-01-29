@@ -12,6 +12,7 @@ LIBRARY_NAME = libammonite.so.1
 AMMONITE_OBJECTS_SOURCE = $(shell ls ./src/ammonite/**/*.cpp)
 AMMONITE_HEADERS_SOURCE = $(shell ls ./src/ammonite/**/*.hpp)
 AMMONITE_HEADER_INSTALL := $(subst ./src/ammonite,$(HEADER_DIR)/ammonite,$(AMMONITE_HEADERS_SOURCE))
+AMMONITE_INCLUDE_HEADERS_SOURCE += $(shell ls ./src/include/ammonite/**/*.hpp)
 
 HELPER_OBJECTS_SOURCE = $(shell ls ./src/helper/**/*.cpp)
 HELPER_HEADERS_SOURCE = $(shell ls ./src/helper/**/*.hpp)
@@ -23,7 +24,8 @@ ROOT_OBJECTS_SOURCE = $(shell ls ./src/*.cpp)
 
 ALL_OBJECTS_SOURCE = $(AMMONITE_OBJECTS_SOURCE) $(HELPER_OBJECTS_SOURCE) $(DEMO_OBJECTS_SOURCE) \
                      $(ROOT_OBJECTS_SOURCE)
-ALL_HEADERS_SOURCE = $(AMMONITE_HEADERS_SOURCE) $(HELPER_HEADERS_SOURCE) $(DEMO_HEADERS_SOURCE)
+ALL_HEADERS_SOURCE = $(AMMONITE_HEADERS_SOURCE) $(HELPER_HEADERS_SOURCE) $(DEMO_HEADERS_SOURCE) \
+                     $(AMMONITE_INCLUDE_HEADERS_SOURCE)
 LINT_FILES = $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.cpp.linted,$(ALL_OBJECTS_SOURCE)))
 LINT_FILES += $(subst ./src,$(OBJECT_DIR),$(subst .hpp,.hpp.linted,$(ALL_HEADERS_SOURCE)))
 
