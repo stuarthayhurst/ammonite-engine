@@ -4,6 +4,8 @@
 #include <unordered_set>
 #include <vector>
 
+#include "skybox.hpp"
+
 #include <stb/stb_image.h>
 #include <GL/glew.h>
 
