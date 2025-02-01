@@ -14,6 +14,7 @@ namespace ammonite {
       void updateMatrices();
     }
 
+    //Exported by the engine
     AmmoniteId createCamera();
     void deleteCamera(AmmoniteId cameraId);
 

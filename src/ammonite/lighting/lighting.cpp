@@ -6,8 +6,8 @@
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 
-#include "internal/lightTypes.hpp"
-#include "internal/internalLighting.hpp"
+#include "lighting.hpp"
+
 #include "../graphics/internal/internalRenderCore.hpp"
 
 #include "../models/modelInterface.hpp"

@@ -20,21 +20,15 @@
 #include "../models/internal/modelTracker.hpp"
 #include "../models/internal/modelTypes.hpp"
 
-#include "../lighting/internal/lightTypes.hpp"
-#include "../lighting/internal/internalLighting.hpp"
-#include "../lighting/lightStorage.hpp"
-#include "../lighting/lightInterface.hpp"
-
-#include "../window/window.hpp"
-
 #include "../camera.hpp"
 #include "../enums.hpp"
 #include "../interface.hpp"
+#include "../lighting/lighting.hpp"
 #include "../skybox.hpp"
 #include "../types.hpp"
-
 #include "../utils/logging.hpp"
 #include "../utils/debug.hpp"
+#include "../window/window.hpp"
 
 /*
  - Store and expose controls settings

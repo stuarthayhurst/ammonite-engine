@@ -12,14 +12,13 @@
 #include <glm/gtx/quaternion.hpp>
 
 #include "../enums.hpp"
+#include "../lighting/lighting.hpp"
 #include "../types.hpp"
+#include "../utils/logging.hpp"
 
 #include "internal/modelTypes.hpp"
 #include "internal/modelLoader.hpp"
-
-#include "../lighting/internal/internalLighting.hpp"
 #include "../graphics/internal/internalTextures.hpp"
-#include "../utils/logging.hpp"
 
 //Class definitions
 namespace {

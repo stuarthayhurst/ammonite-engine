@@ -5,13 +5,13 @@
 #include "../camera.hpp"
 #include "../enums.hpp"
 #include "../interface.hpp"
+#include "../lighting/lighting.hpp"
 #include "../types.hpp"
 #include "../utils/logging.hpp"
 #include "../utils/timer.hpp"
 #include "../window/window.hpp"
 
 #include "internal/internalRenderCore.hpp"
-#include "../lighting/internal/internalLighting.hpp"
 #include "../utils/internal/threadPool.hpp"
 
 /*

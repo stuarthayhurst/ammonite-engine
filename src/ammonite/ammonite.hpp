@@ -3,9 +3,6 @@
 
 #include "graphics/renderer.hpp"
 
-#include "lighting/lightInterface.hpp"
-#include "lighting/lightStorage.hpp"
-
 #include "models/modelInterface.hpp"
 #include "models/modelStorage.hpp"
 
