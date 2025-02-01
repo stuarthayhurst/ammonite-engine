@@ -3,17 +3,10 @@
 
 #include <glm/glm.hpp>
 
-#include "internal.hpp"
 #include "types.hpp"
 
 namespace ammonite {
   namespace camera {
-    namespace AMMONITE_INTERNAL internal {
-      glm::mat4* getViewMatrixPtr();
-      glm::mat4* getProjectionMatrixPtr();
-      void updateMatrices();
-    }
-
     AmmoniteId createCamera();
     void deleteCamera(AmmoniteId cameraId);
 

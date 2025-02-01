@@ -1,6 +1,7 @@
 #ifndef AMMONITE
 #define AMMONITE
 
+#include "camera.hpp"
 #include "enums.hpp"
 #include "interface.hpp"
 #include "skybox.hpp"

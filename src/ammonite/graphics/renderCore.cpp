@@ -17,8 +17,6 @@
 #include "internal/internalRenderHelper.hpp"
 #include "internal/internalShaders.hpp"
 
-#include "../internal/internalCamera.hpp"
-
 #include "../models/internal/modelTracker.hpp"
 #include "../models/internal/modelTypes.hpp"
 

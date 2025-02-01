@@ -9,9 +9,9 @@
 
 #include "window.hpp"
 
-#include "../input.hpp"
-#include "../internal/internalCamera.hpp"
+#include "../camera.hpp"
 #include "../enums.hpp"
+#include "../input.hpp"
 #include "../utils/debug.hpp"
 #include "../utils/logging.hpp"
 #include "../utils/timer.hpp"

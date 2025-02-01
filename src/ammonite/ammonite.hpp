@@ -16,7 +16,6 @@
 #include "utils/thread.hpp"
 #include "utils/timer.hpp"
 
-#include "camera.hpp"
 #include "controls.hpp"
 #include "input.hpp"
 

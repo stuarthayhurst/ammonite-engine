@@ -4,6 +4,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/constants.hpp>
 
+#include "camera.hpp"
+
 #include "graphics/internal/internalRenderCore.hpp"
 #include "types.hpp"
 #include "window/window.hpp"
