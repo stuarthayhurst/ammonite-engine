@@ -11,8 +11,7 @@
 #include <assimp/scene.h>
 #include <assimp/types.h>
 
-#include "internal/modelTypes.hpp"
-#include "internal/modelLoader.hpp"
+#include "models.hpp"
 
 #include "../graphics/internal/internalTextures.hpp"
 #include "../utils/logging.hpp"

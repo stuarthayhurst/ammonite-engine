@@ -11,13 +11,13 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/quaternion.hpp>
 
+#include "models.hpp"
+
 #include "../enums.hpp"
 #include "../lighting/lighting.hpp"
 #include "../types.hpp"
 #include "../utils/logging.hpp"
 
-#include "internal/modelTypes.hpp"
-#include "internal/modelLoader.hpp"
 #include "../graphics/internal/internalTextures.hpp"
 
 //Class definitions
@@ -304,7 +304,7 @@ namespace ammonite {
         modelObject.modelData = &modelDataMap[modelObject.modelName];
 
         //Generate info required to load model
-        ModelLoadInfo modelLoadInfo;
+        internal::ModelLoadInfo modelLoadInfo;
         modelLoadInfo.flipTexCoords = flipTexCoords;
         modelLoadInfo.srgbTextures = srgbTextures;
         modelLoadInfo.modelDirectory = objectPath.substr(0, objectPath.find_last_of('/'));

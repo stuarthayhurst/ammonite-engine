@@ -10,10 +10,9 @@
 
 #include "../graphics/internal/internalRenderCore.hpp"
 
-#include "../models/modelInterface.hpp"
-#include "../models/internal/modelTracker.hpp"
-#include "../utils/thread.hpp"
+#include "../models/models.hpp"
 #include "../types.hpp"
+#include "../utils/thread.hpp"
 
 namespace ammonite {
   namespace {

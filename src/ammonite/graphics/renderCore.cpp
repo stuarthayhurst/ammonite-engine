@@ -17,13 +17,11 @@
 #include "internal/internalRenderHelper.hpp"
 #include "internal/internalShaders.hpp"
 
-#include "../models/internal/modelTracker.hpp"
-#include "../models/internal/modelTypes.hpp"
-
 #include "../camera.hpp"
 #include "../enums.hpp"
 #include "../interface.hpp"
 #include "../lighting/lighting.hpp"
+#include "../models/models.hpp"
 #include "../skybox.hpp"
 #include "../types.hpp"
 #include "../utils/logging.hpp"
