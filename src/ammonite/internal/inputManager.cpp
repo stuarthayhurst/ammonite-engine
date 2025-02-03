@@ -111,6 +111,43 @@ namespace ammonite {
             }
           }
         }
+
+        //Register a keybind, use passed ID to allow forcing an ID
+        AmmoniteId registerRawKeybind(int keycodes[], int count, AmmoniteEnum overrideMode,
+                                      bool toggle, AmmoniteKeyCallback callback,
+                                      void* userPtr, AmmoniteId keybindId) {
+          //Validate override mode
+          if (overrideMode < AMMONITE_ALLOW_OVERRIDE || overrideMode > AMMONITE_RESPECT_BLOCK) {
+            ammoniteInternalDebug << "Invalid override mode passed" << std::endl;
+            return 0;
+          }
+
+          //Start tracking keycode states
+          std::vector<int> keycodeVec;
+          for (int i = 0; i < count; i++) {
+            int keycode = keycodes[i];
+            keycodeVec.push_back(keycode);
+
+            if (!keycodeStateMap.contains(keycode)) {
+              KeycodeState keycodeState;
+              keycodeState.refCount = 0;
+              keycodeState.keybindIdStateEnumMap[keybindId] = AMMONITE_RELEASED;
+
+              keycodeStateMap[keycode] = keycodeState;
+            }
+            keycodeStateMap[keycode].refCount++;
+
+            //Set initial key state
+            keycodeStateMap[keycode].keybindIdStateEnumMap[keybindId] = AMMONITE_RELEASED;
+          }
+
+          //Bundle keybind data and add to tracker
+          KeybindData keybindData = {
+            keycodeVec, overrideMode, toggle, callback, userPtr
+          };
+          keybindIdDataMap[keybindId] = keybindData;
+          return keybindId;
+        }
       }
 
       //Use tracked states to update saved states and run callbacks
@@ -250,43 +287,6 @@ namespace ammonite {
 
       bool* getInputBlockPtr() {
         return &isInputBlocked;
-      }
-
-      //Register a keybind, use passed ID to allow forcing an ID
-      AmmoniteId registerRawKeybind(int keycodes[], int count, AmmoniteEnum overrideMode,
-                                    bool toggle, AmmoniteKeyCallback callback,
-                                    void* userPtr, AmmoniteId keybindId) {
-        //Validate override mode
-        if (overrideMode < AMMONITE_ALLOW_OVERRIDE || overrideMode > AMMONITE_RESPECT_BLOCK) {
-          ammoniteInternalDebug << "Invalid override mode passed" << std::endl;
-          return 0;
-        }
-
-        //Start tracking keycode states
-        std::vector<int> keycodeVec;
-        for (int i = 0; i < count; i++) {
-          int keycode = keycodes[i];
-          keycodeVec.push_back(keycode);
-
-          if (!keycodeStateMap.contains(keycode)) {
-            KeycodeState keycodeState;
-            keycodeState.refCount = 0;
-            keycodeState.keybindIdStateEnumMap[keybindId] = AMMONITE_RELEASED;
-
-            keycodeStateMap[keycode] = keycodeState;
-          }
-          keycodeStateMap[keycode].refCount++;
-
-          //Set initial key state
-          keycodeStateMap[keycode].keybindIdStateEnumMap[keybindId] = AMMONITE_RELEASED;
-        }
-
-        //Bundle keybind data and add to tracker
-        KeybindData keybindData = {
-          keycodeVec, overrideMode, toggle, callback, userPtr
-        };
-        keybindIdDataMap[keybindId] = keybindData;
-        return keybindId;
       }
 
       AmmoniteId registerRawKeybind(int keycodes[], int count, AmmoniteEnum overrideMode,

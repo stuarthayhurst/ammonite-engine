@@ -1,15 +1,8 @@
 #ifndef CONTROLS
 #define CONTROLS
 
-#include "internal.hpp"
-
 namespace ammonite {
   namespace controls {
-    namespace AMMONITE_INTERNAL internal {
-      void setCursorFocus(bool inputFocused);
-    }
-
-    //Exported by the engine
     namespace settings {
       void setMovementSpeed(float newMovementSpeed);
       void setMouseSpeed(float newMouseSpeed);

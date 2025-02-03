@@ -1,7 +1,8 @@
 #include <GLFW/glfw3.h>
 
-#include "internal/inputManager.hpp"
-#include "internal/internalControls.hpp"
+#include "input.hpp"
+
+#include "controls.hpp"
 #include "enums.hpp"
 #include "types.hpp"
 

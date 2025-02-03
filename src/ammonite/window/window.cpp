@@ -8,7 +8,7 @@
 
 #include "window.hpp"
 
-#include "../internal/inputManager.hpp"
+#include "../input.hpp"
 #include "../utils/logging.hpp"
 
 static constexpr std::string DEFAULT_TITLE = "Ammonite Window";

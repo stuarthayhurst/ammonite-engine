@@ -5,11 +5,13 @@
 #include <glm/gtc/constants.hpp>
 #include <GLFW/glfw3.h>
 
+#include "controls.hpp"
+
 #include "camera.hpp"
 #include "enums.hpp"
 #include "types.hpp"
 #include "utils/timer.hpp"
-#include "internal/inputManager.hpp"
+#include "input.hpp"
 #include "window/window.hpp"
 
 //Store and expose controls settings
