@@ -7,6 +7,8 @@
   #include <immintrin.h>
 #endif
 
+#include "hash.hpp"
+
 namespace ammonite {
   namespace utils {
     namespace files {

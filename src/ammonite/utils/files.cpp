@@ -14,13 +14,12 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include "../enums.hpp"
+#include "files.hpp"
 
 #include "debug.hpp"
+#include "../enums.hpp"
+#include "hash.hpp"
 #include "logging.hpp"
-
-#include "internal/hash.hpp"
-#include "files.hpp"
 
 constexpr unsigned int MAX_LOAD_ATTEMPTS = 10;
 
