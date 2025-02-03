@@ -10,6 +10,7 @@
 namespace ammonite {
   namespace utils {
     namespace files {
+      //Exported by the engine
       void deleteFile(std::string filePath);
       bool getFileMetadata(std::string filePath, std::size_t* filesize, std::time_t* timestamp);
 

@@ -5,6 +5,7 @@
 
 namespace ammonite {
   namespace utils {
+    //Exported by the engine
     class Timer {
     private:
       bool timerRunning;

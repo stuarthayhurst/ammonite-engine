@@ -6,6 +6,7 @@
 namespace ammonite {
   namespace utils {
     namespace thread {
+      //Exported by the engine
       unsigned int getHardwareThreadCount();
       unsigned int getThreadPoolSize();
 

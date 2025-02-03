@@ -11,6 +11,7 @@
 namespace ammonite {
   namespace input {
     namespace AMMONITE_INTERNAL internal {
+      //Implemented by internal/inputManager.hpp
       void setupInputCallback(GLFWwindow* windowPtr);
       void runCallbacks();
 

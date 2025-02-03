@@ -16,6 +16,7 @@
 namespace ammonite {
   namespace utils {
     namespace debug {
+      //Exported by the engine
       void enableDebug();
       void printDriverInfo();
     }

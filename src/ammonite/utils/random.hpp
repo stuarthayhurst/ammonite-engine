@@ -5,6 +5,7 @@
 
 namespace ammonite {
   namespace utils {
+    //Exported by the engine
     uintmax_t randomUInt(uintmax_t lower, uintmax_t upper);
     uintmax_t randomUInt(uintmax_t upper);
     intmax_t randomInt(intmax_t lower, intmax_t upper);

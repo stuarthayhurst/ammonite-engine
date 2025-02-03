@@ -7,6 +7,7 @@
 
 namespace ammonite {
   namespace utils {
+    //Exported by the engine
     class OutputHelper {
     private:
       //NOLINTNEXTLINE(cppcoreguidelines-avoid-const-or-ref-data-members)
