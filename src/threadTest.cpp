@@ -3,13 +3,13 @@
 #include <iostream>
 
 #include "ammonite/ammonite.hpp"
-#include "ammonite/utils/internal/threadPool.hpp"
+#include <ammonite/ammonite.hpp>
 
 constexpr unsigned int JOB_COUNT = (2 << 16);
 
 //NOLINTBEGIN(cppcoreguidelines-macro-usage)
 #define CREATE_THREAD_POOL(THREADS) \
-if (!ammonite::utils::thread::internal::createThreadPool((THREADS))) { \
+if (!ammonite::utils::thread::createThreadPool((THREADS))) { \
   ammonite::utils::error << "Failed to create thread pool, exiting" << std::endl; \
   return false; \
 }
@@ -103,7 +103,7 @@ namespace {
     FINISH_TIMERS
     VERIFY_WORK(jobCount)
 
-    ammonite::utils::thread::internal::destroyThreadPool();
+    ammonite::utils::thread::destroyThreadPool();
     return passed;
   }
 
@@ -122,7 +122,7 @@ namespace {
     FINISH_TIMERS
     VERIFY_WORK(jobCount)
 
-    ammonite::utils::thread::internal::destroyThreadPool();
+    ammonite::utils::thread::destroyThreadPool();
     return passed;
   }
 
@@ -136,7 +136,7 @@ namespace {
     submitTimer.pause();
 
     //Finish work
-    ammonite::utils::thread::internal::destroyThreadPool();
+    ammonite::utils::thread::destroyThreadPool();
     FINISH_TIMERS
     VERIFY_WORK(jobCount)
 
@@ -161,7 +161,7 @@ namespace {
     FINISH_TIMERS
     VERIFY_WORK(jobCount)
 
-    ammonite::utils::thread::internal::destroyThreadPool();
+    ammonite::utils::thread::destroyThreadPool();
     return passed;
   }
 
@@ -190,7 +190,7 @@ namespace {
     FINISH_TIMERS
     VERIFY_WORK(jobCount)
 
-    ammonite::utils::thread::internal::destroyThreadPool();
+    ammonite::utils::thread::destroyThreadPool();
     return passed;
   }
 
@@ -217,7 +217,7 @@ namespace {
     FINISH_TIMERS
     delete [] data;
     VERIFY_WORK(jobCount)
-    ammonite::utils::thread::internal::destroyThreadPool();
+    ammonite::utils::thread::destroyThreadPool();
 
     return passed;
   }
@@ -240,7 +240,7 @@ namespace {
       ammonite::utils::error << "Failed to verify work" << std::endl;
     }
 
-    ammonite::utils::thread::internal::destroyThreadPool();
+    ammonite::utils::thread::destroyThreadPool();
     return passed;
   }
 
@@ -262,7 +262,7 @@ namespace {
     FINISH_TIMERS
     VERIFY_WORK(jobCount)
 
-    ammonite::utils::thread::internal::destroyThreadPool();
+    ammonite::utils::thread::destroyThreadPool();
     return passed;
   }
 
@@ -286,7 +286,7 @@ namespace {
     FINISH_TIMERS
     VERIFY_WORK(jobCount)
 
-    ammonite::utils::thread::internal::destroyThreadPool();
+    ammonite::utils::thread::destroyThreadPool();
     return passed;
   }
 
@@ -303,7 +303,7 @@ namespace {
     submitTimer.pause();
 
     //Finish work
-    ammonite::utils::thread::internal::destroyThreadPool();
+    ammonite::utils::thread::destroyThreadPool();
     FINISH_TIMERS
     VERIFY_WORK(jobCount)
 
@@ -321,7 +321,7 @@ namespace {
     ammonite::utils::thread::unblockThreads();
 
     SUBMIT_JOBS(jobCount)
-    ammonite::utils::thread::internal::destroyThreadPool();
+    ammonite::utils::thread::destroyThreadPool();
     VERIFY_WORK(jobCount)
     return passed;
   }
@@ -334,7 +334,7 @@ namespace {
     ammonite::utils::thread::unblockThreads();
 
     SUBMIT_JOBS(jobCount)
-    ammonite::utils::thread::internal::destroyThreadPool();
+    ammonite::utils::thread::destroyThreadPool();
     VERIFY_WORK(jobCount)
     return passed;
   }
@@ -348,7 +348,7 @@ namespace {
     SUBMIT_JOBS(jobCount)
     ammonite::utils::thread::unblockThreads();
 
-    ammonite::utils::thread::internal::destroyThreadPool();
+    ammonite::utils::thread::destroyThreadPool();
     VERIFY_WORK(jobCount)
     return passed;
   }
@@ -360,7 +360,7 @@ namespace {
     ammonite::utils::thread::blockThreads();
 
     SUBMIT_JOBS(jobCount)
-    ammonite::utils::thread::internal::destroyThreadPool();
+    ammonite::utils::thread::destroyThreadPool();
     VERIFY_WORK(jobCount)
     return passed;
   }
@@ -373,7 +373,7 @@ namespace {
     ammonite::utils::thread::unblockThreads();
 
     SUBMIT_JOBS(jobCount)
-    ammonite::utils::thread::internal::destroyThreadPool();
+    ammonite::utils::thread::destroyThreadPool();
     VERIFY_WORK(jobCount)
     return passed;
   }
@@ -384,7 +384,7 @@ namespace {
     ammonite::utils::thread::unblockThreads();
 
     SUBMIT_JOBS(jobCount)
-    ammonite::utils::thread::internal::destroyThreadPool();
+    ammonite::utils::thread::destroyThreadPool();
     VERIFY_WORK(jobCount)
     return passed;
   }
@@ -392,7 +392,7 @@ namespace {
 
 int main() {
   bool failed = false;
-  ammonite::utils::status << ammonite::utils::thread::internal::getHardwareThreadCount() \
+  ammonite::utils::status << ammonite::utils::thread::getHardwareThreadCount() \
                           << " hardware threads detected" << std::endl;
 
   //Begin regular tests

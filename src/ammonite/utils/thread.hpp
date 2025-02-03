@@ -6,7 +6,12 @@
 namespace ammonite {
   namespace utils {
     namespace thread {
+      unsigned int getHardwareThreadCount();
       unsigned int getThreadPoolSize();
+
+      bool createThreadPool(unsigned int threadCount);
+      void destroyThreadPool();
+
       void submitWork(AmmoniteWork work, void* userPtr);
       void submitWork(AmmoniteWork work, void* userPtr, AmmoniteGroup* group);
       void submitMultiple(AmmoniteWork work, void* userBuffer, int stride,

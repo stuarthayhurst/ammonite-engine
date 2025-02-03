@@ -10,10 +10,9 @@
 #include "../lighting/lighting.hpp"
 #include "../types.hpp"
 #include "../utils/logging.hpp"
+#include "../utils/threadPool.hpp"
 #include "../utils/timer.hpp"
 #include "../window/window.hpp"
-
-#include "../utils/internal/threadPool.hpp"
 
 /*
  - Externally exposed renderer functions

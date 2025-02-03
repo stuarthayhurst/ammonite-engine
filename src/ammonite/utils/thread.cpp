@@ -1,15 +1,36 @@
+#include "threadPool.hpp"
 #include "../types.hpp"
-#include "internal/threadPool.hpp"
 
 namespace ammonite {
   namespace utils {
     namespace thread {
+      //Return the number of hardware threads available
+      unsigned int getHardwareThreadCount() {
+        return ammonite::utils::thread::internal::getHardwareThreadCount();
+      }
+
       /*
        - Return the number of threads in the pool
-          - Returns 0 if the pool doesn't exist
+         - Returns 0 if the pool doesn't exist
       */
       unsigned int getThreadPoolSize() {
         return ammonite::utils::thread::internal::getThreadPoolSize();
+      }
+
+      /*
+       - Create a thread pool, without initialising the renderer
+       - Must be destroyed before the renderer is started
+      */
+      bool createThreadPool(unsigned int threadCount) {
+        return ammonite::utils::thread::internal::createThreadPool(threadCount);
+      }
+
+      /*
+       - Destroy the current thread pool
+       - Must only be used on thread pools created before the renderer
+      */
+      void destroyThreadPool() {
+        ammonite::utils::thread::internal::destroyThreadPool();
       }
 
       /*

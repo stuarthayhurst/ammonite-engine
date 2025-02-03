@@ -1,16 +1,17 @@
 #ifndef THREADMANAGER
 #define THREADMANAGER
 
-#include "../../types.hpp"
+#include "../internal.hpp"
+#include "../types.hpp"
 
 namespace ammonite {
   namespace utils {
     namespace thread {
-      namespace internal {
+      namespace AMMONITE_INTERNAL internal {
         unsigned int getHardwareThreadCount();
         unsigned int getThreadPoolSize();
 
-        bool createThreadPool(unsigned int extraThreads);
+        bool createThreadPool(unsigned int threadCount);
         void destroyThreadPool();
 
         void submitWork(AmmoniteWork work, void* userPtr, AmmoniteGroup* group);
@@ -26,4 +27,3 @@ namespace ammonite {
 }
 
 #endif
-

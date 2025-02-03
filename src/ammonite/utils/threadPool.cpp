@@ -7,8 +7,10 @@
 #include <system_error>
 #include <thread>
 
-#include "../../types.hpp"
-#include "../logging.hpp"
+#include "threadPool.hpp"
+
+#include "../types.hpp"
+#include "logging.hpp"
 
 constexpr unsigned int MAX_THREADS = 512;
 
