@@ -1,5 +1,8 @@
 #include <iostream>
+
 #include <GL/glew.h>
+
+#include "extensions.hpp"
 
 #include "../utils/debug.hpp"
 

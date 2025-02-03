@@ -1,5 +1,7 @@
 #include <GL/glew.h>
 
+#include "renderer.hpp"
+
 /*
  - Generic helpers for the render core
 */

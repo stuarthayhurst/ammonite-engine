@@ -1,18 +1,15 @@
-#ifndef INTERNALSHADERS
-#define INTERNALSHADERS
-
-/* Internally exposed header:
- - Allow window manager to prompt checking for cache support
- - Allow loading shaders by path or directory
-*/
+#ifndef SHADERS
+#define SHADERS
 
 #include <string>
 
 #include <GL/glew.h>
 
+#include "../internal.hpp"
+
 namespace ammonite {
   namespace shaders {
-    namespace internal {
+    namespace AMMONITE_INTERNAL internal {
       GLuint createProgram(std::string* shaderPaths, unsigned int shaderCount);
       GLuint loadDirectory(std::string directoryPath);
       void updateCacheSupport();

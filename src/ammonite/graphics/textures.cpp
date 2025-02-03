@@ -9,6 +9,8 @@
 
 #include <GL/glew.h>
 
+#include "textures.hpp"
+
 #include "../utils/logging.hpp"
 
 namespace ammonite {

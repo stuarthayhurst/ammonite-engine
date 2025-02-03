@@ -1,17 +1,15 @@
-#ifndef INTERNALTEXTURE
-#define INTERNALTEXTURE
-
-/* Internally exposed header:
- - Expose texture handling methods internally
-*/
+#ifndef TEXTURES
+#define TEXTURES
 
 #include <string>
 
 #include <GL/glew.h>
 
+#include "../internal.hpp"
+
 namespace ammonite {
   namespace textures {
-    namespace internal {
+    namespace AMMONITE_INTERNAL internal {
       GLuint createTexture(int width, int height, unsigned char* data, GLenum dataFormat,
                            GLenum textureFormat, GLint mipmapLevels);
       GLuint loadTexture(std::string texturePath, bool flipTexture, bool srgbTexture);

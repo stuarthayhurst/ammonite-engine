@@ -1,8 +1,6 @@
 #ifndef AMMONITELEGACY
 #define AMMONITELEGACY
 
-#include "graphics/renderer.hpp"
-
 #include "utils/debug.hpp"
 #include "utils/files.hpp"
 #include "utils/logging.hpp"

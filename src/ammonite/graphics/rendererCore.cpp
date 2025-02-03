@@ -13,15 +13,15 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include "internal/internalExtensions.hpp"
-#include "internal/internalRenderHelper.hpp"
-#include "internal/internalShaders.hpp"
+#include "renderer.hpp"
 
 #include "../camera.hpp"
+#include "extensions.hpp"
 #include "../enums.hpp"
 #include "../interface.hpp"
 #include "../lighting/lighting.hpp"
 #include "../models/models.hpp"
+#include "shaders.hpp"
 #include "../skybox.hpp"
 #include "../types.hpp"
 #include "../utils/logging.hpp"

@@ -1,13 +1,11 @@
-#ifndef INTERNALEXTENSION
-#define INTERNALEXTENSION
+#ifndef EXTENSIONS
+#define EXTENSIONS
 
-/* Internally exposed header:
- - Expose extension checking functions
-*/
+#include "../internal.hpp"
 
 namespace ammonite {
   namespace graphics {
-    namespace internal {
+    namespace AMMONITE_INTERNAL internal {
       bool checkExtension(const char* extension, const char* version);
       bool checkExtension(const char* extension);
     }

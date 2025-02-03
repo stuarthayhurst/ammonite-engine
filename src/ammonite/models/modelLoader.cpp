@@ -13,7 +13,7 @@
 
 #include "models.hpp"
 
-#include "../graphics/internal/internalTextures.hpp"
+#include "../graphics/textures.hpp"
 #include "../utils/logging.hpp"
 
 namespace ammonite {

@@ -3,6 +3,7 @@
 
 #include "camera.hpp"
 #include "enums.hpp"
+#include "graphics/renderer.hpp"
 #include "interface.hpp"
 #include "lighting/lighting.hpp"
 #include "models/models.hpp"

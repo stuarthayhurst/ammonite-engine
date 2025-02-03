@@ -11,12 +11,14 @@
 
 #include <GL/glew.h>
 
+#include "shaders.hpp"
+
+#include "extensions.hpp"
 #include "../enums.hpp"
 #include "../utils/debug.hpp"
 #include "../utils/files.hpp"
 #include "../utils/logging.hpp"
 #include "../utils/thread.hpp"
-#include "internal/internalExtensions.hpp"
 
 namespace ammonite {
   //Static helper functions and anonymous data

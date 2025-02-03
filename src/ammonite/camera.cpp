@@ -6,7 +6,7 @@
 
 #include "camera.hpp"
 
-#include "graphics/internal/internalRenderCore.hpp"
+#include "graphics/renderer.hpp"
 #include "types.hpp"
 #include "window/window.hpp"
 

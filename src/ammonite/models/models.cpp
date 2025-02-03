@@ -14,11 +14,10 @@
 #include "models.hpp"
 
 #include "../enums.hpp"
+#include "../graphics/textures.hpp"
 #include "../lighting/lighting.hpp"
 #include "../types.hpp"
 #include "../utils/logging.hpp"
-
-#include "../graphics/internal/internalTextures.hpp"
 
 //Class definitions
 namespace {

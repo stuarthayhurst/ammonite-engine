@@ -2,6 +2,8 @@
 #include <iostream>
 #include <string>
 
+#include "renderer.hpp"
+
 #include "../camera.hpp"
 #include "../enums.hpp"
 #include "../interface.hpp"
@@ -11,7 +13,6 @@
 #include "../utils/timer.hpp"
 #include "../window/window.hpp"
 
-#include "internal/internalRenderCore.hpp"
 #include "../utils/internal/threadPool.hpp"
 
 /*

@@ -9,7 +9,7 @@
 #include <stb/stb_image.h>
 #include <GL/glew.h>
 
-#include "graphics/internal/internalTextures.hpp"
+#include "graphics/textures.hpp"
 #include "utils/logging.hpp"
 #include "types.hpp"
 #include "enums.hpp"

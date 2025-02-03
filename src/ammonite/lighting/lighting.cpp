@@ -8,8 +8,7 @@
 
 #include "lighting.hpp"
 
-#include "../graphics/internal/internalRenderCore.hpp"
-
+#include "../graphics/renderer.hpp"
 #include "../models/models.hpp"
 #include "../types.hpp"
 #include "../utils/thread.hpp"
