@@ -11,7 +11,6 @@ LIBRARY_NAME = libammonite.so.1
 
 AMMONITE_OBJECTS_SOURCE = $(shell ls ./src/ammonite/**/*.cpp)
 AMMONITE_HEADERS_SOURCE = $(shell ls ./src/ammonite/**/*.hpp)
-AMMONITE_HEADER_INSTALL := $(subst ./src/ammonite,$(HEADER_DIR)/ammonite,$(AMMONITE_HEADERS_SOURCE))
 AMMONITE_INCLUDE_HEADERS_SOURCE += $(shell ls ./src/include/ammonite/**/*.hpp)
 
 HELPER_OBJECTS_SOURCE = $(shell ls ./src/helper/**/*.cpp)
@@ -102,7 +101,7 @@ $(OBJECT_DIR)/%.linted: ./src/% $(BUILD_DIR)/compile_flags.txt .clang-tidy
 	@mkdir -p "$$(dirname $@)"
 	@touch "$@"
 
-.PHONY: build demo threads debug library headers install uninstall clean lint cache icons $(AMMONITE_HEADER_INSTALL)
+.PHONY: build demo threads debug library headers install uninstall clean lint cache icons
 build: demo threads
 demo: $(BUILD_DIR)/demo
 	@if [[ "$(DEBUG)" != "true" ]]; then \
@@ -118,15 +117,6 @@ library: $(BUILD_DIR)/$(LIBRARY_NAME)
 headers:
 	@rm -rf "$(HEADER_DIR)/ammonite"
 	@cp -rvL "src/include/ammonite" "$(HEADER_DIR)/ammonite"
-	$(MAKE) $(AMMONITE_HEADER_INSTALL)
-$(AMMONITE_HEADER_INSTALL):
-	@targetFile="$@"; \
-	targetDir="$$(dirname $$targetFile)"; \
-	origFile="$${targetFile//'$(HEADER_DIR)'/src}"; \
-	if [[ "$$targetDir/" != */internal/* ]]; then \
-	  mkdir -p "$$targetDir" && \
-	  cp -vn "$$origFile" "$$targetFile"; \
-	fi
 install:
 	@mkdir -p "$(INSTALL_DIR)/ammonite"
 	install "$(BUILD_DIR)/libammonite.so" "$(INSTALL_DIR)/ammonite/$(LIBRARY_NAME)"
