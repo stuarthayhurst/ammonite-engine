@@ -3,6 +3,8 @@
 #include <limits>
 #include <random>
 
+#include "random.hpp"
+
 namespace ammonite {
   namespace utils {
     namespace {

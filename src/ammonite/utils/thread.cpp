@@ -1,3 +1,5 @@
+#include "thread.hpp"
+
 #include "threadPool.hpp"
 #include "../types.hpp"
 

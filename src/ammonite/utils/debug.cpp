@@ -2,6 +2,8 @@
 
 #include <GL/glew.h>
 
+#include "debug.hpp"
+
 #include "../graphics/extensions.hpp"
 #include "logging.hpp"
 
