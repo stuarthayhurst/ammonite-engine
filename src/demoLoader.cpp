@@ -9,7 +9,6 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 
-#include "ammonite/ammonite.hpp"
 #include <ammonite/ammonite.hpp>
 #include "helper/argHandler.hpp"
 

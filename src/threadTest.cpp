@@ -2,7 +2,6 @@
 #include <cstdlib>
 #include <iostream>
 
-#include "ammonite/ammonite.hpp"
 #include <ammonite/ammonite.hpp>
 
 constexpr unsigned int JOB_COUNT = (2 << 16);
