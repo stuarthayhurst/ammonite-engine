@@ -4,10 +4,12 @@
 #include <unordered_set>
 #include <vector>
 
-#include "skybox.hpp"
+extern "C" {
+  #include <stb/stb_image.h>
+  #include <GL/glew.h>
+}
 
-#include <stb/stb_image.h>
-#include <GL/glew.h>
+#include "skybox.hpp"
 
 #include "graphics/textures.hpp"
 #include "utils/logging.hpp"

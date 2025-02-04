@@ -3,7 +3,10 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
-#include <GLFW/glfw3.h>
+
+extern "C" {
+  #include <GLFW/glfw3.h>
+}
 
 #include "controls.hpp"
 

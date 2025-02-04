@@ -4,8 +4,10 @@
 #include <string>
 #include <thread>
 
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
+extern "C" {
+  #include <GL/glew.h>
+  #include <GLFW/glfw3.h>
+}
 
 #include "window.hpp"
 

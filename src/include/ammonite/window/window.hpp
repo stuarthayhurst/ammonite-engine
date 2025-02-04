@@ -3,7 +3,9 @@
 
 #include <string>
 
-#include <GLFW/glfw3.h>
+extern "C" {
+  #include <GLFW/glfw3.h>
+}
 
 namespace ammonite {
   namespace window {

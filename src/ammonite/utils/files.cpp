@@ -9,10 +9,12 @@
 #include <iostream>
 #include <string>
 
-#include <errno.h>
-#include <fcntl.h>
-#include <sys/stat.h>
-#include <unistd.h>
+extern "C" {
+  #include <errno.h>
+  #include <fcntl.h>
+  #include <sys/stat.h>
+  #include <unistd.h>
+}
 
 #include "files.hpp"
 

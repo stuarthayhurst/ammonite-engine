@@ -1,6 +1,8 @@
 #include <iostream>
 
-#include <GL/glew.h>
+extern "C" {
+  #include <GL/glew.h>
+}
 
 #include "debug.hpp"
 

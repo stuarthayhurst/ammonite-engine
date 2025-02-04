@@ -4,7 +4,9 @@
 #include <cstdint>
 #include <string>
 
-#include <GL/glew.h>
+extern "C" {
+  #include <GL/glew.h>
+}
 
 #include "../enums.hpp"
 #include "../internal.hpp"

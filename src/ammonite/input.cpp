@@ -1,4 +1,6 @@
-#include <GLFW/glfw3.h>
+extern "C" {
+  #include <GLFW/glfw3.h>
+}
 
 #include "input.hpp"
 

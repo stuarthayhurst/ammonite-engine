@@ -3,8 +3,11 @@
 #include <iterator>
 #include <utility>
 
-#include <GL/glew.h>
 #include <glm/glm.hpp>
+
+extern "C" {
+  #include <GL/glew.h>
+}
 
 #include "lighting.hpp"
 

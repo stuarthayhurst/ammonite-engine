@@ -1,7 +1,9 @@
 #ifndef INPUT
 #define INPUT
 
-#include <GLFW/glfw3.h>
+extern "C" {
+  #include <GLFW/glfw3.h>
+}
 
 #include "internal.hpp"
 

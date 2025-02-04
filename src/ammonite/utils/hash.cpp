@@ -1,11 +1,13 @@
 #include <cstdint>
 #include <string>
 
-#if defined(__AVX512F__) && defined(__AVX512BW__) && defined(__VAES__) && defined(__BMI2__) && \
-    defined(UINT64_MAX)
-  #define USE_VAES_AVX512
-  #include <immintrin.h>
-#endif
+extern "C" {
+  #if defined(__AVX512F__) && defined(__AVX512BW__) && defined(__VAES__) && defined(__BMI2__) && \
+      defined(UINT64_MAX)
+    #define USE_VAES_AVX512
+    #include <immintrin.h>
+  #endif
+}
 
 #include "hash.hpp"
 

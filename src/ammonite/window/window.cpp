@@ -3,8 +3,10 @@
 #include <string>
 #include <vector>
 
-#include <GLFW/glfw3.h>
-#include <stb/stb_image.h>
+extern "C" {
+  #include <GLFW/glfw3.h>
+  #include <stb/stb_image.h>
+}
 
 #include "window.hpp"
 

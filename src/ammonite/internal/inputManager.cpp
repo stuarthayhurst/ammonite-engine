@@ -2,7 +2,9 @@
 #include <vector>
 #include <iostream>
 
-#include <GLFW/glfw3.h>
+extern "C" {
+  #include <GLFW/glfw3.h>
+}
 
 #include "../utils/debug.hpp"
 #include "../enums.hpp"

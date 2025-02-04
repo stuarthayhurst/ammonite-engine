@@ -5,9 +5,12 @@
 #include <string>
 #include <vector>
 
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
+
+extern "C" {
+  #include <GL/glew.h>
+  #include <GLFW/glfw3.h>
+}
 
 #include <ammonite/ammonite.hpp>
 #include "helper/argHandler.hpp"

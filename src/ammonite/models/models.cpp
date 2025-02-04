@@ -5,11 +5,13 @@
 #include <string>
 #include <algorithm>
 
-#include <GL/glew.h>
-
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/quaternion.hpp>
+
+extern "C" {
+  #include <GL/glew.h>
+}
 
 #include "models.hpp"
 
