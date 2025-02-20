@@ -35,7 +35,7 @@ namespace {
     ModelTrackerMap lightTrackerMap;
     ModelPtrTrackerMap* modelIdPtrMapPtr;
 
-    std::map<AmmoniteEnum, ModelTrackerMap*> modelSelector = {
+    std::map<AmmoniteModelEnum, ModelTrackerMap*> modelSelector = {
       {AMMONITE_MODEL, &modelTrackerMap},
       {AMMONITE_LIGHT_EMITTER, &lightTrackerMap}
     };
@@ -43,11 +43,11 @@ namespace {
   public:
     ModelTracker(ModelPtrTrackerMap* modelIdPtrMapAddr): modelIdPtrMapPtr(modelIdPtrMapAddr) {}
 
-    unsigned int getModelCount(AmmoniteEnum modelType) {
+    unsigned int getModelCount(AmmoniteModelEnum modelType) {
       return modelSelector[modelType]->size();
     }
 
-    void getModels(AmmoniteEnum modelType, unsigned int modelCount,
+    void getModels(AmmoniteModelEnum modelType, unsigned int modelCount,
                    ammonite::models::internal::ModelInfo* modelArr[]) {
       //Select the right model tracker
       ModelTrackerMap* modelMapPtr = modelSelector[modelType];
@@ -70,7 +70,7 @@ namespace {
 
     void deleteModel(AmmoniteId modelId) {
       //Get the type of model, so the right tracker can be selected
-      AmmoniteEnum modelType = (*modelIdPtrMapPtr)[modelId]->modelType;
+      AmmoniteModelEnum modelType = (*modelIdPtrMapPtr)[modelId]->modelType;
       ModelTrackerMap* targetMapPtr = modelSelector[modelType];
 
       //Delete the model and id to pointer map entry
@@ -79,9 +79,9 @@ namespace {
       haveModelsMoved = true;
     }
 
-    void changeModelType(AmmoniteId modelId, AmmoniteEnum targetType) {
+    void changeModelType(AmmoniteId modelId, AmmoniteModelEnum targetType) {
       //Get the type of model, so the right tracker can be selected
-      AmmoniteEnum modelType = (*modelIdPtrMapPtr)[modelId]->modelType;
+      AmmoniteModelEnum modelType = (*modelIdPtrMapPtr)[modelId]->modelType;
 
       //Return early if no work needs to be done
       if (modelType == targetType) {
@@ -114,7 +114,7 @@ namespace {
       }
 
       //Get the type of model, so the right tracker can be selected
-      AmmoniteEnum modelType = (*modelIdPtrMapPtr)[modelId]->modelType;
+      AmmoniteModelEnum modelType = (*modelIdPtrMapPtr)[modelId]->modelType;
       ModelTrackerMap* targetMapPtr = modelSelector[modelType];
 
       //Return whether the selected tracker holds the model
@@ -139,11 +139,11 @@ namespace ammonite {
   //Internally exposed model handling methods
   namespace models {
     namespace internal {
-      unsigned int getModelCount(AmmoniteEnum modelType) {
+      unsigned int getModelCount(AmmoniteModelEnum modelType) {
         return activeModelTracker.getModelCount(modelType);
       }
 
-      void getModels(AmmoniteEnum modelType, unsigned int modelCount,
+      void getModels(AmmoniteModelEnum modelType, unsigned int modelCount,
                      ammonite::models::internal::ModelInfo* modelArr[]) {
         activeModelTracker.getModels(modelType, modelCount, modelArr);
       }

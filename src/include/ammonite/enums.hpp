@@ -13,10 +13,6 @@ enum AmmoniteEnum : unsigned char {
   AMMONITE_DRAW_WIREFRAME,
   AMMONITE_DRAW_POINTS,
 
-  //Model types
-  AMMONITE_MODEL,
-  AMMONITE_LIGHT_EMITTER,
-
   //OpenGL / GLFW context hints
   AMMONITE_DEFAULT_CONTEXT,
   AMMONITE_NO_ERROR_CONTEXT,

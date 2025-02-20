@@ -760,7 +760,7 @@ namespace ammonite {
      - Update the cache when given AMMONITE_DATA_REFRESH or a pointer to a null pointer
     */
     static void drawModelsCached(ammonite::models::internal::ModelInfo*** modelPtrsPtr,
-                                AmmoniteEnum modelType, AmmoniteRenderMode renderMode) {
+                                AmmoniteModelEnum modelType, AmmoniteRenderMode renderMode) {
       unsigned int modelCount = ammonite::models::internal::getModelCount(modelType);
 
       //Create / update cache for model pointers

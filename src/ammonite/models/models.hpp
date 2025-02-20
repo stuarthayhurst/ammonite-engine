@@ -18,6 +18,12 @@ extern "C" {
 //Include public interface
 #include "../../include/ammonite/models/models.hpp" // IWYU pragma: export
 
+//Model types
+enum AMMONITE_INTERNAL AmmoniteModelEnum : unsigned char {
+  AMMONITE_MODEL,
+  AMMONITE_LIGHT_EMITTER
+};
+
 namespace ammonite {
   namespace models {
     namespace AMMONITE_INTERNAL internal {
@@ -70,11 +76,12 @@ namespace ammonite {
         unsigned int lightIndex;
         std::string modelName;
         AmmoniteId modelId = 0;
-        AmmoniteEnum modelType = AMMONITE_MODEL;
+        AmmoniteModelEnum modelType = AMMONITE_MODEL;
       };
 
-      unsigned int getModelCount(AmmoniteEnum modelType);
-      void getModels(AmmoniteEnum modelType, unsigned int modelCount, ModelInfo* modelArr[]);
+      unsigned int getModelCount(AmmoniteModelEnum modelType);
+      void getModels(AmmoniteModelEnum modelType, unsigned int modelCount,
+                     ModelInfo* modelArr[]);
 
       ModelInfo* getModelPtr(AmmoniteId modelId);
       bool* getModelsMovedPtr();
