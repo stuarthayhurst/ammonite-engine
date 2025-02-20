@@ -6,7 +6,7 @@
 #include "internal.hpp"
 
 //Include public interface
-#include "../include/ammonite/camera.hpp"
+#include "../include/ammonite/camera.hpp" // IWYU pragma: export
 
 namespace ammonite {
   namespace camera {

@@ -1,7 +1,6 @@
 #ifndef LIGHTING
 #define LIGHTING
 
-#include <map>
 #include <glm/glm.hpp>
 
 #include "../types.hpp"

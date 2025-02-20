@@ -2,7 +2,7 @@
 #define INTERNALTHREAD
 
 //Include public interface
-#include "../../include/ammonite/utils/thread.hpp"
+#include "../../include/ammonite/utils/thread.hpp" // IWYU pragma: export
 
 #endif
 

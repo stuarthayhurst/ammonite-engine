@@ -1,6 +1,7 @@
 #ifndef AMMONITE
 #define AMMONITE
 
+// IWYU pragma: begin_exports
 #include "camera.hpp"
 #include "controls.hpp"
 #include "enums.hpp"
@@ -18,5 +19,6 @@
 #include "utils/thread.hpp"
 #include "utils/timer.hpp"
 #include "window/window.hpp"
+// IWYU pragma: end_exports
 
 #endif

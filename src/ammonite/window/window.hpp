@@ -11,7 +11,7 @@ extern "C" {
 #include "../internal.hpp"
 
 //Include public interface
-#include "../../include/ammonite/window/window.hpp"
+#include "../../include/ammonite/window/window.hpp" // IWYU pragma: export
 
 namespace ammonite {
   namespace window {

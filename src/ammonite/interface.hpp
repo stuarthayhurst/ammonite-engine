@@ -7,7 +7,7 @@
 #include "types.hpp"
 
 //Include public interface
-#include "../include/ammonite/interface.hpp"
+#include "../include/ammonite/interface.hpp" // IWYU pragma: export
 
 namespace ammonite {
   namespace interface {

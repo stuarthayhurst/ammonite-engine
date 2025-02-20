@@ -16,7 +16,7 @@ extern "C" {
 #include "../types.hpp"
 
 //Include public interface
-#include "../../include/ammonite/models/models.hpp"
+#include "../../include/ammonite/models/models.hpp" // IWYU pragma: export
 
 namespace ammonite {
   namespace models {

@@ -4,7 +4,7 @@
 #include "internal.hpp"
 
 //Include public interface
-#include "../include/ammonite/controls.hpp"
+#include "../include/ammonite/controls.hpp" // IWYU pragma: export
 
 namespace ammonite {
   namespace controls {

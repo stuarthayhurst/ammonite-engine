@@ -11,7 +11,7 @@ extern "C" {
 #include "../types.hpp"
 
 //Include public interface
-#include "../../include/ammonite/graphics/renderer.hpp"
+#include "../../include/ammonite/graphics/renderer.hpp" // IWYU pragma: export
 
 namespace ammonite {
   namespace renderer {

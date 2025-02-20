@@ -2,6 +2,6 @@
 #define INTERNALLOGGING
 
 //Include public interface
-#include "../../include/ammonite/utils/logging.hpp"
+#include "../../include/ammonite/utils/logging.hpp" // IWYU pragma: export
 
 #endif

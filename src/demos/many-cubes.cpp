@@ -1,3 +1,4 @@
+#include <cmath>
 #include <cstddef>
 #include <iostream>
 #include <string>
@@ -65,7 +66,7 @@ namespace manyCubesDemo {
     ammonite::renderer::drawFrame();
 
     //Reposition cubes
-    sideLength = (unsigned int)sqrt(modelCount);
+    sideLength = (unsigned int)std::sqrt(modelCount);
     for (unsigned int x = 0; x < sideLength; x++) {
       for (unsigned int y = 0; y < sideLength; y++) {
         ammonite::models::position::setPosition(loadedModelIds[((std::size_t)x * sideLength) + y],

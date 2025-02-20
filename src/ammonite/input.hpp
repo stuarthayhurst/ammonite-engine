@@ -11,7 +11,7 @@ extern "C" {
 #include "types.hpp"
 
 //Include public interface
-#include "../include/ammonite/input.hpp"
+#include "../include/ammonite/input.hpp" // IWYU pragma: export
 
 namespace ammonite {
   namespace input {

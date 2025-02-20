@@ -10,6 +10,7 @@ extern "C" {
 
 #include "window.hpp"
 
+#include "../enums.hpp"
 #include "../input.hpp"
 #include "../utils/logging.hpp"
 

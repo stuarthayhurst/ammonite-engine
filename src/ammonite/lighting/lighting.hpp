@@ -8,7 +8,7 @@
 #include "../types.hpp"
 
 //Include public interface
-#include "../../include/ammonite/lighting/lighting.hpp"
+#include "../../include/ammonite/lighting/lighting.hpp" // IWYU pragma: export
 
 namespace ammonite {
   namespace lighting {

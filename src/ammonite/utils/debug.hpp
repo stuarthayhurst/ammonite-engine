@@ -14,6 +14,6 @@
 #endif
 
 //Include public interface
-#include "../../include/ammonite/utils/debug.hpp"
+#include "../../include/ammonite/utils/debug.hpp" // IWYU pragma: export
 
 #endif
