@@ -7,6 +7,9 @@
 #include "../internal.hpp"
 #include "../types.hpp"
 
+//Include public interface
+#include "../../include/ammonite/lighting/lighting.hpp"
+
 namespace ammonite {
   namespace lighting {
     namespace AMMONITE_INTERNAL internal {
@@ -30,27 +33,6 @@ namespace ammonite {
       std::map<AmmoniteId, LightSource>* getLightTrackerPtr();
       glm::mat4** getLightTransformsPtr();
     }
-
-    //Exported by the engine
-    namespace properties {
-      glm::vec3 getGeometry(AmmoniteId lightId);
-      glm::vec3 getColour(AmmoniteId lightId);
-      float getPower(AmmoniteId lightId);
-
-      void setGeometry(AmmoniteId lightId, glm::vec3 geometry);
-      void setColour(AmmoniteId lightId, glm::vec3 colour);
-      void setPower(AmmoniteId lightId, float power);
-    }
-
-    glm::vec3 getAmbientLight();
-    void setAmbientLight(glm::vec3 newAmbientLight);
-
-    unsigned int getMaxLightCount();
-    AmmoniteId createLightSource();
-    void deleteLightSource(AmmoniteId lightId);
-
-    void linkModel(AmmoniteId lightId, AmmoniteId modelId);
-    void unlinkModel(AmmoniteId lightId);
   }
 }
 

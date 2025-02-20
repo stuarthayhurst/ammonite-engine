@@ -74,7 +74,7 @@ $(BUILD_DIR)/$(LIBRARY_NAME): $(BUILD_DIR)/libammonite.so
 	@rm -fv "$(BUILD_DIR)/$(LIBRARY_NAME)"
 	@ln -sv "libammonite.so" "$(BUILD_DIR)/$(LIBRARY_NAME)"
 
-$(OBJECT_DIR)/ammonite/%.o: ./src/ammonite/%.cpp $(AMMONITE_HEADERS_SOURCE)
+$(OBJECT_DIR)/ammonite/%.o: ./src/ammonite/%.cpp $(AMMONITE_HEADERS_SOURCE) $(AMMONITE_INCLUDE_HEADERS_SOURCE)
 	@mkdir -p "$$(dirname $@)"
 	$(CXX) "$<" -c $(CXXFLAGS) -fpic -o "$@"
 
@@ -116,7 +116,7 @@ debug: clean
 library: $(BUILD_DIR)/$(LIBRARY_NAME)
 headers:
 	@rm -rf "$(HEADER_DIR)/ammonite"
-	@cp -rvL "src/include/ammonite" "$(HEADER_DIR)/ammonite"
+	@cp -rv "src/include/ammonite" "$(HEADER_DIR)/ammonite"
 install:
 	@mkdir -p "$(INSTALL_DIR)/ammonite"
 	install "$(BUILD_DIR)/libammonite.so" "$(INSTALL_DIR)/ammonite/$(LIBRARY_NAME)"

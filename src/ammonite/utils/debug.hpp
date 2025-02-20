@@ -13,14 +13,7 @@
   if(false) std::cout
 #endif
 
-namespace ammonite {
-  namespace utils {
-    namespace debug {
-      //Exported by the engine
-      void enableDebug();
-      void printDriverInfo();
-    }
-  }
-}
+//Include public interface
+#include "../../include/ammonite/utils/debug.hpp"
 
 #endif
