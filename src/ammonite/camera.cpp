@@ -1,3 +1,4 @@
+#include <cmath>
 #include <map>
 
 #include <glm/glm.hpp>
@@ -34,9 +35,9 @@ namespace ammonite {
     namespace {
       static glm::vec3 calculateDirection(double vertical, double horizontal) {
         return glm::vec3(
-          glm::cos(vertical) * glm::sin(horizontal),
-          glm::sin(vertical),
-          glm::cos(vertical) * glm::cos(horizontal)
+          std::cos(vertical) * std::sin(horizontal),
+          std::sin(vertical),
+          std::cos(vertical) * std::cos(horizontal)
         );
       }
     }
@@ -53,28 +54,28 @@ namespace ammonite {
 
       void updateMatrices() {
         //Get the active camera
-        Camera activeCamera = cameraTrackerMap[activeCameraId];
+        Camera* activeCamera = &cameraTrackerMap[activeCameraId];
 
         //Vector for current direction faced
-        glm::vec3 direction = calculateDirection(activeCamera.verticalAngle,
-                                                 activeCamera.horizontalAngle);
+        glm::vec3 direction = calculateDirection(activeCamera->verticalAngle,
+                                                 activeCamera->horizontalAngle);
 
         //Right vector, relative to the camera
         glm::vec3 right = glm::vec3(
-          glm::sin(activeCamera.horizontalAngle - glm::half_pi<float>()),
+          std::sin(activeCamera->horizontalAngle - glm::half_pi<float>()),
           0,
-          glm::cos(activeCamera.horizontalAngle - glm::half_pi<float>())
+          std::cos(activeCamera->horizontalAngle - glm::half_pi<float>())
         );
         //Up vector, relative to the camera
         glm::vec3 up = glm::cross(right, direction);
 
         //Calculate the projection matrix from FoV, aspect ratio and display range
         float aspectRatio = ammonite::window::internal::getGraphicsAspectRatio();
-        projectionMatrix = glm::perspective(activeCamera.fov,
+        projectionMatrix = glm::perspective(activeCamera->fov,
                                             aspectRatio, 0.1f, *renderFarPlanePtr);
 
         //Calculate view matrix from position, where it's looking, and relative up
-        viewMatrix = glm::lookAt(activeCamera.position, activeCamera.position + direction, up);
+        viewMatrix = glm::lookAt(activeCamera->position, activeCamera->position + direction, up);
       }
     }
 
