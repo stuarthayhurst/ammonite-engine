@@ -9,7 +9,7 @@ extern "C" {
 #include "../graphics/extensions.hpp"
 #include "logging.hpp"
 
-#ifdef DEBUG
+#ifdef AMMONITE_DEBUG
 /*NOLINTBEGIN(cppcoreguidelines-avoid-non-const-global-variables,
               cppcoreguidelines-interfaces-global-init)*/
 ammonite::utils::OutputHelper ammoniteInternalDebug(std::cout, "DEBUG: ");

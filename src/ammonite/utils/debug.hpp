@@ -2,7 +2,7 @@
 #define DEBUGHEADER
 
 //Output sent to ammoniteInternalDebug will disappear unless DEBUG is set
-#ifdef DEBUG
+#ifdef AMMONITE_DEBUG
   #include "logging.hpp"
   //NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
   extern ammonite::utils::OutputHelper ammoniteInternalDebug;

@@ -43,7 +43,7 @@ ifeq ($(FAST),true)
 endif
 
 ifeq ($(DEBUG),true)
-  CXXFLAGS += -DDEBUG -g -fno-omit-frame-pointer -fsanitize=address,undefined
+  CXXFLAGS += -DAMMONITE_DEBUG -g -fno-omit-frame-pointer -fsanitize=address,undefined
   CHECK_LEAKS = true
 endif
 

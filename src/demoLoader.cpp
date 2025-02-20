@@ -214,7 +214,7 @@ int main(int argc, char** argv) noexcept(false) {
   //Start timer for demo loading
   ammonite::utils::Timer utilityTimer;
 
-#ifdef DEBUG
+#ifdef AMMONITE_DEBUG
   ammonite::renderer::setup::requestContextType(AMMONITE_DEBUG_CONTEXT);
 #elifdef FAST
   ammonite::renderer::setup::requestContextType(AMMONITE_NO_ERROR_CONTEXT);
@@ -237,7 +237,7 @@ int main(int argc, char** argv) noexcept(false) {
     ammonite::renderer::settings::setVsync(true);
   }
 
-#ifdef DEBUG
+#ifdef AMMONITE_DEBUG
   ammonite::utils::debug::enableDebug();
 #endif
 
