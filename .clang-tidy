@@ -102,6 +102,7 @@ Checks: [
   'misc-confusable-identifiers',
   'misc-definitions-in-headers',
   'misc-header-include-cycle',
+  'misc-include-cleaner'
 ]
 CheckOptions:
   - key: bugprone-implicit-widening-of-multiplication-result.UseCXXStaticCastsInCppSources
@@ -110,6 +111,8 @@ CheckOptions:
     value: true
   - key: cppcoreguidelines-avoid-non-const-global-variables.AllowInternalLinkage
     value: true
+  - key: misc-include-cleaner.IgnoreHeaders
+    value: glm/.*;
 WarningsAsErrors: 'true,*'
 SystemHeaders: 'false'
 ---
