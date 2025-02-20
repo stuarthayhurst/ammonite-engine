@@ -1,5 +1,5 @@
-#ifndef ENUMS
-#define ENUMS
+#ifndef INTERNALENUMS
+#define INTERNALENUMS
 
 //Constants for loading assumptions
 #define ASSUME_FLIP_MODEL_UVS true

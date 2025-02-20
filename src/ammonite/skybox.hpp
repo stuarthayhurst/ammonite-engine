@@ -1,5 +1,5 @@
-#ifndef SKYBOX
-#define SKYBOX
+#ifndef INTERNALSKYBOX
+#define INTERNALSKYBOX
 
 #include <string>
 

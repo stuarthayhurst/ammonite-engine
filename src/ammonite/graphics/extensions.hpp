@@ -1,5 +1,5 @@
-#ifndef EXTENSIONS
-#define EXTENSIONS
+#ifndef INTERNALEXTENSIONS
+#define INTERNALEXTENSIONS
 
 #include "../internal.hpp"
 

@@ -1,5 +1,5 @@
-#ifndef INPUT
-#define INPUT
+#ifndef INTERNALINPUT
+#define INTERNALINPUT
 
 extern "C" {
   #include <GLFW/glfw3.h>

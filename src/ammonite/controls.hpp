@@ -1,5 +1,5 @@
-#ifndef CONTROLS
-#define CONTROLS
+#ifndef INTERNALCONTROLS
+#define INTERNALCONTROLS
 
 #include "internal.hpp"
 

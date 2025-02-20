@@ -1,5 +1,5 @@
-#ifndef INTERFACE
-#define INTERFACE
+#ifndef INTERNALINTERFACE
+#define INTERNALINTERFACE
 
 #include <glm/glm.hpp>
 

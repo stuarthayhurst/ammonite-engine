@@ -1,5 +1,5 @@
-#ifndef TEXTURES
-#define TEXTURES
+#ifndef INTERNALTEXTURES
+#define INTERNALTEXTURES
 
 #include <string>
 

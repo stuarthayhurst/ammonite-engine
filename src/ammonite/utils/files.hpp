@@ -1,5 +1,5 @@
-#ifndef FILES
-#define FILES
+#ifndef INTERNALFILES
+#define INTERNALFILES
 
 #include <cstddef>
 #include <ctime>

@@ -1,5 +1,5 @@
-#ifndef RENDERER
-#define RENDERER
+#ifndef INTERNALRENDERER
+#define INTERNALRENDERER
 
 #include <cstdint>
 #include <string>

@@ -1,5 +1,5 @@
-#ifndef HASH
-#define HASH
+#ifndef INTERNALHASH
+#define INTERNALHASH
 
 #include <string>
 

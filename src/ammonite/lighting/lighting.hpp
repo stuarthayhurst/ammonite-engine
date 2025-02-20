@@ -1,5 +1,5 @@
-#ifndef LIGHTING
-#define LIGHTING
+#ifndef INTERNALLIGHTING
+#define INTERNALLIGHTING
 
 #include <map>
 #include <glm/glm.hpp>

@@ -1,5 +1,5 @@
-#ifndef THREADMANAGER
-#define THREADMANAGER
+#ifndef INTERNALTHREADMANAGER
+#define INTERNALTHREADMANAGER
 
 #include "../internal.hpp"
 #include "../types.hpp"

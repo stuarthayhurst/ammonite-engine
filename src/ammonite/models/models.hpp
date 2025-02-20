@@ -1,5 +1,5 @@
-#ifndef MODELS
-#define MODELS
+#ifndef INTERNALMODELS
+#define INTERNALMODELS
 
 #include <string>
 #include <vector>

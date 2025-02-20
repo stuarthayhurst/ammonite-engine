@@ -1,5 +1,5 @@
-#ifndef CAMERA
-#define CAMERA
+#ifndef INTERNALCAMERA
+#define INTERNALCAMERA
 
 #include <glm/glm.hpp>
 

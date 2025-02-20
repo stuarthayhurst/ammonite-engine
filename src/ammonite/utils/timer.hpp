@@ -1,5 +1,5 @@
-#ifndef TIMER
-#define TIMER
+#ifndef INTERNALTIMER
+#define INTERNALTIMER
 
 #include <ctime>
 

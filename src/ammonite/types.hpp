@@ -1,5 +1,5 @@
-#ifndef TYPES
-#define TYPES
+#ifndef INTERNALTYPES
+#define INTERNALTYPES
 
 #include <climits>
 #include <semaphore>

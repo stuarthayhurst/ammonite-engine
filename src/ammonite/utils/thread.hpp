@@ -1,5 +1,5 @@
-#ifndef THREAD
-#define THREAD
+#ifndef INTERNALTHREAD
+#define INTERNALTHREAD
 
 #include "../types.hpp"
 

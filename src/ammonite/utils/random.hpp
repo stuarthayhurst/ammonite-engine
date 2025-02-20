@@ -1,5 +1,5 @@
-#ifndef RANDOM
-#define RANDOM
+#ifndef INTERNALRANDOM
+#define INTERNALRANDOM
 
 #include <cstdint>
 

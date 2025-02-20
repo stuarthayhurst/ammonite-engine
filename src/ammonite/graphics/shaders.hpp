@@ -1,5 +1,5 @@
-#ifndef SHADERS
-#define SHADERS
+#ifndef INTERNALSHADERS
+#define INTERNALSHADERS
 
 #include <string>
 

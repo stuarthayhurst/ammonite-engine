@@ -1,5 +1,5 @@
-#ifndef LOGGING
-#define LOGGING
+#ifndef INTERNALLOGGING
+#define INTERNALLOGGING
 
 #include <iostream>
 #include <string>

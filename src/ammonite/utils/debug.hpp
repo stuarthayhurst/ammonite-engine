@@ -1,5 +1,5 @@
-#ifndef DEBUGHEADER
-#define DEBUGHEADER
+#ifndef INTERNALDEBUGHEADER
+#define INTERNALDEBUGHEADER
 
 //Output sent to ammoniteInternalDebug will disappear unless DEBUG is set
 #ifdef AMMONITE_DEBUG

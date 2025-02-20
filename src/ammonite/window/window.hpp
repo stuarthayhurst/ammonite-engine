@@ -1,5 +1,5 @@
-#ifndef WINDOW
-#define WINDOW
+#ifndef INTERNALWINDOW
+#define INTERNALWINDOW
 
 #include <string>
 
