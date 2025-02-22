@@ -754,55 +754,54 @@ namespace ammonite {
       }
     }
 
-    /*
-     - Draw models of a given type, from a cache
-     - Update the cache when given AMMONITE_DATA_REFRESH or a pointer to a null pointer
-    */
-    static void drawModelsCached(ammonite::models::internal::ModelInfo*** modelPtrsPtr,
-                                AmmoniteModelEnum modelType, AmmoniteRenderMode renderMode) {
-      unsigned int modelCount = ammonite::models::internal::getModelCount(modelType);
+    namespace {
+      /*
+       - Draw models of a given type, from a cache
+       - Update the cache when given AMMONITE_DATA_REFRESH or a pointer to a null pointer
+      */
+      static void drawModelsCached(ammonite::models::internal::ModelInfo*** modelPtrsPtr,
+                                  AmmoniteModelEnum modelType, AmmoniteRenderMode renderMode) {
+        unsigned int modelCount = ammonite::models::internal::getModelCount(modelType);
 
-      //Create / update cache for model pointers
-      if (renderMode == AMMONITE_DATA_REFRESH || *modelPtrsPtr == nullptr) {
-        //Free old model cache
-        if (*modelPtrsPtr != nullptr) {
-          delete [] *modelPtrsPtr;
+        //Create / update cache for model pointers
+        if (renderMode == AMMONITE_DATA_REFRESH || *modelPtrsPtr == nullptr) {
+          //Free old model cache
+          if (*modelPtrsPtr != nullptr) {
+            delete [] *modelPtrsPtr;
+          }
+
+          //Create and fill / update model pointers cache
+          *modelPtrsPtr = new ammonite::models::internal::ModelInfo*[modelCount];
+          ammonite::models::internal::getModels(modelType, modelCount, *modelPtrsPtr);
+
+          //Return if only refreshing
+         if (renderMode == AMMONITE_DATA_REFRESH) {
+            return;
+          }
         }
 
-        //Create and fill / update model pointers cache
-        *modelPtrsPtr = new ammonite::models::internal::ModelInfo*[modelCount];
-        ammonite::models::internal::getModels(modelType, modelCount, *modelPtrsPtr);
-
-        //Return if only refreshing
-        if (renderMode == AMMONITE_DATA_REFRESH) {
-          return;
+        //Draw the model pointers
+        for (unsigned int i = 0; i < modelCount; i++) {
+          drawModel((*modelPtrsPtr)[i], renderMode);
         }
       }
 
-      //Draw the model pointers
-      for (unsigned int i = 0; i < modelCount; i++) {
-        drawModel((*modelPtrsPtr)[i], renderMode);
+      static void drawSkybox(AmmoniteId activeSkyboxId) {
+        //Swap to skybox shader and pass uniforms
+        glUseProgram(skyboxShader.shaderId);
+        glUniformMatrix4fv(skyboxShader.viewMatrixId, 1, GL_FALSE,
+                           glm::value_ptr(glm::mat4(glm::mat3(*viewMatrix))));
+        glUniformMatrix4fv(skyboxShader.projectionMatrixId, 1, GL_FALSE,
+                           glm::value_ptr(*projectionMatrix));
+
+        //Prepare and draw the skybox
+        glBindVertexArray(skyboxVertexArrayId);
+        glBindTextureUnit(3, activeSkyboxId);
+        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, nullptr);
       }
 
-      return;
-    }
-
-    static void drawSkybox(AmmoniteId activeSkyboxId) {
-      //Swap to skybox shader and pass uniforms
-      glUseProgram(skyboxShader.shaderId);
-      glUniformMatrix4fv(skyboxShader.viewMatrixId, 1, GL_FALSE,
-                         glm::value_ptr(glm::mat4(glm::mat3(*viewMatrix))));
-      glUniformMatrix4fv(skyboxShader.projectionMatrixId, 1, GL_FALSE,
-                         glm::value_ptr(*projectionMatrix));
-
-      //Prepare and draw the skybox
-      glBindVertexArray(skyboxVertexArrayId);
-      glBindTextureUnit(3, activeSkyboxId);
-      glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, nullptr);
-    }
-
-    static void drawLoadingScreen(AmmoniteId loadingScreenId, unsigned int width,
-                                  unsigned int height) {
+      static void drawLoadingScreen(AmmoniteId loadingScreenId, unsigned int width,
+                                    unsigned int height) {
         //Swap to loading screen shader
         glUseProgram(loadingShader.shaderId);
 
@@ -832,6 +831,7 @@ namespace ammonite {
         glUniform3fv(loadingShader.progressColourId, 1, glm::value_ptr(loadingScreen->progressColour));
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, nullptr);
       }
+    }
 
     namespace internal {
       void internalDrawLoadingScreen(AmmoniteId loadingScreenId) {
