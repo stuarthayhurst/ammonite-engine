@@ -29,6 +29,6 @@ jobs:
       run: |
         make clean
 
-    - name: (DEBUG) Run the linting target
+    - name: (DEBUG + FAST) Run the linting target
       run: |
-        TIDY="clang-tidy-19" DEBUG="true" make lint -j$(nproc)
+        TIDY="clang-tidy-19" DEBUG="true" FAST="true" make lint -j$(nproc)

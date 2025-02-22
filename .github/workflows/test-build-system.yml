@@ -34,9 +34,9 @@ jobs:
       run: |
         CXX="g++-14" make build -j$(nproc)
 
-    - name: (g++) (DEBUG) Test debug demo build target
+    - name: (g++) (DEBUG + FAST) Test debug demo build target
       run: |
-        CXX="g++-14" make debug -j$(nproc)
+        CXX="g++-14" FAST="true" make debug -j$(nproc)
 
     - name: (g++) Check built objects are present
       run: |
@@ -54,9 +54,9 @@ jobs:
       run: |
         CXX="clang++-19" make build -j$(nproc)
 
-    - name: (clang++) (DEBUG) Test debug demo build target
+    - name: (clang++) (DEBUG + FAST) Test debug demo build target
       run: |
-        CXX="clang++-19" make debug -j$(nproc)
+        CXX="clang++-19" FAST="true" make debug -j$(nproc)
 
     - name: (clang++) Check built objects are present
       run: |
