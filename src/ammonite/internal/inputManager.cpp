@@ -6,6 +6,8 @@ extern "C" {
   #include <GLFW/glfw3.h>
 }
 
+#include "../input.hpp"
+
 #include "../utils/debug.hpp"
 #include "../enums.hpp"
 #include "../types.hpp"
