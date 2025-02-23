@@ -1,5 +1,7 @@
 #include <string>
 
+#include "argHandler.hpp"
+
 namespace arguments {
   /*
    - Look for identifier in argv

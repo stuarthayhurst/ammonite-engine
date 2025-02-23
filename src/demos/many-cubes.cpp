@@ -8,6 +8,8 @@
 
 #include <ammonite/ammonite.hpp>
 
+#include "many-cubes.hpp"
+
 namespace manyCubesDemo {
   namespace {
     std::vector<AmmoniteId> loadedModelIds;

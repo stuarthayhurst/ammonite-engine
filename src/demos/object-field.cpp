@@ -13,6 +13,8 @@ extern "C" {
 
 #include <ammonite/ammonite.hpp>
 
+#include "object-field.hpp"
+
 namespace objectFieldDemo {
   namespace {
     //IDs and pointer data

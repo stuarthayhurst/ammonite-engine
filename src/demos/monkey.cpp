@@ -4,6 +4,8 @@
 
 #include <ammonite/ammonite.hpp>
 
+#include "monkey.hpp"
+
 namespace monkeyDemo {
   namespace {
     std::vector<AmmoniteId> loadedModelIds;

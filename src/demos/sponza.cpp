@@ -4,6 +4,8 @@
 
 #include <ammonite/ammonite.hpp>
 
+#include "sponza.hpp"
+
 namespace sponzaDemo {
   namespace {
     std::vector<AmmoniteId> loadedModelIds;
