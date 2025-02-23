@@ -95,7 +95,7 @@ namespace ammonite {
       CursorPositionCallback activeCursorPositionCallback = nullptr;
 
       //Keyboard control direction enums
-      enum DirectionEnum {
+      enum DirectionEnum : unsigned char {
         AMMONITE_FORWARD,
         AMMONITE_BACK,
         AMMONITE_UP,

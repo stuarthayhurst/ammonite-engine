@@ -24,7 +24,7 @@ namespace ammonite {
           void* userPtr;
         };
 
-        enum KeycodeStateEnum {
+        enum KeycodeStateEnum : unsigned char {
           AMMONITE_HELD,
           AMMONITE_RELEASED
         };

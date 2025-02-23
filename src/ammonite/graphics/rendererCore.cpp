@@ -295,7 +295,7 @@ namespace ammonite {
       glm::mat4 viewProjectionMatrix;
 
       //Render modes for drawModels()
-      enum AmmoniteRenderMode {
+      enum AmmoniteRenderMode : unsigned char {
         AMMONITE_RENDER_PASS,
         AMMONITE_DEPTH_PASS,
         AMMONITE_EMISSION_PASS,
