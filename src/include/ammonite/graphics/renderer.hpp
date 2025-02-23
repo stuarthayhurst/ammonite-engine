@@ -37,8 +37,8 @@ namespace ammonite {
       bool getVsync();
       float getFrameLimit();
       unsigned int getShadowRes();
-      float setRenderResMultiplier();
-      unsigned int setAntialiasingSamples();
+      float getRenderResMultiplier();
+      unsigned int getAntialiasingSamples();
       float getRenderFarPlane();
       float getShadowFarPlane();
       bool getGammaCorrection();
