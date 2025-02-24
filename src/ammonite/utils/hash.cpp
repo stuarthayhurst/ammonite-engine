@@ -67,7 +67,7 @@ namespace ammonite {
           int pathLength = (int)filePaths[i].length();
           for (int i = 0; i < pathLength; i++) {
             output[0] ^= filePath[i];
-            for (int j = 0; j < 8; j++) {
+            for (unsigned int j = 0; j < sizeof(uintmax_t); j++) {
               output[j] ^= prev;
               prev = output[j];
             }
