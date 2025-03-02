@@ -21,7 +21,7 @@
 
 ## Keybindings:
   - `ammonite::controls::setKeybind(engineId, keycode)` takes 2 arguments, the action to rebind, and a key to bind to
-    - `keycode` should be a valid [GLFW key token](https://www.glfw.org/docs/3.3/group__keys.html)
+    - `keycode` should be a valid [GLFW key token](https://www.glfw.org/docs/latest/group__keys.html)
     - `engineId` is the action within Ammonite to rebind
       - `AMMONITE_EXIT`: Hints that the engine should be destroyed
       - `AMMONITE_FORWARD`: Moves the bound camera forwards
