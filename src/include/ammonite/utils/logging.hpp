@@ -15,7 +15,7 @@ namespace ammonite {
       bool hasFlushed = true;
 
     public:
-      OutputHelper(std::ostream& output, std::string pre);
+      OutputHelper(std::ostream& output, const std::string& pre);
       template<typename T> OutputHelper& operator << (T&& input);
       OutputHelper& operator << (std::ostream& (*)(std::ostream&));
     };

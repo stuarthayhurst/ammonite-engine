@@ -88,8 +88,9 @@ namespace ammonite {
       void setLightEmitterId(AmmoniteId modelId, AmmoniteId lightEmitterId);
       AmmoniteId getLightEmitterId(AmmoniteId modelId);
 
-      bool loadObject(std::string objectPath, models::internal::ModelData* modelObjectData,
-                      ModelLoadInfo modelLoadInfo);
+      bool loadObject(const std::string& objectPath,
+                      models::internal::ModelData* modelObjectData,
+                      const ModelLoadInfo& modelLoadInfo);
     }
   }
 }

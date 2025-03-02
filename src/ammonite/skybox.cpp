@@ -121,7 +121,7 @@ namespace ammonite {
        - srgbTextures controls whether the textures are treated as sRGB
      - Returns 0 on failure
     */
-    AmmoniteId loadDirectory(std::string directoryPath, bool flipTextures, bool srgbTextures) {
+    AmmoniteId loadDirectory(const std::string& directoryPath, bool flipTextures, bool srgbTextures) {
       //Create filesystem directory iterator
       std::filesystem::directory_iterator it;
       try {
@@ -135,7 +135,7 @@ namespace ammonite {
       //Find files to send to next stage
       std::vector<std::string> faces(0);
       for (auto const& fileName : it) {
-        std::filesystem::path filePath{fileName};
+        const std::filesystem::path& filePath{fileName};
         faces.push_back(std::string(filePath));
       }
 
@@ -179,7 +179,7 @@ namespace ammonite {
      - Load 6 textures from a directory as a skybox and return its ID
      - Returns 0 on failure
     */
-    AmmoniteId loadDirectory(std::string directoryPath) {
+    AmmoniteId loadDirectory(const std::string& directoryPath) {
       return loadDirectory(directoryPath, ASSUME_FLIP_SKYBOX_FACES,
                            ASSUME_SRGB_TEXTURES);
     }

@@ -123,7 +123,7 @@ namespace ammonite {
 
     //Keyboard control callbacks
     namespace {
-      static void keyboardCameraCallback(std::vector<int>, int action, void* userPtr) {
+      static void keyboardCameraCallback(const std::vector<int>&, int action, void* userPtr) {
         DirectionData* directionData = (DirectionData*)userPtr;
         ammonite::utils::Timer* directionTimer = &directionData->directionTimer;
         //If it's an initial key press, start the timer and return

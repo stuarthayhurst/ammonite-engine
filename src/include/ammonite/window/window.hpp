@@ -9,17 +9,17 @@ extern "C" {
 
 namespace ammonite {
   namespace window {
-    bool createWindow(unsigned int width, unsigned int height, std::string title);
+    bool createWindow(unsigned int width, unsigned int height, const std::string& title);
     bool createWindow(unsigned int width, unsigned int height);
     void destroyWindow();
 
     void setWindowResizable(bool resizable);
     bool getWindowResizable();
 
-    void setTitle(std::string title);
-    void useIcons(std::string* iconPaths, unsigned int iconCount);
-    void useIcon(std::string iconPath);
-    void useIconDir(std::string iconDirPath);
+    void setTitle(const std::string& title);
+    void useIcons(const std::string* iconPaths, unsigned int iconCount);
+    void useIcon(const std::string& iconPath);
+    void useIconDir(const std::string& iconDirPath);
 
     void setWindowGeometry(unsigned int width, unsigned int height, unsigned int xPos,
                            unsigned int yPos, bool useDecoratedSize, bool useDecoratedPos);

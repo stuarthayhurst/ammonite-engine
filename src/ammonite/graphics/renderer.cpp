@@ -26,7 +26,7 @@ namespace ammonite {
     }
 
     namespace setup {
-      bool setupRenderer(std::string shaderPath) {
+      bool setupRenderer(const std::string& shaderPath) {
         //Start a timer to measure load time
         ammonite::utils::Timer loadTimer;
 

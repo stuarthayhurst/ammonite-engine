@@ -135,7 +135,7 @@ namespace ammonite {
          - srgbTexture controls whether the texture is treated as sRGB
        - Returns 0 on failure
       */
-      GLuint loadTexture(std::string texturePath, bool flipTexture, bool srgbTexture) {
+      GLuint loadTexture(const std::string& texturePath, bool flipTexture, bool srgbTexture) {
         //Check if texture has already been loaded, with the same settings
         unsigned char extraData = (flipTexture << 0) | (srgbTexture << 1);
         std::string textureString = texturePath + std::to_string(extraData);

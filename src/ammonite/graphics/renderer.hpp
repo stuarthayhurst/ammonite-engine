@@ -18,7 +18,7 @@ namespace ammonite {
     namespace setup {
       namespace AMMONITE_INTERNAL internal {
         bool checkGPUCapabilities(unsigned int* failureCount);
-        bool createShaders(std::string shaderPath);
+        bool createShaders(const std::string& shaderPath);
         void setupOpenGLObjects();
         void deleteShaders();
         void destroyOpenGLObjects();

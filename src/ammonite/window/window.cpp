@@ -38,7 +38,7 @@ namespace ammonite {
       }
     }
 
-    bool createWindow(unsigned int width, unsigned int height, std::string title) {
+    bool createWindow(unsigned int width, unsigned int height, const std::string& title) {
       //Setup GLFW
       if (!internal::setupGlfw(requestedContextType)) {
         ammonite::utils::error << "Failed to initialize GLFW" << std::endl;
@@ -94,7 +94,7 @@ namespace ammonite {
       return internal::getWindowResizable(windowPtr);
     }
 
-    void setTitle(std::string title) {
+    void setTitle(const std::string& title) {
       if (windowPtr == nullptr) {
         ammonite::utils::warning << "No window to set icon for" << std::endl;
         return;
@@ -103,7 +103,7 @@ namespace ammonite {
       internal::setTitle(windowPtr, title);
     }
 
-    void useIcons(std::string* iconPaths, unsigned int iconCount) {
+    void useIcons(const std::string* iconPaths, unsigned int iconCount) {
       if (iconPaths == nullptr || iconCount == 0) {
         ammonite::utils::warning << "Failed to load icons (none specified)" << std::endl;
         return;
@@ -139,19 +139,19 @@ namespace ammonite {
       delete [] images;
     }
 
-    void useIcon(std::string iconPath) {
+    void useIcon(const std::string& iconPath) {
       useIcons(&iconPath, 1);
     }
 
-    void useIconDir(std::string iconDirPath) {
+    void useIconDir(const std::string& iconDirPath) {
       //Attempt to add all PNG files to a vector
       std::vector<std::string> pngFiles(0);
       try {
-        const std::filesystem::path searchDir{iconDirPath};
+        const std::filesystem::path& searchDir{iconDirPath};
         const auto it = std::filesystem::directory_iterator{searchDir};
 
         for (auto const& fileName : it) {
-          std::filesystem::path filePath{fileName};
+          const std::filesystem::path& filePath{fileName};
           if (filePath.extension() == ".png") {
             pngFiles.push_back(std::string(filePath));
           }

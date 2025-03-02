@@ -28,13 +28,13 @@ namespace ammonite {
       void rotateModel(AmmoniteId modelId, glm::vec3 rotation);
     }
 
-    AmmoniteId createModel(std::string objectPath);
-    AmmoniteId createModel(std::string objectPath, bool flipTexCoords, bool srgbTextures);
+    AmmoniteId createModel(const std::string& objectPath);
+    AmmoniteId createModel(const std::string& objectPath, bool flipTexCoords, bool srgbTextures);
     void deleteModel(AmmoniteId modelId);
     AmmoniteId copyModel(AmmoniteId modelId);
 
-    bool applyTexture(AmmoniteId modelId, AmmoniteEnum textureType, std::string texturePath);
-    bool applyTexture(AmmoniteId modelId, AmmoniteEnum textureType, std::string texturePath,
+    bool applyTexture(AmmoniteId modelId, AmmoniteEnum textureType, const std::string& texturePath);
+    bool applyTexture(AmmoniteId modelId, AmmoniteEnum textureType, const std::string& texturePath,
                       bool srgbTexture);
     unsigned int getIndexCount(AmmoniteId modelId);
     unsigned int getVertexCount(AmmoniteId modelId);

@@ -14,7 +14,7 @@ namespace ammonite {
     namespace AMMONITE_INTERNAL internal {
       GLuint createTexture(int width, int height, unsigned char* data, GLenum dataFormat,
                            GLenum textureFormat, GLint mipmapLevels);
-      GLuint loadTexture(std::string texturePath, bool flipTexture, bool srgbTexture);
+      GLuint loadTexture(const std::string& texturePath, bool flipTexture, bool srgbTexture);
       void deleteTexture(GLuint textureId);
 
       bool getTextureFormat(int channels, bool srgbTexture, GLenum* textureFormat,

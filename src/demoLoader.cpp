@@ -58,20 +58,20 @@ namespace {
 
 //Callbacks
 namespace {
-  static void inputFocusCallback(std::vector<int>, int, void*) {
+  static void inputFocusCallback(const std::vector<int>&, int, void*) {
     ammonite::input::setInputFocus(!ammonite::input::getInputFocus());
   }
 
-  static void fullscreenToggleCallback(std::vector<int>, int, void*) {
+  static void fullscreenToggleCallback(const std::vector<int>&, int, void*) {
     ammonite::window::setFullscreen(!ammonite::window::getFullscreen());
   }
 
-  static void focalToggleCallback(std::vector<int>, int, void*) {
+  static void focalToggleCallback(const std::vector<int>&, int, void*) {
     ammonite::renderer::settings::post::setFocalDepthEnabled(
       !ammonite::renderer::settings::post::getFocalDepthEnabled());
   }
 
-  static void sprintToggleCallback(std::vector<int>, int action, void*) {
+  static void sprintToggleCallback(const std::vector<int>&, int action, void*) {
     float movementSpeed = 0.0f;
     if (action == GLFW_REPEAT) {
       return;
@@ -82,13 +82,13 @@ namespace {
     ammonite::controls::settings::setMovementSpeed(movementSpeed);
   }
 
-  static void cameraCycleCallback(std::vector<int>, int, void* userPtr) {
+  static void cameraCycleCallback(const std::vector<int>&, int, void* userPtr) {
     CameraData* cameraData = (CameraData*)userPtr;
     cameraData->cameraIndex = (int)((cameraData->cameraIndex + 1) % cameraData->cameraIds.size());
     ammonite::camera::setActiveCamera(cameraData->cameraIds[cameraData->cameraIndex]);
   }
 
-  static void changeFocalDepthCallback(std::vector<int>, int action, void* userPtr) {
+  static void changeFocalDepthCallback(const std::vector<int>&, int action, void* userPtr) {
     static ammonite::utils::Timer focalDepthTimer;
     if (action != GLFW_RELEASE) {
       float sign = *(float*)userPtr;
@@ -105,7 +105,7 @@ namespace {
     focalDepthTimer.reset();
   }
 
-  static void changeFrameRateCallback(std::vector<int>, int action, void* userPtr) {
+  static void changeFrameRateCallback(const std::vector<int>&, int action, void* userPtr) {
     static ammonite::utils::Timer frameRateTimer;
     if (action != GLFW_RELEASE) {
       float sign = *(float*)userPtr;
@@ -123,7 +123,7 @@ namespace {
     frameRateTimer.reset();
   }
 
-  static void closeWindowCallback(std::vector<int>, int, void* userPtr) {
+  static void closeWindowCallback(const std::vector<int>&, int, void* userPtr) {
     *(bool*)userPtr = true;
   }
 }

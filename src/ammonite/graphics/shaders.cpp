@@ -179,7 +179,7 @@ namespace ammonite {
   //Shader compilation and cache functions, local to this file
   namespace {
     //Take shader source code, compile it and load it
-    static GLuint loadShader(std::string shaderPath, const GLenum shaderType) {
+    static GLuint loadShader(const std::string& shaderPath, const GLenum shaderType) {
       //Create the shader
       GLuint shaderId = glCreateShader(shaderType);
 
@@ -370,7 +370,7 @@ namespace ammonite {
         std::vector<GLenum> shaderTypes(0);
         for (unsigned int i = 0; i < inputShaderCount; i++) {
           std::filesystem::path filePath{inputShaderPaths[i]};
-          std::string extension = filePath.extension();
+          const std::string& extension = filePath.extension();
 
           if (shaderMatches.contains(extension)) {
             GLenum shaderType = shaderMatches[extension];
@@ -421,7 +421,7 @@ namespace ammonite {
          - If possible, load and store a cache
        - Returns 0 on failure
       */
-      GLuint loadDirectory(std::string directoryPath) {
+      GLuint loadDirectory(const std::string& directoryPath) {
         //Create filesystem directory iterator
         std::filesystem::directory_iterator it;
         try {
@@ -435,7 +435,7 @@ namespace ammonite {
         //Find files to send to next stage
         std::vector<std::string> shaderPaths(0);
         for (auto const& fileName : it) {
-          std::filesystem::path filePath{fileName};
+          const std::filesystem::path& filePath{fileName};
           shaderPaths.push_back(std::string(filePath));
         }
 

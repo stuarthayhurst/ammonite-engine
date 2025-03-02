@@ -22,7 +22,7 @@ namespace ammonite {
       namespace {
         static bool processMesh(aiMesh* meshPtr, const aiScene* scenePtr,
                                 models::internal::ModelData* modelObjectData,
-                                ModelLoadInfo modelLoadInfo) {
+                                const ModelLoadInfo& modelLoadInfo) {
           std::vector<models::internal::TextureIdGroup>* textureIds = &modelObjectData->textureIds;
 
           //Add a new empty mesh to the mesh vector
@@ -111,7 +111,7 @@ namespace ammonite {
 
         static bool processNodes(const aiScene* scenePtr,
                                  models::internal::ModelData* modelObjectData,
-                                 ModelLoadInfo modelLoadInfo) {
+                                 const ModelLoadInfo& modelLoadInfo) {
           std::queue<aiNode*> nodePtrQueue;
           nodePtrQueue.push(scenePtr->mRootNode);
 
@@ -141,8 +141,8 @@ namespace ammonite {
        - Load an object from objectPath, using the settings from modelLoadInfo
        - Store the model's data using the modelObjectData pointer
       */
-      bool loadObject(std::string objectPath, models::internal::ModelData* modelObjectData,
-                      ModelLoadInfo modelLoadInfo) {
+      bool loadObject(const std::string& objectPath, models::internal::ModelData* modelObjectData,
+                      const ModelLoadInfo& modelLoadInfo) {
         //Generate post-processing flags
         auto aiProcessFlags = aiProcess_Triangulate |
                               aiProcess_GenNormals |

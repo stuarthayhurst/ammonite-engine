@@ -5,7 +5,7 @@
 #include <semaphore>
 #include <vector>
 
-typedef void (*AmmoniteKeyCallback)(std::vector<int> keycodes, int action, void* userPtr);
+typedef void (*AmmoniteKeyCallback)(const std::vector<int>& keycodes, int action, void* userPtr);
 typedef void (*AmmoniteWork)(void* userPtr);
 
 typedef std::counting_semaphore<INT_MAX> AmmoniteGroup;

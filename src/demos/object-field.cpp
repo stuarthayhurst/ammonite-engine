@@ -72,7 +72,7 @@ namespace objectFieldDemo {
       }
     }
 
-    static void genCubesCallback(std::vector<int>, int, void*) {
+    static void genCubesCallback(const std::vector<int>&, int, void*) {
       //Hold data for randomised cube positions
       unsigned int offset = lightCount + 1;
       unsigned int cubeCount = loadedModelIds.size() - offset;
@@ -95,7 +95,7 @@ namespace objectFieldDemo {
       ammonite::utils::status << "Shuffled cubes" << std::endl;
     }
 
-    static void spawnCubeCallback(std::vector<int>, int, void*) {
+    static void spawnCubeCallback(const std::vector<int>&, int, void*) {
       AmmoniteId activeCameraId = ammonite::camera::getActiveCamera();
       AmmoniteId modelId = ammonite::models::copyModel(floorId);
       loadedModelIds.push_back(modelId);

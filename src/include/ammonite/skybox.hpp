@@ -12,8 +12,8 @@ namespace ammonite {
 
     AmmoniteId createSkybox(std::string texturePaths[6]);
     AmmoniteId createSkybox(std::string texturePaths[6], bool flipTextures, bool srgbTextures);
-    AmmoniteId loadDirectory(std::string directoryPath);
-    AmmoniteId loadDirectory(std::string directoryPath, bool flipTextures, bool srgbTextures);
+    AmmoniteId loadDirectory(const std::string& directoryPath);
+    AmmoniteId loadDirectory(const std::string& directoryPath, bool flipTextures, bool srgbTextures);
 
     void deleteSkybox(AmmoniteId skyboxId);
   }

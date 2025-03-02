@@ -9,7 +9,7 @@
 namespace ammonite {
   namespace renderer {
     namespace setup {
-      bool setupRenderer(std::string shaderPath);
+      bool setupRenderer(const std::string& shaderPath);
       void destroyRenderer();
       void requestContextType(AmmoniteEnum contextType);
     }

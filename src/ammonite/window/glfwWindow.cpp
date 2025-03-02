@@ -249,7 +249,7 @@ namespace ammonite {
         return glfwGetWindowAttrib(windowPtr, GLFW_RESIZABLE);
       }
 
-      void setTitle(GLFWwindow* windowPtr, std::string title) {
+      void setTitle(GLFWwindow* windowPtr, const std::string& title) {
         glfwSetWindowTitle(windowPtr, title.c_str());
       }
 

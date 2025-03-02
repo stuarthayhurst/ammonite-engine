@@ -97,7 +97,7 @@ namespace ammonite {
             }
 
             //Check first token is 'input'
-            std::string currentFilePath = filePaths[internalFileCount - 1];
+            const std::string& currentFilePath = filePaths[internalFileCount - 1];
             char* nestedState = nullptr;
             char* nestedToken = parseToken(token, ';', &nestedState);
             if ((nestedToken == nullptr) ||
@@ -144,21 +144,21 @@ namespace ammonite {
           return result;
         }
 
-        static void deleteCacheFile(std::string filePath) {
+        static void deleteCacheFile(const std::string& filePath) {
           ammonite::utils::status << "Clearing '" << filePath << "'" << std::endl;
           deleteFile(filePath);
         }
       }
 
-      void deleteFile(std::string filePath) {
+      void deleteFile(const std::string& filePath) {
         if (std::filesystem::exists(filePath)) {
           std::remove(filePath.c_str());
         }
       }
 
-      bool getFileMetadata(std::string filePath, std::size_t* filesize, std::time_t* timestamp) {
+      bool getFileMetadata(const std::string& filePath, std::size_t* filesize, std::time_t* timestamp) {
         //Give up if the file doesn't exist
-        std::filesystem::path filesystemPath = std::string(filePath);
+        std::filesystem::path filesystemPath = filePath;
         if (!std::filesystem::exists(filesystemPath)) {
           return false;
         }
@@ -180,7 +180,7 @@ namespace ammonite {
        - Attempt to setup targetCachePath for caching, and return whether it can be used
        - This path will be used for all caches created by the engine, as well as by the user
       */
-      bool useDataCache(std::string targetCachePath) {
+      bool useDataCache(const std::string& targetCachePath) {
         //Attempt to create the cache directory if it doesn't already exist
         if (!std::filesystem::is_directory(targetCachePath)) {
           ammonite::utils::warning << "Couldn't find cache directory '" << targetCachePath \
@@ -225,7 +225,7 @@ namespace ammonite {
        - If the read fails, return null
          - In this case, nothing needs to be freed
       */
-      unsigned char* loadFile(std::string filePath, std::size_t* size) {
+      unsigned char* loadFile(const std::string& filePath, std::size_t* size) {
         unsigned char* data = nullptr;
         int descriptor = open(filePath.c_str(), O_RDONLY);
         if (descriptor == -1) {
@@ -280,7 +280,7 @@ namespace ammonite {
          - Erase the file if present
        - Returns true on success, false on failure
       */
-      bool writeFile(std::string filePath, unsigned char* data, std::size_t size) {
+      bool writeFile(const std::string& filePath, unsigned char* data, std::size_t size) {
         int descriptor = creat(filePath.c_str(), S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH);
         if (descriptor == -1) {
           ammonite::utils::warning << "Error while opening '" << filePath \
@@ -431,7 +431,7 @@ namespace ammonite {
        - Also write userDataSize bytes of userData to the cache file
        - Returns true on success, false on failure
       */
-      bool writeCacheFile(std::string cacheFilePath, std::string* filePaths,
+      bool writeCacheFile(const std::string& cacheFilePath, std::string* filePaths,
                           unsigned int fileCount, unsigned char* data, std::size_t dataSize,
                           unsigned char* userData, std::size_t userDataSize) {
         //Generate data to write

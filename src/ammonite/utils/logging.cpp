@@ -5,7 +5,7 @@
 
 namespace ammonite {
   namespace utils {
-    OutputHelper::OutputHelper(std::ostream& output, std::string pre):outputStream(output),
+    OutputHelper::OutputHelper(std::ostream& output, const std::string& pre):outputStream(output),
       prefix(pre) {}
 
     //Handle std::endl

@@ -61,7 +61,7 @@ namespace {
       }
     }
 
-    void addModel(AmmoniteId modelId, ammonite::models::internal::ModelInfo modelObject) {
+    void addModel(AmmoniteId modelId, const ammonite::models::internal::ModelInfo& modelObject) {
       ModelTrackerMap* targetMapPtr = modelSelector[modelObject.modelType];
       (*targetMapPtr)[modelId] = modelObject;
       (*modelIdPtrMapPtr)[modelId] = &(*targetMapPtr)[modelId];
@@ -288,8 +288,8 @@ namespace ammonite {
 
   //Exposed model handling methods
   namespace models {
-    AmmoniteId createModel(std::string objectPath, bool flipTexCoords,
-                    bool srgbTextures) {
+    AmmoniteId createModel(const std::string& objectPath, bool flipTexCoords,
+                           bool srgbTextures) {
       //Create the model
       internal::ModelInfo modelObject;
       modelObject.modelName = objectPath;
@@ -340,7 +340,7 @@ namespace ammonite {
       return modelObject.modelId;
     }
 
-    AmmoniteId createModel(std::string objectPath) {
+    AmmoniteId createModel(const std::string& objectPath) {
       return createModel(objectPath, ASSUME_FLIP_MODEL_UVS, ASSUME_SRGB_TEXTURES);
     }
 
@@ -416,8 +416,8 @@ namespace ammonite {
       }
     }
 
-    bool applyTexture(AmmoniteId modelId, AmmoniteEnum textureType, std::string texturePath,
-                      bool srgbTexture) {
+    bool applyTexture(AmmoniteId modelId, AmmoniteEnum textureType,
+                      const std::string& texturePath, bool srgbTexture) {
       internal::ModelInfo* modelPtr = modelIdPtrMap[modelId];
       if (modelPtr == nullptr) {
         return false;
@@ -455,7 +455,8 @@ namespace ammonite {
       return true;
     }
 
-    bool applyTexture(AmmoniteId modelId, AmmoniteEnum textureType, std::string texturePath) {
+    bool applyTexture(AmmoniteId modelId, AmmoniteEnum textureType,
+                      const std::string& texturePath) {
       return applyTexture(modelId, textureType, texturePath, ASSUME_SRGB_TEXTURES);
     }
 
