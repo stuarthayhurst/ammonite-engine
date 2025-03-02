@@ -68,6 +68,13 @@ namespace {
       haveModelsMoved = true;
     }
 
+    void copyModelFromPtr(AmmoniteId modelId, ammonite::models::internal::ModelInfo* modelObject) {
+      ModelTrackerMap* targetMapPtr = modelSelector[modelObject->modelType];
+      (*targetMapPtr)[modelId] = *modelObject;
+      (*modelIdPtrMapPtr)[modelId] = &(*targetMapPtr)[modelId];
+      haveModelsMoved = true;
+    }
+
     void deleteModel(AmmoniteId modelId) {
       //Get the type of model, so the right tracker can be selected
       AmmoniteModelEnum modelType = (*modelIdPtrMapPtr)[modelId]->modelType;
@@ -351,15 +358,17 @@ namespace ammonite {
         return 0;
       }
 
-      //Copy model data
-      internal::ModelInfo modelObject = *oldModelObject;
-      modelObject.lightEmitterId = 0;
-      modelObject.modelData->refCount++;
+      //Add model to the tracker via pointer
+      AmmoniteId newModelId = ++totalModels;
+      activeModelTracker.copyModelFromPtr(newModelId, oldModelObject);
 
-      //Add model to the tracker and return the ID
-      modelObject.modelId = ++totalModels;
-      activeModelTracker.addModel(modelObject.modelId, modelObject);
-      return modelObject.modelId;
+      //Correct its ID and reference counter
+      modelIdPtrMap[newModelId]->modelId = newModelId;
+      modelIdPtrMap[newModelId]->lightEmitterId = 0;
+      oldModelObject->modelData->refCount++;
+
+      //Return the new ID
+      return newModelId;
     }
 
     void deleteModel(AmmoniteId modelId) {
