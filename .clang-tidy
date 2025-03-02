@@ -119,7 +119,24 @@ Checks: [
   'misc-unused-parameters',
   'misc-unused-using-decls',
   'misc-use-anonymous-namespace',
-  'misc-use-internal-linkage'
+  'misc-use-internal-linkage',
+  'performance-enum-size',
+  'performance-faster-string-find',
+  'performance-for-range-copy',
+  'performance-implicit-conversion-in-loop',
+  'performance-inefficient-algorithm',
+  'performance-inefficient-vector-operation',
+  'performance-move-const-arg',
+  'performance-move-constructor-init',
+  'performance-no-automatic-move',
+  'performance-no-int-to-ptr',
+  'performance-noexcept-destructor',
+  'performance-noexcept-move-constructor',
+  'performance-noexcept-swap',
+  'performance-trivially-destructible',
+  'performance-type-promotion-in-math-fn',
+  'performance-unnecessary-copy-initialization',
+  'performance-unnecessary-value-param'
 ]
 CheckOptions:
   - key: bugprone-implicit-widening-of-multiplication-result.UseCXXStaticCastsInCppSources
