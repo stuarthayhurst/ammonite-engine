@@ -53,7 +53,7 @@ namespace ammonite {
         std::vector<KeypressInfo> releasedKeys;
 
         //Dispatch user defined code to handle keypress
-        static void keyCallbackHandler(GLFWwindow*, int keycode, int, int action, int) {
+        void keyCallbackHandler(GLFWwindow*, int keycode, int, int action, int) {
           if (!keycodeStateMap.contains(keycode)) {
             ammoniteInternalDebug << "Keycode '" << keycode << "' not registered" << std::endl;
             return;
@@ -117,7 +117,7 @@ namespace ammonite {
         }
 
         //Register a keybind, use passed ID to allow forcing an ID
-        AmmoniteId registerRawKeybind(int keycodes[], int count, AmmoniteEnum overrideMode,
+        AmmoniteId registerRawKeybind(const int keycodes[], int count, AmmoniteEnum overrideMode,
                                       bool toggle, AmmoniteKeyCallback callback,
                                       void* userPtr, AmmoniteId keybindId) {
           //Validate override mode
@@ -363,7 +363,7 @@ namespace ammonite {
         }
 
         //Return true if any IDs remain
-        return potentialIds.size() > 0;
+        return !potentialIds.empty();
       }
 
       bool changeKeybindKeycodes(AmmoniteId keybindId, int newKeycodes[], int count) {

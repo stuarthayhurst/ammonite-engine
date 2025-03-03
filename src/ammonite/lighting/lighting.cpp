@@ -52,7 +52,7 @@ namespace ammonite {
   }
 
   namespace {
-    static void lightWork(void* userPtr) {
+    void lightWork(void* userPtr) {
       unsigned int i = ((LightWorkerData*)userPtr)->i;
       glm::mat4* shadowProj = ((LightWorkerData*)userPtr)->shadowProj;
 
@@ -74,7 +74,7 @@ namespace ammonite {
 
       //Calculate shadow transforms for shadows
       glm::vec3 lightPos = lightSource->geometry;
-      glm::mat4* transformStart = lightTransforms + (std::size_t)(lightSource->lightIndex) * 6;
+      glm::mat4* transformStart = lightTransforms + ((std::size_t)(lightSource->lightIndex) * 6);
       transformStart[0] = *shadowProj *
         glm::lookAt(lightPos, lightPos + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));
       transformStart[1] = *shadowProj *
@@ -103,9 +103,9 @@ namespace ammonite {
         //Check the light source exists, and return a pointer
         if (lightTrackerMap.contains(lightId)) {
           return &lightTrackerMap[lightId];
-        } else {
-          return nullptr;
         }
+
+        return nullptr;
       }
 
       std::map<AmmoniteId, LightSource>* getLightTrackerPtr() {
@@ -265,7 +265,7 @@ namespace ammonite {
         lightTrackerMap.erase(lightId);
       }
 
-      if (lightTrackerMap.size() == 0) {
+      if (lightTrackerMap.empty()) {
         if (lightTransforms != nullptr) {
           delete [] lightTransforms;
           delete [] shaderData;

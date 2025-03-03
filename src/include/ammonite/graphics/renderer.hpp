@@ -26,7 +26,7 @@ namespace ammonite {
       }
 
       void setVsync(bool enabled);
-      void setFrameLimit(float frameTarget);
+      void setFrameLimit(float frameLimit);
       void setShadowRes(unsigned int shadowRes);
       void setRenderResMultiplier(float renderRes);
       void setAntialiasingSamples(unsigned int samples);

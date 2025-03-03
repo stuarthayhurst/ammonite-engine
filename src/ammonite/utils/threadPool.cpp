@@ -82,7 +82,7 @@ namespace ammonite {
         }
 
         namespace {
-          static void initWorker() {
+          void initWorker() {
             while (stayAlive) {
               //Fetch the work
               WorkItem workItem;
@@ -104,7 +104,7 @@ namespace ammonite {
             }
           }
 
-          static void blocker(void*) {
+          void blocker(void*) {
             if (++blockedThreadCount == poolThreadCount) {
               threadsBlocked = true;
               threadsBlocked.notify_all();

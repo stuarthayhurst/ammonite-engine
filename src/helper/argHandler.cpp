@@ -24,10 +24,10 @@ namespace arguments {
         if (i + 1 < argc) {
           *argValuePtr = std::string(argv[i + 1]);
           return 1;
-        //If we're at the end exit with -1
-        } else {
-          return -1;
         }
+
+        //If we're at the end exit with -1
+        return -1;
       }
     }
 

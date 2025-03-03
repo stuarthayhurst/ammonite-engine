@@ -549,13 +549,8 @@ namespace ammonite {
         }
 
         void deleteModelCache() {
-          if (modelPtrs != nullptr) {
-            delete [] modelPtrs;
-          }
-
-          if (lightModelPtrs != nullptr) {
-            delete [] lightModelPtrs;
-          }
+          delete [] modelPtrs;
+          delete [] lightModelPtrs;
         }
       }
     }
@@ -566,7 +561,7 @@ namespace ammonite {
       */
 
       //Setup framebuffers for rendering
-      static void recreateFramebuffers(GLuint* targetBufferIdPtr, unsigned int sampleCount,
+      void recreateFramebuffers(GLuint* targetBufferIdPtr, unsigned int sampleCount,
                                        unsigned int renderWidth, unsigned int renderHeight) {
         //Delete regular colour and depth storage textures
         if (screenQuadTextureId != 0) {
@@ -625,7 +620,7 @@ namespace ammonite {
         glNamedFramebufferTexture(screenQuadFBO, GL_DEPTH_ATTACHMENT, screenQuadDepthTextureId, 0);
       }
 
-      static void checkFramebuffers(unsigned int renderWidth, unsigned int renderHeight,
+      void checkFramebuffers(unsigned int renderWidth, unsigned int renderHeight,
                                     unsigned int sampleCount) {
         //Check multisampled framebuffer
         if (sampleCount != 0) {
@@ -649,7 +644,7 @@ namespace ammonite {
       }
 
       //Create, configure and bind depth cubemap for shadows
-      static void setupDepthMap(unsigned int lightCount, unsigned int shadowRes) {
+      void setupDepthMap(unsigned int lightCount, unsigned int shadowRes) {
         //Delete the cubemap array if it already exists
         if (depthCubeMapId != 0) {
           glDeleteTextures(1, &depthCubeMapId);
@@ -684,7 +679,7 @@ namespace ammonite {
       /*
        - Helper functions to draw / wrap components
       */
-      static void drawModel(ammonite::models::internal::ModelInfo *drawObject,
+      void drawModel(ammonite::models::internal::ModelInfo *drawObject,
                             AmmoniteRenderMode renderMode) {
         //Get model draw data
         ammonite::models::internal::ModelData* drawObjectData = drawObject->modelData;
@@ -759,16 +754,14 @@ namespace ammonite {
        - Draw models of a given type, from a cache
        - Update the cache when given AMMONITE_DATA_REFRESH or a pointer to a null pointer
       */
-      static void drawModelsCached(ammonite::models::internal::ModelInfo*** modelPtrsPtr,
-                                  AmmoniteModelEnum modelType, AmmoniteRenderMode renderMode) {
+      void drawModelsCached(ammonite::models::internal::ModelInfo*** modelPtrsPtr,
+                            AmmoniteModelEnum modelType, AmmoniteRenderMode renderMode) {
         unsigned int modelCount = ammonite::models::internal::getModelCount(modelType);
 
         //Create / update cache for model pointers
         if (renderMode == AMMONITE_DATA_REFRESH || *modelPtrsPtr == nullptr) {
           //Free old model cache
-          if (*modelPtrsPtr != nullptr) {
-            delete [] *modelPtrsPtr;
-          }
+          delete [] *modelPtrsPtr;
 
           //Create and fill / update model pointers cache
           *modelPtrsPtr = new ammonite::models::internal::ModelInfo*[modelCount];
@@ -786,7 +779,7 @@ namespace ammonite {
         }
       }
 
-      static void drawSkybox(AmmoniteId activeSkyboxId) {
+      void drawSkybox(AmmoniteId activeSkyboxId) {
         //Swap to skybox shader and pass uniforms
         glUseProgram(skyboxShader.shaderId);
         glUniformMatrix4fv(skyboxShader.viewMatrixId, 1, GL_FALSE,
@@ -800,8 +793,8 @@ namespace ammonite {
         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, nullptr);
       }
 
-      static void drawLoadingScreen(AmmoniteId loadingScreenId, unsigned int width,
-                                    unsigned int height) {
+      void drawLoadingScreen(AmmoniteId loadingScreenId, unsigned int width,
+                             unsigned int height) {
         //Swap to loading screen shader
         glUseProgram(loadingShader.shaderId);
 
@@ -862,8 +855,8 @@ namespace ammonite {
 
         //Recreate the framebuffer if the width, height, resolution multiplier or sample count changes
         static GLuint targetBufferId = 0;
-        if ((lastWidth != width) or (lastHeight != height) or
-            (lastRenderResMultiplier != *renderResMultiplierPtr) or
+        if ((lastWidth != width) || (lastHeight != height) ||
+            (lastRenderResMultiplier != *renderResMultiplierPtr) ||
             (lastSamples != *samplesPtr)) {
           //Update values used to determine when to recreate framebuffer
           lastWidth = width;
@@ -900,7 +893,7 @@ namespace ammonite {
         static unsigned int lastLightCount = -1;
 
         //If number of lights or shadow resolution changes, recreate cubemap
-        if ((*shadowResPtr != lastShadowRes) or (lightCount != lastLightCount)) {
+        if ((*shadowResPtr != lastShadowRes) || (lightCount != lastLightCount)) {
           setupDepthMap(lightCount, *shadowResPtr);
 
           //Save for next time to avoid cubemap recreation
@@ -949,7 +942,7 @@ namespace ammonite {
           }
 
           //Pass shadow transform matrices to depth shader
-          glm::mat4* lightTransformStart = *lightTransformsPtr + (std::size_t)(lightSource->lightIndex) * 6;
+          glm::mat4* lightTransformStart = *lightTransformsPtr + ((std::size_t)(lightSource->lightIndex) * 6);
           for (int i = 0; i < 6; i++) {
             std::string identifier = std::string("shadowMatrices[") + std::to_string(i) + std::string("]");
             GLint shadowMatrixId = glGetUniformLocation(depthShader.shaderId, identifier.c_str());

@@ -13,7 +13,7 @@ namespace ammonite {
       void deleteFile(const std::string& filePath);
       bool getFileMetadata(const std::string& filePath, std::size_t* filesize, std::time_t* timestamp);
 
-      bool useDataCache(const std::string& dataCachePath);
+      bool useDataCache(const std::string& targetCachePath);
       bool getCacheEnabled();
 
       unsigned char* loadFile(const std::string& filePath, std::size_t* size);

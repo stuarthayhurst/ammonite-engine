@@ -123,7 +123,7 @@ namespace ammonite {
 
     //Keyboard control callbacks
     namespace {
-      static void keyboardCameraCallback(const std::vector<int>&, int action, void* userPtr) {
+      void keyboardCameraCallback(const std::vector<int>&, int action, void* userPtr) {
         DirectionData* directionData = (DirectionData*)userPtr;
         ammonite::utils::Timer* directionTimer = &directionData->directionTimer;
         //If it's an initial key press, start the timer and return
@@ -188,30 +188,30 @@ namespace ammonite {
     //Mouse control callbacks
     namespace {
       //Increase / decrease FoV on scroll (xoffset is unused)
-      static void scrollCallback(GLFWwindow*, double, double yoffset) {
-        if (!(*isInputBlockedPtr) and isCameraActive) {
+      void scrollCallback(GLFWwindow*, double, double yoffset) {
+        if (!(*isInputBlockedPtr) && isCameraActive) {
           AmmoniteId activeCameraId = ammonite::camera::getActiveCamera();
           float fov = ammonite::camera::getFieldOfView(activeCameraId);
 
           //Only zoom if FoV will be between 1 and FoV limit
           float newFov = fov - ((float)yoffset * controlSettings.zoomSpeed);
-          if (newFov > 0 and newFov <= controlSettings.fovLimit) {
+          if (newFov > 0 && newFov <= controlSettings.fovLimit) {
             ammonite::camera::setFieldOfView(activeCameraId, newFov);
           }
         }
       }
 
       //Reset FoV on middle click, (modifier bits are unused)
-      static void zoomResetCallback(GLFWwindow*, int button, int action, int) {
-        if (!(*isInputBlockedPtr) and isCameraActive) {
-          if (button == GLFW_MOUSE_BUTTON_MIDDLE and action == GLFW_PRESS) {
+      void zoomResetCallback(GLFWwindow*, int button, int action, int) {
+        if (!(*isInputBlockedPtr) && isCameraActive) {
+          if (button == GLFW_MOUSE_BUTTON_MIDDLE && action == GLFW_PRESS) {
             ammonite::camera::setFieldOfView(ammonite::camera::getActiveCamera(),
                                              glm::quarter_pi<float>());
           }
         }
       }
 
-      static void cursorPositionCallback(GLFWwindow*, double xpos, double ypos) {
+      void cursorPositionCallback(GLFWwindow*, double xpos, double ypos) {
         if (isCameraActive) {
           //Work out distance moved since last movement
           float xoffset = (float)(xpos - xposLast);

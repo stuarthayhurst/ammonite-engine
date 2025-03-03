@@ -64,8 +64,8 @@ namespace ammonite {
       */
       void submitMultiple(AmmoniteWork work, void* userBuffer, int stride,
                           AmmoniteGroup* group, unsigned int jobCount) {
-        return ammonite::utils::thread::internal::submitMultiple(work, userBuffer,
-          stride, group, jobCount);
+        ammonite::utils::thread::internal::submitMultiple(work, userBuffer, stride,
+          group, jobCount);
       }
 
       //Wait for a group to be finished, group can't be a nullptr

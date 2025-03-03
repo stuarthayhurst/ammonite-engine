@@ -47,7 +47,7 @@ namespace monkeyDemo {
 
       //Sum vertices and load texture if given
       vertexCount += ammonite::models::getVertexCount(loadedModelIds[i]);
-      if (models[i][1] != "") {
+      if (!models[i][1].empty()) {
         if (!ammonite::models::applyTexture(loadedModelIds[i], AMMONITE_DIFFUSE_TEXTURE,
                                            models[i][1], true)) {
           ammonite::utils::warning << "Failed to apply texture '" << models[i][1] \

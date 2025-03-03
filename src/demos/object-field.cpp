@@ -55,7 +55,7 @@ namespace objectFieldDemo {
 
   //Non-orbit internal functions
   namespace {
-    static void genRandomPosData(glm::vec3* objectData, unsigned int objectCount) {
+    void genRandomPosData(glm::vec3* objectData, unsigned int objectCount) {
       for (unsigned int i = 0; i < objectCount; i++) {
         //Position;
         objectData[(i * 3) + 0].x = (float)ammonite::utils::randomDouble(-10.0, 10.0);
@@ -72,7 +72,7 @@ namespace objectFieldDemo {
       }
     }
 
-    static void genCubesCallback(const std::vector<int>&, int, void*) {
+    void genCubesCallback(const std::vector<int>&, int, void*) {
       //Hold data for randomised cube positions
       unsigned int offset = lightCount + 1;
       unsigned int cubeCount = loadedModelIds.size() - offset;
@@ -95,7 +95,7 @@ namespace objectFieldDemo {
       ammonite::utils::status << "Shuffled cubes" << std::endl;
     }
 
-    static void spawnCubeCallback(const std::vector<int>&, int, void*) {
+    void spawnCubeCallback(const std::vector<int>&, int, void*) {
       AmmoniteId activeCameraId = ammonite::camera::getActiveCamera();
       AmmoniteId modelId = ammonite::models::copyModel(floorId);
       loadedModelIds.push_back(modelId);
@@ -115,7 +115,7 @@ namespace objectFieldDemo {
   //Orbit handling internal functions
   namespace {
     //Return true if 2 angles are within threshold radians of each other
-    constexpr static bool isWithinThreshold(float angleA, float angleB, float threshold) {
+    constexpr bool isWithinThreshold(float angleA, float angleB, float threshold) {
       float delta = angleA - angleB;
       if (delta < -glm::pi<float>()) {
         delta += glm::two_pi<float>();
@@ -127,7 +127,7 @@ namespace objectFieldDemo {
     }
 
     //Return the position of an orbit's centre, so that each orbit in a shape meets the next
-    constexpr static glm::vec2 calculateOrbitPosition(unsigned int orbitCount,
+    constexpr glm::vec2 calculateOrbitPosition(unsigned int orbitCount,
                                                       unsigned int orbitIndex, float radius) {
       float nucleusAngle = (glm::two_pi<float>() * (float)orbitIndex) / (float)orbitCount;
 
@@ -144,7 +144,7 @@ namespace objectFieldDemo {
      - First index has the angle to the previous index
        - The second index has the angle to the next index
     */
-    static float* calculateSwapAngles(unsigned int orbitCount) {
+    float* calculateSwapAngles(unsigned int orbitCount) {
       const float down = glm::half_pi<float>();
       const float indexOffsetAngle = glm::half_pi<float>() - (glm::pi<float>() / (float)orbitCount);
 
@@ -177,7 +177,7 @@ namespace objectFieldDemo {
      - The first index of the pair points to previous swap target index
      - The second index of the pair points to the next swap target index
     */
-    static unsigned int* calculateSwapTargets(unsigned int orbitCount) {
+    unsigned int* calculateSwapTargets(unsigned int orbitCount) {
       unsigned int* swapTargets = new unsigned int[(std::size_t)(orbitCount) * 2];
       for (unsigned int orbit = 0; orbit < orbitCount; orbit++) {
         unsigned int writeIndex = orbit * 2;

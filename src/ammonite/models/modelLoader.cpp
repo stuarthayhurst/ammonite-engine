@@ -20,7 +20,7 @@ namespace ammonite {
   namespace models {
     namespace internal {
       namespace {
-        static bool processMesh(aiMesh* meshPtr, const aiScene* scenePtr,
+        bool processMesh(aiMesh* meshPtr, const aiScene* scenePtr,
                                 models::internal::ModelData* modelObjectData,
                                 const ModelLoadInfo& modelLoadInfo) {
           std::vector<models::internal::TextureIdGroup>* textureIds = &modelObjectData->textureIds;
@@ -109,7 +109,7 @@ namespace ammonite {
           return true;
         }
 
-        static bool processNodes(const aiScene* scenePtr,
+        bool processNodes(const aiScene* scenePtr,
                                  models::internal::ModelData* modelObjectData,
                                  const ModelLoadInfo& modelLoadInfo) {
           std::queue<aiNode*> nodePtrQueue;

@@ -111,8 +111,8 @@ namespace manyCubesDemo {
 
         x += lightSourcePositions[i].x;
         z += lightSourcePositions[i].z;
-        if (x >= 0.0f and x <= (float)sideLength) {
-          if (z >= 0.0f and z <= (float)sideLength) {
+        if (x >= 0.0f && x <= (float)sideLength) {
+          if (z >= 0.0f && z <= (float)sideLength) {
             invalid = false;
           }
         }

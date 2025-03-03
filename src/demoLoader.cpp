@@ -48,30 +48,27 @@ namespace {
   };
 }
 
-//Struct definitions
+//Callbacks and definitions
 namespace {
   struct CameraData {
     int cameraIndex;
     std::vector<AmmoniteId> cameraIds;
   };
-}
 
-//Callbacks
-namespace {
-  static void inputFocusCallback(const std::vector<int>&, int, void*) {
+  void inputFocusCallback(const std::vector<int>&, int, void*) {
     ammonite::input::setInputFocus(!ammonite::input::getInputFocus());
   }
 
-  static void fullscreenToggleCallback(const std::vector<int>&, int, void*) {
+  void fullscreenToggleCallback(const std::vector<int>&, int, void*) {
     ammonite::window::setFullscreen(!ammonite::window::getFullscreen());
   }
 
-  static void focalToggleCallback(const std::vector<int>&, int, void*) {
+  void focalToggleCallback(const std::vector<int>&, int, void*) {
     ammonite::renderer::settings::post::setFocalDepthEnabled(
       !ammonite::renderer::settings::post::getFocalDepthEnabled());
   }
 
-  static void sprintToggleCallback(const std::vector<int>&, int action, void*) {
+  void sprintToggleCallback(const std::vector<int>&, int action, void*) {
     float movementSpeed = 0.0f;
     if (action == GLFW_REPEAT) {
       return;
@@ -82,13 +79,13 @@ namespace {
     ammonite::controls::settings::setMovementSpeed(movementSpeed);
   }
 
-  static void cameraCycleCallback(const std::vector<int>&, int, void* userPtr) {
+  void cameraCycleCallback(const std::vector<int>&, int, void* userPtr) {
     CameraData* cameraData = (CameraData*)userPtr;
     cameraData->cameraIndex = (int)((cameraData->cameraIndex + 1) % cameraData->cameraIds.size());
     ammonite::camera::setActiveCamera(cameraData->cameraIds[cameraData->cameraIndex]);
   }
 
-  static void changeFocalDepthCallback(const std::vector<int>&, int action, void* userPtr) {
+  void changeFocalDepthCallback(const std::vector<int>&, int action, void* userPtr) {
     static ammonite::utils::Timer focalDepthTimer;
     if (action != GLFW_RELEASE) {
       float sign = *(float*)userPtr;
@@ -105,7 +102,7 @@ namespace {
     focalDepthTimer.reset();
   }
 
-  static void changeFrameRateCallback(const std::vector<int>&, int action, void* userPtr) {
+  void changeFrameRateCallback(const std::vector<int>&, int action, void* userPtr) {
     static ammonite::utils::Timer frameRateTimer;
     if (action != GLFW_RELEASE) {
       float sign = *(float*)userPtr;
@@ -123,14 +120,14 @@ namespace {
     frameRateTimer.reset();
   }
 
-  static void closeWindowCallback(const std::vector<int>&, int, void* userPtr) {
+  void closeWindowCallback(const std::vector<int>&, int, void* userPtr) {
     *(bool*)userPtr = true;
   }
 }
 
 //Helpers
 namespace {
-  static void printMetrics(double frameTime) {
+  void printMetrics(double frameTime) {
     double frameRate = 0.0;
     if (frameTime != 0.0) {
       frameRate = 1 / frameTime;
@@ -141,7 +138,7 @@ namespace {
   }
 
   //Clean up anything that was created
-  static void cleanEngine(unsigned int setupBits, std::vector<AmmoniteId>* keybindIdsPtr) {
+  void cleanEngine(unsigned int setupBits, std::vector<AmmoniteId>* keybindIdsPtr) {
     if (setupBits & HAS_SETUP_CONTROLS) {
       ammonite::controls::releaseFreeCamera();
       if (keybindIdsPtr != nullptr) {
@@ -173,7 +170,9 @@ int main(int argc, char** argv) noexcept(false) {
     " --vsync     :  Enable / disable VSync (true / false)\n"
     " --demo      :  Run the selected demo" << std::endl;
     return EXIT_SUCCESS;
-  } else if (showHelp == -1) {
+  }
+
+  if (showHelp == -1) {
     return EXIT_FAILURE;
   }
 
@@ -188,7 +187,7 @@ int main(int argc, char** argv) noexcept(false) {
   //Fetch demo, list options and validate the chosen demo
   std::string demoName;
   if (arguments::searchArgument(argc, argv, "--demo", &demoName) != 0) {
-    if (demoName == "") {
+    if (demoName.empty()) {
       std::cout << "Valid demos:" << std::endl;
       for (auto it = demoFunctionMap.begin(); it != demoFunctionMap.end(); it++) {
         std::cout << " - " << it->first << std::endl;
@@ -199,7 +198,7 @@ int main(int argc, char** argv) noexcept(false) {
   }
 
   if (!demoFunctionMap.contains(demoName)) {
-    if (demoName != "") {
+    if (!demoName.empty()) {
       ammonite::utils::warning << "Invalid demo '" << demoName << "', using default instead" \
                                << std::endl;
     }
@@ -231,7 +230,7 @@ int main(int argc, char** argv) noexcept(false) {
   std::cout << std::endl;
 
   //Set vsync (disable if benchmarking)
-  if (useVsync == "false" or useBenchmark) {
+  if (useVsync == "false" || useBenchmark) {
     ammonite::renderer::settings::setVsync(false);
   } else if (useVsync == "true") {
     ammonite::renderer::settings::setVsync(true);

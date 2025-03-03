@@ -33,7 +33,7 @@ namespace ammonite {
     }
 
     namespace {
-      static glm::vec3 calculateDirection(double vertical, double horizontal) {
+      glm::vec3 calculateDirection(double vertical, double horizontal) {
         return glm::vec3(
           std::cos(vertical) * std::sin(horizontal),
           std::sin(vertical),
@@ -104,7 +104,7 @@ namespace ammonite {
 
     void deleteCamera(AmmoniteId cameraId) {
       //Delete the camera if present
-      if (cameraTrackerMap.contains(cameraId) and cameraId != 1) {
+      if (cameraTrackerMap.contains(cameraId) && cameraId != 1) {
         cameraTrackerMap.erase(cameraId);
       }
 
@@ -118,9 +118,9 @@ namespace ammonite {
     glm::vec3 getPosition(AmmoniteId cameraId) {
       if (cameraTrackerMap.contains(cameraId)) {
         return cameraTrackerMap[cameraId].position;
-      } else {
-        return glm::vec3(0.0f);
       }
+
+      return glm::vec3(0.0f);
     }
 
     glm::vec3 getDirection(AmmoniteId cameraId) {
@@ -129,36 +129,36 @@ namespace ammonite {
         glm::vec3 direction = calculateDirection(activeCamera->verticalAngle,
                                                  activeCamera->horizontalAngle);
         return glm::normalize(direction);
-      } else {
-        return glm::vec3(0.0f);
       }
+
+      return glm::vec3(0.0f);
     }
 
     //Get horizontal angle (radians)
     float getHorizontal(AmmoniteId cameraId) {
       if (cameraTrackerMap.contains(cameraId)) {
         return cameraTrackerMap[cameraId].horizontalAngle;
-      } else {
-        return 0.0f;
       }
+
+      return 0.0f;
     }
 
     //Get vertical angle (radians)
     float getVertical(AmmoniteId cameraId) {
       if (cameraTrackerMap.contains(cameraId)) {
         return cameraTrackerMap[cameraId].verticalAngle;
-      } else {
-        return 0.0f;
       }
+
+      return 0.0f;
     }
 
     //Get field of view (radians)
     float getFieldOfView(AmmoniteId cameraId) {
       if (cameraTrackerMap.contains(cameraId)) {
         return cameraTrackerMap[cameraId].fov;
-      } else {
-        return glm::quarter_pi<float>();
       }
+
+      return glm::quarter_pi<float>();
     }
 
     //Set position

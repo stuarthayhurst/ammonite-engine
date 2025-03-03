@@ -59,7 +59,7 @@ namespace ammonite {
          - Conditionally account for decoration
          - isWindowFullscreen must be set correctly
         */
-        static void storeWindowGeometry(GLFWwindow* windowPtr, WindowGeom* storage,
+        void storeWindowGeometry(GLFWwindow* windowPtr, WindowGeom* storage,
                                         bool useDecoratedSize, bool useDecoratedPos) {
           /*
            - If the window is fullscreen, set the width, height, aspect ratio and bail out
@@ -102,7 +102,7 @@ namespace ammonite {
           }
         }
 
-        static GLFWmonitor* getClosestMonitor(GLFWwindow* windowPtr) {
+        GLFWmonitor* getClosestMonitor(GLFWwindow* windowPtr) {
           int monitorCount = 0;
           GLFWmonitor **monitors = glfwGetMonitors(&monitorCount);
 
@@ -135,12 +135,12 @@ namespace ammonite {
         }
 
         //Callback to update height and width on window resize
-        static void windowSizeCallback(GLFWwindow* windowPtr, int, int) {
+        void windowSizeCallback(GLFWwindow* windowPtr, int, int) {
           storeWindowGeometry(windowPtr, &activeWindowGeom, false, true);
           ammonite::camera::internal::updateMatrices();
         }
 
-        static void windowFocusCallback(GLFWwindow*, int focused) {
+        void windowFocusCallback(GLFWwindow*, int focused) {
           //Unbind / bind input with window focus (fixes missing mouse)
           if (!focused) {
             ammonite::input::setInputFocus(focused);

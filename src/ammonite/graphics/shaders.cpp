@@ -23,38 +23,35 @@ extern "C" {
 #include "../utils/thread.hpp"
 
 namespace ammonite {
-  //Static helper functions and anonymous data
   namespace {
-    namespace {
-      //Set by updateCacheSupport(), when renderer is set up
-      bool isBinaryCacheSupported = false;
+    //Set by updateCacheSupport(), when renderer is set up
+    bool isBinaryCacheSupported = false;
 
-      //Identify shader types by extensions / contained strings
-      std::map<std::string, GLenum> shaderMatches = {
-        {".vert", GL_VERTEX_SHADER}, {".vs", GL_VERTEX_SHADER}, {"vert", GL_VERTEX_SHADER},
-        {".frag", GL_FRAGMENT_SHADER}, {".fs", GL_FRAGMENT_SHADER}, {"frag", GL_FRAGMENT_SHADER},
-        {".geom", GL_GEOMETRY_SHADER}, {".gs", GL_GEOMETRY_SHADER}, {"geom", GL_GEOMETRY_SHADER},
-        {".tessc", GL_TESS_CONTROL_SHADER}, {".tsc", GL_TESS_CONTROL_SHADER},
-          {"tessc", GL_TESS_CONTROL_SHADER}, {"control", GL_TESS_CONTROL_SHADER},
-        {".tesse", GL_TESS_EVALUATION_SHADER}, {".tes", GL_TESS_EVALUATION_SHADER},
-          {"tesse", GL_TESS_EVALUATION_SHADER}, {"eval", GL_TESS_EVALUATION_SHADER},
-        {".comp", GL_COMPUTE_SHADER}, {".cs", GL_COMPUTE_SHADER}, {"compute", GL_COMPUTE_SHADER},
-        {".glsl", GL_FALSE} //Don't ignore generic shaders
-      };
+    //Identify shader types by extensions / contained strings
+    std::map<std::string, GLenum> shaderMatches = {
+      {".vert", GL_VERTEX_SHADER}, {".vs", GL_VERTEX_SHADER}, {"vert", GL_VERTEX_SHADER},
+      {".frag", GL_FRAGMENT_SHADER}, {".fs", GL_FRAGMENT_SHADER}, {"frag", GL_FRAGMENT_SHADER},
+      {".geom", GL_GEOMETRY_SHADER}, {".gs", GL_GEOMETRY_SHADER}, {"geom", GL_GEOMETRY_SHADER},
+      {".tessc", GL_TESS_CONTROL_SHADER}, {".tsc", GL_TESS_CONTROL_SHADER},
+        {"tessc", GL_TESS_CONTROL_SHADER}, {"control", GL_TESS_CONTROL_SHADER},
+      {".tesse", GL_TESS_EVALUATION_SHADER}, {".tes", GL_TESS_EVALUATION_SHADER},
+        {"tesse", GL_TESS_EVALUATION_SHADER}, {"eval", GL_TESS_EVALUATION_SHADER},
+      {".comp", GL_COMPUTE_SHADER}, {".cs", GL_COMPUTE_SHADER}, {"compute", GL_COMPUTE_SHADER},
+      {".glsl", GL_FALSE} //Don't ignore generic shaders
+    };
 
-      //Data required by cache worker
-      struct CacheWorkerData {
-        unsigned int shaderCount;
-        std::string* shaderPaths;
-        std::string cacheFilePath;
-        int binaryLength;
-        GLenum binaryFormat;
-        char* binaryData;
-      };
-    }
+    //Data required by cache worker
+    struct CacheWorkerData {
+      unsigned int shaderCount;
+      std::string* shaderPaths;
+      std::string cacheFilePath;
+      int binaryLength;
+      GLenum binaryFormat;
+      char* binaryData;
+    };
 
     //Thread pool work to cache a program
-    static void doCacheWork(void* userPtr) {
+    void doCacheWork(void* userPtr) {
       CacheWorkerData* data = (CacheWorkerData*)userPtr;
 
       //Prepare user data required to load the cache again
@@ -74,8 +71,8 @@ namespace ammonite {
       delete data;
     }
 
-    static void cacheProgram(const GLuint programId, std::string* shaderPaths,
-                             unsigned int shaderCount, std::string* cacheFilePath) {
+    void cacheProgram(const GLuint programId, std::string* shaderPaths,
+                      unsigned int shaderCount, std::string* cacheFilePath) {
       CacheWorkerData* data = new CacheWorkerData;
       data->shaderCount = shaderCount;
 
@@ -112,7 +109,7 @@ namespace ammonite {
       ammonite::utils::thread::submitWork(doCacheWork, data, nullptr);
     }
 
-    static bool checkObject(GLuint objectId, const char* actionString, GLenum statusEnum,
+    bool checkObject(GLuint objectId, const char* actionString, GLenum statusEnum,
                             void (*objectQuery)(GLuint, GLenum, GLint*),
                             void (*objectLog)(GLuint, GLsizei, GLsizei*, GLchar*)) {
       //Test whether the program linked
@@ -147,17 +144,17 @@ namespace ammonite {
       return false;
     }
 
-    static bool checkProgram(GLuint programId, bool isCached) {
+    bool checkProgram(GLuint programId, bool isCached) {
       return checkObject(programId, isCached ? "upload shader program" : "link shader program",
                          GL_LINK_STATUS, glGetProgramiv, glGetProgramInfoLog);
     }
 
-    static bool checkShader(GLuint shaderId) {
+    bool checkShader(GLuint shaderId) {
       return checkObject(shaderId, "compile shader stage", GL_COMPILE_STATUS,
                          glGetShaderiv, glGetShaderInfoLog);
     }
 
-    static GLenum attemptIdentifyShaderType(std::string shaderPath) {
+    GLenum attemptIdentifyShaderType(std::string shaderPath) {
       std::string lowerShaderPath;
       for (unsigned int i = 0; i < shaderPath.size(); i++) {
         lowerShaderPath += (char)std::tolower(shaderPath[i]);
@@ -179,7 +176,7 @@ namespace ammonite {
   //Shader compilation and cache functions, local to this file
   namespace {
     //Take shader source code, compile it and load it
-    static GLuint loadShader(const std::string& shaderPath, const GLenum shaderType) {
+    GLuint loadShader(const std::string& shaderPath, const GLenum shaderType) {
       //Create the shader
       GLuint shaderId = glCreateShader(shaderType);
 
@@ -207,7 +204,7 @@ namespace ammonite {
     }
 
     //Take multiple shader objects and create a program
-    static GLuint createProgramObject(GLuint* shaderIds, unsigned int shaderCount) {
+    GLuint createProgramObject(GLuint* shaderIds, unsigned int shaderCount) {
       //Create the program
       GLuint programId = glCreateProgram();
 
@@ -233,7 +230,7 @@ namespace ammonite {
     }
 
     //Create a program from shader source with loadShader() and createProgramObject()
-    static GLuint createProgramUncached(std::string* shaderPaths, GLenum* shaderTypes,
+    GLuint createProgramUncached(std::string* shaderPaths, GLenum* shaderTypes,
                                         unsigned int shaderCount) {
       //Since cache wasn't available, generate fresh shaders
       GLuint* shaderIds = new GLuint[shaderCount];
@@ -268,7 +265,7 @@ namespace ammonite {
     }
 
     //Attempt to use a cached program or hand off to createProgramUncached()
-    static GLuint createProgramCached(std::string* shaderPaths, GLenum* shaderTypes,
+    GLuint createProgramCached(std::string* shaderPaths, GLenum* shaderTypes,
                                       unsigned int shaderCount) {
       //Check for OpenGL and engine cache support
       bool isCacheSupported = ammonite::utils::files::getCacheEnabled();
@@ -307,16 +304,17 @@ namespace ammonite {
           glProgramBinary(programId, binaryFormat, cacheData, (GLsizei)cacheDataSize);
           delete [] cacheData;
 
-          //Return the program ID, unless the cache was faulty, then delete and carry on
+          //Return the program ID if the cache worked
           if (checkProgram(programId, true)) {
             return programId;
-          } else {
-            ammonite::utils::warning << "Failed to process '" << cacheFilePath \
-                                     << "'" << std::endl;
-            ammonite::utils::status << "Clearing '" << cacheFilePath << "'" << std::endl;
-            glDeleteProgram(programId);
-            ammonite::utils::files::deleteFile(cacheFilePath);
           }
+
+          //Cache was faulty, delete it and carry on
+          ammonite::utils::warning << "Failed to process '" << cacheFilePath \
+                                   << "'" << std::endl;
+          ammonite::utils::status << "Clearing '" << cacheFilePath << "'" << std::endl;
+          glDeleteProgram(programId);
+          ammonite::utils::files::deleteFile(cacheFilePath);
         }
       }
 
@@ -398,7 +396,7 @@ namespace ammonite {
             }
 
             //Check for tessellation shader support if needed
-            if (shaderType == GL_TESS_CONTROL_SHADER or shaderType == GL_TESS_EVALUATION_SHADER) {
+            if (shaderType == GL_TESS_CONTROL_SHADER || shaderType == GL_TESS_EVALUATION_SHADER) {
               if (!graphics::internal::checkExtension("GL_ARB_tessellation_shader",
                                                       "GL_VERSION_4_0")) {
                 ammonite::utils::warning << "Tessellation shaders unsupported" << std::endl;
@@ -412,7 +410,7 @@ namespace ammonite {
         }
 
         //Create the program and return the ID
-        return createProgramCached(&shaderPaths[0], &shaderTypes[0], shaderPaths.size());
+        return createProgramCached(shaderPaths.data(), shaderTypes.data(), shaderPaths.size());
       }
 
       /*
@@ -443,7 +441,7 @@ namespace ammonite {
         std::sort(shaderPaths.begin(), shaderPaths.end());
 
         //Create the program and return the ID
-        return createProgram(&shaderPaths[0], shaderPaths.size());
+        return createProgram(shaderPaths.data(), shaderPaths.size());
       }
     }
   }

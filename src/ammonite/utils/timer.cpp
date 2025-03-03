@@ -9,7 +9,7 @@ namespace ammonite {
   namespace utils {
     namespace {
       //Add nanoseconds to *time, account for wrap-around
-      static void addNanoseconds(std::timespec* time, std::time_t nanoseconds) {
+      void addNanoseconds(std::timespec* time, std::time_t nanoseconds) {
         static_assert(typeid(time->tv_nsec) == typeid(signed long),
                       "expected tv_nsec to be signed");
 
@@ -90,7 +90,7 @@ namespace ammonite {
     }
 
     //Returns whether the timer is running or not
-    bool Timer::isRunning() {
+    bool Timer::isRunning() const {
       return timerRunning;
     }
 

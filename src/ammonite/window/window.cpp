@@ -161,14 +161,8 @@ namespace ammonite {
         return;
       }
 
-      std::string* iconPaths = new std::string[pngFiles.size()];
-      for (unsigned int i = 0; i < pngFiles.size(); i++) {
-        iconPaths[i] = pngFiles[i].c_str();
-      }
-
       //Hand off to another icon handler
-      useIcons(iconPaths, pngFiles.size());
-      delete [] iconPaths;
+      useIcons(pngFiles.data(), pngFiles.size());
     }
 
     //Set decorated window size and position, for non-fullscreen windows only

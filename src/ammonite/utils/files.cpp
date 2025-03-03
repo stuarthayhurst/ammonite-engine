@@ -35,7 +35,7 @@ namespace ammonite {
       }
 
       namespace {
-        static std::string getCachedFilePath(std::string* filePaths, unsigned int fileCount) {
+        std::string getCachedFilePath(std::string* filePaths, unsigned int fileCount) {
           return dataCachePath + internal::hashStrings(filePaths, fileCount) + \
                  std::string(".cache");
         }
@@ -45,7 +45,7 @@ namespace ammonite {
          - Unsafe if called with both input and (save or *save) as nullptr / undefined
          - save must never be nullptr
         */
-        static char* parseToken(char* input, char delim, char** save) {
+        char* parseToken(char* input, char delim, char** save) {
           //Restore from next byte to search
           if (input == nullptr) {
             input = *save;
@@ -74,7 +74,7 @@ namespace ammonite {
         }
 
         //Check paths, times and file sizes are correct
-        static AmmoniteEnum validateInputs(std::string* filePaths, unsigned int fileCount,
+        AmmoniteEnum validateInputs(std::string* filePaths, unsigned int fileCount,
                                            unsigned char* extraData, std::size_t extraDataSize) {
           unsigned char* extraDataCopy = new unsigned char[extraDataSize + 1];
           std::memcpy(extraDataCopy, extraData, extraDataSize);
@@ -144,7 +144,7 @@ namespace ammonite {
           return result;
         }
 
-        static void deleteCacheFile(const std::string& filePath) {
+        void deleteCacheFile(const std::string& filePath) {
           ammonite::utils::status << "Clearing '" << filePath << "'" << std::endl;
           deleteFile(filePath);
         }
@@ -248,7 +248,9 @@ namespace ammonite {
           intmax_t newBytesRead = read(descriptor, data + bytesRead, statBuf.st_size - bytesRead);
           if (newBytesRead == 0) {
             break;
-          } else if (newBytesRead < 0) {
+          }
+
+          if (newBytesRead < 0) {
             ammonite::utils::warning << "Error while reading '" << filePath \
                                      << "' (" << -errno << ")" << std::endl;
             close(descriptor);
@@ -297,7 +299,9 @@ namespace ammonite {
           intmax_t newBytesWritten = write(descriptor, data + bytesWritten, size - bytesWritten);
           if (newBytesWritten == 0) {
             break;
-          } else if (newBytesWritten < 0) {
+          }
+
+          if (newBytesWritten < 0) {
             ammonite::utils::warning << "Error while writing to '" << filePath \
                                      << "' (" << -errno << ")" << std::endl;
             close(descriptor);

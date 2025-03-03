@@ -17,7 +17,7 @@ namespace ammonite {
       double getTime();
       void setTime(std::time_t seconds, std::time_t nanoseconds);
       void setTime(double newTime);
-      bool isRunning();
+      bool isRunning() const;
       void reset();
       void pause();
       void unpause();

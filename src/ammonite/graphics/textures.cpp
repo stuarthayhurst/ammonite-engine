@@ -34,7 +34,7 @@ namespace ammonite {
          - Writes the format of the data to dataFormat
          - Writes the format of the final texture to textureFormat
         */
-        static bool decideTextureFormat(int channels, bool srgbTexture, GLenum* textureFormat,
+        bool decideTextureFormat(int channels, bool srgbTexture, GLenum* textureFormat,
                                         GLenum* dataFormat) {
           if (channels == 3) {
             *dataFormat = GL_RGB;
@@ -84,7 +84,7 @@ namespace ammonite {
         //Decrease the reference counter, delete the texture if now unused
         if (--textureInfoPtr->refCount == 0) {
           //Remove the string entry
-          if (textureInfoPtr->string != "") {
+          if (!textureInfoPtr->string.empty()) {
             stringTexturePtrMap.erase(textureInfoPtr->string);
           }
 

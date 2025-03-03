@@ -159,9 +159,9 @@ namespace ammonite {
         //Check the model exists, and return a pointer
         if (modelIdPtrMap.contains(modelId)) {
           return modelIdPtrMap[modelId];
-        } else {
-          return nullptr;
         }
+
+        return nullptr;
       }
 
       bool* getModelsMovedPtr() {
@@ -201,7 +201,7 @@ namespace ammonite {
   }
 
   namespace {
-    static void createBuffers(models::internal::ModelData* modelObjectData) {
+    void createBuffers(models::internal::ModelData* modelObjectData) {
       //Generate buffers for every mesh
       for (unsigned int i = 0; i < modelObjectData->meshes.size(); i++) {
         models::internal::MeshData* meshData = &modelObjectData->meshes[i];
@@ -257,7 +257,7 @@ namespace ammonite {
       }
     }
 
-    static void deleteBuffers(models::internal::ModelData* modelObjectData) {
+    void deleteBuffers(models::internal::ModelData* modelObjectData) {
       //Delete created buffers and the VAO
       for (unsigned int i = 0; i < modelObjectData->meshes.size(); i++) {
         models::internal::MeshData* meshData = &modelObjectData->meshes[i];
@@ -268,21 +268,21 @@ namespace ammonite {
       }
     }
 
-    static void moveModelToActive(AmmoniteId modelId, ammonite::models::internal::ModelInfo* modelPtr) {
+    void moveModelToActive(AmmoniteId modelId, ammonite::models::internal::ModelInfo* modelPtr) {
       //Move from inactive to active tracker, update model pointer map
       ammonite::models::internal::ModelInfo modelObject = *modelPtr;
       inactiveModelTracker.deleteModel(modelId);
       activeModelTracker.addModel(modelId, modelObject);
     }
 
-    static void moveModelToInactive(AmmoniteId modelId, ammonite::models::internal::ModelInfo* modelPtr) {
+    void moveModelToInactive(AmmoniteId modelId, ammonite::models::internal::ModelInfo* modelPtr) {
       //Move from active to inactive tracker, update model pointer map
       ammonite::models::internal::ModelInfo modelObject = *modelPtr;
       activeModelTracker.deleteModel(modelId);
       inactiveModelTracker.addModel(modelId, modelObject);
     }
 
-    static void calcModelMatrices(models::internal::PositionData* positionData) {
+    void calcModelMatrices(models::internal::PositionData* positionData) {
       //Recalculate the model matrix when a component changes
       positionData->modelMatrix = positionData->translationMatrix
                                 * glm::toMat4(positionData->rotationQuat)

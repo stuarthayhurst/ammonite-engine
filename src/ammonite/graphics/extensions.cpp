@@ -12,7 +12,7 @@ namespace ammonite {
   namespace graphics {
     namespace internal {
       bool checkExtension(const char* extension, const char* version) {
-        if (glewIsSupported(extension) or glewIsSupported(version)) {
+        if (glewIsSupported(extension) || glewIsSupported(version)) {
           //Extension supported, either explicitly or by version
           ammoniteInternalDebug << extension << " supported (" << version << ")" << std::endl;
           return true;

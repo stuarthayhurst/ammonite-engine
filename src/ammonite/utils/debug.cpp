@@ -20,7 +20,7 @@ ammonite::utils::OutputHelper ammoniteInternalDebug(std::cout, "DEBUG: ");
 namespace ammonite {
   namespace utils {
     namespace {
-      static void GLAPIENTRY debugMessageCallback(GLenum, GLenum type, GLuint, GLenum severity,
+      void GLAPIENTRY debugMessageCallback(GLenum, GLenum type, GLuint, GLenum severity,
                                                   GLsizei, const GLchar* message, const void*) {
         std::cerr << "\nGL MESSAGE ";
         switch (severity) {
