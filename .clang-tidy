@@ -136,7 +136,46 @@ Checks: [
   'performance-trivially-destructible',
   'performance-type-promotion-in-math-fn',
   'performance-unnecessary-copy-initialization',
-  'performance-unnecessary-value-param'
+  'performance-unnecessary-value-param',
+  'readability-avoid-const-params-in-decls',
+  'readability-avoid-nested-conditional-operator',
+  'readability-avoid-return-with-void-value',
+  'readability-avoid-unconditional-preprocessor-if',
+  'readability-braces-around-statements',
+  'readability-const-return-type',
+  'readability-container-contains',
+  'readability-container-data-pointer',
+  'readability-container-size-empty',
+  'readability-convert-member-functions-to-static',
+  'readability-delete-null-pointer',
+  'readability-duplicate-include',
+  'readability-else-after-return',
+  'readability-enum-initial-value',
+  'readability-inconsistent-declaration-parameter-name',
+  'readability-make-member-function-const',
+  'readability-math-missing-parentheses',
+  'readability-misleading-indentation',
+  'readability-misplaced-array-index',
+  'readability-non-const-parameter',
+  'readability-operators-representation',
+  'readability-redundant-access-specifiers',
+  'readability-redundant-casting',
+  'readability-redundant-control-flow',
+  'readability-redundant-declaration',
+  'readability-redundant-function-ptr-dereference',
+  'readability-redundant-inline-specifier',
+  'readability-redundant-member-init',
+  'readability-redundant-preprocessor',
+  'readability-redundant-smartptr-get',
+  'readability-redundant-string-cstr',
+  'readability-redundant-string-init',
+  'readability-reference-to-constructed-temporary',
+  'readability-simplify-boolean-expr',
+  'readability-simplify-subscript-expr',
+  'readability-static-accessed-through-instance',
+  'readability-static-definition-in-anonymous-namespace',
+  'readability-string-compare',
+  'readability-uniqueptr-delete-release'
 ]
 CheckOptions:
   - key: bugprone-implicit-widening-of-multiplication-result.UseCXXStaticCastsInCppSources
@@ -147,6 +186,10 @@ CheckOptions:
     value: true
   - key: misc-include-cleaner.IgnoreHeaders
     value: glm/.*;
+  - key: readability-operators-representation.BinaryOperators
+    value: '&&;&=;&;|;~;!;!=;||;|=;^;^='
+  - key: readability-operators-representation.OverloadedOperators
+    value: '&&;&=;&;|;~;!;!=;||;|=;^;^='
 WarningsAsErrors: 'true,*'
 SystemHeaders: 'false'
 ---
