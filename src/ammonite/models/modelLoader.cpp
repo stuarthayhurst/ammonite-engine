@@ -43,7 +43,7 @@ namespace ammonite {
             newMesh->meshData[i].normal = glm::vec3(meshPtr->mNormals[i].x,
               meshPtr->mNormals[i].y, meshPtr->mNormals[i].z);
 
-            if (meshPtr->mTextureCoords[0]) {
+            if (meshPtr->mTextureCoords[0] != nullptr) {
               newMesh->meshData[i].texturePoint = glm::vec2(meshPtr->mTextureCoords[0][i].x,
                 meshPtr->mTextureCoords[0][i].y);
             } else {
@@ -161,7 +161,9 @@ namespace ammonite {
         const aiScene* scenePtr = importer.ReadFile(objectPath.c_str(), aiProcessFlags);
 
         //Check model loaded correctly
-        if (!scenePtr || scenePtr->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scenePtr->mRootNode) {
+        if (scenePtr == nullptr ||
+            (scenePtr->mFlags & AI_SCENE_FLAGS_INCOMPLETE) != 0 ||
+            scenePtr->mRootNode == nullptr) {
           ammonite::utils::warning << importer.GetErrorString() << std::endl;
           return false;
         }

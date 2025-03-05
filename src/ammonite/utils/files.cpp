@@ -197,7 +197,7 @@ namespace ammonite {
         }
 
         //Check for read and write permissions
-        if (access(targetCachePath.c_str(), R_OK | W_OK)) {
+        if ((access(targetCachePath.c_str(), R_OK | W_OK)) != 0) {
           ammonite::utils::warning << "Insufficient permissions to use cache directory '" \
                                    << targetCachePath << "'" << std::endl;
           return false;
@@ -239,7 +239,7 @@ namespace ammonite {
         *size = statBuf.st_size;
         data = new unsigned char[statBuf.st_size];
 
-        if (posix_fadvise(descriptor, 0, 0, POSIX_FADV_SEQUENTIAL)) {
+        if ((posix_fadvise(descriptor, 0, 0, POSIX_FADV_SEQUENTIAL)) != 0) {
           ammonite::utils::warning << "Error while advising kernel, continuing" << std::endl;
         }
 
@@ -290,7 +290,7 @@ namespace ammonite {
           return false;
         }
 
-        if (posix_fadvise(descriptor, 0, 0, POSIX_FADV_SEQUENTIAL)) {
+        if ((posix_fadvise(descriptor, 0, 0, POSIX_FADV_SEQUENTIAL)) != 0) {
           ammonite::utils::warning << "Error while advising kernel, continuing" << std::endl;
         }
 

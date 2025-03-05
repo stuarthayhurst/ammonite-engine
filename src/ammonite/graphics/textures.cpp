@@ -137,7 +137,7 @@ namespace ammonite {
       */
       GLuint loadTexture(const std::string& texturePath, bool flipTexture, bool srgbTexture) {
         //Check if texture has already been loaded, with the same settings
-        unsigned char extraData = (flipTexture << 0) | (srgbTexture << 1);
+        unsigned char extraData = ((int)flipTexture << 0) | ((int)srgbTexture << 1);
         std::string textureString = texturePath + std::to_string(extraData);
         if (stringTexturePtrMap.contains(textureString)) {
           TextureInfo* textureInfo = stringTexturePtrMap[textureString];
@@ -148,14 +148,14 @@ namespace ammonite {
 
         //Handle texture flips
         if (flipTexture) {
-          stbi_set_flip_vertically_on_load_thread(true);
+          stbi_set_flip_vertically_on_load_thread(1);
         }
 
         //Read image data
         int width = 0, height = 0, nChannels = 0;
         unsigned char* data = stbi_load(texturePath.c_str(), &width, &height, &nChannels, 0);
         if (flipTexture) {
-          stbi_set_flip_vertically_on_load_thread(false);
+          stbi_set_flip_vertically_on_load_thread(0);
         }
 
         if (data == nullptr) {

@@ -142,14 +142,14 @@ namespace ammonite {
 
         void windowFocusCallback(GLFWwindow*, int focused) {
           //Unbind / bind input with window focus (fixes missing mouse)
-          if (!focused) {
-            ammonite::input::setInputFocus(focused);
+          if (focused == 0) {
+            ammonite::input::setInputFocus(focused != 0);
           }
         }
       }
 
       bool setupGlfw(AmmoniteEnum contextType) {
-        if (!glfwInit()) {
+        if (glfwInit() == 0) {
           return false;
         }
 
@@ -231,7 +231,7 @@ namespace ammonite {
         glfwSetInputMode(windowPtr, GLFW_STICKY_MOUSE_BUTTONS, GL_TRUE);
 
         //Enable raw mouse motion if supported
-        if (glfwRawMouseMotionSupported()) {
+        if (glfwRawMouseMotionSupported() != 0) {
           glfwSetInputMode(windowPtr, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
         }
 
@@ -242,11 +242,11 @@ namespace ammonite {
       }
 
       void setWindowResizable(GLFWwindow* windowPtr, bool resizable) {
-        glfwSetWindowAttrib(windowPtr, GLFW_RESIZABLE, resizable);
+        glfwSetWindowAttrib(windowPtr, GLFW_RESIZABLE, (int)resizable);
       }
 
       bool getWindowResizable(GLFWwindow* windowPtr) {
-        return glfwGetWindowAttrib(windowPtr, GLFW_RESIZABLE);
+        return glfwGetWindowAttrib(windowPtr, GLFW_RESIZABLE) != 0;
       }
 
       void setTitle(GLFWwindow* windowPtr, const std::string& title) {
@@ -358,7 +358,7 @@ namespace ammonite {
       }
 
       bool shouldWindowClose(GLFWwindow* windowPtr) {
-        return glfwWindowShouldClose(windowPtr);
+        return glfwWindowShouldClose(windowPtr) != 0;
       }
 
       float getGraphicsAspectRatio() {

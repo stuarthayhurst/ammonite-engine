@@ -49,7 +49,7 @@ namespace ammonite {
       bool hasCreatedStorage = false;
       for (int i = 0; i < 6; i++) {
         if (flipTextures) {
-          stbi_set_flip_vertically_on_load_thread(true);
+          stbi_set_flip_vertically_on_load_thread(1);
         }
 
         //Read the image data
@@ -58,7 +58,7 @@ namespace ammonite {
 
         //Disable texture flipping, to avoid interfering with future calls
         if (flipTextures) {
-          stbi_set_flip_vertically_on_load_thread(false);
+          stbi_set_flip_vertically_on_load_thread(0);
         }
 
         //Decide the format of the texture and data
@@ -82,7 +82,7 @@ namespace ammonite {
         }
 
         //Fill the texture with each face
-        if (imageData) {
+        if (imageData != nullptr) {
           glTextureSubImage3D(textureId, 0, 0, 0, i, width, height, 1, dataFormat,
                               GL_UNSIGNED_BYTE, imageData);
           stbi_image_free(imageData);

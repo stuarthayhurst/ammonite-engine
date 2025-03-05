@@ -195,7 +195,7 @@ namespace ammonite {
         if (modelPtr != nullptr) {
           return modelPtr->lightEmitterId;
         }
-        return false;
+        return 0;
       }
     }
   }

@@ -139,7 +139,7 @@ namespace {
 
   //Clean up anything that was created
   void cleanEngine(unsigned int setupBits, std::vector<AmmoniteId>* keybindIdsPtr) {
-    if (setupBits & HAS_SETUP_CONTROLS) {
+    if ((setupBits & HAS_SETUP_CONTROLS) != 0) {
       ammonite::controls::releaseFreeCamera();
       if (keybindIdsPtr != nullptr) {
         for (unsigned int i = 0; i < keybindIdsPtr->size(); i++) {
@@ -148,11 +148,11 @@ namespace {
       }
     }
 
-    if (setupBits & HAS_SETUP_RENDERER) {
+    if ((setupBits & HAS_SETUP_RENDERER) != 0) {
       ammonite::renderer::setup::destroyRenderer();
     }
 
-    if (setupBits & HAS_SETUP_WINDOW) {
+    if ((setupBits & HAS_SETUP_WINDOW) != 0) {
       ammonite::window::destroyWindow();
     }
   }
@@ -176,7 +176,7 @@ int main(int argc, char** argv) noexcept(false) {
     return EXIT_FAILURE;
   }
 
-  const bool useBenchmark = arguments::searchArgument(argc, argv, "--benchmark", nullptr);
+  const bool useBenchmark = arguments::searchArgument(argc, argv, "--benchmark", nullptr) != 0;
 
   std::string useVsync;
   if (arguments::searchArgument(argc, argv, "--vsync", &useVsync) == -1) {

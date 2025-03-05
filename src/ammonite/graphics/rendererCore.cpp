@@ -364,7 +364,7 @@ namespace ammonite {
           }
 
           //Check minimum OpenGL version is supported
-          if (!glewIsSupported("GL_VERSION_3_2")) {
+          if (glewIsSupported("GL_VERSION_3_2") == GL_FALSE) {
             ammonite::utils::error << "OpenGL 3.2 unsupported" << std::endl;
             success = false;
             (*failureCount)++;
@@ -1041,7 +1041,7 @@ namespace ammonite {
           glUseProgram(screenShader.shaderId);
 
           //Conditionally send data for blur
-          glUniform1i(screenShader.focalDepthEnabledId, *focalDepthEnabledPtr);
+          glUniform1i(screenShader.focalDepthEnabledId, (GLint)*focalDepthEnabledPtr);
           if (*focalDepthEnabledPtr) {
             static float* focalDepthPtr = settings::post::internal::getFocalDepthPtr();
             static float* blurStrengthPtr = settings::post::internal::getBlurStrengthPtr();
