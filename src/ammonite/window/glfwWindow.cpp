@@ -378,8 +378,13 @@ namespace ammonite {
        - Waits for vertical sync and / or a frame limiter, if set
       */
       void showFrame(GLFWwindow* windowPtr, bool vsync, float frameLimit) {
-        //Handle vertical sync and swap buffers
-        glfwSwapInterval(int(vsync));
+        //Set correct vertical sync state
+        static bool lastVsync = !vsync;
+        if (vsync != lastVsync) {
+          glfwSwapInterval(int(vsync));
+          lastVsync = vsync;
+        }
+
         glfwSwapBuffers(windowPtr);
 
         //Wait until next frame should be prepared
