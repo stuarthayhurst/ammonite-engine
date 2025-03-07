@@ -65,7 +65,7 @@ namespace ammonite {
 
         //Enable OpenGL debug output
         glEnable(GL_DEBUG_OUTPUT);
-        glDebugMessageCallback(debugMessageCallback, 0);
+        glDebugMessageCallback(debugMessageCallback, nullptr);
       }
 
       void printDriverInfo() {
