@@ -26,10 +26,6 @@ extern "C" {
    NAMESPACE::rendererMainloop, NAMESPACE::demoExit}}
 //NOLINTEND(cppcoreguidelines-macro-usage)
 
-#define HAS_SETUP_WINDOW   (1 << 0)
-#define HAS_SETUP_RENDERER (1 << 1)
-#define HAS_SETUP_CONTROLS (1 << 2)
-
 //Definitions for demo loading
 namespace {
   using DemoFunctionType = bool (*)();
@@ -53,6 +49,12 @@ namespace {
   struct CameraData {
     int cameraIndex;
     std::vector<AmmoniteId> cameraIds;
+  };
+
+  enum : unsigned char {
+    HAS_SETUP_WINDOW   = (1 << 0),
+    HAS_SETUP_RENDERER = (1 << 1),
+    HAS_SETUP_CONTROLS = (1 << 2)
   };
 
   void inputFocusCallback(const std::vector<int>&, int, void*) {
@@ -138,7 +140,7 @@ namespace {
   }
 
   //Clean up anything that was created
-  void cleanEngine(unsigned int setupBits, std::vector<AmmoniteId>* keybindIdsPtr) {
+  void cleanEngine(unsigned char setupBits, std::vector<AmmoniteId>* keybindIdsPtr) {
     if ((setupBits & HAS_SETUP_CONTROLS) != 0) {
       ammonite::controls::releaseFreeCamera();
       if (keybindIdsPtr != nullptr) {
@@ -223,7 +225,7 @@ int main(int argc, char** argv) noexcept(false) {
   if (!ammonite::window::createWindow(1024, 768, "Ammonite Engine")) {
     return EXIT_FAILURE;
   }
-  unsigned int setupBits = HAS_SETUP_WINDOW;
+  unsigned char setupBits = HAS_SETUP_WINDOW;
   ammonite::window::useIconDir("assets/icons/");
 
   ammonite::utils::debug::printDriverInfo();
