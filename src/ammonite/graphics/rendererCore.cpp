@@ -835,8 +835,7 @@ namespace ammonite {
 
         //Prepare for next frame
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        ammonite::window::internal::showFrame(window::internal::getWindowPtr(),
-          settings::getVsync(), settings::getFrameLimit());
+        ammonite::window::internal::showFrame(window::internal::getWindowPtr(), false, 0);
       }
 
       void internalDrawFrame() {
