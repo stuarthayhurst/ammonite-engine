@@ -438,7 +438,7 @@ namespace ammonite {
         }
 
         //Ensure shaders don't get rebuilt due to a file order change
-        std::sort(shaderPaths.begin(), shaderPaths.end());
+        std::ranges::sort(shaderPaths);
 
         //Create the program and return the ID
         return createProgram(shaderPaths.data(), shaderPaths.size());
