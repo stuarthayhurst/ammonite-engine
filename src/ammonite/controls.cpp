@@ -91,7 +91,7 @@ namespace ammonite {
   namespace controls {
     namespace {
       GLFWwindow* windowPtr = nullptr;
-      typedef void (*CursorPositionCallback)(GLFWwindow*, double, double);
+      using CursorPositionCallback = void (*)(GLFWwindow*, double, double);
       CursorPositionCallback activeCursorPositionCallback = nullptr;
 
       //Keyboard control direction enums

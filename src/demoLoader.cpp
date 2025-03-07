@@ -32,7 +32,7 @@ extern "C" {
 
 //Definitions for demo loading
 namespace {
-  typedef bool (*DemoFunctionType)(void);
+  using DemoFunctionType = bool (*)();
   struct DemoFunctions {
     DemoFunctionType preRendererInit;
     DemoFunctionType postRendererInit;

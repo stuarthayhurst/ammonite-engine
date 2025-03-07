@@ -23,9 +23,9 @@ extern "C" {
 
 //Class definitions
 namespace {
-  typedef std::map<AmmoniteId, ammonite::models::internal::ModelInfo> ModelTrackerMap;
-  typedef std::map<AmmoniteId, ammonite::models::internal::ModelInfo*> ModelPtrTrackerMap;
-  typedef std::map<std::string, ammonite::models::internal::ModelData> ModelDataMap;
+  using ModelTrackerMap = std::map<AmmoniteId, ammonite::models::internal::ModelInfo>;
+  using ModelPtrTrackerMap = std::map<AmmoniteId, ammonite::models::internal::ModelInfo*>;
+  using ModelDataMap = std::map<std::string, ammonite::models::internal::ModelData>;
 
   bool haveModelsMoved = false;
 
