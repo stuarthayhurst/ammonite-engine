@@ -2,9 +2,9 @@
 #define ENUMS
 
 //Constants for loading assumptions
-#define ASSUME_FLIP_MODEL_UVS true
-#define ASSUME_FLIP_SKYBOX_FACES false
-#define ASSUME_SRGB_TEXTURES true
+static constexpr bool ASSUME_FLIP_MODEL_UVS = true;
+static constexpr bool ASSUME_FLIP_SKYBOX_FACES = false;
+static constexpr bool ASSUME_SRGB_TEXTURES = true;
 
 enum AmmoniteEnum : unsigned char {
   //Draw modes
