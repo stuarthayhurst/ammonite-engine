@@ -24,7 +24,6 @@ namespace ammonite {
       //View and projection matrices
       glm::mat4 viewMatrix;
       glm::mat4 projectionMatrix;
-      float* renderFarPlanePtr = ammonite::renderer::settings::internal::getRenderFarPlanePtr();
 
       //Create map to track cameras, with default camera
       unsigned int totalUserCameras = 0;
@@ -71,8 +70,9 @@ namespace ammonite {
 
         //Calculate the projection matrix from FoV, aspect ratio and display range
         float aspectRatio = ammonite::window::internal::getGraphicsAspectRatio();
+        float renderFarPlane = ammonite::renderer::settings::getRenderFarPlane();
         projectionMatrix = glm::perspective(activeCamera->fov,
-                                            aspectRatio, 0.1f, *renderFarPlanePtr);
+                                            aspectRatio, 0.1f, renderFarPlane);
 
         //Calculate view matrix from position, where it's looking, and relative up
         viewMatrix = glm::lookAt(activeCamera->position, activeCamera->position + direction, up);

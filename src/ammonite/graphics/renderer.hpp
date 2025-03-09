@@ -26,26 +26,6 @@ namespace ammonite {
       }
     }
 
-    namespace settings {
-      namespace post {
-        namespace AMMONITE_INTERNAL internal {
-          bool* getFocalDepthEnabledPtr();
-          float* getFocalDepthPtr();
-          float* getBlurStrengthPtr();
-        }
-      }
-
-      namespace AMMONITE_INTERNAL internal {
-        float* getFrameLimitPtr();
-        unsigned int* getShadowResPtr();
-        float* getRenderResMultiplierPtr();
-        unsigned int* getAntialiasingSamplesPtr();
-        float* getRenderFarPlanePtr();
-        float* getShadowFarPlanePtr();
-        bool* getGammaCorrectionPtr();
-      }
-    }
-
     namespace AMMONITE_INTERNAL internal {
       void internalDrawFrame();
       void internalDrawLoadingScreen(AmmoniteId loadingScreenId);

@@ -158,9 +158,9 @@ namespace ammonite {
           return;
         }
 
-        static float* shadowFarPlanePtr = renderer::settings::internal::getShadowFarPlanePtr();
+        float shadowFarPlane = renderer::settings::getShadowFarPlane();
         glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f),
-                                                1.0f, 0.0f, *shadowFarPlanePtr);
+                                                1.0f, 0.0f, shadowFarPlane);
 
         //Resize buffers
         std::size_t shaderDataSize = sizeof(ShaderLightSource) * lightCount;

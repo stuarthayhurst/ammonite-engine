@@ -30,171 +30,6 @@ extern "C" {
 #include "../window/window.hpp"
 
 /*
- - Store and expose controls settings
-*/
-
-namespace ammonite {
-  namespace renderer {
-    namespace {
-      struct PostSettings {
-        bool focalDepthEnabled = false;
-        float focalDepth = 0.0f;
-        float blurStrength = 1.0f;
-      } postSettings;
-
-      struct GraphicsSettings {
-        bool vsyncEnabled = true;
-        float frameLimit = 0.0f;
-        unsigned int shadowRes = 1024;
-        float renderResMultiplier = 1.0f;
-        unsigned int antialiasingSamples = 0;
-        float renderFarPlane = 100.0f;
-        float shadowFarPlane = 25.0f;
-        bool gammaCorrection = false;
-      } graphicsSettings;
-    }
-
-    namespace settings {
-      namespace post {
-        namespace internal {
-          bool* getFocalDepthEnabledPtr() {
-            return &postSettings.focalDepthEnabled;
-          }
-
-          float* getFocalDepthPtr() {
-            return &postSettings.focalDepth;
-          }
-
-          float* getBlurStrengthPtr() {
-            return &postSettings.blurStrength;
-          }
-        }
-
-        void setFocalDepthEnabled(bool enabled) {
-          postSettings.focalDepthEnabled = enabled;
-        }
-
-        bool getFocalDepthEnabled() {
-          return postSettings.focalDepthEnabled;
-        }
-
-        void setFocalDepth(float depth) {
-          postSettings.focalDepth = depth;
-        }
-
-        float getFocalDepth() {
-          return postSettings.focalDepth;
-        }
-
-        void setBlurStrength(float strength) {
-          postSettings.blurStrength = strength;
-        }
-
-        float getBlurStrength() {
-          return postSettings.blurStrength;
-        }
-      }
-
-      //Exposed internally only
-      namespace internal {
-        float* getFrameLimitPtr() {
-          return &graphicsSettings.frameLimit;
-        }
-
-        unsigned int* getShadowResPtr() {
-          return &graphicsSettings.shadowRes;
-        }
-
-        float* getRenderResMultiplierPtr() {
-          return &graphicsSettings.renderResMultiplier;
-        }
-
-        unsigned int* getAntialiasingSamplesPtr() {
-          return &graphicsSettings.antialiasingSamples;
-        }
-
-        float* getRenderFarPlanePtr() {
-          return &graphicsSettings.renderFarPlane;
-        }
-
-        float* getShadowFarPlanePtr() {
-          return &graphicsSettings.shadowFarPlane;
-        }
-
-        bool* getGammaCorrectionPtr() {
-          return &graphicsSettings.gammaCorrection;
-        }
-      }
-
-      void setVsync(bool enabled) {
-        graphicsSettings.vsyncEnabled = enabled;
-      }
-
-      bool getVsync() {
-        return graphicsSettings.vsyncEnabled;
-      }
-
-      void setFrameLimit(float frameLimit) {
-        //Override with 0 if given a negative
-        graphicsSettings.frameLimit = frameLimit > 0.0 ? frameLimit : 0;
-      }
-
-      float getFrameLimit() {
-        return graphicsSettings.frameLimit;
-      }
-
-      void setShadowRes(unsigned int shadowRes) {
-        graphicsSettings.shadowRes = shadowRes;
-      }
-
-      unsigned int getShadowRes() {
-        return graphicsSettings.shadowRes;
-      }
-
-      void setRenderResMultiplier(float renderResMultiplier) {
-        graphicsSettings.renderResMultiplier = renderResMultiplier;
-      }
-
-      float getRenderResMultiplier() {
-        return graphicsSettings.renderResMultiplier;
-      }
-
-      void setAntialiasingSamples(unsigned int samples) {
-        graphicsSettings.antialiasingSamples = samples;
-      }
-
-      unsigned int getAntialiasingSamples() {
-        return graphicsSettings.antialiasingSamples;
-      }
-
-      void setRenderFarPlane(float renderFarPlane) {
-        graphicsSettings.renderFarPlane = renderFarPlane;
-      }
-
-      float getRenderFarPlane() {
-        return graphicsSettings.renderFarPlane;
-      }
-
-      void setShadowFarPlane(float shadowFarPlane) {
-        graphicsSettings.shadowFarPlane = shadowFarPlane;
-      }
-
-      float getShadowFarPlane() {
-        return graphicsSettings.shadowFarPlane;
-      }
-
-      void setGammaCorrection(bool gammaCorrection) {
-        graphicsSettings.gammaCorrection = gammaCorrection;
-      }
-
-      bool getGammaCorrection() {
-        return graphicsSettings.gammaCorrection;
-      }
-    }
-  }
-}
-
-/*
  - Implement core rendering for 3D graphics
 */
 
@@ -844,39 +679,38 @@ namespace ammonite {
         unsigned int height = ammonite::window::internal::getGraphicsHeight();
 
         static float lastRenderResMultiplier = 0.0f;
-        static float* renderResMultiplierPtr = settings::internal::getRenderResMultiplierPtr();
+        float renderResMultiplier = settings::getRenderResMultiplier();
 
         static unsigned int lastSamples = 0;
-        static unsigned int* samplesPtr = settings::internal::getAntialiasingSamplesPtr();
-        static unsigned int sampleCount = *samplesPtr;
+        unsigned int sampleCount = settings::getAntialiasingSamples();
 
         static unsigned int renderWidth = 0, renderHeight = 0;
 
         //Recreate the framebuffer if the width, height, resolution multiplier or sample count changes
         static GLuint targetBufferId = 0;
         if ((lastWidth != width) || (lastHeight != height) ||
-            (lastRenderResMultiplier != *renderResMultiplierPtr) ||
-            (lastSamples != *samplesPtr)) {
+            (lastRenderResMultiplier != renderResMultiplier) ||
+            (lastSamples != sampleCount)) {
           //Update values used to determine when to recreate framebuffer
           lastWidth = width;
           lastHeight = height;
-          lastRenderResMultiplier = *renderResMultiplierPtr;
-          lastSamples = *samplesPtr;
+          lastRenderResMultiplier = renderResMultiplier;
+          lastSamples = sampleCount;
 
           //Limit sample count to implementation limit
-          unsigned int requestedSamples = *samplesPtr;
+          unsigned int requestedSamples = sampleCount;
           sampleCount = std::min(requestedSamples, (unsigned int)maxSampleCount);
 
           if (sampleCount < requestedSamples) {
             ammonite::utils::warning << "Ignoring request for " << requestedSamples \
                                      << " samples, using implementation limit of " \
                                      << maxSampleCount << std::endl;
-            *samplesPtr = sampleCount;
+            settings::setAntialiasingSamples(sampleCount);
           }
 
           //Calculate render resolution
-          renderWidth = (unsigned int)((float)width * *renderResMultiplierPtr);
-          renderHeight = (unsigned int)((float)height * *renderResMultiplierPtr);
+          renderWidth = (unsigned int)((float)width * renderResMultiplier);
+          renderHeight = (unsigned int)((float)height * renderResMultiplier);
 
           //Create or recreate the framebuffers for rendering
           recreateFramebuffers(&targetBufferId, sampleCount, renderWidth, renderHeight);
@@ -886,27 +720,27 @@ namespace ammonite {
         }
 
         //Get shadow resolution and light count, save for next time to avoid cubemap recreation
-        static unsigned int* shadowResPtr = settings::internal::getShadowResPtr();
+        unsigned int shadowRes = settings::getShadowRes();
         static unsigned int lastShadowRes = 0;
         unsigned int lightCount = lightTrackerMap->size();
         static unsigned int lastLightCount = -1;
 
         //If number of lights or shadow resolution changes, recreate cubemap
-        if ((*shadowResPtr != lastShadowRes) || (lightCount != lastLightCount)) {
-          setupDepthMap(lightCount, *shadowResPtr);
+        if ((shadowRes != lastShadowRes) || (lightCount != lastLightCount)) {
+          setupDepthMap(lightCount, shadowRes);
 
           //Save for next time to avoid cubemap recreation
-          lastShadowRes = *shadowResPtr;
+          lastShadowRes = shadowRes;
           lastLightCount = lightCount;
         }
 
         //Swap to depth shader and enable depth testing
         glUseProgram(depthShader.shaderId);
-        internal::prepareScreen(depthMapFBO, *shadowResPtr, *shadowResPtr, true);
+        internal::prepareScreen(depthMapFBO, shadowRes, shadowRes, true);
 
         //Pass uniforms that don't change between light sources
-        static float* shadowFarPlanePtr = settings::internal::getShadowFarPlanePtr();
-        glUniform1f(depthShader.shadowFarPlaneId, *shadowFarPlanePtr);
+        float shadowFarPlane = settings::getShadowFarPlane();
+        glUniform1f(depthShader.shadowFarPlaneId, shadowFarPlane);
 
         //Clear existing depth values
         glClear(GL_DEPTH_BUFFER_BIT);
@@ -920,8 +754,7 @@ namespace ammonite {
         }
 
         //Use gamma correction if enabled
-        static bool* gammaPtr = settings::internal::getGammaCorrectionPtr();
-        if (*gammaPtr) {
+        if (settings::getGammaCorrection()) {
           glEnable(GL_FRAMEBUFFER_SRGB);
         } else {
           glDisable(GL_FRAMEBUFFER_SRGB);
@@ -984,7 +817,7 @@ namespace ammonite {
         //Pass uniforms and render regular models
         glUniform3fv(modelShader.ambientLightId, 1, glm::value_ptr(ambientLight));
         glUniform3fv(modelShader.cameraPosId, 1, glm::value_ptr(cameraPosition));
-        glUniform1f(modelShader.shadowFarPlaneId, *shadowFarPlanePtr);
+        glUniform1f(modelShader.shadowFarPlaneId, shadowFarPlane);
         glUniform1ui(modelShader.lightCountId, activeLights);
         drawModelsCached(&modelPtrs, AMMONITE_MODEL, AMMONITE_RENDER_PASS);
 
@@ -1005,16 +838,16 @@ namespace ammonite {
         }
 
         //Get focal depth status, used to conditionally post-process
-        static bool* focalDepthEnabledPtr = settings::post::internal::getFocalDepthEnabledPtr();
+        bool focalDepthEnabled = settings::post::getFocalDepthEnabled();
 
         //Enable post-processor when required, or blit would fail
-        bool isPostRequired = *focalDepthEnabledPtr;
-        if (sampleCount == 0 || *renderResMultiplierPtr != 1.0f) {
+        bool isPostRequired = focalDepthEnabled;
+        if (sampleCount == 0 || renderResMultiplier != 1.0f) {
           /*
            - Workaround until non-multisampled rendering is done to an offscreen framebuffer
              - sampleCount == 0
            - Workaround INVALID_OPERATION when scaling a multisampled buffer with a blit
-             - sampleCount != 0 && *renderResMultiplierPtr != 1.0f
+             - sampleCount != 0 && renderResMultiplier != 1.0f
           */
           isPostRequired = true;
         }
@@ -1040,15 +873,15 @@ namespace ammonite {
           glUseProgram(screenShader.shaderId);
 
           //Conditionally send data for blur
-          glUniform1i(screenShader.focalDepthEnabledId, (GLint)*focalDepthEnabledPtr);
-          if (*focalDepthEnabledPtr) {
-            static float* focalDepthPtr = settings::post::internal::getFocalDepthPtr();
-            static float* blurStrengthPtr = settings::post::internal::getBlurStrengthPtr();
-            static float* farPlanePtr = settings::internal::getRenderFarPlanePtr();
+          glUniform1i(screenShader.focalDepthEnabledId, (GLint)focalDepthEnabled);
+          if (focalDepthEnabled) {
+            float focalDepth = settings::post::getFocalDepth();
+            float blurStrength = settings::post::getBlurStrength();
+            float farPlane = settings::getRenderFarPlane();
 
-            glUniform1f(screenShader.focalDepthId, *focalDepthPtr);
-            glUniform1f(screenShader.blurStrengthId, *blurStrengthPtr);
-            glUniform1f(screenShader.farPlaneId, *farPlanePtr);
+            glUniform1f(screenShader.focalDepthId, focalDepth);
+            glUniform1f(screenShader.blurStrengthId, blurStrength);
+            glUniform1f(screenShader.farPlaneId, farPlane);
             glBindTextureUnit(5, screenQuadDepthTextureId);
           }
 
