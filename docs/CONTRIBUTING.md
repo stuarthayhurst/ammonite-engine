@@ -65,3 +65,4 @@
     - Internal headers at a higher level than the current file
     - For headers, the header with the corresponding public interface
   - Within each category the headers should be ordered alphabetically
+  - Any internal symbols should be placed in a `namespace AMMONITE_INTERNAL internal {}`
