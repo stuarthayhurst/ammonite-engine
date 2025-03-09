@@ -56,3 +56,12 @@
     - Non-development related targets should also be documented in `README.md`
   - Any scripts should be placed in `scripts/`
   - Icons should be regenerated using `make icons`
+  - Header includes should use the following order:
+    - Standard library headers
+    - C++ library headers
+    - C library headers, in an `extern "C" {}`
+    - The header the file is providing symbols for
+    - Internal headers at the same level / deeper than the current file
+    - Internal headers at a higher level than the current file
+    - For headers, the header with the corresponding public interface
+  - Within each category the headers should be ordered alphabetically
