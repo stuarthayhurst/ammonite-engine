@@ -344,17 +344,10 @@ namespace ammonite {
 
           //Create vertex array object for screen quad
           glCreateVertexArrays(1, &screenQuadVertexArrayId);
-          //Vertex positions
           glEnableVertexArrayAttrib(screenQuadVertexArrayId, 0);
           glVertexArrayVertexBuffer(screenQuadVertexArrayId, 0, bufferIds.screenQuad, 0, 4 * sizeof(signed char));
           glVertexArrayAttribFormat(screenQuadVertexArrayId, 0, 2, GL_BYTE, GL_FALSE, 0);
           glVertexArrayAttribBinding(screenQuadVertexArrayId, 0, 0);
-
-          //Texture coords
-          glEnableVertexArrayAttrib(screenQuadVertexArrayId, 1);
-          glVertexArrayVertexBuffer(screenQuadVertexArrayId, 1, bufferIds.screenQuad, 2 * sizeof(signed char), 4 * sizeof(signed char));
-          glVertexArrayAttribFormat(screenQuadVertexArrayId, 1, 2, GL_BYTE, GL_FALSE, 0);
-          glVertexArrayAttribBinding(screenQuadVertexArrayId, 1, 1);
 
           glVertexArrayElementBuffer(screenQuadVertexArrayId, bufferIds.screenQuadElement);
         }
