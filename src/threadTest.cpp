@@ -4,8 +4,6 @@
 
 #include <ammonite/ammonite.hpp>
 
-constexpr unsigned int JOB_COUNT = (2 << 16);
-
 //NOLINTBEGIN(cppcoreguidelines-macro-usage)
 #define CREATE_THREAD_POOL(THREADS) \
 if (!ammonite::utils::thread::createThreadPool((THREADS))) { \
@@ -394,59 +392,62 @@ int main() {
   ammonite::utils::status << ammonite::utils::thread::getHardwareThreadCount() \
                           << " hardware threads detected" << std::endl;
 
+  //Pick jobs per test
+  const unsigned int jobCount = (2 << 16);
+
   //Begin regular tests
   std::cout << "Testing standard submit, wait, destroy" << std::endl;
-  failed |= !testCreateSubmitWaitDestroy(JOB_COUNT);
+  failed |= !testCreateSubmitWaitDestroy(jobCount);
 
   std::cout << "Testing alternative sync" << std::endl;
-  failed |= !testCreateSubmitBlockUnblockDestroy(JOB_COUNT);
+  failed |= !testCreateSubmitBlockUnblockDestroy(jobCount);
 
   std::cout << "Testing no sync" << std::endl;
-  failed |= !testCreateSubmitDestroy(JOB_COUNT);
+  failed |= !testCreateSubmitDestroy(jobCount);
 
   std::cout << "Testing blocked queue" << std::endl;
-  failed |= !testCreateBlockSubmitUnblockWaitDestroy(JOB_COUNT);
+  failed |= !testCreateBlockSubmitUnblockWaitDestroy(jobCount);
 
   std::cout << "Testing queue limits (8x regular over 2 batches)" << std::endl;
-  failed |= !testQueueLimits(JOB_COUNT);
+  failed |= !testQueueLimits(jobCount);
 
   std::cout << "Testing nested jobs" << std::endl;
-  failed |= !testNestedJobs(JOB_COUNT);
+  failed |= !testNestedJobs(jobCount);
 
   std::cout << "Testing chained jobs" << std::endl;
-  failed |= !testChainJobs(JOB_COUNT);
+  failed |= !testChainJobs(jobCount);
 
   std::cout << "Testing submit multiple" << std::endl;
-  failed |= !testSubmitMultiple(JOB_COUNT);
+  failed |= !testSubmitMultiple(jobCount);
 
   std::cout << "Testing submit multiple (4x regular over 4 batches)" << std::endl;
-  failed |= !testSubmitMultipleMultiple(JOB_COUNT);
+  failed |= !testSubmitMultipleMultiple(jobCount);
 
   std::cout << "Testing submit multiple, no sync" << std::endl;
-  failed |= !testSubmitMultipleNoSync(JOB_COUNT);
+  failed |= !testSubmitMultipleNoSync(jobCount);
 
   //Begin blocking tests
   std::cout << "Testing double block, double unblock" << std::endl;
-  failed |= !testCreateBlockBlockUnblockUnblockSubmitDestroy(JOB_COUNT);
+  failed |= !testCreateBlockBlockUnblockUnblockSubmitDestroy(jobCount);
 
   std::cout << "Testing double block, single unblock" << std::endl;
-  failed |= !testCreateBlockBlockUnblockSubmitDestroy(JOB_COUNT);
+  failed |= !testCreateBlockBlockUnblockSubmitDestroy(jobCount);
 
   std::cout << "Testing double block, submit jobs, single unblock" << std::endl;
-  failed |= !testCreateBlockBlockSubmitUnblockDestroy(JOB_COUNT);
+  failed |= !testCreateBlockBlockSubmitUnblockDestroy(jobCount);
 
   std::cout << "Testing double block, submit jobs, no explicit unblock" << std::endl;
-  failed |= !testCreateBlockBlockSubmitDestroy(JOB_COUNT);
+  failed |= !testCreateBlockBlockSubmitDestroy(jobCount);
 
   std::cout << "Testing single block, double unblock" << std::endl;
-  failed |= !testCreateBlockUnblockUnblockSubmitDestroy(JOB_COUNT);
+  failed |= !testCreateBlockUnblockUnblockSubmitDestroy(jobCount);
 
   std::cout << "Testing unblock without block" << std::endl;
-  failed |= !testCreateUnblockSubmitDestroy(JOB_COUNT);
+  failed |= !testCreateUnblockSubmitDestroy(jobCount);
 
   //Check system is still functional
   std::cout << "Double-checking standard submit, wait, destroy" << std::endl;
-  failed |= !testCreateSubmitWaitDestroy(JOB_COUNT);
+  failed |= !testCreateSubmitWaitDestroy(jobCount);
 
   return failed ? EXIT_FAILURE : EXIT_SUCCESS;
 }

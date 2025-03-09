@@ -23,7 +23,7 @@ extern "C" {
 #include "logging.hpp"
 #include "../enums.hpp"
 
-constexpr unsigned int MAX_LOAD_ATTEMPTS = 10;
+static constexpr unsigned int MAX_LOAD_ATTEMPTS = 10;
 
 namespace ammonite {
   namespace utils {
