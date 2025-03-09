@@ -1,6 +1,6 @@
+#include <iostream>
 #include <map>
 #include <vector>
-#include <iostream>
 
 extern "C" {
   #include <GLFW/glfw3.h>
@@ -8,9 +8,9 @@ extern "C" {
 
 #include "../input.hpp"
 
-#include "../utils/debug.hpp"
 #include "../enums.hpp"
 #include "../types.hpp"
+#include "../utils/debug.hpp"
 
 namespace ammonite {
   namespace input {

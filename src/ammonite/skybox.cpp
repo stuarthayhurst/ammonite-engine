@@ -11,10 +11,10 @@ extern "C" {
 
 #include "skybox.hpp"
 
-#include "graphics/textures.hpp"
-#include "utils/logging.hpp"
-#include "types.hpp"
 #include "enums.hpp"
+#include "graphics/textures.hpp"
+#include "types.hpp"
+#include "utils/logging.hpp"
 
 namespace ammonite {
   namespace {

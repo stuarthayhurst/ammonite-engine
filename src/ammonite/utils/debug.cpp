@@ -6,8 +6,8 @@ extern "C" {
 
 #include "debug.hpp"
 
-#include "../graphics/extensions.hpp"
 #include "logging.hpp"
+#include "../graphics/extensions.hpp"
 
 #ifdef AMMONITE_DEBUG
 /*NOLINTBEGIN(cppcoreguidelines-avoid-non-const-global-variables,

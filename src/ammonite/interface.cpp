@@ -1,10 +1,10 @@
-#include <map>
 #include <iostream>
+#include <map>
 
 #include "interface.hpp"
 
-#include "utils/logging.hpp"
 #include "types.hpp"
+#include "utils/logging.hpp"
 
 namespace ammonite {
   namespace interface {

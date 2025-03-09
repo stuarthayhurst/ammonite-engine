@@ -1,10 +1,10 @@
+#include <chrono>
 #include <cstddef>
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
-#include <chrono>
 #include <filesystem>
 #include <iostream>
 #include <string>
@@ -19,9 +19,9 @@ extern "C" {
 #include "files.hpp"
 
 #include "debug.hpp"
-#include "../enums.hpp"
 #include "hash.hpp"
 #include "logging.hpp"
+#include "../enums.hpp"
 
 constexpr unsigned int MAX_LOAD_ATTEMPTS = 10;
 

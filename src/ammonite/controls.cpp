@@ -12,9 +12,9 @@ extern "C" {
 
 #include "camera.hpp"
 #include "enums.hpp"
+#include "input.hpp"
 #include "types.hpp"
 #include "utils/timer.hpp"
-#include "input.hpp"
 #include "window/window.hpp"
 
 //Store and expose controls settings

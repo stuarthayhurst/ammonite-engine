@@ -4,9 +4,8 @@
 #include <string>
 #include <vector>
 
-#include <glm/glm.hpp>
-
 #include <ammonite/ammonite.hpp>
+#include <glm/glm.hpp>
 
 #include "many-cubes.hpp"
 

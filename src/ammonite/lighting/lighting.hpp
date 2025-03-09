@@ -2,6 +2,7 @@
 #define INTERNALLIGHTING
 
 #include <map>
+
 #include <glm/glm.hpp>
 
 #include "../internal.hpp"

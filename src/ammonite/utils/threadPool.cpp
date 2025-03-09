@@ -9,8 +9,8 @@
 
 #include "threadPool.hpp"
 
-#include "../types.hpp"
 #include "logging.hpp"
+#include "../types.hpp"
 
 constexpr unsigned int MAX_THREADS = 512;
 

@@ -4,14 +4,13 @@
 #include <string>
 #include <vector>
 
+#include <ammonite/ammonite.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
 
 extern "C" {
   #include <GLFW/glfw3.h>
 }
-
-#include <ammonite/ammonite.hpp>
 
 #include "object-field.hpp"
 

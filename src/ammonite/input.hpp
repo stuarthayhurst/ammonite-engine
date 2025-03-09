@@ -5,9 +5,8 @@ extern "C" {
   #include <GLFW/glfw3.h>
 }
 
-#include "internal.hpp"
-
 #include "enums.hpp"
+#include "internal.hpp"
 #include "types.hpp"
 
 //Include public interface

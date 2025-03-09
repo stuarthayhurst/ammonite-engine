@@ -1,20 +1,18 @@
-#include <iostream>
 #include <cstdlib>
+#include <iostream>
 #include <map>
 #include <print>
 #include <string>
 #include <vector>
 
+#include <ammonite/ammonite.hpp>
 #include <glm/glm.hpp>
 
 extern "C" {
-  #include <GL/glew.h>
   #include <GLFW/glfw3.h>
 }
 
-#include <ammonite/ammonite.hpp>
 #include "helper/argHandler.hpp"
-
 #include "demos/object-field.hpp"
 #include "demos/many-cubes.hpp"
 #include "demos/monkey.hpp"
