@@ -1,4 +1,5 @@
 #include <cmath>
+#include <cstdint>
 #include <map>
 
 #include <glm/glm.hpp>
@@ -26,7 +27,7 @@ namespace ammonite {
       glm::mat4 projectionMatrix;
 
       //Create map to track cameras, with default camera
-      unsigned int totalUserCameras = 0;
+      uintmax_t totalUserCameras = 0;
       AmmoniteId activeCameraId = 1;
       std::map<AmmoniteId, Camera> cameraTrackerMap = {{1, defaultCamera}};
     }
