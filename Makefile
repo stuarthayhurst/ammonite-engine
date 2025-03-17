@@ -96,7 +96,7 @@ $(BUILD_DIR)/compile_flags.txt: Makefile
 	@for arg in $(CXXFLAGS); do \
 		echo $$arg >> "$(BUILD_DIR)/compile_flags.txt"; \
 	done
-$(OBJECT_DIR)/%.linted: ./src/% $(BUILD_DIR)/compile_flags.txt .clang-tidy
+$(OBJECT_DIR)/%.linted: ./src/% $(BUILD_DIR)/compile_flags.txt .clang-tidy $(ALL_HEADERS_SOURCE)
 	$(TIDY) --quiet -p "$(BUILD_DIR)" "$<"
 	@mkdir -p "$$(dirname $@)"
 	@touch "$@"
