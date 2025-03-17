@@ -14,6 +14,7 @@ extern "C" {
 #include "../graphics/renderer.hpp"
 #include "../models/models.hpp"
 #include "../types.hpp"
+#include "../utils/id.hpp"
 #include "../utils/thread.hpp"
 
 namespace ammonite {
@@ -29,9 +30,7 @@ namespace ammonite {
     glm::mat4* lightTransforms = nullptr;
     unsigned int prevLightCount = 0;
     bool lightSourcesChanged = false;
-
-    //Track cumulative number of created light sources
-    unsigned int totalLights = 0;
+    AmmoniteId lastLightId = 0;
 
     //Data structure to pass light sources into shader
     struct ShaderLightSource {
@@ -222,7 +221,7 @@ namespace ammonite {
       internal::LightSource lightSource;
 
       //Add light source to the tracker
-      lightSource.lightId = ++totalLights;
+      lightSource.lightId = utils::internal::setNextId(&lastLightId, lightTrackerMap);
       lightTrackerMap[lightSource.lightId] = lightSource;
 
       //Return the light source's ID

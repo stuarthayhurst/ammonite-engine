@@ -19,6 +19,7 @@ extern "C" {
 #include "../graphics/textures.hpp"
 #include "../lighting/lighting.hpp"
 #include "../types.hpp"
+#include "../utils/id.hpp"
 #include "../utils/logging.hpp"
 
 //Class definitions
@@ -135,9 +136,7 @@ namespace ammonite {
     //Track all loaded models
     ModelDataMap modelDataMap;
     ModelPtrTrackerMap modelIdPtrMap;
-
-    //Track cumulative number of created models
-    int totalModels = 0;
+    AmmoniteId lastModelId = 0;
 
     ModelTracker activeModelTracker(&modelIdPtrMap);
     ModelTracker inactiveModelTracker(&modelIdPtrMap);
@@ -342,7 +341,7 @@ namespace ammonite {
       calcModelMatrices(&modelObject.positionData);
 
       //Add model to the tracker and return the ID
-      modelObject.modelId = ++totalModels;
+      modelObject.modelId = utils::internal::setNextId(&lastModelId, modelIdPtrMap);
       activeModelTracker.addModel(modelObject.modelId, modelObject);
       return modelObject.modelId;
     }
@@ -359,7 +358,7 @@ namespace ammonite {
       }
 
       //Add model to the tracker via pointer
-      AmmoniteId newModelId = ++totalModels;
+      AmmoniteId newModelId = utils::internal::setNextId(&lastModelId, modelIdPtrMap);
       activeModelTracker.copyModelFromPtr(newModelId, oldModelObject);
 
       //Correct its ID and reference counter

@@ -11,6 +11,7 @@ extern "C" {
 #include "../enums.hpp"
 #include "../types.hpp"
 #include "../utils/debug.hpp"
+#include "../utils/id.hpp"
 
 namespace ammonite {
   namespace input {
@@ -46,12 +47,14 @@ namespace ammonite {
         //Track keybind data and states
         std::map<AmmoniteId, KeybindData> keybindIdDataMap;
         std::map<int, KeycodeState> keycodeStateMap;
-        unsigned int totalKeybinds = 0;
+        AmmoniteId lastKeybindId = 0;
 
         //Vectors to track pressed and released keys, with a pending callback
         std::vector<KeypressInfo> pressedKeys;
         std::vector<KeypressInfo> releasedKeys;
+      }
 
+      namespace {
         //Dispatch user defined code to handle keypress
         void keyCallbackHandler(GLFWwindow*, int keycode, int, int action, int) {
           if (!keycodeStateMap.contains(keycode)) {
@@ -297,7 +300,7 @@ namespace ammonite {
                                     bool toggle, AmmoniteKeyCallback callback,
                                     void* userPtr) {
         //Generate an ID
-        AmmoniteId keybindId = ++totalKeybinds;
+        AmmoniteId keybindId = utils::internal::setNextId(&lastKeybindId, keybindIdDataMap);
 
         //Hand off to actual registry
         return registerRawKeybind(keycodes, count, overrideMode, toggle, callback,

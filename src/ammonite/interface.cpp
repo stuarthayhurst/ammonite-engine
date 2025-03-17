@@ -4,13 +4,14 @@
 #include "interface.hpp"
 
 #include "types.hpp"
+#include "utils/id.hpp"
 #include "utils/logging.hpp"
 
 namespace ammonite {
   namespace interface {
     namespace {
       AmmoniteId activeLoadingScreenId = 0;
-      unsigned int totalLoadingScreens = 0;
+      AmmoniteId lastLoadingScreenId = 0;
       std::map<AmmoniteId, internal::LoadingScreen> loadingScreenTracker;
     }
 
@@ -22,11 +23,9 @@ namespace ammonite {
     }
 
     AmmoniteId createLoadingScreen() {
-      totalLoadingScreens++;
-
       //Create and track the loading screen
       internal::LoadingScreen loadingScreen;
-      AmmoniteId screenId = totalLoadingScreens;
+      AmmoniteId screenId = utils::internal::setNextId(&lastLoadingScreenId, loadingScreenTracker);
       loadingScreenTracker[screenId] = loadingScreen;
 
       return screenId;

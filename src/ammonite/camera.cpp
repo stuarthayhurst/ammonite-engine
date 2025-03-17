@@ -1,5 +1,4 @@
 #include <cmath>
-#include <cstdint>
 #include <map>
 
 #include <glm/glm.hpp>
@@ -10,6 +9,7 @@
 
 #include "graphics/renderer.hpp"
 #include "types.hpp"
+#include "utils/id.hpp"
 #include "window/window.hpp"
 
 namespace ammonite {
@@ -27,7 +27,7 @@ namespace ammonite {
       glm::mat4 projectionMatrix;
 
       //Create map to track cameras, with default camera
-      uintmax_t totalUserCameras = 0;
+      AmmoniteId lastCameraId = 1;
       AmmoniteId activeCameraId = 1;
       std::map<AmmoniteId, Camera> cameraTrackerMap = {{1, defaultCamera}};
     }
@@ -93,8 +93,7 @@ namespace ammonite {
 
     AmmoniteId createCamera() {
       //Get an ID for the new camera
-      totalUserCameras++;
-      AmmoniteId cameraId = 1 + totalUserCameras;
+      AmmoniteId cameraId = utils::internal::setNextId(&lastCameraId, cameraTrackerMap);
 
       //Add the new camera to the tracker
       Camera newCamera;
