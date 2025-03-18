@@ -14,7 +14,7 @@ namespace ammonite {
        - Write the result back to lastId, and return it
       */
       template <typename T>
-      AmmoniteId setNextId(AmmoniteId* lastId, const std::map<AmmoniteId, T>& tracker) {
+      static AmmoniteId setNextId(AmmoniteId* lastId, const std::map<AmmoniteId, T>& tracker) {
         while (*lastId == 0 || tracker.contains(*lastId)) {
           (*lastId)++;
         }
