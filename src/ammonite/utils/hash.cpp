@@ -2,8 +2,9 @@
 #include <string>
 
 extern "C" {
-  #if defined(__AVX512F__) && defined(__AVX512BW__) && defined(__VAES__) && \
-      defined(__AVX2__) && defined(__SSE2__) && defined(__BMI2__) && defined(UINT64_MAX)
+  #if defined(__AVX512F__) && defined(__AVX512BW__) && defined(__AVX512VL__) && \
+      defined(__VAES__) && defined(__AVX2__) && defined(__SSE2__) && \
+      defined(__BMI2__) && defined(UINT64_MAX)
     #define USE_VAES_AVX512
     #include <immintrin.h>
     #include <emmintrin.h>
@@ -23,6 +24,7 @@ namespace ammonite {
        - Don't use this for security, you'll lose your job
       */
 #ifdef USE_VAES_AVX512
+#pragma message("Using AVX512 + AVX2 + VAES + SSE2 optimised hashing")
       std::string hashStrings(std::string* filePaths, unsigned int fileCount) {
         __m512i last = _mm512_setzero_epi32();
         for (unsigned int i = 0; i < fileCount; i++) {
