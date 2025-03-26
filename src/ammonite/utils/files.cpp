@@ -36,8 +36,7 @@ namespace ammonite {
 
       namespace {
         std::string getCachedFilePath(std::string* filePaths, unsigned int fileCount) {
-          return dataCachePath + internal::hashStrings(filePaths, fileCount) + \
-                 std::string(".cache");
+          return dataCachePath + internal::hashStrings(filePaths, fileCount).append(".cache");
         }
 
         /*
