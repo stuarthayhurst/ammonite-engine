@@ -1,6 +1,4 @@
-extern "C" {
-  #include <GL/glew.h>
-}
+#include <GL/glew.h>
 
 #include "renderer.hpp"
 

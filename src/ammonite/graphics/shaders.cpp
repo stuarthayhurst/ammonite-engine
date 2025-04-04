@@ -8,9 +8,7 @@
 #include <string>
 #include <vector>
 
-extern "C" {
-  #include <GL/glew.h>
-}
+#include <GL/glew.h>
 
 #include "shaders.hpp"
 
