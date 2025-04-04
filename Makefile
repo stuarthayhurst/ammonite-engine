@@ -55,6 +55,10 @@ ifeq ($(CHECK_THREADS),true)
   CXXFLAGS += -fsanitize=thread
 endif
 
+ifeq ($(USE_LLVM_CPP),true)
+  CXXFLAGS += -stdlib=libc++
+endif
+
 $(BUILD_DIR)/demo: $(BUILD_DIR)/$(LIBRARY_NAME) $(HELPER_OBJECTS) $(DEMO_OBJECTS) $(OBJECT_DIR)/demoLoader.o
 	@mkdir -p "$(BUILD_DIR)"
 	$(CXX) -o "$(BUILD_DIR)/demo" $(HELPER_OBJECTS) $(DEMO_OBJECTS) $(OBJECT_DIR)/demoLoader.o $(CXXFLAGS) "-L$(BUILD_DIR)" -lammonite $(LDFLAGS)

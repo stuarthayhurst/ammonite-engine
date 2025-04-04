@@ -75,6 +75,7 @@
   - `coreutils`
   - `g++` **OR** `clang`
     - If using clang, use `CXX="clang++" make [TARGET]`
+      - `USE_LLVM_CPP=true` might be useful for systems without (a new enough) GCC
     - When swapping between different compilers, run `make clean`
   - ### Libraries:
     - `libglm-dev libglfw3-dev libglew-dev libstb-dev libassimp-dev`

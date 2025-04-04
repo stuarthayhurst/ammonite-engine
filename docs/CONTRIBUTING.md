@@ -31,6 +31,7 @@
   - ### Flags:
     - `DEBUG`: `true / false` - Compiles the target in debug mode
     - `FAST`: `true / false` - Compiles with `-march=native` and uses a no-error context
+    - `USE_LLVM_CPP`: `true / false` - Link against `libc++` instead of `libstdc++`
     - `BUILD_DIR` - Use a different directory for temporary build system files
     - `INSTALL_DIR` - Install `libammonite.so` to a different location
     - `HEADER_DIR` - Install Ammonite headers to a different location
