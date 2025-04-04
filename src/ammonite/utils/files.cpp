@@ -166,9 +166,10 @@ namespace ammonite {
         std::filesystem::file_time_type fileTimestamp =
           std::filesystem::last_write_time(filesystemPath);
 
-        //Convert time point to unix time
-        *timestamp =
-          std::chrono::system_clock::to_time_t(std::chrono::file_clock::to_sys(fileTimestamp));
+        //Convert time point from file time to system time, then save it
+        std::chrono::time_point<std::chrono::system_clock> systemTimestamp =
+          std::chrono::clock_cast<std::chrono::system_clock>(fileTimestamp);
+        *timestamp = std::chrono::system_clock::to_time_t(systemTimestamp);
 
         //Get filesize of the file
         *filesize = std::filesystem::file_size(filesystemPath);
