@@ -49,7 +49,7 @@ namespace ammonite {
 
   namespace {
     void lightWork(void* userPtr) {
-      unsigned int i = ((LightWorkerData*)userPtr)->i;
+      const unsigned int i = ((LightWorkerData*)userPtr)->i;
       glm::mat4* shadowProj = ((LightWorkerData*)userPtr)->shadowProj;
 
       //Repacking light sources
@@ -69,7 +69,7 @@ namespace ammonite {
       }
 
       //Calculate shadow transforms for shadows
-      glm::vec3 lightPos = lightSource->geometry;
+      const glm::vec3 lightPos = lightSource->geometry;
       glm::mat4* transformStart = lightTransforms + ((std::size_t)(lightSource->lightIndex) * 6);
       transformStart[0] = *shadowProj *
         glm::lookAt(lightPos, lightPos + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));
@@ -126,7 +126,7 @@ namespace ammonite {
       //Unlink a light source from a model, using only the model ID (doesn't touch the model)
       void unlinkByModel(AmmoniteId modelId) {
         //Get the ID of the light attached to the model
-        AmmoniteId lightId = ammonite::models::internal::getLightEmitterId(modelId);
+        const AmmoniteId lightId = ammonite::models::internal::getLightEmitterId(modelId);
         //Unlink if a light was attached
         if (lightId != 0) {
           lightTrackerMap[lightId].modelId = 0;
@@ -145,7 +145,7 @@ namespace ammonite {
         }
 
         //If no lights remain, unbind and return early
-        unsigned int lightCount = lightTrackerMap.size();
+        const unsigned int lightCount = lightTrackerMap.size();
         if (lightCount == 0) {
           glDeleteBuffers(1, &lightDataId);
           glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, 0);
@@ -154,12 +154,12 @@ namespace ammonite {
           return;
         }
 
-        float shadowFarPlane = renderer::settings::getShadowFarPlane();
+        const float shadowFarPlane = renderer::settings::getShadowFarPlane();
         glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f),
                                                 1.0f, 0.0f, shadowFarPlane);
 
         //Resize buffers
-        std::size_t shaderDataSize = sizeof(ShaderLightSource) * lightCount;
+        const std::size_t shaderDataSize = sizeof(ShaderLightSource) * lightCount;
         if (prevLightCount != lightCount) {
           if (lightTransforms != nullptr) {
             delete [] lightTransforms;

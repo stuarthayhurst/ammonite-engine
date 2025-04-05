@@ -25,7 +25,7 @@ namespace ammonite {
     bool isBinaryCacheSupported = false;
 
     //Identify shader types by extensions / contained strings
-    struct {
+    const struct {
       std::string match;
       GLenum shaderType;
     } shaderMatches[] = {
@@ -45,7 +45,7 @@ namespace ammonite {
       {"tesse", GL_TESS_EVALUATION_SHADER}, {"eval", GL_TESS_EVALUATION_SHADER},
       {"compute", GL_COMPUTE_SHADER}
     };
-    unsigned int shaderMatchCount = sizeof(shaderMatches) / sizeof(shaderMatches[0]);
+    const unsigned int shaderMatchCount = sizeof(shaderMatches) / sizeof(shaderMatches[0]);
 
 
     //Data required by cache worker
@@ -63,8 +63,8 @@ namespace ammonite {
       CacheWorkerData* data = (CacheWorkerData*)userPtr;
 
       //Prepare user data required to load the cache again
-      std::string userData = std::to_string(data->binaryFormat) + "\n";
-      std::size_t userDataSize = userData.length();
+      const std::string userData = std::to_string(data->binaryFormat) + "\n";
+      const std::size_t userDataSize = userData.length();
       unsigned char* userBuffer = new unsigned char[userDataSize];
       userData.copy((char*)userBuffer, userDataSize, 0);
 
@@ -184,7 +184,7 @@ namespace ammonite {
     //Take shader source code, compile it and load it
     GLuint loadShader(const std::string& shaderPath, const GLenum shaderType) {
       //Create the shader
-      GLuint shaderId = glCreateShader(shaderType);
+      const GLuint shaderId = glCreateShader(shaderType);
 
       //Read the shader's source code
       std::size_t shaderCodeSize = 0;
@@ -212,7 +212,7 @@ namespace ammonite {
     //Take multiple shader objects and create a program
     GLuint createProgramObject(GLuint* shaderIds, unsigned int shaderCount) {
       //Create the program
-      GLuint programId = glCreateProgram();
+      const GLuint programId = glCreateProgram();
 
       //Attach and link all passed shader IDs
       for (unsigned int i = 0; i < shaderCount; i++) {
@@ -293,7 +293,7 @@ namespace ammonite {
         //Fetch and validate binary format
         GLenum binaryFormat = 0;
         if (cacheState == AMMONITE_CACHE_HIT && userDataSize != 0) {
-          long long rawFormat = std::atoll((char*)userData);
+          const long long rawFormat = std::atoll((char*)userData);
           binaryFormat = rawFormat;
 
           if (binaryFormat == 0) {
@@ -374,7 +374,7 @@ namespace ammonite {
         std::vector<GLenum> shaderTypes(0);
         for (unsigned int i = 0; i < inputShaderCount; i++) {
           //Identify shader type, skip unidentifiable shaders
-          GLenum shaderType = identifyShaderType(inputShaderPaths[i]);
+          const GLenum shaderType = identifyShaderType(inputShaderPaths[i]);
           if (shaderType == GL_FALSE) {
             ammonite::utils::warning << "Couldn't identify type of shader '" \
                                      << inputShaderPaths[i] << "'" << std::endl;

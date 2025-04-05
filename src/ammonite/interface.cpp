@@ -24,8 +24,9 @@ namespace ammonite {
 
     AmmoniteId createLoadingScreen() {
       //Create and track the loading screen
-      internal::LoadingScreen loadingScreen;
-      AmmoniteId screenId = utils::internal::setNextId(&lastLoadingScreenId, loadingScreenTracker);
+      const internal::LoadingScreen loadingScreen;
+      const AmmoniteId screenId = utils::internal::setNextId(&lastLoadingScreenId,
+                                                             loadingScreenTracker);
       loadingScreenTracker[screenId] = loadingScreen;
 
       return screenId;

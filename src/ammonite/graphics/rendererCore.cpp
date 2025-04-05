@@ -140,7 +140,7 @@ namespace ammonite {
         //Load required shaders from a path
         bool createShaders(const std::string& shaderPath) {
           //Directory and pointer to ID of each shader
-          struct {
+          const struct {
             std::string shaderDir;
             GLuint* shaderId;
           } shaderInfo[6] = {
@@ -151,12 +151,12 @@ namespace ammonite {
             {"screen/", &screenShader.shaderId},
             {"loading/", &loadingShader.shaderId}
           };
-          unsigned int shaderCount = sizeof(shaderInfo) / sizeof(shaderInfo[0]);
+          const unsigned int shaderCount = sizeof(shaderInfo) / sizeof(shaderInfo[0]);
 
           //Load shaders
           bool hasCreatedShaders = true;
           for (unsigned int i = 0; i < shaderCount; i++) {
-            std::string shaderLocation = shaderPath + shaderInfo[i].shaderDir;
+            const std::string shaderLocation = shaderPath + shaderInfo[i].shaderDir;
             *shaderInfo[i].shaderId = ammonite::shaders::internal::loadDirectory(shaderLocation);
             if (*shaderInfo[i].shaderId == 0) {
               hasCreatedShaders = false;
@@ -177,14 +177,14 @@ namespace ammonite {
 
         //Check for essential GPU capabilities
         bool checkGPUCapabilities(unsigned int* failureCount) {
-          const char* extensions[5][3] = {
+          const char* const extensions[5][3] = {
             {"GL_ARB_direct_state_access", "GL_VERSION_4_5", "Direct state access"},
             {"GL_ARB_shader_storage_buffer_object", "GL_VERSION_4_3", "Shader Storage Buffer Objects (SSBOs)"},
             {"GL_ARB_texture_storage", "GL_VERSION_4_2", "Texture storage"},
             {"GL_ARB_shading_language_420pack", "GL_VERSION_4_2", "GLSL shader version 4.20"},
             {"GL_ARB_texture_cube_map_array", "GL_VERSION_4_0", "Cubemap arrays"}
           };
-          unsigned int extensionCount = sizeof(extensions) / sizeof(extensions[0]);
+          const unsigned int extensionCount = sizeof(extensions) / sizeof(extensions[0]);
 
           bool success = true;
           for (unsigned int i = 0; i < extensionCount; i++) {
@@ -484,7 +484,7 @@ namespace ammonite {
         }
 
         //Create 6 faces for each light source
-        GLsizei depthLayers = (GLsizei)std::min(maxLightCount, lightCount) * 6;
+        const GLsizei depthLayers = (GLsizei)std::min(maxLightCount, lightCount) * 6;
         glTextureStorage3D(depthCubeMapId, 1, GL_DEPTH_COMPONENT32, (GLsizei)shadowRes,
                            (GLsizei)shadowRes, depthLayers);
 
@@ -581,7 +581,7 @@ namespace ammonite {
       */
       void drawModelsCached(ammonite::models::internal::ModelInfo*** modelPtrsPtr,
                             AmmoniteModelEnum modelType, AmmoniteRenderMode renderMode) {
-        unsigned int modelCount = ammonite::models::internal::getModelCount(modelType);
+        const unsigned int modelCount = ammonite::models::internal::getModelCount(modelType);
 
         //Create / update cache for model pointers
         if (renderMode == AMMONITE_DATA_REFRESH || *modelPtrsPtr == nullptr) {
@@ -634,7 +634,7 @@ namespace ammonite {
         internal::prepareScreen(0, width, height, false);
 
         //Prepare to draw the screen
-        glm::vec3 backgroundColour = loadingScreen->backgroundColour;
+        const glm::vec3 backgroundColour = loadingScreen->backgroundColour;
         glClearColor(backgroundColour.x, backgroundColour.y, backgroundColour.z, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         glBindVertexArray(screenQuadVertexArrayId);
@@ -653,8 +653,8 @@ namespace ammonite {
 
     namespace internal {
       void internalDrawLoadingScreen(AmmoniteId loadingScreenId) {
-        unsigned int width = ammonite::window::internal::getGraphicsWidth();
-        unsigned int height = ammonite::window::internal::getGraphicsHeight();
+        const unsigned int width = ammonite::window::internal::getGraphicsWidth();
+        const unsigned int height = ammonite::window::internal::getGraphicsHeight();
 
         drawLoadingScreen(loadingScreenId, width, height);
 
@@ -664,12 +664,12 @@ namespace ammonite {
       }
 
       void internalDrawFrame() {
+        const unsigned int width = ammonite::window::internal::getGraphicsWidth();
+        const unsigned int height = ammonite::window::internal::getGraphicsHeight();
         static unsigned int lastWidth = 0, lastHeight = 0;
-        unsigned int width = ammonite::window::internal::getGraphicsWidth();
-        unsigned int height = ammonite::window::internal::getGraphicsHeight();
 
         static float lastRenderResMultiplier = 0.0f;
-        float renderResMultiplier = settings::getRenderResMultiplier();
+        const float renderResMultiplier = settings::getRenderResMultiplier();
 
         static unsigned int lastSamples = 0;
         unsigned int sampleCount = settings::getAntialiasingSamples();
@@ -688,7 +688,7 @@ namespace ammonite {
           lastSamples = sampleCount;
 
           //Limit sample count to implementation limit
-          unsigned int requestedSamples = sampleCount;
+          const unsigned int requestedSamples = sampleCount;
           sampleCount = std::min(requestedSamples, (unsigned int)maxSampleCount);
 
           if (sampleCount < requestedSamples) {
@@ -710,9 +710,9 @@ namespace ammonite {
         }
 
         //Get shadow resolution and light count, save for next time to avoid cubemap recreation
-        unsigned int shadowRes = settings::getShadowRes();
+        const unsigned int shadowRes = settings::getShadowRes();
+        const unsigned int lightCount = lightTrackerMap->size();
         static unsigned int lastShadowRes = 0;
-        unsigned int lightCount = lightTrackerMap->size();
         static unsigned int lastLightCount = -1;
 
         //If number of lights or shadow resolution changes, recreate cubemap
@@ -729,7 +729,7 @@ namespace ammonite {
         internal::prepareScreen(depthMapFBO, shadowRes, shadowRes, true);
 
         //Pass uniforms that don't change between light sources
-        float shadowFarPlane = settings::getShadowFarPlane();
+        const float shadowFarPlane = settings::getShadowFarPlane();
         glUniform1f(depthShader.shadowFarPlaneId, shadowFarPlane);
 
         //Clear existing depth values
@@ -752,7 +752,7 @@ namespace ammonite {
 
         //Depth mapping render passes
         auto lightIt = lightTrackerMap->begin();
-        unsigned int activeLights = std::min(lightCount, maxLightCount);
+        const unsigned int activeLights = std::min(lightCount, maxLightCount);
         for (unsigned int shadowCount = 0; shadowCount < activeLights; shadowCount++) {
           //Get light source and position from tracker
           auto lightSource = &lightIt->second;
@@ -764,10 +764,13 @@ namespace ammonite {
           }
 
           //Pass shadow transform matrices to depth shader
-          glm::mat4* lightTransformStart = *lightTransformsPtr + ((std::size_t)(lightSource->lightIndex) * 6);
+          glm::mat4* lightTransformStart = *lightTransformsPtr + \
+            ((std::size_t)(lightSource->lightIndex) * 6);
           for (int i = 0; i < 6; i++) {
-            std::string identifier = std::string("shadowMatrices[") + std::to_string(i) + std::string("]");
-            GLint shadowMatrixId = glGetUniformLocation(depthShader.shaderId, identifier.c_str());
+            const std::string identifier = std::string("shadowMatrices[") + \
+                                     std::to_string(i) + std::string("]");
+            const GLint shadowMatrixId = glGetUniformLocation(depthShader.shaderId,
+                                                              identifier.c_str());
             //Fetch the transform from the tracker, and send to the shader
             glUniformMatrix4fv(shadowMatrixId, 1, GL_FALSE,
                                glm::value_ptr(lightTransformStart[i]));
@@ -786,7 +789,7 @@ namespace ammonite {
         internal::prepareScreen(targetBufferId, renderWidth, renderHeight, true);
 
         //Clear depth and colour (if no skybox is used)
-        AmmoniteId activeSkybox = ammonite::skybox::getActiveSkybox();
+        const AmmoniteId activeSkybox = ammonite::skybox::getActiveSkybox();
         if (activeSkybox == 0) {
           glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         } else {
@@ -812,7 +815,8 @@ namespace ammonite {
         drawModelsCached(&modelPtrs, AMMONITE_MODEL, AMMONITE_RENDER_PASS);
 
         //Render light emitting models
-        unsigned int lightModelCount = ammonite::models::internal::getModelCount(AMMONITE_LIGHT_EMITTER);
+        const unsigned int lightModelCount =
+          ammonite::models::internal::getModelCount(AMMONITE_LIGHT_EMITTER);
         if (lightModelCount > 0) {
           //Swap to the light emitter shader and render cached light model pointers
           glUseProgram(lightShader.shaderId);
@@ -828,7 +832,7 @@ namespace ammonite {
         }
 
         //Get focal depth status, used to conditionally post-process
-        bool focalDepthEnabled = settings::post::getFocalDepthEnabled();
+        const bool focalDepthEnabled = settings::post::getFocalDepthEnabled();
 
         //Enable post-processor when required, or blit would fail
         bool isPostRequired = focalDepthEnabled;
@@ -852,7 +856,7 @@ namespace ammonite {
         if (isPostRequired) {
           //Resolve multisampling into regular texture
           if (sampleCount != 0) {
-            GLbitfield blitBits = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT;
+            const GLbitfield blitBits = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT;
             glBlitNamedFramebuffer(colourBufferMultisampleFBO, screenQuadFBO, 0, 0,
                                    (GLint)renderWidth, (GLint)renderHeight, 0, 0,
                                    (GLint)renderWidth, (GLint)renderHeight,
@@ -865,9 +869,9 @@ namespace ammonite {
           //Conditionally send data for blur
           glUniform1i(screenShader.focalDepthEnabledId, (GLint)focalDepthEnabled);
           if (focalDepthEnabled) {
-            float focalDepth = settings::post::getFocalDepth();
-            float blurStrength = settings::post::getBlurStrength();
-            float farPlane = settings::getRenderFarPlane();
+            const float focalDepth = settings::post::getFocalDepth();
+            const float blurStrength = settings::post::getBlurStrength();
+            const float farPlane = settings::getRenderFarPlane();
 
             glUniform1f(screenShader.focalDepthId, focalDepth);
             glUniform1f(screenShader.blurStrengthId, blurStrength);
@@ -882,7 +886,7 @@ namespace ammonite {
         } else {
           //Resolve multisampling into default framebuffer
           if (sampleCount != 0) {
-            GLbitfield blitBits = GL_COLOR_BUFFER_BIT;
+            const GLbitfield blitBits = GL_COLOR_BUFFER_BIT;
             glBlitNamedFramebuffer(colourBufferMultisampleFBO, 0, 0, 0,
                                    (GLint)renderWidth, (GLint)renderHeight, 0, 0,
                                    (GLint)width, (GLint)height, blitBits, GL_NEAREST);

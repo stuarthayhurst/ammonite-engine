@@ -32,7 +32,7 @@ namespace ammonite {
           unsigned int pathSize = filePaths[i].length();
 
           while (pathSize >= 64) {
-            __m512i a = _mm512_loadu_epi8(filePath);
+            const __m512i a = _mm512_loadu_epi8(filePath);
             last = _mm512_aesenc_epi128(last, a);
 
             pathSize -= 64;
@@ -40,8 +40,8 @@ namespace ammonite {
           }
 
           if (pathSize > 0) {
-            __mmask64 mask = _bzhi_u64(0xFFFFFFFF, pathSize);
-            __m512i a = _mm512_maskz_loadu_epi8(mask, filePath);
+            const __mmask64 mask = _bzhi_u64(0xFFFFFFFF, pathSize);
+            const __m512i a = _mm512_maskz_loadu_epi8(mask, filePath);
             last = _mm512_aesenc_epi128(last, a);
           }
         }
@@ -56,18 +56,18 @@ namespace ammonite {
         std::string output(16, 0);
 
         //Load result into the vector
-        __m128i resultVec = _mm_set1_epi64((__m64)result);
+        const __m128i resultVec = _mm_set1_epi64((__m64)result);
 
         //Shift the result 4 bits right
-        __m128i shift = _mm_set_epi64((__m64)0ull, (__m64)4ull);
-        __m128i shiftedResult = _mm_srlv_epi64(resultVec, shift);
+        const __m128i shift = _mm_set_epi64((__m64)0ull, (__m64)4ull);
+        const __m128i shiftedResult = _mm_srlv_epi64(resultVec, shift);
 
         //Interleave the result and shifted result every 8 bits, clear the high 4 bits
-        __m128i spacedResult = _mm_unpacklo_epi8(resultVec, shiftedResult);
-        __m128i clearedResult = _mm_and_si128(spacedResult, _mm_set1_epi8(0xF));
+        const __m128i spacedResult = _mm_unpacklo_epi8(resultVec, shiftedResult);
+        const __m128i clearedResult = _mm_and_si128(spacedResult, _mm_set1_epi8(0xF));
 
         //Adjust every element to start at 'A', save the result
-        __m128i addedResult = _mm_add_epi8(clearedResult, _mm_set1_epi8('A'));
+        const __m128i addedResult = _mm_add_epi8(clearedResult, _mm_set1_epi8('A'));
         _mm_storeu_epi8((__m128i*)output.data(), addedResult);
 
         return output;
@@ -85,7 +85,7 @@ namespace ammonite {
         */
         for (unsigned int i = 0; i < fileCount; i++) {
           uint8_t* filePath = (uint8_t*)filePaths[i].c_str();
-          unsigned int pathLength = filePaths[i].length();
+          const unsigned int pathLength = filePaths[i].length();
           for (unsigned int i = 0; i < pathLength; i++) {
             output[0] ^= filePath[i];
             for (unsigned int j = 0; j < sizeof(uintmax_t); j++) {
@@ -96,7 +96,7 @@ namespace ammonite {
         }
 
         std::string outputString(sizeof(uintmax_t) * 2, 0);
-        uintmax_t result = *(uintmax_t*)output;
+        const uintmax_t result = *(uintmax_t*)output;
         for (uintmax_t i = 0; i < sizeof(uintmax_t) * 2; i++) {
           outputString[i] = (char)('A' + (char)((result >> (i * 4)) & 0xFull));
         }

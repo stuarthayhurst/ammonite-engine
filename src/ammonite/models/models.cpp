@@ -75,7 +75,7 @@ namespace {
 
     void deleteModel(AmmoniteId modelId) {
       //Get the type of model, so the right tracker can be selected
-      AmmoniteModelEnum modelType = (*modelIdPtrMapPtr)[modelId]->modelType;
+      const AmmoniteModelEnum modelType = (*modelIdPtrMapPtr)[modelId]->modelType;
       ModelTrackerMap* targetMapPtr = modelSelector[modelType];
 
       //Delete the model and id to pointer map entry
@@ -86,7 +86,7 @@ namespace {
 
     void changeModelType(AmmoniteId modelId, AmmoniteModelEnum targetType) {
       //Get the type of model, so the right tracker can be selected
-      AmmoniteModelEnum modelType = (*modelIdPtrMapPtr)[modelId]->modelType;
+      const AmmoniteModelEnum modelType = (*modelIdPtrMapPtr)[modelId]->modelType;
 
       //Return early if no work needs to be done
       if (modelType == targetType) {
@@ -119,7 +119,7 @@ namespace {
       }
 
       //Get the type of model, so the right tracker can be selected
-      AmmoniteModelEnum modelType = (*modelIdPtrMapPtr)[modelId]->modelType;
+      const AmmoniteModelEnum modelType = (*modelIdPtrMapPtr)[modelId]->modelType;
       ModelTrackerMap* targetMapPtr = modelSelector[modelType];
 
       //Return whether the selected tracker holds the model
@@ -223,9 +223,9 @@ namespace ammonite {
         //Create the vertex attribute buffer
         glCreateVertexArrays(1, &meshData->vertexArrayId);
 
-        GLuint vaoId = meshData->vertexArrayId;
-        GLuint vboId = meshData->vertexBufferId;
-        int stride = sizeof(models::internal::VertexData);
+        const GLuint vaoId = meshData->vertexArrayId;
+        const GLuint vboId = meshData->vertexBufferId;
+        const int stride = sizeof(models::internal::VertexData);
 
         //Vertex attribute
         glEnableVertexArrayAttrib(vaoId, 0);
@@ -266,14 +266,14 @@ namespace ammonite {
 
     void moveModelToActive(AmmoniteId modelId, ammonite::models::internal::ModelInfo* modelPtr) {
       //Move from inactive to active tracker, update model pointer map
-      ammonite::models::internal::ModelInfo modelObject = *modelPtr;
+      const ammonite::models::internal::ModelInfo modelObject = *modelPtr;
       inactiveModelTracker.deleteModel(modelId);
       activeModelTracker.addModel(modelId, modelObject);
     }
 
     void moveModelToInactive(AmmoniteId modelId, ammonite::models::internal::ModelInfo* modelPtr) {
       //Move from active to inactive tracker, update model pointer map
-      ammonite::models::internal::ModelInfo modelObject = *modelPtr;
+      const ammonite::models::internal::ModelInfo modelObject = *modelPtr;
       activeModelTracker.deleteModel(modelId);
       inactiveModelTracker.addModel(modelId, modelObject);
     }
@@ -303,7 +303,7 @@ namespace ammonite {
         modelObject.modelData = &modelDataMap[modelObject.modelName];
       } else {
         //Create empty ModelData object and add to tracker
-        internal::ModelData newModelData;
+        const internal::ModelData newModelData;
         modelDataMap[modelObject.modelName] = newModelData;
         modelObject.modelData = &modelDataMap[modelObject.modelName];
 
@@ -355,7 +355,7 @@ namespace ammonite {
       }
 
       //Add model to the tracker via pointer
-      AmmoniteId newModelId = utils::internal::setNextId(&lastModelId, modelIdPtrMap);
+      const AmmoniteId newModelId = utils::internal::setNextId(&lastModelId, modelIdPtrMap);
       activeModelTracker.copyModelFromPtr(newModelId, oldModelObject);
 
       //Correct its ID and reference counter
@@ -448,7 +448,7 @@ namespace ammonite {
         }
 
         //Create new texture and apply to the mesh
-        GLuint textureId = ammonite::textures::internal::loadTexture(texturePath,
+        const GLuint textureId = ammonite::textures::internal::loadTexture(texturePath,
           false, srgbTexture);
         if (textureId == 0) {
           return false;

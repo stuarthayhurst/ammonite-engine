@@ -82,8 +82,8 @@ namespace ammonite {
 
     //Set the active time on the timer, without changing pause state
     void Timer::setTime(double newTime) {
-      std::time_t seconds = (std::time_t)newTime;
-      std::time_t nanoseconds = (std::time_t)((newTime - (double)seconds) * 1000000000.0);
+      const std::time_t seconds = (std::time_t)newTime;
+      const std::time_t nanoseconds = (std::time_t)((newTime - (double)seconds) * 1000000000.0);
 
       //Set the time using seconds and nanoseconds
       setTime(seconds, nanoseconds);
@@ -123,7 +123,7 @@ namespace ammonite {
 
       //Handle seconds and wrap around nanoseconds
       startTime.tv_sec += now.tv_sec - stopTime.tv_sec;
-      std::time_t nDiff = now.tv_nsec - stopTime.tv_nsec;
+      const std::time_t nDiff = now.tv_nsec - stopTime.tv_nsec;
       addNanoseconds(&startTime, nDiff);
 
       timerRunning = true;

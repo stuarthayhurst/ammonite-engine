@@ -57,21 +57,21 @@ namespace ammonite {
         Camera* activeCamera = &cameraTrackerMap[activeCameraId];
 
         //Vector for current direction faced
-        glm::vec3 direction = calculateDirection(activeCamera->verticalAngle,
-                                                 activeCamera->horizontalAngle);
+        const glm::vec3 direction = calculateDirection(activeCamera->verticalAngle,
+                                                       activeCamera->horizontalAngle);
 
         //Right vector, relative to the camera
-        glm::vec3 right = glm::vec3(
+        const glm::vec3 right = glm::vec3(
           std::sin(activeCamera->horizontalAngle - glm::half_pi<float>()),
           0,
           std::cos(activeCamera->horizontalAngle - glm::half_pi<float>())
         );
         //Up vector, relative to the camera
-        glm::vec3 up = glm::cross(right, direction);
+        const glm::vec3 up = glm::cross(right, direction);
 
         //Calculate the projection matrix from FoV, aspect ratio and display range
-        float aspectRatio = ammonite::window::internal::getGraphicsAspectRatio();
-        float renderFarPlane = ammonite::renderer::settings::getRenderFarPlane();
+        const float aspectRatio = ammonite::window::internal::getGraphicsAspectRatio();
+        const float renderFarPlane = ammonite::renderer::settings::getRenderFarPlane();
         projectionMatrix = glm::perspective(activeCamera->fov,
                                             aspectRatio, 0.1f, renderFarPlane);
 
@@ -93,10 +93,10 @@ namespace ammonite {
 
     AmmoniteId createCamera() {
       //Get an ID for the new camera
-      AmmoniteId cameraId = utils::internal::setNextId(&lastCameraId, cameraTrackerMap);
+      const AmmoniteId cameraId = utils::internal::setNextId(&lastCameraId, cameraTrackerMap);
 
       //Add the new camera to the tracker
-      Camera newCamera;
+      const Camera newCamera;
       cameraTrackerMap[cameraId] = newCamera;
 
       return cameraId;
@@ -126,8 +126,8 @@ namespace ammonite {
     glm::vec3 getDirection(AmmoniteId cameraId) {
       if (cameraTrackerMap.contains(cameraId)) {
         Camera* activeCamera = &cameraTrackerMap[cameraId];
-        glm::vec3 direction = calculateDirection(activeCamera->verticalAngle,
-                                                 activeCamera->horizontalAngle);
+        const glm::vec3 direction = calculateDirection(activeCamera->verticalAngle,
+                                                       activeCamera->horizontalAngle);
         return glm::normalize(direction);
       }
 

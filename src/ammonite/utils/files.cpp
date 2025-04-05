@@ -157,19 +157,18 @@ namespace ammonite {
 
       bool getFileMetadata(const std::string& filePath, std::size_t* filesize, std::time_t* timestamp) {
         //Give up if the file doesn't exist
-        std::filesystem::path filesystemPath = filePath;
+        const std::filesystem::path filesystemPath = filePath;
         if (!std::filesystem::exists(filesystemPath)) {
           return false;
         }
 
         //Get a time point for last write time of the file
-        std::filesystem::file_time_type fileTimestamp =
+        const std::filesystem::file_time_type fileTimestamp =
           std::filesystem::last_write_time(filesystemPath);
 
         //Convert time point from file time to system time, then save it
-        std::chrono::time_point<std::chrono::system_clock> systemTimestamp =
-          std::chrono::clock_cast<std::chrono::system_clock>(fileTimestamp);
-        *timestamp = std::chrono::system_clock::to_time_t(systemTimestamp);
+        *timestamp = std::chrono::system_clock::to_time_t(
+          std::chrono::clock_cast<std::chrono::system_clock>(fileTimestamp));
 
         //Get filesize of the file
         *filesize = std::filesystem::file_size(filesystemPath);
@@ -227,7 +226,7 @@ namespace ammonite {
       */
       unsigned char* loadFile(const std::string& filePath, std::size_t* size) {
         unsigned char* data = nullptr;
-        int descriptor = open(filePath.c_str(), O_RDONLY);
+        const int descriptor = open(filePath.c_str(), O_RDONLY);
         if (descriptor == -1) {
           ammonite::utils::warning << "Error while opening '" << filePath \
                                    << "' (" << -errno << ")" << std::endl;
@@ -245,7 +244,8 @@ namespace ammonite {
 
         intmax_t bytesRead = 0;
         while (bytesRead < statBuf.st_size) {
-          intmax_t newBytesRead = read(descriptor, data + bytesRead, statBuf.st_size - bytesRead);
+          const intmax_t newBytesRead = read(descriptor, data + bytesRead,
+                                             statBuf.st_size - bytesRead);
           if (newBytesRead == 0) {
             break;
           }
@@ -283,7 +283,7 @@ namespace ammonite {
        - Returns true on success, false on failure
       */
       bool writeFile(const std::string& filePath, unsigned char* data, std::size_t size) {
-        int descriptor = creat(filePath.c_str(), S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH);
+        const int descriptor = creat(filePath.c_str(), S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH);
         if (descriptor == -1) {
           ammonite::utils::warning << "Error while opening '" << filePath \
                                    << "' (" << -errno << ")" << std::endl;
@@ -296,7 +296,8 @@ namespace ammonite {
 
         std::size_t bytesWritten = 0;
         while (bytesWritten < size) {
-          intmax_t newBytesWritten = write(descriptor, data + bytesWritten, size - bytesWritten);
+          const intmax_t newBytesWritten = write(descriptor, data + bytesWritten,
+                                                 size - bytesWritten);
           if (newBytesWritten == 0) {
             break;
           }
@@ -381,7 +382,7 @@ namespace ammonite {
           *userData = cacheData + blockSizes[0];
           *userDataSize = blockSizes[1];
           unsigned char* extraData = *userData + *userDataSize;
-          std::size_t extraDataSize = blockSizes[2] - sizeof(blockSizes);
+          const std::size_t extraDataSize = blockSizes[2] - sizeof(blockSizes);
 
           //Check size of data is as expected, then validate the loaded cache
           if (blockSizes[0] + blockSizes[1] + blockSizes[2] != size) {
@@ -389,7 +390,8 @@ namespace ammonite {
                                      << "'" << std::endl;
             failed = true;
           } else {
-            AmmoniteEnum result = validateInputs(filePaths, fileCount, extraData, extraDataSize);
+            const AmmoniteEnum result = validateInputs(filePaths, fileCount,
+                                                       extraData, extraDataSize);
             if (result == AMMONITE_CACHE_COLLISION) {
               //Append the attempt counter to the file path and try again
               collision = true;
@@ -450,8 +452,8 @@ namespace ammonite {
           extraData.append(";" + std::to_string(modificationTime) + "\n");
         }
 
-        std::size_t extraSize = extraData.length();
-        std::size_t totalDataSize = dataSize + userDataSize + extraSize + sizeof(blockSizes);
+        const std::size_t extraSize = extraData.length();
+        const std::size_t totalDataSize = dataSize + userDataSize + extraSize + sizeof(blockSizes);
         unsigned char* fileData = new unsigned char[totalDataSize];
 
         //blockSize and its size gets special handling, as it's not written to extraData

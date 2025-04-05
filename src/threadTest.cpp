@@ -192,7 +192,7 @@ namespace {
   }
 
   bool testNestedJobs(int fullJobCount) {
-    unsigned int jobCount = fullJobCount / 2;
+    const unsigned int jobCount = fullJobCount / 2;
     INIT_TIMERS
     CREATE_THREAD_POOL(0)
     AmmoniteGroup group{0};

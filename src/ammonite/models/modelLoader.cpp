@@ -64,7 +64,7 @@ namespace ammonite {
           newMesh->indices = new unsigned int[newMesh->indexCount];
           unsigned int index = 0;
           for (unsigned int i = 0; i < meshPtr->mNumFaces; i++) {
-            aiFace face = meshPtr->mFaces[i];
+            const aiFace face = meshPtr->mFaces[i];
             if (&face.mIndices[0] != nullptr) {
               std::memcpy(&newMesh->indices[index], &face.mIndices[0],
                           face.mNumIndices * sizeof(unsigned int));
@@ -82,8 +82,8 @@ namespace ammonite {
             material->GetTexture(aiTextureType_DIFFUSE, 0, &localTexturePath);
             fullTexturePath = modelLoadInfo.modelDirectory + '/' + localTexturePath.C_Str();
 
-            GLuint textureId = ammonite::textures::internal::loadTexture(fullTexturePath,
-              false, modelLoadInfo.srgbTextures);
+            const GLuint textureId = ammonite::textures::internal::loadTexture(
+              fullTexturePath, false, modelLoadInfo.srgbTextures);
             if (textureId == 0) {
               return false;
             }
@@ -95,8 +95,8 @@ namespace ammonite {
             material->GetTexture(aiTextureType_SPECULAR, 0, &localTexturePath);
             fullTexturePath = modelLoadInfo.modelDirectory + '/' + localTexturePath.C_Str();
 
-            GLuint textureId = ammonite::textures::internal::loadTexture(fullTexturePath,
-              false, modelLoadInfo.srgbTextures);
+            const GLuint textureId = ammonite::textures::internal::loadTexture(
+              fullTexturePath, false, modelLoadInfo.srgbTextures);
             if (textureId == 0) {
               return false;
             }

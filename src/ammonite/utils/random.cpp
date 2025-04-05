@@ -71,7 +71,7 @@ namespace ammonite {
        - The probability is the chance of returning true
     */
     bool randomBool(double probability) {
-      double result = std::uniform_real_distribution<double>{0, 1.0}(engine);
+      const double result = std::uniform_real_distribution<double>{0, 1.0}(engine);
       return result < probability;
     }
   }

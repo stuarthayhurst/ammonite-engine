@@ -122,7 +122,7 @@ namespace ammonite {
             mw = mode->width;
             mh = mode->height;
 
-            int overlap =
+            const int overlap =
               std::max(0, std::min(wx + ww, mx + mw) - std::max(wx, mx)) *
               std::max(0, std::min(wy + wh, my + mh) - std::max(wy, my));
 
@@ -181,11 +181,11 @@ namespace ammonite {
 
       bool setupGlew() {
         glewExperimental = GL_TRUE;
-        GLenum err = glewInit();
+        const GLenum err = glewInit();
         if (err != GLEW_OK) {
           //Workaround for GLEW issues on Wayland (requires GLFW 3.4+)
 #if (GLFW_VERSION_MAJOR > 3) || ((GLFW_VERSION_MAJOR == 3) && (GLFW_VERSION_MINOR >= 4))
-          int platform = glfwGetPlatform();
+          const int platform = glfwGetPlatform();
           if (err == GLEW_ERROR_NO_GLX_DISPLAY && platform == GLFW_PLATFORM_WAYLAND) {
             ammonite::utils::warning << "Wayland detected, ignoring GLEW_ERROR_NO_GLX_DISPLAY" \
                                      << std::endl;

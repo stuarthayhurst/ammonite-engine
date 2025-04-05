@@ -149,7 +149,7 @@ namespace ammonite {
 
       //Select 6 faces using their names
       std::string skyboxFaces[6];
-      std::string faceOrder[6] = {"right", "left", "top", "bottom", "front", "back"};
+      const std::string faceOrder[6] = {"right", "left", "top", "bottom", "front", "back"};
       int targetFace = 0;
       while (targetFace < 6) {
         //Look for the target face
@@ -192,7 +192,7 @@ namespace ammonite {
         skyboxTracker.erase(skyboxId);
 
         //Delete skybox
-        GLuint skyboxTextureId = skyboxId;
+        const GLuint skyboxTextureId = skyboxId;
         glDeleteTextures(1, &skyboxTextureId);
 
         //If the active skybox is the target to delete, unset it

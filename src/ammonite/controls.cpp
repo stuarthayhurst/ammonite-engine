@@ -134,22 +134,22 @@ namespace ammonite {
         }
 
         //Get active camera
-        AmmoniteId activeCameraId = ammonite::camera::getActiveCamera();
+        const AmmoniteId activeCameraId = ammonite::camera::getActiveCamera();
 
         //Vector for current direction, without vertical component
-        float horizontalAngle = ammonite::camera::getHorizontal(activeCameraId);
-        glm::vec3 horizontalDirection(std::sin(horizontalAngle), 0,
-                                      std::cos(horizontalAngle));
+        const float horizontalAngle = ammonite::camera::getHorizontal(activeCameraId);
+        const glm::vec3 horizontalDirection(std::sin(horizontalAngle), 0,
+                                            std::cos(horizontalAngle));
 
         //Right vector, relative to the camera
-        glm::vec3 right = glm::vec3(std::sin(horizontalAngle - glm::half_pi<float>()), 0,
-                                    std::cos(horizontalAngle - glm::half_pi<float>()));
+        const glm::vec3 right = glm::vec3(std::sin(horizontalAngle - glm::half_pi<float>()), 0,
+                                          std::cos(horizontalAngle - glm::half_pi<float>()));
 
         //Get the current camera position
         glm::vec3 position = ammonite::camera::getPosition(activeCameraId);
 
         //Calculate the new position
-        float unitDelta = (float)directionTimer->getTime() * controlSettings.movementSpeed;
+        const float unitDelta = (float)directionTimer->getTime() * controlSettings.movementSpeed;
         switch (directionData->directionEnum) {
         case AMMONITE_FORWARD:
           position += horizontalDirection * unitDelta;
@@ -190,11 +190,11 @@ namespace ammonite {
       //Increase / decrease FoV on scroll (xoffset is unused)
       void scrollCallback(GLFWwindow*, double, double yoffset) {
         if (!(*isInputBlockedPtr) && isCameraActive) {
-          AmmoniteId activeCameraId = ammonite::camera::getActiveCamera();
-          float fov = ammonite::camera::getFieldOfView(activeCameraId);
+          const AmmoniteId activeCameraId = ammonite::camera::getActiveCamera();
+          const float fov = ammonite::camera::getFieldOfView(activeCameraId);
 
           //Only zoom if FoV will be between 1 and FoV limit
-          float newFov = fov - ((float)yoffset * controlSettings.zoomSpeed);
+          const float newFov = fov - ((float)yoffset * controlSettings.zoomSpeed);
           if (newFov > 0 && newFov <= controlSettings.fovLimit) {
             ammonite::camera::setFieldOfView(activeCameraId, newFov);
           }
@@ -214,8 +214,8 @@ namespace ammonite {
       void cursorPositionCallback(GLFWwindow*, double xpos, double ypos) {
         if (isCameraActive) {
           //Work out distance moved since last movement
-          float xoffset = (float)(xpos - xposLast);
-          float yoffset = (float)(ypos - yposLast);
+          const float xoffset = (float)(xpos - xposLast);
+          const float yoffset = (float)(ypos - yposLast);
 
           //Update saved cursor positions
           xposLast = xpos;
@@ -227,8 +227,8 @@ namespace ammonite {
           }
 
           //Get current viewing angles
-          AmmoniteId activeCameraId = ammonite::camera::getActiveCamera();
-          float horizontalAngle = ammonite::camera::getHorizontal(activeCameraId);
+          const AmmoniteId activeCameraId = ammonite::camera::getActiveCamera();
+          const float horizontalAngle = ammonite::camera::getHorizontal(activeCameraId);
           float verticalAngle = ammonite::camera::getVertical(activeCameraId);
 
           //Update viewing angles ('-' corrects camera inversion)
@@ -236,7 +236,7 @@ namespace ammonite {
             horizontalAngle - (controlSettings.mouseSpeed * xoffset));
 
           //Only accept vertical angle if it won't create an impossible movement
-          float newAngle = verticalAngle - (controlSettings.mouseSpeed * yoffset);
+          const float newAngle = verticalAngle - (controlSettings.mouseSpeed * yoffset);
           static const float limit = glm::radians(90.0f);
           if (newAngle > limit) { //Vertical max
             verticalAngle = limit;

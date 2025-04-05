@@ -91,7 +91,7 @@ namespace ammonite {
     void drawFrame() {
       //Increase frame counters
       static int unsigned frameCount = 0;
-      AmmoniteId loadingScreenId = ammonite::interface::getActiveLoadingScreenId();
+      const AmmoniteId loadingScreenId = ammonite::interface::getActiveLoadingScreenId();
       if (loadingScreenId == 0) {
         totalFrames++;
         frameCount++;
@@ -99,7 +99,7 @@ namespace ammonite {
 
       //Every tenth of a second, update the frame time
       static ammonite::utils::Timer frameTimer;
-      double deltaTime = frameTimer.getTime();
+      const double deltaTime = frameTimer.getTime();
       if (deltaTime >= 0.1f) {
         frameTime = deltaTime / frameCount;
         frameTimer.reset();

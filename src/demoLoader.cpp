@@ -88,7 +88,7 @@ namespace {
   void changeFocalDepthCallback(const std::vector<int>&, int action, void* userPtr) {
     static ammonite::utils::Timer focalDepthTimer;
     if (action != GLFW_RELEASE) {
-      float sign = *(float*)userPtr;
+      const float sign = *(float*)userPtr;
       const float unitsPerSecond = 0.8f;
       const float focalTimeDelta = (float)focalDepthTimer.getTime();
       float depth = ammonite::renderer::settings::post::getFocalDepth();
@@ -105,7 +105,7 @@ namespace {
   void changeFrameRateCallback(const std::vector<int>&, int action, void* userPtr) {
     static ammonite::utils::Timer frameRateTimer;
     if (action != GLFW_RELEASE) {
-      float sign = *(float*)userPtr;
+      const float sign = *(float*)userPtr;
       const float unitsPerSecond = 10.0f;
       const float frameTimeDelta = (float)frameRateTimer.getTime();
       float frameRate = ammonite::renderer::settings::getFrameLimit();
@@ -245,9 +245,15 @@ int main(int argc, char** argv) noexcept(false) {
     preRendererInit();
   }
 
-  //Enable engine caching, setup renderer and initialise controls
+  //Enable engine caching
   ammonite::utils::files::useDataCache("cache/");
-  bool success = ammonite::renderer::setup::setupRenderer("shaders/");
+
+  //Initialise renderer, clean up and exit on failure
+  if (!ammonite::renderer::setup::setupRenderer("shaders/")) {
+    ammonite::utils::error << "Failed to initialise renderer, exiting" << std::endl;
+    cleanEngine(setupBits, nullptr);
+    return EXIT_FAILURE;
+  }
   setupBits |= HAS_SETUP_RENDERER;
 
   //Graphics settings
@@ -257,15 +263,8 @@ int main(int argc, char** argv) noexcept(false) {
   ammonite::renderer::settings::setShadowRes(1024);
   ammonite::renderer::settings::setFrameLimit(0.0f);
 
-  //Renderer failed to initialise, clean up and exit
-  if (!success) {
-    ammonite::utils::error << "Failed to initialise renderer, exiting" << std::endl;
-    cleanEngine(setupBits, nullptr);
-    return EXIT_FAILURE;
-  }
-
   //Create a loading screen and render initial frame
-  AmmoniteId screenId = ammonite::interface::createLoadingScreen();
+  const AmmoniteId screenId = ammonite::interface::createLoadingScreen();
   ammonite::interface::setActiveLoadingScreen(screenId);
   ammonite::interface::setLoadingScreenProgress(screenId, 0.0f);
   ammonite::renderer::drawFrame();

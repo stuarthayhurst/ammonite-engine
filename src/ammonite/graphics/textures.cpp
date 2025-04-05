@@ -138,8 +138,8 @@ namespace ammonite {
       */
       GLuint loadTexture(const std::string& texturePath, bool flipTexture, bool srgbTexture) {
         //Check if texture has already been loaded, with the same settings
-        unsigned char extraData = ((int)flipTexture << 0) | ((int)srgbTexture << 1);
-        std::string textureString = texturePath + std::to_string(extraData);
+        const unsigned char extraData = ((int)flipTexture << 0) | ((int)srgbTexture << 1);
+        const std::string textureString = texturePath + std::to_string(extraData);
         if (stringTexturePtrMap.contains(textureString)) {
           TextureInfo* textureInfo = stringTexturePtrMap[textureString];
 
@@ -175,9 +175,9 @@ namespace ammonite {
         }
 
         //Create the texture and free the image data
-        unsigned int mipmapLevels = calculateMipmapLevels(width, height);
-        GLuint textureId = createTexture(width, height, data, dataFormat, textureFormat,
-                                         (GLint)mipmapLevels);
+        const unsigned int mipmapLevels = calculateMipmapLevels(width, height);
+        const GLuint textureId = createTexture(width, height, data, dataFormat, textureFormat,
+                                               (GLint)mipmapLevels);
         stbi_image_free(data);
         if (textureId == 0) {
           ammonite::utils::warning << "Failed to load texture '" << texturePath << "'" \

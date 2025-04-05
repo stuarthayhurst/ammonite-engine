@@ -32,17 +32,17 @@ namespace manyCubesDemo {
   }
 
   bool postRendererInit() {
-    AmmoniteId screenId = ammonite::interface::getActiveLoadingScreenId();
+    const AmmoniteId screenId = ammonite::interface::getActiveLoadingScreenId();
 
     //Load models from a set of objects and textures
-    std::string models[2] = {"assets/cube.obj", "assets/flat.png"};
-    unsigned int modelCount = 10000;
+    const std::string models[2] = {"assets/cube.obj", "assets/flat.png"};
+    const unsigned int modelCount = 10000;
 
     //Load cube model
-    AmmoniteId modelId = ammonite::models::createModel(models[0]);
+    const AmmoniteId modelId = ammonite::models::createModel(models[0]);
     loadedModelIds.push_back(modelId);
-    bool applied = ammonite::models::applyTexture(loadedModelIds[0], AMMONITE_DIFFUSE_TEXTURE,
-                                                models[1], true);
+    const bool applied = ammonite::models::applyTexture(loadedModelIds[0],
+      AMMONITE_DIFFUSE_TEXTURE, models[1], true);
     long unsigned int vertexCount = ammonite::models::getVertexCount(loadedModelIds[0]);
     if (modelId == 0 || !applied) {
       demoExit();
@@ -55,7 +55,7 @@ namespace manyCubesDemo {
       vertexCount += ammonite::models::getVertexCount(loadedModelIds[i]);
 
       //Update loading screen
-      float progress = float(i + 1) / float(modelCount + 1);
+      const float progress = float(i + 1) / float(modelCount + 1);
       ammonite::interface::setLoadingScreenProgress(screenId, progress);
       ammonite::renderer::drawFrame();
     }
@@ -82,15 +82,15 @@ namespace manyCubesDemo {
       lightSourcePositions[i] = glm::vec3(ammonite::utils::randomInt(0, sideLength),
                                           4.0f,
                                           ammonite::utils::randomInt(0, sideLength));
-      float red = (float)ammonite::utils::randomDouble(1.0);
-      float green = (float)ammonite::utils::randomDouble(1.0);
-      float blue = (float)ammonite::utils::randomDouble(1.0);
+      const float red = (float)ammonite::utils::randomDouble(1.0);
+      const float green = (float)ammonite::utils::randomDouble(1.0);
+      const float blue = (float)ammonite::utils::randomDouble(1.0);
       ammonite::lighting::properties::setPower(lightSourceIds[i], 50.0f);
       ammonite::lighting::properties::setColour(lightSourceIds[i], glm::vec3(red, green, blue));
     }
 
     //Set the camera position
-    AmmoniteId cameraId = ammonite::camera::getActiveCamera();
+    const AmmoniteId cameraId = ammonite::camera::getActiveCamera();
     ammonite::camera::setPosition(cameraId, glm::vec3(0.0f, 12.0f, 0.0f));
     ammonite::camera::setHorizontal(cameraId, glm::radians(45.0f));
     ammonite::camera::setVertical(cameraId, glm::radians(-20.0f));
@@ -102,7 +102,7 @@ namespace manyCubesDemo {
     //Update light source positions
     for (unsigned int i = 0; i < lightCount; i++) {
       bool invalid = true;
-      AmmoniteId currLightSourceId = lightSourceIds[i];
+      const AmmoniteId currLightSourceId = lightSourceIds[i];
       float x = 0.0f, z = 0.0f;
       while (invalid) {
         x = (float)ammonite::utils::randomDouble(-1.0, 1.0);
