@@ -2,32 +2,34 @@
 #define LOGGING
 
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <utility>
 
 namespace ammonite {
   namespace utils {
+    /*
+     - Output helper to buffer output data and synchronise with other helpers to display
+     - Prefixes the output with the prefix of the instant used to flush
+     - Buffer is shared between all instances on the same thread
+    */
     class OutputHelper {
     private:
       //NOLINTNEXTLINE(cppcoreguidelines-avoid-const-or-ref-data-members)
       std::ostream& outputStream;
       std::string prefix;
-      bool hasFlushed = true;
 
     public:
       OutputHelper(std::ostream& output, const std::string& pre);
       template<typename T> OutputHelper& operator << (T&& input);
       OutputHelper& operator << (std::ostream& (*)(std::ostream&));
+      static void writeStorage(const std::string& data);
     };
 
     template<typename T> OutputHelper& OutputHelper::operator << (T&& input) {
-      if (hasFlushed) {
-        outputStream << prefix << std::forward<T>(input);
-        hasFlushed = false;
-      } else {
-        outputStream << std::forward<T>(input);
-      }
-
+      std::stringstream temp;
+      temp << std::forward<T>(input);
+      writeStorage(temp.str());
       return *this;
     }
 
