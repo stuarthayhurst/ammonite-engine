@@ -95,9 +95,8 @@ namespace ammonite {
       //Get an ID for the new camera
       const AmmoniteId cameraId = utils::internal::setNextId(&lastCameraId, cameraTrackerMap);
 
-      //Add the new camera to the tracker
-      const Camera newCamera;
-      cameraTrackerMap[cameraId] = newCamera;
+      //Add a new camera to the tracker
+      cameraTrackerMap[cameraId] = {};
 
       return cameraId;
     }
