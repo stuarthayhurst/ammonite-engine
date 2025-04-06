@@ -11,8 +11,6 @@ namespace ammonite {
       std::mutex outputLock;
     }
 
-    thread_local std::stringstream OutputHelper::storageStream = std::stringstream("");
-
     OutputHelper::OutputHelper(std::ostream& output, const std::string& pre):
       outputStream(output), prefix(pre) {}
 
@@ -32,6 +30,8 @@ namespace ammonite {
 
     /*NOLINTBEGIN(cppcoreguidelines-avoid-non-const-global-variables,
                   cppcoreguidelines-interfaces-global-init)*/
+    thread_local std::stringstream OutputHelper::storageStream = std::stringstream("");
+
     OutputHelper error(std::cerr, "ERROR: ");
     OutputHelper warning(std::cerr, "WARNING: ");
     OutputHelper status(std::cout, "STATUS: ");
