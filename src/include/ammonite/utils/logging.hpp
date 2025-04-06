@@ -19,17 +19,16 @@ namespace ammonite {
       std::ostream& outputStream;
       std::string prefix;
 
+      static thread_local std::stringstream storageStream;
+
     public:
       OutputHelper(std::ostream& output, const std::string& pre);
       template<typename T> OutputHelper& operator << (T&& input);
       OutputHelper& operator << (std::ostream& (*)(std::ostream&));
-      static void writeStorage(const std::string& data);
     };
 
     template<typename T> OutputHelper& OutputHelper::operator << (T&& input) {
-      std::stringstream temp;
-      temp << std::forward<T>(input);
-      writeStorage(temp.str());
+      storageStream << std::forward<T>(input);
       return *this;
     }
 

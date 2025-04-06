@@ -8,16 +8,13 @@
 namespace ammonite {
   namespace utils {
     namespace {
-      thread_local std::stringstream storageStream;
       std::mutex outputLock;
     }
 
+    thread_local std::stringstream OutputHelper::storageStream = std::stringstream("");
+
     OutputHelper::OutputHelper(std::ostream& output, const std::string& pre):
       outputStream(output), prefix(pre) {}
-
-    void OutputHelper::writeStorage(const std::string& data) {
-      storageStream << data;
-    }
 
     //Output the stored string
     OutputHelper& OutputHelper::operator << (std::ostream& (*)(std::ostream&)) {
