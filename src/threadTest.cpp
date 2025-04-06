@@ -1,6 +1,10 @@
 #include <atomic>
 #include <cstdlib>
 #include <iostream>
+#include <ostream>
+#include <sstream>
+#include <string>
+#include <unordered_set>
 
 #include <ammonite/ammonite.hpp>
 
@@ -54,6 +58,12 @@ delete [] values;
 //NOLINTEND(cppcoreguidelines-macro-usage)
 
 namespace {
+  //NOLINTNEXTLINE(cppcoreguidelines-interfaces-global-init)
+  std::stringstream outputCapture("");
+  ammonite::utils::OutputHelper outputTester(outputCapture, "PREFIX: ");
+}
+
+namespace {
   struct ResubmitData {
     int* writePtr;
     AmmoniteGroup* syncPtr;
@@ -81,6 +91,18 @@ namespace {
       dataPtr->totalSubmitted++;
       ammonite::utils::thread::submitWork(chainTask, dataPtr, dataPtr->syncPtr);
     }
+  }
+
+  constexpr unsigned int outputCount = 1000;
+  void loggingTask(void* userPtr) {
+    const int value = *((int*)userPtr);
+    outputTester << value << " ";
+    for (unsigned int i = 0; i < outputCount; i++) {
+      outputTester << value;
+    }
+    outputTester << std::endl;
+
+    *(int*)userPtr = 1;
   }
 }
 
@@ -387,6 +409,77 @@ namespace {
   }
 }
 
+namespace {
+  bool testOutputHelpers(unsigned int jobCount) {
+    INIT_TIMERS
+    CREATE_THREAD_POOL(0)
+    AmmoniteGroup group{0};
+
+    //Submit logging jobs
+    RESET_TIMERS
+    bool passed = true;
+    int* values = new int[jobCount];
+    for (unsigned int i = 0; i < jobCount; i++) {
+      values[i] = (int)i;
+      ammonite::utils::thread::submitWork(loggingTask, &values[i], &group);
+    }
+    submitTimer.pause();
+
+    //Finish work
+    ammonite::utils::thread::waitGroupComplete(&group, jobCount);
+    FINISH_TIMERS
+    VERIFY_WORK(jobCount)
+
+    //Verify output blocks
+    std::string threadOutput;
+    std::unordered_set<int> foundValues;
+    while (std::getline(outputCapture, threadOutput)) {
+      std::stringstream lineStream(threadOutput);
+      std::string component;
+
+      //Extract and verify prefix
+      std::getline(lineStream, component, ' ');
+      if (component != std::string("PREFIX:")) {
+        ammonite::utils::error << "Failed to verify output prefix" << std::endl;
+        ammonite::utils::error << "Expected: PREFIX:" << std::endl;
+        ammonite::utils::error << "Got:" << component << std::endl;
+        passed = false;
+      }
+
+      //Extract the value used for the data
+      std::string value;
+      std::getline(lineStream, value, ' ');
+      foundValues.insert(stoi(value));
+
+      //Generate expected output block
+      std::getline(lineStream, component);
+      std::string expected;
+      for (unsigned int i = 0; i < outputCount; i++) {
+        expected.append(value);
+      }
+
+      //Verify output block
+      if (component != expected) {
+        ammonite::utils::error << "Failed to verify output block" << std::endl;
+        ammonite::utils::error << "Expected:" << expected << std::endl;
+        ammonite::utils::error << "Got:" << component << std::endl;
+        passed = false;
+      }
+    }
+
+    //Verify all numbers were seen
+    for (unsigned int i = 0; i < jobCount; i++) {
+      if (!foundValues.contains((int)i)) {
+        ammonite::utils::error << "Failed to verify value '" << i << "'" << std::endl;
+        passed = false;
+      }
+    }
+
+    ammonite::utils::thread::destroyThreadPool();
+    return passed;
+  }
+}
+
 int main() {
   bool failed = false;
   ammonite::utils::status << ammonite::utils::thread::getHardwareThreadCount() \
@@ -448,6 +541,10 @@ int main() {
   //Check system is still functional
   std::cout << "Double-checking standard submit, wait, destroy" << std::endl;
   failed |= !testCreateSubmitWaitDestroy(jobCount);
+
+  std::cout << "Testing synchronised output helpers" << std::endl;
+  const unsigned int threadCount = ammonite::utils::thread::getHardwareThreadCount();
+  failed |= !testOutputHelpers(threadCount * 4);
 
   return failed ? EXIT_FAILURE : EXIT_SUCCESS;
 }
