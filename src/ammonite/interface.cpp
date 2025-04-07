@@ -41,7 +41,8 @@ namespace ammonite {
 
         loadingScreenTracker.erase(targetScreenId);
       } else {
-        ammonite::utils::warning << "Loading screen " << targetScreenId << " doesn't exist" << std::endl;
+        ammonite::utils::warning << "Requested loading screen doesn't exist (ID " \
+                                 << targetScreenId << ")" << std::endl;
       }
     }
 
@@ -52,7 +53,8 @@ namespace ammonite {
       } else if (targetScreenId == 0) {
         activeLoadingScreenId = 0;
       } else {
-        ammonite::utils::warning << "Loading screen " << targetScreenId << " doesn't exist" << std::endl;
+        ammonite::utils::warning << "Requested loading screen doesn't exist (ID " \
+                                 << targetScreenId << ")" << std::endl;
       }
     }
 
@@ -64,7 +66,8 @@ namespace ammonite {
       if (loadingScreenTracker.contains(targetScreenId)) {
         loadingScreenTracker[targetScreenId].progress = progress;
       } else {
-        ammonite::utils::warning << "Loading screen " << targetScreenId << " doesn't exist" << std::endl;
+        ammonite::utils::warning << "Requested loading screen doesn't exist (ID " \
+                                 << targetScreenId << ")" << std::endl;
       }
     }
 
@@ -75,7 +78,8 @@ namespace ammonite {
         loadingScreenTracker[targetScreenId].height = height;
         loadingScreenTracker[targetScreenId].heightOffset = heightOffset;
       } else {
-        ammonite::utils::warning << "Loading screen " << targetScreenId << " doesn't exist" << std::endl;
+           ammonite::utils::warning << "Requested loading screen doesn't exist (ID " \
+                                 << targetScreenId << ")" << std::endl;
       }
     }
 
@@ -86,7 +90,8 @@ namespace ammonite {
         loadingScreenTracker[targetScreenId].trackColour = trackColour;
         loadingScreenTracker[targetScreenId].progressColour = progressColour;
       } else {
-        ammonite::utils::warning << "Loading screen " << targetScreenId << " doesn't exist" << std::endl;
+           ammonite::utils::warning << "Requested loading screen doesn't exist (ID " \
+                                 << targetScreenId << ")" << std::endl;
       }
     }
 
