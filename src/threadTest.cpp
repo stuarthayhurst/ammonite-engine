@@ -34,14 +34,14 @@ totalTimer.reset();
 
 #define SUBMIT_JOBS(jobCount) \
 bool passed = true; \
-int* values = new int[(jobCount)]{}; \
+unsigned int* values = new unsigned int[(jobCount)]{}; \
 for (unsigned int i = 0; i < (jobCount); i++) { \
   ammonite::utils::thread::submitWork(shortTask, &(values)[i], nullptr); \
 }
 
 #define SUBMIT_SYNC_JOBS(jobCount, group) \
 bool passed = true; \
-int* values = new int[(jobCount)]{}; \
+unsigned int* values = new unsigned int[(jobCount)]{}; \
 for (unsigned int i = 0; i < (jobCount); i++) { \
   ammonite::utils::thread::submitWork(shortTask, &(values)[i], &(group)); \
 }
@@ -65,7 +65,7 @@ namespace {
 
 namespace {
   struct ResubmitData {
-    int* writePtr;
+    unsigned int* writePtr;
     AmmoniteGroup* syncPtr;
   };
 
@@ -77,7 +77,7 @@ namespace {
   };
 
   void shortTask(void* userPtr) {
-    *(int*)userPtr = 1;
+    *(unsigned int*)userPtr = 1;
   }
 
   void resubmitTask(void* userPtr) {
@@ -95,14 +95,14 @@ namespace {
 
   constexpr unsigned int outputCount = 1000;
   void loggingTask(void* userPtr) {
-    const int value = *((int*)userPtr);
+    const unsigned int value = *((unsigned int*)userPtr);
     outputTester << value << " ";
     for (unsigned int i = 0; i < outputCount; i++) {
       outputTester << value;
     }
     outputTester << std::endl;
 
-    *(int*)userPtr = 1;
+    *(unsigned int*)userPtr = 1;
   }
 }
 
@@ -198,7 +198,7 @@ namespace {
     VERIFY_WORK(jobCount)
 
     //Submit second batch
-    values = new int[(jobCount)]{};
+    values = new unsigned int[(jobCount)]{};
     submitTimer.unpause();
     for (unsigned int i = 0; i < jobCount; i++) { \
       ammonite::utils::thread::submitWork(shortTask, &(values)[i], &group); \
@@ -222,7 +222,7 @@ namespace {
     //Submit nested 'jobs'
     RESET_TIMERS
     bool passed = true;
-    int* values = new int[jobCount]{};
+    unsigned int* values = new unsigned int[jobCount]{};
     ResubmitData* data = new ResubmitData[jobCount]{};
     for (unsigned int i = 0; i < jobCount; i++) {
       data[i].writePtr = &values[i];
@@ -270,9 +270,9 @@ namespace {
     //Submit fast 'jobs'
     RESET_TIMERS
     bool passed = true;
-    int* values = new int[jobCount]{};
+    unsigned int* values = new unsigned int[jobCount]{};
     AmmoniteGroup group{0};
-    ammonite::utils::thread::submitMultiple(shortTask, &values[0], sizeof(int),
+    ammonite::utils::thread::submitMultiple(shortTask, &values[0], sizeof(values[0]),
                                             &group, jobCount);
     submitTimer.pause();
 
@@ -292,11 +292,11 @@ namespace {
     //Submit fast 'jobs'
     RESET_TIMERS
     bool passed = true;
-    int* values = new int[(std::size_t)jobCount * 4]{};
+    unsigned int* values = new unsigned int[(std::size_t)jobCount * 4]{};
     AmmoniteGroup group{0};
     for (int i = 0; i < 4; i++) {
       ammonite::utils::thread::submitMultiple(shortTask, &values[(std::size_t)jobCount * i],
-        sizeof(int), &group, jobCount);
+        sizeof(values[0]), &group, jobCount);
     }
     submitTimer.pause();
 
@@ -316,9 +316,9 @@ namespace {
     //Submit fast 'jobs'
     RESET_TIMERS
     bool passed = true;
-    int* values = new int[jobCount]{};
-    ammonite::utils::thread::submitMultiple(shortTask, &values[0], sizeof(int),
-                                            nullptr, jobCount);
+    unsigned int* values = new unsigned int[jobCount]{};
+    ammonite::utils::thread::submitMultiple(shortTask, &values[0],
+      sizeof(values[0]), nullptr, jobCount);
     submitTimer.pause();
 
     //Finish work
@@ -418,9 +418,9 @@ namespace {
     //Submit logging jobs
     RESET_TIMERS
     bool passed = true;
-    int* values = new int[jobCount];
+    unsigned int* values = new unsigned int[jobCount];
     for (unsigned int i = 0; i < jobCount; i++) {
-      values[i] = (int)i;
+      values[i] = i;
       ammonite::utils::thread::submitWork(loggingTask, &values[i], &group);
     }
     submitTimer.pause();
@@ -432,7 +432,7 @@ namespace {
 
     //Verify output blocks
     std::string threadOutput;
-    std::unordered_set<int> foundValues;
+    std::unordered_set<unsigned int> foundValues;
     while (std::getline(outputCapture, threadOutput)) {
       std::stringstream lineStream(threadOutput);
       std::string component;
@@ -469,7 +469,7 @@ namespace {
 
     //Verify all numbers were seen
     for (unsigned int i = 0; i < jobCount; i++) {
-      if (!foundValues.contains((int)i)) {
+      if (!foundValues.contains(i)) {
         ammonite::utils::error << "Failed to verify value '" << i << "'" << std::endl;
         passed = false;
       }
