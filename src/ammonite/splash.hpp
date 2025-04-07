@@ -1,5 +1,5 @@
-#ifndef INTERNALINTERFACE
-#define INTERNALINTERFACE
+#ifndef INTERNALSPLASH
+#define INTERNALSPLASH
 
 #include <glm/glm.hpp>
 
@@ -7,10 +7,10 @@
 #include "types.hpp"
 
 //Include public interface
-#include "../include/ammonite/interface.hpp" // IWYU pragma: export
+#include "../include/ammonite/splash.hpp" // IWYU pragma: export
 
 namespace ammonite {
-  namespace interface {
+  namespace splash {
     namespace AMMONITE_INTERNAL internal {
       struct LoadingScreen {
         float progress = 0.0f;

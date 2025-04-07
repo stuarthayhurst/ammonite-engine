@@ -1,14 +1,14 @@
 #include <iostream>
 #include <map>
 
-#include "interface.hpp"
+#include "splash.hpp"
 
 #include "types.hpp"
 #include "utils/id.hpp"
 #include "utils/logging.hpp"
 
 namespace ammonite {
-  namespace interface {
+  namespace splash {
     namespace {
       AmmoniteId activeLoadingScreenId = 0;
       AmmoniteId lastLoadingScreenId = 0;

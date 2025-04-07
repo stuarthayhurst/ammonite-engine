@@ -24,7 +24,7 @@ namespace monkeyDemo {
   }
 
   bool postRendererInit() {
-    const AmmoniteId screenId = ammonite::interface::getActiveLoadingScreenId();
+    const AmmoniteId screenId = ammonite::splash::getActiveLoadingScreenId();
 
     //Load models from a set of objects and textures
     const std::string models[][2] = {
@@ -56,7 +56,7 @@ namespace monkeyDemo {
       }
 
       //Update loading screen
-      ammonite::interface::setLoadingScreenProgress(screenId, float(i + 1) / float(modelCount + 1));
+      ammonite::splash::setLoadingScreenProgress(screenId, float(i + 1) / float(modelCount + 1));
       ammonite::renderer::drawFrame();
     }
 
@@ -70,7 +70,7 @@ namespace monkeyDemo {
     ammonite::utils::status << "Loaded " << vertexCount << " vertices" << std::endl;
 
     //Update loading screen
-    ammonite::interface::setLoadingScreenProgress(screenId, 1.0f);
+    ammonite::splash::setLoadingScreenProgress(screenId, 1.0f);
     ammonite::renderer::drawFrame();
 
     //Example translation, scale and rotation

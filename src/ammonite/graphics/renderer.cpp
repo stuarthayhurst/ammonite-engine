@@ -6,8 +6,8 @@
 
 #include "../camera.hpp"
 #include "../enums.hpp"
-#include "../interface.hpp"
 #include "../lighting/lighting.hpp"
+#include "../splash.hpp"
 #include "../types.hpp"
 #include "../utils/logging.hpp"
 #include "../utils/thread.hpp"
@@ -91,7 +91,7 @@ namespace ammonite {
     void drawFrame() {
       //Increase frame counters
       static int unsigned frameCount = 0;
-      const AmmoniteId loadingScreenId = ammonite::interface::getActiveLoadingScreenId();
+      const AmmoniteId loadingScreenId = ammonite::splash::getActiveLoadingScreenId();
       if (loadingScreenId == 0) {
         totalFrames++;
         frameCount++;

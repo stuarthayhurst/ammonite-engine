@@ -1,12 +1,12 @@
-#ifndef INTERFACE
-#define INTERFACE
+#ifndef SPLASH
+#define SPLASH
 
 #include <glm/glm.hpp>
 
 #include "types.hpp"
 
 namespace ammonite {
-  namespace interface {
+  namespace splash {
     AmmoniteId createLoadingScreen();
     void deleteLoadingScreen(AmmoniteId targetScreenId);
     void setActiveLoadingScreen(AmmoniteId targetScreenId);

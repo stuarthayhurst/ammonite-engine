@@ -17,10 +17,10 @@
 #include "shaders.hpp"
 #include "../camera.hpp"
 #include "../enums.hpp"
-#include "../interface.hpp"
 #include "../lighting/lighting.hpp"
 #include "../models/models.hpp"
 #include "../skybox.hpp"
+#include "../splash.hpp"
 #include "../types.hpp"
 #include "../utils/logging.hpp"
 #include "../utils/debug.hpp"
@@ -624,8 +624,8 @@ namespace ammonite {
         glUseProgram(loadingShader.shaderId);
 
         //Pass drawing parameters
-        interface::internal::LoadingScreen* loadingScreen =
-          interface::internal::getLoadingScreenPtr(loadingScreenId);
+        splash::internal::LoadingScreen* loadingScreen =
+          splash::internal::getLoadingScreenPtr(loadingScreenId);
         glUniform1f(loadingShader.widthId, loadingScreen->width);
         glUniform1f(loadingShader.heightId, loadingScreen->height);
         glUniform1f(loadingShader.heightOffsetId, loadingScreen->heightOffset);

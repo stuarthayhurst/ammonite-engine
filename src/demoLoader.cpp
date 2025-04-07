@@ -264,16 +264,16 @@ int main(int argc, char** argv) noexcept(false) {
   ammonite::renderer::settings::setFrameLimit(0.0f);
 
   //Create a loading screen and render initial frame
-  const AmmoniteId screenId = ammonite::interface::createLoadingScreen();
-  ammonite::interface::setActiveLoadingScreen(screenId);
-  ammonite::interface::setLoadingScreenProgress(screenId, 0.0f);
+  const AmmoniteId screenId = ammonite::splash::createLoadingScreen();
+  ammonite::splash::setActiveLoadingScreen(screenId);
+  ammonite::splash::setLoadingScreenProgress(screenId, 0.0f);
   ammonite::renderer::drawFrame();
 
   //Call main demo setup
   if (postRendererInit != nullptr) {
     if (!postRendererInit()) {
       ammonite::utils::error << "Failed to set up demo, exiting" << std::endl;
-      ammonite::interface::deleteLoadingScreen(screenId);
+      ammonite::splash::deleteLoadingScreen(screenId);
       cleanEngine(setupBits, nullptr);
       return EXIT_FAILURE;
     }
@@ -325,7 +325,7 @@ int main(int argc, char** argv) noexcept(false) {
 
   //Engine loaded, delete the loading screen
   ammonite::utils::status << "Loaded demo in " << utilityTimer.getTime() << "s\n" << std::endl;
-  ammonite::interface::deleteLoadingScreen(screenId);
+  ammonite::splash::deleteLoadingScreen(screenId);
 
   //Create and reset timers for performance metrics
   utilityTimer.reset();

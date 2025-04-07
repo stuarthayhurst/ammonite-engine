@@ -32,7 +32,7 @@ namespace manyCubesDemo {
   }
 
   bool postRendererInit() {
-    const AmmoniteId screenId = ammonite::interface::getActiveLoadingScreenId();
+    const AmmoniteId screenId = ammonite::splash::getActiveLoadingScreenId();
 
     //Load models from a set of objects and textures
     const std::string models[2] = {"assets/cube.obj", "assets/flat.png"};
@@ -56,14 +56,14 @@ namespace manyCubesDemo {
 
       //Update loading screen
       const float progress = float(i + 1) / float(modelCount + 1);
-      ammonite::interface::setLoadingScreenProgress(screenId, progress);
+      ammonite::splash::setLoadingScreenProgress(screenId, progress);
       ammonite::renderer::drawFrame();
     }
 
     ammonite::utils::status << "Loaded " << vertexCount << " vertices" << std::endl;
 
     //Update loading screen
-    ammonite::interface::setLoadingScreenProgress(screenId, 1.0f);
+    ammonite::splash::setLoadingScreenProgress(screenId, 1.0f);
     ammonite::renderer::drawFrame();
 
     //Reposition cubes
