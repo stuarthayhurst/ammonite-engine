@@ -10,7 +10,7 @@
 #include "../lighting/lighting.hpp"
 #include "../types.hpp"
 #include "../utils/logging.hpp"
-#include "../utils/threadPool.hpp"
+#include "../utils/thread.hpp"
 #include "../utils/timer.hpp"
 #include "../window/window.hpp"
 
@@ -31,13 +31,13 @@ namespace ammonite {
         ammonite::utils::Timer loadTimer;
 
         //Create a thread pool
-        if (!ammonite::utils::thread::internal::createThreadPool(0)) { \
+        if (!ammonite::utils::thread::createThreadPool(0)) {
           ammonite::utils::error << "Failed to create thread pool" << std::endl;
           return false;
         }
 
         ammonite::utils::status << "Created thread pool with " \
-                                << ammonite::utils::thread::internal::getThreadPoolSize() \
+                                << ammonite::utils::thread::getThreadPoolSize() \
                                 << " threads" << std::endl;
 
         //Check GPU supported required extensions
@@ -59,7 +59,7 @@ namespace ammonite {
       }
 
       void destroyRenderer() {
-        ammonite::utils::thread::internal::destroyThreadPool();
+        ammonite::utils::thread::destroyThreadPool();
         internal::deleteShaders();
         internal::destroyOpenGLObjects();
         lighting::internal::destroyLightSystem();

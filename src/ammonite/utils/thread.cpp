@@ -1,11 +1,18 @@
+#include <iostream>
+
 #include "thread.hpp"
 
+#include "logging.hpp"
 #include "threadPool.hpp"
 #include "../types.hpp"
 
 namespace ammonite {
   namespace utils {
     namespace thread {
+      namespace {
+        unsigned int poolUsers = 0;
+      }
+
       //Return the number of hardware threads available
       unsigned int getHardwareThreadCount() {
         return ammonite::utils::thread::internal::getHardwareThreadCount();
@@ -20,19 +27,38 @@ namespace ammonite {
       }
 
       /*
-       - Create a thread pool, without initialising the renderer
-       - Must be destroyed before the renderer is started
+       - Create or join a thread pool, without initialising the renderer
+       - The engine will share the thread pool if it's not destroyed before the
+         renderer is initialised
+       - destroyThreadPool() is still safe to call after renderer initialisation
+       - Returns false if no thread pool exists or was created
       */
       bool createThreadPool(unsigned int threadCount) {
-        return ammonite::utils::thread::internal::createThreadPool(threadCount);
+        bool exists = true;
+        if (poolUsers == 0) {
+          exists = internal::createThreadPool(threadCount);
+        }
+
+        poolUsers++;
+        return exists;
       }
 
       /*
-       - Destroy the current thread pool
-       - Must only be used on thread pools created before the renderer
+       - Destroy or exit the current thread pool
+       - Must be called once per creation / connection
+       - Safe to be called after renderer initialisation
       */
       void destroyThreadPool() {
-        ammonite::utils::thread::internal::destroyThreadPool();
+        if (poolUsers == 0) {
+          ammonite::utils::warning << "Attempted to destroy a thread pool before creation, ignoring" \
+                                   << std::endl;
+          return;
+        }
+
+        poolUsers--;
+        if (poolUsers == 0) {
+          ammonite::utils::thread::internal::destroyThreadPool();
+        }
       }
 
       /*
