@@ -7,7 +7,7 @@ PREFIX_DIR ?= /usr/local
 INSTALL_DIR ?= $(PREFIX_DIR)/lib
 HEADER_DIR ?= $(PREFIX_DIR)/include
 PKG_CONF_DIR ?= $(INSTALL_DIR)/pkgconfig
-LIBRARY_NAME = libammonite.so.0.0.1
+LIBRARY_NAME = libammonite.so.$(shell pkg-config --modversion ammonite.pc)
 
 AMMONITE_OBJECTS_SOURCE = $(shell ls ./src/ammonite/**/*.cpp)
 AMMONITE_HEADERS_SOURCE = $(shell ls ./src/ammonite/**/*.hpp)
@@ -58,23 +58,25 @@ ifeq ($(USE_LLVM_CPP),true)
   LDFLAGS += -stdlib=libc++
 endif
 
+#Sync these with ammonite.pc
+REQUIRES_PRIVATE = glm glfw3 glew stb assimp
+FLAGS_PRIVATE = -lm -latomic -pthread
+
 #Library arguments
 LIBRARY_CXXFLAGS := $(CXXFLAGS) -fpic
-LIBRARY_LDFLAGS := $(LDFLAGS) "-Wl,-soname,$(LIBRARY_NAME)"
+LIBRARY_LDFLAGS := $(LDFLAGS) "-Wl,-soname,$(LIBRARY_NAME)" \
+                   $(shell pkg-config --libs $(REQUIRES_PRIVATE))
 
 #Client arguments
-ifeq ($(USE_SYSTEM),true)
-  PKG_CONF_ARGS = ""
-  PKG_CONF_NAME = ammonite
-else
+ifneq ($(USE_SYSTEM),true)
   PROJECT_ROOT = $(dir $(realpath $(firstword $(MAKEFILE_LIST))))
   PKG_CONF_ARGS = "--define-variable=libdir=$(BUILD_DIR)" \
-                  "--define-variable=includeprefix=$(PROJECT_ROOT)src"
-  PKG_CONF_NAME = ammonite.pc
+                  "--define-variable=includedir=$(PROJECT_ROOT)src/include" \
+                  "--with-path=$(PROJECT_ROOT)"
 endif
 
-CLIENT_CXXFLAGS := $(CXXFLAGS) $(shell pkg-config $(PKG_CONF_ARGS) --cflags $(PKG_CONF_NAME))
-CLIENT_LDFLAGS := $(LDFLAGS) $(shell pkg-config $(PKG_CONF_ARGS) --libs $(PKG_CONF_NAME))
+CLIENT_CXXFLAGS := $(CXXFLAGS) $(shell pkg-config $(PKG_CONF_ARGS) --cflags ammonite)
+CLIENT_LDFLAGS := $(LDFLAGS) $(shell pkg-config $(PKG_CONF_ARGS) --libs ammonite)
 
 # --------------------------------
 # Client build recipes
