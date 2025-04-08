@@ -55,6 +55,7 @@ endif
 
 ifeq ($(USE_LLVM_CPP),true)
   CXXFLAGS += -stdlib=libc++
+  LDFLAGS += -stdlib=libc++
 endif
 
 #Library arguments
