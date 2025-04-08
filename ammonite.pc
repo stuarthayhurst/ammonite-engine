@@ -1,0 +1,13 @@
+libprefix=/usr/local
+includeprefix=/usr/local
+
+libdir=${libprefix}/lib
+includedir=${includeprefix}/include
+
+Name: Ammonite
+Description: Ammonite, a simple graphics engine for experimentation
+URL: https://github.com/stuarthayhurst/ammonite-engine
+Version: 0.0.1
+Requires: glm glfw3 glew stb assimp
+Cflags: -I${includedir}
+Libs: -L${libdir} -lammonite -lm -latomic -pthread
