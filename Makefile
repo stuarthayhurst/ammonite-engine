@@ -7,7 +7,7 @@ PREFIX_DIR ?= /usr/local
 INSTALL_DIR ?= $(PREFIX_DIR)/lib
 HEADER_DIR ?= $(PREFIX_DIR)/include
 PKG_CONF_DIR ?= $(INSTALL_DIR)/pkgconfig
-LIBRARY_NAME = libammonite.so.1
+LIBRARY_NAME = libammonite.so.0.0.1
 
 AMMONITE_OBJECTS_SOURCE = $(shell ls ./src/ammonite/**/*.cpp)
 AMMONITE_HEADERS_SOURCE = $(shell ls ./src/ammonite/**/*.hpp)
@@ -62,11 +62,18 @@ LIBRARY_CXXFLAGS := $(CXXFLAGS) -fpic
 LIBRARY_LDFLAGS := $(LDFLAGS) "-Wl,-soname,$(LIBRARY_NAME)"
 
 #Client arguments
-PROJECT_ROOT := $(dir $(realpath $(firstword $(MAKEFILE_LIST))))
-PKG_CONF_ARGS := "--define-variable=libdir=$(BUILD_DIR)" \
-                 "--define-variable=includeprefix=$(PROJECT_ROOT)src"
-CLIENT_CXXFLAGS := $(CXXFLAGS) $(shell pkg-config $(PKG_CONF_ARGS) --cflags ammonite.pc)
-CLIENT_LDFLAGS := $(LDFLAGS) $(shell pkg-config $(PKG_CONF_ARGS) --libs ammonite.pc)
+ifeq ($(USE_SYSTEM),true)
+  PKG_CONF_ARGS = ""
+  PKG_CONF_NAME = ammonite
+else
+  PROJECT_ROOT = $(dir $(realpath $(firstword $(MAKEFILE_LIST))))
+  PKG_CONF_ARGS = "--define-variable=libdir=$(BUILD_DIR)" \
+                  "--define-variable=includeprefix=$(PROJECT_ROOT)src"
+  PKG_CONF_NAME = ammonite.pc
+endif
+
+CLIENT_CXXFLAGS := $(CXXFLAGS) $(shell pkg-config $(PKG_CONF_ARGS) --cflags $(PKG_CONF_NAME))
+CLIENT_LDFLAGS := $(LDFLAGS) $(shell pkg-config $(PKG_CONF_ARGS) --libs $(PKG_CONF_NAME))
 
 # --------------------------------
 # Client build recipes
@@ -161,6 +168,7 @@ headers:
 install:
 	@mkdir -p "$(INSTALL_DIR)/ammonite"
 	install "$(BUILD_DIR)/libammonite.so" "$(INSTALL_DIR)/ammonite/$(LIBRARY_NAME)"
+	@ln -sfv "$(LIBRARY_NAME)" "$(INSTALL_DIR)/ammonite/libammonite.so"
 	ldconfig "$(INSTALL_DIR)/ammonite"
 uninstall:
 	@rm -fv "$(INSTALL_DIR)/ammonite/libammonite.so"*

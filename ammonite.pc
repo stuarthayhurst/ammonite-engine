@@ -1,7 +1,7 @@
 libprefix=/usr/local
 includeprefix=/usr/local
 
-libdir=${libprefix}/lib
+libdir=${libprefix}/lib/ammonite
 includedir=${includeprefix}/include
 
 Name: Ammonite
