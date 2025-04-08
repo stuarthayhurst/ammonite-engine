@@ -59,8 +59,8 @@ ifeq ($(USE_LLVM_CPP),true)
 endif
 
 #Fetch library dependencies and flags from ammonite.pc
-REQUIRES_PRIVATE = $(shell sed -n -e 's/^.*Requires.private: //p' ammonite.pc)
-FLAGS_PRIVATE = $(shell sed -n -e 's/^.*Libs.private: //p' ammonite.pc)
+REQUIRES_PRIVATE = $(shell sed -ne 's/^.*Requires.private: //p' ammonite.pc)
+FLAGS_PRIVATE = $(shell sed -ne 's/^.*Libs.private: //p' ammonite.pc)
 
 #Library arguments
 LIBRARY_CXXFLAGS := $(CXXFLAGS) -fpic
@@ -165,9 +165,11 @@ library: $(BUILD_DIR)/$(LIBRARY_NAME)
 
 headers:
 	@rm -rf "$(HEADER_DIR)/ammonite"
+	@mkdir -p "$(HEADER_DIR)"
 	@cp -rv "src/include/ammonite" "$(HEADER_DIR)/ammonite"
 	@mkdir -p "$(PKG_CONF_DIR)"
 	install "ammonite.pc" "$(PKG_CONF_DIR)/ammonite.pc"
+	sed -e "s|prefix=/usr/local|prefix=$(PREFIX_DIR)|" "ammonite.pc" > "$(PKG_CONF_DIR)/ammonite.pc"
 install:
 	@mkdir -p "$(INSTALL_DIR)/ammonite"
 	install "$(BUILD_DIR)/libammonite.so" "$(INSTALL_DIR)/ammonite/$(LIBRARY_NAME)"
