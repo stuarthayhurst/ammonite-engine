@@ -73,6 +73,7 @@
   - `make`
   - `pkgconf`
   - `coreutils`
+  - `sed`
   - `g++` **OR** `clang`
     - If using clang, use `CXX="clang++" make [TARGET]`
       - `USE_LLVM_CPP=true` might be useful for systems without (a new enough) GCC

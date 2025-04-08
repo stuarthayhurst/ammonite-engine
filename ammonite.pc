@@ -9,4 +9,4 @@ Version: 0.0.1
 Requires.private: glm glfw3 glew stb assimp
 Cflags: -I${includedir}
 Libs: -L${libdir} -lammonite
-Lib.private: -lm -latomic -pthread
+Libs.private: -lm -latomic -pthread

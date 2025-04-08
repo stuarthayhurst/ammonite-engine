@@ -58,13 +58,13 @@ ifeq ($(USE_LLVM_CPP),true)
   LDFLAGS += -stdlib=libc++
 endif
 
-#Sync these with ammonite.pc
-REQUIRES_PRIVATE = glm glfw3 glew stb assimp
-FLAGS_PRIVATE = -lm -latomic -pthread
+#Fetch library dependencies and flags from ammonite.pc
+REQUIRES_PRIVATE = $(shell sed -n -e 's/^.*Requires.private: //p' ammonite.pc)
+FLAGS_PRIVATE = $(shell sed -n -e 's/^.*Libs.private: //p' ammonite.pc)
 
 #Library arguments
 LIBRARY_CXXFLAGS := $(CXXFLAGS) -fpic
-LIBRARY_LDFLAGS := $(LDFLAGS) "-Wl,-soname,$(LIBRARY_NAME)" \
+LIBRARY_LDFLAGS := $(LDFLAGS) "-Wl,-soname,$(LIBRARY_NAME)" $(FLAGS_PRIVATE) \
                    $(shell pkg-config --libs $(REQUIRES_PRIVATE))
 
 #Client arguments
