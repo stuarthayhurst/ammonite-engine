@@ -480,7 +480,7 @@ namespace {
   }
 }
 
-int main() {
+int main() noexcept(false) {
   bool failed = false;
   ammonite::utils::status << ammonite::utils::thread::getHardwareThreadCount() \
                           << " hardware threads detected" << std::endl;
