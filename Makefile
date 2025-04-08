@@ -1,12 +1,11 @@
 SHELL = bash -O globstar
 TIDY ?= clang-tidy
 
-LIBS = glm glfw3 glew stb assimp
 BUILD_DIR ?= build
 CACHE_DIR = cache
-INCLUDE_DIR = src/include
 INSTALL_DIR ?= /usr/local/lib
 HEADER_DIR ?= /usr/local/include
+PKG_CONF_DIR ?= $(INSTALL_DIR)/pkgconfig
 LIBRARY_NAME = libammonite.so.1
 
 AMMONITE_OBJECTS_SOURCE = $(shell ls ./src/ammonite/**/*.cpp)
@@ -33,10 +32,8 @@ AMMONITE_OBJECTS = $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.o,$(AMMONITE_OBJECT
 HELPER_OBJECTS = $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.o,$(HELPER_OBJECTS_SOURCE)))
 DEMO_OBJECTS = $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.o,$(DEMO_OBJECTS_SOURCE)))
 
-ROOT_DIR:=$(dir $(realpath $(firstword $(MAKEFILE_LIST))))
-CXXFLAGS += $(shell pkg-config --cflags $(LIBS)) "-I$(ROOT_DIR)$(INCLUDE_DIR)"
+#Global arguments
 CXXFLAGS += -Wall -Wextra -Werror -std=c++23 -flto=auto -O3
-LDFLAGS := $(shell pkg-config --libs $(LIBS)) -lm -latomic -pthread
 
 ifeq ($(FAST),true)
   CXXFLAGS += -march=native -DFAST
@@ -59,45 +56,64 @@ ifeq ($(USE_LLVM_CPP),true)
   CXXFLAGS += -stdlib=libc++
 endif
 
+#Library arguments
+LIBRARY_CXXFLAGS := $(CXXFLAGS) -fpic
+LIBRARY_LDFLAGS := $(LDFLAGS) "-Wl,-soname,$(LIBRARY_NAME)"
+
+#Client arguments
+PROJECT_ROOT := $(dir $(realpath $(firstword $(MAKEFILE_LIST))))
+PKG_CONF_ARGS := "--define-variable=libdir=$(BUILD_DIR)" \
+                 "--define-variable=includeprefix=$(PROJECT_ROOT)src"
+CLIENT_CXXFLAGS := $(CXXFLAGS) $(shell pkg-config $(PKG_CONF_ARGS) --cflags ammonite.pc)
+CLIENT_LDFLAGS := $(LDFLAGS) $(shell pkg-config $(PKG_CONF_ARGS) --libs ammonite.pc)
+
+# --------------------------------
+# Client build recipes
+# --------------------------------
+
 $(BUILD_DIR)/demo: $(BUILD_DIR)/$(LIBRARY_NAME) $(HELPER_OBJECTS) $(DEMO_OBJECTS) $(OBJECT_DIR)/demoLoader.o
 	@mkdir -p "$(BUILD_DIR)"
-	$(CXX) -o "$(BUILD_DIR)/demo" $(HELPER_OBJECTS) $(DEMO_OBJECTS) $(OBJECT_DIR)/demoLoader.o $(CXXFLAGS) "-L$(BUILD_DIR)" -lammonite $(LDFLAGS)
-
+	$(CXX) -o "$(BUILD_DIR)/demo" $(HELPER_OBJECTS) $(DEMO_OBJECTS) $(OBJECT_DIR)/demoLoader.o $(CLIENT_CXXFLAGS) $(CLIENT_LDFLAGS)
 $(BUILD_DIR)/threadTest: $(BUILD_DIR)/$(LIBRARY_NAME) $(OBJECT_DIR)/threadTest.o
 	@mkdir -p "$(BUILD_DIR)"
-	$(CXX) -o "$(BUILD_DIR)/threadTest" $(OBJECT_DIR)/threadTest.o $(CXXFLAGS) "-L$(BUILD_DIR)" -lammonite $(LDFLAGS)
+	$(CXX) -o "$(BUILD_DIR)/threadTest" $(OBJECT_DIR)/threadTest.o $(CLIENT_CXXFLAGS) $(CLIENT_LDFLAGS)
+$(OBJECT_DIR)/helper/%.o: ./src/helper/%.cpp $(HELPER_HEADERS_SOURCE)
+	@mkdir -p "$$(dirname $@)"
+	$(CXX) "$<" -c $(CLIENT_CXXFLAGS) -o "$@"
+$(OBJECT_DIR)/demos/%.o: ./src/demos/%.cpp $(DEMO_HEADERS_SOURCE) $(AMMONITE_HEADERS_SOURCE) $(AMMONITE_INCLUDE_HEADERS_SOURCE)
+	@mkdir -p "$$(dirname $@)"
+	$(CXX) "$<" -c $(CLIENT_CXXFLAGS) -o "$@"
+$(OBJECT_DIR)/%.o: ./src/%.cpp $(AMMONITE_HEADERS_SOURCE) $(HELPER_HEADERS_SOURCE) $(AMMONITE_INCLUDE_HEADERS_SOURCE)
+	@mkdir -p "$(OBJECT_DIR)"
+	$(CXX) "$<" -c $(CLIENT_CXXFLAGS) -o "$@"
+
+
+# --------------------------------
+# Library build recipes
+# --------------------------------
 
 $(BUILD_DIR)/libammonite.so: $(AMMONITE_OBJECTS)
 	@mkdir -p "$(OBJECT_DIR)"
-	$(CXX) -shared -o "$@" $(AMMONITE_OBJECTS) $(CXXFLAGS) "-Wl,-soname,$(LIBRARY_NAME)"
+	$(CXX) -shared -o "$@" $(AMMONITE_OBJECTS) $(LIBRARY_CXXFLAGS) $(LIBRARY_LDFLAGS)
 	@if [[ "$(DEBUG)" != "true" ]]; then \
 	  strip --strip-unneeded "$(BUILD_DIR)/libammonite.so"; \
 	fi
-
 $(BUILD_DIR)/$(LIBRARY_NAME): $(BUILD_DIR)/libammonite.so
 	@rm -fv "$(BUILD_DIR)/$(LIBRARY_NAME)"
 	@ln -sv "libammonite.so" "$(BUILD_DIR)/$(LIBRARY_NAME)"
-
 $(OBJECT_DIR)/ammonite/%.o: ./src/ammonite/%.cpp $(AMMONITE_HEADERS_SOURCE) $(AMMONITE_INCLUDE_HEADERS_SOURCE)
 	@mkdir -p "$$(dirname $@)"
-	$(CXX) "$<" -c $(CXXFLAGS) -fpic -o "$@"
+	$(CXX) "$<" -c $(LIBRARY_CXXFLAGS) -o "$@"
 
-$(OBJECT_DIR)/helper/%.o: ./src/helper/%.cpp $(HELPER_HEADERS_SOURCE)
-	@mkdir -p "$$(dirname $@)"
-	$(CXX) "$<" -c $(CXXFLAGS) -o "$@"
 
-$(OBJECT_DIR)/demos/%.o: ./src/demos/%.cpp $(DEMO_HEADERS_SOURCE) $(AMMONITE_HEADERS_SOURCE) $(AMMONITE_INCLUDE_HEADERS_SOURCE)
-	@mkdir -p "$$(dirname $@)"
-	$(CXX) "$<" -c $(CXXFLAGS) -o "$@"
-
-$(OBJECT_DIR)/%.o: ./src/%.cpp $(AMMONITE_HEADERS_SOURCE) $(HELPER_HEADERS_SOURCE) $(AMMONITE_INCLUDE_HEADERS_SOURCE)
-	@mkdir -p "$(OBJECT_DIR)"
-	$(CXX) "$<" -c $(CXXFLAGS) -o "$@"
+# --------------------------------
+# Shared linting recipes
+# --------------------------------
 
 $(BUILD_DIR)/compile_flags.txt: Makefile
 	@mkdir -p "$(BUILD_DIR)"
 	@rm -fv "$(BUILD_DIR)/compile_flags.txt"
-	@for arg in $(CXXFLAGS); do \
+	@for arg in $(LIBRARY_CXXFLAGS) $(CLIENT_CXXFLAGS); do \
 		echo $$arg >> "$(BUILD_DIR)/compile_flags.txt"; \
 	done
 $(OBJECT_DIR)/%.linted: ./src/% $(BUILD_DIR)/compile_flags.txt .clang-tidy $(ALL_HEADERS_SOURCE)
@@ -105,7 +121,13 @@ $(OBJECT_DIR)/%.linted: ./src/% $(BUILD_DIR)/compile_flags.txt .clang-tidy $(ALL
 	@mkdir -p "$$(dirname $@)"
 	@touch "$@"
 
+
 .PHONY: build demo threads debug library headers install uninstall clean lint cache icons
+
+
+# --------------------------------
+# Client phony recipes
+# --------------------------------
 build: demo threads
 demo: $(BUILD_DIR)/demo
 	@if [[ "$(DEBUG)" != "true" ]]; then \
@@ -117,10 +139,24 @@ threads: $(BUILD_DIR)/threadTest
 	fi
 debug: clean
 	@DEBUG="true" $(MAKE) build
+
+
+# --------------------------------
+# Library phony recipes
+# --------------------------------
+
 library: $(BUILD_DIR)/$(LIBRARY_NAME)
+
+
+# --------------------------------
+# Installer phony recipes
+# --------------------------------
+
 headers:
 	@rm -rf "$(HEADER_DIR)/ammonite"
 	@cp -rv "src/include/ammonite" "$(HEADER_DIR)/ammonite"
+	@mkdir -p "$(PKG_CONF_DIR)"
+	install "ammonite.pc" "$(PKG_CONF_DIR)/ammonite.pc"
 install:
 	@mkdir -p "$(INSTALL_DIR)/ammonite"
 	install "$(BUILD_DIR)/libammonite.so" "$(INSTALL_DIR)/ammonite/$(LIBRARY_NAME)"
@@ -129,6 +165,12 @@ uninstall:
 	@rm -fv "$(INSTALL_DIR)/ammonite/libammonite.so"*
 	@if [[ -d "$(INSTALL_DIR)/ammonite" ]]; then rm -di "$(INSTALL_DIR)/ammonite"; fi
 	@if [[ -d "$(HEADER_DIR)/ammonite" ]]; then rm -rf "$(HEADER_DIR)/ammonite"; fi
+
+
+# --------------------------------
+# Utility / support phony recipes
+# --------------------------------
+
 clean: cache
 	@rm -rfv "$(BUILD_DIR)"
 lint: $(LINT_FILES)
