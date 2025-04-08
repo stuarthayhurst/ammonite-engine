@@ -18,12 +18,12 @@
     - `make library` - Builds `build/libammonite.so`
     - `make demo` - Builds a demo binary, a working demonstration of the renderer
     - `make threads` - Builds a test program for the thread pool
-    - `make install` - Installs `libammonite.so` to system directories
+    - `make install` - Installs `libammonite.so` to the system
       - The install path can be configured, by setting the environment variable `INSTALL_DIR`
-    - `make headers` - Installs Ammonite headers to the system
+    - `make headers` - Installs Ammonite headers and `ammonite.pc` to the system
       - The install path can be configured, by setting the environment variable `HEADER_DIR`
-    - `make uninstall` - Removes installed library
-      - Custom install locations can be removed using the environment variable `INSTALL_DIR`
+    - `make uninstall` - Removes installed library and headers
+      - Custom install locations must be specified the same way as they were installed
     - `make icons` - Creates `assets/icons/icon-*.png` from `assets/icons/icon.svg`
     - `make lint` - Lints the project using `clang-tidy`
     - `make clean` - Cleans the build area (`build/`) and default runtime cache (`cache/`)
@@ -33,8 +33,10 @@
     - `FAST`: `true / false` - Compiles with `-march=native` and uses a no-error context
     - `USE_LLVM_CPP`: `true / false` - Link against `libc++` instead of `libstdc++`
     - `BUILD_DIR` - Use a different directory for temporary build system files
-    - `INSTALL_DIR` - Install `libammonite.so` to a different location
-    - `HEADER_DIR` - Install Ammonite headers to a different location
+    - `PREFIX_DIR` - Change the base install path
+      - `INSTALL_DIR` - Install `libammonite.so` and `ammonite.pc` to a different location
+      - `HEADER_DIR` - Install Ammonite headers to a different location
+      - `PKG_CONF_DIR` - Install `ammonite.pc` to a different location
     - `CHECK_LEAKS` - Enables `-fsanitize=leak` for runtime leak checking
     - `CHECK_THREADS` - Enables `-fsanitize=thread` for runtime data race checking
     - `TIDY` - Override default choice for `clang-tidy`

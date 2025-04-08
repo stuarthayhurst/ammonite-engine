@@ -59,14 +59,14 @@
     - `build` and `library` support `-j[CORE COUNT]`
     - `make build` - Builds the demo and thread demo
     - `make library` - Builds `build/libammonite.so`
-    - `make install` - Installs `libammonite.so` to system directories
-      - The install path can be configured, by setting the environment variable `INSTALL_DIR`
-    - `make headers` - Installs Ammonite headers to the system
-      - The install path can be configured, by setting the environment variable `HEADER_DIR`
-    - `make uninstall` - Removes installed library
-      - Custom install locations can be removed using the environment variable `INSTALL_DIR`
+    - `make install` - Installs `libammonite.so` to the system
+    - `make headers` - Installs Ammonite headers and `ammonite.pc` to the system
+    - `make uninstall` - Removes installed library and headers
+      - Custom install locations must be specified the same way as they were installed
     - `make clean` - Cleans the build area (`build/`) and default runtime cache (`cache/`)
   - All targets and optional flags are documented [here](docs/CONTRIBUTING.md#build-system)
+  - Set the environment variable `PREFIX_DIR` to configure the base install path
+    - The `install`, `headers` and `uninstall` targets have additional path options
 
 ## Dependencies:
   - Package names are correct for Debian, other distros may vary
