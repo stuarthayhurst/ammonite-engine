@@ -2,3 +2,4 @@ build/
 cache/
 todo.txt
 assets-experimental/
+compile_commands.json

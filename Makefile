@@ -32,6 +32,7 @@ OBJECT_DIR = $(BUILD_DIR)/objects
 AMMONITE_OBJECTS = $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.o,$(AMMONITE_OBJECTS_SOURCE)))
 HELPER_OBJECTS = $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.o,$(HELPER_OBJECTS_SOURCE)))
 DEMO_OBJECTS = $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.o,$(DEMO_OBJECTS_SOURCE)))
+ROOT_OBJECTS = $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.o,$(ROOT_OBJECTS_SOURCE)))
 
 #Global arguments
 CXXFLAGS += -Wall -Wextra -Werror -std=c++23 -flto=auto -O3
@@ -78,6 +79,10 @@ endif
 CLIENT_CXXFLAGS := $(CXXFLAGS) $(shell pkg-config $(PKG_CONF_ARGS) --cflags ammonite)
 CLIENT_LDFLAGS := $(LDFLAGS) $(shell pkg-config $(PKG_CONF_ARGS) --libs ammonite)
 
+#Helper to run the compiler and extract the command
+EXTRACT_SCRIPT = python3 extract-command.py
+EXTRACT = @function inline() { if [[ "$(DUMMY)" != "true" ]]; then echo "$(CXX) $$@"; $(CXX) $$@; else $(EXTRACT_SCRIPT) "$(BUILD_DIR)" $(CXX) $$@; fi }; inline
+
 # --------------------------------
 # Client build recipes
 # --------------------------------
@@ -88,16 +93,16 @@ $(BUILD_DIR)/demo: $(BUILD_DIR)/$(LIBRARY_NAME) $(HELPER_OBJECTS) $(DEMO_OBJECTS
 $(BUILD_DIR)/threadTest: $(BUILD_DIR)/$(LIBRARY_NAME) $(OBJECT_DIR)/threadTest.o
 	@mkdir -p "$(BUILD_DIR)"
 	$(CXX) -o "$(BUILD_DIR)/threadTest" $(OBJECT_DIR)/threadTest.o $(CLIENT_CXXFLAGS) $(CLIENT_LDFLAGS)
+
 $(OBJECT_DIR)/helper/%.o: ./src/helper/%.cpp $(HELPER_HEADERS_SOURCE)
 	@mkdir -p "$$(dirname $@)"
-	$(CXX) "$<" -c $(CLIENT_CXXFLAGS) -o "$@"
+	$(EXTRACT) "$<" -c $(CLIENT_CXXFLAGS) -o "$@"
 $(OBJECT_DIR)/demos/%.o: ./src/demos/%.cpp $(DEMO_HEADERS_SOURCE) $(AMMONITE_HEADERS_SOURCE) $(AMMONITE_INCLUDE_HEADERS_SOURCE)
 	@mkdir -p "$$(dirname $@)"
-	$(CXX) "$<" -c $(CLIENT_CXXFLAGS) -o "$@"
+	$(EXTRACT) "$<" -c $(CLIENT_CXXFLAGS) -o "$@"
 $(OBJECT_DIR)/%.o: ./src/%.cpp $(AMMONITE_HEADERS_SOURCE) $(HELPER_HEADERS_SOURCE) $(AMMONITE_INCLUDE_HEADERS_SOURCE)
 	@mkdir -p "$(OBJECT_DIR)"
-	$(CXX) "$<" -c $(CLIENT_CXXFLAGS) -o "$@"
-
+	$(EXTRACT) "$<" -c $(CLIENT_CXXFLAGS) -o "$@"
 
 # --------------------------------
 # Library build recipes
@@ -112,28 +117,24 @@ $(BUILD_DIR)/libammonite.so: $(AMMONITE_OBJECTS)
 $(BUILD_DIR)/$(LIBRARY_NAME): $(BUILD_DIR)/libammonite.so
 	@rm -fv "$(BUILD_DIR)/$(LIBRARY_NAME)"
 	@ln -sv "libammonite.so" "$(BUILD_DIR)/$(LIBRARY_NAME)"
+
 $(OBJECT_DIR)/ammonite/%.o: ./src/ammonite/%.cpp $(AMMONITE_HEADERS_SOURCE) $(AMMONITE_INCLUDE_HEADERS_SOURCE)
 	@mkdir -p "$$(dirname $@)"
-	$(CXX) "$<" -c $(LIBRARY_CXXFLAGS) -o "$@"
+	$(EXTRACT) "$<" -c $(LIBRARY_CXXFLAGS) -o "$@"
 
 
 # --------------------------------
 # Shared linting recipes
 # --------------------------------
-
-$(BUILD_DIR)/compile_flags.txt: Makefile
-	@mkdir -p "$(BUILD_DIR)"
-	@rm -fv "$(BUILD_DIR)/compile_flags.txt"
-	@for arg in $(LIBRARY_CXXFLAGS) $(CLIENT_CXXFLAGS); do \
-		echo $$arg >> "$(BUILD_DIR)/compile_flags.txt"; \
-	done
-$(OBJECT_DIR)/%.linted: ./src/% $(BUILD_DIR)/compile_flags.txt .clang-tidy $(ALL_HEADERS_SOURCE)
+$(BUILD_DIR)/compile_commands.json:
+	@DUMMY="true" $(MAKE) $(AMMONITE_OBJECTS) $(HELPER_OBJECTS) $(DEMO_OBJECTS) $(ROOT_OBJECTS)
+$(OBJECT_DIR)/%.linted: ./src/% .clang-tidy $(ALL_HEADERS_SOURCE)
 	$(TIDY) --quiet -p "$(BUILD_DIR)" "$<"
 	@mkdir -p "$$(dirname $@)"
 	@touch "$@"
 
 
-.PHONY: build demo threads debug library headers install uninstall clean lint cache icons
+.PHONY: build demo threads debug library headers install uninstall clean lint run_lint cache icons
 
 
 # --------------------------------
@@ -188,7 +189,10 @@ uninstall:
 
 clean: cache
 	@rm -rfv "$(BUILD_DIR)"
-lint: $(LINT_FILES)
+run_lint: $(LINT_FILES)
+lint:
+	@$(MAKE) -B --no-print-directory $(BUILD_DIR)/compile_commands.json
+	@$(MAKE) --no-print-directory run_lint
 cache:
 	@rm -rfv "$(CACHE_DIR)"
 icons:
