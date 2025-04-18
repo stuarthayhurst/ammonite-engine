@@ -150,7 +150,7 @@ threads: $(BUILD_DIR)/threadTest
 	  strip --strip-unneeded "$(BUILD_DIR)/threadTest"; \
 	fi
 debug:
-	@DEBUG="true" $(MAKE) build
+	@DEBUG="true" $(MAKE) --no-print-directory build
 
 
 # --------------------------------
