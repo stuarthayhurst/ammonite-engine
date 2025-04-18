@@ -3,6 +3,7 @@
 
 #include <map>
 
+#include <GL/glew.h>
 #include <glm/glm.hpp>
 
 #include "../internal.hpp"
@@ -32,7 +33,7 @@ namespace ammonite {
       void destroyLightSystem();
 
       std::map<AmmoniteId, LightSource>* getLightTrackerPtr();
-      glm::mat4** getLightTransformsPtr();
+      GLfloat** getLightTransformsPtr();
     }
   }
 }

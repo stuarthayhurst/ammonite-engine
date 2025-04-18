@@ -59,6 +59,7 @@ namespace ammonite {
         GLint modelMatrixId;
         GLint shadowFarPlaneId;
         GLint depthLightPosId;
+        GLint shadowMatrixId;
         GLint depthShadowIndex;
       } depthShader;
 
@@ -114,7 +115,7 @@ namespace ammonite {
       //Get the light trackers
       std::map<AmmoniteId, ammonite::lighting::internal::LightSource>* lightTrackerMap =
         ammonite::lighting::internal::getLightTrackerPtr();
-      glm::mat4** lightTransformsPtr = ammonite::lighting::internal::getLightTransformsPtr();
+      GLfloat** lightTransformsPtr = ammonite::lighting::internal::getLightTransformsPtr();
       unsigned int maxLightCount = 0;
 
       //Store model data pointers for regular models and light models
@@ -228,6 +229,7 @@ namespace ammonite {
           depthShader.modelMatrixId = glGetUniformLocation(depthShader.shaderId, "modelMatrix");
           depthShader.shadowFarPlaneId = glGetUniformLocation(depthShader.shaderId, "shadowFarPlane");
           depthShader.depthLightPosId = glGetUniformLocation(depthShader.shaderId, "lightPos");
+          depthShader.shadowMatrixId = glGetUniformLocation(depthShader.shaderId, "shadowMatrices");
           depthShader.depthShadowIndex = glGetUniformLocation(depthShader.shaderId, "shadowMapIndex");
 
           skyboxShader.viewMatrixId = glGetUniformLocation(skyboxShader.shaderId, "viewMatrix");
@@ -764,17 +766,8 @@ namespace ammonite {
           }
 
           //Pass shadow transform matrices to depth shader
-          glm::mat4* lightTransformStart = *lightTransformsPtr + \
-            ((std::size_t)(lightSource->lightIndex) * 6);
-          for (int i = 0; i < 6; i++) {
-            const std::string identifier = std::string("shadowMatrices[") + \
-                                     std::to_string(i) + std::string("]");
-            const GLint shadowMatrixId = glGetUniformLocation(depthShader.shaderId,
-                                                              identifier.c_str());
-            //Fetch the transform from the tracker, and send to the shader
-            glUniformMatrix4fv(shadowMatrixId, 1, GL_FALSE,
-                               glm::value_ptr(lightTransformStart[i]));
-          }
+          GLfloat* lightTransformStart = *lightTransformsPtr + ((std::size_t)(lightSource->lightIndex) * 6 * 4 * 4);
+          glUniformMatrix4fv(depthShader.shadowMatrixId, 6, GL_FALSE, lightTransformStart);
 
           //Pass light source specific uniforms
           glUniform3fv(depthShader.depthLightPosId, 1, glm::value_ptr(lightPos));

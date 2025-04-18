@@ -1,10 +1,12 @@
 #include <cstddef>
+#include <cstring>
 #include <iterator>
 #include <map>
 #include <utility>
 
 #include <GL/glew.h>
 #include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include "lighting.hpp"
 
@@ -24,7 +26,7 @@ namespace ammonite {
 
     //Track light sources
     std::map<AmmoniteId, lighting::internal::LightSource> lightTrackerMap;
-    glm::mat4* lightTransforms = nullptr;
+    GLfloat* lightTransforms = nullptr;
     unsigned int prevLightCount = 0;
     bool lightSourcesChanged = false;
     AmmoniteId lastLightId = 0;
@@ -70,19 +72,21 @@ namespace ammonite {
 
       //Calculate shadow transforms for shadows
       const glm::vec3 lightPos = lightSource->geometry;
-      glm::mat4* transformStart = lightTransforms + ((std::size_t)(lightSource->lightIndex) * 6);
-      transformStart[0] = *shadowProj *
-        glm::lookAt(lightPos, lightPos + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));
-      transformStart[1] = *shadowProj *
-        glm::lookAt(lightPos, lightPos + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));
-      transformStart[2] = *shadowProj *
-        glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0));
-      transformStart[3] = *shadowProj *
-        glm::lookAt(lightPos, lightPos + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0));
-      transformStart[4] = *shadowProj *
-        glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0));
-      transformStart[5] = *shadowProj *
-        glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0));
+
+      glm::mat4 transforms[6] = {
+        *shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)),
+        *shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)),
+        *shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0)),
+        *shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0)),
+        *shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0)),
+        *shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0))
+      };
+
+      const std::size_t matSize = (std::size_t)4 * 4;
+      GLfloat* transformStart = lightTransforms + (matSize * 6 * lightSource->lightIndex);
+      for (int i = 0; i < 6; i++) {
+        std::memcpy(transformStart + (matSize * i), glm::value_ptr(transforms[i]), matSize * sizeof(GLfloat));
+      }
 
       //Repack lighting information
       shaderData[i].geometry = glm::vec4(lightSource->geometry, 0.0f);
@@ -108,7 +112,7 @@ namespace ammonite {
         return &lightTrackerMap;
       }
 
-      glm::mat4** getLightTransformsPtr() {
+      GLfloat** getLightTransformsPtr() {
         return &lightTransforms;
       }
 
@@ -167,7 +171,7 @@ namespace ammonite {
             delete [] workerData;
           }
 
-          lightTransforms = new glm::mat4[(std::size_t)(lightCount) * 6];
+          lightTransforms = new GLfloat[(std::size_t)(lightCount) * 6 * 4 * 4];
           shaderData = new ShaderLightSource[lightCount];
           workerData = new LightWorkerData[lightCount];
         }
