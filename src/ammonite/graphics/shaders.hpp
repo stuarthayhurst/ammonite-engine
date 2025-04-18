@@ -8,11 +8,85 @@
 #include "../internal.hpp"
 
 namespace ammonite {
-  namespace shaders {
+  namespace renderer {
     namespace AMMONITE_INTERNAL internal {
-      GLuint createProgram(std::string* shaderPaths, unsigned int shaderCount);
-      GLuint loadDirectory(const std::string& directoryPath);
-      void updateCacheSupport();
+      class Shader {
+      protected:
+        GLuint shaderId = 0;
+        virtual void setUniformLocations() {};
+
+      public:
+        bool loadShader(const std::string& shaderDirectory);
+        void destroyShader();
+        void useShader() const;
+      };
+
+      class ModelShader : public Shader {
+      private:
+        void setUniformLocations() override;
+      public:
+        GLint matrixId;
+        GLint modelMatrixId;
+        GLint normalMatrixId;
+        GLint ambientLightId;
+        GLint cameraPosId;
+        GLint shadowFarPlaneId;
+        GLint lightCountId;
+        GLint diffuseSamplerId;
+        GLint specularSamplerId;
+        GLint shadowCubeMapId;
+      };
+
+      class LightShader : public Shader {
+      private:
+        void setUniformLocations() override;
+      public:
+        GLint lightMatrixId;
+        GLint lightIndexId;
+      };
+
+      class DepthShader : public Shader {
+      private:
+        void setUniformLocations() override;
+      public:
+        GLint modelMatrixId;
+        GLint shadowFarPlaneId;
+        GLint depthLightPosId;
+        GLint shadowMatrixId;
+        GLint depthShadowIndex;
+      };
+
+      class SkyboxShader : public Shader {
+      private:
+        void setUniformLocations() override;
+      public:
+        GLint viewMatrixId;
+        GLint projectionMatrixId;
+        GLint skyboxSamplerId;
+      };
+
+      class ScreenShader : public Shader {
+      private:
+        void setUniformLocations() override;
+      public:
+        GLint screenSamplerId;
+        GLint depthSamplerId;
+        GLint focalDepthId;
+        GLint focalDepthEnabledId;
+        GLint blurStrengthId;
+        GLint farPlaneId;
+      };
+
+      class LoadingShader : public Shader {
+      private:
+        void setUniformLocations() override;
+      public:
+        GLint progressId;
+        GLint widthId;
+        GLint heightId;
+        GLint heightOffsetId;
+        GLint progressColourId;
+      };
     }
   }
 }

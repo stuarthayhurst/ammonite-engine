@@ -14,6 +14,7 @@
 #include "renderer.hpp"
 
 #include "extensions.hpp"
+#include "shaderLoader.hpp"
 #include "shaders.hpp"
 #include "../camera.hpp"
 #include "../enums.hpp"
@@ -34,60 +35,12 @@ namespace ammonite {
   namespace renderer {
     namespace {
       //Structures to store uniform IDs for the shaders
-      struct {
-        GLuint shaderId;
-        GLint matrixId;
-        GLint modelMatrixId;
-        GLint normalMatrixId;
-        GLint ambientLightId;
-        GLint cameraPosId;
-        GLint shadowFarPlaneId;
-        GLint lightCountId;
-        GLint diffuseSamplerId;
-        GLint specularSamplerId;
-        GLint shadowCubeMapId;
-      } modelShader;
-
-      struct {
-        GLuint shaderId;
-        GLint lightMatrixId;
-        GLint lightIndexId;
-      } lightShader;
-
-      struct {
-        GLuint shaderId;
-        GLint modelMatrixId;
-        GLint shadowFarPlaneId;
-        GLint depthLightPosId;
-        GLint shadowMatrixId;
-        GLint depthShadowIndex;
-      } depthShader;
-
-      struct {
-        GLuint shaderId;
-        GLint viewMatrixId;
-        GLint projectionMatrixId;
-        GLint skyboxSamplerId;
-      } skyboxShader;
-
-      struct {
-        GLuint shaderId;
-        GLint screenSamplerId;
-        GLint depthSamplerId;
-        GLint focalDepthId;
-        GLint focalDepthEnabledId;
-        GLint blurStrengthId;
-        GLint farPlaneId;
-      } screenShader;
-
-      struct {
-        GLuint shaderId;
-        GLint progressId;
-        GLint widthId;
-        GLint heightId;
-        GLint heightOffsetId;
-        GLint progressColourId;
-      } loadingShader;
+      internal::ModelShader modelShader;
+      internal::LightShader lightShader;
+      internal::DepthShader depthShader;
+      internal::SkyboxShader skyboxShader;
+      internal::ScreenShader screenShader;
+      internal::LoadingShader loadingShader;
 
       struct {
         GLuint skybox;
@@ -140,40 +93,24 @@ namespace ammonite {
       namespace internal {
         //Load required shaders from a path
         bool createShaders(const std::string& shaderPath) {
-          //Directory and pointer to ID of each shader
-          const struct {
-            std::string shaderDir;
-            GLuint* shaderId;
-          } shaderInfo[6] = {
-            {"models/", &modelShader.shaderId},
-            {"lights/", &lightShader.shaderId},
-            {"depth/", &depthShader.shaderId},
-            {"skybox/", &skyboxShader.shaderId},
-            {"screen/", &screenShader.shaderId},
-            {"loading/", &loadingShader.shaderId}
-          };
-          const unsigned int shaderCount = sizeof(shaderInfo) / sizeof(shaderInfo[0]);
-
-          //Load shaders
-          bool hasCreatedShaders = true;
-          for (unsigned int i = 0; i < shaderCount; i++) {
-            const std::string shaderLocation = shaderPath + shaderInfo[i].shaderDir;
-            *shaderInfo[i].shaderId = ammonite::shaders::internal::loadDirectory(shaderLocation);
-            if (*shaderInfo[i].shaderId == 0) {
-              hasCreatedShaders = false;
-            }
-          }
+          //Load the shader classes
+          bool hasCreatedShaders = modelShader.loadShader(shaderPath + "models/");
+          hasCreatedShaders &= lightShader.loadShader(shaderPath + "lights/");
+          hasCreatedShaders &= depthShader.loadShader(shaderPath + "depth/");
+          hasCreatedShaders &= skyboxShader.loadShader(shaderPath + "skybox/");
+          hasCreatedShaders &= screenShader.loadShader(shaderPath + "screen/");
+          hasCreatedShaders &= loadingShader.loadShader(shaderPath + "loading/");
 
           return hasCreatedShaders;
         }
 
         void deleteShaders() {
-          glDeleteProgram(modelShader.shaderId);
-          glDeleteProgram(lightShader.shaderId);
-          glDeleteProgram(depthShader.shaderId);
-          glDeleteProgram(skyboxShader.shaderId);
-          glDeleteProgram(screenShader.shaderId);
-          glDeleteProgram(loadingShader.shaderId);
+          modelShader.destroyShader();
+          lightShader.destroyShader();
+          depthShader.destroyShader();
+          skyboxShader.destroyShader();
+          screenShader.destroyShader();
+          loadingShader.destroyShader();
         }
 
         //Check for essential GPU capabilities
@@ -211,54 +148,16 @@ namespace ammonite {
 
         //Prepare required objects for rendering
         void setupOpenGLObjects() {
-          //Shader uniform locations
-          modelShader.matrixId = glGetUniformLocation(modelShader.shaderId, "MVP");
-          modelShader.modelMatrixId = glGetUniformLocation(modelShader.shaderId, "modelMatrix");
-          modelShader.normalMatrixId = glGetUniformLocation(modelShader.shaderId, "normalMatrix");
-          modelShader.ambientLightId = glGetUniformLocation(modelShader.shaderId, "ambientLight");
-          modelShader.cameraPosId = glGetUniformLocation(modelShader.shaderId, "cameraPos");
-          modelShader.shadowFarPlaneId = glGetUniformLocation(modelShader.shaderId, "shadowFarPlane");
-          modelShader.lightCountId = glGetUniformLocation(modelShader.shaderId, "lightCount");
-          modelShader.diffuseSamplerId = glGetUniformLocation(modelShader.shaderId, "diffuseSampler");
-          modelShader.specularSamplerId = glGetUniformLocation(modelShader.shaderId, "specularSampler");
-          modelShader.shadowCubeMapId = glGetUniformLocation(modelShader.shaderId, "shadowCubeMap");
-
-          lightShader.lightMatrixId = glGetUniformLocation(lightShader.shaderId, "MVP");
-          lightShader.lightIndexId = glGetUniformLocation(lightShader.shaderId, "lightIndex");
-
-          depthShader.modelMatrixId = glGetUniformLocation(depthShader.shaderId, "modelMatrix");
-          depthShader.shadowFarPlaneId = glGetUniformLocation(depthShader.shaderId, "shadowFarPlane");
-          depthShader.depthLightPosId = glGetUniformLocation(depthShader.shaderId, "lightPos");
-          depthShader.shadowMatrixId = glGetUniformLocation(depthShader.shaderId, "shadowMatrices");
-          depthShader.depthShadowIndex = glGetUniformLocation(depthShader.shaderId, "shadowMapIndex");
-
-          skyboxShader.viewMatrixId = glGetUniformLocation(skyboxShader.shaderId, "viewMatrix");
-          skyboxShader.projectionMatrixId = glGetUniformLocation(skyboxShader.shaderId, "projectionMatrix");
-          skyboxShader.skyboxSamplerId = glGetUniformLocation(skyboxShader.shaderId, "skyboxSampler");
-
-          screenShader.screenSamplerId = glGetUniformLocation(screenShader.shaderId, "screenSampler");
-          screenShader.depthSamplerId = glGetUniformLocation(screenShader.shaderId, "depthSampler");
-          screenShader.focalDepthId = glGetUniformLocation(screenShader.shaderId, "focalDepth");
-          screenShader.focalDepthEnabledId = glGetUniformLocation(screenShader.shaderId, "focalDepthEnabled");
-          screenShader.blurStrengthId = glGetUniformLocation(screenShader.shaderId, "blurStrength");
-          screenShader.farPlaneId = glGetUniformLocation(screenShader.shaderId, "farPlane");
-
-          loadingShader.progressId = glGetUniformLocation(loadingShader.shaderId, "progress");
-          loadingShader.widthId = glGetUniformLocation(loadingShader.shaderId, "width");
-          loadingShader.heightId = glGetUniformLocation(loadingShader.shaderId, "height");
-          loadingShader.heightOffsetId = glGetUniformLocation(loadingShader.shaderId, "heightOffset");
-          loadingShader.progressColourId = glGetUniformLocation(loadingShader.shaderId, "progressColour");
-
           //Pass texture unit locations
-          glUseProgram(modelShader.shaderId);
+          modelShader.useShader();
           glUniform1i(modelShader.diffuseSamplerId, 0);
           glUniform1i(modelShader.specularSamplerId, 1);
           glUniform1i(modelShader.shadowCubeMapId, 2);
 
-          glUseProgram(skyboxShader.shaderId);
+          skyboxShader.useShader();
           glUniform1i(skyboxShader.skyboxSamplerId, 3);
 
-          glUseProgram(screenShader.shaderId);
+          screenShader.useShader();
           glUniform1i(screenShader.screenSamplerId, 4);
           glUniform1i(screenShader.depthSamplerId, 5);
 
@@ -608,7 +507,7 @@ namespace ammonite {
 
       void drawSkybox(AmmoniteId activeSkyboxId) {
         //Swap to skybox shader and pass uniforms
-        glUseProgram(skyboxShader.shaderId);
+        skyboxShader.useShader();
         glUniformMatrix4fv(skyboxShader.viewMatrixId, 1, GL_FALSE,
                            glm::value_ptr(glm::mat4(glm::mat3(*viewMatrix))));
         glUniformMatrix4fv(skyboxShader.projectionMatrixId, 1, GL_FALSE,
@@ -623,7 +522,7 @@ namespace ammonite {
       void drawLoadingScreen(AmmoniteId loadingScreenId, unsigned int width,
                              unsigned int height) {
         //Swap to loading screen shader
-        glUseProgram(loadingShader.shaderId);
+        loadingShader.useShader();
 
         //Pass drawing parameters
         splash::internal::LoadingScreen* loadingScreen =
@@ -727,7 +626,7 @@ namespace ammonite {
         }
 
         //Swap to depth shader and enable depth testing
-        glUseProgram(depthShader.shaderId);
+        depthShader.useShader();
         internal::prepareScreen(depthMapFBO, shadowRes, shadowRes, true);
 
         //Pass uniforms that don't change between light sources
@@ -790,7 +689,7 @@ namespace ammonite {
         }
 
         //Prepare model shader and depth cube map
-        glUseProgram(modelShader.shaderId);
+        modelShader.useShader();
         glBindTextureUnit(2, depthCubeMapId);
 
         //Calculate view projection matrix
@@ -812,7 +711,7 @@ namespace ammonite {
           ammonite::models::internal::getModelCount(AMMONITE_LIGHT_EMITTER);
         if (lightModelCount > 0) {
           //Swap to the light emitter shader and render cached light model pointers
-          glUseProgram(lightShader.shaderId);
+          lightShader.useShader();
           drawModelsCached(&lightModelPtrs, AMMONITE_LIGHT_EMITTER, AMMONITE_EMISSION_PASS);
         }
 
@@ -857,7 +756,7 @@ namespace ammonite {
           }
 
           //Swap to correct shaders
-          glUseProgram(screenShader.shaderId);
+          screenShader.useShader();
 
           //Conditionally send data for blur
           glUniform1i(screenShader.focalDepthEnabledId, (GLint)focalDepthEnabled);
