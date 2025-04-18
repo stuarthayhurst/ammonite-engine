@@ -14,7 +14,7 @@
   - ### Targets:
     - `build`, `debug`, `library`, `demo`, `threads` and `lint` support `-j[CORE COUNT]`
     - `make build` - Builds the demo and thread demo
-    - `make debug` - Cleans build directory, then runs `make build` in debug mode
+    - `make debug` - Runs `make build` in debug mode
     - `make library` - Builds `build/libammonite.so`
     - `make demo` - Builds a demo binary, a working demonstration of the renderer
     - `make threads` - Builds a test program for the thread pool
@@ -49,8 +49,7 @@
     - It'll also enable graphics API debug warnings, messages and errors
       - This will use a debug graphics context, if available
     - Each object is compiled with debugging symbols, and `strip` is skipped
-  - Before swapping back to regular builds, run `make clean`
-  - `make debug` will create a fresh build every time
+  - Run `make clean` whenever swapping between regular and debug builds
   - `DEBUG=true make ...` can be used on any target, and only rebuilds changed objects
     - If an initial `make clean` isn't used, the build may fail or produce broken results
 

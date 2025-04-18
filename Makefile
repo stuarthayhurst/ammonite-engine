@@ -149,7 +149,7 @@ threads: $(BUILD_DIR)/threadTest
 	@if [[ "$(DEBUG)" != "true" ]]; then \
 	  strip --strip-unneeded "$(BUILD_DIR)/threadTest"; \
 	fi
-debug: clean
+debug:
 	@DEBUG="true" $(MAKE) build
 
 
