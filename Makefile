@@ -126,6 +126,7 @@ $(OBJECT_DIR)/ammonite/%.o: ./src/ammonite/%.cpp $(AMMONITE_HEADERS_SOURCE) $(AM
 # --------------------------------
 # Shared linting recipes
 # --------------------------------
+
 $(BUILD_DIR)/compile_commands.json:
 	@DUMMY="true" $(MAKE) $(AMMONITE_OBJECTS) $(HELPER_OBJECTS) $(DEMO_OBJECTS) $(ROOT_OBJECTS)
 $(OBJECT_DIR)/%.linted: ./src/% .clang-tidy $(ALL_HEADERS_SOURCE)
@@ -140,6 +141,7 @@ $(OBJECT_DIR)/%.linted: ./src/% .clang-tidy $(ALL_HEADERS_SOURCE)
 # --------------------------------
 # Client phony recipes
 # --------------------------------
+
 build: demo threads
 demo: $(BUILD_DIR)/demo
 	@if [[ "$(DEBUG)" != "true" ]]; then \
