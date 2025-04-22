@@ -51,7 +51,7 @@ ifeq ($(DEBUG),true)
   CXXFLAGS += -DAMMONITE_DEBUG -g -fno-omit-frame-pointer
 
   #Enable ASan and UBSan by default in debug mode if nothing incompatible is enabled
-  ifeq (,$(filter true,$(CHECK_THREADS) $(CHECK_TYPES) $(CHECK_MEMORY) $(CHECK_LEAKS)))
+  ifeq (,$(filter true,$(CHECK_THREADS) $(CHECK_TYPES) $(CHECK_MEMORY)))
     ifndef CHECK_ADDRESS
       CHECK_ADDRESS = true
     endif
