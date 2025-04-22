@@ -51,7 +51,7 @@ ifeq ($(DEBUG),true)
   CXXFLAGS += -DAMMONITE_DEBUG -g -fno-omit-frame-pointer
 
   #Enable ASan and UBSan by default in debug mode if nothing incompatible is enabled
-  ifeq (,$(filter true,$(CHECK_LEAKS) $(CHECK_THREADS)))
+  ifeq (,$(filter true,$(CHECK_THREADS) $(CHECK_TYPES) $(CHECK_MEMORY) $(CHECK_LEAKS)))
     ifndef CHECK_ADDRESS
       CHECK_ADDRESS = true
     endif
@@ -69,12 +69,20 @@ ifeq ($(CHECK_UNDEFINED),true)
   CXXFLAGS += -fsanitize=undefined
 endif
 
-ifeq ($(CHECK_LEAKS),true)
-  LDFLAGS += -fsanitize=leak
-endif
-
 ifeq ($(CHECK_THREADS),true)
   CXXFLAGS += -fsanitize=thread
+endif
+
+ifeq ($(CHECK_TYPES),true)
+  CXXFLAGS += -fsanitize=type
+endif
+
+ifeq ($(CHECK_MEMORY),true)
+  CXXFLAGS += -fsanitize=memory
+endif
+
+ifeq ($(CHECK_LEAKS),true)
+  LDFLAGS += -fsanitize=leak
 endif
 
 #Fetch library dependencies and flags from ammonite.pc
