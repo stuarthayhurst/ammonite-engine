@@ -41,8 +41,32 @@ ifeq ($(FAST),true)
   CXXFLAGS += -march=native -DFAST
 endif
 
+ifeq ($(USE_LLVM_CPP),true)
+  CXXFLAGS += -stdlib=libc++
+  LDFLAGS += -stdlib=libc++
+endif
+
+
 ifeq ($(DEBUG),true)
-  CXXFLAGS += -DAMMONITE_DEBUG -g -fno-omit-frame-pointer -fsanitize=address,undefined
+  CXXFLAGS += -DAMMONITE_DEBUG -g -fno-omit-frame-pointer
+
+  #Enable ASan and UBSan by default in debug mode if nothing incompatible is enabled
+  ifeq (,$(filter true,$(CHECK_LEAKS) $(CHECK_THREADS)))
+    ifndef CHECK_ADDRESS
+      CHECK_ADDRESS = true
+    endif
+    ifndef CHECK_UNDEFINED
+      CHECK_UNDEFINED = true
+    endif
+  endif
+endif
+
+ifeq ($(CHECK_ADDRESS),true)
+  CXXFLAGS += -fsanitize=address
+endif
+
+ifeq ($(CHECK_UNDEFINED),true)
+  CXXFLAGS += -fsanitize=undefined
 endif
 
 ifeq ($(CHECK_LEAKS),true)
@@ -51,11 +75,6 @@ endif
 
 ifeq ($(CHECK_THREADS),true)
   CXXFLAGS += -fsanitize=thread
-endif
-
-ifeq ($(USE_LLVM_CPP),true)
-  CXXFLAGS += -stdlib=libc++
-  LDFLAGS += -stdlib=libc++
 endif
 
 #Fetch library dependencies and flags from ammonite.pc
