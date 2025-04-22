@@ -665,7 +665,8 @@ namespace ammonite {
           }
 
           //Pass shadow transform matrices to depth shader
-          GLfloat* lightTransformStart = *lightTransformsPtr + ((std::size_t)(lightSource->lightIndex) * 6 * 4 * 4);
+          const GLfloat* lightTransformStart = *lightTransformsPtr + \
+            ((std::size_t)(lightSource->lightIndex) * 6 * 4 * 4);
           glUniformMatrix4fv(depthShader.shadowMatrixId, 6, GL_FALSE, lightTransformStart);
 
           //Pass light source specific uniforms

@@ -52,7 +52,7 @@ namespace ammonite {
   namespace {
     void lightWork(void* userPtr) {
       const unsigned int i = ((LightWorkerData*)userPtr)->i;
-      glm::mat4* shadowProj = ((LightWorkerData*)userPtr)->shadowProj;
+      const glm::mat4* shadowProj = ((LightWorkerData*)userPtr)->shadowProj;
 
       //Repacking light sources
       auto lightIt = lightTrackerMap.begin();
@@ -293,7 +293,7 @@ namespace ammonite {
   namespace lighting {
     namespace properties {
       glm::vec3 getGeometry(AmmoniteId lightId) {
-        ammonite::lighting::internal::LightSource* lightSource =
+        const ammonite::lighting::internal::LightSource* lightSource =
           ammonite::lighting::internal::getLightSourcePtr(lightId);
         if (lightSource == nullptr) {
           return glm::vec3(0.0f);
@@ -303,7 +303,7 @@ namespace ammonite {
       }
 
       glm::vec3 getColour(AmmoniteId lightId) {
-        ammonite::lighting::internal::LightSource* lightSource =
+        const ammonite::lighting::internal::LightSource* lightSource =
           ammonite::lighting::internal::getLightSourcePtr(lightId);
         if (lightSource == nullptr) {
           return glm::vec3(0.0f);
@@ -313,7 +313,7 @@ namespace ammonite {
       }
 
       float getPower(AmmoniteId lightId) {
-        ammonite::lighting::internal::LightSource* lightSource =
+        const ammonite::lighting::internal::LightSource* lightSource =
           ammonite::lighting::internal::getLightSourcePtr(lightId);
         if (lightSource == nullptr) {
           return 0.0f;

@@ -73,7 +73,7 @@ namespace ammonite {
           }
 
           //Fetch material for the mesh
-          aiMaterial *material = scenePtr->mMaterials[meshPtr->mMaterialIndex];
+          const aiMaterial *material = scenePtr->mMaterials[meshPtr->mMaterialIndex];
           aiString localTexturePath;
           std::string fullTexturePath;
           models::internal::TextureIdGroup textureIdGroup;
@@ -118,7 +118,7 @@ namespace ammonite {
           //Process root node, then process any more connected to it
           bool passed = true;
           while (!nodePtrQueue.empty()) {
-            aiNode* nodePtr = nodePtrQueue.front();
+            const aiNode* nodePtr = nodePtrQueue.front();
             nodePtrQueue.pop();
 
             //Process meshes

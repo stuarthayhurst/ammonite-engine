@@ -8,6 +8,7 @@
 #include <filesystem>
 #include <iostream>
 #include <string>
+#include <utility>
 
 extern "C" {
   #include <errno.h>
@@ -98,7 +99,7 @@ namespace ammonite {
             //Check first token is 'input'
             const std::string& currentFilePath = filePaths[internalFileCount - 1];
             char* nestedState = nullptr;
-            char* nestedToken = parseToken(token, ';', &nestedState);
+            const char* nestedToken = parseToken(token, ';', &nestedState);
             if ((nestedToken == nullptr) ||
                 (std::string(nestedToken) != std::string("input"))) {
               break;
@@ -120,7 +121,7 @@ namespace ammonite {
 
             //Check token matches file size
             nestedToken = parseToken(nullptr, ';', &nestedState);
-            if ((nestedToken == nullptr) || ((std::size_t)std::atoll(nestedToken) != filesize)) {
+            if ((nestedToken == nullptr) || std::cmp_not_equal(std::atoll(nestedToken), filesize)) {
               break;
             }
 

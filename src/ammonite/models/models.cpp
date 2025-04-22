@@ -120,7 +120,7 @@ namespace {
 
       //Get the type of model, so the right tracker can be selected
       const AmmoniteModelEnum modelType = (*modelIdPtrMapPtr)[modelId]->modelType;
-      ModelTrackerMap* targetMapPtr = modelSelector[modelType];
+      const ModelTrackerMap* targetMapPtr = modelSelector[modelType];
 
       //Return whether the selected tracker holds the model
       return targetMapPtr->contains(modelId);
@@ -187,7 +187,7 @@ namespace ammonite {
       }
 
       AmmoniteId getLightEmitterId(AmmoniteId modelId) {
-        internal::ModelInfo* modelPtr = modelIdPtrMap[modelId];
+        const internal::ModelInfo* modelPtr = modelIdPtrMap[modelId];
         if (modelPtr != nullptr) {
           return modelPtr->lightEmitterId;
         }
@@ -256,7 +256,7 @@ namespace ammonite {
     void deleteBuffers(models::internal::ModelData* modelObjectData) {
       //Delete created buffers and the VAO
       for (unsigned int i = 0; i < modelObjectData->meshes.size(); i++) {
-        models::internal::MeshData* meshData = &modelObjectData->meshes[i];
+        const models::internal::MeshData* meshData = &modelObjectData->meshes[i];
 
         glDeleteBuffers(1, &meshData->vertexBufferId);
         glDeleteBuffers(1, &meshData->elementBufferId);
@@ -429,7 +429,7 @@ namespace ammonite {
       }
 
       //Apply texture to every mesh on the model
-      internal::ModelData* modelObjectData = modelPtr->modelData;
+      const internal::ModelData* modelObjectData = modelPtr->modelData;
       for (unsigned int i = 0; i < modelObjectData->meshes.size(); i++) {
         GLuint* textureIdPtr = nullptr;
         if (textureType == AMMONITE_DIFFUSE_TEXTURE) {
@@ -467,7 +467,7 @@ namespace ammonite {
 
     //Return the number of indices on a model
     unsigned int getIndexCount(AmmoniteId modelId) {
-      internal::ModelInfo* modelPtr = modelIdPtrMap[modelId];
+      const internal::ModelInfo* modelPtr = modelIdPtrMap[modelId];
       if (modelPtr == nullptr) {
         return 0;
       }
@@ -483,7 +483,7 @@ namespace ammonite {
 
     //Return the number of vertices on a model
     unsigned int getVertexCount(AmmoniteId modelId) {
-      internal::ModelInfo* modelPtr = modelIdPtrMap[modelId];
+      const internal::ModelInfo* modelPtr = modelIdPtrMap[modelId];
       if (modelPtr == nullptr) {
         return 0;
       }
@@ -519,7 +519,7 @@ namespace ammonite {
     namespace position {
       glm::vec3 getPosition(AmmoniteId modelId) {
         //Get the model and check it exists
-        models::internal::ModelInfo* modelObject = modelIdPtrMap[modelId];
+        const models::internal::ModelInfo* modelObject = modelIdPtrMap[modelId];
         if (modelObject == nullptr) {
           return glm::vec3(0.0f);
         }
@@ -530,7 +530,7 @@ namespace ammonite {
 
       glm::vec3 getScale(AmmoniteId modelId) {
         //Get the model and check it exists
-        models::internal::ModelInfo* modelObject = modelIdPtrMap[modelId];
+        const models::internal::ModelInfo* modelObject = modelIdPtrMap[modelId];
         if (modelObject == nullptr) {
           return glm::vec3(0.0f);
         }
@@ -541,7 +541,7 @@ namespace ammonite {
       //Return rotation, in radians
       glm::vec3 getRotation(AmmoniteId modelId) {
         //Get the model and check it exists
-        models::internal::ModelInfo* modelObject = modelIdPtrMap[modelId];
+        const models::internal::ModelInfo* modelObject = modelIdPtrMap[modelId];
         if (modelObject == nullptr) {
           return glm::vec3(0.0f);
         }

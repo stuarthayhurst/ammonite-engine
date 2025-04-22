@@ -60,7 +60,7 @@ namespace ammonite {
 
     //Thread pool work to cache a program
     void doCacheWork(void* userPtr) {
-      CacheWorkerData* data = (CacheWorkerData*)userPtr;
+      const CacheWorkerData* data = (CacheWorkerData*)userPtr;
 
       //Prepare user data required to load the cache again
       const std::string userData = std::to_string(data->binaryFormat) + "\n";
@@ -188,8 +188,8 @@ namespace ammonite {
 
       //Read the shader's source code
       std::size_t shaderCodeSize = 0;
-      char* shaderCodePtr = (char*)ammonite::utils::files::loadFile(shaderPath,
-                                                                    &shaderCodeSize);
+      const char* shaderCodePtr = (const char*)ammonite::utils::files::loadFile(shaderPath,
+        &shaderCodeSize);
       if (shaderCodePtr == nullptr) {
         ammonite::utils::warning << "Failed to open '" << shaderPath << "'" << std::endl;
         return 0;
@@ -287,7 +287,7 @@ namespace ammonite {
         AmmoniteEnum cacheState = AMMONITE_CACHE_INVALID;
 
         //Attempt to load the cached program
-        unsigned char* cacheData = ammonite::utils::files::getCachedFile(&cacheFilePath,
+        const unsigned char* cacheData = ammonite::utils::files::getCachedFile(&cacheFilePath,
           shaderPaths, shaderCount, &cacheDataSize, &userData, &userDataSize, &cacheState);
 
         //Fetch and validate binary format

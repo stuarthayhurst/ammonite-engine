@@ -84,7 +84,7 @@ namespace ammonite {
          - Repeat this process for every character of every path
         */
         for (unsigned int i = 0; i < fileCount; i++) {
-          uint8_t* filePath = (uint8_t*)filePaths[i].c_str();
+          const uint8_t* filePath = (uint8_t*)filePaths[i].c_str();
           const unsigned int pathLength = filePaths[i].length();
           for (unsigned int i = 0; i < pathLength; i++) {
             output[0] ^= filePath[i];

@@ -81,7 +81,7 @@ namespace {
   }
 
   void resubmitTask(void* userPtr) {
-    ResubmitData* dataPtr = (ResubmitData*)userPtr;
+    const ResubmitData* dataPtr = (ResubmitData*)userPtr;
     ammonite::utils::thread::submitWork(shortTask, dataPtr->writePtr, dataPtr->syncPtr);
   }
 

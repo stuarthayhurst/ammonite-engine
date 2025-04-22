@@ -54,7 +54,7 @@ namespace ammonite {
 
       void updateMatrices() {
         //Get the active camera
-        Camera* activeCamera = &cameraTrackerMap[activeCameraId];
+        const Camera* activeCamera = &cameraTrackerMap[activeCameraId];
 
         //Vector for current direction faced
         const glm::vec3 direction = calculateDirection(activeCamera->verticalAngle,
@@ -124,7 +124,7 @@ namespace ammonite {
 
     glm::vec3 getDirection(AmmoniteId cameraId) {
       if (cameraTrackerMap.contains(cameraId)) {
-        Camera* activeCamera = &cameraTrackerMap[cameraId];
+        const Camera* activeCamera = &cameraTrackerMap[cameraId];
         const glm::vec3 direction = calculateDirection(activeCamera->verticalAngle,
                                                        activeCamera->horizontalAngle);
         return glm::normalize(direction);
