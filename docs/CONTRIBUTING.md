@@ -33,8 +33,12 @@
     - `FAST`: `true / false` - Compiles with `-march=native` and uses a no-error context
     - `USE_LLVM_CPP`: `true / false` - Link against `libc++` instead of `libstdc++`
     - `USE_SYSTEM`: `true / false` - Use the system copy of Ammonite's headers, library and package config for the client code
-    - `CHECK_LEAKS`: `true / false` - Enables `-fsanitize=leak` for runtime leak checking
+    - `CHECK_ADDRESS`: `true / false` - Enables `-fsanitize=address` for runtime memory error checking
+    - `CHECK_UNDEFINED`: `true / false` - Enables `-fsanitize=undefined` for runtime undefined behaviour checking
     - `CHECK_THREADS`: `true / false` - Enables `-fsanitize=thread` for runtime data race checking 
+    - `CHECK_TYPES`: `true / false` - Enables `-fsanitize=type` for runtime type aliasing violation checking
+    - `CHECK_MEMORY`: `true / false` - Enables `-fsanitize=memory` for runtime uninitialised read checking
+    - `CHECK_LEAKS`: `true / false` - Enables `-fsanitize=leak` for runtime leak checking
     - `BUILD_DIR` - Use a different directory for temporary build system files
     - `PREFIX_DIR` - Change the base install path
       - `INSTALL_DIR` - Install `libammonite.so` and `ammonite.pc` to a different location
@@ -45,7 +49,8 @@
 ## Debug mode:
   - To compile in debug mode, use `make debug` or `DEBUG=true make ...`
     - This enables additional checks and debug output from the engine
-    - Makes use of `-fsanitize=address,undefined,leak` and `-fno-omit-frame-pointer`
+    - Makes use of `-fsanitize=address,undefined` and `-fno-omit-frame-pointer`
+      - `-fsanitize=address,undefined` will be skipped if explicitly disabled, or incompatible options are used
     - It'll also enable graphics API debug warnings, messages and errors
       - This will use a debug graphics context, if available
     - Each object is compiled with debugging symbols, and `strip` is skipped

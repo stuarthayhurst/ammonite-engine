@@ -26,38 +26,38 @@ jobs:
         sudo apt-get install g++-14 clang-19
         sudo apt-get install --no-install-recommends libglm-dev libglfw3-dev libglew-dev libstb-dev libassimp-dev
 
-    - name: (g++) (DEBUG) Build thread tester
+    - name: (g++) (DEBUG + ASan + UBSan) Build thread tester
       run: |
         make clean
         CXX="g++-14" DEBUG="true" make threads -j$(nproc)
 
-    - name: (g++) (DEBUG) Run thread tester
+    - name: (g++) (DEBUG + ASan + UBSan) Run thread tester
       run: |
         ./launch.sh --threads
 
-    - name: (g++) (CHECK_THREADS) Build thread tester
+    - name: (g++) (DEBUG + TSan) Build thread tester
       run: |
         make clean
-        CXX="g++-14" CHECK_THREADS="true" make threads -j$(nproc)
+        CXX="g++-14" CHECK_THREADS="true" DEBUG="true" make threads -j$(nproc)
 
-    - name: (g++) (CHECK_THREADS) Run thread tester
+    - name: (g++) (DEBUG + TSan) Run thread tester
       run: |
         ./launch.sh --threads
 
-    - name: (clang++) (DEBUG) Build thread tester
+    - name: (clang++) (DEBUG + ASan + UBSan) Build thread tester
       run: |
         make clean
         CXX="clang++-19" DEBUG="true" make threads -j$(nproc)
 
-    - name: (clang++) (DEBUG) Run thread tester
+    - name: (clang++) (DEBUG + ASan + UBSan) Run thread tester
       run: |
         ./launch.sh --threads
 
-    - name: (clang++) (CHECK_THREADS) Build thread tester
+    - name: (clang++) (DEBUG + TSan) Build thread tester
       run: |
         make clean
-        CXX="clang++-19" CHECK_THREADS="true" make threads -j$(nproc)
+        CXX="clang++-19" CHECK_THREADS="true" DEBUG="true" make threads -j$(nproc)
 
-    - name: (clang++) (CHECK_THREADS) Run thread tester
+    - name: (clang++) (DEBUG + TSan) Run thread tester
       run: |
         ./launch.sh --threads
