@@ -74,7 +74,8 @@ namespace ammonite {
       }
 #else
       std::string hashStrings(std::string* filePaths, unsigned int fileCount) {
-        alignas(uintmax_t) uint8_t output[sizeof(uintmax_t)] = {0};
+        constexpr unsigned int hashWidth = 8;
+        alignas(uintmax_t) uint8_t output[hashWidth] = {0};
         uint8_t prev = 0;
 
         /*
@@ -88,17 +89,18 @@ namespace ammonite {
           const unsigned int pathLength = filePaths[i].length();
           for (unsigned int i = 0; i < pathLength; i++) {
             output[0] ^= filePath[i];
-            for (unsigned int j = 0; j < sizeof(uintmax_t); j++) {
+            for (unsigned int j = 0; j < sizeof(output); j++) {
               output[j] ^= prev;
               prev = output[j];
             }
           }
         }
 
-        std::string outputString(sizeof(uintmax_t) * 2, 0);
-        const uintmax_t result = *(uintmax_t*)output;
-        for (uintmax_t i = 0; i < sizeof(uintmax_t) * 2; i++) {
-          outputString[i] = (char)('A' + (char)((result >> (i * 4)) & 0xFull));
+        //Split upper and lower half of each byte, add to 'A' and store
+        std::string outputString(sizeof(output) * 2, 0);
+        for (unsigned int i = 0; i < sizeof(output) * 2; i++) {
+          const char value = (char)((output[i / 2] >> ((i % 2) * 4)) & 0xF);
+          outputString[i] = (char)('A' + value);
         }
 
         return outputString;
