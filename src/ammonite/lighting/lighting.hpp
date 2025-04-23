@@ -1,7 +1,7 @@
 #ifndef INTERNALLIGHTING
 #define INTERNALLIGHTING
 
-#include <map>
+#include <unordered_map>
 
 #include <GL/glew.h>
 #include <glm/glm.hpp>
@@ -26,13 +26,12 @@ namespace ammonite {
       };
 
       void unlinkByModel(AmmoniteId modelId);
-      LightSource* getLightSourcePtr(AmmoniteId lightId);
 
       void updateLightSources();
       void setLightSourcesChanged();
       void destroyLightSystem();
 
-      std::map<AmmoniteId, LightSource>* getLightTrackerPtr();
+      std::unordered_map<AmmoniteId, LightSource>* getLightTrackerPtr();
       GLfloat** getLightTransformsPtr();
     }
   }

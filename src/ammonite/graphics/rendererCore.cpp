@@ -2,8 +2,8 @@
 #include <cstdlib>
 #include <iostream>
 #include <iterator>
-#include <map>
 #include <string>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -66,7 +66,7 @@ namespace ammonite {
       glm::mat4* projectionMatrix = ammonite::camera::internal::getProjectionMatrixPtr();
 
       //Get the light trackers
-      std::map<AmmoniteId, ammonite::lighting::internal::LightSource>* lightTrackerMap =
+      std::unordered_map<AmmoniteId, ammonite::lighting::internal::LightSource>* lightTrackerMap =
         ammonite::lighting::internal::getLightTrackerPtr();
       GLfloat** lightTransformsPtr = ammonite::lighting::internal::getLightTransformsPtr();
       unsigned int maxLightCount = 0;
@@ -524,7 +524,7 @@ namespace ammonite {
         //Swap to loading screen shader
         loadingShader.useShader();
 
-        //Pass drawing parameters
+        //Pass drawing parameters, pointer is only valid for this frame
         splash::internal::LoadingScreen* loadingScreen =
           splash::internal::getLoadingScreenPtr(loadingScreenId);
         glUniform1f(loadingShader.widthId, loadingScreen->width);

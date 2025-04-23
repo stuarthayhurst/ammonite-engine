@@ -1,7 +1,7 @@
 #include <cstddef>
 #include <cstring>
 #include <iterator>
-#include <map>
+#include <unordered_map>
 #include <utility>
 
 #include <GL/glew.h>
@@ -17,89 +17,87 @@
 #include "../utils/thread.hpp"
 
 namespace ammonite {
-  namespace {
-    //Lighting shader storage buffer IDs
-    GLuint lightDataId = 0;
+  namespace lighting {
+    namespace {
+      //Lighting shader storage buffer IDs
+      GLuint lightDataId = 0;
 
-    //Default ambient light
-    glm::vec3 ambientLight = glm::vec3(0.0f, 0.0f, 0.0f);
+      //Default ambient light
+      glm::vec3 ambientLight = glm::vec3(0.0f, 0.0f, 0.0f);
 
-    //Track light sources
-    std::map<AmmoniteId, lighting::internal::LightSource> lightTrackerMap;
-    GLfloat* lightTransforms = nullptr;
-    unsigned int prevLightCount = 0;
-    bool lightSourcesChanged = false;
-    AmmoniteId lastLightId = 0;
+      //Track light sources
+      std::unordered_map<AmmoniteId, lighting::internal::LightSource> lightTrackerMap;
+      GLfloat* lightTransforms = nullptr;
+      unsigned int prevLightCount = 0;
+      bool lightSourcesChanged = false;
+      AmmoniteId lastLightId = 0;
 
-    //Data structure to pass light sources into shader
-    struct ShaderLightSource {
-      glm::vec4 geometry;
-      glm::vec4 diffuse;
-      glm::vec4 specular;
-      glm::vec4 power;
-    };
-
-    //Data used by the light worker
-    struct LightWorkerData {
-      glm::mat4* shadowProj;
-      unsigned int i;
-    };
-
-    ShaderLightSource* shaderData = nullptr;
-    LightWorkerData* workerData = nullptr;
-  }
-
-  namespace {
-    void lightWork(void* userPtr) {
-      const unsigned int i = ((LightWorkerData*)userPtr)->i;
-      const glm::mat4* shadowProj = ((LightWorkerData*)userPtr)->shadowProj;
-
-      //Repacking light sources
-      auto lightIt = lightTrackerMap.begin();
-      std::advance(lightIt, i);
-      lighting::internal::LightSource* lightSource = &lightIt->second;
-      lightSource->lightIndex = i;
-
-      //Override position for light emitting models, and add to tracker
-      if (lightSource->modelId != 0) {
-        //Override light position, using linked model
-        lightSource->geometry = ammonite::models::position::getPosition(lightSource->modelId);
-
-        //Update lightIndex for rendering light emitting models
-        auto modelPtr = ammonite::models::internal::getModelPtr(lightSource->modelId);
-        modelPtr->lightIndex = lightSource->lightIndex;
-      }
-
-      //Calculate shadow transforms for shadows
-      const glm::vec3 lightPos = lightSource->geometry;
-
-      glm::mat4 transforms[6] = {
-        *shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)),
-        *shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)),
-        *shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0)),
-        *shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0)),
-        *shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0)),
-        *shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0))
+      //Data structure to pass light sources into shader
+      struct ShaderLightSource {
+        glm::vec4 geometry;
+        glm::vec4 diffuse;
+        glm::vec4 specular;
+        glm::vec4 power;
       };
 
-      const std::size_t matSize = (std::size_t)4 * 4;
-      GLfloat* transformStart = lightTransforms + (matSize * 6 * lightSource->lightIndex);
-      for (int i = 0; i < 6; i++) {
-        std::memcpy(transformStart + (matSize * i), glm::value_ptr(transforms[i]), matSize * sizeof(GLfloat));
+      //Data used by the light worker
+      struct LightWorkerData {
+        glm::mat4* shadowProj;
+        unsigned int i;
+      };
+
+      ShaderLightSource* shaderData = nullptr;
+      LightWorkerData* workerData = nullptr;
+    }
+
+    namespace {
+      void lightWork(void* userPtr) {
+        const unsigned int i = ((LightWorkerData*)userPtr)->i;
+        const glm::mat4* shadowProj = ((LightWorkerData*)userPtr)->shadowProj;
+
+        //Repacking light sources
+        auto lightIt = lightTrackerMap.begin();
+        std::advance(lightIt, i);
+        lighting::internal::LightSource* lightSource = &lightIt->second;
+        lightSource->lightIndex = i;
+
+        //Override position for light emitting models, and add to tracker
+        if (lightSource->modelId != 0) {
+          //Override light position, using linked model
+          lightSource->geometry = ammonite::models::position::getPosition(lightSource->modelId);
+
+          //Update lightIndex for rendering light emitting models
+          auto modelPtr = ammonite::models::internal::getModelPtr(lightSource->modelId);
+          modelPtr->lightIndex = lightSource->lightIndex;
+        }
+
+        //Calculate shadow transforms for shadows
+        const glm::vec3 lightPos = lightSource->geometry;
+
+        glm::mat4 transforms[6] = {
+          *shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)),
+          *shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)),
+          *shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0)),
+          *shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0)),
+          *shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0)),
+          *shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0))
+        };
+
+        const std::size_t matSize = (std::size_t)4 * 4;
+        GLfloat* transformStart = lightTransforms + (matSize * 6 * lightSource->lightIndex);
+        for (int i = 0; i < 6; i++) {
+          std::memcpy(transformStart + (matSize * i), glm::value_ptr(transforms[i]), matSize * sizeof(GLfloat));
+        }
+
+        //Repack lighting information
+        shaderData[i].geometry = glm::vec4(lightSource->geometry, 0.0f);
+        shaderData[i].diffuse = glm::vec4(lightSource->diffuse, 0.0f);
+        shaderData[i].specular = glm::vec4(lightSource->specular, 0.0f);
+        shaderData[i].power = glm::vec4(lightSource->power, 0.0f, 0.0f, 0.0f);
       }
 
-      //Repack lighting information
-      shaderData[i].geometry = glm::vec4(lightSource->geometry, 0.0f);
-      shaderData[i].diffuse = glm::vec4(lightSource->diffuse, 0.0f);
-      shaderData[i].specular = glm::vec4(lightSource->specular, 0.0f);
-      shaderData[i].power = glm::vec4(lightSource->power, 0.0f, 0.0f, 0.0f);
-    }
-  }
-
-  namespace lighting {
-    //Internally exposed light handling methods
-    namespace internal {
-      LightSource* getLightSourcePtr(AmmoniteId lightId) {
+      //Pointer is only valid until lightTrackerMap is modified
+      internal::LightSource* getLightSourcePtr(AmmoniteId lightId) {
         //Check the light source exists, and return a pointer
         if (lightTrackerMap.contains(lightId)) {
           return &lightTrackerMap[lightId];
@@ -107,8 +105,12 @@ namespace ammonite {
 
         return nullptr;
       }
+    }
 
-      std::map<AmmoniteId, LightSource>* getLightTrackerPtr() {
+
+    //Internally exposed light handling methods
+    namespace internal {
+      std::unordered_map<AmmoniteId, LightSource>* getLightTrackerPtr() {
         return &lightTrackerMap;
       }
 
@@ -235,8 +237,7 @@ namespace ammonite {
       ammonite::lighting::internal::unlinkByModel(modelId);
 
       //If the light source is already linked to another model, reset the linked model
-      ammonite::lighting::internal::LightSource* lightSource =
-        ammonite::lighting::internal::getLightSourcePtr(lightId);
+      internal::LightSource* lightSource = &lightTrackerMap[lightId];
       if (lightSource->modelId != 0) {
         ammonite::models::internal::setLightEmitterId(lightSource->modelId, 0);
       }
@@ -249,7 +250,7 @@ namespace ammonite {
 
     void unlinkModel(AmmoniteId lightId) {
       //Unlink the attached model from the light source
-      ammonite::lighting::internal::LightSource* lightSource = ammonite::lighting::internal::getLightSourcePtr(lightId);
+      internal::LightSource* lightSource = &lightTrackerMap[lightId];
       ammonite::models::internal::setLightEmitterId(lightSource->modelId, 0);
       lightSource->modelId = 0;
       lightSourcesChanged = true;
@@ -287,14 +288,12 @@ namespace ammonite {
     glm::vec3 getAmbientLight() {
       return ambientLight;
     }
-  }
 
-  //Exposed methods to modify light properties
-  namespace lighting {
+
+    //Exposed functions to modify light properties
     namespace properties {
       glm::vec3 getGeometry(AmmoniteId lightId) {
-        const ammonite::lighting::internal::LightSource* lightSource =
-          ammonite::lighting::internal::getLightSourcePtr(lightId);
+        const internal::LightSource* lightSource = getLightSourcePtr(lightId);
         if (lightSource == nullptr) {
           return glm::vec3(0.0f);
         }
@@ -303,8 +302,7 @@ namespace ammonite {
       }
 
       glm::vec3 getColour(AmmoniteId lightId) {
-        const ammonite::lighting::internal::LightSource* lightSource =
-          ammonite::lighting::internal::getLightSourcePtr(lightId);
+        const internal::LightSource* lightSource = getLightSourcePtr(lightId);
         if (lightSource == nullptr) {
           return glm::vec3(0.0f);
         }
@@ -313,8 +311,7 @@ namespace ammonite {
       }
 
       float getPower(AmmoniteId lightId) {
-        const ammonite::lighting::internal::LightSource* lightSource =
-          ammonite::lighting::internal::getLightSourcePtr(lightId);
+        const internal::LightSource* lightSource = getLightSourcePtr(lightId);
         if (lightSource == nullptr) {
           return 0.0f;
         }
@@ -323,8 +320,7 @@ namespace ammonite {
       }
 
       void setGeometry(AmmoniteId lightId, glm::vec3 geometry) {
-        ammonite::lighting::internal::LightSource* lightSource =
-          ammonite::lighting::internal::getLightSourcePtr(lightId);
+        internal::LightSource* lightSource = getLightSourcePtr(lightId);
         if (lightSource != nullptr) {
           lightSource->geometry = geometry;
           lightSourcesChanged = true;
@@ -332,8 +328,7 @@ namespace ammonite {
       }
 
       void setColour(AmmoniteId lightId, glm::vec3 colour) {
-        ammonite::lighting::internal::LightSource* lightSource =
-          ammonite::lighting::internal::getLightSourcePtr(lightId);
+        internal::LightSource* lightSource = getLightSourcePtr(lightId);
         if (lightSource != nullptr) {
           lightSource->diffuse = colour;
           lightSourcesChanged = true;
@@ -341,8 +336,7 @@ namespace ammonite {
       }
 
       void setPower(AmmoniteId lightId, float power) {
-        ammonite::lighting::internal::LightSource* lightSource =
-          ammonite::lighting::internal::getLightSourcePtr(lightId);
+        internal::LightSource* lightSource = getLightSourcePtr(lightId);
         if (lightSource != nullptr) {
           lightSource->power = power;
           lightSourcesChanged = true;

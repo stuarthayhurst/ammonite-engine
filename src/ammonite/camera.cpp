@@ -1,5 +1,5 @@
 #include <cmath>
-#include <map>
+#include <unordered_map>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -29,7 +29,7 @@ namespace ammonite {
       //Create map to track cameras, with default camera
       AmmoniteId lastCameraId = 1;
       AmmoniteId activeCameraId = 1;
-      std::map<AmmoniteId, Camera> cameraTrackerMap = {{1, defaultCamera}};
+      std::unordered_map<AmmoniteId, Camera> cameraTrackerMap = {{1, defaultCamera}};
     }
 
     namespace {

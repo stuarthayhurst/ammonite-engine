@@ -1,5 +1,5 @@
 #include <iostream>
-#include <map>
+#include <unordered_map>
 
 #include "splash.hpp"
 
@@ -12,11 +12,12 @@ namespace ammonite {
     namespace {
       AmmoniteId activeLoadingScreenId = 0;
       AmmoniteId lastLoadingScreenId = 0;
-      std::map<AmmoniteId, internal::LoadingScreen> loadingScreenTracker;
+      std::unordered_map<AmmoniteId, internal::LoadingScreen> loadingScreenTracker;
     }
 
     //Internally exposed functions
     namespace internal {
+      //Pointer is only valid until loadingScreenTracker is modified
       LoadingScreen* getLoadingScreenPtr(AmmoniteId loadingScreenId) {
         return &loadingScreenTracker[loadingScreenId];
       }

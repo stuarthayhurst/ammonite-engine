@@ -205,7 +205,6 @@ namespace ammonite {
           const AmmoniteId keybindId = it->first;
           KeybindData* keybindData = &it->second;
 
-
           //Check all keys are held
           bool runCallback = true;
           std::vector<int>* keycodes = &keybindData->keycodes;

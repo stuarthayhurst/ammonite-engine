@@ -1,8 +1,8 @@
 #include <algorithm>
+#include <cmath>
 #include <iostream>
 #include <string>
-#include <map>
-#include <cmath>
+#include <unordered_map>
 
 #include <GL/glew.h>
 
@@ -25,8 +25,8 @@ namespace ammonite {
           unsigned int refCount = 0;
         };
 
-        std::map<GLuint, TextureInfo> idTextureMap;
-        std::map<std::string, TextureInfo*> stringTexturePtrMap;
+        std::unordered_map<GLuint, TextureInfo> idTextureMap;
+        std::unordered_map<std::string, TextureInfo*> stringTexturePtrMap;
       }
 
       namespace {

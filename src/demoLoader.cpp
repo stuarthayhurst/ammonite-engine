@@ -1,8 +1,8 @@
 #include <cstdlib>
 #include <iostream>
-#include <map>
 #include <print>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include <ammonite/ammonite.hpp>
@@ -34,7 +34,7 @@ namespace {
     DemoFunctionType demoExit;
   };
 
-  std::map<std::string, DemoFunctions> demoFunctionMap = {
+  std::unordered_map<std::string, DemoFunctions> demoFunctionMap = {
     EXPAND_DEMO("object-field", objectFieldDemo),
     EXPAND_DEMO("many-cubes", manyCubesDemo),
     EXPAND_DEMO("monkey", monkeyDemo),
