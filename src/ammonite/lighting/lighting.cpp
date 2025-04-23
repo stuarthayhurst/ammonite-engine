@@ -2,7 +2,6 @@
 #include <cstring>
 #include <iterator>
 #include <unordered_map>
-#include <utility>
 
 #include <GL/glew.h>
 #include <glm/glm.hpp>
