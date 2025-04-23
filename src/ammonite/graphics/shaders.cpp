@@ -51,7 +51,6 @@ namespace ammonite {
       void DepthShader::setUniformLocations() {
         modelMatrixId = glGetUniformLocation(shaderId, "modelMatrix");
         shadowFarPlaneId = glGetUniformLocation(shaderId, "shadowFarPlane");
-        depthLightPosId = glGetUniformLocation(shaderId, "lightPos");
         shadowMatrixId = glGetUniformLocation(shaderId, "shadowMatrices");
         depthShadowIndex = glGetUniformLocation(shaderId, "shadowMapIndex");
       }

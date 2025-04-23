@@ -21,6 +21,7 @@ namespace ammonite {
     void setAmbientLight(glm::vec3 newAmbientLight);
 
     unsigned int getMaxLightCount();
+    unsigned int getLightCount();
     AmmoniteId createLightSource();
     void deleteLightSource(AmmoniteId lightId);
 

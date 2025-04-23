@@ -51,7 +51,6 @@ namespace ammonite {
       public:
         GLint modelMatrixId;
         GLint shadowFarPlaneId;
-        GLint depthLightPosId;
         GLint shadowMatrixId;
         GLint depthShadowIndex;
       };

@@ -20,19 +20,20 @@ namespace ammonite {
     namespace {
       //Lighting shader storage buffer IDs
       GLuint lightDataId = 0;
+      GLuint shadowDataId = 0;
 
       //Default ambient light
       glm::vec3 ambientLight = glm::vec3(0.0f, 0.0f, 0.0f);
 
       //Track light sources
       std::unordered_map<AmmoniteId, lighting::internal::LightSource> lightTrackerMap;
-      GLfloat* lightTransforms = nullptr;
       unsigned int prevLightCount = 0;
       bool lightSourcesChanged = false;
       AmmoniteId lastLightId = 0;
 
       //Data structure to match shader light sources in shader
       using ShaderLightSource = glm::vec4[3];
+      using ShaderShadowTransform = GLfloat[4z * 4z * 6z];
 
       //Data used by the light worker
       struct LightWorkerData {
@@ -40,7 +41,8 @@ namespace ammonite {
         unsigned int i;
       };
 
-      ShaderLightSource* shaderData = nullptr;
+      ShaderLightSource* shaderLightData = nullptr;
+      ShaderShadowTransform* shaderShadowData = nullptr;
       LightWorkerData* workerData = nullptr;
     }
 
@@ -65,9 +67,13 @@ namespace ammonite {
           modelPtr->lightIndex = lightSource->lightIndex;
         }
 
-        //Calculate shadow transforms for shadows
-        const glm::vec3 lightPos = lightSource->geometry;
+        //Repack lighting information
+        shaderLightData[i][0] = glm::vec4(lightSource->geometry, 0.0f);
+        shaderLightData[i][1] = glm::vec4(lightSource->diffuse, 0.0f);
+        shaderLightData[i][2] = glm::vec4(lightSource->specular, lightSource->power);
 
+        //Calculate shadow transforms
+        const glm::vec3 lightPos = lightSource->geometry;
         glm::mat4 transforms[6] = {
           *shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)),
           *shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)),
@@ -77,16 +83,13 @@ namespace ammonite {
           *shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0))
         };
 
+        //Pack shadow transforms
         const std::size_t matSize = 4z * 4z;
-        GLfloat* transformStart = lightTransforms + (matSize * 6 * lightSource->lightIndex);
-        for (int i = 0; i < 6; i++) {
-          std::memcpy(transformStart + (matSize * i), glm::value_ptr(transforms[i]), matSize * sizeof(GLfloat));
+        GLfloat* transformBlockStart = shaderShadowData[lightSource->lightIndex];
+        for (int face = 0; face < 6; face++) {
+          std::memcpy(transformBlockStart + (matSize * face), glm::value_ptr(transforms[face]),
+                      matSize * sizeof(GLfloat));
         }
-
-        //Repack lighting information
-        shaderData[i][0] = glm::vec4(lightSource->geometry, 0.0f);
-        shaderData[i][1] = glm::vec4(lightSource->diffuse, 0.0f);
-        shaderData[i][2] = glm::vec4(lightSource->specular, lightSource->power);
       }
 
       //Pointer is only valid until lightTrackerMap is modified
@@ -103,21 +106,15 @@ namespace ammonite {
 
     //Internally exposed light handling methods
     namespace internal {
-      std::unordered_map<AmmoniteId, LightSource>* getLightTrackerPtr() {
-        return &lightTrackerMap;
-      }
-
-      GLfloat** getLightTransformsPtr() {
-        return &lightTransforms;
-      }
-
       void destroyLightSystem() {
         if (lightDataId != 0) {
           glDeleteBuffers(1, &lightDataId);
+          glDeleteBuffers(1, &shadowDataId);
         }
 
-        if (shaderData != nullptr) {
-          delete [] shaderData;
+        if (shaderLightData != nullptr) {
+          delete [] shaderLightData;
+          delete [] shaderShadowData;
           delete [] workerData;
         }
       }
@@ -149,6 +146,11 @@ namespace ammonite {
           glDeleteBuffers(1, &lightDataId);
           glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, 0);
           lightDataId = 0;
+
+          glDeleteBuffers(1, &shadowDataId);
+          glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, 0);
+          shadowDataId = 0;
+
           lightSourcesChanged = false;
           return;
         }
@@ -158,20 +160,21 @@ namespace ammonite {
                                                 1.0f, 0.0f, shadowFarPlane);
 
         //Resize buffers
-        const std::size_t shaderDataSize = sizeof(ShaderLightSource) * lightCount;
+        const std::size_t shaderLightDataSize = sizeof(ShaderLightSource) * lightCount;
+        const std::size_t shaderShadowDataSize = sizeof(ShaderShadowTransform) * lightCount;
         if (prevLightCount != lightCount) {
-          if (lightTransforms != nullptr) {
-            delete [] lightTransforms;
-            delete [] shaderData;
+          if (shaderLightData != nullptr) {
+            delete [] shaderLightData;
+            delete [] shaderShadowData;
             delete [] workerData;
           }
 
-          lightTransforms = new GLfloat[(std::size_t)(lightCount) * 6 * 4 * 4];
-          shaderData = new ShaderLightSource[lightCount];
+          shaderLightData = new ShaderLightSource[lightCount];
+          shaderShadowData = new ShaderShadowTransform[lightCount];
           workerData = new LightWorkerData[lightCount];
         }
 
-        //Repack light sources into ShaderData (uses vec4s for OpenGL)
+        //Repack light sources into buffers (uses vec4s for OpenGL)
         for (unsigned int i = 0; i < lightCount; i++) {
           workerData[i].shadowProj = &shadowProj;
           workerData[i].i = i;
@@ -183,20 +186,26 @@ namespace ammonite {
 
         //If the light count hasn't changed, sub the data instead of recreating the buffer
         if (prevLightCount == lightTrackerMap.size()) {
-          glNamedBufferSubData(lightDataId, 0, (GLsizeiptr)shaderDataSize, shaderData);
+          glNamedBufferSubData(lightDataId, 0, (GLsizeiptr)shaderLightDataSize, shaderLightData);
+          glNamedBufferSubData(shadowDataId, 0, (GLsizeiptr)shaderShadowDataSize, shaderShadowData);
         } else {
-          //If the buffer already exists, destroy it
+          //If the buffers already exist, destroy them
           if (lightDataId != 0) {
             glDeleteBuffers(1, &lightDataId);
+            glDeleteBuffers(1, &shadowDataId);
           }
 
           //Add the shader data to a shader storage buffer object
           glCreateBuffers(1, &lightDataId);
-          glNamedBufferData(lightDataId, (GLsizeiptr)shaderDataSize, shaderData, GL_DYNAMIC_DRAW);
+          glNamedBufferData(lightDataId, (GLsizeiptr)shaderLightDataSize, shaderLightData, GL_DYNAMIC_DRAW);
+
+          glCreateBuffers(1, &shadowDataId);
+          glNamedBufferData(shadowDataId, (GLsizeiptr)shaderShadowDataSize, shaderShadowData, GL_DYNAMIC_DRAW);
         }
 
-        //Use the lighting shader storage buffer
+        //Use the lighting and shadow shader storage buffer
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, lightDataId);
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, shadowDataId);
 
         //Update previous light count for next run
         prevLightCount = lightTrackerMap.size();
@@ -204,7 +213,11 @@ namespace ammonite {
       }
     }
 
-    //Regular light handling methods
+
+    //Exposed light handling functions
+    unsigned int getLightCount() {
+      return lightTrackerMap.size();
+    }
 
     unsigned int getMaxLightCount() {
       //Get the max number of lights supported, from the max layers on a cubemap
@@ -260,14 +273,14 @@ namespace ammonite {
       }
 
       if (lightTrackerMap.empty()) {
-        if (lightTransforms != nullptr) {
-          delete [] lightTransforms;
-          delete [] shaderData;
+        if (shaderLightData != nullptr) {
+          delete [] shaderLightData;
+          delete [] shaderShadowData;
           delete [] workerData;
         }
 
-        lightTransforms = nullptr;
-        shaderData = nullptr;
+        shaderLightData = nullptr;
+        shaderShadowData = nullptr;
         workerData = nullptr;
       }
 

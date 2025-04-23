@@ -3,7 +3,11 @@
 layout (triangles) in;
 layout (triangle_strip, max_vertices = 18) out;
 
-uniform mat4 shadowMatrices[6];
+//Shadow transforms from shader storage buffer
+layout (std430, binding = 1) buffer ShadowMatricesBuffer {
+  mat4 shadowMatrices[][6];
+};
+
 uniform uint shadowMapIndex;
 
 out vec4 fragPos;
@@ -15,7 +19,7 @@ void main() {
 
     for (int i = 0; i < 3; i++) {
       fragPos = gl_in[i].gl_Position;
-      gl_Position = shadowMatrices[face] * fragPos;
+      gl_Position = shadowMatrices[shadowMapIndex][face] * fragPos;
 
       EmitVertex();
     }
