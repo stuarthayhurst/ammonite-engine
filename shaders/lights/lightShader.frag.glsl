@@ -1,11 +1,11 @@
 #version 430 core
 
 //Data structure to handle input from shader storage buffer object
+//specular.w is actually power
 struct LightSource {
   vec3 geometry;
   vec3 diffuse;
-  vec3 specular;
-  vec3 power;
+  vec4 specular;
 };
 
 //Lighting inputs from shader storage buffer

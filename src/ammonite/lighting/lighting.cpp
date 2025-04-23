@@ -37,7 +37,6 @@ namespace ammonite {
         glm::vec4 geometry;
         glm::vec4 diffuse;
         glm::vec4 specular;
-        glm::vec4 power;
       };
 
       //Data used by the light worker
@@ -92,8 +91,7 @@ namespace ammonite {
         //Repack lighting information
         shaderData[i].geometry = glm::vec4(lightSource->geometry, 0.0f);
         shaderData[i].diffuse = glm::vec4(lightSource->diffuse, 0.0f);
-        shaderData[i].specular = glm::vec4(lightSource->specular, 0.0f);
-        shaderData[i].power = glm::vec4(lightSource->power, 0.0f, 0.0f, 0.0f);
+        shaderData[i].specular = glm::vec4(lightSource->specular, lightSource->power);
       }
 
       //Pointer is only valid until lightTrackerMap is modified

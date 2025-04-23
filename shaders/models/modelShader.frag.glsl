@@ -1,11 +1,11 @@
 #version 430 core
 
 //Data structure to handle input from shader storage buffer object
+//specular.w is actually power
 struct LightSource {
   vec3 geometry;
   vec3 diffuse;
-  vec3 specular;
-  vec3 power;
+  vec4 specular;
 };
 
 //Lighting inputs from shader storage buffer
@@ -52,13 +52,13 @@ vec3 calcLight(LightSource lightSource, vec3 normal, vec3 fragPos, vec3 lightDir
     vec3 viewDir = normalize(cameraPos - fragPos);
     vec3 halfwayDir = normalize(lightDir + viewDir);
     float spec = pow(dot(normal, halfwayDir), 2.0);
-    specular = lightSource.specular * spec;
+    specular = lightSource.specular.xyz * spec;
     specular *= texture(specularSampler, fragData.texCoord).rgb;
   }
 
   //Attenuation of the source
   float dist = distance(lightSource.geometry, fragPos);
-  float attenuation = lightSource.power.x / (dist * dist);
+  float attenuation = lightSource.specular.w / (dist * dist);
 
   return (diffuse + specular) * attenuation;
 }
