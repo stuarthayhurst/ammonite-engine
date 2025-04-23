@@ -17,8 +17,8 @@
 
 //Model types
 enum AMMONITE_INTERNAL AmmoniteModelEnum : unsigned char {
-  AMMONITE_MODEL,
-  AMMONITE_LIGHT_EMITTER
+  AMMONITE_MODEL = 0,
+  AMMONITE_LIGHT_EMITTER = 1
 };
 
 namespace ammonite {
