@@ -32,12 +32,8 @@ namespace ammonite {
       bool lightSourcesChanged = false;
       AmmoniteId lastLightId = 0;
 
-      //Data structure to pass light sources into shader
-      struct ShaderLightSource {
-        glm::vec4 geometry;
-        glm::vec4 diffuse;
-        glm::vec4 specular;
-      };
+      //Data structure to match shader light sources in shader
+      using ShaderLightSource = glm::vec4[3];
 
       //Data used by the light worker
       struct LightWorkerData {
@@ -89,9 +85,9 @@ namespace ammonite {
         }
 
         //Repack lighting information
-        shaderData[i].geometry = glm::vec4(lightSource->geometry, 0.0f);
-        shaderData[i].diffuse = glm::vec4(lightSource->diffuse, 0.0f);
-        shaderData[i].specular = glm::vec4(lightSource->specular, lightSource->power);
+        shaderData[i][0] = glm::vec4(lightSource->geometry, 0.0f);
+        shaderData[i][1] = glm::vec4(lightSource->diffuse, 0.0f);
+        shaderData[i][2] = glm::vec4(lightSource->specular, lightSource->power);
       }
 
       //Pointer is only valid until lightTrackerMap is modified
