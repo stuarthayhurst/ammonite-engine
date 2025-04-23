@@ -78,7 +78,7 @@ namespace ammonite {
           *shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0))
         };
 
-        const std::size_t matSize = (std::size_t)4 * 4;
+        const std::size_t matSize = 4z * 4z;
         GLfloat* transformStart = lightTransforms + (matSize * 6 * lightSource->lightIndex);
         for (int i = 0; i < 6; i++) {
           std::memcpy(transformStart + (matSize * i), glm::value_ptr(transforms[i]), matSize * sizeof(GLfloat));
