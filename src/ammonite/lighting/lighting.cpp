@@ -110,6 +110,7 @@ namespace ammonite {
         if (lightDataId != 0) {
           glDeleteBuffers(1, &lightDataId);
           glDeleteBuffers(1, &shadowDataId);
+          prevLightCount = 0;
         }
 
         if (shaderLightData != nullptr) {
@@ -151,6 +152,7 @@ namespace ammonite {
           glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, 0);
           shadowDataId = 0;
 
+          prevLightCount = 0;
           lightSourcesChanged = false;
           return;
         }
@@ -193,6 +195,7 @@ namespace ammonite {
           if (lightDataId != 0) {
             glDeleteBuffers(1, &lightDataId);
             glDeleteBuffers(1, &shadowDataId);
+            prevLightCount = 0;
           }
 
           //Add the shader data to a shader storage buffer object
