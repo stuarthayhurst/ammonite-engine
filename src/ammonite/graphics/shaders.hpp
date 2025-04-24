@@ -52,7 +52,7 @@ namespace ammonite {
         GLint modelMatrixId;
         GLint shadowFarPlaneId;
         GLint shadowMatrixId;
-        GLint depthShadowIndex;
+        GLint depthShadowIndexId;
       };
 
       class SkyboxShader : public Shader {

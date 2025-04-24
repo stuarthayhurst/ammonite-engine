@@ -653,7 +653,7 @@ namespace ammonite {
           }
 
           //Pass light source specific uniforms
-          glUniform1ui(depthShader.depthShadowIndex, shadowCount);
+          glUniform1ui(depthShader.depthShadowIndexId, shadowCount);
 
           //Render to depth buffer and move to the next light source
           drawModelsCached(&modelPtrs, AMMONITE_MODEL, AMMONITE_DEPTH_PASS);

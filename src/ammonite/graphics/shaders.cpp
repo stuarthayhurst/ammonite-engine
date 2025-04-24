@@ -52,7 +52,7 @@ namespace ammonite {
         modelMatrixId = glGetUniformLocation(shaderId, "modelMatrix");
         shadowFarPlaneId = glGetUniformLocation(shaderId, "shadowFarPlane");
         shadowMatrixId = glGetUniformLocation(shaderId, "shadowMatrices");
-        depthShadowIndex = glGetUniformLocation(shaderId, "shadowMapIndex");
+        depthShadowIndexId = glGetUniformLocation(shaderId, "shadowMapIndex");
       }
 
       void SkyboxShader::setUniformLocations() {
