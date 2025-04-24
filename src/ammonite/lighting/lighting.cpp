@@ -37,19 +37,19 @@ namespace ammonite {
 
       //Data used by the light worker
       struct LightWorkerData {
-        glm::mat4* shadowProj;
         unsigned int i;
       };
+      glm::mat4 shadowProj;
 
       ShaderLightSource* shaderLightData = nullptr;
       ShaderShadowTransform* shaderShadowData = nullptr;
       LightWorkerData* workerData = nullptr;
+      AmmoniteGroup group{0};
     }
 
     namespace {
       void lightWork(void* userPtr) {
         const unsigned int i = ((LightWorkerData*)userPtr)->i;
-        const glm::mat4* shadowProj = ((LightWorkerData*)userPtr)->shadowProj;
 
         //Repacking light sources
         auto lightIt = lightTrackerMap.begin();
@@ -75,12 +75,12 @@ namespace ammonite {
         //Calculate shadow transforms
         const glm::vec3 lightPos = lightSource->geometry;
         glm::mat4 transforms[6] = {
-          *shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)),
-          *shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)),
-          *shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0)),
-          *shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0)),
-          *shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0)),
-          *shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0))
+          shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)),
+          shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)),
+          shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0)),
+          shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0)),
+          shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0)),
+          shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0))
         };
 
         //Pack shadow transforms
@@ -135,7 +135,8 @@ namespace ammonite {
         lightSourcesChanged = true;
       }
 
-      void updateLightSources() {
+      //Dispatch workers if the lighting buffers need rebuilding
+      void startUpdateLightSources() {
         //If lights haven't changed, skip
         if (!lightSourcesChanged) {
           return;
@@ -158,12 +159,9 @@ namespace ammonite {
         }
 
         const float shadowFarPlane = renderer::settings::getShadowFarPlane();
-        glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f),
-                                                1.0f, 0.0f, shadowFarPlane);
+        shadowProj = glm::perspective(glm::radians(90.0f), 1.0f, 0.0f, shadowFarPlane);
 
         //Resize buffers
-        const std::size_t shaderLightDataSize = sizeof(ShaderLightSource) * lightCount;
-        const std::size_t shaderShadowDataSize = sizeof(ShaderShadowTransform) * lightCount;
         if (prevLightCount != lightCount) {
           if (shaderLightData != nullptr) {
             delete [] shaderLightData;
@@ -178,12 +176,24 @@ namespace ammonite {
 
         //Repack light sources into buffers (uses vec4s for OpenGL)
         for (unsigned int i = 0; i < lightCount; i++) {
-          workerData[i].shadowProj = &shadowProj;
           workerData[i].i = i;
         }
-        AmmoniteGroup group{0};
+
         ammonite::utils::thread::submitMultiple(lightWork, &workerData[0],
           sizeof(LightWorkerData), &group, lightCount);
+      }
+
+      //Wait for the workers to finish and upload the lighting buffers
+      void finishUpdateLightSources() {
+        //If lights haven't changed, skip
+        if (!lightSourcesChanged) {
+          return;
+        }
+
+        const unsigned int lightCount = lightTrackerMap.size();
+        const std::size_t shaderLightDataSize = sizeof(ShaderLightSource) * lightCount;
+        const std::size_t shaderShadowDataSize = sizeof(ShaderShadowTransform) * lightCount;
+
         ammonite::utils::thread::waitGroupComplete(&group, lightCount);
 
         //If the light count hasn't changed, sub the data instead of recreating the buffer
