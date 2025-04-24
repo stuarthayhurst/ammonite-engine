@@ -10,7 +10,7 @@ namespace ammonite {
     namespace {
       std::mutex outputLock;
 
-      const std::string reset = "\033[0m";
+      constexpr const char* reset = "\033[0m";
     }
 
     OutputHelper::OutputHelper(std::ostream& output, const std::string& pre):
