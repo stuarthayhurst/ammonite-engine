@@ -8,43 +8,43 @@
 #include "../graphics/extensions.hpp"
 
 #ifdef AMMONITE_DEBUG
-/*NOLINTBEGIN(cppcoreguidelines-avoid-non-const-global-variables,
-              cppcoreguidelines-interfaces-global-init)*/
+//NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables, cppcoreguidelines-interfaces-global-init)
 ammonite::utils::OutputHelper ammoniteInternalDebug(std::cout, "DEBUG: ",
                                                     ammonite::utils::colour::magenta);
-/*NOLINTEND(cppcoreguidelines-avoid-non-const-global-variables,
-            cppcoreguidelines-interfaces-global-init)*/
 #endif
 
 namespace ammonite {
   namespace utils {
     namespace {
+      //NOLINTNEXTLINE(cppcoreguidelines-interfaces-global-init)
+      ammonite::utils::OutputHelper glDebugLogger(std::cerr, "\nGL MESSAGE: ",
+                                                  ammonite::utils::colour::cyan);
+
       void GLAPIENTRY debugMessageCallback(GLenum, GLenum type, GLuint, GLenum severity,
-                                                  GLsizei, const GLchar* message, const void*) {
-        std::cerr << "\nGL MESSAGE ";
+                                           GLsizei, const GLchar* message, const void*) {
         switch (severity) {
-          case GL_DEBUG_SEVERITY_HIGH: std::cerr << "(High priority): "; break;
-          case GL_DEBUG_SEVERITY_MEDIUM: std::cerr << "(Medium priority): "; break;
-          case GL_DEBUG_SEVERITY_LOW: std::cerr << "(Low priority): "; break;
-          case GL_DEBUG_SEVERITY_NOTIFICATION: std::cerr << "(Notification): "; break;
-          default: std::cerr << "(Unknown severity): "; break;
+          case GL_DEBUG_SEVERITY_HIGH: glDebugLogger << "(High priority): "; break;
+          case GL_DEBUG_SEVERITY_MEDIUM: glDebugLogger << "(Medium priority): "; break;
+          case GL_DEBUG_SEVERITY_LOW: glDebugLogger << "(Low priority): "; break;
+          case GL_DEBUG_SEVERITY_NOTIFICATION: glDebugLogger << "(Notification): "; break;
+          default: glDebugLogger << "(Unknown severity): "; break;
         }
 
         switch (type) {
-          case GL_DEBUG_TYPE_ERROR: std::cerr << "** ERROR **"; break;
-          case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: std::cerr << "DEPRECATED BEHAVIOUR"; break;
-          case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR: std::cerr << "UNDEFINED BEHAVIOUR"; break;
-          case GL_DEBUG_TYPE_PORTABILITY: std::cerr << "PORTABILITY"; break;
-          case GL_DEBUG_TYPE_PERFORMANCE: std::cerr << "PERFORMANCE"; break;
-          case GL_DEBUG_TYPE_MARKER: std::cerr << "MARKER"; break;
-          case GL_DEBUG_TYPE_PUSH_GROUP: std::cerr << "PUSH GROUP"; break;
-          case GL_DEBUG_TYPE_POP_GROUP: std::cerr << "POP GROUP"; break;
-          case GL_DEBUG_TYPE_OTHER: std::cerr << "OTHER"; break;
-          default: std::cerr << "UNKNOWN"; break;
+          case GL_DEBUG_TYPE_ERROR: glDebugLogger << "** ERROR **"; break;
+          case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: glDebugLogger << "DEPRECATED BEHAVIOUR"; break;
+          case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR: glDebugLogger << "UNDEFINED BEHAVIOUR"; break;
+          case GL_DEBUG_TYPE_PORTABILITY: glDebugLogger << "PORTABILITY"; break;
+          case GL_DEBUG_TYPE_PERFORMANCE: glDebugLogger << "PERFORMANCE"; break;
+          case GL_DEBUG_TYPE_MARKER: glDebugLogger << "MARKER"; break;
+          case GL_DEBUG_TYPE_PUSH_GROUP: glDebugLogger << "PUSH GROUP"; break;
+          case GL_DEBUG_TYPE_POP_GROUP: glDebugLogger << "POP GROUP"; break;
+          case GL_DEBUG_TYPE_OTHER: glDebugLogger << "OTHER"; break;
+          default: glDebugLogger << "UNKNOWN"; break;
         }
 
-        std::cerr << std::endl;
-        std::cerr << "  Message: " << message << "\n" << std::endl;
+
+        glDebugLogger << "\n  Message: " << message << "\n" << std::endl;
       }
     }
 
