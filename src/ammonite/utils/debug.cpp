@@ -10,7 +10,8 @@
 #ifdef AMMONITE_DEBUG
 /*NOLINTBEGIN(cppcoreguidelines-avoid-non-const-global-variables,
               cppcoreguidelines-interfaces-global-init)*/
-ammonite::utils::OutputHelper ammoniteInternalDebug(std::cout, "DEBUG: ");
+ammonite::utils::OutputHelper ammoniteInternalDebug(std::cout, "DEBUG: ",
+                                                    ammonite::utils::colour::magenta);
 /*NOLINTEND(cppcoreguidelines-avoid-non-const-global-variables,
             cppcoreguidelines-interfaces-global-init)*/
 #endif
