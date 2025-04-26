@@ -87,11 +87,12 @@ endif
 
 #Fetch library dependencies and flags from ammonite.pc
 REQUIRES_PRIVATE = $(shell sed -ne 's/^.*Requires.private: //p' ammonite.pc)
-FLAGS_PRIVATE = $(shell sed -ne 's/^.*Libs.private: //p' ammonite.pc)
+LDFLAGS_PRIVATE = $(shell sed -ne 's/^.*Libs.private: //p' ammonite.pc)
+CFLAGS_PRIVATE = $(shell sed -ne 's/^.*Cflags.private: //p' ammonite.pc)
 
 #Library arguments
-LIBRARY_CXXFLAGS := $(CXXFLAGS) -fpic
-LIBRARY_LDFLAGS := $(LDFLAGS) "-Wl,-soname,$(LIBRARY_NAME)" $(FLAGS_PRIVATE) \
+LIBRARY_CXXFLAGS := $(CXXFLAGS) -fpic $(CFLAGS_PRIVATE)
+LIBRARY_LDFLAGS := $(LDFLAGS) "-Wl,-soname,$(LIBRARY_NAME)" $(LDFLAGS_PRIVATE) \
                    $(shell pkg-config --libs $(REQUIRES_PRIVATE))
 
 #Client arguments
