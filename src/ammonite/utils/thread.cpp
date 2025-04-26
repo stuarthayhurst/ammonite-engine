@@ -28,9 +28,10 @@ namespace ammonite {
 
       /*
        - Create or join a thread pool, without initialising the renderer
-       - The engine will share the thread pool if it's not destroyed before the
-         renderer is initialised
+         - The engine will share the thread pool if it's not destroyed before the
+           renderer is initialised
        - destroyThreadPool() is still safe to call after renderer initialisation
+       - Do not submit jobs that block conditionally on other jobs
        - Returns false if no thread pool exists or was created
       */
       bool createThreadPool(unsigned int threadCount) {
@@ -64,6 +65,7 @@ namespace ammonite {
       /*
        - Submit a job to the thread pool, with a user-provided pointer
          - userPtr may be a nullptr
+       - Do not submit jobs that block conditionally on other jobs
       */
       void submitWork(AmmoniteWork work, void* userPtr) {
         ammonite::utils::thread::internal::submitWork(work, userPtr, nullptr);
@@ -75,6 +77,7 @@ namespace ammonite {
            - A group can be used between multiple calls, but waiting on it will block
              until all work in the group is done
          - userPtr may be a nullptr
+       - Do not submit jobs that block conditionally on other jobs
       */
       void submitWork(AmmoniteWork work, void* userPtr, AmmoniteGroup* group) {
         ammonite::utils::thread::internal::submitWork(work, userPtr, group);
@@ -87,9 +90,15 @@ namespace ammonite {
            - stride should by the size of each section to give to a job, in bytes
          - group should either be a nullptr, or an AmmoniteGroup{0}
          - jobCount specifies how many times submit the job
+       - Do not submit jobs that block conditionally on other jobs
       */
       void submitMultiple(AmmoniteWork work, void* userBuffer, int stride,
                           AmmoniteGroup* group, unsigned int jobCount) {
+        //Force stride to 0 if no data was given to simplify maths
+        if (userBuffer == nullptr) {
+          stride = 0;
+        }
+
         ammonite::utils::thread::internal::submitMultiple(work, userBuffer, stride,
           group, jobCount);
       }
