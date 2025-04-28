@@ -1,12 +1,9 @@
 #include <atomic>
-#include <bit>
 #include <cstddef>
 #include <cstdint>
 #include <iostream>
-#include <limits>
 #include <mutex>
 #include <queue>
-#include <semaphore>
 #include <system_error>
 #include <thread>
 
@@ -29,34 +26,38 @@ namespace {
   private:
     std::queue<WorkItem> queue;
     std::mutex queueLock;
-    std::counting_semaphore<std::numeric_limits<int32_t>::max()> jobCount{0};
 
   public:
     void push(AmmoniteWork work, void* userPtr, AmmoniteGroup* group) {
       queueLock.lock();
       queue.push({work, userPtr, group});
       queueLock.unlock();
-      jobCount.release();
     }
-
 
     void pushMultiple(AmmoniteWork work, void* userBuffer, int stride,
                       AmmoniteGroup* group, unsigned int count) {
+      //Add multiple jobs in 1 pass
       queueLock.lock();
-      for (unsigned int i = 0; i < count; i++) {
-        queue.push({work, (char*)userBuffer + ((std::size_t)(i) * stride), group});
+      if (userBuffer == nullptr) {
+        for (unsigned int i = 0; i < count; i++) {
+          queue.push({work, nullptr, group});
+        }
+      } else {
+        for (unsigned int i = 0; i < count; i++) {
+          queue.push({work, (char*)userBuffer + ((std::size_t)(i) * stride), group});
+        }
       }
-
       queueLock.unlock();
-      jobCount.release(count);
     }
 
-
     void pop(WorkItem* workItemPtr) {
-      jobCount.acquire();
       queueLock.lock();
-      *workItemPtr = queue.front();
-      queue.pop();
+      if (!queue.empty()) {
+        *workItemPtr = queue.front();
+        queue.pop();
+      } else {
+        workItemPtr->work = nullptr;
+      }
       queueLock.unlock();
     }
   };
@@ -76,29 +77,29 @@ namespace ammonite {
           std::atomic<unsigned int> blockedThreadCount{0};
           std::atomic<bool> threadsBlocked{false};
 
-          WorkQueue* workQueues;
-          unsigned int queueLaneCount = 0;
-          unsigned int queueLaneMask = 0;
-          std::atomic<uintmax_t> nextJobRead = 0;
-          std::atomic<uintmax_t> nextJobWrite = 0;
+          WorkQueue* workQueue;
+          std::atomic<uintmax_t> jobCount = 0;
         }
 
         namespace {
           void initWorker() {
             while (stayAlive) {
               //Fetch the work
-              WorkItem workItem = {nullptr, nullptr, nullptr};
+              WorkItem workItem;
+              workQueue->pop(&workItem);
 
-              //Wait for a job to be available
-              const uintmax_t targetQueue = (nextJobRead++) & queueLaneMask;
-              workQueues[targetQueue].pop(&workItem);
+              //Execute the work or sleep
+              if (workItem.work != nullptr) {
+                jobCount--;
+                workItem.work(workItem.userPtr);
 
-              //Execute the work
-              workItem.work(workItem.userPtr);
-
-              //Update the group semaphore, if given
-              if (workItem.group != nullptr) {
-                workItem.group->release();
+                //Update the group semaphore, if given
+                if (workItem.group != nullptr) {
+                  workItem.group->release();
+                }
+              } else {
+                //Sleep while 0 jobs remain
+                jobCount.wait(0);
               }
             }
           }
@@ -128,46 +129,30 @@ namespace ammonite {
 
         void submitWork(AmmoniteWork work, void* userPtr, AmmoniteGroup* group) {
           //Add work to the queue
-          const uintmax_t targetQueue = (nextJobWrite++) & queueLaneMask;
-          workQueues[targetQueue].push(work, userPtr, group);
+          workQueue->push(work, userPtr, group);
+
+          //Increase job count, wake a sleeping thread
+          jobCount++;
+          jobCount.notify_one();
         }
 
-        /*
-         - Submit multiple jobs in a batch, with no ordering guarantees
-         - Even carefully crafted blocking jobs that depend on other jobs will fail
-           - For the special 'blocker', use submitWork instead
-        */
+        //Submit multiple jobs without locking multiple times
         void submitMultiple(AmmoniteWork work, void* userBuffer, int stride,
                             AmmoniteGroup* group, unsigned int newJobs) {
-          //Every queue gets at least baseBatchSize jobs
-          const unsigned int baseBatchSize = newJobs / queueLaneCount;
-
-          /*
-           - Add the base amount of work to each queue without touching the atomic index
-           - This only works because every queue is being given an equal amount of work
-             - This doesn't work if the job will block until all jobs are executing
-          */
-          if (baseBatchSize > 0) {
-            for (unsigned int i = 0; i < queueLaneCount; i++) {
-              workQueues[i].pushMultiple(work, userBuffer, stride, group, baseBatchSize);
-              userBuffer = (char*)userBuffer + (std::size_t(baseBatchSize) * stride);
-            }
-          }
-
-          //Add the remaining work
-          const unsigned int remainingJobs = newJobs - (baseBatchSize * queueLaneCount);
-          for (unsigned int i = 0; i < remainingJobs; i++) {
-            const uintmax_t targetQueue = (nextJobWrite++) & queueLaneMask;
-            workQueues[targetQueue].push(work, (char*)userBuffer + (std::size_t(i) * stride), group);
-          }
+          workQueue->pushMultiple(work, userBuffer, stride, group, newJobs);
+          jobCount += newJobs;
+          jobCount.notify_all();
         }
 
-        //Create thread pool of the requested size, if one doesn't already exist
+        //Create thread pool, existing work will begin executing
         bool createThreadPool(unsigned int threadCount) {
           //Exit if thread pool already exists
           if (poolThreadCount != 0) {
             return false;
           }
+
+          //Create the queue
+          workQueue = new WorkQueue();
 
           //Default to creating a worker thread for every hardware thread
           if (threadCount == 0) {
@@ -181,20 +166,13 @@ namespace ammonite {
             return false;
           }
 
-          //Round thread count up to nearest power of 2 to decide queue count
-          queueLaneCount = std::bit_ceil(threadCount);
-          queueLaneMask = queueLaneCount - 1;
-
-          //Create the queues
-          workQueues = new WorkQueue[queueLaneCount];
-          poolThreadCount = threadCount;
-
-          //Create the queues threads for the pool
+          //Create the threads for the pool
           stayAlive = true;
           for (unsigned int i = 0; i < threadCount; i++) {
             threadPool[i] = std::thread(initWorker);
           }
 
+          poolThreadCount = threadCount;
           return true;
         }
 
@@ -206,10 +184,7 @@ namespace ammonite {
         void blockThreads() {
           if (!threadsBlocked) {
             threadBlockTrigger = true;
-            for (unsigned int i = 0; i < poolThreadCount; i++) {
-              //submitMultiple can't be used as it doesn't assign atomically from the current position
-              submitWork(blocker, nullptr, nullptr);
-            }
+            submitMultiple(blocker, nullptr, 0, nullptr, poolThreadCount);
 
             threadsBlocked.wait(false);
           }
@@ -259,10 +234,8 @@ namespace ammonite {
           }
 
           //Reset remaining data
-          delete [] workQueues;
+          delete workQueue;
           delete [] threadPool;
-          queueLaneCount = 0;
-          queueLaneMask = 0;
           poolThreadCount = 0;
         }
       }

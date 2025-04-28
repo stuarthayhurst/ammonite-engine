@@ -7,8 +7,6 @@
 #include <vector>
 
 using AmmoniteKeyCallback = void (*)(const std::vector<int>& keycodes, int action, void* userPtr);
-
-//Functions of this type must not block conditionally on other jobs
 using AmmoniteWork = void (*)(void* userPtr);
 
 using AmmoniteGroup = std::counting_semaphore<INT_MAX>;
