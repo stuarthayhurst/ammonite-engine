@@ -1,6 +1,8 @@
 #include <iostream>
 
-#include <GL/glew.h>
+extern "C" {
+  #include <epoxy/gl.h>
+}
 
 #include "extensions.hpp"
 
@@ -9,21 +11,27 @@
 namespace ammonite {
   namespace graphics {
     namespace internal {
-      bool checkExtension(const char* extension, const char* version) {
-        if (glewIsSupported(extension) == GL_TRUE || glewIsSupported(version) == GL_TRUE) {
+      bool checkGlVersion(int majorVersion, int minorVersion) {
+        return (epoxy_gl_version() >= (majorVersion * 10 + minorVersion));
+      }
+
+      bool checkExtension(const char* extension, int major, int minor) {
+        if (epoxy_has_gl_extension(extension) || checkGlVersion(major, minor)) {
           //Extension supported, either explicitly or by version
-          ammoniteInternalDebug << extension << " supported (" << version << ")" << std::endl;
+          ammoniteInternalDebug << extension << " supported (" << major << "." \
+                                << minor << ")" << std::endl;
           return true;
         }
 
         //Extension unsupported
-        ammoniteInternalDebug << extension << " unsupported (" << version << ")" << std::endl;
+        ammoniteInternalDebug << extension << " unsupported (" << major << "." \
+                              << minor << ")" << std::endl;
         return false;
       }
 
       //Allow checking for extensions without a fallback version
       bool checkExtension(const char* extension) {
-        if (glewIsSupported(extension) == GL_TRUE) {
+        if (epoxy_has_gl_extension(extension)) {
           //Extension supported
           ammoniteInternalDebug << extension << " supported" << std::endl;
           return true;

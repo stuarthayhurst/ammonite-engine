@@ -6,7 +6,7 @@ Name: Ammonite
 Description: Ammonite, a simple graphics engine for experimentation
 URL: https://github.com/stuarthayhurst/ammonite-engine
 Version: 0.0.1
-Requires.private: glm glfw3 glew stb assimp
+Requires.private: glm glfw3 epoxy stb assimp
 Cflags: -I${includedir}
 Libs: -L${libdir} -lammonite
 Cflags.private: -pthread

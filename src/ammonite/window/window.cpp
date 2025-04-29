@@ -41,7 +41,7 @@ namespace ammonite {
     bool createWindow(unsigned int width, unsigned int height, const std::string& title) {
       //Setup GLFW
       if (!internal::setupGlfw(requestedContextType)) {
-        ammonite::utils::error << "Failed to initialize GLFW" << std::endl;
+        ammonite::utils::error << "Failed to initialise GLFW" << std::endl;
         return false;
       }
 
@@ -54,12 +54,6 @@ namespace ammonite {
 
       //Set window title
       setTitle(title);
-
-      //Setup GLEW
-      if (!internal::setupGlew()) {
-        ammonite::utils::error << "Failed to initialize GLEW" << std::endl;
-        return false;
-      }
 
       //Setup input for window
       ammonite::input::internal::setupInputCallback(windowPtr);

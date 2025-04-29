@@ -4,9 +4,8 @@
 #include <unordered_set>
 #include <vector>
 
-#include <GL/glew.h>
-
 extern "C" {
+  #include <epoxy/gl.h>
   #include <stb/stb_image.h>
 }
 

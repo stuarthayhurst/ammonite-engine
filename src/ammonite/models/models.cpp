@@ -6,10 +6,13 @@
 #include <string>
 #include <unordered_map>
 
-#include <GL/glew.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/quaternion.hpp>
+
+extern "C" {
+  #include <epoxy/gl.h>
+}
 
 #include "models.hpp"
 

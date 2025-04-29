@@ -5,9 +5,8 @@
 #include <string>
 #include <thread>
 
-#include <GL/glew.h>
-
 extern "C" {
+  #include <epoxy/gl.h>
   #include <GLFW/glfw3.h>
 }
 
@@ -17,7 +16,6 @@ extern "C" {
 #include "../enums.hpp"
 #include "../input.hpp"
 #include "../utils/debug.hpp"
-#include "../utils/logging.hpp"
 #include "../utils/timer.hpp"
 
 //GLFW-specific implementations to support window.hpp
@@ -174,29 +172,6 @@ namespace ammonite {
         } else if (contextType == AMMONITE_DEBUG_CONTEXT) {
           ammoniteInternalDebug << "Creating window with AMMONITE_DEBUG_CONTEXT" << std::endl;
           glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
-        }
-
-        return true;
-      }
-
-      bool setupGlew() {
-        glewExperimental = GL_TRUE;
-        const GLenum err = glewInit();
-        if (err != GLEW_OK) {
-          //Workaround for GLEW issues on Wayland (requires GLFW 3.4+)
-#if (GLFW_VERSION_MAJOR > 3) || ((GLFW_VERSION_MAJOR == 3) && (GLFW_VERSION_MINOR >= 4))
-          const int platform = glfwGetPlatform();
-          if (err == GLEW_ERROR_NO_GLX_DISPLAY && platform == GLFW_PLATFORM_WAYLAND) {
-            ammonite::utils::warning << "Wayland detected, ignoring GLEW_ERROR_NO_GLX_DISPLAY" \
-                                     << std::endl;
-            return true;
-          }
-#else
-          #pragma message("GLFW 3.4 unavailable, skipping Wayland checks")
-#endif
-
-          ammonite::utils::error << glewGetErrorString(err) << std::endl;
-          return false;
         }
 
         return true;

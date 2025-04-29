@@ -5,9 +5,12 @@
 #include <utility>
 #include <vector>
 
-#include <GL/glew.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
+
+extern "C" {
+  #include <epoxy/gl.h>
+}
 
 #include "renderer.hpp"
 
@@ -108,26 +111,32 @@ namespace ammonite {
 
         //Check for essential GPU capabilities
         bool checkGPUCapabilities(unsigned int* failureCount) {
-          const char* const extensions[5][3] = {
-            {"GL_ARB_direct_state_access", "GL_VERSION_4_5", "Direct state access"},
-            {"GL_ARB_shader_storage_buffer_object", "GL_VERSION_4_3", "Shader Storage Buffer Objects (SSBOs)"},
-            {"GL_ARB_texture_storage", "GL_VERSION_4_2", "Texture storage"},
-            {"GL_ARB_shading_language_420pack", "GL_VERSION_4_2", "GLSL shader version 4.20"},
-            {"GL_ARB_texture_cube_map_array", "GL_VERSION_4_0", "Cubemap arrays"}
+          const struct {
+            const char* extension;
+            int major;
+            int minor;
+            const char* prettyName;
+          } extensions[5] {
+            {"GL_ARB_direct_state_access", 4, 5, "Direct state access"},
+            {"GL_ARB_shader_storage_buffer_object", 4, 3, "Shader Storage Buffer Objects (SSBOs)"},
+            {"GL_ARB_texture_storage", 4, 2, "Texture storage"},
+            {"GL_ARB_shading_language_420pack", 4, 2, "GLSL shader version 4.20"},
+            {"GL_ARB_texture_cube_map_array", 4, 2, "Cubemap arrays"}
           };
           const unsigned int extensionCount = sizeof(extensions) / sizeof(extensions[0]);
 
           bool success = true;
           for (unsigned int i = 0; i < extensionCount; i++) {
-            if (!graphics::internal::checkExtension(extensions[i][0], extensions[i][1])) {
-              ammonite::utils::error << extensions[i][2] << " unsupported" << std::endl;
+            if (!graphics::internal::checkExtension(extensions[i].extension,
+                extensions[i].major, extensions[i].minor)) {
+              ammonite::utils::error << extensions[i].prettyName << " unsupported" << std::endl;
               success = false;
               (*failureCount)++;
             }
           }
 
           //Check minimum OpenGL version is supported
-          if (glewIsSupported("GL_VERSION_3_2") == GL_FALSE) {
+          if (!graphics::internal::checkGlVersion(3, 2)) {
             ammonite::utils::error << "OpenGL 3.2 unsupported" << std::endl;
             success = false;
             (*failureCount)++;

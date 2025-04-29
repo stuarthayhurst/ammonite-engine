@@ -4,9 +4,8 @@
 #include <string>
 #include <unordered_map>
 
-#include <GL/glew.h>
-
 extern "C" {
+  #include <epoxy/gl.h>
   #define STB_IMAGE_IMPLEMENTATION
   #include <stb/stb_image.h>
 }

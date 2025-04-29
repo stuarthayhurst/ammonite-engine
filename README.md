@@ -80,7 +80,7 @@
       - `USE_LLVM_CPP=true` might be useful for systems without (a new enough) GCC
     - When swapping between different compilers, run `make clean`
   - ### Libraries:
-    - `libglm-dev libglfw3-dev libglew-dev libstb-dev libassimp-dev`
+    - `libglm-dev libglfw3-dev libepoxy-dev libstb-dev libassimp-dev`
     - `libdecor-0-0 libdecor-0-plugin-1-gtk` are required for Wayland window decorations
   - ### Linting:
     - `clang-tidy (19+)`

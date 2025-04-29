@@ -1,6 +1,8 @@
 #include <string>
 
-#include <GL/glew.h>
+extern "C" {
+  #include <epoxy/gl.h>
+}
 
 #include "shaders.hpp"
 

@@ -1,4 +1,6 @@
-#include <GL/glew.h>
+extern "C" {
+  #include <epoxy/gl.h>
+}
 
 #include "renderer.hpp"
 

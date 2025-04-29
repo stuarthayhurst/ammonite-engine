@@ -8,7 +8,9 @@
 #include <string>
 #include <vector>
 
-#include <GL/glew.h>
+extern "C" {
+  #include <epoxy/gl.h>
+}
 
 #include "shaderLoader.hpp"
 
@@ -347,7 +349,7 @@ namespace ammonite {
 
         //Check support for collecting the program binary
         isBinaryCacheSupported = true;
-        if (!graphics::internal::checkExtension("GL_ARB_get_program_binary", "GL_VERSION_4_1")) {
+        if (!graphics::internal::checkExtension("GL_ARB_get_program_binary", 4, 1)) {
           ammonite::utils::warning << "Program caching unsupported" << std::endl;
           isBinaryCacheSupported = false;
         } else if (numBinaryFormats < 1) {
@@ -383,8 +385,7 @@ namespace ammonite {
 
           //Check for compute shader support if needed
           if (shaderType == GL_COMPUTE_SHADER) {
-            if (!graphics::internal::checkExtension("GL_ARB_compute_shader",
-                                                    "GL_VERSION_4_3")) {
+            if (!graphics::internal::checkExtension("GL_ARB_compute_shader", 4, 3)) {
               ammonite::utils::warning << "Compute shaders unsupported" << std::endl;
               continue;
             }
@@ -392,8 +393,7 @@ namespace ammonite {
 
           //Check for tessellation shader support if needed
           if (shaderType == GL_TESS_CONTROL_SHADER || shaderType == GL_TESS_EVALUATION_SHADER) {
-            if (!graphics::internal::checkExtension("GL_ARB_tessellation_shader",
-                                                    "GL_VERSION_4_0")) {
+            if (!graphics::internal::checkExtension("GL_ARB_tessellation_shader", 4, 0)) {
               ammonite::utils::warning << "Tessellation shaders unsupported" << std::endl;
               continue;
             }

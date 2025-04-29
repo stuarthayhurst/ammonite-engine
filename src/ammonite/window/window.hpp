@@ -28,7 +28,6 @@ namespace ammonite {
 
       //Implemented by glfwWindow.hpp
       bool setupGlfw(AmmoniteEnum contextType);
-      bool setupGlew();
       void destroyGlfw();
       void setFocusCallback(GLFWwindow* windowPtr);
 

@@ -1,8 +1,11 @@
 #ifndef INTERNALLIGHTING
 #define INTERNALLIGHTING
 
-#include <GL/glew.h>
 #include <glm/glm.hpp>
+
+extern "C" {
+  #include <epoxy/gl.h>
+}
 
 #include "../internal.hpp"
 #include "../types.hpp"
