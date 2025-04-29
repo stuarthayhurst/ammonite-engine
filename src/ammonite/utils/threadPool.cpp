@@ -9,6 +9,7 @@
 
 #include "threadPool.hpp"
 
+#include "debug.hpp"
 #include "logging.hpp"
 #include "../types.hpp"
 
@@ -213,6 +214,8 @@ namespace ammonite {
 
         //Finish work already in the queue and kill the threads
         void destroyThreadPool() {
+          ammoniteInternalDebug << "Destroying thread pool" << std::endl;
+
           //Finish existing work and block new work from starting
           unblockThreads();
           blockThreads();

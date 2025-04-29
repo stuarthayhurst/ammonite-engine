@@ -2,6 +2,7 @@
 
 #include "thread.hpp"
 
+#include "debug.hpp"
 #include "logging.hpp"
 #include "threadPool.hpp"
 #include "../types.hpp"
@@ -58,6 +59,9 @@ namespace ammonite {
         poolUsers--;
         if (poolUsers == 0) {
           ammonite::utils::thread::internal::destroyThreadPool();
+        } else {
+          ammoniteInternalDebug << "Skipping thread pool destruction, " \
+                                << poolUsers << " users remain" << std::endl;
         }
       }
 
