@@ -152,9 +152,9 @@ namespace ammonite {
           return false;
         }
 
-        //Set minimum version to OpenGL 3.2+
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+        //Request OpenGL 4.5, we check everything we need above 3.2 anyway
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
 
         //Disable compatibility profile
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
