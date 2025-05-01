@@ -127,7 +127,7 @@ namespace objectFieldDemo {
 
     //Return the position of an orbit's centre, so that each orbit in a shape meets the next
     constexpr glm::vec2 calculateOrbitPosition(unsigned int orbitCount,
-                                                      unsigned int orbitIndex, float radius) {
+                                               unsigned int orbitIndex, float radius) {
       const float nucleusAngle = (glm::two_pi<float>() * (float)orbitIndex) / (float)orbitCount;
 
       //Correct for overlapping orbits
