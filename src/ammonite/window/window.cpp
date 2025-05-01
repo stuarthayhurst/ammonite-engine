@@ -11,7 +11,7 @@ extern "C" {
 #include "window.hpp"
 
 #include "../enums.hpp"
-#include "../input.hpp"
+#include "../input/input.hpp"
 #include "../utils/logging.hpp"
 
 static constexpr std::string DEFAULT_TITLE = "Ammonite Window";

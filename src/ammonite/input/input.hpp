@@ -5,18 +5,19 @@ extern "C" {
   #include <GLFW/glfw3.h>
 }
 
-#include "enums.hpp"
-#include "internal.hpp"
-#include "types.hpp"
+#include "../enums.hpp"
+#include "../internal.hpp"
+#include "../types.hpp"
 
 //Include public interface
-#include "../include/ammonite/input.hpp" // IWYU pragma: export
+#include "../../include/ammonite/input.hpp" // IWYU pragma: export
 
 namespace ammonite {
   namespace input {
     namespace AMMONITE_INTERNAL internal {
-      //Implemented by internal/inputManager.hpp
+      //Implemented by inputManager.cpp
       void setupInputCallback(GLFWwindow* windowPtr);
+
       void runCallbacks();
 
       void setInputBlock(bool inputBlocked);

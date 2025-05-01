@@ -5,8 +5,9 @@ extern "C" {
 #include "input.hpp"
 
 #include "controls.hpp"
-#include "enums.hpp"
-#include "types.hpp"
+
+#include "../enums.hpp"
+#include "../types.hpp"
 
 #define OVERRIDE_MODE_DEFAULT AMMONITE_FORCE_RELEASE
 

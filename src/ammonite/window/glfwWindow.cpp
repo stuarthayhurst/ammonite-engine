@@ -14,7 +14,7 @@ extern "C" {
 
 #include "../camera.hpp"
 #include "../enums.hpp"
-#include "../input.hpp"
+#include "../input/input.hpp"
 #include "../utils/debug.hpp"
 #include "../utils/timer.hpp"
 
