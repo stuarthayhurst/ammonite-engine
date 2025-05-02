@@ -112,9 +112,6 @@ namespace ammonite {
       } directionData[6];
       AmmoniteId keybindIds[6] = {0};
 
-      //Various pointers to other systems, used by callbacks
-      bool* isInputBlockedPtr = ammonite::input::internal::getInputBlockPtr();
-
       //Mouse position callback data
       double xposLast, yposLast;
       bool ignoreNextCursor = false;
@@ -190,7 +187,8 @@ namespace ammonite {
     namespace {
       //Increase / decrease FoV on scroll (xoffset is unused)
       void scrollCallback(GLFWwindow*, double, double yoffset) {
-        if (!(*isInputBlockedPtr) && isCameraActive) {
+        const bool inputBlocked = input::internal::getInputBlock();
+        if (!inputBlocked && isCameraActive) {
           const AmmoniteId activeCameraId = ammonite::camera::getActiveCamera();
           const float fov = ammonite::camera::getFieldOfView(activeCameraId);
 
@@ -204,7 +202,8 @@ namespace ammonite {
 
       //Reset FoV on middle click, (modifier bits are unused)
       void zoomResetCallback(GLFWwindow*, int button, int action, int) {
-        if (!(*isInputBlockedPtr) && isCameraActive) {
+        const bool inputBlocked = input::internal::getInputBlock();
+        if (!inputBlocked && isCameraActive) {
           if (button == GLFW_MOUSE_BUTTON_MIDDLE && action == GLFW_PRESS) {
             ammonite::camera::setFieldOfView(ammonite::camera::getActiveCamera(),
                                              glm::quarter_pi<float>());

@@ -3,10 +3,10 @@
 
 // IWYU pragma: begin_exports
 #include "camera.hpp"
-#include "controls.hpp"
 #include "enums.hpp"
 #include "graphics/renderer.hpp"
-#include "input.hpp"
+#include "input/controls.hpp"
+#include "input/input.hpp"
 #include "lighting/lighting.hpp"
 #include "models/models.hpp"
 #include "skybox.hpp"

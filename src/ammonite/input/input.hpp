@@ -10,7 +10,7 @@ extern "C" {
 #include "../types.hpp"
 
 //Include public interface
-#include "../../include/ammonite/input.hpp" // IWYU pragma: export
+#include "../../include/ammonite/input/input.hpp" // IWYU pragma: export
 
 namespace ammonite {
   namespace input {
@@ -18,17 +18,15 @@ namespace ammonite {
       //Implemented by inputManager.cpp
       void setupInputCallback(GLFWwindow* windowPtr);
 
-      void runCallbacks();
-
       void setInputBlock(bool inputBlocked);
       bool getInputBlock();
-      bool* getInputBlockPtr();
 
-      AmmoniteId registerRawKeybind(int keycodes[], int count, AmmoniteEnum overrideMode,
+      void runCallbacks();
+      AmmoniteId registerRawKeybind(const int keycodes[], int count, AmmoniteEnum overrideMode,
                                     bool toggle, AmmoniteKeyCallback callback, void* userPtr);
       bool unregisterKeybind(AmmoniteId keybindId);
-      bool isKeycodeRegistered(int keycodes[], int count);
-      bool changeKeybindKeycodes(AmmoniteId keybindId, int newKeycodes[], int count);
+      bool isKeycodeRegistered(const int keycodes[], int count);
+      bool changeKeybindKeycodes(AmmoniteId keybindId, const int newKeycodes[], int count);
     }
   }
 }

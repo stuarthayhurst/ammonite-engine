@@ -1,8 +1,8 @@
 #ifndef INPUT
 #define INPUT
 
-#include "enums.hpp"
-#include "types.hpp"
+#include "../enums.hpp"
+#include "../types.hpp"
 
 namespace ammonite {
   namespace input {
