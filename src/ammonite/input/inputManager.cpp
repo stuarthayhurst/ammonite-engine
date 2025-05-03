@@ -194,11 +194,9 @@ namespace ammonite {
           //Determine reported keybind state and run callback
           if (allowCallback && runCallback) {
             //Determine which action triggered the callback
-            int userState = GLFW_RELEASE;
+            KeyStateEnum userState = keybindState;
             if (keybindData.lastState == keybindState) {
-              userState = GLFW_REPEAT;
-            } else if (keybindState == AMMONITE_HELD) {
-              userState = GLFW_PRESS;
+              userState = AMMONITE_REPEAT;
             }
 
             //Run the callback

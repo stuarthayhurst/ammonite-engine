@@ -120,11 +120,11 @@ namespace ammonite {
 
     //Keyboard control callbacks
     namespace {
-      void keyboardCameraCallback(const std::vector<int>&, int action, void* userPtr) {
+      void keyboardCameraCallback(const std::vector<int>&, KeyStateEnum action, void* userPtr) {
         DirectionData* directionData = (DirectionData*)userPtr;
         ammonite::utils::Timer* directionTimer = &directionData->directionTimer;
         //If it's an initial key press, start the timer and return
-        if (action == GLFW_PRESS) {
+        if (action == AMMONITE_HELD) {
           directionTimer->reset();
           directionTimer->unpause();
           return;
@@ -174,7 +174,7 @@ namespace ammonite {
         }
 
         //Reset time between inputs
-        if (action == GLFW_RELEASE) {
+        if (action == AMMONITE_RELEASED) {
           //If it's a key release, stop the timer
           directionTimer->pause();
         }

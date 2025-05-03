@@ -14,10 +14,11 @@ enum AmmoniteReleaseEnum : unsigned char {
 
 enum KeyStateEnum : unsigned char {
   AMMONITE_HELD,
-  AMMONITE_RELEASED
+  AMMONITE_RELEASED,
+  AMMONITE_REPEAT
 };
 
-using AmmoniteKeyCallback = void (*)(const std::vector<int>& keycodes, int action, void* userPtr);
+using AmmoniteKeyCallback = void (*)(const std::vector<int>& keycodes, KeyStateEnum action, void* userPtr);
 
 namespace ammonite {
   namespace input {

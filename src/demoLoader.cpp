@@ -55,39 +55,39 @@ namespace {
     HAS_SETUP_CONTROLS = (1 << 2)
   };
 
-  void inputFocusCallback(const std::vector<int>&, int, void*) {
+  void inputFocusCallback(const std::vector<int>&, KeyStateEnum, void*) {
     ammonite::input::setInputFocus(!ammonite::input::getInputFocus());
   }
 
-  void fullscreenToggleCallback(const std::vector<int>&, int, void*) {
+  void fullscreenToggleCallback(const std::vector<int>&, KeyStateEnum, void*) {
     ammonite::window::setFullscreen(!ammonite::window::getFullscreen());
   }
 
-  void focalToggleCallback(const std::vector<int>&, int, void*) {
+  void focalToggleCallback(const std::vector<int>&, KeyStateEnum, void*) {
     ammonite::renderer::settings::post::setFocalDepthEnabled(
       !ammonite::renderer::settings::post::getFocalDepthEnabled());
   }
 
-  void sprintToggleCallback(const std::vector<int>&, int action, void*) {
+  void sprintToggleCallback(const std::vector<int>&, KeyStateEnum action, void*) {
     float movementSpeed = 0.0f;
-    if (action == GLFW_REPEAT) {
+    if (action == AMMONITE_REPEAT) {
       return;
     }
 
     movementSpeed = ammonite::controls::settings::getMovementSpeed();
-    movementSpeed *= (action == GLFW_PRESS) ? 2.0f : (1.0f / 2.0f);
+    movementSpeed *= (action == AMMONITE_HELD) ? 2.0f : (1.0f / 2.0f);
     ammonite::controls::settings::setMovementSpeed(movementSpeed);
   }
 
-  void cameraCycleCallback(const std::vector<int>&, int, void* userPtr) {
+  void cameraCycleCallback(const std::vector<int>&, KeyStateEnum, void* userPtr) {
     CameraData* cameraData = (CameraData*)userPtr;
     cameraData->cameraIndex = (int)((cameraData->cameraIndex + 1) % cameraData->cameraIds.size());
     ammonite::camera::setActiveCamera(cameraData->cameraIds[cameraData->cameraIndex]);
   }
 
-  void changeFocalDepthCallback(const std::vector<int>&, int action, void* userPtr) {
+  void changeFocalDepthCallback(const std::vector<int>&, KeyStateEnum action, void* userPtr) {
     static ammonite::utils::Timer focalDepthTimer;
-    if (action != GLFW_RELEASE) {
+    if (action != AMMONITE_RELEASED) {
       const float sign = *(float*)userPtr;
       const float unitsPerSecond = 0.8f;
       const float focalTimeDelta = (float)focalDepthTimer.getTime();
@@ -102,9 +102,9 @@ namespace {
     focalDepthTimer.reset();
   }
 
-  void changeFrameRateCallback(const std::vector<int>&, int action, void* userPtr) {
+  void changeFrameRateCallback(const std::vector<int>&, KeyStateEnum action, void* userPtr) {
     static ammonite::utils::Timer frameRateTimer;
-    if (action != GLFW_RELEASE) {
+    if (action != AMMONITE_RELEASED) {
       const float sign = *(float*)userPtr;
       const float unitsPerSecond = 10.0f;
       const float frameTimeDelta = (float)frameRateTimer.getTime();
@@ -120,7 +120,7 @@ namespace {
     frameRateTimer.reset();
   }
 
-  void closeWindowCallback(const std::vector<int>&, int, void* userPtr) {
+  void closeWindowCallback(const std::vector<int>&, KeyStateEnum, void* userPtr) {
     *(bool*)userPtr = true;
   }
 }
