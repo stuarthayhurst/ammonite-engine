@@ -8,7 +8,6 @@ extern "C" {
 
 #include "input.hpp"
 
-#include "../enums.hpp"
 #include "../types.hpp"
 #include "../utils/debug.hpp"
 #include "../utils/id.hpp"
@@ -17,24 +16,19 @@ namespace ammonite {
   namespace input {
     namespace internal {
       namespace {
-        enum KeycodeStateEnum : unsigned char {
-          AMMONITE_HELD,
-          AMMONITE_RELEASED
-        };
-
         struct KeybindData {
           std::vector<int> keycodes;
-          AmmoniteEnum overrideMode;
+          AmmoniteReleaseEnum overrideMode;
           bool toggle;
           AmmoniteKeyCallback callback;
           void* userPtr;
-          KeycodeStateEnum lastState = AMMONITE_RELEASED;
+          KeyStateEnum lastState = AMMONITE_RELEASED;
           bool debugLogAllowed = true;
         };
 
         struct KeycodeData {
           unsigned int refCount = 0;
-          KeycodeStateEnum state;
+          KeyStateEnum state;
         };
 
         GLFWwindow* windowPtr = nullptr;
@@ -72,7 +66,7 @@ namespace ammonite {
           }
         }
 
-        KeycodeStateEnum getKeyState(int keycode) {
+        KeyStateEnum getKeyState(int keycode) {
           //Treat key as unpressed if the window isn't ready yet
           if (windowPtr == nullptr) {
             return AMMONITE_RELEASED;
@@ -129,7 +123,7 @@ namespace ammonite {
         for (auto& keybindEntry : keybindIdDataMap) {
           auto& keybindData = keybindEntry.second;
           //Determine keybind state
-          KeycodeStateEnum keybindState = AMMONITE_HELD;
+          KeyStateEnum keybindState = AMMONITE_HELD;
           for (unsigned int i = 0; i < keybindData.keycodes.size(); i++) {
             if (keycodeStateMap[keybindData.keycodes[i]].state == AMMONITE_RELEASED) {
               keybindState = AMMONITE_RELEASED;
@@ -178,14 +172,6 @@ namespace ammonite {
               keybindState = keybindData.lastState;
               allowStateChange = false;
               break;
-
-            default: //Unhandled override, send debug and carry on
-              if (keybindData.debugLogAllowed) {
-                keybindData.debugLogAllowed = false;
-                ammoniteInternalDebug << "Keybind '" << keybindEntry.first \
-                                      << "' has unexpected override mode" << std::endl;
-              }
-              break;
             }
           } else {
             keybindData.debugLogAllowed = true;
@@ -227,7 +213,7 @@ namespace ammonite {
       }
 
       //Register a keybind
-      AmmoniteId registerRawKeybind(const int keycodes[], int count, AmmoniteEnum overrideMode,
+      AmmoniteId registerRawKeybind(const int keycodes[], int count, AmmoniteReleaseEnum overrideMode,
                                     bool toggle, AmmoniteKeyCallback callback,
                                     void* userPtr) {
         //Validate override mode

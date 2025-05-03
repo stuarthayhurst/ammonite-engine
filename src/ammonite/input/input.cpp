@@ -6,7 +6,6 @@ extern "C" {
 
 #include "controls.hpp"
 
-#include "../enums.hpp"
 #include "../types.hpp"
 
 #define OVERRIDE_MODE_DEFAULT AMMONITE_FORCE_RELEASE
@@ -15,14 +14,14 @@ namespace ammonite {
   namespace input {
     //A: Multi-key, override mode, no toggle
     //Hands off to core
-    AmmoniteId registerKeybind(int keycodes[], int count, AmmoniteEnum overrideMode,
+    AmmoniteId registerKeybind(int keycodes[], int count, AmmoniteReleaseEnum overrideMode,
                                AmmoniteKeyCallback callback, void* userPtr) {
       return internal::registerRawKeybind(keycodes, count, overrideMode, false, callback, userPtr);
     }
 
     //B: Multi-key, override mode, toggle
     //Hands off to core
-    AmmoniteId registerToggleKeybind(int keycodes[], int count, AmmoniteEnum overrideMode,
+    AmmoniteId registerToggleKeybind(int keycodes[], int count, AmmoniteReleaseEnum overrideMode,
                                      AmmoniteKeyCallback callback, void* userPtr) {
       return internal::registerRawKeybind(keycodes, count, overrideMode, true, callback, userPtr);
     }
@@ -43,14 +42,14 @@ namespace ammonite {
 
     //E: Single key, override mode, no toggle
     //Hands off to C
-    AmmoniteId registerKeybind(int keycode, AmmoniteEnum overrideMode,
+    AmmoniteId registerKeybind(int keycode, AmmoniteReleaseEnum overrideMode,
                                AmmoniteKeyCallback callback, void* userPtr) {
       return registerKeybind(&keycode, 1, overrideMode, callback, userPtr);
     }
 
     //F: Single key, override mode, toggle
     //Hands off to D
-    AmmoniteId registerToggleKeybind(int keycode, AmmoniteEnum overrideMode,
+    AmmoniteId registerToggleKeybind(int keycode, AmmoniteReleaseEnum overrideMode,
                                      AmmoniteKeyCallback callback, void* userPtr) {
       return registerToggleKeybind(&keycode, 1, overrideMode, callback, userPtr);
     }

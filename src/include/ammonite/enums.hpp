@@ -6,6 +6,7 @@ static constexpr bool ASSUME_FLIP_MODEL_UVS = true;
 static constexpr bool ASSUME_FLIP_SKYBOX_FACES = false;
 static constexpr bool ASSUME_SRGB_TEXTURES = true;
 
+//Miscellaneous enums
 enum AmmoniteEnum : unsigned char {
   //Draw modes
   AMMONITE_DRAW_INACTIVE,
@@ -21,13 +22,6 @@ enum AmmoniteEnum : unsigned char {
   //Texture types
   AMMONITE_DIFFUSE_TEXTURE,
   AMMONITE_SPECULAR_TEXTURE,
-
-  //Keybind input override modes
-  //New entries must go between first and last, or update validation
-  AMMONITE_ALLOW_OVERRIDE,
-  AMMONITE_ALLOW_RELEASE,
-  AMMONITE_FORCE_RELEASE,
-  AMMONITE_RESPECT_BLOCK,
 
   //Cache return values
   AMMONITE_CACHE_HIT,

@@ -5,7 +5,6 @@ extern "C" {
   #include <GLFW/glfw3.h>
 }
 
-#include "../enums.hpp"
 #include "../internal.hpp"
 #include "../types.hpp"
 
@@ -22,7 +21,7 @@ namespace ammonite {
       bool getInputBlock();
 
       void runCallbacks();
-      AmmoniteId registerRawKeybind(const int keycodes[], int count, AmmoniteEnum overrideMode,
+      AmmoniteId registerRawKeybind(const int keycodes[], int count, AmmoniteReleaseEnum overrideMode,
                                     bool toggle, AmmoniteKeyCallback callback, void* userPtr);
       bool unregisterKeybind(AmmoniteId keybindId);
       bool isKeycodeRegistered(const int keycodes[], int count);

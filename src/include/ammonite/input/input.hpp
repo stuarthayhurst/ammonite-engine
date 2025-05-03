@@ -1,8 +1,23 @@
 #ifndef INPUT
 #define INPUT
 
-#include "../enums.hpp"
+#include <vector>
+
 #include "../types.hpp"
+
+enum AmmoniteReleaseEnum : unsigned char {
+  AMMONITE_ALLOW_OVERRIDE,
+  AMMONITE_ALLOW_RELEASE,
+  AMMONITE_FORCE_RELEASE,
+  AMMONITE_RESPECT_BLOCK
+};
+
+enum KeyStateEnum : unsigned char {
+  AMMONITE_HELD,
+  AMMONITE_RELEASED
+};
+
+using AmmoniteKeyCallback = void (*)(const std::vector<int>& keycodes, int action, void* userPtr);
 
 namespace ammonite {
   namespace input {
@@ -13,18 +28,18 @@ namespace ammonite {
     //Keybind takes keycodes, count, (overrideMode), action callback, user pointer
     AmmoniteId registerKeybind(int keycodes[], int count,
                                AmmoniteKeyCallback callback, void* userPtr);
-    AmmoniteId registerKeybind(int keycodes[], int count, AmmoniteEnum overrideMode,
+    AmmoniteId registerKeybind(int keycodes[], int count, AmmoniteReleaseEnum overrideMode,
                                AmmoniteKeyCallback callback, void* userPtr);
-    AmmoniteId registerToggleKeybind(int keycodes[], int count, AmmoniteEnum overrideMode,
+    AmmoniteId registerToggleKeybind(int keycodes[], int count, AmmoniteReleaseEnum overrideMode,
                                      AmmoniteKeyCallback callback, void* userPtr);
     AmmoniteId registerToggleKeybind(int keycodes[], int count,
                                      AmmoniteKeyCallback callback, void* userPtr);
 
     //Single key variants of the above
     AmmoniteId registerKeybind(int keycode, AmmoniteKeyCallback callback, void* userPtr);
-    AmmoniteId registerKeybind(int keycode, AmmoniteEnum overrideMode,
+    AmmoniteId registerKeybind(int keycode, AmmoniteReleaseEnum overrideMode,
                                AmmoniteKeyCallback callback, void* userPtr);
-    AmmoniteId registerToggleKeybind(int keycode, AmmoniteEnum overrideMode,
+    AmmoniteId registerToggleKeybind(int keycode, AmmoniteReleaseEnum overrideMode,
                                      AmmoniteKeyCallback callback, void* userPtr);
     AmmoniteId registerToggleKeybind(int keycode, AmmoniteKeyCallback callback, void* userPtr);
 
