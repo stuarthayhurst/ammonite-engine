@@ -52,11 +52,11 @@ namespace ammonite {
 
           //Track new state for the keycode
           if (action == GLFW_PRESS) {
-            if (keycodeStateMap[keycode].state == AMMONITE_HELD) {
+            if (keycodeStateMap[keycode].state == AMMONITE_PRESSED) {
               ammoniteInternalDebug << "Keycode '" << keycode << "' already held" << std::endl;
             }
 
-            keycodeStateMap[keycode].state = AMMONITE_HELD;
+            keycodeStateMap[keycode].state = AMMONITE_PRESSED;
           } else if (action == GLFW_RELEASE) {
             if (keycodeStateMap[keycode].state == AMMONITE_RELEASED) {
               ammoniteInternalDebug << "Keycode '" << keycode << "' wasn't held" << std::endl;
@@ -76,7 +76,7 @@ namespace ammonite {
             return AMMONITE_RELEASED;
           }
 
-          return AMMONITE_HELD;
+          return AMMONITE_PRESSED;
         }
       }
 
@@ -123,7 +123,7 @@ namespace ammonite {
         for (auto& keybindEntry : keybindIdDataMap) {
           auto& keybindData = keybindEntry.second;
           //Determine keybind state
-          KeyStateEnum keybindState = AMMONITE_HELD;
+          KeyStateEnum keybindState = AMMONITE_PRESSED;
           for (unsigned int i = 0; i < keybindData.keycodes.size(); i++) {
             if (keycodeStateMap[keybindData.keycodes[i]].state == AMMONITE_RELEASED) {
               keybindState = AMMONITE_RELEASED;
@@ -155,7 +155,7 @@ namespace ammonite {
 
             case AMMONITE_FORCE_RELEASE: //Force keybind to be released, including the state
               //Log blocked keybind once per press
-              if (keybindState == AMMONITE_HELD) {
+              if (keybindState == AMMONITE_PRESSED) {
                 if (keybindData.debugLogAllowed) {
                   keybindData.debugLogAllowed = false;
                   ammoniteInternalDebug << "Keybind '" << keybindEntry.first \
@@ -179,14 +179,14 @@ namespace ammonite {
 
           //Run the callback if the keybind is down or was just released
           bool runCallback = false;
-          if (keybindState == AMMONITE_HELD ||
-              (keybindData.lastState == AMMONITE_HELD && keybindState == AMMONITE_RELEASED)) {
+          if (keybindState == AMMONITE_PRESSED ||
+              (keybindData.lastState == AMMONITE_PRESSED && keybindState == AMMONITE_RELEASED)) {
             runCallback = true;
           }
 
           //Filter toggle keybinds if the keybind was already pressed
           if (runCallback && keybindData.toggle) {
-            if (keybindData.lastState == AMMONITE_HELD) {
+            if (keybindData.lastState == AMMONITE_PRESSED) {
               runCallback = false;
             }
           }

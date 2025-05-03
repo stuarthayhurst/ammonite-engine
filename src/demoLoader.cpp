@@ -75,7 +75,7 @@ namespace {
     }
 
     movementSpeed = ammonite::controls::settings::getMovementSpeed();
-    movementSpeed *= (action == AMMONITE_HELD) ? 2.0f : (1.0f / 2.0f);
+    movementSpeed *= (action == AMMONITE_PRESSED) ? 2.0f : (1.0f / 2.0f);
     ammonite::controls::settings::setMovementSpeed(movementSpeed);
   }
 

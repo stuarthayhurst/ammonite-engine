@@ -124,7 +124,7 @@ namespace ammonite {
         DirectionData* directionData = (DirectionData*)userPtr;
         ammonite::utils::Timer* directionTimer = &directionData->directionTimer;
         //If it's an initial key press, start the timer and return
-        if (action == AMMONITE_HELD) {
+        if (action == AMMONITE_PRESSED) {
           directionTimer->reset();
           directionTimer->unpause();
           return;

@@ -13,7 +13,7 @@ enum AmmoniteReleaseEnum : unsigned char {
 };
 
 enum KeyStateEnum : unsigned char {
-  AMMONITE_HELD,
+  AMMONITE_PRESSED,
   AMMONITE_RELEASED,
   AMMONITE_REPEAT
 };
