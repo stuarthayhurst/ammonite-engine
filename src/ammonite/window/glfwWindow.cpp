@@ -155,7 +155,7 @@ namespace ammonite {
         }
       }
 
-      bool setupGlfw(AmmoniteEnum contextType) {
+      bool setupGlfw(AmmoniteContextEnum contextType) {
         if (glfwInit() == 0) {
           return false;
         }

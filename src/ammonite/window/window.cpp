@@ -20,7 +20,7 @@ namespace ammonite {
   namespace window {
     namespace {
       GLFWwindow* windowPtr = nullptr;
-      AmmoniteEnum requestedContextType = AMMONITE_DEFAULT_CONTEXT;
+      AmmoniteContextEnum requestedContextType = AMMONITE_DEFAULT_CONTEXT;
     }
 
     namespace internal {
@@ -28,7 +28,7 @@ namespace ammonite {
         return windowPtr;
       }
 
-      void setContextType(AmmoniteEnum contextType) {
+      void setContextType(AmmoniteContextEnum contextType) {
         if (windowPtr != nullptr) {
           ammonite::utils::warning << "Window already created, ignoring context type request" << std::endl;
           return;

@@ -24,10 +24,10 @@ namespace ammonite {
 
       //Implemented by window.hpp
       GLFWwindow* getWindowPtr();
-      void setContextType(AmmoniteEnum contextType);
+      void setContextType(AmmoniteContextEnum contextType);
 
       //Implemented by glfwWindow.hpp
-      bool setupGlfw(AmmoniteEnum contextType);
+      bool setupGlfw(AmmoniteContextEnum contextType);
       void destroyGlfw();
       void setFocusCallback(GLFWwindow* windowPtr);
 

@@ -66,7 +66,7 @@ namespace ammonite {
         internal::deleteModelCache();
       }
 
-      void requestContextType(AmmoniteEnum contextType) {
+      void requestContextType(AmmoniteContextEnum contextType) {
         switch (contextType) {
         case AMMONITE_DEFAULT_CONTEXT:
         case AMMONITE_NO_ERROR_CONTEXT:
