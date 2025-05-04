@@ -14,7 +14,6 @@ extern "C" {
 
 #include "../graphics/renderer.hpp"
 #include "../models/models.hpp"
-#include "../types.hpp"
 #include "../utils/id.hpp"
 #include "../utils/thread.hpp"
 

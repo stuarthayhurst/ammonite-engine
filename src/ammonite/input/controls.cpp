@@ -13,7 +13,7 @@ extern "C" {
 #include "input.hpp"
 
 #include "../camera.hpp"
-#include "../types.hpp"
+#include "../utils/id.hpp"
 #include "../utils/timer.hpp"
 #include "../window/window.hpp"
 

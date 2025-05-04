@@ -8,7 +8,7 @@
 #include "../enums.hpp"
 #include "../lighting/lighting.hpp"
 #include "../splash.hpp"
-#include "../types.hpp"
+#include "../utils/id.hpp"
 #include "../utils/logging.hpp"
 #include "../utils/thread.hpp"
 #include "../utils/timer.hpp"

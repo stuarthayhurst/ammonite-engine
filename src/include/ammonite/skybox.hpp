@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include "types.hpp"
+#include "utils/id.hpp"
 
 namespace ammonite {
   namespace skybox {

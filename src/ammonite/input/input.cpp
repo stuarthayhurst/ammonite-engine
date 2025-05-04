@@ -6,7 +6,7 @@ extern "C" {
 
 #include "controls.hpp"
 
-#include "../types.hpp"
+#include "../utils/id.hpp"
 
 #define OVERRIDE_MODE_DEFAULT AMMONITE_FORCE_RELEASE
 

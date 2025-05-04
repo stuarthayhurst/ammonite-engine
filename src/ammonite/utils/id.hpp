@@ -4,7 +4,9 @@
 #include <unordered_map>
 
 #include "../internal.hpp"
-#include "../types.hpp"
+
+//Include public interface
+#include "../../include/ammonite/utils/id.hpp" // IWYU pragma: export
 
 namespace ammonite {
   namespace utils {

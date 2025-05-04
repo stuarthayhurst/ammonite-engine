@@ -3,7 +3,7 @@
 
 #include <glm/glm.hpp>
 
-#include "types.hpp"
+#include "utils/id.hpp"
 
 namespace ammonite {
   namespace camera {

@@ -8,7 +8,6 @@ extern "C" {
 
 #include "input.hpp"
 
-#include "../types.hpp"
 #include "../utils/debug.hpp"
 #include "../utils/id.hpp"
 

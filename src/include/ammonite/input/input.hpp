@@ -3,7 +3,7 @@
 
 #include <vector>
 
-#include "../types.hpp"
+#include "../utils/id.hpp"
 
 enum AmmoniteReleaseEnum : unsigned char {
   AMMONITE_ALLOW_OVERRIDE,

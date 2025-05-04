@@ -1,5 +1,5 @@
-#ifndef TYPES
-#define TYPES
+#ifndef AMMONITEID
+#define AMMONITEID
 
 #include <cstdint>
 

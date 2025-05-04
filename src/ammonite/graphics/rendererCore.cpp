@@ -23,9 +23,9 @@ extern "C" {
 #include "../models/models.hpp"
 #include "../skybox.hpp"
 #include "../splash.hpp"
-#include "../types.hpp"
-#include "../utils/logging.hpp"
 #include "../utils/debug.hpp"
+#include "../utils/logging.hpp"
+#include "../utils/id.hpp"
 #include "../window/window.hpp"
 
 /*

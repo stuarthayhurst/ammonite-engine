@@ -13,7 +13,7 @@ extern "C" {
 
 #include "../enums.hpp"
 #include "../internal.hpp"
-#include "../types.hpp"
+#include "../utils/id.hpp"
 
 //Include public interface
 #include "../../include/ammonite/models/models.hpp" // IWYU pragma: export

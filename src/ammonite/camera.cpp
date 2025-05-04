@@ -8,7 +8,6 @@
 #include "camera.hpp"
 
 #include "graphics/renderer.hpp"
-#include "types.hpp"
 #include "utils/id.hpp"
 #include "window/window.hpp"
 

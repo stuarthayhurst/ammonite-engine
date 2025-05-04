@@ -8,7 +8,7 @@ extern "C" {
 }
 
 #include "../internal.hpp"
-#include "../types.hpp"
+#include "../utils/id.hpp"
 
 //Include public interface
 #include "../../include/ammonite/lighting/lighting.hpp" // IWYU pragma: export

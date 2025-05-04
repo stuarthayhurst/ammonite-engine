@@ -6,7 +6,7 @@
 #include <glm/glm.hpp>
 
 #include "../enums.hpp"
-#include "../types.hpp"
+#include "../utils/id.hpp"
 
 namespace ammonite {
   namespace models {

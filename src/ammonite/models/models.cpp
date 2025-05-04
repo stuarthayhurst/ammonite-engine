@@ -19,7 +19,6 @@ extern "C" {
 #include "../enums.hpp"
 #include "../graphics/textures.hpp"
 #include "../lighting/lighting.hpp"
-#include "../types.hpp"
 #include "../utils/id.hpp"
 #include "../utils/logging.hpp"
 
