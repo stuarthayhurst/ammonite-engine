@@ -5,7 +5,13 @@
 #include <ctime>
 #include <string>
 
-#include "../enums.hpp"
+//Cache return values / states
+enum AmmoniteCacheEnum : unsigned char {
+  AMMONITE_CACHE_HIT,
+  AMMONITE_CACHE_MISS,
+  AMMONITE_CACHE_INVALID,
+  AMMONITE_CACHE_COLLISION
+};
 
 namespace ammonite {
   namespace utils {
@@ -21,7 +27,7 @@ namespace ammonite {
       unsigned char* getCachedFile(std::string* cacheFilePath, std::string* filePaths,
                                    unsigned int fileCount, std::size_t* dataSize,
                                    unsigned char** userData, std::size_t* userDataSize,
-                                   AmmoniteEnum* cacheState);
+                                   AmmoniteCacheEnum* cacheState);
       bool writeCacheFile(const std::string& cacheFilePath, std::string* filePaths,
                           unsigned int fileCount, unsigned char* data, std::size_t dataSize,
                           unsigned char* userData, std::size_t userDataSize);

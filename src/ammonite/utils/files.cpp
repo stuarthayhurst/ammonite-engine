@@ -22,7 +22,6 @@ extern "C" {
 #include "debug.hpp"
 #include "hash.hpp"
 #include "logging.hpp"
-#include "../enums.hpp"
 
 static constexpr unsigned int MAX_LOAD_ATTEMPTS = 10;
 
@@ -74,8 +73,8 @@ namespace ammonite {
         }
 
         //Check paths, times and file sizes are correct
-        AmmoniteEnum validateInputs(std::string* filePaths, unsigned int fileCount,
-                                           unsigned char* extraData, std::size_t extraDataSize) {
+        AmmoniteCacheEnum validateInputs(std::string* filePaths, unsigned int fileCount,
+                                         unsigned char* extraData, std::size_t extraDataSize) {
           unsigned char* extraDataCopy = new unsigned char[extraDataSize + 1];
           std::memcpy(extraDataCopy, extraData, extraDataSize);
           extraDataCopy[extraDataSize] = '\0';
@@ -84,7 +83,7 @@ namespace ammonite {
            - Decide whether the cache file can be used
            - Uses input files, sizes and timestamps
           */
-          AmmoniteEnum result = AMMONITE_CACHE_INVALID;
+          AmmoniteCacheEnum result = AMMONITE_CACHE_INVALID;
           char* state = nullptr;
           unsigned int internalFileCount = 1;
           std::size_t filesize = 0;
@@ -342,7 +341,7 @@ namespace ammonite {
       unsigned char* getCachedFile(std::string* cacheFilePath, std::string* filePaths,
                                    unsigned int fileCount, std::size_t* dataSize,
                                    unsigned char** userData, std::size_t* userDataSize,
-                                   AmmoniteEnum* cacheState) {
+                                   AmmoniteCacheEnum* cacheState) {
         //Generate a cache string
         *cacheFilePath = getCachedFilePath(filePaths, fileCount);
 
@@ -391,8 +390,8 @@ namespace ammonite {
                                      << "'" << std::endl;
             failed = true;
           } else {
-            const AmmoniteEnum result = validateInputs(filePaths, fileCount,
-                                                       extraData, extraDataSize);
+            const AmmoniteCacheEnum result = validateInputs(
+              filePaths, fileCount, extraData, extraDataSize);
             if (result == AMMONITE_CACHE_COLLISION) {
               //Append the attempt counter to the file path and try again
               collision = true;

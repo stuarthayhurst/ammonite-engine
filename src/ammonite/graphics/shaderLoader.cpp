@@ -15,7 +15,6 @@ extern "C" {
 #include "shaderLoader.hpp"
 
 #include "extensions.hpp"
-#include "../enums.hpp"
 #include "../utils/debug.hpp"
 #include "../utils/files.hpp"
 #include "../utils/logging.hpp"
@@ -286,7 +285,7 @@ namespace ammonite {
         unsigned char* userData = nullptr;
         std::size_t cacheDataSize = 0;
         std::size_t userDataSize = 0;
-        AmmoniteEnum cacheState = AMMONITE_CACHE_INVALID;
+        AmmoniteCacheEnum cacheState = AMMONITE_CACHE_INVALID;
 
         //Attempt to load the cached program
         const unsigned char* cacheData = ammonite::utils::files::getCachedFile(&cacheFilePath,
