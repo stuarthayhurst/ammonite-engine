@@ -1,7 +1,11 @@
 #ifndef THREAD
 #define THREAD
 
-#include "../types.hpp"
+#include <climits>
+#include <semaphore>
+
+using AmmoniteWork = void (*)(void* userPtr);
+using AmmoniteGroup = std::counting_semaphore<INT_MAX>;
 
 namespace ammonite {
   namespace utils {

@@ -4,8 +4,6 @@
 
 #include "debug.hpp"
 #include "logging.hpp"
-#include "threadPool.hpp"
-#include "../types.hpp"
 
 namespace ammonite {
   namespace utils {
