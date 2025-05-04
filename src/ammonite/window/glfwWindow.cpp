@@ -16,6 +16,7 @@ extern "C" {
 #include "../enums.hpp"
 #include "../input/input.hpp"
 #include "../utils/debug.hpp"
+#include "../utils/logging.hpp"
 #include "../utils/timer.hpp"
 
 //GLFW-specific implementations to support window.hpp
@@ -29,7 +30,8 @@ namespace ammonite {
           unsigned int height = 0;
           unsigned int xPos = 0;
           unsigned int yPos = 0;
-          float aspectRatio = 0.0f; //Aspect ratio is always for window content
+          unsigned int bufferWidth = 0;
+          unsigned int bufferHeight = 0;
         };
 
         /*
@@ -54,22 +56,30 @@ namespace ammonite {
 
       namespace {
         /*
-         - Fill storage with height, width, position and aspect ratio
+         - Fill storage with height, width and position
          - Conditionally account for decoration
          - isWindowFullscreen must be set correctly
         */
         void storeWindowGeometry(GLFWwindow* windowPtr, WindowGeom* storage,
                                         bool useDecoratedSize, bool useDecoratedPos) {
+          int bufferWidth = 0, bufferHeight = 0;
+          glfwGetFramebufferSize(windowPtr, &bufferWidth, &bufferHeight);
+          storage->bufferWidth = bufferWidth;
+          storage->bufferHeight = bufferHeight;
+
           /*
-           - If the window is fullscreen, set the width, height, aspect ratio and bail out
+           - If the window is fullscreen, set the width and height then bail out
            - Ignores useDecoratedSize and useDecoratedPos
           */
           if (isWindowFullscreen) {
             GLFWmonitor* monitorPtr = glfwGetWindowMonitor(windowPtr);
+            if (monitorPtr == nullptr) {
+              ammonite::utils::warning << "Couldn't determine monitor, window geometry may be incorrect" << std::endl;
+            }
+
             const GLFWvidmode* mode = glfwGetVideoMode(monitorPtr);
             storage->width = mode->width;
             storage->height = mode->height;
-            storage->aspectRatio = (float)(storage->width) / (float)(storage->height);
             storage->xPos = 0;
             storage->yPos = 0;
             return;
@@ -86,8 +96,6 @@ namespace ammonite {
           storage->height = height;
           storage->xPos = xPos;
           storage->yPos = yPos;
-
-          storage->aspectRatio = (float)(storage->width) / (float)(storage->height);
 
           //Apply frame dimension corrections
           if (useDecoratedSize) {
@@ -134,7 +142,7 @@ namespace ammonite {
         }
 
         //Callback to update height and width on window resize
-        void windowSizeCallback(GLFWwindow* windowPtr, int, int) {
+        void framebufferSizeCallback(GLFWwindow* windowPtr, int, int) {
           storeWindowGeometry(windowPtr, &activeWindowGeom, false, true);
           ammonite::camera::internal::updateMatrices();
         }
@@ -199,7 +207,7 @@ namespace ammonite {
         storeWindowGeometry(windowPtr, &activeWindowGeom, false, true);
 
         //Update stored geometry and matrices when resized
-        glfwSetWindowSizeCallback(windowPtr, windowSizeCallback);
+        glfwSetFramebufferSizeCallback(windowPtr, framebufferSizeCallback);
         glfwMakeContextCurrent(windowPtr);
 
         //Set input modes
@@ -282,10 +290,10 @@ namespace ammonite {
       void setFullscreenMonitor(GLFWwindow* windowPtr, GLFWmonitor* monitor) {
         //Set fullscreen mode
         const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+        isWindowFullscreen = true;
         glfwSetWindowMonitor(windowPtr, monitor, 0, 0, mode->width, mode->height, GLFW_DONT_CARE);
 
         //Update active window geometry store
-        isWindowFullscreen = true;
         storeWindowGeometry(windowPtr, &activeWindowGeom, false, true);
       }
 
@@ -306,13 +314,13 @@ namespace ammonite {
           }
 
           //Set window to windowed mode, using last geometry
+          isWindowFullscreen = false;
           glfwSetWindowMonitor(windowPtr, nullptr,
                                (int)windowGeomRestore.xPos, (int)windowGeomRestore.yPos,
                                (int)windowGeomRestore.width, (int)windowGeomRestore.height,
                                GLFW_DONT_CARE);
 
           //Update active window geometry
-          isWindowFullscreen = false;
           storeWindowGeometry(windowPtr, &activeWindowGeom, false, true);
         }
       }
@@ -338,15 +346,15 @@ namespace ammonite {
       }
 
       float getGraphicsAspectRatio() {
-        return activeWindowGeom.aspectRatio;
+        return (float)activeWindowGeom.bufferWidth / (float)activeWindowGeom.bufferHeight;
       }
 
       unsigned int getGraphicsWidth() {
-        return activeWindowGeom.width;
+        return activeWindowGeom.bufferWidth;
       }
 
       unsigned int getGraphicsHeight() {
-        return activeWindowGeom.height;
+        return activeWindowGeom.bufferHeight;
       }
 
       /*
