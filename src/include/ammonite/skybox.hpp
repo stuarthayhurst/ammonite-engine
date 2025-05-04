@@ -1,5 +1,5 @@
-#ifndef SKYBOX
-#define SKYBOX
+#ifndef AMMONITESKYBOX
+#define AMMONITESKYBOX
 
 #include <string>
 

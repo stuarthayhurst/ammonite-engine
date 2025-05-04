@@ -1,5 +1,5 @@
-#ifndef WINDOW
-#define WINDOW
+#ifndef AMMONITEWINDOW
+#define AMMONITEWINDOW
 
 #include <string>
 

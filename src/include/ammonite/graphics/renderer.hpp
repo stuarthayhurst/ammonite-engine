@@ -1,5 +1,5 @@
-#ifndef RENDERER
-#define RENDERER
+#ifndef AMMONITERENDERER
+#define AMMONITERENDERER
 
 #include <cstdint>
 #include <string>

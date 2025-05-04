@@ -1,5 +1,5 @@
-#ifndef CONTROLS
-#define CONTROLS
+#ifndef AMMONITECONTROLS
+#define AMMONITECONTROLS
 
 namespace ammonite {
   namespace controls {

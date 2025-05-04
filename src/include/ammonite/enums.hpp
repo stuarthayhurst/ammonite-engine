@@ -1,5 +1,5 @@
-#ifndef ENUMS
-#define ENUMS
+#ifndef AMMONITEENUMS
+#define AMMONITEENUMS
 
 //Constants for loading assumptions
 static constexpr bool ASSUME_FLIP_MODEL_UVS = true;

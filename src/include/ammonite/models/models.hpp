@@ -1,5 +1,5 @@
-#ifndef MODELS
-#define MODELS
+#ifndef AMMONITEMODELS
+#define AMMONITEMODELS
 
 #include <string>
 

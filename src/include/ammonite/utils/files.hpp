@@ -1,5 +1,5 @@
-#ifndef FILES
-#define FILES
+#ifndef AMMONITEFILES
+#define AMMONITEFILES
 
 #include <cstddef>
 #include <ctime>

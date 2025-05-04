@@ -1,5 +1,5 @@
-#ifndef LOGGING
-#define LOGGING
+#ifndef AMMONITELOGGING
+#define AMMONITELOGGING
 
 #include <iostream>
 #include <sstream>

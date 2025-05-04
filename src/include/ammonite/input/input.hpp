@@ -1,5 +1,5 @@
-#ifndef INPUT
-#define INPUT
+#ifndef AMMONITEINPUT
+#define AMMONITEINPUT
 
 #include <vector>
 

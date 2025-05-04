@@ -1,5 +1,5 @@
-#ifndef DEBUGHEADER
-#define DEBUGHEADER
+#ifndef AMMONITEDEBUG
+#define AMMONITEDEBUG
 
 namespace ammonite {
   namespace utils {

@@ -1,5 +1,5 @@
-#ifndef THREAD
-#define THREAD
+#ifndef AMMONITETHREAD
+#define AMMONITETHREAD
 
 #include <climits>
 #include <semaphore>

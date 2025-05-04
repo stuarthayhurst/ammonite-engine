@@ -1,5 +1,5 @@
-#ifndef LIGHTING
-#define LIGHTING
+#ifndef AMMONITELIGHTING
+#define AMMONITELIGHTING
 
 #include <glm/glm.hpp>
 

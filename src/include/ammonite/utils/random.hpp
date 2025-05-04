@@ -1,5 +1,5 @@
-#ifndef RANDOM
-#define RANDOM
+#ifndef AMMONITERANDOM
+#define AMMONITERANDOM
 
 #include <cstdint>
 

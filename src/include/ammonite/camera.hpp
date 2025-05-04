@@ -1,5 +1,5 @@
-#ifndef CAMERA
-#define CAMERA
+#ifndef AMMONITECAMERA
+#define AMMONITECAMERA
 
 #include <glm/glm.hpp>
 

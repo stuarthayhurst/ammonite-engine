@@ -1,5 +1,5 @@
-#ifndef TIMER
-#define TIMER
+#ifndef AMMONITETIMER
+#define AMMONITETIMER
 
 #include <ctime>
 

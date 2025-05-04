@@ -1,5 +1,5 @@
-#ifndef SPLASH
-#define SPLASH
+#ifndef AMMONITESPLASH
+#define AMMONITESPLASH
 
 #include <glm/glm.hpp>
 
