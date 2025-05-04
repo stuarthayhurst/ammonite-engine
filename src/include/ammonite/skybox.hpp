@@ -5,6 +5,8 @@
 
 #include "utils/id.hpp"
 
+static constexpr bool ASSUME_FLIP_SKYBOX_FACES = false;
+
 namespace ammonite {
   namespace skybox {
     AmmoniteId getActiveSkybox();

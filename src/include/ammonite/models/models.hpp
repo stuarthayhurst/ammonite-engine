@@ -7,6 +7,8 @@
 
 #include "../utils/id.hpp"
 
+static constexpr bool ASSUME_FLIP_MODEL_UVS = true;
+
 //Texture type enums
 enum AmmoniteTextureEnum : unsigned char {
   AMMONITE_DIFFUSE_TEXTURE,
