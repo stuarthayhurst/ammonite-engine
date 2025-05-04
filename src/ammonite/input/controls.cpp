@@ -294,29 +294,12 @@ namespace ammonite {
       directionData[5].directionEnum = AMMONITE_LEFT;
 
       //Set keyboard callbacks
-      if (forwardKey != 0) {
-        keybindIds[0] = ammonite::input::internal::registerRawKeybind(&forwardKey, 1,
-          AMMONITE_FORCE_RELEASE, false, keyboardCameraCallback, &directionData[0]);
-      }
-      if (backKey != 0) {
-        keybindIds[1] = ammonite::input::internal::registerRawKeybind(&backKey, 1,
-          AMMONITE_FORCE_RELEASE, false, keyboardCameraCallback, &directionData[1]);
-      }
-      if (upKey != 0) {
-        keybindIds[2] = ammonite::input::internal::registerRawKeybind(&upKey, 1,
-          AMMONITE_FORCE_RELEASE, false, keyboardCameraCallback, &directionData[2]);
-      }
-      if (downKey != 0) {
-        keybindIds[3] = ammonite::input::internal::registerRawKeybind(&downKey, 1,
-          AMMONITE_FORCE_RELEASE, false, keyboardCameraCallback, &directionData[3]);
-      }
-      if (rightKey != 0) {
-        keybindIds[4] = ammonite::input::internal::registerRawKeybind(&rightKey, 1,
-          AMMONITE_FORCE_RELEASE, false, keyboardCameraCallback, &directionData[4]);
-      }
-      if (leftKey != 0) {
-        keybindIds[5] = ammonite::input::internal::registerRawKeybind(&leftKey, 1,
-          AMMONITE_FORCE_RELEASE, false, keyboardCameraCallback, &directionData[5]);
+      const int keycodes[6] = {forwardKey, backKey, upKey, downKey, rightKey, leftKey};
+      for (int i = 0; i < 6; i++) {
+        if (keycodes[i] != 0) {
+          keybindIds[0] = ammonite::input::internal::registerRawKeybind(&keycodes[i], 1,
+            AMMONITE_FORCE_RELEASE, false, keyboardCameraCallback, &directionData[i]);
+        }
       }
 
       //Mouse controls setup, prepare cursor position and mode
@@ -334,29 +317,11 @@ namespace ammonite {
 
     void releaseFreeCamera() {
       //Clean up keybinds
-      if (keybindIds[0] != 0) {
-        ammonite::input::internal::unregisterKeybind(keybindIds[0]);
-        keybindIds[0] = 0;
-      }
-      if (keybindIds[1] != 0) {
-        ammonite::input::internal::unregisterKeybind(keybindIds[1]);
-        keybindIds[1] = 0;
-      }
-      if (keybindIds[2] != 0) {
-        ammonite::input::internal::unregisterKeybind(keybindIds[2]);
-        keybindIds[2] = 0;
-      }
-      if (keybindIds[3] != 0) {
-        ammonite::input::internal::unregisterKeybind(keybindIds[3]);
-        keybindIds[3] = 0;
-      }
-      if (keybindIds[4] != 0) {
-        ammonite::input::internal::unregisterKeybind(keybindIds[4]);
-        keybindIds[4] = 0;
-      }
-      if (keybindIds[5] != 0) {
-        ammonite::input::internal::unregisterKeybind(keybindIds[5]);
-        keybindIds[5] = 0;
+      for (int i = 0; i < 6; i++) {
+        if (keybindIds[i] != 0) {
+          ammonite::input::internal::unregisterKeybind(keybindIds[i]);
+          keybindIds[i] = 0;
+        }
       }
 
       //Mouse callback clean up
