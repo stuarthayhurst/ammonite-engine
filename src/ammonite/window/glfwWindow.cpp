@@ -61,7 +61,7 @@ namespace ammonite {
          - isWindowFullscreen must be set correctly
         */
         void storeWindowGeometry(GLFWwindow* windowPtr, WindowGeom* storage,
-                                        bool useDecoratedSize, bool useDecoratedPos) {
+                                 bool useDecoratedSize, bool useDecoratedPos) {
           int bufferWidth = 0, bufferHeight = 0;
           glfwGetFramebufferSize(windowPtr, &bufferWidth, &bufferHeight);
           storage->bufferWidth = bufferWidth;
