@@ -12,13 +12,14 @@ namespace ammonite {
   namespace utils {
     namespace AMMONITE_INTERNAL internal {
       /*
-       - Find the next unused ID in tracker, starting with lastId
+       - Find the next unused ID in tracker, starting with lastId + 1
        - Write the result back to lastId, and return it
       */
       template <typename T>
       static AmmoniteId setNextId(AmmoniteId* lastId,
                                   const std::unordered_map<AmmoniteId, T>& tracker) {
-        while (*lastId == 0 || tracker.contains(*lastId)) {
+        (*lastId)++;
+        while (tracker.contains(*lastId) || *lastId == 0) {
           (*lastId)++;
         }
 
