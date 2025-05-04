@@ -11,7 +11,6 @@ extern "C" {
   #include <epoxy/gl.h>
 }
 
-#include "../enums.hpp"
 #include "../internal.hpp"
 #include "../utils/id.hpp"
 
@@ -71,7 +70,7 @@ namespace ammonite {
         ModelData* modelData;
         PositionData positionData;
         std::vector<TextureIdGroup> textureIds;
-        AmmoniteEnum drawMode = AMMONITE_DRAW_ACTIVE;
+        AmmoniteDrawEnum drawMode = AMMONITE_DRAW_ACTIVE;
         AmmoniteId lightEmitterId = 0;
         unsigned int lightIndex;
         std::string modelName;

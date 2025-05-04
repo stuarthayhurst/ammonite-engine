@@ -8,20 +8,10 @@ static constexpr bool ASSUME_SRGB_TEXTURES = true;
 
 //Miscellaneous enums
 enum AmmoniteEnum : unsigned char {
-  //Draw modes
-  AMMONITE_DRAW_INACTIVE,
-  AMMONITE_DRAW_ACTIVE,
-  AMMONITE_DRAW_WIREFRAME,
-  AMMONITE_DRAW_POINTS,
-
   //OpenGL / GLFW context hints
   AMMONITE_DEFAULT_CONTEXT,
   AMMONITE_NO_ERROR_CONTEXT,
   AMMONITE_DEBUG_CONTEXT,
-
-  //Texture types
-  AMMONITE_DIFFUSE_TEXTURE,
-  AMMONITE_SPECULAR_TEXTURE
 };
 
 #endif

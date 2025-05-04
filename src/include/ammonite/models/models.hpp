@@ -5,8 +5,21 @@
 
 #include <glm/glm.hpp>
 
-#include "../enums.hpp"
 #include "../utils/id.hpp"
+
+//Texture type enums
+enum AmmoniteTextureEnum : unsigned char {
+  AMMONITE_DIFFUSE_TEXTURE,
+  AMMONITE_SPECULAR_TEXTURE
+};
+
+//Model drawing mode enums
+enum AmmoniteDrawEnum : unsigned char {
+  AMMONITE_DRAW_INACTIVE,
+  AMMONITE_DRAW_ACTIVE,
+  AMMONITE_DRAW_WIREFRAME,
+  AMMONITE_DRAW_POINTS
+};
 
 namespace ammonite {
   namespace models {
@@ -33,12 +46,12 @@ namespace ammonite {
     void deleteModel(AmmoniteId modelId);
     AmmoniteId copyModel(AmmoniteId modelId);
 
-    bool applyTexture(AmmoniteId modelId, AmmoniteEnum textureType, const std::string& texturePath);
-    bool applyTexture(AmmoniteId modelId, AmmoniteEnum textureType, const std::string& texturePath,
+    bool applyTexture(AmmoniteId modelId, AmmoniteTextureEnum textureType, const std::string& texturePath);
+    bool applyTexture(AmmoniteId modelId, AmmoniteTextureEnum textureType, const std::string& texturePath,
                       bool srgbTexture);
     unsigned int getIndexCount(AmmoniteId modelId);
     unsigned int getVertexCount(AmmoniteId modelId);
-    void setDrawMode(AmmoniteId modelId, AmmoniteEnum drawMode);
+    void setDrawMode(AmmoniteId modelId, AmmoniteDrawEnum drawMode);
   }
 }
 

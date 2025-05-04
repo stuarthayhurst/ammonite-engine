@@ -18,7 +18,6 @@ extern "C" {
 #include "shaderLoader.hpp"
 #include "shaders.hpp"
 #include "../camera.hpp"
-#include "../enums.hpp"
 #include "../lighting/lighting.hpp"
 #include "../models/models.hpp"
 #include "../skybox.hpp"

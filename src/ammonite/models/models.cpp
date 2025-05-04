@@ -415,7 +415,7 @@ namespace ammonite {
       }
     }
 
-    bool applyTexture(AmmoniteId modelId, AmmoniteEnum textureType,
+    bool applyTexture(AmmoniteId modelId, AmmoniteTextureEnum textureType,
                       const std::string& texturePath, bool srgbTexture) {
       internal::ModelInfo* modelPtr = modelIdPtrMap[modelId];
       if (modelPtr == nullptr) {
@@ -454,7 +454,7 @@ namespace ammonite {
       return true;
     }
 
-    bool applyTexture(AmmoniteId modelId, AmmoniteEnum textureType,
+    bool applyTexture(AmmoniteId modelId, AmmoniteTextureEnum textureType,
                       const std::string& texturePath) {
       return applyTexture(modelId, textureType, texturePath, ASSUME_SRGB_TEXTURES);
     }
@@ -491,7 +491,7 @@ namespace ammonite {
       return vertexCount;
     }
 
-    void setDrawMode(AmmoniteId modelId, AmmoniteEnum drawMode) {
+    void setDrawMode(AmmoniteId modelId, AmmoniteDrawEnum drawMode) {
       internal::ModelInfo* modelPtr = modelIdPtrMap[modelId];
       if (modelPtr != nullptr) {
         if (modelPtr->drawMode == AMMONITE_DRAW_INACTIVE &&
