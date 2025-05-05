@@ -57,6 +57,7 @@ namespace ammonite {
 
       //Setup input for window
       ammonite::input::internal::setupInputCallback(windowPtr);
+      ammonite::input::internal::setupMouseCallback(windowPtr);
       internal::setFocusCallback(windowPtr);
 
       return true;

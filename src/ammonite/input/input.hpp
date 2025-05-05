@@ -14,7 +14,7 @@ extern "C" {
 namespace ammonite {
   namespace input {
     namespace AMMONITE_INTERNAL internal {
-      //Implemented by inputManager.cpp
+      //Implemented by keyInputManager.cpp
       void setupInputCallback(GLFWwindow* windowPtr);
 
       void setInputBlock(bool inputBlocked);
@@ -26,6 +26,13 @@ namespace ammonite {
       bool unregisterKeybind(AmmoniteId keybindId);
       bool isKeycodeRegistered(const int keycodes[], int count);
       bool changeKeybindKeycodes(AmmoniteId keybindId, const int newKeycodes[], int count);
+
+      //Implemented by mouseInputManager.cpp
+      void setupMouseCallback(GLFWwindow* windowPtr);
+
+      void setCursorPositionCallback(AmmoniteCursorCallback callback, void* userPtr);
+      void setMouseButtonCallback(AmmoniteButtonCallback callback, void* userPtr);
+      void setScrollWheelCallback(AmmoniteScrollCallback callback, void* userPtr);
     }
   }
 }

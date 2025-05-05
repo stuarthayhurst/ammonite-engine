@@ -19,6 +19,9 @@ enum KeyStateEnum : unsigned char {
 };
 
 using AmmoniteKeyCallback = void (*)(const std::vector<int>& keycodes, KeyStateEnum action, void* userPtr);
+using AmmoniteCursorCallback = void (*)(double xPosition, double yPosition, void* userPtr);
+using AmmoniteButtonCallback = void (*)(int button, KeyStateEnum action, void* userPtr);
+using AmmoniteScrollCallback = void (*)(double xOffset, double yOffset, void* userPtr);
 
 namespace ammonite {
   namespace input {
@@ -50,6 +53,10 @@ namespace ammonite {
 
     bool changeKeybind(AmmoniteId keybindId, int keycodes[], int count);
     bool changeKeybind(AmmoniteId keybindId, int keycode);
+
+    void setCursorPositionCallback(AmmoniteCursorCallback callback, void* userPtr);
+    void setMouseButtonCallback(AmmoniteButtonCallback callback, void* userPtr);
+    void setScrollWheelCallback(AmmoniteScrollCallback callback, void* userPtr);
 
     void setInputFocus(bool active);
     bool getInputFocus();

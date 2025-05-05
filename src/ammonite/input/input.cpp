@@ -80,6 +80,18 @@ namespace ammonite {
       return isKeycodeRegistered(&keycode, 1);
     }
 
+    void setCursorPositionCallback(AmmoniteCursorCallback callback, void* userPtr) {
+      internal::setCursorPositionCallback(callback, userPtr);
+    }
+
+    void setMouseButtonCallback(AmmoniteButtonCallback callback, void* userPtr) {
+      internal::setMouseButtonCallback(callback, userPtr);
+    }
+
+    void setScrollWheelCallback(AmmoniteScrollCallback callback, void* userPtr) {
+      internal::setScrollWheelCallback(callback, userPtr);
+    }
+
     void setInputFocus(bool active) {
       internal::setInputBlock(!active);
       ammonite::controls::internal::setCursorFocus(active);

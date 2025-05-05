@@ -91,8 +91,6 @@ namespace ammonite {
   namespace controls {
     namespace {
       GLFWwindow* windowPtr = nullptr;
-      using CursorPositionCallback = void (*)(GLFWwindow*, double, double);
-      CursorPositionCallback activeCursorPositionCallback = nullptr;
 
       //Keyboard control direction enums
       enum DirectionEnum : unsigned char {
@@ -112,8 +110,9 @@ namespace ammonite {
       AmmoniteId keybindIds[6] = {0};
 
       //Mouse position callback data
-      double xposLast, yposLast;
+      double xPosLast, yPosLast;
       bool ignoreNextCursor = false;
+      bool ignoreMousePosition = false;
 
       bool isCameraActive = true;
     }
@@ -184,41 +183,41 @@ namespace ammonite {
 
     //Mouse control callbacks
     namespace {
-      //Increase / decrease FoV on scroll (xoffset is unused)
-      void scrollCallback(GLFWwindow*, double, double yoffset) {
+      //Increase / decrease field of view on scroll
+      void scrollCallback(double, double yOffset, void*) {
         const bool inputBlocked = input::internal::getInputBlock();
         if (!inputBlocked && isCameraActive) {
           const AmmoniteId activeCameraId = ammonite::camera::getActiveCamera();
           const float fov = ammonite::camera::getFieldOfView(activeCameraId);
 
           //Only zoom if FoV will be between 1 and FoV limit
-          const float newFov = fov - ((float)yoffset * controlSettings.zoomSpeed);
+          const float newFov = fov - ((float)yOffset * controlSettings.zoomSpeed);
           if (newFov > 0 && newFov <= controlSettings.fovLimit) {
             ammonite::camera::setFieldOfView(activeCameraId, newFov);
           }
         }
       }
 
-      //Reset FoV on middle click, (modifier bits are unused)
-      void zoomResetCallback(GLFWwindow*, int button, int action, int) {
+      //Reset field of view on middle click, (modifier bits are unused)
+      void zoomResetCallback(int button, KeyStateEnum action, void*) {
         const bool inputBlocked = input::internal::getInputBlock();
         if (!inputBlocked && isCameraActive) {
-          if (button == GLFW_MOUSE_BUTTON_MIDDLE && action == GLFW_PRESS) {
+          if (button == GLFW_MOUSE_BUTTON_MIDDLE && action == AMMONITE_PRESSED) {
             ammonite::camera::setFieldOfView(ammonite::camera::getActiveCamera(),
                                              glm::quarter_pi<float>());
           }
         }
       }
 
-      void cursorPositionCallback(GLFWwindow*, double xpos, double ypos) {
-        if (isCameraActive) {
+      void cursorPositionCallback(double xPos, double yPos, void*) {
+        if (isCameraActive && !ignoreMousePosition) {
           //Work out distance moved since last movement
-          const float xoffset = (float)(xpos - xposLast);
-          const float yoffset = (float)(ypos - yposLast);
+          const float xOffset = (float)(xPos - xPosLast);
+          const float yOffset = (float)(yPos - yPosLast);
 
           //Update saved cursor positions
-          xposLast = xpos;
-          yposLast = ypos;
+          xPosLast = xPos;
+          yPosLast = yPos;
 
           if (ignoreNextCursor) {
             ignoreNextCursor = false;
@@ -232,17 +231,17 @@ namespace ammonite {
 
           //Update viewing angles ('-' corrects camera inversion)
           ammonite::camera::setHorizontal(activeCameraId,
-            horizontalAngle - (controlSettings.mouseSpeed * xoffset));
+            horizontalAngle - (controlSettings.mouseSpeed * xOffset));
 
           //Only accept vertical angle if it won't create an impossible movement
-          const float newAngle = verticalAngle - (controlSettings.mouseSpeed * yoffset);
+          const float newAngle = verticalAngle - (controlSettings.mouseSpeed * yOffset);
           static const float limit = glm::radians(90.0f);
           if (newAngle > limit) { //Vertical max
             verticalAngle = limit;
           } else if (newAngle < -limit) { //Vertical min
             verticalAngle = -limit;
           } else {
-            verticalAngle += -controlSettings.mouseSpeed * yoffset;
+            verticalAngle += -controlSettings.mouseSpeed * yOffset;
           }
           ammonite::camera::setVertical(activeCameraId, verticalAngle);
         }
@@ -264,12 +263,13 @@ namespace ammonite {
         if (inputFocused) {
           //Hide cursor and start taking mouse input
           glfwSetInputMode(windowPtr, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-          glfwSetCursorPosCallback(windowPtr, activeCursorPositionCallback);
+          ignoreMousePosition = false;
+
           //Reset saved cursor position to avoid a large jump
-          glfwGetCursorPos(windowPtr, &xposLast, &yposLast);
+          glfwGetCursorPos(windowPtr, &xPosLast, &yPosLast);
         } else {
           //Remove callback and restore cursor
-          glfwSetCursorPosCallback(windowPtr, nullptr);
+          ignoreMousePosition = true;
           glfwSetInputMode(windowPtr, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         }
       }
@@ -306,13 +306,12 @@ namespace ammonite {
       ignoreNextCursor = true;
       windowPtr = ammonite::window::internal::getWindowPtr();
       glfwSetInputMode(windowPtr, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-      glfwGetCursorPos(windowPtr, &xposLast, &yposLast);
+      glfwGetCursorPos(windowPtr, &xPosLast, &yPosLast);
 
       //Set mouse control callbacks
-      glfwSetScrollCallback(windowPtr, scrollCallback);
-      glfwSetMouseButtonCallback(windowPtr, zoomResetCallback);
-      glfwSetCursorPosCallback(windowPtr, cursorPositionCallback);
-      activeCursorPositionCallback = cursorPositionCallback;
+      ammonite::input::setCursorPositionCallback(cursorPositionCallback, nullptr);
+      ammonite::input::setMouseButtonCallback(zoomResetCallback, nullptr);
+      ammonite::input::setScrollWheelCallback(scrollCallback, nullptr);
     }
 
     void releaseFreeCamera() {
@@ -325,10 +324,9 @@ namespace ammonite {
       }
 
       //Mouse callback clean up
-      glfwSetScrollCallback(windowPtr, nullptr);
-      glfwSetMouseButtonCallback(windowPtr, nullptr);
-      glfwSetCursorPosCallback(windowPtr, nullptr);
-      activeCursorPositionCallback = nullptr;
+      ammonite::input::setCursorPositionCallback(nullptr, nullptr);
+      ammonite::input::setMouseButtonCallback(nullptr, nullptr);
+      ammonite::input::setScrollWheelCallback(nullptr, nullptr);
 
       //Reset input mode and window pointer
       glfwSetInputMode(windowPtr, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
