@@ -2,10 +2,6 @@
 #include <unordered_map>
 #include <vector>
 
-extern "C" {
-  #include <GLFW/glfw3.h>
-}
-
 #include "input.hpp"
 
 #include "../utils/debug.hpp"
@@ -30,53 +26,11 @@ namespace ammonite {
           KeyStateEnum state;
         };
 
-        GLFWwindow* windowPtr = nullptr;
-
         bool isInputBlocked = false;
 
         std::unordered_map<AmmoniteId, KeybindData> keybindIdDataMap;
         std::unordered_map<int, KeycodeData> keycodeStateMap;
         AmmoniteId lastKeybindId = 0;
-      }
-
-      //Window implementation specific internal functions
-      namespace {
-        //Update the states of tracked keys on input
-        void keyCallbackHandler(GLFWwindow*, int keycode, int, int action, int) {
-          //Filter out unmapped keys
-          if (!keycodeStateMap.contains(keycode)) {
-            ammoniteInternalDebug << "Keycode '" << keycode << "' not registered" << std::endl;
-            return;
-          }
-
-          //Track new state for the keycode
-          if (action == GLFW_PRESS) {
-            if (keycodeStateMap[keycode].state == AMMONITE_PRESSED) {
-              ammoniteInternalDebug << "Keycode '" << keycode << "' already held" << std::endl;
-            }
-
-            keycodeStateMap[keycode].state = AMMONITE_PRESSED;
-          } else if (action == GLFW_RELEASE) {
-            if (keycodeStateMap[keycode].state == AMMONITE_RELEASED) {
-              ammoniteInternalDebug << "Keycode '" << keycode << "' wasn't held" << std::endl;
-            }
-
-            keycodeStateMap[keycode].state = AMMONITE_RELEASED;
-          }
-        }
-
-        KeyStateEnum getKeyState(int keycode) {
-          //Treat key as unpressed if the window isn't ready yet
-          if (windowPtr == nullptr) {
-            return AMMONITE_RELEASED;
-          }
-
-          if (glfwGetKey(windowPtr, keycode) == GLFW_RELEASE) {
-            return AMMONITE_RELEASED;
-          }
-
-          return AMMONITE_PRESSED;
-        }
       }
 
       //Generic internal functions
@@ -103,9 +57,12 @@ namespace ammonite {
         }
       }
 
-      //Link to window and set callback
-      void setupInputCallback(GLFWwindow* windowPtr) {
-        glfwSetKeyCallback(windowPtr, keyCallbackHandler);
+      KeyStateEnum* getKeycodeStatePtr(int keycode) {
+        if (keycodeStateMap.contains(keycode)) {
+          return &keycodeStateMap[keycode].state;
+        }
+
+        return nullptr;
       }
 
       void setInputBlock(bool inputBlocked) {
