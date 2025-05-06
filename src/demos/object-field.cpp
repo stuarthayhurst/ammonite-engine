@@ -239,7 +239,7 @@ namespace objectFieldDemo {
   }
 
   bool postRendererInit() {
-    const AmmoniteId screenId = ammonite::splash::getActiveLoadingScreenId();
+    const AmmoniteId screenId = ammonite::splash::getActiveSplashScreenId();
 
     //Generate random positions, orientations and sizes, skipping first item
     glm::vec3 cubeData[cubeCount][3];
@@ -267,9 +267,9 @@ namespace objectFieldDemo {
         success = false;
       }
 
-      //Update loading screen
+      //Update splash screen
       modelCount++;
-      ammonite::splash::setLoadingScreenProgress(screenId,
+      ammonite::splash::setSplashScreenProgress(screenId,
         float(modelCount) / float(totalModels));
       ammonite::renderer::drawFrame();
     }
@@ -302,17 +302,17 @@ namespace objectFieldDemo {
       ammonite::models::position::setRotation(loadedModelIds[modelCount], cubeData[i][1]);
       ammonite::models::position::setScale(loadedModelIds[modelCount], cubeData[i][2]);
 
-      //Update loading screen
+      //Update splash screen
       modelCount++;
-      ammonite::splash::setLoadingScreenProgress(screenId,
+      ammonite::splash::setSplashScreenProgress(screenId,
         (float)modelCount / (float)totalModels);
       ammonite::renderer::drawFrame();
     }
 
     ammonite::utils::status << "Loaded " << vertexCount << " vertices" << std::endl;
 
-    //Update loading screen
-    ammonite::splash::setLoadingScreenProgress(screenId, 1.0f);
+    //Update splash screen
+    ammonite::splash::setSplashScreenProgress(screenId, 1.0f);
     ammonite::renderer::drawFrame();
 
     //Setup each light and model

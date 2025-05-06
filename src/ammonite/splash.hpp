@@ -12,7 +12,7 @@
 namespace ammonite {
   namespace splash {
     namespace AMMONITE_INTERNAL internal {
-      struct LoadingScreen {
+      struct SplashScreen {
         float progress = 0.0f;
         float width = 0.85f;
         float height = 0.04f;
@@ -22,7 +22,7 @@ namespace ammonite {
         glm::vec3 progressColour = glm::vec3(0.0f, 0.6f, 0.8f);
       };
 
-      LoadingScreen* getLoadingScreenPtr(AmmoniteId loadingScreenId);
+      SplashScreen* getSplashScreenPtr(AmmoniteId splashScreenId);
     }
   }
 }

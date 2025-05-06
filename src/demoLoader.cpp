@@ -263,17 +263,17 @@ int main(int argc, char** argv) noexcept(false) {
   ammonite::renderer::settings::setShadowRes(1024);
   ammonite::renderer::settings::setFrameLimit(0.0f);
 
-  //Create a loading screen and render initial frame
-  const AmmoniteId screenId = ammonite::splash::createLoadingScreen();
-  ammonite::splash::setActiveLoadingScreen(screenId);
-  ammonite::splash::setLoadingScreenProgress(screenId, 0.0f);
+  //Create a splash screen and render initial frame
+  const AmmoniteId screenId = ammonite::splash::createSplashScreen();
+  ammonite::splash::setActiveSplashScreen(screenId);
+  ammonite::splash::setSplashScreenProgress(screenId, 0.0f);
   ammonite::renderer::drawFrame();
 
   //Call main demo setup
   if (postRendererInit != nullptr) {
     if (!postRendererInit()) {
       ammonite::utils::error << "Failed to set up demo, exiting" << std::endl;
-      ammonite::splash::deleteLoadingScreen(screenId);
+      ammonite::splash::deleteSplashScreen(screenId);
       cleanEngine(setupBits, nullptr);
       return EXIT_FAILURE;
     }
@@ -323,9 +323,9 @@ int main(int argc, char** argv) noexcept(false) {
   keybindIds.push_back(ammonite::input::registerToggleKeybind(GLFW_KEY_ESCAPE,
                        AMMONITE_ALLOW_OVERRIDE, closeWindowCallback, &closeWindow));
 
-  //Engine loaded, delete the loading screen
+  //Engine loaded, delete the splash screen
   ammonite::utils::status << "Loaded demo in " << utilityTimer.getTime() << "s\n" << std::endl;
-  ammonite::splash::deleteLoadingScreen(screenId);
+  ammonite::splash::deleteSplashScreen(screenId);
 
   //Create and reset timers for performance metrics
   utilityTimer.reset();

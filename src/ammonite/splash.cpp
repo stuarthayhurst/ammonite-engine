@@ -9,88 +9,88 @@
 namespace ammonite {
   namespace splash {
     namespace {
-      AmmoniteId activeLoadingScreenId = 0;
-      AmmoniteId lastLoadingScreenId = 0;
-      std::unordered_map<AmmoniteId, internal::LoadingScreen> loadingScreenTracker;
+      AmmoniteId activeSplashScreenId = 0;
+      AmmoniteId lastSplashScreenId = 0;
+      std::unordered_map<AmmoniteId, internal::SplashScreen> splashScreenTracker;
     }
 
     //Internally exposed functions
     namespace internal {
-      //Pointer is only valid until loadingScreenTracker is modified
-      LoadingScreen* getLoadingScreenPtr(AmmoniteId loadingScreenId) {
-        return &loadingScreenTracker[loadingScreenId];
+      //Pointer is only valid until splashScreenTracker is modified
+      SplashScreen* getSplashScreenPtr(AmmoniteId splashScreenId) {
+        return &splashScreenTracker[splashScreenId];
       }
     }
 
-    AmmoniteId createLoadingScreen() {
-      //Create and track the loading screen
-      const internal::LoadingScreen loadingScreen;
-      const AmmoniteId screenId = utils::internal::setNextId(&lastLoadingScreenId,
-                                                             loadingScreenTracker);
-      loadingScreenTracker[screenId] = loadingScreen;
+    AmmoniteId createSplashScreen() {
+      //Create and track the splash screen
+      const internal::SplashScreen splashScreen;
+      const AmmoniteId screenId = utils::internal::setNextId(&lastSplashScreenId,
+                                                             splashScreenTracker);
+      splashScreenTracker[screenId] = splashScreen;
 
       return screenId;
     }
 
-    void deleteLoadingScreen(AmmoniteId targetScreenId) {
+    void deleteSplashScreen(AmmoniteId targetScreenId) {
       //Set as inactive if the target is active, then delete
-      if (loadingScreenTracker.contains(targetScreenId)) {
-        if (activeLoadingScreenId == targetScreenId) {
-          activeLoadingScreenId = 0;
+      if (splashScreenTracker.contains(targetScreenId)) {
+        if (activeSplashScreenId == targetScreenId) {
+          activeSplashScreenId = 0;
         }
 
-        loadingScreenTracker.erase(targetScreenId);
+        splashScreenTracker.erase(targetScreenId);
       } else {
-        ammonite::utils::warning << "Requested loading screen doesn't exist (ID " \
+        ammonite::utils::warning << "Requested splash screen doesn't exist (ID " \
                                  << targetScreenId << ")" << std::endl;
       }
     }
 
-    void setActiveLoadingScreen(AmmoniteId targetScreenId) {
-      //Change the active loading screen, if it exists
-      if (loadingScreenTracker.contains(targetScreenId)) {
-        activeLoadingScreenId = targetScreenId;
+    void setActiveSplashScreen(AmmoniteId targetScreenId) {
+      //Change the active splash screen, if it exists
+      if (splashScreenTracker.contains(targetScreenId)) {
+        activeSplashScreenId = targetScreenId;
       } else if (targetScreenId == 0) {
-        activeLoadingScreenId = 0;
+        activeSplashScreenId = 0;
       } else {
-        ammonite::utils::warning << "Requested loading screen doesn't exist (ID " \
+        ammonite::utils::warning << "Requested splash screen doesn't exist (ID " \
                                  << targetScreenId << ")" << std::endl;
       }
     }
 
-    AmmoniteId getActiveLoadingScreenId() {
-      return activeLoadingScreenId;
+    AmmoniteId getActiveSplashScreenId() {
+      return activeSplashScreenId;
     }
 
-    void setLoadingScreenProgress(AmmoniteId targetScreenId, float progress) {
-      if (loadingScreenTracker.contains(targetScreenId)) {
-        loadingScreenTracker[targetScreenId].progress = progress;
+    void setSplashScreenProgress(AmmoniteId targetScreenId, float progress) {
+      if (splashScreenTracker.contains(targetScreenId)) {
+        splashScreenTracker[targetScreenId].progress = progress;
       } else {
-        ammonite::utils::warning << "Requested loading screen doesn't exist (ID " \
+        ammonite::utils::warning << "Requested splash screen doesn't exist (ID " \
                                  << targetScreenId << ")" << std::endl;
       }
     }
 
-    void setLoadingScreenGeometry(AmmoniteId targetScreenId, float width, float height,
+    void setSplashScreenGeometry(AmmoniteId targetScreenId, float width, float height,
                                   float heightOffset) {
-      if (loadingScreenTracker.contains(targetScreenId)) {
-        loadingScreenTracker[targetScreenId].width = width;
-        loadingScreenTracker[targetScreenId].height = height;
-        loadingScreenTracker[targetScreenId].heightOffset = heightOffset;
+      if (splashScreenTracker.contains(targetScreenId)) {
+        splashScreenTracker[targetScreenId].width = width;
+        splashScreenTracker[targetScreenId].height = height;
+        splashScreenTracker[targetScreenId].heightOffset = heightOffset;
       } else {
-           ammonite::utils::warning << "Requested loading screen doesn't exist (ID " \
+           ammonite::utils::warning << "Requested splash screen doesn't exist (ID " \
                                  << targetScreenId << ")" << std::endl;
       }
     }
 
-    void setLoadingScreenColours(AmmoniteId targetScreenId, glm::vec3 backgroundColour,
+    void setSplashScreenColours(AmmoniteId targetScreenId, glm::vec3 backgroundColour,
                                  glm::vec3 trackColour, glm::vec3 progressColour) {
-      if (loadingScreenTracker.contains(targetScreenId)) {
-        loadingScreenTracker[targetScreenId].backgroundColour = backgroundColour;
-        loadingScreenTracker[targetScreenId].trackColour = trackColour;
-        loadingScreenTracker[targetScreenId].progressColour = progressColour;
+      if (splashScreenTracker.contains(targetScreenId)) {
+        splashScreenTracker[targetScreenId].backgroundColour = backgroundColour;
+        splashScreenTracker[targetScreenId].trackColour = trackColour;
+        splashScreenTracker[targetScreenId].progressColour = progressColour;
       } else {
-           ammonite::utils::warning << "Requested loading screen doesn't exist (ID " \
+           ammonite::utils::warning << "Requested splash screen doesn't exist (ID " \
                                  << targetScreenId << ")" << std::endl;
       }
     }

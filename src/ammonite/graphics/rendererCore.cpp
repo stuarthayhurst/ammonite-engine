@@ -40,7 +40,7 @@ namespace ammonite {
       internal::DepthShader depthShader;
       internal::SkyboxShader skyboxShader;
       internal::ScreenShader screenShader;
-      internal::LoadingShader loadingShader;
+      internal::SplashShader splashShader;
 
       struct {
         GLuint skybox;
@@ -94,7 +94,7 @@ namespace ammonite {
           hasCreatedShaders &= depthShader.loadShader(shaderPath + "depth/");
           hasCreatedShaders &= skyboxShader.loadShader(shaderPath + "skybox/");
           hasCreatedShaders &= screenShader.loadShader(shaderPath + "screen/");
-          hasCreatedShaders &= loadingShader.loadShader(shaderPath + "loading/");
+          hasCreatedShaders &= splashShader.loadShader(shaderPath + "splash/");
 
           return hasCreatedShaders;
         }
@@ -105,7 +105,7 @@ namespace ammonite {
           depthShader.destroyShader();
           skyboxShader.destroyShader();
           screenShader.destroyShader();
-          loadingShader.destroyShader();
+          splashShader.destroyShader();
         }
 
         //Check for essential GPU capabilities
@@ -520,45 +520,45 @@ namespace ammonite {
         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, nullptr);
       }
 
-      void drawLoadingScreen(AmmoniteId loadingScreenId, unsigned int width,
-                             unsigned int height) {
-        //Swap to loading screen shader
-        loadingShader.useShader();
+      void drawSplashScreen(AmmoniteId splashScreenId, unsigned int width,
+                            unsigned int height) {
+        //Swap to splash screen shader
+        splashShader.useShader();
 
         //Pass drawing parameters, pointer is only valid for this frame
-        splash::internal::LoadingScreen* loadingScreen =
-          splash::internal::getLoadingScreenPtr(loadingScreenId);
-        glUniform1f(loadingShader.widthId, loadingScreen->width);
-        glUniform1f(loadingShader.heightId, loadingScreen->height);
-        glUniform1f(loadingShader.heightOffsetId, loadingScreen->heightOffset);
+        splash::internal::SplashScreen* splashScreen =
+          splash::internal::getSplashScreenPtr(splashScreenId);
+        glUniform1f(splashShader.widthId, splashScreen->width);
+        glUniform1f(splashShader.heightId, splashScreen->height);
+        glUniform1f(splashShader.heightOffsetId, splashScreen->heightOffset);
 
         //Prepare viewport and framebuffer
         internal::prepareScreen(0, width, height, false);
 
         //Prepare to draw the screen
-        const glm::vec3 backgroundColour = loadingScreen->backgroundColour;
+        const glm::vec3 backgroundColour = splashScreen->backgroundColour;
         glClearColor(backgroundColour.x, backgroundColour.y, backgroundColour.z, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         glBindVertexArray(screenQuadVertexArrayId);
 
         //Draw the track
-        glUniform1f(loadingShader.progressId, 1.0f);
-        glUniform3fv(loadingShader.progressColourId, 1, glm::value_ptr(loadingScreen->trackColour));
+        glUniform1f(splashShader.progressId, 1.0f);
+        glUniform3fv(splashShader.progressColourId, 1, glm::value_ptr(splashScreen->trackColour));
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, nullptr);
 
         //Fill in the bar
-        glUniform1f(loadingShader.progressId, loadingScreen->progress);
-        glUniform3fv(loadingShader.progressColourId, 1, glm::value_ptr(loadingScreen->progressColour));
+        glUniform1f(splashShader.progressId, splashScreen->progress);
+        glUniform3fv(splashShader.progressColourId, 1, glm::value_ptr(splashScreen->progressColour));
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, nullptr);
       }
     }
 
     namespace internal {
-      void internalDrawLoadingScreen(AmmoniteId loadingScreenId) {
+      void internalDrawSplashScreen(AmmoniteId splashScreenId) {
         const unsigned int width = ammonite::window::internal::getGraphicsWidth();
         const unsigned int height = ammonite::window::internal::getGraphicsHeight();
 
-        drawLoadingScreen(loadingScreenId, width, height);
+        drawSplashScreen(splashScreenId, width, height);
 
         //Prepare for next frame
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);

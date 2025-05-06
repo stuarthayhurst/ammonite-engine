@@ -91,8 +91,8 @@ namespace ammonite {
     void drawFrame() {
       //Increase frame counters
       static int unsigned frameCount = 0;
-      const AmmoniteId loadingScreenId = ammonite::splash::getActiveLoadingScreenId();
-      if (loadingScreenId == 0) {
+      const AmmoniteId splashScreenId = ammonite::splash::getActiveSplashScreenId();
+      if (splashScreenId == 0) {
         ammonite::lighting::internal::startUpdateLightSources();
         totalFrames++;
         frameCount++;
@@ -108,11 +108,11 @@ namespace ammonite {
       }
 
       //Offload rest of frame drawing to helpers
-      if (loadingScreenId == 0) {
+      if (splashScreenId == 0) {
         ammonite::camera::internal::updateMatrices();
         internal::internalDrawFrame();
       } else {
-        internal::internalDrawLoadingScreen(loadingScreenId);
+        internal::internalDrawSplashScreen(splashScreenId);
       }
     }
   }

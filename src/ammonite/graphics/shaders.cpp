@@ -72,7 +72,7 @@ namespace ammonite {
         farPlaneId = glGetUniformLocation(shaderId, "farPlane");
       }
 
-      void LoadingShader::setUniformLocations() {
+      void SplashShader::setUniformLocations() {
         progressId = glGetUniformLocation(shaderId, "progress");
         widthId = glGetUniformLocation(shaderId, "width");
         heightId = glGetUniformLocation(shaderId, "height");

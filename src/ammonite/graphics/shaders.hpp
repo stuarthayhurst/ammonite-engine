@@ -78,7 +78,7 @@ namespace ammonite {
         GLint farPlaneId;
       };
 
-      class LoadingShader : public Shader {
+      class SplashShader : public Shader {
       private:
         void setUniformLocations() override;
       public:

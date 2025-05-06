@@ -28,7 +28,7 @@ namespace ammonite {
 
     namespace AMMONITE_INTERNAL internal {
       void internalDrawFrame();
-      void internalDrawLoadingScreen(AmmoniteId loadingScreenId);
+      void internalDrawSplashScreen(AmmoniteId splashScreenId);
 
       void prepareScreen(GLuint framebufferId, unsigned int width,
                          unsigned int height, bool depthTest);

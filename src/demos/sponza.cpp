@@ -24,7 +24,7 @@ namespace sponzaDemo {
   }
 
   bool postRendererInit() {
-    const AmmoniteId screenId = ammonite::splash::getActiveLoadingScreenId();
+    const AmmoniteId screenId = ammonite::splash::getActiveSplashScreenId();
 
     //Load models from a set of objects and textures
     const std::string models[][2] = {
@@ -55,8 +55,8 @@ namespace sponzaDemo {
         }
       }
 
-      //Update loading screen
-      ammonite::splash::setLoadingScreenProgress(screenId, float(i + 1) / float(modelCount + 1));
+      //Update splash screen
+      ammonite::splash::setSplashScreenProgress(screenId, float(i + 1) / float(modelCount + 1));
       ammonite::renderer::drawFrame();
     }
 
@@ -73,8 +73,8 @@ namespace sponzaDemo {
 
     ammonite::utils::status << "Loaded " << vertexCount << " vertices" << std::endl;
 
-    //Update loading screen
-    ammonite::splash::setLoadingScreenProgress(screenId, 1.0f);
+    //Update splash screen
+    ammonite::splash::setSplashScreenProgress(screenId, 1.0f);
     ammonite::renderer::drawFrame();
 
     //Set light source properties
