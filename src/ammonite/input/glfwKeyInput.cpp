@@ -60,6 +60,10 @@ namespace ammonite {
 
         return AMMONITE_PRESSED;
       }
+
+      void updateEvents() {
+        glfwPollEvents();
+      }
     }
   }
 }

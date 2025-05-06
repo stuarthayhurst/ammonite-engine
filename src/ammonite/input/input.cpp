@@ -1,7 +1,3 @@
-extern "C" {
-  #include <GLFW/glfw3.h>
-}
-
 #include "input.hpp"
 
 #include "../utils/id.hpp"
@@ -109,8 +105,8 @@ namespace ammonite {
     }
 
     void updateInput() {
-        //Poll GLFW for input, run keybind callbacks
-        glfwPollEvents();
+        //Update key states, then run keybind callbacks
+        ammonite::input::internal::updateEvents();
         ammonite::input::internal::runCallbacks();
     }
   }

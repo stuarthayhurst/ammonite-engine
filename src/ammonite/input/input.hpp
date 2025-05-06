@@ -17,6 +17,7 @@ namespace ammonite {
       //Implemented by glfwKeyInput.cpp
       void setupInputCallback(GLFWwindow* windowPtr);
       KeyStateEnum getKeyState(int keycode);
+      void updateEvents();
 
       //Implemented by keyInputManager.cpp
       KeyStateEnum* getKeycodeStatePtr(int keycode);
