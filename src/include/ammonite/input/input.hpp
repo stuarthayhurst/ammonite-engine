@@ -19,7 +19,7 @@ enum KeyStateEnum : unsigned char {
 };
 
 using AmmoniteKeyCallback = void (*)(const std::vector<int>& keycodes, KeyStateEnum action, void* userPtr);
-using AmmoniteCursorCallback = void (*)(double xPosition, double yPosition, void* userPtr);
+using AmmoniteCursorCallback = void (*)(double xPosition, double yPosition, double xDelta, double yDelta, void* userPtr);
 using AmmoniteButtonCallback = void (*)(int button, KeyStateEnum action, void* userPtr);
 using AmmoniteScrollCallback = void (*)(double xOffset, double yOffset, void* userPtr);
 

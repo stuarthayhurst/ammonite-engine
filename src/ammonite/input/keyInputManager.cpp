@@ -65,11 +65,11 @@ namespace ammonite {
         return nullptr;
       }
 
-      void setInputBlock(bool inputBlocked) {
+      void setKeyInputBlock(bool inputBlocked) {
         isInputBlocked = inputBlocked;
       }
 
-      bool getInputBlock() {
+      bool getKeyInputBlock() {
         return isInputBlocked;
       }
 

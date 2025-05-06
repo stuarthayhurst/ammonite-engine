@@ -21,8 +21,8 @@ namespace ammonite {
       //Implemented by keyInputManager.cpp
       KeyStateEnum* getKeycodeStatePtr(int keycode);
 
-      void setInputBlock(bool inputBlocked);
-      bool getInputBlock();
+      void setKeyInputBlock(bool inputBlocked);
+      bool getKeyInputBlock();
 
       void runCallbacks();
       AmmoniteId registerRawKeybind(const int keycodes[], int count, AmmoniteReleaseEnum overrideMode,
@@ -33,6 +33,9 @@ namespace ammonite {
 
       //Implemented by glfwMouseInput.cpp
       void setupMouseCallback(GLFWwindow* windowPtr);
+
+      void setMouseInputBlock(bool inputBlocked);
+      bool getMouseInputBlock();
 
       void setCursorPositionCallback(AmmoniteCursorCallback callback, void* userPtr);
       void setMouseButtonCallback(AmmoniteButtonCallback callback, void* userPtr);

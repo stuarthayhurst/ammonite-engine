@@ -109,11 +109,6 @@ namespace ammonite {
       } directionData[6];
       AmmoniteId keybindIds[6] = {0};
 
-      //Mouse position callback data
-      double xPosLast, yPosLast;
-      bool ignoreNextCursor = false;
-      bool ignoreMousePosition = false;
-
       bool isCameraActive = true;
     }
 
@@ -185,8 +180,7 @@ namespace ammonite {
     namespace {
       //Increase / decrease field of view on scroll
       void scrollCallback(double, double yOffset, void*) {
-        const bool inputBlocked = input::internal::getInputBlock();
-        if (!inputBlocked && isCameraActive) {
+        if (isCameraActive) {
           const AmmoniteId activeCameraId = ammonite::camera::getActiveCamera();
           const float fov = ammonite::camera::getFieldOfView(activeCameraId);
 
@@ -200,8 +194,7 @@ namespace ammonite {
 
       //Reset field of view on middle click, (modifier bits are unused)
       void zoomResetCallback(int button, KeyStateEnum action, void*) {
-        const bool inputBlocked = input::internal::getInputBlock();
-        if (!inputBlocked && isCameraActive) {
+        if (isCameraActive) {
           if (button == GLFW_MOUSE_BUTTON_MIDDLE && action == AMMONITE_PRESSED) {
             ammonite::camera::setFieldOfView(ammonite::camera::getActiveCamera(),
                                              glm::quarter_pi<float>());
@@ -209,21 +202,8 @@ namespace ammonite {
         }
       }
 
-      void cursorPositionCallback(double xPos, double yPos, void*) {
-        if (isCameraActive && !ignoreMousePosition) {
-          //Work out distance moved since last movement
-          const float xOffset = (float)(xPos - xPosLast);
-          const float yOffset = (float)(yPos - yPosLast);
-
-          //Update saved cursor positions
-          xPosLast = xPos;
-          yPosLast = yPos;
-
-          if (ignoreNextCursor) {
-            ignoreNextCursor = false;
-            return;
-          }
-
+      void cursorPositionCallback(double, double, double xOffset, double yOffset, void*) {
+        if (isCameraActive) {
           //Get current viewing angles
           const AmmoniteId activeCameraId = ammonite::camera::getActiveCamera();
           const float horizontalAngle = ammonite::camera::getHorizontal(activeCameraId);
@@ -231,46 +211,19 @@ namespace ammonite {
 
           //Update viewing angles ('-' corrects camera inversion)
           ammonite::camera::setHorizontal(activeCameraId,
-            horizontalAngle - (controlSettings.mouseSpeed * xOffset));
+            horizontalAngle - (controlSettings.mouseSpeed * (float)xOffset));
 
           //Only accept vertical angle if it won't create an impossible movement
-          const float newAngle = verticalAngle - (controlSettings.mouseSpeed * yOffset);
+          const float newAngle = verticalAngle - (controlSettings.mouseSpeed * (float)yOffset);
           static const float limit = glm::radians(90.0f);
           if (newAngle > limit) { //Vertical max
             verticalAngle = limit;
           } else if (newAngle < -limit) { //Vertical min
             verticalAngle = -limit;
           } else {
-            verticalAngle += -controlSettings.mouseSpeed * yOffset;
+            verticalAngle += -controlSettings.mouseSpeed * (float)yOffset;
           }
           ammonite::camera::setVertical(activeCameraId, verticalAngle);
-        }
-      }
-    }
-
-    //Internally exposed function to set cursor focus from input system
-    namespace internal {
-      //Helper function to set input state
-      void setCursorFocus(bool inputFocused) {
-        //Skip next cursor movement, to avoid huge jumps
-        ignoreNextCursor = true;
-
-        if (windowPtr == nullptr) {
-          return;
-        }
-
-        //Hide and unhide cursor as necessary
-        if (inputFocused) {
-          //Hide cursor and start taking mouse input
-          glfwSetInputMode(windowPtr, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-          ignoreMousePosition = false;
-
-          //Reset saved cursor position to avoid a large jump
-          glfwGetCursorPos(windowPtr, &xPosLast, &yPosLast);
-        } else {
-          //Remove callback and restore cursor
-          ignoreMousePosition = true;
-          glfwSetInputMode(windowPtr, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         }
       }
     }
@@ -303,10 +256,8 @@ namespace ammonite {
       }
 
       //Mouse controls setup, prepare cursor position and mode
-      ignoreNextCursor = true;
       windowPtr = ammonite::window::internal::getWindowPtr();
       glfwSetInputMode(windowPtr, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-      glfwGetCursorPos(windowPtr, &xPosLast, &yPosLast);
 
       //Set mouse control callbacks
       ammonite::input::setCursorPositionCallback(cursorPositionCallback, nullptr);

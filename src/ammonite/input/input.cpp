@@ -4,8 +4,6 @@ extern "C" {
 
 #include "input.hpp"
 
-#include "controls.hpp"
-
 #include "../utils/id.hpp"
 
 #define OVERRIDE_MODE_DEFAULT AMMONITE_FORCE_RELEASE
@@ -93,12 +91,13 @@ namespace ammonite {
     }
 
     void setInputFocus(bool active) {
-      internal::setInputBlock(!active);
-      ammonite::controls::internal::setCursorFocus(active);
+      internal::setKeyInputBlock(!active);
+      internal::setMouseInputBlock(!active);
     }
 
     bool getInputFocus() {
-      return !internal::getInputBlock();
+      //Technically we should factor in the mouse, but they're always in sync
+      return !internal::getKeyInputBlock();
     }
 
     bool changeKeybind(AmmoniteId keybindId, int keycodes[], int count) {
