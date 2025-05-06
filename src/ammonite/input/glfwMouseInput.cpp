@@ -94,6 +94,9 @@ namespace ammonite {
       void setupMouseCallback(GLFWwindow* newWindowPtr) {
         windowPtr = newWindowPtr;
 
+        //Disable mouse input block
+        setMouseInputBlock(false);
+
         glfwSetCursorPosCallback(windowPtr, cursorPositionCallbackWrapper);
         glfwSetMouseButtonCallback(windowPtr, mouseButtonCallbackWrapper);
         glfwSetScrollCallback(windowPtr, scrollWheelCallbackWrapper);

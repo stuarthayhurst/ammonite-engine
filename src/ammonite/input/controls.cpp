@@ -15,7 +15,6 @@ extern "C" {
 #include "../camera.hpp"
 #include "../utils/id.hpp"
 #include "../utils/timer.hpp"
-#include "../window/window.hpp"
 
 //Store and expose controls settings
 namespace ammonite {
@@ -90,8 +89,6 @@ namespace ammonite {
 namespace ammonite {
   namespace controls {
     namespace {
-      GLFWwindow* windowPtr = nullptr;
-
       //Keyboard control direction enums
       enum DirectionEnum : unsigned char {
         AMMONITE_FORWARD,
@@ -255,10 +252,6 @@ namespace ammonite {
         }
       }
 
-      //Mouse controls setup, prepare cursor position and mode
-      windowPtr = ammonite::window::internal::getWindowPtr();
-      glfwSetInputMode(windowPtr, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-
       //Set mouse control callbacks
       ammonite::input::setCursorPositionCallback(cursorPositionCallback, nullptr);
       ammonite::input::setMouseButtonCallback(zoomResetCallback, nullptr);
@@ -278,10 +271,6 @@ namespace ammonite {
       ammonite::input::setCursorPositionCallback(nullptr, nullptr);
       ammonite::input::setMouseButtonCallback(nullptr, nullptr);
       ammonite::input::setScrollWheelCallback(nullptr, nullptr);
-
-      //Reset input mode and window pointer
-      glfwSetInputMode(windowPtr, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-      windowPtr = nullptr;
     }
   }
 }
