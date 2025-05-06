@@ -4,6 +4,11 @@
 
 #define OVERRIDE_MODE_DEFAULT AMMONITE_FORCE_RELEASE
 
+/*
+ - This file provides user-accessible functions to control the input layer's internals
+ - Most importantly, it maps register(Toggle)Keybind() to registerRawKeybind()
+*/
+
 namespace ammonite {
   namespace input {
     //A: Multi-key, override mode, no toggle

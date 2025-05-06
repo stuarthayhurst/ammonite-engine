@@ -8,6 +8,10 @@ extern "C" {
 
 #include "../utils/debug.hpp"
 
+/*
+ - This file implements GLFW-specific key handling, used by the input layer
+*/
+
 namespace ammonite {
   namespace input {
     namespace internal {
@@ -67,9 +71,3 @@ namespace ammonite {
     }
   }
 }
-
-
-
-
-
-

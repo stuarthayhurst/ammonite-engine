@@ -16,6 +16,11 @@ extern "C" {
 #include "../utils/id.hpp"
 #include "../utils/timer.hpp"
 
+/*
+ - This file provides some ready-made camera controls, built on the input layer
+ - It shouldn't rely on engine internals or engine dependencies to work
+*/
+
 //Store and expose controls settings
 namespace ammonite {
   namespace controls {

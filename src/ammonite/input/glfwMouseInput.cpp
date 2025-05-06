@@ -8,6 +8,10 @@ extern "C" {
 
 #include "../utils/logging.hpp"
 
+/*
+ - This file implements GLFW-specific mouse handling, used by the input layer
+*/
+
 namespace ammonite {
   namespace input {
     namespace internal {

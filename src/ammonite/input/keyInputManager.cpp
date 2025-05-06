@@ -7,6 +7,12 @@
 #include "../utils/debug.hpp"
 #include "../utils/id.hpp"
 
+/*
+ - This file implements keybind and keycode state tracking
+ - Interest in keycodes is registered through keybinds
+   - These keycodes have their states tracked, to determine when to run keybind callbacks
+*/
+
 namespace ammonite {
   namespace input {
     namespace internal {
