@@ -14,7 +14,7 @@
   - Model loading, using `libassimp`
   - Internal thread pool
   - Shader program caching
-  - Keyboard and mouse input handling
+  - Key binding and mouse input support
 
 ## Requirements:
   - A `c++23` compatible compiler (`g++ (14+)` / `clang (18+)`)
