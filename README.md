@@ -12,9 +12,9 @@
 
 ## Features:
   - Model loading, using `libassimp`
-  - Internal thread pool
   - Shader program caching
   - Key binding and mouse input support
+  - Miscellaneous utilities (thread pool, thread-safe logging, timers, random number generation)
 
 ## Requirements:
   - A `c++23` compatible compiler (`g++ (14+)` / `clang (18+)`)
