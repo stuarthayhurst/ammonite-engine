@@ -99,8 +99,8 @@ namespace objectFieldDemo {
       const AmmoniteId modelId = ammonite::models::copyModel(floorId);
       loadedModelIds.push_back(modelId);
 
-      const float horiz = ammonite::camera::getHorizontal(activeCameraId);
-      const float vert = ammonite::camera::getVertical(activeCameraId);
+      const double horiz = ammonite::camera::getHorizontal(activeCameraId);
+      const double vert = ammonite::camera::getVertical(activeCameraId);
 
       ammonite::models::position::setRotation(modelId, glm::vec3(-vert, horiz, 0.0f));
       ammonite::models::position::setScale(modelId, 0.25f);
@@ -338,8 +338,7 @@ namespace objectFieldDemo {
     //Set the camera position
     const AmmoniteId cameraId = ammonite::camera::getActiveCamera();
     ammonite::camera::setPosition(cameraId, glm::vec3(10.0f, 17.0f, 17.0f));
-    ammonite::camera::setHorizontal(cameraId, 4.75f * glm::quarter_pi<float>());
-    ammonite::camera::setVertical(cameraId, -0.7f);
+    ammonite::camera::setAngle(cameraId, 4.75f * glm::quarter_pi<float>(), -0.7f);
 
     return true;
   }

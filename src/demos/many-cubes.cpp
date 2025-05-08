@@ -92,8 +92,7 @@ namespace manyCubesDemo {
     //Set the camera position
     const AmmoniteId cameraId = ammonite::camera::getActiveCamera();
     ammonite::camera::setPosition(cameraId, glm::vec3(0.0f, 12.0f, 0.0f));
-    ammonite::camera::setHorizontal(cameraId, glm::radians(45.0f));
-    ammonite::camera::setVertical(cameraId, glm::radians(-20.0f));
+    ammonite::camera::setAngle(cameraId, glm::radians(45.0f), glm::radians(-20.0f));
 
     return true;
   }

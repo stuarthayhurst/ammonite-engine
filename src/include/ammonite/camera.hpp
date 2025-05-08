@@ -15,14 +15,14 @@ namespace ammonite {
 
     glm::vec3 getPosition(AmmoniteId cameraId);
     glm::vec3 getDirection(AmmoniteId cameraId);
-    float getHorizontal(AmmoniteId cameraId);
-    float getVertical(AmmoniteId cameraId);
+    double getHorizontal(AmmoniteId cameraId);
+    double getVertical(AmmoniteId cameraId);
     float getFieldOfView(AmmoniteId cameraId);
 
-    void setPosition(AmmoniteId cameraId, glm::vec3 newPosition);
-    void setHorizontal(AmmoniteId cameraId, float newHorizontal);
-    void setVertical(AmmoniteId cameraId, float newVertical);
-    void setFieldOfView(AmmoniteId cameraId, float newFov);
+    void setPosition(AmmoniteId cameraId, glm::vec3 position);
+    void setDirection(AmmoniteId cameraId, glm::vec3 direction);
+    void setAngle(AmmoniteId cameraId, double horizontal, double vertical);
+    void setFieldOfView(AmmoniteId cameraId, float fov);
   }
 }
 

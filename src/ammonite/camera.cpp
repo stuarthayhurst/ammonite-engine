@@ -16,8 +16,8 @@ namespace ammonite {
     namespace {
       struct Camera {
         glm::vec3 position = glm::vec3(0.0f);
-        float horizontalAngle = glm::pi<float>();
-        float verticalAngle = 0.0f;
+        double horizontalAngle = glm::pi<double>();
+        double verticalAngle = 0.0f;
         float fov = glm::quarter_pi<float>();
       } defaultCamera;
 
@@ -32,12 +32,24 @@ namespace ammonite {
     }
 
     namespace {
-      glm::vec3 calculateDirection(double vertical, double horizontal) {
-        return glm::vec3(
+      glm::vec3 calculateDirection(double horizontal, double vertical) {
+        return glm::normalize(glm::vec3(
           std::cos(vertical) * std::sin(horizontal),
           std::sin(vertical),
           std::cos(vertical) * std::cos(horizontal)
-        );
+        ));
+      }
+
+//TODO: normalize?
+      double calculateVerticalAngle(glm::vec3 direction) {
+        return std::asin(direction.y);
+      }
+
+//TODO: no idea if this works - are the axis correct?
+      double calculateHorizontalAngle(glm::vec3 direction) {
+        direction.y = 0.0f;
+        direction = glm::normalize(direction);
+        return std::atan2(direction.x, direction.z);
       }
     }
 
@@ -55,16 +67,17 @@ namespace ammonite {
         //Get the active camera
         const Camera* activeCamera = &cameraTrackerMap[activeCameraId];
 
-        //Vector for current direction faced
-        const glm::vec3 direction = calculateDirection(activeCamera->verticalAngle,
-                                                       activeCamera->horizontalAngle);
+        //Calculate the direction vector
+        const glm::vec3 direction = calculateDirection(activeCamera->horizontalAngle,
+                                                       activeCamera->verticalAngle);
 
         //Right vector, relative to the camera
         const glm::vec3 right = glm::vec3(
-          std::sin(activeCamera->horizontalAngle - glm::half_pi<float>()),
+          std::sin(activeCamera->horizontalAngle - glm::half_pi<double>()),
           0,
-          std::cos(activeCamera->horizontalAngle - glm::half_pi<float>())
+          std::cos(activeCamera->horizontalAngle - glm::half_pi<double>())
         );
+
         //Up vector, relative to the camera
         const glm::vec3 up = glm::cross(right, direction);
 
@@ -75,7 +88,8 @@ namespace ammonite {
                                             aspectRatio, 0.1f, renderFarPlane);
 
         //Calculate view matrix from position, where it's looking, and relative up
-        viewMatrix = glm::lookAt(activeCamera->position, activeCamera->position + direction, up);
+        viewMatrix = glm::lookAt(activeCamera->position,
+                                 activeCamera->position + direction, up);
       }
     }
 
@@ -123,31 +137,29 @@ namespace ammonite {
 
     glm::vec3 getDirection(AmmoniteId cameraId) {
       if (cameraTrackerMap.contains(cameraId)) {
-        const Camera* activeCamera = &cameraTrackerMap[cameraId];
-        const glm::vec3 direction = calculateDirection(activeCamera->verticalAngle,
-                                                       activeCamera->horizontalAngle);
-        return glm::normalize(direction);
+        const Camera& activeCamera = cameraTrackerMap[cameraId];
+        return calculateDirection(activeCamera.horizontalAngle, activeCamera.verticalAngle);
       }
 
       return glm::vec3(0.0f);
     }
 
     //Get horizontal angle (radians)
-    float getHorizontal(AmmoniteId cameraId) {
+    double getHorizontal(AmmoniteId cameraId) {
       if (cameraTrackerMap.contains(cameraId)) {
         return cameraTrackerMap[cameraId].horizontalAngle;
       }
 
-      return 0.0f;
+      return 0.0;
     }
 
     //Get vertical angle (radians)
-    float getVertical(AmmoniteId cameraId) {
+    double getVertical(AmmoniteId cameraId) {
       if (cameraTrackerMap.contains(cameraId)) {
         return cameraTrackerMap[cameraId].verticalAngle;
       }
 
-      return 0.0f;
+      return 0.0;
     }
 
     //Get field of view (radians)
@@ -160,34 +172,37 @@ namespace ammonite {
     }
 
     //Set position
-    void setPosition(AmmoniteId cameraId, glm::vec3 newPosition) {
+    void setPosition(AmmoniteId cameraId, glm::vec3 position) {
       //Find the target camera and update position
       if (cameraTrackerMap.contains(cameraId)) {
-        cameraTrackerMap[cameraId].position = newPosition;
+        cameraTrackerMap[cameraId].position = position;
       }
     }
 
-    //Set horizontal angle (radians)
-    void setHorizontal(AmmoniteId cameraId, float newHorizontal) {
-      //Find the target camera and update horizontal angle
+    //Set direction
+    void setDirection(AmmoniteId cameraId, glm::vec3 direction) {
+      //Find the target camera and update direction
       if (cameraTrackerMap.contains(cameraId)) {
-        cameraTrackerMap[cameraId].horizontalAngle = newHorizontal;
+        Camera& activeCamera = cameraTrackerMap[cameraId];
+        activeCamera.horizontalAngle = calculateHorizontalAngle(direction);
+        activeCamera.verticalAngle = calculateVerticalAngle(direction);
       }
     }
 
-    //Set vertical angle (radians)
-    void setVertical(AmmoniteId cameraId, float newVertical) {
-      //Find the target camera and update vertical angle
+    //Set camera direction via angle pair (radians)
+    void setAngle(AmmoniteId cameraId, double horizontal, double vertical) {
+      //Convert to a vector and set it
       if (cameraTrackerMap.contains(cameraId)) {
-        cameraTrackerMap[cameraId].verticalAngle = newVertical;
+        cameraTrackerMap[cameraId].horizontalAngle = horizontal;
+        cameraTrackerMap[cameraId].verticalAngle = vertical;
       }
     }
 
     //Set field of view (radians)
-    void setFieldOfView(AmmoniteId cameraId, float newFov) {
+    void setFieldOfView(AmmoniteId cameraId, float fov) {
       //Find the target camera and update field of view
       if (cameraTrackerMap.contains(cameraId)) {
-        cameraTrackerMap[cameraId].fov = newFov;
+        cameraTrackerMap[cameraId].fov = fov;
       }
     }
   }

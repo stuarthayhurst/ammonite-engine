@@ -130,13 +130,13 @@ namespace ammonite {
         const AmmoniteId activeCameraId = ammonite::camera::getActiveCamera();
 
         //Vector for current direction, without vertical component
-        const float horizontalAngle = ammonite::camera::getHorizontal(activeCameraId);
+        const double horizontalAngle = ammonite::camera::getHorizontal(activeCameraId);
         const glm::vec3 horizontalDirection(std::sin(horizontalAngle), 0,
                                             std::cos(horizontalAngle));
 
         //Right vector, relative to the camera
-        const glm::vec3 right = glm::vec3(std::sin(horizontalAngle - glm::half_pi<float>()), 0,
-                                          std::cos(horizontalAngle - glm::half_pi<float>()));
+        const glm::vec3 right = glm::vec3(std::sin(horizontalAngle - glm::half_pi<double>()), 0,
+                                          std::cos(horizontalAngle - glm::half_pi<double>()));
 
         //Get the current camera position
         glm::vec3 position = ammonite::camera::getPosition(activeCameraId);
@@ -208,24 +208,23 @@ namespace ammonite {
         if (isCameraActive) {
           //Get current viewing angles
           const AmmoniteId activeCameraId = ammonite::camera::getActiveCamera();
-          const float horizontalAngle = ammonite::camera::getHorizontal(activeCameraId);
-          float verticalAngle = ammonite::camera::getVertical(activeCameraId);
+          double horizontalAngle = ammonite::camera::getHorizontal(activeCameraId);
+          const double verticalAngle = ammonite::camera::getVertical(activeCameraId);
 
-          //Update viewing angles ('-' corrects camera inversion)
-          ammonite::camera::setHorizontal(activeCameraId,
-            horizontalAngle - (controlSettings.mouseSpeed * (float)xOffset));
+          //Calculate new horizontal angle
+          horizontalAngle -= controlSettings.mouseSpeed * xOffset;
 
           //Only accept vertical angle if it won't create an impossible movement
-          const float newAngle = verticalAngle - (controlSettings.mouseSpeed * (float)yOffset);
-          static const float limit = glm::radians(90.0f);
-          if (newAngle > limit) { //Vertical max
-            verticalAngle = limit;
-          } else if (newAngle < -limit) { //Vertical min
-            verticalAngle = -limit;
-          } else {
-            verticalAngle += -controlSettings.mouseSpeed * (float)yOffset;
+          double newVerticalAngle = verticalAngle - (controlSettings.mouseSpeed * yOffset);
+          const double limit = glm::radians(90.0);
+          if (newVerticalAngle > limit) { //Vertical max
+            newVerticalAngle = limit;
+          } else if (newVerticalAngle < -limit) { //Vertical min
+            newVerticalAngle = -limit;
           }
-          ammonite::camera::setVertical(activeCameraId, verticalAngle);
+
+          //Update the camera
+          ammonite::camera::setAngle(activeCameraId, horizontalAngle, newVerticalAngle);
         }
       }
     }
