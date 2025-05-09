@@ -40,12 +40,10 @@ namespace ammonite {
         ));
       }
 
-//TODO: normalize?
       double calculateVerticalAngle(glm::vec3 direction) {
-        return std::asin(direction.y);
+        return std::asin(glm::normalize(direction).y);
       }
 
-//TODO: no idea if this works - are the axis correct?
       double calculateHorizontalAngle(glm::vec3 direction) {
         direction.y = 0.0f;
         direction = glm::normalize(direction);
