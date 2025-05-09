@@ -27,6 +27,7 @@ namespace ammonite {
                            unsigned int* yPos, bool useDecoratedSize, bool useDecoratedPos);
 
     void setFullscreenMonitor(GLFWmonitor* monitor);
+    void setFullscreen(bool shouldFullscreen, GLFWmonitor* monitor);
     void setFullscreen(bool shouldFullscreen);
     GLFWmonitor* getCurrentMonitor();
     GLFWmonitor** getMonitors(unsigned int* monitorCount);

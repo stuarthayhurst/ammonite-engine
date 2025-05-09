@@ -198,7 +198,7 @@ namespace ammonite {
      - Set monitor for a fullscreen window
      - Does nothing if the window isn't fullscreen
     */
-    void setFullscreenMonitor(GLFWmonitor* monitor) {
+    void setFullscreenMonitor(GLFWmonitor* monitorPtr) {
       if (windowPtr == nullptr) {
         ammonite::utils::warning << "Window system hasn't been initialised" << std::endl;
         return;
@@ -210,14 +210,14 @@ namespace ammonite {
         return;
       }
 
-      internal::setFullscreenMonitor(windowPtr, monitor);
+      internal::setFullscreenMonitor(windowPtr, monitorPtr);
     }
 
     /*
      - Make a window fullscreen, or restore a fullscreen window to windowed
      - Windowing a fullscreen window attempts to restore the previous geometry
     */
-    void setFullscreen(bool shouldFullscreen) {
+    void setFullscreen(bool shouldFullscreen, GLFWmonitor* monitorPtr) {
       if (windowPtr == nullptr) {
         ammonite::utils::warning << "Window system hasn't been initialised" << std::endl;
         return;
@@ -228,7 +228,20 @@ namespace ammonite {
         return;
       }
 
-      internal::setFullscreen(windowPtr, shouldFullscreen);
+      internal::setFullscreen(windowPtr, shouldFullscreen, monitorPtr);
+    }
+
+    /*
+     - Same as the more configurable setFullscreen(), without specifying a monitor
+     - Instead, attempt to guess which monitor the window is on
+    */
+    void setFullscreen(bool shouldFullscreen) {
+      if (windowPtr == nullptr) {
+        ammonite::utils::warning << "Window system hasn't been initialised" << std::endl;
+        return;
+      }
+
+      setFullscreen(shouldFullscreen, getCurrentMonitor());
     }
 
     //Return the fullscreen monitor, or the closest matched when windowed

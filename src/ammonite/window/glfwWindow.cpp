@@ -297,12 +297,12 @@ namespace ammonite {
         storeWindowGeometry(windowPtr, &activeWindowGeom, false, true);
       }
 
-      void setFullscreen(GLFWwindow* windowPtr, bool shouldFullscreen) {
+      void setFullscreen(GLFWwindow* windowPtr, bool shouldFullscreen, GLFWmonitor* monitor) {
         //Handle new window mode
         if (shouldFullscreen) {
           //Store windowed geometry and then fullscreen
           storeWindowGeometry(windowPtr, &windowGeomRestore, true, true);
-          setFullscreenMonitor(windowPtr, getClosestMonitor(windowPtr));
+          setFullscreenMonitor(windowPtr, monitor);
         } else {
           //Work around maximised windows being made fullscreen again
           if (windowGeomRestore.xPos == 0 && windowGeomRestore.yPos == 0) {
