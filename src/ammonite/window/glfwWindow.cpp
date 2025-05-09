@@ -141,6 +141,35 @@ namespace ammonite {
           return bestMonitor;
         }
 
+        unsigned int getMonitorIndex(GLFWmonitor* monitorPtr) {
+          int glfwMonitorCount = 0;
+          GLFWmonitor** monitorPtrs = glfwGetMonitors(&glfwMonitorCount);
+
+          //Search provided monitor pointers for the target monitor
+          for (int i = 0; i < glfwMonitorCount; i++) {
+            if (monitorPtrs[i] == monitorPtr) {
+              return (unsigned int)i;
+            }
+          }
+
+          ammonite::utils::warning << "Failed to find monitor for pointer '" \
+                                   << monitorPtr << "'" << std::endl;
+          return 0;
+        }
+
+        GLFWmonitor* getMonitorPtr(unsigned int monitorIndex) {
+          int glfwMonitorCount = 0;
+          GLFWmonitor** monitorPtrs = glfwGetMonitors(&glfwMonitorCount);
+
+          if ((int)monitorIndex >= glfwMonitorCount) {
+            ammonite::utils::warning << "Unknown monitor index '" << monitorIndex << \
+              "', only found " << glfwMonitorCount << " monitors" << std::endl;
+            monitorIndex = (unsigned int)(glfwMonitorCount - 1);
+          }
+
+          return monitorPtrs[monitorIndex];
+        }
+
         //Callback to update height and width on window resize
         void framebufferSizeCallback(GLFWwindow* windowPtr, int, int) {
           storeWindowGeometry(windowPtr, &activeWindowGeom, false, true);
@@ -287,22 +316,25 @@ namespace ammonite {
         *yPos = tempStorage.yPos;
       }
 
-      void setFullscreenMonitor(GLFWwindow* windowPtr, GLFWmonitor* monitor) {
+      void setFullscreenMonitor(GLFWwindow* windowPtr, unsigned int monitorIndex) {
+        //Convert index to pointer
+        GLFWmonitor* monitorPtr = getMonitorPtr(monitorIndex);
+
         //Set fullscreen mode
-        const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+        const GLFWvidmode* mode = glfwGetVideoMode(monitorPtr);
         isWindowFullscreen = true;
-        glfwSetWindowMonitor(windowPtr, monitor, 0, 0, mode->width, mode->height, GLFW_DONT_CARE);
+        glfwSetWindowMonitor(windowPtr, monitorPtr, 0, 0, mode->width, mode->height, GLFW_DONT_CARE);
 
         //Update active window geometry store
         storeWindowGeometry(windowPtr, &activeWindowGeom, false, true);
       }
 
-      void setFullscreen(GLFWwindow* windowPtr, bool shouldFullscreen, GLFWmonitor* monitor) {
+      void setFullscreen(GLFWwindow* windowPtr, bool shouldFullscreen, unsigned int monitorIndex) {
         //Handle new window mode
         if (shouldFullscreen) {
           //Store windowed geometry and then fullscreen
           storeWindowGeometry(windowPtr, &windowGeomRestore, true, true);
-          setFullscreenMonitor(windowPtr, monitor);
+          setFullscreenMonitor(windowPtr, monitorIndex);
         } else {
           //Work around maximised windows being made fullscreen again
           if (windowGeomRestore.xPos == 0 && windowGeomRestore.yPos == 0) {
@@ -325,16 +357,22 @@ namespace ammonite {
         }
       }
 
-      GLFWmonitor* getCurrentMonitor(GLFWwindow* windowPtr) {
-        return isWindowFullscreen ? glfwGetWindowMonitor(windowPtr) : getClosestMonitor(windowPtr);
+      unsigned int getCurrentMonitorIndex(GLFWwindow* windowPtr) {
+        GLFWmonitor* monitorPtr = nullptr;
+        if (isWindowFullscreen) {
+          monitorPtr = glfwGetWindowMonitor(windowPtr);
+        } else {
+          monitorPtr = getClosestMonitor(windowPtr);
+        }
+
+        return getMonitorIndex(monitorPtr);
       }
 
-      GLFWmonitor** getMonitors(unsigned int* monitorCount) {
+      unsigned int getMonitorCount() {
         int glfwMonitorCount = 0;
-        GLFWmonitor** monitorPtrs = glfwGetMonitors(&glfwMonitorCount);
+        glfwGetMonitors(&glfwMonitorCount);
 
-        *monitorCount = (unsigned int)glfwMonitorCount;
-        return monitorPtrs;
+        return (unsigned int)glfwMonitorCount;
       }
 
       bool getFullscreen() {

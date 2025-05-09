@@ -3,10 +3,6 @@
 
 #include <string>
 
-extern "C" {
-  #include <GLFW/glfw3.h>
-}
-
 namespace ammonite {
   namespace window {
     bool createWindow(unsigned int width, unsigned int height, const std::string& title);
@@ -26,13 +22,13 @@ namespace ammonite {
     void getWindowGeometry(unsigned int* width, unsigned int* height, unsigned int* xPos,
                            unsigned int* yPos, bool useDecoratedSize, bool useDecoratedPos);
 
-    void setFullscreen(bool shouldFullscreen, GLFWmonitor* monitor);
+    void setFullscreen(bool shouldFullscreen, unsigned int monitorIndex);
     void setFullscreen(bool shouldFullscreen);
     bool getFullscreen();
 
-    GLFWmonitor* getCurrentMonitor();
-    GLFWmonitor** getMonitors(unsigned int* monitorCount);
-    void changeFullscreenMonitor(GLFWmonitor* monitor);
+    unsigned int getCurrentMonitorIndex();
+    unsigned int getMonitorCount();
+    void changeFullscreenMonitor(unsigned int monitorIndex);
 
     bool shouldWindowClose();
   }

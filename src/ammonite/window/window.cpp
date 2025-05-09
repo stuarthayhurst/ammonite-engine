@@ -198,7 +198,7 @@ namespace ammonite {
      - Change the current monitor for a fullscreen window
      - Does nothing if the window isn't fullscreen
     */
-    void changeFullscreenMonitor(GLFWmonitor* monitorPtr) {
+    void changeFullscreenMonitor(unsigned int monitorIndex) {
       if (windowPtr == nullptr) {
         ammonite::utils::warning << "Window system hasn't been initialised" << std::endl;
         return;
@@ -210,14 +210,14 @@ namespace ammonite {
         return;
       }
 
-      internal::setFullscreenMonitor(windowPtr, monitorPtr);
+      internal::setFullscreenMonitor(windowPtr, monitorIndex);
     }
 
     /*
      - Make a window fullscreen, or restore a fullscreen window to windowed
      - Windowing a fullscreen window attempts to restore the previous geometry
     */
-    void setFullscreen(bool shouldFullscreen, GLFWmonitor* monitorPtr) {
+    void setFullscreen(bool shouldFullscreen, unsigned int monitorIndex) {
       if (windowPtr == nullptr) {
         ammonite::utils::warning << "Window system hasn't been initialised" << std::endl;
         return;
@@ -228,7 +228,7 @@ namespace ammonite {
         return;
       }
 
-      internal::setFullscreen(windowPtr, shouldFullscreen, monitorPtr);
+      internal::setFullscreen(windowPtr, shouldFullscreen, monitorIndex);
     }
 
     /*
@@ -241,35 +241,30 @@ namespace ammonite {
         return;
       }
 
-      setFullscreen(shouldFullscreen, getCurrentMonitor());
+      setFullscreen(shouldFullscreen, getCurrentMonitorIndex());
     }
 
     //Return the fullscreen monitor, or the closest matched when windowed
-    GLFWmonitor* getCurrentMonitor() {
+    unsigned int getCurrentMonitorIndex() {
       if (windowPtr == nullptr) {
         ammonite::utils::warning << "No window to get monitor for" << std::endl;
-        return nullptr;
+        return 0;
       }
 
-      return internal::getCurrentMonitor(windowPtr);
+      return internal::getCurrentMonitorIndex(windowPtr);
     }
 
     /*
-     - Return an array of monitors, write the number of monitors to monitorCount
-       - Returned array is managed by GLFW, and shouldn't be freed
+     - Return the number of monitors
+     - The highest monitor index will be 1 less than this
     */
-    GLFWmonitor** getMonitors(unsigned int* monitorCount) {
+    unsigned int getMonitorCount() {
       if (windowPtr == nullptr) {
         ammonite::utils::warning << "Window system hasn't been initialised" << std::endl;
-        return nullptr;
+        return 0;
       }
 
-      if (monitorCount == nullptr) {
-        ammonite::utils::warning << "Nowhere provided to store monitor count" << std::endl;
-        return nullptr;
-      }
-
-      return internal::getMonitors(monitorCount);
+      return internal::getMonitorCount();
     }
 
     bool getFullscreen() {
