@@ -195,10 +195,10 @@ namespace ammonite {
     }
 
     /*
-     - Set monitor for a fullscreen window
+     - Change the current monitor for a fullscreen window
      - Does nothing if the window isn't fullscreen
     */
-    void setFullscreenMonitor(GLFWmonitor* monitorPtr) {
+    void changeFullscreenMonitor(GLFWmonitor* monitorPtr) {
       if (windowPtr == nullptr) {
         ammonite::utils::warning << "Window system hasn't been initialised" << std::endl;
         return;

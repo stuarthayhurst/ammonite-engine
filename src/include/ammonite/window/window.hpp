@@ -26,12 +26,13 @@ namespace ammonite {
     void getWindowGeometry(unsigned int* width, unsigned int* height, unsigned int* xPos,
                            unsigned int* yPos, bool useDecoratedSize, bool useDecoratedPos);
 
-    void setFullscreenMonitor(GLFWmonitor* monitor);
     void setFullscreen(bool shouldFullscreen, GLFWmonitor* monitor);
     void setFullscreen(bool shouldFullscreen);
+    bool getFullscreen();
+
     GLFWmonitor* getCurrentMonitor();
     GLFWmonitor** getMonitors(unsigned int* monitorCount);
-    bool getFullscreen();
+    void changeFullscreenMonitor(GLFWmonitor* monitor);
 
     bool shouldWindowClose();
   }
