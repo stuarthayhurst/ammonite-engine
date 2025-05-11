@@ -7,6 +7,23 @@
  - Values match corresponding values in GLFW
  - Redefined here to avoid client code including GLFW headers
 */
+
+enum AmmoniteButton : unsigned char {
+  AMMONITE_MOUSE_BUTTON_1      = 0,
+  AMMONITE_MOUSE_BUTTON_2      = 1,
+  AMMONITE_MOUSE_BUTTON_3      = 2,
+  AMMONITE_MOUSE_BUTTON_4      = 3,
+  AMMONITE_MOUSE_BUTTON_5      = 4,
+  AMMONITE_MOUSE_BUTTON_6      = 5,
+  AMMONITE_MOUSE_BUTTON_7      = 6,
+  AMMONITE_MOUSE_BUTTON_8      = 7,
+
+  AMMONITE_MOUSE_BUTTON_LAST   = AMMONITE_MOUSE_BUTTON_8,
+  AMMONITE_MOUSE_BUTTON_LEFT   = AMMONITE_MOUSE_BUTTON_1,
+  AMMONITE_MOUSE_BUTTON_RIGHT  = AMMONITE_MOUSE_BUTTON_2,
+  AMMONITE_MOUSE_BUTTON_MIDDLE = AMMONITE_MOUSE_BUTTON_3
+};
+
 //NOLINTBEGIN(misc-confusable-identifiers)
 enum AmmoniteKeycode : int16_t {
   AMMONITE_UNKNOWN       = -1,

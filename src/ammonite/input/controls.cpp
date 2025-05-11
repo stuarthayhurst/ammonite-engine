@@ -4,10 +4,6 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
 
-extern "C" {
-  #include <GLFW/glfw3.h>
-}
-
 #include "controls.hpp"
 
 #include "input.hpp"
@@ -197,9 +193,9 @@ namespace ammonite {
       }
 
       //Reset field of view on middle click, (modifier bits are unused)
-      void zoomResetCallback(int button, KeyStateEnum action, void*) {
+      void zoomResetCallback(AmmoniteButton button, KeyStateEnum action, void*) {
         if (isCameraActive) {
-          if (button == GLFW_MOUSE_BUTTON_MIDDLE && action == AMMONITE_PRESSED) {
+          if (button == AMMONITE_MOUSE_BUTTON_MIDDLE && action == AMMONITE_PRESSED) {
             ammonite::camera::setFieldOfView(ammonite::camera::getActiveCamera(),
                                              glm::quarter_pi<float>());
           }

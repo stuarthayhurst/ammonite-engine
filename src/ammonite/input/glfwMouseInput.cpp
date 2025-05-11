@@ -6,6 +6,8 @@ extern "C" {
 
 #include "input.hpp"
 
+#include "keycodes.hpp"
+
 #include "../utils/logging.hpp"
 
 /*
@@ -53,7 +55,8 @@ namespace ammonite {
           }
         }
 
-        void mouseButtonCallbackWrapper(GLFWwindow*, int button, int action, int) {
+        void mouseButtonCallbackWrapper(GLFWwindow*, int rawButton, int action, int) {
+          const AmmoniteButton button = (AmmoniteButton) rawButton;
           if (!mouseInputBlocked && mouseButtonCallback != nullptr) {
             KeyStateEnum buttonState = AMMONITE_RELEASED;
             if (action == GLFW_PRESS) {
