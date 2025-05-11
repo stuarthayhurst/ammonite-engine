@@ -1,6 +1,8 @@
 #ifndef AMMONITECONTROLS
 #define AMMONITECONTROLS
 
+#include "keycodes.hpp"
+
 namespace ammonite {
   namespace controls {
     namespace settings {
@@ -15,8 +17,9 @@ namespace ammonite {
       float getFovLimit();
     }
 
-    void setupFreeCamera(int forwardKey, int backKey, int upKey, int downKey,
-                         int rightKey, int leftKey);
+    void setupFreeCamera(AmmoniteKeycode forwardKey, AmmoniteKeycode backKey,
+                         AmmoniteKeycode upKey, AmmoniteKeycode downKey,
+                         AmmoniteKeycode rightKey, AmmoniteKeycode leftKey);
     void releaseFreeCamera();
 
     void setCameraActive(bool active);

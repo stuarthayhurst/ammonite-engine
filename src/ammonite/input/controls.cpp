@@ -11,6 +11,7 @@ extern "C" {
 #include "controls.hpp"
 
 #include "input.hpp"
+#include "keycodes.hpp"
 
 #include "../camera.hpp"
 #include "../utils/id.hpp"
@@ -96,12 +97,12 @@ namespace ammonite {
     namespace {
       //Keyboard control direction enums
       enum DirectionEnum : unsigned char {
-        AMMONITE_FORWARD,
-        AMMONITE_BACK,
-        AMMONITE_UP,
-        AMMONITE_DOWN,
-        AMMONITE_RIGHT,
-        AMMONITE_LEFT
+        DIRECTION_FORWARD,
+        DIRECTION_BACK,
+        DIRECTION_UP,
+        DIRECTION_DOWN,
+        DIRECTION_RIGHT,
+        DIRECTION_LEFT
       };
 
       //Data to handle independent camera directions
@@ -116,7 +117,8 @@ namespace ammonite {
 
     //Keyboard control callbacks
     namespace {
-      void keyboardCameraCallback(const std::vector<int>&, KeyStateEnum action, void* userPtr) {
+      void keyboardCameraCallback(const std::vector<AmmoniteKeycode>&,
+                                  KeyStateEnum action, void* userPtr) {
         DirectionData* directionData = (DirectionData*)userPtr;
         ammonite::utils::Timer* directionTimer = &directionData->directionTimer;
         //If it's an initial key press, start the timer and return
@@ -144,22 +146,22 @@ namespace ammonite {
         //Calculate the new position
         const float unitDelta = (float)directionTimer->getTime() * controlSettings.movementSpeed;
         switch (directionData->directionEnum) {
-        case AMMONITE_FORWARD:
+        case DIRECTION_FORWARD:
           position += horizontalDirection * unitDelta;
           break;
-        case AMMONITE_BACK:
+        case DIRECTION_BACK:
           position -= horizontalDirection * unitDelta;
           break;
-        case AMMONITE_UP:
+        case DIRECTION_UP:
           position += glm::vec3(0, 1, 0) * unitDelta;
           break;
-        case AMMONITE_DOWN:
+        case DIRECTION_DOWN:
           position -= glm::vec3(0, 1, 0) * unitDelta;
           break;
-        case AMMONITE_RIGHT:
+        case DIRECTION_RIGHT:
           position += right * unitDelta;
           break;
-        case AMMONITE_LEFT:
+        case DIRECTION_LEFT:
           position -= right * unitDelta;
           break;
         }
@@ -237,18 +239,19 @@ namespace ammonite {
       return isCameraActive;
     }
 
-    void setupFreeCamera(int forwardKey, int backKey, int upKey,
-                         int downKey, int rightKey, int leftKey) {
+    void setupFreeCamera(AmmoniteKeycode forwardKey, AmmoniteKeycode backKey,
+                         AmmoniteKeycode upKey, AmmoniteKeycode downKey,
+                         AmmoniteKeycode rightKey, AmmoniteKeycode leftKey) {
       //Keyboards controls setup
-      directionData[0].directionEnum = AMMONITE_FORWARD;
-      directionData[1].directionEnum = AMMONITE_BACK;
-      directionData[2].directionEnum = AMMONITE_UP;
-      directionData[3].directionEnum = AMMONITE_DOWN;
-      directionData[4].directionEnum = AMMONITE_RIGHT;
-      directionData[5].directionEnum = AMMONITE_LEFT;
+      directionData[0].directionEnum = DIRECTION_FORWARD;
+      directionData[1].directionEnum = DIRECTION_BACK;
+      directionData[2].directionEnum = DIRECTION_UP;
+      directionData[3].directionEnum = DIRECTION_DOWN;
+      directionData[4].directionEnum = DIRECTION_RIGHT;
+      directionData[5].directionEnum = DIRECTION_LEFT;
 
       //Set keyboard callbacks
-      const int keycodes[6] = {forwardKey, backKey, upKey, downKey, rightKey, leftKey};
+      const AmmoniteKeycode keycodes[6] = {forwardKey, backKey, upKey, downKey, rightKey, leftKey};
       for (int i = 0; i < 6; i++) {
         if (keycodes[i] != 0) {
           keybindIds[0] = ammonite::input::internal::registerRawKeybind(&keycodes[i], 1,

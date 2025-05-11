@@ -3,6 +3,8 @@
 
 #include <vector>
 
+#include "keycodes.hpp"
+
 #include "../utils/id.hpp"
 
 enum AmmoniteReleaseEnum : unsigned char {
@@ -18,7 +20,7 @@ enum KeyStateEnum : unsigned char {
   AMMONITE_REPEAT
 };
 
-using AmmoniteKeyCallback = void (*)(const std::vector<int>& keycodes, KeyStateEnum action, void* userPtr);
+using AmmoniteKeyCallback = void (*)(const std::vector<AmmoniteKeycode>& keycodes, KeyStateEnum action, void* userPtr);
 using AmmoniteCursorCallback = void (*)(double xPosition, double yPosition, double xDelta, double yDelta, void* userPtr);
 using AmmoniteButtonCallback = void (*)(int button, KeyStateEnum action, void* userPtr);
 using AmmoniteScrollCallback = void (*)(double xOffset, double yOffset, void* userPtr);
@@ -30,29 +32,29 @@ namespace ammonite {
     */
 
     //Keybind takes keycodes, count, (overrideMode), action callback, user pointer
-    AmmoniteId registerKeybind(int keycodes[], int count,
+    AmmoniteId registerKeybind(AmmoniteKeycode keycodes[], int count,
                                AmmoniteKeyCallback callback, void* userPtr);
-    AmmoniteId registerKeybind(int keycodes[], int count, AmmoniteReleaseEnum overrideMode,
+    AmmoniteId registerKeybind(AmmoniteKeycode keycodes[], int count, AmmoniteReleaseEnum overrideMode,
                                AmmoniteKeyCallback callback, void* userPtr);
-    AmmoniteId registerToggleKeybind(int keycodes[], int count, AmmoniteReleaseEnum overrideMode,
+    AmmoniteId registerToggleKeybind(AmmoniteKeycode keycodes[], int count, AmmoniteReleaseEnum overrideMode,
                                      AmmoniteKeyCallback callback, void* userPtr);
-    AmmoniteId registerToggleKeybind(int keycodes[], int count,
+    AmmoniteId registerToggleKeybind(AmmoniteKeycode keycodes[], int count,
                                      AmmoniteKeyCallback callback, void* userPtr);
 
     //Single key variants of the above
-    AmmoniteId registerKeybind(int keycode, AmmoniteKeyCallback callback, void* userPtr);
-    AmmoniteId registerKeybind(int keycode, AmmoniteReleaseEnum overrideMode,
+    AmmoniteId registerKeybind(AmmoniteKeycode keycode, AmmoniteKeyCallback callback, void* userPtr);
+    AmmoniteId registerKeybind(AmmoniteKeycode keycode, AmmoniteReleaseEnum overrideMode,
                                AmmoniteKeyCallback callback, void* userPtr);
-    AmmoniteId registerToggleKeybind(int keycode, AmmoniteReleaseEnum overrideMode,
+    AmmoniteId registerToggleKeybind(AmmoniteKeycode keycode, AmmoniteReleaseEnum overrideMode,
                                      AmmoniteKeyCallback callback, void* userPtr);
-    AmmoniteId registerToggleKeybind(int keycode, AmmoniteKeyCallback callback, void* userPtr);
+    AmmoniteId registerToggleKeybind(AmmoniteKeycode keycode, AmmoniteKeyCallback callback, void* userPtr);
 
     bool unregisterKeybind(AmmoniteId keybindId);
-    bool isKeycodeRegistered(int keycodes[], int count);
-    bool isKeycodeRegistered(int keycode);
+    bool isKeycodeRegistered(AmmoniteKeycode keycodes[], int count);
+    bool isKeycodeRegistered(AmmoniteKeycode keycode);
 
-    bool changeKeybind(AmmoniteId keybindId, int keycodes[], int count);
-    bool changeKeybind(AmmoniteId keybindId, int keycode);
+    bool changeKeybind(AmmoniteId keybindId, AmmoniteKeycode keycodes[], int count);
+    bool changeKeybind(AmmoniteId keybindId, AmmoniteKeycode keycode);
 
     void setCursorPositionCallback(AmmoniteCursorCallback callback, void* userPtr);
     void setMouseButtonCallback(AmmoniteButtonCallback callback, void* userPtr);

@@ -6,6 +6,8 @@ extern "C" {
 
 #include "input.hpp"
 
+#include "keycodes.hpp"
+
 #include "../utils/debug.hpp"
 
 /*
@@ -22,8 +24,9 @@ namespace ammonite {
       //Window implementation specific internal functions
       namespace {
         //Update the states of tracked keys on input
-        void keyCallbackHandler(GLFWwindow*, int keycode, int, int action, int) {
+        void keyCallbackHandler(GLFWwindow*, int rawKeycode, int, int action, int) {
           //Filter out unmapped keys
+          const AmmoniteKeycode keycode = (AmmoniteKeycode)rawKeycode;
           KeyStateEnum* keycodeStatePtr = getKeycodeStatePtr(keycode);
           if (keycodeStatePtr == nullptr) {
             ammoniteInternalDebug << "Keycode '" << keycode << "' not registered" << std::endl;
@@ -52,7 +55,7 @@ namespace ammonite {
         glfwSetKeyCallback(windowPtr, keyCallbackHandler);
       }
 
-      KeyStateEnum getKeyState(int keycode) {
+      KeyStateEnum getKeyState(AmmoniteKeycode keycode) {
         //Treat key as unpressed if the window isn't ready yet
         if (windowPtr == nullptr) {
           return AMMONITE_RELEASED;

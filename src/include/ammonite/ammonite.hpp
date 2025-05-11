@@ -7,6 +7,7 @@
 #include "graphics/renderer.hpp"
 #include "input/controls.hpp"
 #include "input/input.hpp"
+#include "input/keycodes.hpp"
 #include "lighting/lighting.hpp"
 #include "models/models.hpp"
 #include "skybox.hpp"

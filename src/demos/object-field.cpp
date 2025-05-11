@@ -8,10 +8,6 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
 
-extern "C" {
-  #include <GLFW/glfw3.h>
-}
-
 #include "object-field.hpp"
 
 namespace objectFieldDemo {
@@ -71,7 +67,7 @@ namespace objectFieldDemo {
       }
     }
 
-    void genCubesCallback(const std::vector<int>&, KeyStateEnum, void*) {
+    void genCubesCallback(const std::vector<AmmoniteKeycode>&, KeyStateEnum, void*) {
       //Hold data for randomised cube positions
       const unsigned int offset = lightCount + 1;
       const unsigned int cubeCount = loadedModelIds.size() - offset;
@@ -94,7 +90,7 @@ namespace objectFieldDemo {
       ammonite::utils::status << "Shuffled cubes" << std::endl;
     }
 
-    void spawnCubeCallback(const std::vector<int>&, KeyStateEnum, void*) {
+    void spawnCubeCallback(const std::vector<AmmoniteKeycode>&, KeyStateEnum, void*) {
       const AmmoniteId activeCameraId = ammonite::camera::getActiveCamera();
       const AmmoniteId modelId = ammonite::models::copyModel(floorId);
       loadedModelIds.push_back(modelId);
@@ -331,8 +327,8 @@ namespace objectFieldDemo {
     }
 
     //Set keybinds
-    cubeKeybindId = ammonite::input::registerToggleKeybind(GLFW_KEY_F, spawnCubeCallback, nullptr);
-    shuffleKeybindId = ammonite::input::registerToggleKeybind(GLFW_KEY_R, genCubesCallback,
+    cubeKeybindId = ammonite::input::registerToggleKeybind(AMMONITE_F, spawnCubeCallback, nullptr);
+    shuffleKeybindId = ammonite::input::registerToggleKeybind(AMMONITE_R, genCubesCallback,
                                                               nullptr);
 
     //Set the camera position

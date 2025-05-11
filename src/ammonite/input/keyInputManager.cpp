@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "input.hpp"
+#include "keycodes.hpp"
 
 #include "../utils/debug.hpp"
 #include "../utils/id.hpp"
@@ -18,7 +19,7 @@ namespace ammonite {
     namespace internal {
       namespace {
         struct KeybindData {
-          std::vector<int> keycodes;
+          std::vector<AmmoniteKeycode> keycodes;
           AmmoniteReleaseEnum overrideMode;
           bool toggle;
           AmmoniteKeyCallback callback;
@@ -35,14 +36,14 @@ namespace ammonite {
         bool isInputBlocked = false;
 
         std::unordered_map<AmmoniteId, KeybindData> keybindIdDataMap;
-        std::unordered_map<int, KeycodeData> keycodeStateMap;
+        std::unordered_map<AmmoniteKeycode, KeycodeData> keycodeStateMap;
         AmmoniteId lastKeybindId = 0;
       }
 
       //Generic internal functions
       namespace {
         //Track states for an array of keycodes
-        void registerKeycodes(const int keycodes[], int count) {
+        void registerKeycodes(const AmmoniteKeycode keycodes[], int count) {
           for (int i = 0; i < count; i++) {
             if (!keycodeStateMap.contains(keycodes[i])) {
               keycodeStateMap[keycodes[i]].state = getKeyState(keycodes[i]);
@@ -53,7 +54,7 @@ namespace ammonite {
         }
 
         //Stop tracking states for an array of keycodes
-        void unregisterKeycodes(const int keycodes[], int count) {
+        void unregisterKeycodes(const AmmoniteKeycode keycodes[], int count) {
           for (int i = 0; i < count; i++) {
             keycodeStateMap[keycodes[i]].refCount--;
             if (keycodeStateMap[keycodes[i]].refCount == 0) {
@@ -63,7 +64,7 @@ namespace ammonite {
         }
       }
 
-      KeyStateEnum* getKeycodeStatePtr(int keycode) {
+      KeyStateEnum* getKeycodeStatePtr(AmmoniteKeycode keycode) {
         if (keycodeStateMap.contains(keycode)) {
           return &keycodeStateMap[keycode].state;
         }
@@ -173,9 +174,9 @@ namespace ammonite {
       }
 
       //Register a keybind
-      AmmoniteId registerRawKeybind(const int keycodes[], int count, AmmoniteReleaseEnum overrideMode,
-                                    bool toggle, AmmoniteKeyCallback callback,
-                                    void* userPtr) {
+      AmmoniteId registerRawKeybind(const AmmoniteKeycode keycodes[], int count,
+                                    AmmoniteReleaseEnum overrideMode, bool toggle,
+                                    AmmoniteKeyCallback callback, void* userPtr) {
         //Validate override mode
         if (overrideMode < AMMONITE_ALLOW_OVERRIDE || overrideMode > AMMONITE_RESPECT_BLOCK) {
           ammoniteInternalDebug << "Invalid override mode passed" << std::endl;
@@ -187,7 +188,7 @@ namespace ammonite {
 
         //Generate an ID for the keybind and register it
         const AmmoniteId keybindId = utils::internal::setNextId(&lastKeybindId, keybindIdDataMap);
-        const std::vector<int> keycodeVec = {keycodes, keycodes + count};
+        const std::vector<AmmoniteKeycode> keycodeVec = {keycodes, keycodes + count};
         keybindIdDataMap[keybindId] = {
           keycodeVec, overrideMode, toggle, callback, userPtr
         };
@@ -213,7 +214,7 @@ namespace ammonite {
       }
 
       //Return true if all keys are found in the same keybind
-      bool isKeycodeRegistered(const int keycodes[], int count) {
+      bool isKeycodeRegistered(const AmmoniteKeycode keycodes[], int count) {
         //Check keycodes against registered keybinds
         for (const auto& keybindData : keybindIdDataMap) {
           //Move onto the next keybind if any keycode isn't found in the keybind
@@ -222,7 +223,7 @@ namespace ammonite {
             bool found = false;
 
             //Search keybind's keycodes for current keycode
-            const std::vector<int>& keybindKeycodes = keybindData.second.keycodes;
+            const std::vector<AmmoniteKeycode>& keybindKeycodes = keybindData.second.keycodes;
             for (unsigned int j = 0; j < keybindKeycodes.size(); j++) {
               if (keybindKeycodes[j] == keycodes[i]) {
                 found = true;
@@ -245,7 +246,8 @@ namespace ammonite {
         return false;
       }
 
-      bool changeKeybindKeycodes(AmmoniteId keybindId, const int newKeycodes[], int count) {
+      bool changeKeybindKeycodes(AmmoniteId keybindId,
+                                 const AmmoniteKeycode newKeycodes[], int count) {
         //Check the keybind exists
         if (!keybindIdDataMap.contains(keybindId)) {
           ammoniteInternalDebug << "Can't change keycodes for keybind ID '" << keybindId

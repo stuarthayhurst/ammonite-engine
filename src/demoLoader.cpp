@@ -8,10 +8,6 @@
 #include <ammonite/ammonite.hpp>
 #include <glm/glm.hpp>
 
-extern "C" {
-  #include <GLFW/glfw3.h>
-}
-
 #include "helper/argHandler.hpp"
 #include "demos/object-field.hpp"
 #include "demos/many-cubes.hpp"
@@ -55,20 +51,20 @@ namespace {
     HAS_SETUP_CONTROLS = (1 << 2)
   };
 
-  void inputFocusCallback(const std::vector<int>&, KeyStateEnum, void*) {
+  void inputFocusCallback(const std::vector<AmmoniteKeycode>&, KeyStateEnum, void*) {
     ammonite::input::setInputFocus(!ammonite::input::getInputFocus());
   }
 
-  void fullscreenToggleCallback(const std::vector<int>&, KeyStateEnum, void*) {
+  void fullscreenToggleCallback(const std::vector<AmmoniteKeycode>&, KeyStateEnum, void*) {
     ammonite::window::setFullscreen(!ammonite::window::getFullscreen());
   }
 
-  void focalToggleCallback(const std::vector<int>&, KeyStateEnum, void*) {
+  void focalToggleCallback(const std::vector<AmmoniteKeycode>&, KeyStateEnum, void*) {
     ammonite::renderer::settings::post::setFocalDepthEnabled(
       !ammonite::renderer::settings::post::getFocalDepthEnabled());
   }
 
-  void sprintToggleCallback(const std::vector<int>&, KeyStateEnum action, void*) {
+  void sprintToggleCallback(const std::vector<AmmoniteKeycode>&, KeyStateEnum action, void*) {
     float movementSpeed = 0.0f;
     if (action == AMMONITE_REPEAT) {
       return;
@@ -79,13 +75,14 @@ namespace {
     ammonite::controls::settings::setMovementSpeed(movementSpeed);
   }
 
-  void cameraCycleCallback(const std::vector<int>&, KeyStateEnum, void* userPtr) {
+  void cameraCycleCallback(const std::vector<AmmoniteKeycode>&, KeyStateEnum, void* userPtr) {
     CameraData* cameraData = (CameraData*)userPtr;
     cameraData->cameraIndex = (int)((cameraData->cameraIndex + 1) % cameraData->cameraIds.size());
     ammonite::camera::setActiveCamera(cameraData->cameraIds[cameraData->cameraIndex]);
   }
 
-  void changeFocalDepthCallback(const std::vector<int>&, KeyStateEnum action, void* userPtr) {
+  void changeFocalDepthCallback(const std::vector<AmmoniteKeycode>&,
+                                KeyStateEnum action, void* userPtr) {
     static ammonite::utils::Timer focalDepthTimer;
     if (action != AMMONITE_RELEASED) {
       const float sign = *(float*)userPtr;
@@ -102,7 +99,8 @@ namespace {
     focalDepthTimer.reset();
   }
 
-  void changeFrameRateCallback(const std::vector<int>&, KeyStateEnum action, void* userPtr) {
+  void changeFrameRateCallback(const std::vector<AmmoniteKeycode>&,
+                               KeyStateEnum action, void* userPtr) {
     static ammonite::utils::Timer frameRateTimer;
     if (action != AMMONITE_RELEASED) {
       const float sign = *(float*)userPtr;
@@ -120,7 +118,7 @@ namespace {
     frameRateTimer.reset();
   }
 
-  void closeWindowCallback(const std::vector<int>&, KeyStateEnum, void* userPtr) {
+  void closeWindowCallback(const std::vector<AmmoniteKeycode>&, KeyStateEnum, void* userPtr) {
     *(bool*)userPtr = true;
   }
 }
@@ -283,8 +281,8 @@ int main(int argc, char** argv) noexcept(false) {
   CameraData cameraData;
   cameraData.cameraIndex = 0;
   cameraData.cameraIds = {1, ammonite::camera::createCamera()};
-  ammonite::controls::setupFreeCamera(GLFW_KEY_W, GLFW_KEY_S,
-    GLFW_KEY_SPACE, GLFW_KEY_LEFT_SHIFT, GLFW_KEY_D, GLFW_KEY_A);
+  ammonite::controls::setupFreeCamera(AMMONITE_W, AMMONITE_S,
+    AMMONITE_SPACE, AMMONITE_LEFT_SHIFT, AMMONITE_D, AMMONITE_A);
 
   //Set the non-default camera to the start position
   ammonite::camera::setPosition(cameraData.cameraIds[1], glm::vec3(0.0f, 0.0f, 2.0f));
@@ -292,35 +290,35 @@ int main(int argc, char** argv) noexcept(false) {
   //Set keybinds
   std::vector<AmmoniteId> keybindIds;
   keybindIds.push_back(ammonite::input::registerToggleKeybind(
-                       GLFW_KEY_C, AMMONITE_ALLOW_OVERRIDE, inputFocusCallback, nullptr));
+                       AMMONITE_C, AMMONITE_ALLOW_OVERRIDE, inputFocusCallback, nullptr));
   keybindIds.push_back(ammonite::input::registerToggleKeybind(
-                       GLFW_KEY_F11, AMMONITE_ALLOW_OVERRIDE,
+                       AMMONITE_F11, AMMONITE_ALLOW_OVERRIDE,
                        fullscreenToggleCallback, nullptr));
   keybindIds.push_back(ammonite::input::registerToggleKeybind(
-                       GLFW_KEY_Z, focalToggleCallback, nullptr));
+                       AMMONITE_Z, focalToggleCallback, nullptr));
   keybindIds.push_back(ammonite::input::registerKeybind(
-                       GLFW_KEY_LEFT_CONTROL, sprintToggleCallback, nullptr));
+                       AMMONITE_LEFT_CONTROL, sprintToggleCallback, nullptr));
   keybindIds.push_back(ammonite::input::registerToggleKeybind(
-                       GLFW_KEY_B, cameraCycleCallback, &cameraData));
+                       AMMONITE_B, cameraCycleCallback, &cameraData));
 
   //Set keybinds to adjust focal depth
   float positive = 1.0f;
   float negative = -1.0f;
   keybindIds.push_back(ammonite::input::registerKeybind(
-                       GLFW_KEY_RIGHT_BRACKET, changeFocalDepthCallback, &positive));
+                       AMMONITE_RIGHT_BRACKET, changeFocalDepthCallback, &positive));
   keybindIds.push_back(ammonite::input::registerKeybind(
-                       GLFW_KEY_LEFT_BRACKET, changeFocalDepthCallback, &negative));
+                       AMMONITE_LEFT_BRACKET, changeFocalDepthCallback, &negative));
 
   //Set keybinds to adjust framerate limit
   keybindIds.push_back(ammonite::input::registerKeybind(
-                       GLFW_KEY_UP, changeFrameRateCallback, &positive));
+                       AMMONITE_UP, changeFrameRateCallback, &positive));
   keybindIds.push_back(ammonite::input::registerKeybind(
-                       GLFW_KEY_DOWN, changeFrameRateCallback, &negative));
+                       AMMONITE_DOWN, changeFrameRateCallback, &negative));
   setupBits |= HAS_SETUP_CONTROLS;
 
   //Set keybind for closing window
   bool closeWindow = false;
-  keybindIds.push_back(ammonite::input::registerToggleKeybind(GLFW_KEY_ESCAPE,
+  keybindIds.push_back(ammonite::input::registerToggleKeybind(AMMONITE_ESCAPE,
                        AMMONITE_ALLOW_OVERRIDE, closeWindowCallback, &closeWindow));
 
   //Engine loaded, delete the splash screen
