@@ -106,6 +106,10 @@ endif
 CLIENT_CXXFLAGS := $(CXXFLAGS) $(shell pkg-config $(PKG_CONF_ARGS) --cflags ammonite)
 CLIENT_LDFLAGS := $(LDFLAGS) $(shell pkg-config $(PKG_CONF_ARGS) --libs ammonite)
 
+#Recipe-specific client arguments
+THREADTEST_EXTRA_LDFLAGS := -latomic
+DEMO_EXTRA_LDFLAGS := -lm
+
 #Helper to run the compiler and extract the command
 EXTRACT_SCRIPT = python3 extract-command.py
 EXTRACT = @function inline() { if [[ "$(DUMMY)" != "true" ]]; then echo "$(CXX) $$@"; $(CXX) $$@; else $(EXTRACT_SCRIPT) "$(BUILD_DIR)" $(CXX) $$@; fi }; inline
@@ -116,10 +120,10 @@ EXTRACT = @function inline() { if [[ "$(DUMMY)" != "true" ]]; then echo "$(CXX) 
 
 $(BUILD_DIR)/demo: $(BUILD_DIR)/$(LIBRARY_NAME) $(HELPER_OBJECTS) $(DEMO_OBJECTS) $(OBJECT_DIR)/demoLoader.o
 	@mkdir -p "$(BUILD_DIR)"
-	$(CXX) -o "$(BUILD_DIR)/demo" $(HELPER_OBJECTS) $(DEMO_OBJECTS) $(OBJECT_DIR)/demoLoader.o $(CLIENT_CXXFLAGS) $(CLIENT_LDFLAGS)
+	$(CXX) -o "$(BUILD_DIR)/demo" $(HELPER_OBJECTS) $(DEMO_OBJECTS) $(OBJECT_DIR)/demoLoader.o $(CLIENT_CXXFLAGS) $(CLIENT_LDFLAGS) $(DEMO_EXTRA_LDFLAGS)
 $(BUILD_DIR)/threadTest: $(BUILD_DIR)/$(LIBRARY_NAME) $(OBJECT_DIR)/threadTest.o
 	@mkdir -p "$(BUILD_DIR)"
-	$(CXX) -o "$(BUILD_DIR)/threadTest" $(OBJECT_DIR)/threadTest.o $(CLIENT_CXXFLAGS) $(CLIENT_LDFLAGS)
+	$(CXX) -o "$(BUILD_DIR)/threadTest" $(OBJECT_DIR)/threadTest.o $(CLIENT_CXXFLAGS) $(CLIENT_LDFLAGS) $(THREADTEST_EXTRA_LDFLAGS)
 
 $(OBJECT_DIR)/helper/%.o: ./src/helper/%.cpp $(HELPER_HEADERS_SOURCE)
 	@mkdir -p "$$(dirname $@)"
