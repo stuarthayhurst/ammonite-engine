@@ -71,6 +71,7 @@ namespace ammonite {
           std::atomic<unsigned int> blockedThreadCount{0};
           std::atomic<bool> threadsBlocked{false};
 
+          //The work queue doesn't need to be heap allocated, but seems to perform better when it is
           WorkQueue* workQueue;
           std::atomic<uintmax_t> jobCount = 0;
         }
