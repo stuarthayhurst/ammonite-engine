@@ -155,6 +155,8 @@ namespace ammonite {
 
           //Cap at configured thread limit, allocate memory for pool
           threadCount = (threadCount > MAX_THREADS) ? MAX_THREADS : threadCount;
+          ammoniteInternalDebug << "Creating thread pool with " << threadCount \
+                                << " thread(s)" << std::endl;
           threadPool = new std::thread[threadCount];
           if (threadPool == nullptr) {
             return false;

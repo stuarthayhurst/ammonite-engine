@@ -38,7 +38,7 @@ namespace ammonite {
 
         ammonite::utils::status << "Created thread pool with " \
                                 << ammonite::utils::thread::getThreadPoolSize() \
-                                << " threads" << std::endl;
+                                << " thread(s)" << std::endl;
 
         //Check GPU supported required extensions
         unsigned int failureCount = 0;

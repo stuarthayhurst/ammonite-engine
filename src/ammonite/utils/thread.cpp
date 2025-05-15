@@ -30,7 +30,7 @@ namespace ammonite {
        - The engine will share the thread pool if it's not destroyed before the
          renderer is initialised
        - destroyThreadPool() is still safe to call after renderer initialisation
-       - Returns false if no thread pool exists or was created
+       - Returns false if no thread pool exists or was created, otherwise true
       */
       bool createThreadPool(unsigned int threadCount) {
         bool exists = true;
