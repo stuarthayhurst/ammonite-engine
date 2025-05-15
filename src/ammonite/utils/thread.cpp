@@ -86,12 +86,17 @@ namespace ammonite {
        - Submit multiple jobs to the thread pool, with a user-provided buffer and group
          - userBuffer should either be a nullptr, or an array of data to be split between jobs
            - Each job will receive a section according to (userBuffer + job index * stride)
-           - stride should by the size of each section to give to a job, in bytes
+           - stride should be the size of each section to give to a job, in bytes
          - group should either be a nullptr, or an AmmoniteGroup{0}
-         - jobCount specifies how many times submit the job
+         - jobCount specifies how many times to submit the job
       */
       void submitMultiple(AmmoniteWork work, void* userBuffer, int stride,
                           AmmoniteGroup* group, unsigned int jobCount) {
+        //Set stride to 0 when no data is passed
+        if (userBuffer == nullptr) {
+          stride = 0;
+        }
+
         ammonite::utils::thread::internal::submitMultiple(work, userBuffer, stride,
           group, jobCount);
       }

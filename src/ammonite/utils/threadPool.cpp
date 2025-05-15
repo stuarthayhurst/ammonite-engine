@@ -36,16 +36,10 @@ namespace {
 
     void pushMultiple(AmmoniteWork work, void* userBuffer, int stride,
                       AmmoniteGroup* group, unsigned int count) {
-      //Add multiple jobs in 1 pass
+      //Add multiple jobs in a single pass
       queueLock.lock();
-      if (userBuffer == nullptr) {
-        for (unsigned int i = 0; i < count; i++) {
-          queue.push({work, nullptr, group});
-        }
-      } else {
-        for (unsigned int i = 0; i < count; i++) {
-          queue.push({work, (char*)userBuffer + ((std::size_t)(i) * stride), group});
-        }
+      for (std::size_t i = 0; i < count; i++) {
+        queue.push({work, (char*)userBuffer + (i * stride), group});
       }
       queueLock.unlock();
     }
