@@ -159,6 +159,7 @@ namespace ammonite {
                                 << " thread(s)" << std::endl;
           threadPool = new std::thread[threadCount];
           if (threadPool == nullptr) {
+            delete workQueue;
             return false;
           }
 
