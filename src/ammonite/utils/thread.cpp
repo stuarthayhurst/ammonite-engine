@@ -98,7 +98,7 @@ namespace ammonite {
         }
 
         ammonite::utils::thread::internal::submitMultiple(work, userBuffer, stride,
-          group, jobCount);
+                                                          group, jobCount);
       }
 
       //Wait for a group to be finished, group can't be a nullptr
@@ -111,17 +111,23 @@ namespace ammonite {
 
       //Block the thread pool from starting newer jobs, return after it takes effect
       void blockThreads() {
-        ammonite::utils::thread::internal::blockThreads();
+        if (poolUsers != 0) {
+          ammonite::utils::thread::internal::blockThreads();
+        }
       }
 
       //Unblock the thread pool from starting newer jobs, return after it takes effect
       void unblockThreads() {
-        ammonite::utils::thread::internal::unblockThreads();
+        if (poolUsers != 0) {
+          ammonite::utils::thread::internal::unblockThreads();
+        }
       }
 
       //Wait until all work in the pool as of the call is finished
       void finishWork() {
-        ammonite::utils::thread::internal::finishWork();
+        if (poolUsers != 0) {
+          ammonite::utils::thread::internal::finishWork();
+        }
       }
     }
   }
