@@ -66,6 +66,7 @@ namespace ammonite {
       /*
        - Submit a job to the thread pool, with a user-provided pointer
          - userPtr may be a nullptr
+       - createThreadPool() must be called before using this
       */
       void submitWork(AmmoniteWork work, void* userPtr) {
         ammonite::utils::thread::internal::submitWork(work, userPtr, nullptr);
@@ -77,6 +78,7 @@ namespace ammonite {
            - A group can be used between multiple calls, but waiting on it will block
              until all work in the group is done
          - userPtr may be a nullptr
+       - createThreadPool() must be called before using this
       */
       void submitWork(AmmoniteWork work, void* userPtr, AmmoniteGroup* group) {
         ammonite::utils::thread::internal::submitWork(work, userPtr, group);
@@ -89,6 +91,7 @@ namespace ammonite {
            - stride should be the size of each section to give to a job, in bytes
          - group should either be a nullptr, or an AmmoniteGroup{0}
          - jobCount specifies how many times to submit the job
+       - createThreadPool() must be called before using this
       */
       void submitMultiple(AmmoniteWork work, void* userBuffer, int stride,
                           AmmoniteGroup* group, unsigned int jobCount) {
