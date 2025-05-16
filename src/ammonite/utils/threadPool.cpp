@@ -251,9 +251,7 @@ namespace ammonite {
          - Return when the work has finished
         */
         void finishWork() {
-          for (unsigned int i = 0; i < poolThreadCount; i++) {
-            submitWork(finishSyncJob, nullptr, nullptr);
-          }
+          submitMultiple(finishSyncJob, nullptr, 0, nullptr, poolThreadCount);
 
           threadsSynced.wait(false);
           threadsSynced = false;
