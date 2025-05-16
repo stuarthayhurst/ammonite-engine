@@ -8,6 +8,8 @@
 #include <system_error>
 #include <thread>
 
+#include <unistd.h>
+
 #include "thread.hpp"
 
 #include "debug.hpp"
@@ -83,6 +85,10 @@ namespace ammonite {
 
         namespace {
           void runWorker() {
+            //Ask the system for the thread ID, since it's more useful for debugging
+            ammoniteInternalDebug << "Started worker thread (ID " << gettid() \
+                                  << ")" << std::endl;
+
             while (stayAlive) {
               //Fetch the work
               WorkItem workItem;
