@@ -251,7 +251,7 @@ namespace ammonite {
          - Return when the work has finished
         */
         void finishWork() {
-          submitMultiple(finishSyncJob, nullptr, 0, nullptr, poolThreadCount);
+          internal::submitMultiple(finishSyncJob, nullptr, 0, nullptr, poolThreadCount);
 
           threadsSynced.wait(false);
           threadsSynced = false;
@@ -267,12 +267,12 @@ namespace ammonite {
           }
 
           //Finish existing work
-          finishWork();
+          internal::finishWork();
 
           //Block threads, instruct them to die then unblock
-          blockThreads();
+          internal::blockThreads();
           stayAlive = false;
-          unblockThreads();
+          internal::unblockThreads();
 
           //Wait until all threads are done
           for (unsigned int i = 0; i < poolThreadCount; i++) {
