@@ -136,8 +136,7 @@ namespace {
     submitTimer.pause();
 
     //Finish work
-    ammonite::utils::thread::blockThreads();
-    ammonite::utils::thread::unblockThreads();
+    ammonite::utils::thread::finishWork();
     FINISH_TIMERS
     VERIFY_WORK(jobCount)
 
