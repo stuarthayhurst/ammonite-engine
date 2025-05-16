@@ -1,4 +1,5 @@
 #include <atomic>
+#include <barrier>
 #include <cstddef>
 #include <cstdint>
 #include <iostream>
@@ -66,10 +67,14 @@ namespace ammonite {
           std::thread* threadPool;
           bool stayAlive = false;
 
-          //Write true / false to threadBlockTrigger to block / unblock threads
-          std::atomic<bool> threadBlockTrigger{false};
-          std::atomic<unsigned int> blockedThreadCount{0};
-          std::atomic<bool> threadsBlocked{false};
+          //Flag and barrier to synchronise all threads, then communicate completion
+          std::atomic<bool> threadsSynced = false;
+          std::barrier<void (*)()>* threadSyncBarrier;
+
+          //Trigger, flag and barrier to block all threads, then communicate completion
+          std::atomic<bool> threadBlockTrigger = false;
+          std::atomic<bool> threadsBlocked = false;
+          std::barrier<void (*)()>* threadBlockBarrier;
 
           //The work queue doesn't need to be heap allocated, but seems to perform better when it is
           WorkQueue* workQueue;
@@ -77,13 +82,16 @@ namespace ammonite {
         }
 
         namespace {
-          void initWorker() {
+          void runWorker() {
             while (stayAlive) {
               //Fetch the work
               WorkItem workItem;
               workQueue->pop(&workItem);
 
-              //Execute the work or sleep
+              /*
+               - Execute the work or sleep
+               - Work may be nullptr if none was available or threads were woken up
+              */
               if (workItem.work != nullptr) {
                 jobCount--;
                 workItem.work(workItem.userPtr);
@@ -92,25 +100,40 @@ namespace ammonite {
                 if (workItem.group != nullptr) {
                   workItem.group->release();
                 }
-              } else {
-                //Sleep while 0 jobs remain
-                jobCount.wait(0);
+              }
+
+              //Sleep while no jobs remain
+              jobCount.wait(0);
+
+              //Block the thread when instructed to, wait to release it
+              if (threadBlockTrigger) {
+                threadBlockBarrier->arrive_and_wait();
+                threadBlockTrigger.wait(true);
               }
             }
           }
 
-          void blocker(void*) {
-            if (++blockedThreadCount == poolThreadCount) {
-              threadsBlocked = true;
-              threadsBlocked.notify_all();
-            }
+          /*
+           - Callback for when threads are synchronised after finishing their work
+           - Mark threads as synchronised
+          */
+          void threadsSyncedCallback() {
+            threadsSynced = true;
+            threadsSynced.notify_all();
+          }
 
-            threadBlockTrigger.wait(true);
+          /*
+           - Callback for when threads are blocked
+           - Mark threads as blocked
+          */
+          void threadsBlockedCallback() {
+            threadsBlocked = true;
+            threadsBlocked.notify_all();
+          }
 
-            if (--blockedThreadCount == 0) {
-              threadsBlocked = false;
-              threadsBlocked.notify_all();
-            }
+          //Simple job to synchronise threads
+          void finishSyncJob(void*) {
+            threadSyncBarrier->arrive_and_wait();
           }
         }
 
@@ -164,10 +187,19 @@ namespace ammonite {
             return false;
           }
 
+          //Prepare thread finish syncs
+          threadSyncBarrier = new std::barrier{threadCount, threadsSyncedCallback};
+          threadsSynced = false;
+
+          //Prepare thread block syncs
+          threadBlockBarrier = new std::barrier{threadCount, threadsBlockedCallback};
+          threadsBlocked = false;
+          threadBlockTrigger = false;
+
           //Create the threads for the pool
           stayAlive = true;
           for (unsigned int i = 0; i < threadCount; i++) {
-            threadPool[i] = std::thread(initWorker);
+            threadPool[i] = std::thread(runWorker);
           }
 
           poolThreadCount = threadCount;
@@ -175,52 +207,67 @@ namespace ammonite {
         }
 
         /*
-         - Prevent the threads from executing newly submitted jobs
-         - Work submitted after the call returns is guaranteed to be blocked
-         - Return when the block takes effect
+         - Instruct threads to block after their current job
+         - Create a fake job for each thread in case they're asleep
+         - Return once the threads are all blocked
         */
         void blockThreads() {
           if (!threadsBlocked) {
             threadBlockTrigger = true;
-            submitMultiple(blocker, nullptr, 0, nullptr, poolThreadCount);
+
+            //Threads need to be woken up, in case they're waiting for work
+            jobCount += poolThreadCount;
+            jobCount.notify_all();
 
             threadsBlocked.wait(false);
           }
         }
 
         /*
-         - Allow the threads to execute queued jobs
-         - Return when all threads are unblocked
+         - Instruct threads to resume execution, clean up fake jobs
+         - Return as soon as possible, threads may still be asleep
         */
         void unblockThreads() {
           if (threadsBlocked) {
+            //Correct the job count
+            jobCount -= poolThreadCount;
+            jobCount.notify_all();
+
             threadBlockTrigger = false;
             threadBlockTrigger.notify_all();
 
-            threadsBlocked.wait(true);
+            threadsBlocked = false;
           }
         }
 
-        //Finish all work in the queue as of calling, return when done
+        /*
+         - Complete all work already queued
+         - Return when the work has finished
+        */
         void finishWork() {
-          //Unblock if blocked, block threads then wait for completion
-          unblockThreads();
-          blockThreads();
-          unblockThreads();
+          for (unsigned int i = 0; i < poolThreadCount; i++) {
+            submitWork(finishSyncJob, nullptr, nullptr);
+          }
+
+          threadsSynced.wait(false);
+          threadsSynced = false;
         }
 
         //Finish work already in the queue and kill the threads
         void destroyThreadPool() {
           ammoniteInternalDebug << "Destroying thread pool" << std::endl;
 
-          //Finish existing work and block new work from starting
-          unblockThreads();
+          if (threadsBlocked) {
+            ammonite::utils::warning << "Attempting to destroy thread pool while blocked" \
+                                     << std::endl;
+          }
+
+          //Finish existing work
+          finishWork();
+
+          //Block threads, instruct them to die then unblock
           blockThreads();
-
-          //Kill all threads after they're unblocked and wake up
           stayAlive = false;
-
-          //Unblock threads and wake them up
           unblockThreads();
 
           //Wait until all threads are done
@@ -233,10 +280,18 @@ namespace ammonite {
             }
           }
 
+          if (jobCount != 0) {
+            ammonite::utils::warning << "Thread pool destroyed with " << jobCount \
+                                     << " jobs remaining" << std::endl;
+          }
+
           //Reset remaining data
           delete workQueue;
           delete [] threadPool;
+          delete threadSyncBarrier;
+          delete threadBlockBarrier;
           poolThreadCount = 0;
+          jobCount = 0;
         }
       }
     }

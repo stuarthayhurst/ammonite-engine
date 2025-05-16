@@ -112,14 +112,20 @@ namespace ammonite {
         }
       }
 
-      //Block the thread pool from starting newer jobs, return after it takes effect
+      /*
+       - Block the pool from starting new jobs
+       - Returns once all threads are blocked
+      */
       void blockThreads() {
         if (poolUsers != 0) {
           ammonite::utils::thread::internal::blockThreads();
         }
       }
 
-      //Unblock the thread pool from starting newer jobs, return after it takes effect
+      /*
+       - Allow the pool to start new jobs again
+       - Returns once threads are allowed to wake up
+      */
       void unblockThreads() {
         if (poolUsers != 0) {
           ammonite::utils::thread::internal::unblockThreads();

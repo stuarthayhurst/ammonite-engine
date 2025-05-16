@@ -372,18 +372,6 @@ namespace {
     return passed;
   }
 
-  bool testCreateBlockBlockSubmitDestroy(unsigned int jobCount) {
-    CREATE_THREAD_POOL(0)
-
-    ammonite::utils::thread::blockThreads();
-    ammonite::utils::thread::blockThreads();
-
-    SUBMIT_JOBS(jobCount)
-    ammonite::utils::thread::destroyThreadPool();
-    VERIFY_WORK(jobCount)
-    return passed;
-  }
-
   bool testCreateBlockUnblockUnblockSubmitDestroy(unsigned int jobCount) {
     CREATE_THREAD_POOL(0)
 
@@ -528,9 +516,6 @@ int main() noexcept(false) {
 
   std::cout << "Testing double block, submit jobs, single unblock" << std::endl;
   failed |= !testCreateBlockBlockSubmitUnblockDestroy(jobCount);
-
-  std::cout << "Testing double block, submit jobs, no explicit unblock" << std::endl;
-  failed |= !testCreateBlockBlockSubmitDestroy(jobCount);
 
   std::cout << "Testing single block, double unblock" << std::endl;
   failed |= !testCreateBlockUnblockUnblockSubmitDestroy(jobCount);
