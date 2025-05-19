@@ -1,6 +1,8 @@
 #ifndef INTERNALINPUT
 #define INTERNALINPUT
 
+#include <vector>
+
 extern "C" {
   #include <GLFW/glfw3.h>
 }
@@ -16,10 +18,18 @@ extern "C" {
 namespace ammonite {
   namespace input {
     namespace AMMONITE_INTERNAL internal {
+      struct KeycodeStatePair {
+        AmmoniteKeycode keycode;
+        KeyStateEnum state;
+      };
+
       //Implemented by glfwKeyInput.cpp
       void setupInputCallback(GLFWwindow* windowPtr);
       KeyStateEnum getKeyState(AmmoniteKeycode keycode);
       void updateEvents();
+
+      std::vector<KeycodeStatePair>* getUpdatedKeys();
+      void clearUpdatedKeys();
 
       //Implemented by keyInputManager.cpp
       KeyStateEnum* getKeycodeStatePtr(AmmoniteKeycode keycode);
@@ -35,6 +45,8 @@ namespace ammonite {
       bool isKeycodeRegistered(const AmmoniteKeycode keycodes[], int count);
       bool changeKeybindKeycodes(AmmoniteId keybindId,
                                  const AmmoniteKeycode newKeycodes[], int count);
+
+      void setAnykeyCallback(AmmoniteKeyCallback callback, void* userPtr);
 
       //Implemented by glfwMouseInput.cpp
       void setupMouseCallback(GLFWwindow* windowPtr);

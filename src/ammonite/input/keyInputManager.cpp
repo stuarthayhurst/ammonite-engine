@@ -38,9 +38,12 @@ namespace ammonite {
         std::unordered_map<AmmoniteId, KeybindData> keybindIdDataMap;
         std::unordered_map<AmmoniteKeycode, KeycodeData> keycodeStateMap;
         AmmoniteId lastKeybindId = 0;
+
+        AmmoniteKeyCallback anykeyCallback = nullptr;
+        void* anykeyCallbackData = nullptr;
       }
 
-      //Generic internal functions
+      //Internal functions
       namespace {
         //Track states for an array of keycodes
         void registerKeycodes(const AmmoniteKeycode keycodes[], int count) {
@@ -61,6 +64,19 @@ namespace ammonite {
               keycodeStateMap.erase(keycodes[i]);
             }
           }
+        }
+
+        void runAnykeyCallback() {
+          if (anykeyCallback == nullptr) {
+            return;
+          }
+
+          std::vector<KeycodeStatePair>* updatedKeysPtr = getUpdatedKeys();
+          for (const auto& updatedKey : *updatedKeysPtr) {
+            anykeyCallback({updatedKey.keycode}, updatedKey.state, anykeyCallbackData);
+          }
+
+          clearUpdatedKeys();
         }
       }
 
@@ -171,6 +187,9 @@ namespace ammonite {
             keybindData.lastState = keybindState;
           }
         }
+
+        //Handle anykey callback
+        runAnykeyCallback();
       }
 
       //Register a keybind
@@ -265,6 +284,11 @@ namespace ammonite {
         //Update keybind registry with new keycodes
         keybindIdDataMap[keybindId].keycodes = {newKeycodes, newKeycodes + count};
         return true;
+      }
+
+      void setAnykeyCallback(AmmoniteKeyCallback callback, void* userPtr) {
+        anykeyCallback = callback;
+        anykeyCallbackData = userPtr;
       }
     }
   }

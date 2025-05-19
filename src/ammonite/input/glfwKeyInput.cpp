@@ -1,4 +1,5 @@
 #include <iostream>
+#include <vector>
 
 extern "C" {
   #include <GLFW/glfw3.h>
@@ -19,14 +20,24 @@ namespace ammonite {
     namespace internal {
       namespace {
         GLFWwindow* windowPtr = nullptr;
+        std::vector<KeycodeStatePair> updatedKeys;
       }
 
       //Window implementation specific internal functions
       namespace {
         //Update the states of tracked keys on input
-        void keyCallbackHandler(GLFWwindow*, int rawKeycode, int, int action, int) {
-          //Filter out unmapped keys
+        void keyCallbackHandler(GLFWwindow*, int rawKeycode, int, int rawAction, int) {
+          //Convert GLFW values to enums
           const AmmoniteKeycode keycode = (AmmoniteKeycode)rawKeycode;
+          KeyStateEnum action = AMMONITE_RELEASED;
+          if (rawAction == GLFW_PRESS) {
+            action = AMMONITE_PRESSED;
+          }
+
+          //Track all updated keys
+          updatedKeys.push_back({keycode, action});
+
+          //Filter out unmapped keys
           KeyStateEnum* keycodeStatePtr = getKeycodeStatePtr(keycode);
           if (keycodeStatePtr == nullptr) {
             ammoniteInternalDebug << "Keycode '" << keycode << "' not registered" << std::endl;
@@ -34,19 +45,15 @@ namespace ammonite {
           }
 
           //Track new state for the keycode
-          if (action == GLFW_PRESS) {
+          if (*keycodeStatePtr == action) {
             if (*keycodeStatePtr == AMMONITE_PRESSED) {
               ammoniteInternalDebug << "Keycode '" << keycode << "' already held" << std::endl;
-            }
-
-            *keycodeStatePtr = AMMONITE_PRESSED;
-          } else if (action == GLFW_RELEASE) {
-            if (*keycodeStatePtr == AMMONITE_RELEASED) {
+            } else {
               ammoniteInternalDebug << "Keycode '" << keycode << "' wasn't held" << std::endl;
             }
-
-            *keycodeStatePtr = AMMONITE_RELEASED;
           }
+
+          *keycodeStatePtr = action;
         }
       }
 
@@ -66,6 +73,14 @@ namespace ammonite {
         }
 
         return AMMONITE_PRESSED;
+      }
+
+      std::vector<KeycodeStatePair>* getUpdatedKeys() {
+        return &updatedKeys;
+      }
+
+      void clearUpdatedKeys() {
+        updatedKeys.clear();
       }
 
       void updateEvents() {

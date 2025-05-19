@@ -85,6 +85,18 @@ namespace ammonite {
       return isKeycodeRegistered(&keycode, 1);
     }
 
+    bool changeKeybind(AmmoniteId keybindId, AmmoniteKeycode keycodes[], int count) {
+      return internal::changeKeybindKeycodes(keybindId, keycodes, count);
+    }
+
+    bool changeKeybind(AmmoniteId keybindId, AmmoniteKeycode keycode) {
+      return internal::changeKeybindKeycodes(keybindId, &keycode, 1);
+    }
+
+    void setAnykeyCallback(AmmoniteKeyCallback callback, void* userPtr) {
+      internal::setAnykeyCallback(callback, userPtr);
+    }
+
     void setCursorPositionCallback(AmmoniteCursorCallback callback, void* userPtr) {
       internal::setCursorPositionCallback(callback, userPtr);
     }
@@ -105,14 +117,6 @@ namespace ammonite {
     bool getInputFocus() {
       //Technically we should factor in the mouse, but they're always in sync
       return !internal::getKeyInputBlock();
-    }
-
-    bool changeKeybind(AmmoniteId keybindId, AmmoniteKeycode keycodes[], int count) {
-      return internal::changeKeybindKeycodes(keybindId, keycodes, count);
-    }
-
-    bool changeKeybind(AmmoniteId keybindId, AmmoniteKeycode keycode) {
-      return internal::changeKeybindKeycodes(keybindId, &keycode, 1);
     }
 
     void updateInput() {

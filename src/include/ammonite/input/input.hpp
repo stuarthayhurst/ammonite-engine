@@ -56,6 +56,8 @@ namespace ammonite {
     bool changeKeybind(AmmoniteId keybindId, AmmoniteKeycode keycodes[], int count);
     bool changeKeybind(AmmoniteId keybindId, AmmoniteKeycode keycode);
 
+    void setAnykeyCallback(AmmoniteKeyCallback callback, void* userPtr);
+
     void setCursorPositionCallback(AmmoniteCursorCallback callback, void* userPtr);
     void setMouseButtonCallback(AmmoniteButtonCallback callback, void* userPtr);
     void setScrollWheelCallback(AmmoniteScrollCallback callback, void* userPtr);
