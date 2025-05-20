@@ -104,7 +104,10 @@ namespace ammonite {
                                                           group, jobCount);
       }
 
-      //Wait for a group to be finished, group can't be a nullptr
+      /*
+       - Wait for a group to be finished
+       - group must not be a nullptr
+      */
       void waitGroupComplete(AmmoniteGroup* group, unsigned int jobCount) {
         //Wait for group to finish
         for (unsigned int i = 0; i < jobCount; i++) {
@@ -115,6 +118,7 @@ namespace ammonite {
       /*
        - Block the pool from starting new jobs
        - Returns once all threads are blocked
+       - This isn't thread safe, and must never be called from a job
       */
       void blockThreads() {
         if (poolUsers != 0) {
@@ -125,6 +129,7 @@ namespace ammonite {
       /*
        - Allow the pool to start new jobs again
        - Returns once threads are allowed to wake up
+       - This isn't thread safe, and must never be called from a job
       */
       void unblockThreads() {
         if (poolUsers != 0) {
@@ -132,7 +137,10 @@ namespace ammonite {
         }
       }
 
-      //Wait until all work in the pool as of the call is finished
+      /*
+       - Wait until all work in the pool as of the call is finished
+       - This isn't thread safe, and must never be called from a job
+      */
       void finishWork() {
         if (poolUsers != 0) {
           ammonite::utils::thread::internal::finishWork();
