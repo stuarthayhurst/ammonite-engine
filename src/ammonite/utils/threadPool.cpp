@@ -96,7 +96,7 @@ namespace ammonite {
 
               /*
                - Execute the work or sleep
-               - Work may be nullptr if none was available or threads were woken up
+               - workItem.work may be nullptr if none was available
               */
               if (workItem.work != nullptr) {
                 jobCount--;
