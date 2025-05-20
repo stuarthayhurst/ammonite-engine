@@ -35,7 +35,7 @@ DEMO_OBJECTS = $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.o,$(DEMO_OBJECTS_SOURCE
 ROOT_OBJECTS = $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.o,$(ROOT_OBJECTS_SOURCE)))
 
 #Global arguments
-CXXFLAGS += -Wall -Wextra -Werror -std=c++23 -flto=auto -O3
+CXXFLAGS += -Wall -Wextra -Werror -Wpedantic -std=c++23 -flto=auto -O3
 
 ifeq ($(FAST),true)
   CXXFLAGS += -march=native -DFAST
