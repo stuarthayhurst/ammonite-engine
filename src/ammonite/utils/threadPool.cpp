@@ -1,10 +1,13 @@
 #include <atomic>
 #include <barrier>
+#include <bit>
 #include <cstddef>
 #include <cstdint>
 #include <iostream>
+#include <limits>
 #include <mutex>
 #include <queue>
+#include <semaphore>
 #include <system_error>
 #include <thread>
 
@@ -29,32 +32,38 @@ namespace {
   private:
     std::queue<WorkItem> queue;
     std::mutex queueLock;
+    std::counting_semaphore<std::numeric_limits<int32_t>::max()> jobCount{0};
 
   public:
     void push(AmmoniteWork work, void* userPtr, AmmoniteGroup* group) {
       queueLock.lock();
+
       queue.push({work, userPtr, group});
+
       queueLock.unlock();
+      jobCount.release();
     }
 
     void pushMultiple(AmmoniteWork work, void* userBuffer, int stride,
                       AmmoniteGroup* group, unsigned int count) {
-      //Add multiple jobs in a single pass
       queueLock.lock();
+
+      //Add multiple jobs in a single pass
       for (std::size_t i = 0; i < count; i++) {
         queue.push({work, (char*)userBuffer + (i * stride), group});
       }
+
       queueLock.unlock();
+      jobCount.release(count);
     }
 
     void pop(WorkItem* workItemPtr) {
+      jobCount.acquire();
       queueLock.lock();
-      if (!queue.empty()) {
-        *workItemPtr = queue.front();
-        queue.pop();
-      } else {
-        workItemPtr->work = nullptr;
-      }
+
+      *workItemPtr = queue.front();
+      queue.pop();
+
       queueLock.unlock();
     }
   };
@@ -77,28 +86,33 @@ namespace ammonite {
           std::atomic<bool> threadsBlocked = false;
           std::barrier<void (*)()>* threadBlockBarrier;
 
-          //The work queue doesn't need to be heap allocated, but seems to perform better when it is
-          WorkQueue* workQueue;
-          std::atomic<uintmax_t> jobCount = 0;
+          WorkQueue* workQueues;
+          unsigned int threadAssignMask = 0;
+          std::atomic<uintmax_t> nextJobWrite = 0;
         }
 
         namespace {
-          void runWorker() {
+          void runWorker(unsigned int index) {
             //Ask the system for the thread ID, since it's more useful for debugging
             ammoniteInternalDebug << "Started worker thread (ID " << gettid() \
                                   << ")" << std::endl;
 
+            WorkItem workItem = {nullptr, nullptr, nullptr};
             while (stayAlive) {
-              //Fetch the work
-              WorkItem workItem;
-              workQueue->pop(&workItem);
+              //Wait for a job to be available, then return it
+              workQueues[index].pop(&workItem);
+
+              //Block the thread when instructed to, wait to release it
+              if (threadBlockTrigger) {
+                threadBlockBarrier->arrive_and_wait();
+                threadBlockTrigger.wait(true);
+              }
 
               /*
                - Execute the work or sleep
-               - workItem.work may be nullptr if none was available
+               - workItem.work may be nullptr to wake the threads up
               */
               if (workItem.work != nullptr) {
-                jobCount--;
                 workItem.work(workItem.userPtr);
 
                 //Update the group semaphore, if given
@@ -106,15 +120,12 @@ namespace ammonite {
                   workItem.group->release();
                 }
               }
+            }
+          }
 
-              //Sleep while no jobs remain
-              jobCount.wait(0);
-
-              //Block the thread when instructed to, wait to release it
-              if (threadBlockTrigger) {
-                threadBlockBarrier->arrive_and_wait();
-                threadBlockTrigger.wait(true);
-              }
+          void wakeThreads() {
+            for (unsigned int i = 0; i < poolThreadCount; i++) {
+              internal::submitWork(nullptr, nullptr, nullptr);
             }
           }
 
@@ -142,36 +153,47 @@ namespace ammonite {
         }
 
         void submitWork(AmmoniteWork work, void* userPtr, AmmoniteGroup* group) {
-          //Add work to the queue
-          workQueue->push(work, userPtr, group);
-
-          //Increase job count, wake a sleeping thread
-          jobCount++;
-          jobCount.notify_one();
+          //Add work to the next queue
+          const uintmax_t targetQueue = (nextJobWrite++) & threadAssignMask;
+          workQueues[targetQueue].push(work, userPtr, group);
         }
 
-        //Submit multiple jobs without locking multiple times
+        //Submit multiple jobs in a batch, with no ordering guarantees
         void submitMultiple(AmmoniteWork work, void* userBuffer, int stride,
                             AmmoniteGroup* group, unsigned int newJobs) {
-          workQueue->pushMultiple(work, userBuffer, stride, group, newJobs);
-          jobCount += newJobs;
-          jobCount.notify_all();
+          //Every queue gets at least baseBatchSize jobs
+          const unsigned int baseBatchSize = newJobs / poolThreadCount;
+
+          //Add the base amount of work to each queue without touching the atomic index
+          if (baseBatchSize > 0) {
+            for (unsigned int i = 0; i < poolThreadCount; i++) {
+              workQueues[i].pushMultiple(work, userBuffer, stride, group, baseBatchSize);
+              userBuffer = (char*)userBuffer + (std::size_t(baseBatchSize) * stride);
+            }
+          }
+
+          //Add the remaining work
+          const unsigned int remainingJobs = newJobs - (baseBatchSize * poolThreadCount);
+          for (unsigned int i = 0; i < remainingJobs; i++) {
+            const uintmax_t targetQueue = (nextJobWrite++) & threadAssignMask;
+            workQueues[targetQueue].push(work, (char*)userBuffer + (std::size_t(i) * stride), group);
+          }
         }
 
-        //Create thread pool, existing work will begin executing
+        //Create a thread pool of the requested size, if one doesn't already exist
         bool createThreadPool(unsigned int threadCount) {
           //Exit if thread pool already exists
           if (poolThreadCount != 0) {
             return false;
           }
 
-          //Create the queue
-          workQueue = new WorkQueue();
-
           //Default to creating a worker thread for every hardware thread
           if (threadCount == 0) {
             threadCount = getHardwareThreadCount();
           }
+
+          //Round thread count up to nearest power of 2 to decide queue count
+          threadCount = std::bit_ceil(threadCount);
 
           //Cap at configured thread limit, allocate memory for pool
           threadCount = (threadCount > MAX_THREADS) ? MAX_THREADS : threadCount;
@@ -179,9 +201,13 @@ namespace ammonite {
                                 << " thread(s)" << std::endl;
           threadPool = new std::thread[threadCount];
           if (threadPool == nullptr) {
-            delete workQueue;
             return false;
           }
+
+          //Create the queues
+          nextJobWrite = 0;
+          threadAssignMask = threadCount - 1;
+          workQueues = new WorkQueue[threadCount];
 
           //Prepare thread finish barrier
           threadSyncBarrier = new std::barrier{threadCount};
@@ -193,11 +219,11 @@ namespace ammonite {
 
           //Create the threads for the pool
           stayAlive = true;
-          for (unsigned int i = 0; i < threadCount; i++) {
-            threadPool[i] = std::thread(runWorker);
+          poolThreadCount = threadCount;
+          for (unsigned int i = 0; i < poolThreadCount; i++) {
+            threadPool[i] = std::thread(runWorker, i);
           }
 
-          poolThreadCount = threadCount;
           return true;
         }
 
@@ -211,23 +237,18 @@ namespace ammonite {
             threadBlockTrigger = true;
 
             //Threads need to be woken up, in case they're waiting for work
-            jobCount += poolThreadCount;
-            jobCount.notify_all();
+            wakeThreads();
 
             threadsBlocked.wait(false);
           }
         }
 
         /*
-         - Instruct threads to resume execution, clean up fake jobs
+         - Instruct threads to resume execution
          - Return as soon as possible, threads may still be asleep
         */
         void unblockThreads() {
           if (threadsBlocked) {
-            //Correct the job count
-            jobCount -= poolThreadCount;
-            jobCount.notify_all();
-
             threadBlockTrigger = false;
             threadBlockTrigger.notify_all();
 
@@ -241,7 +262,9 @@ namespace ammonite {
         */
         void finishWork() {
           AmmoniteGroup group{0};
-          internal::submitMultiple(finishSyncJob, nullptr, 0, &group, poolThreadCount);
+          for (unsigned int i = 0; i < poolThreadCount; i++) {
+            internal::submitWork(finishSyncJob, nullptr, &group);
+          }
 
           waitGroupComplete(&group, poolThreadCount);
         }
@@ -273,18 +296,14 @@ namespace ammonite {
             }
           }
 
-          if (jobCount != 0) {
-            ammonite::utils::warning << "Thread pool destroyed with " << jobCount \
-                                     << " jobs remaining" << std::endl;
-          }
-
           //Reset remaining data
-          delete workQueue;
+          delete [] workQueues;
           delete [] threadPool;
           delete threadSyncBarrier;
           delete threadBlockBarrier;
           poolThreadCount = 0;
-          jobCount = 0;
+          threadAssignMask = 0;
+          nextJobWrite = 0;
         }
       }
     }

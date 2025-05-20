@@ -27,8 +27,8 @@ namespace ammonite {
 
       /*
        - Create or join a thread pool, without initialising the renderer
-       - The engine will share the thread pool if it's not destroyed before the
-         renderer is initialised
+         - The engine will share the thread pool if it's not destroyed before the
+           renderer is initialised
        - destroyThreadPool() is still safe to call after renderer initialisation
        - Returns false if no thread pool exists or was created, otherwise true
       */
@@ -67,6 +67,7 @@ namespace ammonite {
        - Submit a job to the thread pool, with a user-provided pointer
          - userPtr may be a nullptr
        - createThreadPool() must be called before using this
+       - Do not submit jobs that block conditionally on other jobs
       */
       void submitWork(AmmoniteWork work, void* userPtr) {
         ammonite::utils::thread::internal::submitWork(work, userPtr, nullptr);
@@ -79,6 +80,7 @@ namespace ammonite {
              until all work in the group is done
          - userPtr may be a nullptr
        - createThreadPool() must be called before using this
+       - Do not submit jobs that block conditionally on other jobs
       */
       void submitWork(AmmoniteWork work, void* userPtr, AmmoniteGroup* group) {
         ammonite::utils::thread::internal::submitWork(work, userPtr, group);
@@ -92,6 +94,7 @@ namespace ammonite {
          - group should either be a nullptr, or an AmmoniteGroup{0}
          - jobCount specifies how many times to submit the job
        - createThreadPool() must be called before using this
+       - Do not submit jobs that block conditionally on other jobs
       */
       void submitMultiple(AmmoniteWork work, void* userBuffer, int stride,
                           AmmoniteGroup* group, unsigned int jobCount) {

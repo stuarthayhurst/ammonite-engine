@@ -4,7 +4,9 @@
 #include <climits>
 #include <semaphore>
 
+//Functions of this type must not block conditionally on other jobs
 using AmmoniteWork = void (*)(void* userPtr);
+
 using AmmoniteGroup = std::counting_semaphore<INT_MAX>;
 
 namespace ammonite {
