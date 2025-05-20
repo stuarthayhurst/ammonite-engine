@@ -36,11 +36,11 @@ namespace {
     ModelInfoMap modelInfoMapSelector[2];
 
   public:
-    unsigned int getModelCount(AmmoniteModelEnum modelType) {
+    unsigned int getModelCount(ModelTypeEnum modelType) {
       return modelInfoMapSelector[modelType].size();
     }
 
-    void getModels(AmmoniteModelEnum modelType, unsigned int modelCount,
+    void getModels(ModelTypeEnum modelType, unsigned int modelCount,
                    ammonite::models::internal::ModelInfo* modelArr[]) {
       //Select the right model tracker
       ModelInfoMap* modelMapPtr = &modelInfoMapSelector[modelType];
@@ -70,7 +70,7 @@ namespace {
 
     void deleteModel(AmmoniteId modelId) {
       //Get the type of model, so the right tracker can be selected
-      const AmmoniteModelEnum modelType = modelIdPtrMap[modelId]->modelType;
+      const ModelTypeEnum modelType = modelIdPtrMap[modelId]->modelType;
       ModelInfoMap* targetMapPtr = &modelInfoMapSelector[modelType];
 
       //Delete the model and id to pointer map entry
@@ -79,9 +79,9 @@ namespace {
       haveModelsMoved = true;
     }
 
-    void changeModelType(AmmoniteId modelId, AmmoniteModelEnum targetType) {
+    void changeModelType(AmmoniteId modelId, ModelTypeEnum targetType) {
       //Get the type of model, so the right tracker can be selected
-      const AmmoniteModelEnum modelType = modelIdPtrMap[modelId]->modelType;
+      const ModelTypeEnum modelType = modelIdPtrMap[modelId]->modelType;
 
       //Return early if no work needs to be done
       if (modelType == targetType) {
@@ -114,7 +114,7 @@ namespace {
       }
 
       //Get the type of model, so the right tracker can be selected
-      const AmmoniteModelEnum modelType = modelIdPtrMap[modelId]->modelType;
+      const ModelTypeEnum modelType = modelIdPtrMap[modelId]->modelType;
       const ModelInfoMap* targetMapPtr = &modelInfoMapSelector[modelType];
 
       //Return whether the selected tracker holds the model
@@ -136,11 +136,11 @@ namespace ammonite {
   //Internally exposed model handling methods
   namespace models {
     namespace internal {
-      unsigned int getModelCount(AmmoniteModelEnum modelType) {
+      unsigned int getModelCount(ModelTypeEnum modelType) {
         return activeModelTracker.getModelCount(modelType);
       }
 
-      void getModels(AmmoniteModelEnum modelType, unsigned int modelCount,
+      void getModels(ModelTypeEnum modelType, unsigned int modelCount,
                      ammonite::models::internal::ModelInfo* modelArr[]) {
         activeModelTracker.getModels(modelType, modelCount, modelArr);
       }
