@@ -69,9 +69,8 @@ namespace ammonite {
           std::thread* threadPool;
           bool stayAlive = false;
 
-          //Flag and barrier to synchronise all threads, then communicate completion
-          std::atomic<bool> threadsSynced = false;
-          std::barrier<void (*)()>* threadSyncBarrier;
+          //Barrier to synchronise all threads
+          std::barrier<>* threadSyncBarrier;
 
           //Trigger, flag and barrier to block all threads, then communicate completion
           std::atomic<bool> threadBlockTrigger = false;
@@ -117,15 +116,6 @@ namespace ammonite {
                 threadBlockTrigger.wait(true);
               }
             }
-          }
-
-          /*
-           - Callback for when threads are synchronised after finishing their work
-           - Mark threads as synchronised
-          */
-          void threadsSyncedCallback() {
-            threadsSynced = true;
-            threadsSynced.notify_all();
           }
 
           /*
@@ -193,9 +183,8 @@ namespace ammonite {
             return false;
           }
 
-          //Prepare thread finish syncs
-          threadSyncBarrier = new std::barrier{threadCount, threadsSyncedCallback};
-          threadsSynced = false;
+          //Prepare thread finish barrier
+          threadSyncBarrier = new std::barrier{threadCount};
 
           //Prepare thread block syncs
           threadBlockBarrier = new std::barrier{threadCount, threadsBlockedCallback};
@@ -251,10 +240,10 @@ namespace ammonite {
          - Return when the work has finished
         */
         void finishWork() {
-          internal::submitMultiple(finishSyncJob, nullptr, 0, nullptr, poolThreadCount);
+          AmmoniteGroup group{0};
+          internal::submitMultiple(finishSyncJob, nullptr, 0, &group, poolThreadCount);
 
-          threadsSynced.wait(false);
-          threadsSynced = false;
+          waitGroupComplete(&group, poolThreadCount);
         }
 
         //Finish work already in the queue and kill the threads
