@@ -87,12 +87,14 @@ namespace ammonite {
           std::barrier<void (*)()>* threadBlockBarrier;
 
           WorkQueue* workQueues;
-          unsigned int threadAssignMask = 0;
+          unsigned int queueLaneCount = 0;
+          unsigned int laneAssignMask = 0;
+          std::atomic<uintmax_t> nextJobRead = 0;
           std::atomic<uintmax_t> nextJobWrite = 0;
         }
 
         namespace {
-          void runWorker(unsigned int index) {
+          void runWorker() {
             //Ask the system for the thread ID, since it's more useful for debugging
             ammoniteInternalDebug << "Started worker thread (ID " << gettid() \
                                   << ")" << std::endl;
@@ -100,7 +102,8 @@ namespace ammonite {
             WorkItem workItem = {nullptr, nullptr, nullptr};
             while (stayAlive) {
               //Wait for a job to be available, then return it
-              workQueues[index].pop(&workItem);
+              const uintmax_t targetQueue = (nextJobRead++) & laneAssignMask;
+              workQueues[targetQueue].pop(&workItem);
 
               //Block the thread when instructed to, wait to release it
               if (threadBlockTrigger) {
@@ -154,7 +157,7 @@ namespace ammonite {
 
         void submitWork(AmmoniteWork work, void* userPtr, AmmoniteGroup* group) {
           //Add work to the next queue
-          const uintmax_t targetQueue = (nextJobWrite++) & threadAssignMask;
+          const uintmax_t targetQueue = (nextJobWrite++) & laneAssignMask;
           workQueues[targetQueue].push(work, userPtr, group);
         }
 
@@ -162,20 +165,20 @@ namespace ammonite {
         void submitMultiple(AmmoniteWork work, void* userBuffer, int stride,
                             AmmoniteGroup* group, unsigned int newJobs) {
           //Every queue gets at least baseBatchSize jobs
-          const unsigned int baseBatchSize = newJobs / poolThreadCount;
+          const unsigned int baseBatchSize = newJobs / queueLaneCount;
 
           //Add the base amount of work to each queue without touching the atomic index
           if (baseBatchSize > 0) {
-            for (unsigned int i = 0; i < poolThreadCount; i++) {
+            for (unsigned int i = 0; i < queueLaneCount; i++) {
               workQueues[i].pushMultiple(work, userBuffer, stride, group, baseBatchSize);
               userBuffer = (char*)userBuffer + (std::size_t(baseBatchSize) * stride);
             }
           }
 
           //Add the remaining work
-          const unsigned int remainingJobs = newJobs - (baseBatchSize * poolThreadCount);
+          const unsigned int remainingJobs = newJobs - (baseBatchSize * queueLaneCount);
           for (unsigned int i = 0; i < remainingJobs; i++) {
-            const uintmax_t targetQueue = (nextJobWrite++) & threadAssignMask;
+            const uintmax_t targetQueue = (nextJobWrite++) & laneAssignMask;
             workQueues[targetQueue].push(work, (char*)userBuffer + (std::size_t(i) * stride), group);
           }
         }
@@ -192,9 +195,6 @@ namespace ammonite {
             threadCount = getHardwareThreadCount();
           }
 
-          //Round thread count up to nearest power of 2 to decide queue count
-          threadCount = std::bit_ceil(threadCount);
-
           //Cap at configured thread limit, allocate memory for pool
           threadCount = (threadCount > MAX_THREADS) ? MAX_THREADS : threadCount;
           ammoniteInternalDebug << "Creating thread pool with " << threadCount \
@@ -204,10 +204,14 @@ namespace ammonite {
             return false;
           }
 
+          //Round thread count up to nearest power of 2 and double it to decide lane count
+          queueLaneCount = std::bit_ceil(threadCount) * 2;
+          laneAssignMask = queueLaneCount - 1;
+
           //Create the queues
+          nextJobRead = 0;
           nextJobWrite = 0;
-          threadAssignMask = threadCount - 1;
-          workQueues = new WorkQueue[threadCount];
+          workQueues = new WorkQueue[queueLaneCount];
 
           //Prepare thread finish barrier
           threadSyncBarrier = new std::barrier{threadCount};
@@ -221,7 +225,7 @@ namespace ammonite {
           stayAlive = true;
           poolThreadCount = threadCount;
           for (unsigned int i = 0; i < poolThreadCount; i++) {
-            threadPool[i] = std::thread(runWorker, i);
+            threadPool[i] = std::thread(runWorker);
           }
 
           return true;
@@ -302,7 +306,9 @@ namespace ammonite {
           delete threadSyncBarrier;
           delete threadBlockBarrier;
           poolThreadCount = 0;
-          threadAssignMask = 0;
+          queueLaneCount = 0;
+          laneAssignMask = 0;
+          nextJobRead = 0;
           nextJobWrite = 0;
         }
       }
