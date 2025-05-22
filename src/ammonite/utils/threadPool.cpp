@@ -1,6 +1,7 @@
 #include <atomic>
 #include <barrier>
 #include <bit>
+#include <chrono>
 #include <cstddef>
 #include <cstdint>
 #include <iostream>
@@ -58,7 +59,14 @@ namespace {
     }
 
     void pop(WorkItem* workItemPtr) {
-      jobCount.acquire();
+      /*
+       - libstdc++ has a deadlock in the implementation of counting_semaphore
+         - https://gcc.gnu.org/bugzilla/show_bug.cgi?id=104928
+       - The deadlock is extremely rare, so the performance impact of this workaround
+         shouldn't be too bad
+       - Once this is fixed, just use 'jobCount.acquire();' instead
+      */
+      while(!jobCount.try_acquire_for(std::chrono::milliseconds(1))) {}
       queueLock.lock();
 
       *workItemPtr = queue.front();
