@@ -84,7 +84,7 @@ namespace ammonite {
         namespace {
           unsigned int poolThreadCount = 0;
           std::thread* threadPool;
-          bool stayAlive = false;
+          std::atomic<bool> stayAlive = false;
 
           //Barrier to synchronise all threads
           std::barrier<>* threadSyncBarrier;
