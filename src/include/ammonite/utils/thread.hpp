@@ -21,7 +21,8 @@ namespace ammonite {
       void submitWork(AmmoniteWork work, void* userPtr);
       void submitWork(AmmoniteWork work, void* userPtr, AmmoniteGroup* group);
       void submitMultiple(AmmoniteWork work, void* userBuffer, int stride,
-                          AmmoniteGroup* group, unsigned int jobCount);
+                          AmmoniteGroup* group, unsigned int jobCount,
+                          AmmoniteGroup* submitGroup);
       void waitGroupComplete(AmmoniteGroup* group, unsigned int jobCount);
 
       void blockThreads();

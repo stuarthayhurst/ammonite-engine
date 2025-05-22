@@ -182,7 +182,7 @@ namespace ammonite {
         }
 
         ammonite::utils::thread::submitMultiple(lightWork, &workerData[0],
-          sizeof(LightWorkerData), &group, lightCount);
+          sizeof(LightWorkerData), &group, lightCount, nullptr);
       }
 
       //Wait for the workers to finish and upload the lighting buffers

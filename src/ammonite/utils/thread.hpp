@@ -18,7 +18,8 @@ namespace ammonite {
 
         void submitWork(AmmoniteWork work, void* userPtr, AmmoniteGroup* group);
         void submitMultiple(AmmoniteWork work, void* userBuffer, int stride,
-                            AmmoniteGroup* group, unsigned int newJobs);
+                            AmmoniteGroup* group, unsigned int newJobs,
+                            AmmoniteGroup* submitGroup);
 
         void blockThreads();
         void unblockThreads();

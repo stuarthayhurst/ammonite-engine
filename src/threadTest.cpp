@@ -272,7 +272,7 @@ namespace {
     unsigned int* values = new unsigned int[jobCount]{};
     AmmoniteGroup group{0};
     ammonite::utils::thread::submitMultiple(shortTask, &values[0], sizeof(values[0]),
-                                            &group, jobCount);
+                                            &group, jobCount, nullptr);
     submitTimer.pause();
 
     //Finish work
@@ -295,7 +295,7 @@ namespace {
     AmmoniteGroup group{0};
     for (int i = 0; i < 4; i++) {
       ammonite::utils::thread::submitMultiple(shortTask, &values[(std::size_t)jobCount * i],
-        sizeof(values[0]), &group, jobCount);
+        sizeof(values[0]), &group, jobCount, nullptr);
     }
     submitTimer.pause();
 
@@ -316,11 +316,13 @@ namespace {
     RESET_TIMERS
     bool passed = true;
     unsigned int* values = new unsigned int[jobCount]{};
+    AmmoniteGroup submitGroup{0};
     ammonite::utils::thread::submitMultiple(shortTask, &values[0],
-      sizeof(values[0]), nullptr, jobCount);
+      sizeof(values[0]), nullptr, jobCount, &submitGroup);
     submitTimer.pause();
 
     //Finish work
+    ammonite::utils::thread::waitGroupComplete(&submitGroup, 1);
     ammonite::utils::thread::destroyThreadPool();
     FINISH_TIMERS
     VERIFY_WORK(jobCount)

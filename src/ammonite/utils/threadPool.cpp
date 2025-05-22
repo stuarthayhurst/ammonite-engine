@@ -155,6 +155,45 @@ namespace ammonite {
           }
         }
 
+        //Helpers for asynchronous submitMultiple()
+        namespace {
+          struct SubmitData {
+            AmmoniteWork work;
+            void* userBuffer;
+            AmmoniteGroup* group;
+            int stride;
+            unsigned int jobCount;
+          };
+
+          void submitMultipleJob(void* rawSubmitData) {
+            SubmitData* submitData = (SubmitData*)rawSubmitData;
+
+            //Every queue gets at least baseBatchSize jobs
+            const unsigned int baseBatchSize = submitData->jobCount / queueLaneCount;
+
+            //Add the base amount of work to each queue without touching the atomic index
+            if (baseBatchSize > 0) {
+              const std::size_t jobSize = std::size_t(baseBatchSize) * submitData->stride;
+              for (unsigned int i = 0; i < queueLaneCount; i++) {
+                workQueues[i].pushMultiple(submitData->work, submitData->userBuffer,
+                                           submitData->stride, submitData->group, baseBatchSize);
+                submitData->userBuffer = (char*)submitData->userBuffer + jobSize;
+              }
+            }
+
+            //Add the remaining work
+            const unsigned int remainingJobs = submitData->jobCount - (baseBatchSize * queueLaneCount);
+            for (unsigned int i = 0; i < remainingJobs; i++) {
+              const uintmax_t targetQueue = (nextJobWrite++) & laneAssignMask;
+              workQueues[targetQueue].push(submitData->work, (char*)submitData->userBuffer,
+                                           submitData->group);
+              submitData->userBuffer = (char*)submitData->userBuffer + submitData->stride;
+            }
+
+            delete submitData;
+          }
+        }
+
         unsigned int getHardwareThreadCount() {
           return std::thread::hardware_concurrency();
         }
@@ -169,26 +208,16 @@ namespace ammonite {
           workQueues[targetQueue].push(work, userPtr, group);
         }
 
-        //Submit multiple jobs in a batch, with no ordering guarantees
+        /*
+         - Submit a job that submits the actual work when executed
+         - Submitting the actual jobs asynchronously returns faster, allowing
+           the overhead to be mitigated by useful work
+        */
         void submitMultiple(AmmoniteWork work, void* userBuffer, int stride,
-                            AmmoniteGroup* group, unsigned int newJobs) {
-          //Every queue gets at least baseBatchSize jobs
-          const unsigned int baseBatchSize = newJobs / queueLaneCount;
-
-          //Add the base amount of work to each queue without touching the atomic index
-          if (baseBatchSize > 0) {
-            for (unsigned int i = 0; i < queueLaneCount; i++) {
-              workQueues[i].pushMultiple(work, userBuffer, stride, group, baseBatchSize);
-              userBuffer = (char*)userBuffer + (std::size_t(baseBatchSize) * stride);
-            }
-          }
-
-          //Add the remaining work
-          const unsigned int remainingJobs = newJobs - (baseBatchSize * queueLaneCount);
-          for (unsigned int i = 0; i < remainingJobs; i++) {
-            const uintmax_t targetQueue = (nextJobWrite++) & laneAssignMask;
-            workQueues[targetQueue].push(work, (char*)userBuffer + (std::size_t(i) * stride), group);
-          }
+                            AmmoniteGroup* group, unsigned int newJobs,
+                            AmmoniteGroup* submitGroup) {
+          SubmitData* dataPtr = new SubmitData{work, userBuffer, group, stride, newJobs};
+          internal::submitWork(submitMultipleJob, dataPtr, submitGroup);
         }
 
         //Create a thread pool of the requested size, if one doesn't already exist

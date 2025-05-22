@@ -14,7 +14,7 @@ namespace ammonite {
 
       //Return the number of hardware threads available
       unsigned int getHardwareThreadCount() {
-        return ammonite::utils::thread::internal::getHardwareThreadCount();
+        return internal::getHardwareThreadCount();
       }
 
       /*
@@ -22,7 +22,7 @@ namespace ammonite {
          - Returns 0 if the pool doesn't exist
       */
       unsigned int getThreadPoolSize() {
-        return ammonite::utils::thread::internal::getThreadPoolSize();
+        return internal::getThreadPoolSize();
       }
 
       /*
@@ -46,6 +46,7 @@ namespace ammonite {
        - Destroy or exit the current thread pool
        - Must be called once per creation / connection
        - Safe to be called after renderer initialisation
+       - If jobs in the queue may more submit work, they must be completed before calling this
       */
       void destroyThreadPool() {
         if (poolUsers == 0) {
@@ -56,7 +57,7 @@ namespace ammonite {
 
         poolUsers--;
         if (poolUsers == 0) {
-          ammonite::utils::thread::internal::destroyThreadPool();
+          internal::destroyThreadPool();
         } else {
           ammoniteInternalDebug << "Skipping thread pool destruction, " \
                                 << poolUsers << " users remain" << std::endl;
@@ -70,7 +71,7 @@ namespace ammonite {
        - Do not submit jobs that block conditionally on other jobs
       */
       void submitWork(AmmoniteWork work, void* userPtr) {
-        ammonite::utils::thread::internal::submitWork(work, userPtr, nullptr);
+        internal::submitWork(work, userPtr, nullptr);
       }
 
       /*
@@ -83,7 +84,7 @@ namespace ammonite {
        - Do not submit jobs that block conditionally on other jobs
       */
       void submitWork(AmmoniteWork work, void* userPtr, AmmoniteGroup* group) {
-        ammonite::utils::thread::internal::submitWork(work, userPtr, group);
+        internal::submitWork(work, userPtr, group);
       }
 
       /*
@@ -92,24 +93,29 @@ namespace ammonite {
            - Each job will receive a section according to (userBuffer + job index * stride)
            - stride should be the size of each section to give to a job, in bytes
          - group should either be a nullptr, or an AmmoniteGroup{0}
+         - submitGroup should either be a nullptr, or an AmmoniteGroup{0}
          - jobCount specifies how many times to submit the job
+       - Jobs are submitted asynchronously, waiting on submitGroup for 1 job can be used
+         to wait for the submit to be complete
+         - Waiting on submitGroup or group must be done before destroying the thread pool
        - createThreadPool() must be called before using this
        - Do not submit jobs that block conditionally on other jobs
       */
       void submitMultiple(AmmoniteWork work, void* userBuffer, int stride,
-                          AmmoniteGroup* group, unsigned int jobCount) {
+                          AmmoniteGroup* group, unsigned int jobCount,
+                          AmmoniteGroup* submitGroup) {
         //Set stride to 0 when no data is passed
         if (userBuffer == nullptr) {
           stride = 0;
         }
 
-        ammonite::utils::thread::internal::submitMultiple(work, userBuffer, stride,
-                                                          group, jobCount);
+        internal::submitMultiple(work, userBuffer, stride, group, jobCount, submitGroup);
       }
 
       /*
        - Wait for a group to be finished
        - group must not be a nullptr
+       - jobCount determines how many jobs to wait for
       */
       void waitGroupComplete(AmmoniteGroup* group, unsigned int jobCount) {
         //Wait for group to finish
@@ -125,7 +131,7 @@ namespace ammonite {
       */
       void blockThreads() {
         if (poolUsers != 0) {
-          ammonite::utils::thread::internal::blockThreads();
+          internal::blockThreads();
         }
       }
 
@@ -136,17 +142,19 @@ namespace ammonite {
       */
       void unblockThreads() {
         if (poolUsers != 0) {
-          ammonite::utils::thread::internal::unblockThreads();
+          internal::unblockThreads();
         }
       }
 
       /*
        - Wait until all work in the pool as of the call is finished
+         - If a job submits more work while executing, the extra work won't be waited for
+         - This includes submitMultiple(), which submits a job to submit the actual jobs
        - This isn't thread safe, and must never be called from a job
       */
       void finishWork() {
         if (poolUsers != 0) {
-          ammonite::utils::thread::internal::finishWork();
+          internal::finishWork();
         }
       }
     }
