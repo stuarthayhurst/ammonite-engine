@@ -38,6 +38,7 @@ namespace ammonite {
       OutputHelper(std::ostream& output, const std::string& pre, const std::string& colour);
       template<typename T> OutputHelper& operator << (T&& input);
       OutputHelper& operator << (std::ostream& (*)(std::ostream&));
+      void printEmptyLine();
     };
 
     template<typename T> OutputHelper& OutputHelper::operator << (T&& input) {

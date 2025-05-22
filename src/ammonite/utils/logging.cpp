@@ -33,6 +33,12 @@ namespace ammonite {
       return *this;
     }
 
+    void OutputHelper::printEmptyLine() {
+      outputLock.lock();
+      outputStream << std::endl;
+      outputLock.unlock();
+    }
+
     /*NOLINTBEGIN(cppcoreguidelines-avoid-non-const-global-variables,
                   cppcoreguidelines-interfaces-global-init)*/
     thread_local std::stringstream OutputHelper::storageStream = std::stringstream("");

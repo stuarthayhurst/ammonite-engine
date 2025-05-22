@@ -351,6 +351,7 @@ int main(int argc, char** argv) noexcept(false) {
   //Output benchmark score
   if (useBenchmark) {
     const double frameTime = utilityTimer.getTime() / (double)ammonite::renderer::getTotalFrames();
+    ammonite::utils::status.printEmptyLine();
     ammonite::utils::status << "Benchmark complete:" << std::endl;
     ammonite::utils::status << "  Average fps: ";
     ammonite::utils::status << formatMetrics(frameTime) << std::endl;
