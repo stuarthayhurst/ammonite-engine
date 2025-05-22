@@ -23,9 +23,9 @@ ammonite::utils::Timer totalTimer;
 #define FINISH_TIMERS \
 runTimer.pause(); \
 totalTimer.pause(); \
-std::cout << "  Submit done : " << submitTimer.getTime() << "s" << std::endl; \
-std::cout << "  Finish work : " << runTimer.getTime() << "s" << std::endl; \
-std::cout << "  Total time  : " << totalTimer.getTime() << "s" << std::endl;
+output << "  Submit done : " << submitTimer.getTime() << "s" << std::endl; \
+output << "  Finish work : " << runTimer.getTime() << "s" << std::endl; \
+output << "  Total time  : " << totalTimer.getTime() << "s" << std::endl;
 
 #define RESET_TIMERS \
 submitTimer.reset(); \
@@ -58,9 +58,13 @@ delete [] values;
 //NOLINTEND(cppcoreguidelines-macro-usage)
 
 namespace {
-  //NOLINTNEXTLINE(cppcoreguidelines-interfaces-global-init)
+  //NOLINTBEGIN(cppcoreguidelines-interfaces-global-init)
   std::stringstream outputCapture("");
   ammonite::utils::OutputHelper outputTester(outputCapture, "PREFIX: ");
+
+  //Thread-safe output
+  ammonite::utils::OutputHelper output(std::cout, "", ammonite::utils::colour::white);
+  //NOLINTEND(cppcoreguidelines-interfaces-global-init)
 }
 
 namespace {
@@ -500,66 +504,66 @@ int main() noexcept(false) {
   const unsigned int jobCount = (2 << 16);
 
   //Begin regular tests
-  std::cout << "Testing standard submit, wait, destroy" << std::endl;
+  output << "Testing standard submit, wait, destroy" << std::endl;
   failed |= !testCreateSubmitWaitDestroy(jobCount);
 
-  std::cout << "Testing alternative sync" << std::endl;
+  output << "Testing alternative sync" << std::endl;
   failed |= !testCreateSubmitBlockUnblockDestroy(jobCount);
 
-  std::cout << "Testing no sync" << std::endl;
+  output << "Testing no sync" << std::endl;
   failed |= !testCreateSubmitDestroy(jobCount);
 
-  std::cout << "Testing blocked queue" << std::endl;
+  output << "Testing blocked queue" << std::endl;
   failed |= !testCreateBlockSubmitUnblockWaitDestroy(jobCount);
 
-  std::cout << "Testing queue limits (8x regular over 2 batches)" << std::endl;
+  output << "Testing queue limits (8x regular over 2 batches)" << std::endl;
   failed |= !testQueueLimits(jobCount);
 
-  std::cout << "Testing nested jobs" << std::endl;
+  output << "Testing nested jobs" << std::endl;
   failed |= !testNestedJobs(jobCount);
 
-  std::cout << "Testing chained jobs" << std::endl;
+  output << "Testing chained jobs" << std::endl;
   failed |= !testChainJobs(jobCount);
 
-  std::cout << "Testing submit multiple" << std::endl;
+  output << "Testing submit multiple" << std::endl;
   failed |= !testSubmitMultiple(jobCount);
 
-  std::cout << "Testing submit multiple, minimal" << std::endl;
+  output << "Testing submit multiple, minimal" << std::endl;
   failed |= !testSubmitMultiple(1);
 
-  std::cout << "Testing submit multiple, thread count" << std::endl;
+  output << "Testing submit multiple, thread count" << std::endl;
   failed |= !testSubmitMultiple(ammonite::utils::thread::getThreadPoolSize());
 
-  std::cout << "Testing submit multiple (4x regular over 4 batches)" << std::endl;
+  output << "Testing submit multiple (4x regular over 4 batches)" << std::endl;
   failed |= !testSubmitMultipleMultiple(jobCount);
 
-  std::cout << "Testing submit multiple, synchronous submit" << std::endl;
+  output << "Testing submit multiple, synchronous submit" << std::endl;
   failed |= !testSubmitMultipleSyncSubmit(jobCount);
 
-  std::cout << "Testing submit multiple, no job sync" << std::endl;
+  output << "Testing submit multiple, no job sync" << std::endl;
   failed |= !testSubmitMultipleNoSync(jobCount);
 
   //Begin blocking tests
-  std::cout << "Testing double block, double unblock" << std::endl;
+  output << "Testing double block, double unblock" << std::endl;
   failed |= !testCreateBlockBlockUnblockUnblockSubmitDestroy(jobCount);
 
-  std::cout << "Testing double block, single unblock" << std::endl;
+  output << "Testing double block, single unblock" << std::endl;
   failed |= !testCreateBlockBlockUnblockSubmitDestroy(jobCount);
 
-  std::cout << "Testing double block, submit jobs, single unblock" << std::endl;
+  output << "Testing double block, submit jobs, single unblock" << std::endl;
   failed |= !testCreateBlockBlockSubmitUnblockDestroy(jobCount);
 
-  std::cout << "Testing single block, double unblock" << std::endl;
+  output << "Testing single block, double unblock" << std::endl;
   failed |= !testCreateBlockUnblockUnblockSubmitDestroy(jobCount);
 
-  std::cout << "Testing unblock without block" << std::endl;
+  output << "Testing unblock without block" << std::endl;
   failed |= !testCreateUnblockSubmitDestroy(jobCount);
 
   //Check system is still functional
-  std::cout << "Double-checking standard submit, wait, destroy" << std::endl;
+  output << "Double-checking standard submit, wait, destroy" << std::endl;
   failed |= !testCreateSubmitWaitDestroy(jobCount);
 
-  std::cout << "Testing synchronised output helpers" << std::endl;
+  output << "Testing synchronised output helpers" << std::endl;
   const unsigned int threadCount = ammonite::utils::thread::getHardwareThreadCount();
   failed |= !testOutputHelpers(threadCount * 4);
 
