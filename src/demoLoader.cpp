@@ -1,6 +1,6 @@
 #include <cstdlib>
+#include <format>
 #include <iostream>
-#include <print>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -125,14 +125,13 @@ namespace {
 
 //Helpers
 namespace {
-  void printMetrics(double frameTime) {
+  std::string formatMetrics(double frameTime) {
     double frameRate = 0.0;
     if (frameTime != 0.0) {
       frameRate = 1 / frameTime;
     }
 
-    std::print("{:.2f} fps", frameRate);
-    std::println(" ({:f}ms)", frameTime * 1000);
+    return std::format("{:.2f} fps ({:f}ms)", frameRate, frameTime * 1000);
   }
 
   //Clean up anything that was created
@@ -225,7 +224,6 @@ int main(int argc, char** argv) noexcept(false) {
   ammonite::window::useIconDir("assets/icons/");
 
   ammonite::utils::debug::printDriverInfo();
-  std::cout << std::endl;
 
   //Set vsync (disable if benchmarking)
   if (useVsync == "false" || useBenchmark) {
@@ -333,7 +331,7 @@ int main(int argc, char** argv) noexcept(false) {
   while(!closeWindow && !ammonite::window::shouldWindowClose()) {
     //Every second, output the framerate
     if (frameTimer.getTime() >= 1.0f) {
-      printMetrics(ammonite::renderer::getFrameTime());
+      ammonite::utils::status << formatMetrics(ammonite::renderer::getFrameTime()) << std::endl;
       frameTimer.reset();
     }
 
@@ -352,9 +350,10 @@ int main(int argc, char** argv) noexcept(false) {
 
   //Output benchmark score
   if (useBenchmark) {
-    std::cout << "\nBenchmark complete:" << std::endl;
-    std::cout << "  Average fps: ";
-    printMetrics(utilityTimer.getTime() / (double)ammonite::renderer::getTotalFrames());
+    const double frameTime = utilityTimer.getTime() / (double)ammonite::renderer::getTotalFrames();
+    ammonite::utils::status << "Benchmark complete:" << std::endl;
+    ammonite::utils::status << "  Average fps: ";
+    ammonite::utils::status << formatMetrics(frameTime) << std::endl;
   }
 
   //Clean up and exit
@@ -370,5 +369,6 @@ int main(int argc, char** argv) noexcept(false) {
   if (!cleanExit) {
     return EXIT_FAILURE;
   }
+
   return EXIT_SUCCESS;
 }

@@ -77,7 +77,7 @@ namespace ammonite {
 
         ammonite::utils::status << "OpenGL version: " << majorVersion << "." << minorVersion << std::endl;
         ammonite::utils::status << "OpenGL renderer: " << glGetString(GL_RENDERER) << std::endl;
-        ammonite::utils::status << "OpenGL vendor: " << glGetString(GL_VENDOR) << std::endl;
+        ammonite::utils::status << "OpenGL vendor: " << glGetString(GL_VENDOR) << "\n" << std::endl;
       }
     }
   }
