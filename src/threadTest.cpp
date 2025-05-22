@@ -524,7 +524,10 @@ int main() noexcept(false) {
   std::cout << "Testing submit multiple" << std::endl;
   failed |= !testSubmitMultiple(jobCount);
 
-  std::cout << "Testing minimal submit multiple" << std::endl;
+  std::cout << "Testing submit multiple, minimal" << std::endl;
+  failed |= !testSubmitMultiple(1);
+
+  std::cout << "Testing submit multiple, thread count" << std::endl;
   failed |= !testSubmitMultiple(ammonite::utils::thread::getThreadPoolSize());
 
   std::cout << "Testing submit multiple (4x regular over 4 batches)" << std::endl;
