@@ -60,7 +60,7 @@ namespace {
 
     void pop(WorkItem* workItemPtr) {
       /*
-       - libstdc++ has a deadlock in the implementation of counting_semaphore
+       - TODO: libstdc++ has a deadlock in the implementation of counting_semaphore
          - https://gcc.gnu.org/bugzilla/show_bug.cgi?id=104928
        - The deadlock is extremely rare, so the performance impact of this workaround
          shouldn't be too bad
@@ -169,6 +169,8 @@ namespace ammonite {
             SubmitData* submitData = (SubmitData*)rawSubmitData;
 
             //Every queue gets at least baseBatchSize jobs
+            //TODO: Remove this once clang-tidy-21 is released
+            //NOLINTNEXTLINE(clang-analyzer-core.UndefinedBinaryOperatorResult)
             const unsigned int baseBatchSize = submitData->jobCount / queueLaneCount;
 
             //Add the base amount of work to each queue without touching the atomic index
