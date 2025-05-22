@@ -23,6 +23,8 @@ namespace ammonite {
       void submitMultiple(AmmoniteWork work, void* userBuffer, int stride,
                           AmmoniteGroup* group, unsigned int jobCount,
                           AmmoniteGroup* submitGroup);
+      void submitMultipleSync(AmmoniteWork work, void* userBuffer, int stride,
+                              AmmoniteGroup* group, unsigned int jobCount);
       void waitGroupComplete(AmmoniteGroup* group, unsigned int jobCount);
 
       void blockThreads();

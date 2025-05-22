@@ -220,6 +220,14 @@ namespace ammonite {
           internal::submitWork(submitMultipleJob, dataPtr, submitGroup);
         }
 
+        //Synchronous version of submitMultiple()
+        void submitMultipleSync(AmmoniteWork work, void* userBuffer, int stride,
+                                AmmoniteGroup* group, unsigned int newJobs) {
+          //Pack the data into the expected format and just execute the job immediately
+          SubmitData* dataPtr = new SubmitData{work, userBuffer, group, stride, newJobs};
+          submitMultipleJob(dataPtr);
+        }
+
         //Create a thread pool of the requested size, if one doesn't already exist
         bool createThreadPool(unsigned int threadCount) {
           //Exit if thread pool already exists

@@ -98,6 +98,7 @@ namespace ammonite {
        - Jobs are submitted asynchronously, waiting on submitGroup for 1 job can be used
          to wait for the submit to be complete
          - Waiting on submitGroup or group must be done before destroying the thread pool
+         - This may be a while, use submitMultipleSync() instead of immediately waiting
        - createThreadPool() must be called before using this
        - Do not submit jobs that block conditionally on other jobs
       */
@@ -110,6 +111,17 @@ namespace ammonite {
         }
 
         internal::submitMultiple(work, userBuffer, stride, group, jobCount, submitGroup);
+      }
+
+      //Synchronous version of submitMultiple()
+      void submitMultipleSync(AmmoniteWork work, void* userBuffer, int stride,
+                              AmmoniteGroup* group, unsigned int jobCount) {
+        //Set stride to 0 when no data is passed
+        if (userBuffer == nullptr) {
+          stride = 0;
+        }
+
+        internal::submitMultipleSync(work, userBuffer, stride, group, jobCount);
       }
 
       /*
