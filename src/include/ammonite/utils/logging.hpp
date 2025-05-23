@@ -17,6 +17,8 @@ namespace ammonite {
       constexpr const char* magenta = "\033[35m";
       constexpr const char* cyan = "\033[36m";
       constexpr const char* white = "\033[37m";
+
+      constexpr const char* none = "";
     }
 
     /*

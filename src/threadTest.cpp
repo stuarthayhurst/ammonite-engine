@@ -63,7 +63,7 @@ namespace {
   ammonite::utils::OutputHelper outputTester(outputCapture, "PREFIX: ");
 
   //Thread-safe output
-  ammonite::utils::OutputHelper output(std::cout, "", ammonite::utils::colour::white);
+  ammonite::utils::OutputHelper output(std::cout, "", ammonite::utils::colour::none);
   //NOLINTEND(cppcoreguidelines-interfaces-global-init)
 }
 
