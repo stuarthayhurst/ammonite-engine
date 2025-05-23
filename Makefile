@@ -103,8 +103,8 @@ ifneq ($(USE_SYSTEM),true)
                   "--with-path=$(PROJECT_ROOT)"
 endif
 
-CLIENT_CXXFLAGS := $(CXXFLAGS) $(shell pkg-config $(PKG_CONF_ARGS) --cflags ammonite)
-CLIENT_LDFLAGS := $(LDFLAGS) $(shell pkg-config $(PKG_CONF_ARGS) --libs ammonite)
+CLIENT_CXXFLAGS := $(CXXFLAGS) $(shell pkg-config $(PKG_CONF_ARGS) --cflags ammonite glm)
+CLIENT_LDFLAGS := $(LDFLAGS) $(shell pkg-config $(PKG_CONF_ARGS) --libs ammonite glm)
 
 #Recipe-specific client arguments
 THREADTEST_EXTRA_LDFLAGS := -latomic
