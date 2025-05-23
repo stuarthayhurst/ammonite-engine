@@ -110,7 +110,7 @@ CLIENT_LDFLAGS := $(LDFLAGS) $(shell pkg-config $(PKG_CONF_ARGS) --libs ammonite
 THREADTEST_EXTRA_LDFLAGS := -latomic
 DEMO_EXTRA_LDFLAGS := -lm
 
-#Helper to run the compiler and extract the command
+#Helper to run the compiler or extract the command
 EXTRACT_SCRIPT = python3 extract-command.py
 EXTRACT = @function inline() { if [[ "$(DUMMY)" != "true" ]]; then echo "$(CXX) $$@"; $(CXX) $$@; else $(EXTRACT_SCRIPT) "$(BUILD_DIR)" $(CXX) $$@; fi }; inline
 
