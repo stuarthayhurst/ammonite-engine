@@ -19,6 +19,7 @@ namespace ammonite {
       constexpr const char* white = "\033[37m";
 
       constexpr const char* none = "";
+      constexpr const char* reset = "\033[0m";
     }
 
     /*

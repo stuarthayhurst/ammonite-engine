@@ -9,15 +9,13 @@ namespace ammonite {
   namespace utils {
     namespace {
       std::mutex outputLock;
-
-      constexpr const char* reset = "\033[0m";
     }
 
     OutputHelper::OutputHelper(std::ostream& output, const std::string& pre):
       outputStream(output), prefix(pre) {}
 
     OutputHelper::OutputHelper(std::ostream& output, const std::string& pre, const std::string& colour):
-      outputStream(output), prefix(colour + pre + reset) {}
+      outputStream(output), prefix(colour + pre + colour::reset) {}
 
     //Output the stored string
     OutputHelper& OutputHelper::operator << (std::ostream& (*)(std::ostream&)) {
