@@ -14,7 +14,7 @@ namespace ammonite {
     OutputHelper::OutputHelper(std::ostream& output, const std::string& pre):
       outputStream(output), prefix(pre) {}
 
-    OutputHelper::OutputHelper(std::ostream& output, const std::string& pre, const std::string& colour):
+    OutputHelper::OutputHelper(std::ostream& output, const std::string& pre, const char* colour):
       outputStream(output), prefix(colour + pre + colour::reset) {}
 
     //Output the stored string
