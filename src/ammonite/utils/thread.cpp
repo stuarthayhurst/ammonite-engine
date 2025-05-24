@@ -126,13 +126,15 @@ namespace ammonite {
 
       /*
        - Wait for a group to be finished
-       - group must not be a nullptr
        - jobCount determines how many jobs to wait for
+         - If less than jobCount jobs have been given the group, this will block forever
+         - It doesn't matter if the jobs have already finished
       */
       void waitGroupComplete(AmmoniteGroup* group, unsigned int jobCount) {
-        //Wait for group to finish
-        for (unsigned int i = 0; i < jobCount; i++) {
-          group->acquire();
+        if (group != nullptr) {
+          internal::waitGroupComplete(group, jobCount);
+        } else {
+          ammoniteInternalDebug << "Group is a nullptr, skipping wait" << std::endl;
         }
       }
 

@@ -230,6 +230,13 @@ namespace ammonite {
           submitMultipleJob(dataPtr);
         }
 
+        //Wait for jobCount jobs in group to finish
+        void waitGroupComplete(AmmoniteGroup* group, unsigned int jobCount) {
+          for (unsigned int i = 0; i < jobCount; i++) {
+            group->acquire();
+          }
+        }
+
         //Create a thread pool of the requested size, if one doesn't already exist
         bool createThreadPool(unsigned int threadCount) {
           //Exit if thread pool already exists
@@ -317,7 +324,7 @@ namespace ammonite {
             internal::submitWork(finishSyncJob, nullptr, &group);
           }
 
-          waitGroupComplete(&group, poolThreadCount);
+          internal::waitGroupComplete(&group, poolThreadCount);
         }
 
         //Finish work already in the queue and kill the threads

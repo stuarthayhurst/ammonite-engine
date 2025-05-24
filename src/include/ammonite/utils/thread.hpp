@@ -7,6 +7,11 @@
 //Functions of this type must not block conditionally on other jobs
 using AmmoniteWork = void (*)(void* userPtr);
 
+/*
+ - Initialise using {0}, for example 'AmmoniteGroup group{0};'
+ - Multiple submit calls can share the same group
+ - A group can be reused without reinitialising it
+*/
 using AmmoniteGroup = std::counting_semaphore<INT_MAX>;
 
 namespace ammonite {
@@ -25,6 +30,7 @@ namespace ammonite {
                           AmmoniteGroup* submitGroup);
       void submitMultipleSync(AmmoniteWork work, void* userBuffer, int stride,
                               AmmoniteGroup* group, unsigned int jobCount);
+
       void waitGroupComplete(AmmoniteGroup* group, unsigned int jobCount);
 
       void blockThreads();
