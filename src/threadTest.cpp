@@ -559,7 +559,7 @@ namespace {
 
     //Submit logging jobs
     resetTimers(timers);
-    unsigned int* values = new unsigned int[jobCount];
+    unsigned int* values = createValues(jobCount);
     for (unsigned int i = 0; i < jobCount; i++) {
       values[i] = i;
       ammonite::utils::thread::submitWork(loggingTask, &values[i], &group);
