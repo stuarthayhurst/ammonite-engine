@@ -242,7 +242,8 @@ namespace ammonite {
         //Wait for jobCount jobs in group to finish
         void waitGroupComplete(AmmoniteGroup* group, unsigned int jobCount) {
           for (unsigned int i = 0; i < jobCount; i++) {
-            group->acquire();
+            //TODO: Same issue as jobCount, see WorkQueue's implementation above
+            while(!group->try_acquire_for(std::chrono::milliseconds(1))) {}
           }
         }
 
