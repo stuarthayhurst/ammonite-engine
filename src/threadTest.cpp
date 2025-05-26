@@ -9,12 +9,6 @@
 #include <ammonite/ammonite.hpp>
 
 //NOLINTBEGIN(cppcoreguidelines-macro-usage)
-#define CREATE_THREAD_POOL(THREADS) \
-if (!ammonite::utils::thread::createThreadPool((THREADS))) { \
-  ammonite::utils::error << "Failed to create thread pool, exiting" << std::endl; \
-  return false; \
-}
-
 #define INIT_TIMERS \
 ammonite::utils::Timer submitTimer; \
 ammonite::utils::Timer runTimer; \
@@ -56,6 +50,17 @@ for (unsigned int i = 0; i < (jobCount); i++) { \
 } \
 delete [] values;
 //NOLINTEND(cppcoreguidelines-macro-usage)
+
+namespace {
+  bool createThreadPool(unsigned int threadCount) {
+    if (!ammonite::utils::thread::createThreadPool(threadCount)) {
+      ammonite::utils::error << "Failed to create thread pool, exiting" << std::endl;
+      return false;
+    }
+
+    return true;
+  }
+}
 
 namespace {
   //NOLINTBEGIN(cppcoreguidelines-interfaces-global-init)
@@ -113,7 +118,9 @@ namespace {
 namespace {
   bool testCreateSubmitWaitDestroy(unsigned int jobCount) {
     INIT_TIMERS
-    CREATE_THREAD_POOL(0)
+    if (!createThreadPool(0)) {
+      return false;
+    }
     AmmoniteGroup group{0};
 
     //Submit fast 'jobs'
@@ -132,7 +139,9 @@ namespace {
 
   bool testCreateSubmitBlockUnblockDestroy(unsigned int jobCount) {
     INIT_TIMERS
-    CREATE_THREAD_POOL(0)
+    if (!createThreadPool(0)) {
+      return false;
+    }
 
     //Submit fast 'jobs'
     RESET_TIMERS
@@ -150,7 +159,9 @@ namespace {
 
   bool testCreateSubmitDestroy(unsigned int jobCount) {
     INIT_TIMERS
-    CREATE_THREAD_POOL(0)
+    if (!createThreadPool(0)) {
+      return false;
+    }
 
     //Submit fast 'jobs'
     RESET_TIMERS
@@ -167,7 +178,9 @@ namespace {
 
   bool testCreateBlockSubmitUnblockWaitDestroy(unsigned int jobCount) {
     INIT_TIMERS
-    CREATE_THREAD_POOL(0)
+    if (!createThreadPool(0)) {
+      return false;
+    }
     AmmoniteGroup group{0};
 
     ammonite::utils::thread::blockThreads();
@@ -189,7 +202,9 @@ namespace {
 
   bool testQueueLimits(unsigned int jobCount) {
     INIT_TIMERS
-    CREATE_THREAD_POOL(0)
+    if (!createThreadPool(0)) {
+      return false;
+    }
     jobCount *= 4;
     AmmoniteGroup group{0};
 
@@ -219,7 +234,9 @@ namespace {
   bool testNestedJobs(int fullJobCount) {
     const unsigned int jobCount = fullJobCount / 2;
     INIT_TIMERS
-    CREATE_THREAD_POOL(0)
+    if (!createThreadPool(0)) {
+      return false;
+    }
     AmmoniteGroup group{0};
 
     //Submit nested 'jobs'
@@ -246,7 +263,9 @@ namespace {
 
   bool testChainJobs(unsigned int jobCount) {
     INIT_TIMERS
-    CREATE_THREAD_POOL(0)
+    if (!createThreadPool(0)) {
+      return false;
+    }
 
     AmmoniteGroup sync{0};
     ChainData userData = {1, jobCount, chainTask, &sync};
@@ -268,7 +287,9 @@ namespace {
 
   bool testSubmitMultiple(unsigned int jobCount) {
     INIT_TIMERS
-    CREATE_THREAD_POOL(0)
+    if (!createThreadPool(0)) {
+      return false;
+    }
 
     //Submit fast 'jobs'
     RESET_TIMERS
@@ -290,7 +311,9 @@ namespace {
 
   bool testSubmitMultipleMultiple(unsigned int jobCount) {
     INIT_TIMERS
-    CREATE_THREAD_POOL(0)
+    if (!createThreadPool(0)) {
+      return false;
+    }
 
     //Submit fast 'jobs'
     RESET_TIMERS
@@ -314,7 +337,9 @@ namespace {
 
   bool testSubmitMultipleSyncSubmit(unsigned int jobCount) {
     INIT_TIMERS
-    CREATE_THREAD_POOL(0)
+    if (!createThreadPool(0)) {
+      return false;
+    }
 
     //Submit fast 'jobs'
     RESET_TIMERS
@@ -336,7 +361,9 @@ namespace {
 
   bool testSubmitMultipleNoSync(unsigned int jobCount) {
     INIT_TIMERS
-    CREATE_THREAD_POOL(0)
+    if (!createThreadPool(0)) {
+      return false;
+    }
 
     //Submit fast 'jobs'
     RESET_TIMERS
@@ -359,7 +386,9 @@ namespace {
 
 namespace {
   bool testCreateBlockBlockUnblockUnblockSubmitDestroy(unsigned int jobCount) {
-    CREATE_THREAD_POOL(0)
+    if (!createThreadPool(0)) {
+      return false;
+    }
 
     ammonite::utils::thread::blockThreads();
     ammonite::utils::thread::blockThreads();
@@ -373,7 +402,9 @@ namespace {
   }
 
   bool testCreateBlockBlockUnblockSubmitDestroy(unsigned int jobCount) {
-    CREATE_THREAD_POOL(0)
+    if (!createThreadPool(0)) {
+      return false;
+    }
 
     ammonite::utils::thread::blockThreads();
     ammonite::utils::thread::blockThreads();
@@ -386,7 +417,9 @@ namespace {
   }
 
   bool testCreateBlockBlockSubmitUnblockDestroy(unsigned int jobCount) {
-    CREATE_THREAD_POOL(0)
+    if (!createThreadPool(0)) {
+      return false;
+    }
 
     ammonite::utils::thread::blockThreads();
     ammonite::utils::thread::blockThreads();
@@ -400,7 +433,9 @@ namespace {
   }
 
   bool testCreateBlockUnblockUnblockSubmitDestroy(unsigned int jobCount) {
-    CREATE_THREAD_POOL(0)
+    if (!createThreadPool(0)) {
+      return false;
+    }
 
     ammonite::utils::thread::blockThreads();
     ammonite::utils::thread::unblockThreads();
@@ -413,7 +448,9 @@ namespace {
   }
 
   bool testCreateUnblockSubmitDestroy(unsigned int jobCount) {
-    CREATE_THREAD_POOL(0)
+    if (!createThreadPool(0)) {
+      return false;
+    }
 
     ammonite::utils::thread::unblockThreads();
 
@@ -427,7 +464,9 @@ namespace {
 namespace {
   bool testOutputHelpers(unsigned int jobCount) {
     INIT_TIMERS
-    CREATE_THREAD_POOL(0)
+    if (!createThreadPool(0)) {
+      return false;
+    }
     AmmoniteGroup group{0};
 
     //Submit logging jobs
