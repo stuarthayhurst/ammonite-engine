@@ -44,15 +44,22 @@ namespace ammonite {
             return;
           }
 
-          //Track new state for the keycode
+          //Debug logging for state changes
           if (*keycodeStatePtr == action) {
-            if (*keycodeStatePtr == AMMONITE_PRESSED) {
+            if (action == AMMONITE_PRESSED) {
               ammoniteInternalDebug << "Keycode '" << keycode << "' already held" << std::endl;
             } else {
               ammoniteInternalDebug << "Keycode '" << keycode << "' wasn't held" << std::endl;
             }
+          } else {
+            if (action == AMMONITE_PRESSED) {
+              ammoniteInternalDebug << "Keycode '" << keycode << "' pressed" << std::endl;
+            } else {
+              ammoniteInternalDebug << "Keycode '" << keycode << "' released" << std::endl;
+            }
           }
 
+          //Track the new state
           *keycodeStatePtr = action;
         }
       }
