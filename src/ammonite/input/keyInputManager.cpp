@@ -178,6 +178,14 @@ namespace ammonite {
               userState = AMMONITE_REPEAT;
             }
 
+            if (userState == AMMONITE_PRESSED) {
+              ammoniteInternalDebug << "Keybind '" << keybindEntry.first \
+                                    << "' pressed" << std::endl;
+            } else if (userState == AMMONITE_RELEASED) {
+              ammoniteInternalDebug << "Keybind '" << keybindEntry.first \
+                                    << "' released" << std::endl;
+            }
+
             //Run the callback
             keybindData.callback(keybindData.keycodes, userState, keybindData.userPtr);
           }
