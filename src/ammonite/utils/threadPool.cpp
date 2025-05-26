@@ -5,6 +5,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <iostream>
+#include <latch>
 #include <limits>
 #include <mutex>
 #include <queue>
@@ -91,11 +92,9 @@ namespace ammonite {
 
           //Trigger, flag and barrier to block all threads, then communicate completion
           std::atomic<bool> threadBlockTrigger = false;
-          std::atomic<bool> threadsBlocked = false;
-          std::barrier<void (*)()>* threadBlockBarrier;
-
-          //Used to wait until all thread have unblocked
-          std::atomic<unsigned int> blockedThreadCount = 0;
+          bool threadsBlocked = false;
+          std::barrier<>* threadBlockBarrier;
+          std::latch* threadUnblockLatch;
 
           WorkQueue* workQueues;
           unsigned int queueLaneCount = 0;
@@ -121,11 +120,8 @@ namespace ammonite {
                 threadBlockBarrier->arrive_and_wait();
                 threadBlockTrigger.wait(true);
 
-                //Mark threads as unblocked when all have resumed
-                if (--blockedThreadCount == 0) {
-                  threadsBlocked = false;
-                  threadsBlocked.notify_all();
-                }
+                //Mark thread as unblocked as it resumes
+                threadUnblockLatch->count_down();
               }
 
               /*
@@ -147,15 +143,6 @@ namespace ammonite {
             for (unsigned int i = 0; i < poolThreadCount; i++) {
               internal::submitWork(nullptr, nullptr, nullptr);
             }
-          }
-
-          /*
-           - Callback for when threads are blocked
-           - Mark threads as blocked
-          */
-          void threadsBlockedCallback() {
-            threadsBlocked = true;
-            threadsBlocked.notify_all();
           }
 
           //Simple job to synchronise threads
@@ -281,10 +268,9 @@ namespace ammonite {
           threadSyncBarrier = new std::barrier{threadCount};
 
           //Prepare thread block syncs
-          threadBlockBarrier = new std::barrier{threadCount, threadsBlockedCallback};
+          threadBlockBarrier = new std::barrier{threadCount + 1};
           threadsBlocked = false;
           threadBlockTrigger = false;
-          blockedThreadCount = 0;
 
           //Create the threads for the pool
           stayAlive = true;
@@ -303,13 +289,15 @@ namespace ammonite {
         */
         void blockThreads() {
           if (!threadsBlocked) {
+            //Instruct thread to block
             threadBlockTrigger = true;
-            blockedThreadCount = poolThreadCount;
 
             //Threads need to be woken up, in case they're waiting for work
             wakeThreads();
 
-            threadsBlocked.wait(false);
+            //Wait for threads to block
+            threadBlockBarrier->arrive_and_wait();
+            threadsBlocked = true;
           }
         }
 
@@ -319,10 +307,17 @@ namespace ammonite {
         */
         void unblockThreads() {
           if (threadsBlocked) {
+            //Prepare a latch for synchronising unblocking
+            threadUnblockLatch = new std::latch{poolThreadCount + 1};
+
+            //Instruct threads to unblock
             threadBlockTrigger = false;
             threadBlockTrigger.notify_all();
 
-            threadsBlocked.wait(true);
+            //Wait for all thread to unblock, then clean up and return
+            threadUnblockLatch->arrive_and_wait();
+            threadsBlocked = false;
+            delete threadUnblockLatch;
           }
         }
 
