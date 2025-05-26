@@ -8,20 +8,6 @@
 
 #include <ammonite/ammonite.hpp>
 
-//NOLINTBEGIN(cppcoreguidelines-macro-usage)
-#define SUBMIT_JOBS(jobCount) \
-unsigned int* values = new unsigned int[(jobCount)]{}; \
-for (unsigned int i = 0; i < (jobCount); i++) { \
-  ammonite::utils::thread::submitWork(shortTask, &(values)[i], nullptr); \
-}
-
-#define SUBMIT_SYNC_JOBS(jobCount, group) \
-unsigned int* values = new unsigned int[(jobCount)]{}; \
-for (unsigned int i = 0; i < (jobCount); i++) { \
-  ammonite::utils::thread::submitWork(shortTask, &(values)[i], &(group)); \
-}
-//NOLINTEND(cppcoreguidelines-macro-usage)
-
 namespace {
   //NOLINTBEGIN(cppcoreguidelines-interfaces-global-init)
   std::stringstream outputCapture("");
@@ -30,6 +16,49 @@ namespace {
   //Thread-safe output
   ammonite::utils::OutputHelper output(std::cout, "", ammonite::utils::colour::none);
   //NOLINTEND(cppcoreguidelines-interfaces-global-init)
+}
+
+namespace {
+  struct ResubmitData {
+    unsigned int* writePtr;
+    AmmoniteGroup* syncPtr;
+  };
+
+  struct ChainData {
+    std::atomic<unsigned int> totalSubmitted;
+    unsigned int targetSubmitted;
+    AmmoniteWork work;
+    AmmoniteGroup* syncPtr;
+  };
+
+  void shortTask(void* userPtr) {
+    *(unsigned int*)userPtr = 1;
+  }
+
+  void resubmitTask(void* userPtr) {
+    const ResubmitData* dataPtr = (ResubmitData*)userPtr;
+    ammonite::utils::thread::submitWork(shortTask, dataPtr->writePtr, dataPtr->syncPtr);
+  }
+
+  void chainTask(void* userPtr) {
+    ChainData* dataPtr = (ChainData*)userPtr;
+    if (dataPtr->totalSubmitted != dataPtr->targetSubmitted) {
+      dataPtr->totalSubmitted++;
+      ammonite::utils::thread::submitWork(chainTask, dataPtr, dataPtr->syncPtr);
+    }
+  }
+
+  constexpr unsigned int outputCount = 1000;
+  void loggingTask(void* userPtr) {
+    const unsigned int value = *((unsigned int*)userPtr);
+    outputTester << value << " ";
+    for (unsigned int i = 0; i < outputCount; i++) {
+      outputTester << value;
+    }
+    outputTester << std::endl;
+
+    *(unsigned int*)userPtr = 1;
+  }
 }
 
 namespace {
@@ -79,6 +108,26 @@ namespace {
     output << "  Total time  : " << timers[2].getTime() << "s" << std::endl;
   }
 
+  unsigned int* createValues(unsigned int jobCount) {
+    return new unsigned int[jobCount]{};
+  }
+
+  void destroyValues(const unsigned int* values) {
+    delete [] values;
+  }
+
+  void submitShortJobs(unsigned int jobCount, unsigned int* values) {
+    for (unsigned int i = 0; i < jobCount; i++) { \
+      ammonite::utils::thread::submitWork(shortTask, &values[i], nullptr); \
+    }
+  }
+
+  void submitShortSyncJobs(unsigned int jobCount, unsigned int* values, AmmoniteGroup* group) {
+    for (unsigned int i = 0; i < jobCount; i++) { \
+      ammonite::utils::thread::submitWork(shortTask, &values[i], group); \
+    }
+  }
+
   bool verifyWork(unsigned int jobCount, const unsigned int* values) {
     for (unsigned int i = 0; i < jobCount; i++) {
       if (values[i] != 1) {
@@ -92,60 +141,18 @@ namespace {
 }
 
 namespace {
-  struct ResubmitData {
-    unsigned int* writePtr;
-    AmmoniteGroup* syncPtr;
-  };
-
-  struct ChainData {
-    std::atomic<unsigned int> totalSubmitted;
-    unsigned int targetSubmitted;
-    AmmoniteWork work;
-    AmmoniteGroup* syncPtr;
-  };
-
-  void shortTask(void* userPtr) {
-    *(unsigned int*)userPtr = 1;
-  }
-
-  void resubmitTask(void* userPtr) {
-    const ResubmitData* dataPtr = (ResubmitData*)userPtr;
-    ammonite::utils::thread::submitWork(shortTask, dataPtr->writePtr, dataPtr->syncPtr);
-  }
-
-  void chainTask(void* userPtr) {
-    ChainData* dataPtr = (ChainData*)userPtr;
-    if (dataPtr->totalSubmitted != dataPtr->targetSubmitted) {
-      dataPtr->totalSubmitted++;
-      ammonite::utils::thread::submitWork(chainTask, dataPtr, dataPtr->syncPtr);
-    }
-  }
-
-  constexpr unsigned int outputCount = 1000;
-  void loggingTask(void* userPtr) {
-    const unsigned int value = *((unsigned int*)userPtr);
-    outputTester << value << " ";
-    for (unsigned int i = 0; i < outputCount; i++) {
-      outputTester << value;
-    }
-    outputTester << std::endl;
-
-    *(unsigned int*)userPtr = 1;
-  }
-}
-
-namespace {
   bool testCreateSubmitWaitDestroy(unsigned int jobCount) {
     ammonite::utils::Timer* timers = createTimers();
     if (!createThreadPool(0)) {
       destroyTimers(timers);
       return false;
     }
+    unsigned int* values = createValues(jobCount);
     AmmoniteGroup group{0};
 
     //Submit fast 'jobs'
     resetTimers(timers);
-    SUBMIT_SYNC_JOBS(jobCount, group)
+    submitShortSyncJobs(jobCount, values, &group);
     finishSubmitTimer(timers);
 
     //Finish work
@@ -154,7 +161,7 @@ namespace {
     printTimers(timers);
     const bool passed = verifyWork(jobCount, values);
 
-    delete [] values;
+    destroyValues(values);
     destroyThreadPool();
     destroyTimers(timers);
     return passed;
@@ -166,10 +173,11 @@ namespace {
       destroyTimers(timers);
       return false;
     }
+    unsigned int* values = createValues(jobCount);
 
     //Submit fast 'jobs'
     resetTimers(timers);
-    SUBMIT_JOBS(jobCount)
+    submitShortJobs(jobCount, values);
     finishSubmitTimer(timers);
 
     //Finish work
@@ -178,7 +186,7 @@ namespace {
     printTimers(timers);
     const bool passed = verifyWork(jobCount, values);
 
-    delete [] values;
+    destroyValues(values);
     destroyThreadPool();
     destroyTimers(timers);
     return passed;
@@ -190,10 +198,11 @@ namespace {
       destroyTimers(timers);
       return false;
     }
+    unsigned int* values = createValues(jobCount);
 
     //Submit fast 'jobs'
     resetTimers(timers);
-    SUBMIT_JOBS(jobCount)
+    submitShortJobs(jobCount, values);
     finishSubmitTimer(timers);
 
     //Finish work
@@ -202,7 +211,7 @@ namespace {
     printTimers(timers);
     const bool passed = verifyWork(jobCount, values);
 
-    delete [] values;
+    destroyValues(values);
     destroyTimers(timers);
     return passed;
   }
@@ -213,13 +222,14 @@ namespace {
       destroyTimers(timers);
       return false;
     }
+    unsigned int* values = createValues(jobCount);
     AmmoniteGroup group{0};
 
     ammonite::utils::thread::blockThreads();
 
     //Submit fast 'jobs'
     resetTimers(timers);
-    SUBMIT_SYNC_JOBS(jobCount, group)
+    submitShortSyncJobs(jobCount, values, &group);
     finishSubmitTimer(timers);
 
     //Finish work
@@ -229,7 +239,7 @@ namespace {
     printTimers(timers);
     const bool passed = verifyWork(jobCount, values);
 
-    delete [] values;
+    destroyValues(values);
     destroyThreadPool();
     destroyTimers(timers);
     return passed;
@@ -242,30 +252,32 @@ namespace {
       return false;
     }
     jobCount *= 4;
+    unsigned int* values = createValues(jobCount);
     AmmoniteGroup group{0};
 
     //Submit fast 'jobs'
     resetTimers(timers);
-    SUBMIT_SYNC_JOBS(jobCount, group)
+    submitShortSyncJobs(jobCount, values, &group);
     finishSubmitTimer(timers);
+
+    //Clean up after the first batch
     ammonite::utils::thread::waitGroupComplete(&group, jobCount);
     bool passed = verifyWork(jobCount, values);
-    delete [] values;
+    destroyValues(values);
 
     //Submit second batch
-    values = new unsigned int[jobCount]{};
+    values = createValues(jobCount);
     resumeSubmitTimer(timers);
-    for (unsigned int i = 0; i < jobCount; i++) { \
-      ammonite::utils::thread::submitWork(shortTask, &(values)[i], &group); \
-    }
+    submitShortSyncJobs(jobCount, values, &group);
     finishSubmitTimer(timers);
 
+    //Clean up after the second batch
     ammonite::utils::thread::waitGroupComplete(&group, jobCount);
     finishExecutionTimers(timers);
     printTimers(timers);
     passed &= verifyWork(jobCount, values);
 
-    delete [] values;
+    destroyValues(values);
     destroyThreadPool();
     destroyTimers(timers);
     return passed;
@@ -278,12 +290,11 @@ namespace {
       destroyTimers(timers);
       return false;
     }
+    unsigned int* values = createValues(jobCount);
     AmmoniteGroup group{0};
 
     //Submit nested 'jobs'
     resetTimers(timers);
-    bool passed = true;
-    unsigned int* values = new unsigned int[jobCount]{};
     ResubmitData* data = new ResubmitData[jobCount]{};
     for (unsigned int i = 0; i < jobCount; i++) {
       data[i].writePtr = &values[i];
@@ -296,10 +307,10 @@ namespace {
     ammonite::utils::thread::waitGroupComplete(&group, jobCount);
     finishExecutionTimers(timers);
     printTimers(timers);
-    delete [] data;
-    passed &= verifyWork(jobCount, values);
+    const bool passed = verifyWork(jobCount, values);
 
-    delete [] values;
+    delete [] data;
+    destroyValues(values);
     destroyThreadPool();
     destroyTimers(timers);
     return passed;
@@ -311,8 +322,10 @@ namespace {
       destroyTimers(timers);
       return false;
     }
-
     AmmoniteGroup sync{0};
+
+    //Submit chain 'jobs'
+    resetTimers(timers);
     ChainData userData = {1, jobCount, chainTask, &sync};
     ammonite::utils::thread::submitWork(chainTask, &userData, &sync);
     finishSubmitTimer(timers);
@@ -338,11 +351,11 @@ namespace {
       destroyTimers(timers);
       return false;
     }
+    unsigned int* values = createValues(jobCount);
+    AmmoniteGroup group{0};
 
     //Submit fast 'jobs'
     resetTimers(timers);
-    unsigned int* values = new unsigned int[jobCount]{};
-    AmmoniteGroup group{0};
     ammonite::utils::thread::submitMultiple(shortTask, &values[0], sizeof(values[0]),
                                             &group, jobCount, nullptr);
     finishSubmitTimer(timers);
@@ -353,7 +366,7 @@ namespace {
     printTimers(timers);
     const bool passed = verifyWork(jobCount, values);
 
-    delete [] values;
+    destroyValues(values);
     destroyThreadPool();
     destroyTimers(timers);
     return passed;
@@ -365,11 +378,11 @@ namespace {
       destroyTimers(timers);
       return false;
     }
+    unsigned int* values = createValues(jobCount * 4);
+    AmmoniteGroup group{0};
 
     //Submit fast 'jobs'
     resetTimers(timers);
-    unsigned int* values = new unsigned int[(std::size_t)jobCount * 4]{};
-    AmmoniteGroup group{0};
     for (int i = 0; i < 4; i++) {
       ammonite::utils::thread::submitMultiple(shortTask, &values[(std::size_t)jobCount * i],
         sizeof(values[0]), &group, jobCount, nullptr);
@@ -382,7 +395,7 @@ namespace {
     printTimers(timers);
     const bool passed = verifyWork(jobCount * 4, values);
 
-    delete [] values;
+    destroyValues(values);
     destroyThreadPool();
     destroyTimers(timers);
     return passed;
@@ -394,11 +407,11 @@ namespace {
       destroyTimers(timers);
       return false;
     }
+    unsigned int* values = createValues(jobCount);
+    AmmoniteGroup group{0};
 
     //Submit fast 'jobs'
     resetTimers(timers);
-    unsigned int* values = new unsigned int[jobCount]{};
-    AmmoniteGroup group{0};
     ammonite::utils::thread::submitMultipleSync(shortTask, &values[0], sizeof(values[0]),
                                                 &group, jobCount);
     finishSubmitTimer(timers);
@@ -409,7 +422,7 @@ namespace {
     printTimers(timers);
     const bool passed = verifyWork(jobCount, values);
 
-    delete [] values;
+    destroyValues(values);
     destroyThreadPool();
     destroyTimers(timers);
     return passed;
@@ -421,11 +434,11 @@ namespace {
       destroyTimers(timers);
       return false;
     }
+    unsigned int* values = createValues(jobCount);
+    AmmoniteGroup submitGroup{0};
 
     //Submit fast 'jobs'
     resetTimers(timers);
-    unsigned int* values = new unsigned int[jobCount]{};
-    AmmoniteGroup submitGroup{0};
     ammonite::utils::thread::submitMultiple(shortTask, &values[0],
       sizeof(values[0]), nullptr, jobCount, &submitGroup);
     finishSubmitTimer(timers);
@@ -437,7 +450,7 @@ namespace {
     printTimers(timers);
     const bool passed = verifyWork(jobCount, values);
 
-    delete [] values;
+    destroyValues(values);
     destroyTimers(timers);
     return passed;
   }
@@ -448,17 +461,18 @@ namespace {
     if (!createThreadPool(0)) {
       return false;
     }
+    unsigned int* values = createValues(jobCount);
 
     ammonite::utils::thread::blockThreads();
     ammonite::utils::thread::blockThreads();
     ammonite::utils::thread::unblockThreads();
     ammonite::utils::thread::unblockThreads();
 
-    SUBMIT_JOBS(jobCount)
+    submitShortJobs(jobCount, values);
     destroyThreadPool();
     const bool passed = verifyWork(jobCount, values);
 
-    delete [] values;
+    destroyValues(values);
     return passed;
   }
 
@@ -466,16 +480,17 @@ namespace {
     if (!createThreadPool(0)) {
       return false;
     }
+    unsigned int* values = createValues(jobCount);
 
     ammonite::utils::thread::blockThreads();
     ammonite::utils::thread::blockThreads();
     ammonite::utils::thread::unblockThreads();
 
-    SUBMIT_JOBS(jobCount)
+    submitShortJobs(jobCount, values);
     destroyThreadPool();
     const bool passed = verifyWork(jobCount, values);
 
-    delete [] values;
+    destroyValues(values);
     return passed;
   }
 
@@ -483,17 +498,18 @@ namespace {
     if (!createThreadPool(0)) {
       return false;
     }
+    unsigned int* values = createValues(jobCount);
 
     ammonite::utils::thread::blockThreads();
     ammonite::utils::thread::blockThreads();
 
-    SUBMIT_JOBS(jobCount)
+    submitShortJobs(jobCount, values);
     ammonite::utils::thread::unblockThreads();
 
     destroyThreadPool();
     const bool passed = verifyWork(jobCount, values);
 
-    delete [] values;
+    destroyValues(values);
     return passed;
   }
 
@@ -501,16 +517,17 @@ namespace {
     if (!createThreadPool(0)) {
       return false;
     }
+    unsigned int* values = createValues(jobCount);
 
     ammonite::utils::thread::blockThreads();
     ammonite::utils::thread::unblockThreads();
     ammonite::utils::thread::unblockThreads();
 
-    SUBMIT_JOBS(jobCount)
+    submitShortJobs(jobCount, values);
     destroyThreadPool();
     const bool passed = verifyWork(jobCount, values);
 
-    delete [] values;
+    destroyValues(values);
     return passed;
   }
 
@@ -518,14 +535,15 @@ namespace {
     if (!createThreadPool(0)) {
       return false;
     }
+    unsigned int* values = createValues(jobCount);
 
     ammonite::utils::thread::unblockThreads();
 
-    SUBMIT_JOBS(jobCount)
+    submitShortJobs(jobCount, values);
     destroyThreadPool();
     const bool passed = verifyWork(jobCount, values);
 
-    delete [] values;
+    destroyValues(values);
     return passed;
   }
 }
@@ -599,7 +617,7 @@ namespace {
       }
     }
 
-    delete [] values;
+    destroyValues(values);
     destroyThreadPool();
     destroyTimers(timers);
     return passed;
