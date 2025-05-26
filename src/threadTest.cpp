@@ -5,6 +5,8 @@
 #include <sstream>
 #include <string>
 #include <unordered_set>
+#include <utility>
+#include <vector>
 
 #include <ammonite/ammonite.hpp>
 
@@ -454,6 +456,189 @@ namespace {
     destroyTimers(timers);
     return passed;
   }
+
+  bool testRandomWorkloads(unsigned int batchSize) {
+    ammonite::utils::Timer* timers = createTimers();
+    if (!createThreadPool(0)) {
+      destroyTimers(timers);
+      return false;
+    }
+    const unsigned int testCount = 15;
+    const unsigned int totalJobCount = batchSize * testCount;
+    unsigned int* values = createValues(totalJobCount);
+
+    struct BatchInfo {
+      AmmoniteGroup* group;
+      unsigned int waitCount = 0;
+    };
+
+    resetTimers(timers);
+    std::vector<BatchInfo> batchInfoVector;
+    for (std::size_t testIndex = 0; testIndex < testCount; testIndex++) {
+      const unsigned int jobTypeCount = 6;
+      unsigned int* offsetValues = values + (testIndex * batchSize);
+
+      switch (ammonite::utils::randomUInt(0, jobTypeCount - 1)) {
+      case 0:
+        output << "  " << testIndex << ": Testing regular submit, with explicit sync" << std::endl;
+          {
+            BatchInfo& batchInfo = batchInfoVector.emplace_back();
+            batchInfo.waitCount = batchSize;
+            batchInfo.group = new AmmoniteGroup{0};
+            submitShortSyncJobs(batchSize, offsetValues, batchInfo.group);
+            break;
+          }
+        case 1:
+          output << "  " << testIndex << ": Testing regular submit, without explicit sync" << std::endl;
+          submitShortSyncJobs(batchSize, offsetValues, nullptr);
+          break;
+        case 2:
+          output << "  " << testIndex << ": Testing submit multiple, sync on jobs" << std::endl;
+          {
+            BatchInfo& batchInfo = batchInfoVector.emplace_back();
+            batchInfo.waitCount = batchSize;
+            batchInfo.group = new AmmoniteGroup{0};
+            ammonite::utils::thread::submitMultiple(shortTask, offsetValues,
+                                                    sizeof(values[0]), batchInfo.group,
+                                                    batchSize, nullptr);
+            break;
+          }
+        case 3:
+          output << "  " << testIndex << ": Testing submit multiple, sync on submit" << std::endl;
+          {
+            BatchInfo& batchInfo = batchInfoVector.emplace_back();
+            batchInfo.waitCount = 1;
+            batchInfo.group = new AmmoniteGroup{0};
+            ammonite::utils::thread::submitMultiple(shortTask, offsetValues,
+                                                    sizeof(values[0]), nullptr,
+                                                    batchSize, batchInfo.group);
+            break;
+          }
+        case 4:
+          output << "  " << testIndex << ": Testing submit multiple, synchronous submit" << std::endl;
+          {
+            BatchInfo& batchInfo = batchInfoVector.emplace_back();
+            batchInfo.waitCount = batchSize;
+            batchInfo.group = new AmmoniteGroup{0};
+            ammonite::utils::thread::submitMultipleSync(shortTask, offsetValues,
+                                                        sizeof(values[0]), batchInfo.group,
+                                                        batchSize);
+            break;
+          }
+        case 5:
+          output << "  " << testIndex << ": Testing submit multiple, blocked" << std::endl;
+          {
+            BatchInfo& batchInfo = batchInfoVector.emplace_back();
+            batchInfo.waitCount = batchSize;
+            batchInfo.group = new AmmoniteGroup{0};
+            ammonite::utils::thread::blockThreads();
+            ammonite::utils::thread::submitMultiple(shortTask, offsetValues,
+                                                    sizeof(values[0]), batchInfo.group,
+                                                    batchSize, nullptr);
+            ammonite::utils::thread::unblockThreads();
+            break;
+          }
+        default:
+          std::unreachable();
+          break;
+        }
+      }
+      finishSubmitTimer(timers);
+
+    //Wait for each batch to finish
+    for (unsigned int i = 0; i < batchInfoVector.size(); i++) {
+      const BatchInfo& batchInfo = batchInfoVector[i];
+      ammonite::utils::thread::waitGroupComplete(batchInfo.group,
+                                                 batchInfo.waitCount);
+      delete batchInfo.group;
+    }
+
+    ammonite::utils::thread::finishWork();
+    finishExecutionTimers(timers);
+    printTimers(timers);
+    const bool passed = verifyWork(totalJobCount, values);
+
+    destroyValues(values);
+    destroyThreadPool();
+    destroyTimers(timers);
+    return passed;
+  }
+}
+
+namespace {
+  bool testOutputHelpers(unsigned int jobCount) {
+    ammonite::utils::Timer* timers = createTimers();
+    if (!createThreadPool(0)) {
+      destroyTimers(timers);
+      return false;
+    }
+    AmmoniteGroup group{0};
+
+    //Submit logging jobs
+    resetTimers(timers);
+    unsigned int* values = createValues(jobCount);
+    for (unsigned int i = 0; i < jobCount; i++) {
+      values[i] = i;
+      ammonite::utils::thread::submitWork(loggingTask, &values[i], &group);
+    }
+    finishSubmitTimer(timers);
+
+    //Finish work
+    ammonite::utils::thread::waitGroupComplete(&group, jobCount);
+    finishExecutionTimers(timers);
+    printTimers(timers);
+    bool passed = verifyWork(jobCount, values);
+
+    //Verify output blocks
+    std::string threadOutput;
+    std::unordered_set<unsigned int> foundValues;
+    while (std::getline(outputCapture, threadOutput)) {
+      std::stringstream lineStream(threadOutput);
+      std::string component;
+
+      //Extract and verify prefix
+      std::getline(lineStream, component, ' ');
+      if (component != std::string("PREFIX:")) {
+        ammonite::utils::error << "Failed to verify output prefix" << std::endl;
+        ammonite::utils::error << "Expected: PREFIX:" << std::endl;
+        ammonite::utils::error << "Got:" << component << std::endl;
+        passed = false;
+      }
+
+      //Extract the value used for the data
+      std::string value;
+      std::getline(lineStream, value, ' ');
+      foundValues.insert(stoi(value));
+
+      //Generate expected output block
+      std::getline(lineStream, component);
+      std::string expected;
+      for (unsigned int i = 0; i < outputCount; i++) {
+        expected.append(value);
+      }
+
+      //Verify output block
+      if (component != expected) {
+        ammonite::utils::error << "Failed to verify output block" << std::endl;
+        ammonite::utils::error << "Expected:" << expected << std::endl;
+        ammonite::utils::error << "Got:" << component << std::endl;
+        passed = false;
+      }
+    }
+
+    //Verify all numbers were seen
+    for (unsigned int i = 0; i < jobCount; i++) {
+      if (!foundValues.contains(i)) {
+        ammonite::utils::error << "Failed to verify value '" << i << "'" << std::endl;
+        passed = false;
+      }
+    }
+
+    destroyValues(values);
+    destroyThreadPool();
+    destroyTimers(timers);
+    return passed;
+  }
 }
 
 namespace {
@@ -548,82 +733,6 @@ namespace {
   }
 }
 
-namespace {
-  bool testOutputHelpers(unsigned int jobCount) {
-    ammonite::utils::Timer* timers = createTimers();
-    if (!createThreadPool(0)) {
-      destroyTimers(timers);
-      return false;
-    }
-    AmmoniteGroup group{0};
-
-    //Submit logging jobs
-    resetTimers(timers);
-    unsigned int* values = createValues(jobCount);
-    for (unsigned int i = 0; i < jobCount; i++) {
-      values[i] = i;
-      ammonite::utils::thread::submitWork(loggingTask, &values[i], &group);
-    }
-    finishSubmitTimer(timers);
-
-    //Finish work
-    ammonite::utils::thread::waitGroupComplete(&group, jobCount);
-    finishExecutionTimers(timers);
-    printTimers(timers);
-    bool passed = verifyWork(jobCount, values);
-
-    //Verify output blocks
-    std::string threadOutput;
-    std::unordered_set<unsigned int> foundValues;
-    while (std::getline(outputCapture, threadOutput)) {
-      std::stringstream lineStream(threadOutput);
-      std::string component;
-
-      //Extract and verify prefix
-      std::getline(lineStream, component, ' ');
-      if (component != std::string("PREFIX:")) {
-        ammonite::utils::error << "Failed to verify output prefix" << std::endl;
-        ammonite::utils::error << "Expected: PREFIX:" << std::endl;
-        ammonite::utils::error << "Got:" << component << std::endl;
-        passed = false;
-      }
-
-      //Extract the value used for the data
-      std::string value;
-      std::getline(lineStream, value, ' ');
-      foundValues.insert(stoi(value));
-
-      //Generate expected output block
-      std::getline(lineStream, component);
-      std::string expected;
-      for (unsigned int i = 0; i < outputCount; i++) {
-        expected.append(value);
-      }
-
-      //Verify output block
-      if (component != expected) {
-        ammonite::utils::error << "Failed to verify output block" << std::endl;
-        ammonite::utils::error << "Expected:" << expected << std::endl;
-        ammonite::utils::error << "Got:" << component << std::endl;
-        passed = false;
-      }
-    }
-
-    //Verify all numbers were seen
-    for (unsigned int i = 0; i < jobCount; i++) {
-      if (!foundValues.contains(i)) {
-        ammonite::utils::error << "Failed to verify value '" << i << "'" << std::endl;
-        passed = false;
-      }
-    }
-
-    destroyValues(values);
-    destroyThreadPool();
-    destroyTimers(timers);
-    return passed;
-  }
-}
-
 int main() noexcept(false) {
   bool failed = false;
   ammonite::utils::status << ammonite::utils::thread::getHardwareThreadCount() \
@@ -672,6 +781,13 @@ int main() noexcept(false) {
   output << "Testing submit multiple, no job sync" << std::endl;
   failed |= !testSubmitMultipleNoSync(jobCount);
 
+  output << "Testing random workloads" << std::endl;
+  failed |= !testRandomWorkloads(jobCount);
+
+  output << "Testing synchronised output helpers" << std::endl;
+  const unsigned int threadCount = ammonite::utils::thread::getHardwareThreadCount();
+  failed |= !testOutputHelpers(threadCount * 4);
+
   //Begin blocking tests
   output << "Testing double block, double unblock" << std::endl;
   failed |= !testCreateBlockBlockUnblockUnblockSubmitDestroy(jobCount);
@@ -691,10 +807,6 @@ int main() noexcept(false) {
   //Check system is still functional
   output << "Double-checking standard submit, wait, destroy" << std::endl;
   failed |= !testCreateSubmitWaitDestroy(jobCount);
-
-  output << "Testing synchronised output helpers" << std::endl;
-  const unsigned int threadCount = ammonite::utils::thread::getHardwareThreadCount();
-  failed |= !testOutputHelpers(threadCount * 4);
 
   return failed ? EXIT_FAILURE : EXIT_SUCCESS;
 }
