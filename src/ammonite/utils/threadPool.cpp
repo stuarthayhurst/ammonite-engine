@@ -94,6 +94,9 @@ namespace ammonite {
           std::atomic<bool> threadsBlocked = false;
           std::barrier<void (*)()>* threadBlockBarrier;
 
+          //Used to wait until all thread have unblocked
+          std::atomic<unsigned int> blockedThreadCount = 0;
+
           WorkQueue* workQueues;
           unsigned int queueLaneCount = 0;
           unsigned int laneAssignMask = 0;
@@ -117,6 +120,12 @@ namespace ammonite {
               if (threadBlockTrigger) {
                 threadBlockBarrier->arrive_and_wait();
                 threadBlockTrigger.wait(true);
+
+                //Mark threads as unblocked when all have resumed
+                if (--blockedThreadCount == 0) {
+                  threadsBlocked = false;
+                  threadsBlocked.notify_all();
+                }
               }
 
               /*
@@ -274,6 +283,7 @@ namespace ammonite {
           threadBlockBarrier = new std::barrier{threadCount, threadsBlockedCallback};
           threadsBlocked = false;
           threadBlockTrigger = false;
+          blockedThreadCount = 0;
 
           //Create the threads for the pool
           stayAlive = true;
@@ -293,6 +303,7 @@ namespace ammonite {
         void blockThreads() {
           if (!threadsBlocked) {
             threadBlockTrigger = true;
+            blockedThreadCount = poolThreadCount;
 
             //Threads need to be woken up, in case they're waiting for work
             wakeThreads();
@@ -303,14 +314,14 @@ namespace ammonite {
 
         /*
          - Instruct threads to resume execution
-         - Return as soon as possible, threads may still be asleep
+         - Return as soon as all threads have woken up
         */
         void unblockThreads() {
           if (threadsBlocked) {
             threadBlockTrigger = false;
             threadBlockTrigger.notify_all();
 
-            threadsBlocked = false;
+            threadsBlocked.wait(true);
           }
         }
 

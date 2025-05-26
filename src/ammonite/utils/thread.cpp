@@ -151,7 +151,7 @@ namespace ammonite {
 
       /*
        - Allow the pool to start new jobs again
-       - Returns once threads are allowed to wake up
+       - Returns once threads are have woken up
        - This isn't thread safe, and must never be called from a job
       */
       void unblockThreads() {
