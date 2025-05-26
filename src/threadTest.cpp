@@ -54,6 +54,10 @@ namespace {
     return true;
   }
 
+  void destroyThreadPool() {
+    ammonite::utils::thread::destroyThreadPool();
+  }
+
   ammonite::utils::Timer* createTimers() {
     return new ammonite::utils::Timer[3];
   }
@@ -151,7 +155,7 @@ namespace {
     printTimers(timers);
     VERIFY_WORK(jobCount)
 
-    ammonite::utils::thread::destroyThreadPool();
+    destroyThreadPool();
     destroyTimers(timers);
     return passed;
   }
@@ -174,7 +178,7 @@ namespace {
     printTimers(timers);
     VERIFY_WORK(jobCount)
 
-    ammonite::utils::thread::destroyThreadPool();
+    destroyThreadPool();
     destroyTimers(timers);
     return passed;
   }
@@ -192,7 +196,7 @@ namespace {
     finishSubmitTimer(timers);
 
     //Finish work
-    ammonite::utils::thread::destroyThreadPool();
+    destroyThreadPool();
     finishExecutionTimers(timers);
     printTimers(timers);
     VERIFY_WORK(jobCount)
@@ -223,7 +227,7 @@ namespace {
     printTimers(timers);
     VERIFY_WORK(jobCount)
 
-    ammonite::utils::thread::destroyThreadPool();
+    destroyThreadPool();
     destroyTimers(timers);
     return passed;
   }
@@ -257,7 +261,7 @@ namespace {
     printTimers(timers);
     VERIFY_WORK(jobCount)
 
-    ammonite::utils::thread::destroyThreadPool();
+    destroyThreadPool();
     destroyTimers(timers);
     return passed;
   }
@@ -290,7 +294,7 @@ namespace {
     delete [] data;
     VERIFY_WORK(jobCount)
 
-    ammonite::utils::thread::destroyThreadPool();
+    destroyThreadPool();
     destroyTimers(timers);
     return passed;
   }
@@ -317,7 +321,7 @@ namespace {
       ammonite::utils::error << "Failed to verify work" << std::endl;
     }
 
-    ammonite::utils::thread::destroyThreadPool();
+    destroyThreadPool();
     destroyTimers(timers);
     return passed;
   }
@@ -344,7 +348,7 @@ namespace {
     printTimers(timers);
     VERIFY_WORK(jobCount)
 
-    ammonite::utils::thread::destroyThreadPool();
+    destroyThreadPool();
     destroyTimers(timers);
     return passed;
   }
@@ -373,7 +377,7 @@ namespace {
     printTimers(timers);
     VERIFY_WORK(jobCount)
 
-    ammonite::utils::thread::destroyThreadPool();
+    destroyThreadPool();
     destroyTimers(timers);
     return passed;
   }
@@ -400,7 +404,7 @@ namespace {
     printTimers(timers);
     VERIFY_WORK(jobCount)
 
-    ammonite::utils::thread::destroyThreadPool();
+    destroyThreadPool();
     destroyTimers(timers);
     return passed;
   }
@@ -423,7 +427,7 @@ namespace {
 
     //Finish work
     ammonite::utils::thread::waitGroupComplete(&submitGroup, 1);
-    ammonite::utils::thread::destroyThreadPool();
+    destroyThreadPool();
     finishExecutionTimers(timers);
     printTimers(timers);
     VERIFY_WORK(jobCount)
@@ -445,7 +449,7 @@ namespace {
     ammonite::utils::thread::unblockThreads();
 
     SUBMIT_JOBS(jobCount)
-    ammonite::utils::thread::destroyThreadPool();
+    destroyThreadPool();
     VERIFY_WORK(jobCount)
 
     return passed;
@@ -461,7 +465,7 @@ namespace {
     ammonite::utils::thread::unblockThreads();
 
     SUBMIT_JOBS(jobCount)
-    ammonite::utils::thread::destroyThreadPool();
+    destroyThreadPool();
     VERIFY_WORK(jobCount)
 
     return passed;
@@ -478,7 +482,7 @@ namespace {
     SUBMIT_JOBS(jobCount)
     ammonite::utils::thread::unblockThreads();
 
-    ammonite::utils::thread::destroyThreadPool();
+    destroyThreadPool();
     VERIFY_WORK(jobCount)
 
     return passed;
@@ -494,7 +498,7 @@ namespace {
     ammonite::utils::thread::unblockThreads();
 
     SUBMIT_JOBS(jobCount)
-    ammonite::utils::thread::destroyThreadPool();
+    destroyThreadPool();
     VERIFY_WORK(jobCount)
     return passed;
   }
@@ -507,7 +511,7 @@ namespace {
     ammonite::utils::thread::unblockThreads();
 
     SUBMIT_JOBS(jobCount)
-    ammonite::utils::thread::destroyThreadPool();
+    destroyThreadPool();
     VERIFY_WORK(jobCount)
     return passed;
   }
@@ -583,7 +587,7 @@ namespace {
       }
     }
 
-    ammonite::utils::thread::destroyThreadPool();
+    destroyThreadPool();
     destroyTimers(timers);
     return passed;
   }
