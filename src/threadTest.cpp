@@ -326,20 +326,32 @@ namespace {
       destroyTimers(timers);
       return false;
     }
-    unsigned int* values = createValues(jobCount);
+    const unsigned int poolSize = ammonite::utils::thread::getThreadPoolSize();
+    const unsigned int totalJobCount = jobCount * poolSize;
+    unsigned int* values = createValues(totalJobCount);
     AmmoniteGroup sync{0};
+
+    ChainData* userDataArray = new ChainData[poolSize];
+    for (std::size_t i = 0; i < poolSize; i++) {
+      userDataArray[i].totalSubmitted = 1;
+      userDataArray[i].targetSubmitted = jobCount;
+      userDataArray[i].work = chainTask;
+      userDataArray[i].values = values + (i * jobCount);
+      userDataArray[i].syncPtr = &sync;
+    }
 
     //Submit chain 'jobs'
     resetTimers(timers);
-    ChainData userData = {1, jobCount, chainTask, values, &sync};
-    ammonite::utils::thread::submitWork(chainTask, &userData, &sync);
+    ammonite::utils::thread::submitMultiple(chainTask, userDataArray, sizeof(ChainData),
+                                            &sync, poolSize, nullptr);
     finishSubmitTimer(timers);
 
-    ammonite::utils::thread::waitGroupComplete(&sync, jobCount);
+    ammonite::utils::thread::waitGroupComplete(&sync, totalJobCount);
     finishExecutionTimers(timers);
     printTimers(timers);
-    const bool passed = verifyWork(jobCount, values);
+    const bool passed = verifyWork(totalJobCount, values);
 
+    delete [] userDataArray;
     destroyValues(values);
     destroyThreadPool();
     destroyTimers(timers);
