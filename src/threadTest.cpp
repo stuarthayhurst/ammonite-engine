@@ -481,69 +481,69 @@ namespace {
       switch (ammonite::utils::randomUInt(0, jobTypeCount - 1)) {
       case 0:
         output << "  " << testIndex << ": Testing regular submit, with explicit sync" << std::endl;
-          {
-            BatchInfo& batchInfo = batchInfoVector.emplace_back();
-            batchInfo.waitCount = batchSize;
-            batchInfo.group = new AmmoniteGroup{0};
-            submitShortSyncJobs(batchSize, offsetValues, batchInfo.group);
-            break;
-          }
-        case 1:
-          output << "  " << testIndex << ": Testing regular submit, without explicit sync" << std::endl;
-          submitShortSyncJobs(batchSize, offsetValues, nullptr);
-          break;
-        case 2:
-          output << "  " << testIndex << ": Testing submit multiple, sync on jobs" << std::endl;
-          {
-            BatchInfo& batchInfo = batchInfoVector.emplace_back();
-            batchInfo.waitCount = batchSize;
-            batchInfo.group = new AmmoniteGroup{0};
-            ammonite::utils::thread::submitMultiple(shortTask, offsetValues,
-                                                    sizeof(values[0]), batchInfo.group,
-                                                    batchSize, nullptr);
-            break;
-          }
-        case 3:
-          output << "  " << testIndex << ": Testing submit multiple, sync on submit" << std::endl;
-          {
-            BatchInfo& batchInfo = batchInfoVector.emplace_back();
-            batchInfo.waitCount = 1;
-            batchInfo.group = new AmmoniteGroup{0};
-            ammonite::utils::thread::submitMultiple(shortTask, offsetValues,
-                                                    sizeof(values[0]), nullptr,
-                                                    batchSize, batchInfo.group);
-            break;
-          }
-        case 4:
-          output << "  " << testIndex << ": Testing submit multiple, synchronous submit" << std::endl;
-          {
-            BatchInfo& batchInfo = batchInfoVector.emplace_back();
-            batchInfo.waitCount = batchSize;
-            batchInfo.group = new AmmoniteGroup{0};
-            ammonite::utils::thread::submitMultipleSync(shortTask, offsetValues,
-                                                        sizeof(values[0]), batchInfo.group,
-                                                        batchSize);
-            break;
-          }
-        case 5:
-          output << "  " << testIndex << ": Testing submit multiple, blocked" << std::endl;
-          {
-            BatchInfo& batchInfo = batchInfoVector.emplace_back();
-            batchInfo.waitCount = batchSize;
-            batchInfo.group = new AmmoniteGroup{0};
-            ammonite::utils::thread::blockThreads();
-            ammonite::utils::thread::submitMultiple(shortTask, offsetValues,
-                                                    sizeof(values[0]), batchInfo.group,
-                                                    batchSize, nullptr);
-            ammonite::utils::thread::unblockThreads();
-            break;
-          }
-        default:
-          std::unreachable();
+        {
+          BatchInfo& batchInfo = batchInfoVector.emplace_back();
+          batchInfo.waitCount = batchSize;
+          batchInfo.group = new AmmoniteGroup{0};
+          submitShortSyncJobs(batchSize, offsetValues, batchInfo.group);
           break;
         }
+      case 1:
+        output << "  " << testIndex << ": Testing regular submit, without explicit sync" << std::endl;
+        submitShortSyncJobs(batchSize, offsetValues, nullptr);
+        break;
+      case 2:
+        output << "  " << testIndex << ": Testing submit multiple, sync on jobs" << std::endl;
+        {
+          BatchInfo& batchInfo = batchInfoVector.emplace_back();
+          batchInfo.waitCount = batchSize;
+          batchInfo.group = new AmmoniteGroup{0};
+          ammonite::utils::thread::submitMultiple(shortTask, offsetValues,
+                                                  sizeof(values[0]), batchInfo.group,
+                                                  batchSize, nullptr);
+          break;
+        }
+      case 3:
+        output << "  " << testIndex << ": Testing submit multiple, sync on submit" << std::endl;
+        {
+          BatchInfo& batchInfo = batchInfoVector.emplace_back();
+          batchInfo.waitCount = 1;
+          batchInfo.group = new AmmoniteGroup{0};
+          ammonite::utils::thread::submitMultiple(shortTask, offsetValues,
+                                                  sizeof(values[0]), nullptr,
+                                                  batchSize, batchInfo.group);
+          break;
+        }
+      case 4:
+        output << "  " << testIndex << ": Testing submit multiple, synchronous submit" << std::endl;
+        {
+          BatchInfo& batchInfo = batchInfoVector.emplace_back();
+          batchInfo.waitCount = batchSize;
+          batchInfo.group = new AmmoniteGroup{0};
+          ammonite::utils::thread::submitMultipleSync(shortTask, offsetValues,
+                                                      sizeof(values[0]), batchInfo.group,
+                                                      batchSize);
+          break;
+        }
+      case 5:
+        output << "  " << testIndex << ": Testing submit multiple, blocked" << std::endl;
+        {
+          BatchInfo& batchInfo = batchInfoVector.emplace_back();
+          batchInfo.waitCount = batchSize;
+          batchInfo.group = new AmmoniteGroup{0};
+          ammonite::utils::thread::blockThreads();
+          ammonite::utils::thread::submitMultiple(shortTask, offsetValues,
+                                                  sizeof(values[0]), batchInfo.group,
+                                                  batchSize, nullptr);
+          ammonite::utils::thread::unblockThreads();
+          break;
+        }
+      default:
+        std::unreachable();
+        break;
       }
-      finishSubmitTimer(timers);
+    }
+    finishSubmitTimer(timers);
 
     //Wait for each batch to finish
     for (unsigned int i = 0; i < batchInfoVector.size(); i++) {
