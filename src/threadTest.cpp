@@ -30,6 +30,7 @@ namespace {
     std::atomic<unsigned int> totalSubmitted;
     unsigned int targetSubmitted;
     AmmoniteWork work;
+    unsigned int* values;
     AmmoniteGroup* syncPtr;
   };
 
@@ -44,6 +45,7 @@ namespace {
 
   void chainTask(void* userPtr) {
     ChainData* dataPtr = (ChainData*)userPtr;
+    *(dataPtr->values++) = 1;
     if (dataPtr->totalSubmitted != dataPtr->targetSubmitted) {
       dataPtr->totalSubmitted++;
       ammonite::utils::thread::submitWork(chainTask, dataPtr, dataPtr->syncPtr);
@@ -324,24 +326,21 @@ namespace {
       destroyTimers(timers);
       return false;
     }
+    unsigned int* values = createValues(jobCount);
     AmmoniteGroup sync{0};
 
     //Submit chain 'jobs'
     resetTimers(timers);
-    ChainData userData = {1, jobCount, chainTask, &sync};
+    ChainData userData = {1, jobCount, chainTask, values, &sync};
     ammonite::utils::thread::submitWork(chainTask, &userData, &sync);
     finishSubmitTimer(timers);
 
     ammonite::utils::thread::waitGroupComplete(&sync, jobCount);
     finishExecutionTimers(timers);
     printTimers(timers);
+    const bool passed = verifyWork(jobCount, values);
 
-    bool passed = true;
-    if (userData.totalSubmitted != jobCount) {
-      passed = false;
-      ammonite::utils::error << "Failed to verify work" << std::endl;
-    }
-
+    destroyValues(values);
     destroyThreadPool();
     destroyTimers(timers);
     return passed;
@@ -474,8 +473,9 @@ namespace {
 
     resetTimers(timers);
     std::vector<BatchInfo> batchInfoVector;
+    std::vector<ChainData*> chainDataVector;
     for (std::size_t testIndex = 0; testIndex < testCount; testIndex++) {
-      const unsigned int jobTypeCount = 6;
+      const unsigned int jobTypeCount = 7;
       unsigned int* offsetValues = values + (testIndex * batchSize);
 
       switch (ammonite::utils::randomUInt(0, jobTypeCount - 1)) {
@@ -485,6 +485,7 @@ namespace {
           BatchInfo& batchInfo = batchInfoVector.emplace_back();
           batchInfo.waitCount = batchSize;
           batchInfo.group = new AmmoniteGroup{0};
+
           submitShortSyncJobs(batchSize, offsetValues, batchInfo.group);
           break;
         }
@@ -498,6 +499,7 @@ namespace {
           BatchInfo& batchInfo = batchInfoVector.emplace_back();
           batchInfo.waitCount = batchSize;
           batchInfo.group = new AmmoniteGroup{0};
+
           ammonite::utils::thread::submitMultiple(shortTask, offsetValues,
                                                   sizeof(values[0]), batchInfo.group,
                                                   batchSize, nullptr);
@@ -509,6 +511,7 @@ namespace {
           BatchInfo& batchInfo = batchInfoVector.emplace_back();
           batchInfo.waitCount = 1;
           batchInfo.group = new AmmoniteGroup{0};
+
           ammonite::utils::thread::submitMultiple(shortTask, offsetValues,
                                                   sizeof(values[0]), nullptr,
                                                   batchSize, batchInfo.group);
@@ -520,6 +523,7 @@ namespace {
           BatchInfo& batchInfo = batchInfoVector.emplace_back();
           batchInfo.waitCount = batchSize;
           batchInfo.group = new AmmoniteGroup{0};
+
           ammonite::utils::thread::submitMultipleSync(shortTask, offsetValues,
                                                       sizeof(values[0]), batchInfo.group,
                                                       batchSize);
@@ -531,11 +535,25 @@ namespace {
           BatchInfo& batchInfo = batchInfoVector.emplace_back();
           batchInfo.waitCount = batchSize;
           batchInfo.group = new AmmoniteGroup{0};
+
           ammonite::utils::thread::blockThreads();
           ammonite::utils::thread::submitMultiple(shortTask, offsetValues,
                                                   sizeof(values[0]), batchInfo.group,
                                                   batchSize, nullptr);
           ammonite::utils::thread::unblockThreads();
+          break;
+        }
+      case 6:
+        output << "  " << testIndex << ": Testing chained jobs" << std::endl;
+        {
+          BatchInfo& batchInfo = batchInfoVector.emplace_back();
+          batchInfo.waitCount = batchSize;
+          batchInfo.group = new AmmoniteGroup{0};
+
+          ChainData* chainData = new ChainData{1, batchSize, chainTask,
+                                               offsetValues, batchInfo.group};
+          chainDataVector.push_back(chainData);
+          ammonite::utils::thread::submitWork(chainTask, chainData, batchInfo.group);
           break;
         }
       default:
@@ -551,6 +569,11 @@ namespace {
       ammonite::utils::thread::waitGroupComplete(batchInfo.group,
                                                  batchInfo.waitCount);
       delete batchInfo.group;
+    }
+
+    //Clean up chain data
+    for (unsigned int i = 0; i < chainDataVector.size(); i++) {
+      delete chainDataVector[i];
     }
 
     ammonite::utils::thread::finishWork();
