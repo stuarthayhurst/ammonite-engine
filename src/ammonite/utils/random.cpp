@@ -9,8 +9,8 @@ namespace ammonite {
   namespace utils {
     namespace {
       //Create a random engine and seed it
-      std::random_device r;
-      std::default_random_engine engine(r());
+      thread_local std::random_device r;
+      thread_local std::default_random_engine engine(r());
     }
 
     /*
