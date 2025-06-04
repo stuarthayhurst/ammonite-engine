@@ -101,10 +101,13 @@ ifneq ($(USE_SYSTEM),true)
   PKG_CONF_ARGS = "--define-variable=libdir=$(BUILD_DIR)" \
                   "--define-variable=includedir=$(PROJECT_ROOT)src/include" \
                   "--with-path=$(PROJECT_ROOT)"
+  PKG_CONF_FILE = ammonite.pc
+else
+  PKG_CONF_FILE = ammonite
 endif
 
-CLIENT_CXXFLAGS := $(CXXFLAGS) $(shell pkg-config $(PKG_CONF_ARGS) --cflags ammonite glm)
-CLIENT_LDFLAGS := $(LDFLAGS) $(shell pkg-config $(PKG_CONF_ARGS) --libs ammonite glm)
+CLIENT_CXXFLAGS := $(CXXFLAGS) $(shell pkg-config $(PKG_CONF_ARGS) --cflags $(PKG_CONF_FILE) glm)
+CLIENT_LDFLAGS := $(LDFLAGS) $(shell pkg-config $(PKG_CONF_ARGS) --libs $(PKG_CONF_FILE) glm)
 
 #Recipe-specific client arguments
 THREADTEST_EXTRA_LDFLAGS := -latomic
