@@ -212,7 +212,7 @@ int main(int argc, char** argv) noexcept(false) {
 
 #ifdef AMMONITE_DEBUG
   ammonite::renderer::setup::requestContextType(AMMONITE_DEBUG_CONTEXT);
-#elifdef FAST
+#elifdef AMMONITE_FAST
   ammonite::renderer::setup::requestContextType(AMMONITE_NO_ERROR_CONTEXT);
 #endif
 

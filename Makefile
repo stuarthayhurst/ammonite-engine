@@ -38,7 +38,7 @@ ROOT_OBJECTS = $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.o,$(ROOT_OBJECTS_SOURCE
 CXXFLAGS += -Wall -Wextra -Werror -Wpedantic -std=c++23 -flto=auto -O3
 
 ifeq ($(FAST),true)
-  CXXFLAGS += -march=native -DFAST
+  CXXFLAGS += -march=native -DAMMONITE_FAST
 endif
 
 ifeq ($(USE_LLVM_CPP),true)
