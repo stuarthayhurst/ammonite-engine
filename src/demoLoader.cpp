@@ -239,6 +239,9 @@ int main(int argc, char** argv) noexcept(false) {
   ammonite::renderer::setup::requestContextType(AMMONITE_NO_ERROR_CONTEXT);
 #endif
 
+  //Enable engine caching
+  ammonite::utils::files::useDataCache("cache/");
+
   //Setup window and icon
   if (!ammonite::window::createWindow(1024, 768, "Ammonite Engine")) {
     return EXIT_FAILURE;
@@ -251,9 +254,6 @@ int main(int argc, char** argv) noexcept(false) {
 #ifdef AMMONITE_DEBUG
   ammonite::utils::debug::enableDebug();
 #endif
-
-  //Enable engine caching
-  ammonite::utils::files::useDataCache("cache/");
 
   //Initialise renderer, clean up and exit on failure
   if (!ammonite::renderer::setup::setupRenderer("shaders/")) {
