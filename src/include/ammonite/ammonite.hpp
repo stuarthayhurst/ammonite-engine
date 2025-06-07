@@ -4,6 +4,7 @@
 // IWYU pragma: begin_exports
 #include "camera.hpp"
 #include "enums.hpp"
+#include "engine.hpp"
 #include "graphics/renderer.hpp"
 #include "input/controls.hpp"
 #include "input/input.hpp"

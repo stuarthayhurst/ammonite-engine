@@ -7,7 +7,8 @@ PREFIX_DIR ?= /usr/local
 INSTALL_DIR ?= $(PREFIX_DIR)/lib
 HEADER_DIR ?= $(PREFIX_DIR)/include
 PKG_CONF_DIR ?= $(INSTALL_DIR)/pkgconfig
-LIBRARY_NAME = libammonite.so.$(shell pkg-config --modversion ammonite.pc)
+LIBRARY_VERSION = $(shell pkg-config --modversion ammonite.pc)
+LIBRARY_NAME = libammonite.so.$(LIBRARY_VERSION)
 
 AMMONITE_OBJECTS_SOURCE = $(shell ls ./src/ammonite/**/*.cpp)
 AMMONITE_HEADERS_SOURCE = $(shell ls ./src/ammonite/**/*.hpp)
@@ -91,7 +92,7 @@ LDFLAGS_PRIVATE = $(shell sed -ne 's/^.*Libs.private: //p' ammonite.pc)
 CFLAGS_PRIVATE = $(shell sed -ne 's/^.*Cflags.private: //p' ammonite.pc)
 
 #Library arguments
-LIBRARY_CXXFLAGS := $(CXXFLAGS) -fpic $(CFLAGS_PRIVATE)
+LIBRARY_CXXFLAGS := $(CXXFLAGS) -fpic $(CFLAGS_PRIVATE) -DAMMONITE_VERSION=$(LIBRARY_VERSION)
 LIBRARY_LDFLAGS := $(LDFLAGS) "-Wl,-soname,$(LIBRARY_NAME)" $(LDFLAGS_PRIVATE) \
                    $(shell pkg-config --libs $(REQUIRES_PRIVATE))
 
