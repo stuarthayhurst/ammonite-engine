@@ -225,13 +225,6 @@ int main(int argc, char** argv) noexcept(false) {
 
   ammonite::utils::debug::printDriverInfo();
 
-  //Set vsync (disable if benchmarking)
-  if (useVsync == "false" || useBenchmark) {
-    ammonite::renderer::settings::setVsync(false);
-  } else if (useVsync == "true") {
-    ammonite::renderer::settings::setVsync(true);
-  }
-
 #ifdef AMMONITE_DEBUG
   ammonite::utils::debug::enableDebug();
 #endif
@@ -251,6 +244,13 @@ int main(int argc, char** argv) noexcept(false) {
     return EXIT_FAILURE;
   }
   setupBits |= HAS_SETUP_RENDERER;
+
+  //Set VSync according to arguments
+  if (useVsync == "false" || useBenchmark) {
+    ammonite::renderer::settings::setVsync(false);
+  } else if (useVsync == "true") {
+    ammonite::renderer::settings::setVsync(true);
+  }
 
   //Graphics settings
   ammonite::renderer::settings::setAntialiasingSamples(4);
