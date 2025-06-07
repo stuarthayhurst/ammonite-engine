@@ -186,8 +186,8 @@ int main(int argc, char** argv) noexcept(false) {
   if (arguments::searchArgument(argc, argv, "--demo", &demoName) != 0) {
     if (demoName.empty()) {
       std::cout << "Valid demos:" << std::endl;
-      for (auto it = demoFunctionMap.begin(); it != demoFunctionMap.end(); it++) {
-        std::cout << " - " << it->first << std::endl;
+      for (const auto& demoEntry : demoFunctionMap) {
+        std::cout << " - " << demoEntry.first << std::endl;
       }
 
       return EXIT_SUCCESS;
