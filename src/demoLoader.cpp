@@ -22,12 +22,12 @@
 
 //Definitions for demo loading
 namespace {
-  using DemoFunctionType = bool (*)();
+  using DemoFunction = bool (*)();
   struct DemoFunctions {
-    DemoFunctionType preRendererInit;
-    DemoFunctionType postRendererInit;
-    DemoFunctionType rendererMainloop;
-    DemoFunctionType demoExit;
+    DemoFunction preRendererInit;
+    DemoFunction postRendererInit;
+    DemoFunction rendererMainloop;
+    DemoFunction demoExit;
   };
 
   std::unordered_map<std::string, DemoFunctions> demoFunctionMap = {
@@ -202,10 +202,10 @@ int main(int argc, char** argv) noexcept(false) {
     demoName = std::string("object-field");
   }
 
-  DemoFunctionType preRendererInit = demoFunctionMap[demoName].preRendererInit;
-  DemoFunctionType postRendererInit = demoFunctionMap[demoName].postRendererInit;
-  DemoFunctionType rendererMainloop = demoFunctionMap[demoName].rendererMainloop;
-  DemoFunctionType demoExit = demoFunctionMap[demoName].demoExit;
+  DemoFunction preRendererInit = demoFunctionMap[demoName].preRendererInit;
+  DemoFunction postRendererInit = demoFunctionMap[demoName].postRendererInit;
+  DemoFunction rendererMainloop = demoFunctionMap[demoName].rendererMainloop;
+  DemoFunction demoExit = demoFunctionMap[demoName].demoExit;
 
   //Start timer for demo loading
   ammonite::utils::Timer utilityTimer;
