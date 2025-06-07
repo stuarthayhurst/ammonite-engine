@@ -19,11 +19,11 @@ namespace sponzaDemo {
     return true;
   }
 
-  bool preRendererInit() {
+  bool preEngineInit() {
     return true;
   }
 
-  bool postRendererInit() {
+  bool postEngineInit() {
     const AmmoniteId screenId = ammonite::splash::getActiveSplashScreenId();
 
     //Load models from a set of objects and textures

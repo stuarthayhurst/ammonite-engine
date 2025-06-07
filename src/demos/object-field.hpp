@@ -2,8 +2,8 @@
 #define OBJECTFIELDDEMO
 
 namespace objectFieldDemo {
-  bool preRendererInit();
-  bool postRendererInit();
+  bool preEngineInit();
+  bool postEngineInit();
   bool rendererMainloop();
   bool demoExit();
 }

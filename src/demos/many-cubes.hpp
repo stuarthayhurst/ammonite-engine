@@ -2,8 +2,8 @@
 #define MANYCUBESDEMO
 
 namespace manyCubesDemo {
-  bool preRendererInit();
-  bool postRendererInit();
+  bool preEngineInit();
+  bool postEngineInit();
   bool rendererMainloop();
   bool demoExit();
 }

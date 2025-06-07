@@ -16,7 +16,7 @@
 
 //NOLINTBEGIN(cppcoreguidelines-macro-usage)
 #define EXPAND_DEMO(DEMO_NAME, NAMESPACE) {std::string(DEMO_NAME), \
-  {NAMESPACE::preRendererInit, NAMESPACE::postRendererInit, \
+  {NAMESPACE::preEngineInit, NAMESPACE::postEngineInit, \
    NAMESPACE::rendererMainloop, NAMESPACE::demoExit}}
 //NOLINTEND(cppcoreguidelines-macro-usage)
 
@@ -24,14 +24,14 @@
 namespace {
   using DemoFunction = bool (*)();
   struct DemoFunctions {
-    DemoFunction preRendererInit;
-    DemoFunction postRendererInit;
+    DemoFunction preEngineInit;
+    DemoFunction postEngineInit;
     DemoFunction rendererMainloop;
     DemoFunction demoExit;
   };
 
-  DemoFunction preRendererInit = nullptr;
-  DemoFunction postRendererInit = nullptr;
+  DemoFunction preEngineInit = nullptr;
+  DemoFunction postEngineInit = nullptr;
   DemoFunction rendererMainloop = nullptr;
   DemoFunction demoExit = nullptr;
 
@@ -68,8 +68,8 @@ namespace {
       demoName = std::string("object-field");
     }
 
-    preRendererInit = demoFunctionMap[demoName].preRendererInit;
-    postRendererInit = demoFunctionMap[demoName].postRendererInit;
+    preEngineInit = demoFunctionMap[demoName].preEngineInit;
+    postEngineInit = demoFunctionMap[demoName].postEngineInit;
     rendererMainloop = demoFunctionMap[demoName].rendererMainloop;
     demoExit = demoFunctionMap[demoName].demoExit;
 
@@ -229,8 +229,8 @@ int main(int argc, char** argv) noexcept(false) {
   ammonite::utils::Timer utilityTimer;
 
   //Call pre-renderer demo setup
-  if (preRendererInit != nullptr) {
-    preRendererInit();
+  if (preEngineInit != nullptr) {
+    preEngineInit();
   }
 
 #ifdef AMMONITE_DEBUG
@@ -284,8 +284,8 @@ int main(int argc, char** argv) noexcept(false) {
   ammonite::renderer::drawFrame();
 
   //Call main demo setup
-  if (postRendererInit != nullptr) {
-    if (!postRendererInit()) {
+  if (postEngineInit != nullptr) {
+    if (!postEngineInit()) {
       ammonite::utils::error << "Failed to set up demo, exiting" << std::endl;
       ammonite::splash::deleteSplashScreen(screenId);
       cleanEngine(setupBits, nullptr);

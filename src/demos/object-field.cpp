@@ -209,7 +209,7 @@ namespace objectFieldDemo {
     return true;
   }
 
-  bool preRendererInit() {
+  bool preEngineInit() {
     //Pick number of orbits
     totalOrbits = ammonite::utils::randomInt(3, 8);
 
@@ -234,7 +234,7 @@ namespace objectFieldDemo {
     return true;
   }
 
-  bool postRendererInit() {
+  bool postEngineInit() {
     const AmmoniteId screenId = ammonite::splash::getActiveSplashScreenId();
 
     //Generate random positions, orientations and sizes, skipping first item

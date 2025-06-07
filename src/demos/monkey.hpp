@@ -2,8 +2,8 @@
 #define MONKEYDEMO
 
 namespace monkeyDemo {
-  bool preRendererInit();
-  bool postRendererInit();
+  bool preEngineInit();
+  bool postEngineInit();
   bool rendererMainloop();
   bool demoExit();
 }
