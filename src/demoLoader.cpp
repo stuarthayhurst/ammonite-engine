@@ -85,9 +85,8 @@ namespace {
   };
 
   enum : unsigned char {
-    HAS_SETUP_WINDOW   = (1 << 0),
-    HAS_SETUP_RENDERER = (1 << 1),
-    HAS_SETUP_CONTROLS = (1 << 2)
+    HAS_SETUP_ENGINE   = (1 << 0),
+    HAS_SETUP_CONTROLS = (1 << 1)
   };
 
   void inputFocusCallback(const std::vector<AmmoniteKeycode>&, KeyStateEnum, void*) {
@@ -184,12 +183,8 @@ namespace {
       }
     }
 
-    if ((setupBits & HAS_SETUP_RENDERER) != 0) {
-      ammonite::renderer::setup::destroyRenderer();
-    }
-
-    if ((setupBits & HAS_SETUP_WINDOW) != 0) {
-      ammonite::window::destroyWindow();
+    if ((setupBits & HAS_SETUP_ENGINE) != 0) {
+      ammonite::destroyEngine();
     }
   }
 }
@@ -242,26 +237,15 @@ int main(int argc, char** argv) noexcept(false) {
   //Enable engine caching
   ammonite::utils::files::useDataCache("cache/");
 
-  //Setup window and icon
-  if (!ammonite::window::createWindow(1024, 768, "Ammonite Engine")) {
+  //Initialise the engine
+  if (!ammonite::setupEngine("shaders/", 1024, 768, "Ammonite Engine")) {
+    ammonite::utils::error << "Failed to initialise engine, exiting" << std::endl;
     return EXIT_FAILURE;
   }
-  unsigned char setupBits = HAS_SETUP_WINDOW;
+  unsigned char setupBits = HAS_SETUP_ENGINE;
+
   ammonite::window::useIconDir("assets/icons/");
 
-  ammonite::utils::debug::printDriverInfo();
-
-#ifdef AMMONITE_DEBUG
-  ammonite::utils::debug::enableDebug();
-#endif
-
-  //Initialise renderer, clean up and exit on failure
-  if (!ammonite::renderer::setup::setupRenderer("shaders/")) {
-    ammonite::utils::error << "Failed to initialise renderer, exiting" << std::endl;
-    cleanEngine(setupBits, nullptr);
-    return EXIT_FAILURE;
-  }
-  setupBits |= HAS_SETUP_RENDERER;
 
   //Set VSync according to arguments
   if (useVsync == "false" || useBenchmark) {
