@@ -210,6 +210,11 @@ int main(int argc, char** argv) noexcept(false) {
   //Start timer for demo loading
   ammonite::utils::Timer utilityTimer;
 
+  //Call pre-renderer demo setup
+  if (preRendererInit != nullptr) {
+    preRendererInit();
+  }
+
 #ifdef AMMONITE_DEBUG
   ammonite::renderer::setup::requestContextType(AMMONITE_DEBUG_CONTEXT);
 #elifdef AMMONITE_FAST
@@ -228,11 +233,6 @@ int main(int argc, char** argv) noexcept(false) {
 #ifdef AMMONITE_DEBUG
   ammonite::utils::debug::enableDebug();
 #endif
-
-  //Call pre-renderer demo setup
-  if (preRendererInit != nullptr) {
-    preRendererInit();
-  }
 
   //Enable engine caching
   ammonite::utils::files::useDataCache("cache/");
