@@ -30,12 +30,51 @@ namespace {
     DemoFunction demoExit;
   };
 
+  DemoFunction preRendererInit = nullptr;
+  DemoFunction postRendererInit = nullptr;
+  DemoFunction rendererMainloop = nullptr;
+  DemoFunction demoExit = nullptr;
+
   std::unordered_map<std::string, DemoFunctions> demoFunctionMap = {
     EXPAND_DEMO("object-field", objectFieldDemo),
     EXPAND_DEMO("many-cubes", manyCubesDemo),
     EXPAND_DEMO("monkey", monkeyDemo),
     EXPAND_DEMO("sponza", sponzaDemo)
   };
+}
+
+//Helpers for demo loading
+namespace {
+  bool setDemo(int argc, char** argv) {
+    //Fetch demo, list options and validate the chosen demo
+    std::string demoName;
+    if (arguments::searchArgument(argc, argv, "--demo", &demoName) != 0) {
+      if (demoName.empty()) {
+        std::cout << "Valid demos:" << std::endl;
+        for (const auto& demoEntry : demoFunctionMap) {
+          std::cout << " - " << demoEntry.first << std::endl;
+        }
+
+        return false;
+      }
+    }
+
+    if (!demoFunctionMap.contains(demoName)) {
+      if (!demoName.empty()) {
+        ammonite::utils::warning << "Invalid demo '" << demoName << "', using default instead" \
+                                 << std::endl;
+      }
+
+      demoName = std::string("object-field");
+    }
+
+    preRendererInit = demoFunctionMap[demoName].preRendererInit;
+    postRendererInit = demoFunctionMap[demoName].postRendererInit;
+    rendererMainloop = demoFunctionMap[demoName].rendererMainloop;
+    demoExit = demoFunctionMap[demoName].demoExit;
+
+    return true;
+  }
 }
 
 //Callbacks and definitions
@@ -181,31 +220,10 @@ int main(int argc, char** argv) noexcept(false) {
     return EXIT_FAILURE;
   }
 
-  //Fetch demo, list options and validate the chosen demo
-  std::string demoName;
-  if (arguments::searchArgument(argc, argv, "--demo", &demoName) != 0) {
-    if (demoName.empty()) {
-      std::cout << "Valid demos:" << std::endl;
-      for (const auto& demoEntry : demoFunctionMap) {
-        std::cout << " - " << demoEntry.first << std::endl;
-      }
-
-      return EXIT_SUCCESS;
-    }
+  //Set the demo function pointers, exit if we just listed the demos
+  if (!setDemo(argc, argv)) {
+    return EXIT_SUCCESS;
   }
-
-  if (!demoFunctionMap.contains(demoName)) {
-    if (!demoName.empty()) {
-      ammonite::utils::warning << "Invalid demo '" << demoName << "', using default instead" \
-                               << std::endl;
-    }
-    demoName = std::string("object-field");
-  }
-
-  DemoFunction preRendererInit = demoFunctionMap[demoName].preRendererInit;
-  DemoFunction postRendererInit = demoFunctionMap[demoName].postRendererInit;
-  DemoFunction rendererMainloop = demoFunctionMap[demoName].rendererMainloop;
-  DemoFunction demoExit = demoFunctionMap[demoName].demoExit;
 
   //Start timer for demo loading
   ammonite::utils::Timer utilityTimer;
