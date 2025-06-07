@@ -10,7 +10,6 @@
 #include "../splash.hpp"
 #include "../utils/id.hpp"
 #include "../utils/logging.hpp"
-#include "../utils/thread.hpp"
 #include "../utils/timer.hpp"
 #include "../window/window.hpp"
 
@@ -29,16 +28,6 @@ namespace ammonite {
       bool setupRenderer(const std::string& shaderPath) {
         //Start a timer to measure load time
         ammonite::utils::Timer loadTimer;
-
-        //Create a thread pool
-        if (!ammonite::utils::thread::createThreadPool(0)) {
-          ammonite::utils::error << "Failed to create thread pool" << std::endl;
-          return false;
-        }
-
-        ammonite::utils::status << "Created thread pool with " \
-                                << ammonite::utils::thread::getThreadPoolSize() \
-                                << " thread(s)" << std::endl;
 
         //Check GPU supported required extensions
         unsigned int failureCount = 0;
@@ -59,7 +48,6 @@ namespace ammonite {
       }
 
       void destroyRenderer() {
-        ammonite::utils::thread::destroyThreadPool();
         internal::deleteShaders();
         internal::destroyOpenGLObjects();
         lighting::internal::destroyLightSystem();
