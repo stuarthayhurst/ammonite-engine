@@ -30,7 +30,8 @@
     - `make cache` - Clears the default runtime binary cache, useful if running into issues with caching
   - ### Flags:
     - `DEBUG`: `true / false` - Compiles the target in debug mode
-    - `FAST`: `true / false` - Compiles with `-march=native` and uses a no-error context
+    - `FAST`: `true / false` - Use a no-error context
+    - `ARCH`: `[microarchitecture]` - Target a specific microarchitecture, defaults to `native`
     - `USE_LLVM_CPP`: `true / false` - Link against `libc++` instead of `libstdc++`
     - `USE_SYSTEM`: `true / false` - Use the system copy of Ammonite's headers, library and package config for the client code
     - `CHECK_ADDRESS`: `true / false` - Enables `-fsanitize=address` for runtime memory error checking
