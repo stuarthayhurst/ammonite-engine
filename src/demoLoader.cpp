@@ -238,14 +238,12 @@ int main(int argc, char** argv) noexcept(false) {
   ammonite::utils::files::useDataCache("cache/");
 
   //Initialise the engine
+  unsigned char setupBits = HAS_SETUP_ENGINE;
   if (!ammonite::setupEngine("shaders/", 1024, 768, "Ammonite Engine")) {
     ammonite::utils::error << "Failed to initialise engine, exiting" << std::endl;
     return EXIT_FAILURE;
   }
-  unsigned char setupBits = HAS_SETUP_ENGINE;
-
   ammonite::window::useIconDir("assets/icons/");
-
 
   //Set VSync according to arguments
   if (useVsync == "false" || useBenchmark) {
