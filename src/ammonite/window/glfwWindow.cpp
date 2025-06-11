@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <thread>
+#include <utility>
 
 extern "C" {
   #include <epoxy/gl.h>
@@ -161,7 +162,7 @@ namespace ammonite {
           int glfwMonitorCount = 0;
           GLFWmonitor** monitorPtrs = glfwGetMonitors(&glfwMonitorCount);
 
-          if ((int)monitorIndex >= glfwMonitorCount) {
+          if (std::cmp_greater_equal(monitorIndex, glfwMonitorCount)) {
             ammonite::utils::warning << "Unknown monitor index '" << monitorIndex << \
               "', only found " << glfwMonitorCount << " monitors" << std::endl;
             monitorIndex = (unsigned int)(glfwMonitorCount - 1);
