@@ -112,7 +112,7 @@ namespace ammonite {
 
         GLFWmonitor* getClosestMonitor(GLFWwindow* windowPtr) {
           int monitorCount = 0;
-          GLFWmonitor **monitors = glfwGetMonitors(&monitorCount);
+          GLFWmonitor** monitors = glfwGetMonitors(&monitorCount);
 
           //Get window position and size
           int wx = 0, wy = 0, ww = 0, wh = 0;
@@ -121,7 +121,7 @@ namespace ammonite {
 
           //Find which monitor the window overlaps most with
           int bestOverlap = 0;
-          GLFWmonitor *bestMonitor = nullptr;
+          GLFWmonitor* bestMonitor = nullptr;
           for (int i = 0; i < monitorCount; i++) {
             int mx = 0, my = 0, mw = 0, mh = 0;
             const GLFWvidmode* mode = glfwGetVideoMode(monitors[i]);
