@@ -12,7 +12,7 @@ namespace ammonite {
   namespace graphics {
     namespace internal {
       bool checkGlVersion(int majorVersion, int minorVersion) {
-        return (epoxy_gl_version() >= (majorVersion * 10 + minorVersion));
+        return (epoxy_gl_version() >= ((majorVersion * 10) + minorVersion));
       }
 
       bool checkExtension(const char* extension, int major, int minor) {
