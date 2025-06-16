@@ -10,6 +10,7 @@
 #include "input/input.hpp"
 #include "input/keycodes.hpp"
 #include "lighting/lighting.hpp"
+#include "maths/vec.hpp"
 #include "models/models.hpp"
 #include "skybox.hpp"
 #include "splash.hpp"

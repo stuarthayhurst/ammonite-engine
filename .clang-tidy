@@ -212,7 +212,7 @@ CheckOptions:
   - key: cppcoreguidelines-avoid-non-const-global-variables.AllowInternalLinkage
     value: true
   - key: misc-include-cleaner.IgnoreHeaders
-    value: glm/.*;epoxy/.*;
+    value: glm/.*;epoxy/.*;experimental/.*
   - key: readability-operators-representation.BinaryOperators
     value: '&&;&=;&;|;~;!;!=;||;|=;^;^='
   - key: readability-operators-representation.OverloadedOperators

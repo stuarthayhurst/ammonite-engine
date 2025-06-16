@@ -1,0 +1,298 @@
+#ifndef AMMONITEVECTOR
+#define AMMONITEVECTOR
+
+#include <array>
+#include <cmath>
+#include <cstring>
+#include <functional>
+#include <type_traits>
+
+//TODO: Convert to <simd> with C++26, drop header filter regex
+//NOLINTNEXTLINE(misc-include-cleaner)
+#include <experimental/simd>
+
+namespace ammonite {
+  inline namespace maths {
+    //Allowed vector element types
+    template <typename T>
+    concept vectorType = std::is_arithmetic_v<T>;
+
+    //Allowed vector sizes
+    template <std::size_t size>
+    concept vectorSize = size >= 2 && size <= 4;
+
+    //Allowed vector element type and size combinations
+    template <typename T, std::size_t size>
+    concept validVector = vectorType<T> && vectorSize<size>;
+
+
+    /*
+     - Treat a typed, fixed-size block of memory as a vector
+       - Since this is an std::array, it's passed by value by default
+    */
+    template <typename T, std::size_t size> requires validVector<T, size>
+    using Vec = std::array<T, size>;
+
+    //Access elements of a Vec using named attributes as references
+    template <typename T, std::size_t size> requires validVector<T, size>
+    struct NamedVec { };
+
+    //NOLINTBEGIN(cppcoreguidelines-avoid-const-or-ref-data-members)
+    template <typename T> requires vectorType<T>
+    struct NamedVec<T, 2> {
+      T& x;
+      T& y;
+
+      NamedVec(Vec<T, 2>& vector): x(vector[0]), y(vector[1]) {};
+    };
+
+    template <typename T> requires vectorType<T>
+    struct NamedVec<T, 3> {
+      T& x;
+      T& y;
+      T& z;
+
+      NamedVec(Vec<T, 3>& vector): x(vector[0]), y(vector[1]), z(vector[2]) {};
+    };
+
+    template <typename T> requires vectorType<T>
+    struct NamedVec<T, 4> {
+      T& x;
+      T& y;
+      T& z;
+      T& w;
+
+      NamedVec(Vec<T, 4>& vector): x(vector[0]), y(vector[1]), z(vector[2]), w(vector[3]) {};
+    };
+    //NOLINTEND(cppcoreguidelines-avoid-const-or-ref-data-members)
+
+
+    //Copy from src to dest, using the size of the smaller vector as the size of the copy
+    template <typename T, std::size_t sizeA, std::size_t sizeB> requires validVector<T, sizeA> && validVector<T, sizeB>
+    void copy(const Vec<T, sizeA>& src, Vec<T, sizeB>& dest) {
+      if constexpr (sizeA <= sizeB) {
+        std::memcpy(dest.data(), src.data(), sizeof(src));
+      } else {
+        std::memcpy(dest.data(), src.data(), sizeof(dest));
+      }
+    }
+
+    /*
+     - Copy from src to dest, using the size of the smaller vector as the size of the copy
+     - Additionally, cast each element during the copy
+    */
+    template <typename T, std::size_t sizeA, typename S, std::size_t sizeB> requires validVector<T, sizeA> && validVector<S, sizeB>
+    constexpr void copyCast(const Vec<T, sizeA>& src, Vec<S, sizeB>& dest) {
+      if constexpr (sizeA <= sizeB) {
+        std::copy(src.data(), &src[sizeA], dest.data());
+      } else {
+        std::copy(src.data(), &src[sizeB], dest.data());
+      }
+    }
+
+    /*
+     - Return true if two vectors of the same size and type have identical elements
+     - This must not be used if the vectors overlap
+    */
+    template <typename T, std::size_t size> requires validVector<T, size>
+    bool equal(const Vec<T, size>& a, const Vec<T, size>& b) {
+      return (std::memcmp(a.data(), b.data(), sizeof(a)) == 0);
+    }
+
+    //Add two vectors of the same size and type, storing the result in dest
+    template <typename T, std::size_t size> requires validVector<T, size>
+    void add(const Vec<T, size>& a, const Vec<T, size>& b, Vec<T, size>& dest) {
+      std::experimental::fixed_size_simd<T, size> aSimd(a.data(), std::experimental::element_aligned);
+      std::experimental::fixed_size_simd<T, size> bSimd(b.data(), std::experimental::element_aligned);
+
+      aSimd += bSimd;
+      aSimd.copy_to(dest.data(), std::experimental::element_aligned);
+    }
+
+    //Add two vectors of the same size and type, storing the result in the first vector
+    template <typename T, std::size_t size> requires validVector<T, size>
+    void add(Vec<T, size>& a, const Vec<T, size>& b) {
+      add(a, b, a);
+    }
+
+    /*
+     - Add a constant to each element of a vector, storing the result in dest
+       - The constant and elements must have the same type
+    */
+    template <typename T, std::size_t size> requires validVector<T, size>
+    void add(const Vec<T, size>& a, T b, Vec<T, size>& dest) {
+      std::experimental::fixed_size_simd<T, size> aSimd(a.data(), std::experimental::element_aligned);
+      std::experimental::fixed_size_simd<T, size> bSimd = b;
+
+      aSimd += bSimd;
+      aSimd.copy_to(dest.data(), std::experimental::element_aligned);
+    }
+
+    /*
+     - Add a constant to each element of a vector, storing the result in the same vector
+       - The constant and elements must have the same type
+    */
+    template <typename T, std::size_t size> requires validVector<T, size>
+    void add(Vec<T, size>& a, T b) {
+      add(a, b, a);
+    }
+
+    //Subtract vector b from vector a of the same size and type, storing the result in dest
+    template <typename T, std::size_t size> requires validVector<T, size>
+    void sub(const Vec<T, size>& a, const Vec<T, size>& b, Vec<T, size>& dest) {
+      std::experimental::fixed_size_simd<T, size> aSimd(a.data(), std::experimental::element_aligned);
+      std::experimental::fixed_size_simd<T, size> bSimd(b.data(), std::experimental::element_aligned);
+
+      aSimd -= bSimd;
+      aSimd.copy_to(dest.data(), std::experimental::element_aligned);
+    }
+
+    //Subtract vector b from vector a of the same size and type, storing the result in vector a
+    template <typename T, std::size_t size> requires validVector<T, size>
+    void sub(Vec<T, size>& a, const Vec<T, size>& b) {
+      sub(a, b, a);
+    }
+
+    /*
+     - Subtract a constant from each element of a vector, storing the result in dest
+       - The constant and elements must have the same type
+    */
+    template <typename T, std::size_t size> requires validVector<T, size>
+    void sub(const Vec<T, size>& a, T b, Vec<T, size>& dest) {
+      std::experimental::fixed_size_simd<T, size> aSimd(a.data(), std::experimental::element_aligned);
+      std::experimental::fixed_size_simd<T, size> bSimd = b;
+
+      aSimd -= bSimd;
+      aSimd.copy_to(dest.data(), std::experimental::element_aligned);
+    }
+
+    /*
+     - Subtract a constant from each element of a vector, storing the result in the same vector
+       - The constant and elements must have the same type
+    */
+    template <typename T, std::size_t size> requires validVector<T, size>
+    void sub(Vec<T, size>& a, T b) {
+      sub(a, b, a);
+    }
+
+    /*
+     - Multiply each element of a vector by a constant, storing the result in dest
+       - The constant and elements must have the same type
+    */
+    template <typename T, std::size_t size> requires validVector<T, size>
+    void scale(const Vec<T, size>& a, T b, Vec<T, size>& dest) {
+      std::experimental::fixed_size_simd<T, size> aSimd(a.data(), std::experimental::element_aligned);
+      std::experimental::fixed_size_simd<T, size> bSimd = b;
+
+      aSimd *= bSimd;
+      aSimd.copy_to(dest.data(), std::experimental::element_aligned);
+    }
+
+    /*
+     - Multiply each element of a vector by a constant, storing the result in the same vector
+       - The constant and elements must have the same type
+    */
+    template <typename T, std::size_t size> requires validVector<T, size>
+    void scale(Vec<T, size>& a, T b) {
+      scale(a, b, a);
+    }
+
+    /*
+     - Divide each element of a vector by a constant, storing the result in dest
+       - The constant and elements must have the same type
+    */
+    template <typename T, std::size_t size> requires validVector<T, size>
+    void div(const Vec<T, size>& a, T b, Vec<T, size>& dest) {
+      std::experimental::fixed_size_simd<T, size> aSimd(a.data(), std::experimental::element_aligned);
+      std::experimental::fixed_size_simd<T, size> bSimd = b;
+
+      aSimd /= bSimd;
+      aSimd.copy_to(dest.data(), std::experimental::element_aligned);
+    }
+
+    /*
+     - Divide each element of a vector by a constant, storing the result in the same vector
+       - The constant and elements must have the same type
+    */
+    template <typename T, std::size_t size> requires validVector<T, size>
+    void div(Vec<T, size>& a, T b) {
+      div(a, b, a);
+    }
+
+    /*
+     - Normalise a vector, storing the result in dest
+       - Intermediate calculations are done with the element's type
+       - This may give strange results for integral types
+    */
+    template <typename T, std::size_t size> requires validVector<T, size>
+    void normalise(const Vec<T, size>& a, Vec<T, size>& dest) {
+      std::experimental::fixed_size_simd<T, size> aSimd(a.data(), std::experimental::element_aligned);
+
+      T sum = std::experimental::reduce(aSimd * aSimd, std::plus{});
+      aSimd /= (T)std::sqrt(sum);
+
+      aSimd.copy_to(dest.data(), std::experimental::element_aligned);
+    }
+
+    /*
+     - Normalise a vector, storing the result in the same vector
+       - Intermediate calculations are done with the element's type
+       - This may give strange results for integral types
+    */
+    template <typename T, std::size_t size> requires validVector<T, size>
+    void normalise(Vec<T, size>& a) {
+      normalise(a, a);
+    }
+
+    //Calculate the dot product a vector
+    template <typename T, std::size_t size> requires validVector<T, size>
+    T dot(const Vec<T, size>& a, const Vec<T, size>& b) {
+      std::experimental::fixed_size_simd<T, size> aSimd(a.data(), std::experimental::element_aligned);
+      std::experimental::fixed_size_simd<T, size> bSimd(b.data(), std::experimental::element_aligned);
+
+      return std::experimental::reduce(aSimd * bSimd, std::plus{});
+    }
+
+    /*
+     - Calculate the cross product for two vectors of the same size and type
+       - Store the result in dest
+    */
+    template <typename T> requires vectorType<T>
+    constexpr void cross(const Vec<T, 3>& a, const Vec<T, 3>& b, Vec<T, 3>& dest) {
+      //TODO: Make use of scatter / gather / permute instructions, when available
+      dest[0] = (a[1] * b[2]) - (a[2] * b[1]);
+      dest[1] = (a[2] * b[0]) - (a[0] * b[2]);
+      dest[2] = (a[0] * b[1]) - (a[1] * b[0]);
+    }
+
+    /*
+     - Calculate the length of a vector
+       - Intermediate calculations are done with the element's type
+       - This may give strange results for integral types
+    */
+    template <typename T, std::size_t size> requires validVector<T, size>
+    T length(const Vec<T, size>& a) {
+      std::experimental::fixed_size_simd<T, size> aSimd(a.data(), std::experimental::element_aligned);
+
+      return (T)std::sqrt(std::experimental::reduce(aSimd * aSimd, std::plus{}));
+    }
+
+    /*
+     - Calculate the distance between two vectors of the same size and type
+       - Intermediate calculations are done with the element's type
+       - This may give strange results for integral types
+     - Logically, this is equivalent to length(b - a)
+    */
+    template <typename T, std::size_t size> requires validVector<T, size>
+    T distance(const Vec<T, size>& a, const Vec<T, size>& b) {
+      std::experimental::fixed_size_simd<T, size> aSimd(a.data(), std::experimental::element_aligned);
+      std::experimental::fixed_size_simd<T, size> bSimd(b.data(), std::experimental::element_aligned);
+
+      std::experimental::fixed_size_simd<T, size> cSimd = bSimd - aSimd;
+
+      return (T)std::sqrt(std::experimental::reduce(cSimd * cSimd, std::plus{}));
+    }
+  }
+}
+
+#endif
