@@ -43,13 +43,18 @@ jobs:
       run: |
         CXX="g++-14" make build -j$(nproc)
 
-    - name: (g++) (DEBUG + FAST) Test debug demo build target
+    - name: (g++) Test threads and maths build targets
       run: |
-        CXX="g++-14" FAST="true" make debug -j$(nproc)
+        CXX="g++-14" make threads maths -j$(nproc)
 
     - name: (g++) Check built objects are present
       run: |
-        ls build/demo build/threadTest build/libammonite.so
+        ls build/demo build/mathsTest build/libammonite.so
+
+    - name: (g++) (DEBUG + FAST) Test debug build target
+      run: |
+        make clean
+        CXX="g++-14" FAST="true" make debug -j$(nproc)
 
     - name: Clean build area
       run: |
@@ -63,13 +68,18 @@ jobs:
       run: |
         CXX="clang++-19" make build -j$(nproc)
 
-    - name: (clang++) (DEBUG + FAST) Test debug demo build target
+    - name: (g++) Test threads and maths build targets
       run: |
-        CXX="clang++-19" FAST="true" make debug -j$(nproc)
+        CXX="clang++-19" make threads maths -j$(nproc)
 
     - name: (clang++) Check built objects are present
       run: |
-        ls build/demo build/threadTest build/libammonite.so
+        ls build/demo build/threadTest build/mathsTest build/libammonite.so
+
+    - name: (clang++) (DEBUG + FAST) Test debug demo build target
+      run: |
+        make clean
+        CXX="clang++-19" FAST="true" make debug -j$(nproc)
 
     - name: Test library install target
       run: |

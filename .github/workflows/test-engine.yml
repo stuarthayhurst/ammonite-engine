@@ -1,5 +1,5 @@
-# This workflow will build and test the thread pool
-name: Thread pool test
+# This workflow will build and test the engine
+name: Engine tests
 
 on:
   push:
@@ -44,6 +44,15 @@ jobs:
       run: |
         ./launch.sh --threads
 
+    - name: (g++) (DEBUG + ASan + UBSan) Build maths tester
+      run: |
+        make clean
+        CXX="g++-14" DEBUG="true" make maths -j$(nproc)
+
+    - name: (g++) (DEBUG + ASan + UBSan) Run maths tester
+      run: |
+        ./launch.sh --maths
+
     - name: (clang++) (DEBUG + ASan + UBSan) Build thread tester
       run: |
         make clean
@@ -61,3 +70,13 @@ jobs:
     - name: (clang++) (DEBUG + TSan) Run thread tester
       run: |
         ./launch.sh --threads
+
+    - name: (clang++) (DEBUG + ASan + UBSan) Build maths tester
+      run: |
+        make clean
+        CXX="clang++-14" DEBUG="true" make maths -j$(nproc)
+
+    - name: (clang++) (DEBUG + ASan + UBSan) Run maths tester
+      run: |
+        ./launch.sh --maths
+

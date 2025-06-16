@@ -187,7 +187,7 @@ $(OBJECT_DIR)/%.linted: ./src/% .clang-tidy $(ALL_HEADERS_SOURCE)
 # Client phony recipes
 # --------------------------------
 
-build: demo threads maths
+build: demo
 demo: $(BUILD_DIR)/demo
 	@if [[ "$(DEBUG)" != "true" ]]; then \
 	  strip --strip-unneeded "$(BUILD_DIR)/demo"; \

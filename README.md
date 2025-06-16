@@ -57,7 +57,7 @@
 ## Build system:
   - ### Targets:
     - `build` and `library` support `-j[CORE COUNT]`
-    - `make build` - Builds the demo and thread demo
+    - `make build` - Builds the demo
     - `make library` - Builds `build/libammonite.so`
     - `make install` - Installs `libammonite.so` to the system
     - `make headers` - Installs Ammonite headers and `ammonite.pc` to the system

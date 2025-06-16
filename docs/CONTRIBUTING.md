@@ -12,12 +12,13 @@
 
 ## Build system:
   - ### Targets:
-    - `build`, `debug`, `library`, `demo`, `threads` and `lint` support `-j[CORE COUNT]`
-    - `make build` - Builds the demo and thread demo
+    - `build`, `debug`, `library`, `demo`, `threads`, `maths` and `lint` support `-j[CORE COUNT]`
+    - `make build` - Builds the demo
     - `make debug` - Runs `make build` in debug mode
     - `make library` - Builds `build/libammonite.so`
     - `make demo` - Builds a demo binary, a working demonstration of the renderer
     - `make threads` - Builds a test program for the thread pool
+    - `make maths` - Builds a test program for the maths
     - `make install` - Installs `libammonite.so` to the system
       - The install path can be configured, by setting the environment variable `INSTALL_DIR`
     - `make headers` - Installs Ammonite headers and `ammonite.pc` to the system
