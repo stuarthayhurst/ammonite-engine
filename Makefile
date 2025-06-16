@@ -118,6 +118,7 @@ CLIENT_LDFLAGS := $(LDFLAGS) $(shell pkg-config $(PKG_CONF_ARGS) --libs $(PKG_CO
 
 #Recipe-specific client arguments
 THREADTEST_EXTRA_LDFLAGS := -latomic
+MATHSTEST_EXTRA_LDFLAGS := -lm
 DEMO_EXTRA_LDFLAGS := -lm
 
 #Helper to run the compiler or extract the command
@@ -134,6 +135,9 @@ $(BUILD_DIR)/demo: $(BUILD_DIR)/$(LIBRARY_NAME) $(HELPER_OBJECTS) $(DEMO_OBJECTS
 $(BUILD_DIR)/threadTest: $(BUILD_DIR)/$(LIBRARY_NAME) $(OBJECT_DIR)/threadTest.o
 	@mkdir -p "$(BUILD_DIR)"
 	$(CXX) -o "$(BUILD_DIR)/threadTest" $(OBJECT_DIR)/threadTest.o $(CLIENT_CXXFLAGS) $(CLIENT_LDFLAGS) $(THREADTEST_EXTRA_LDFLAGS)
+$(BUILD_DIR)/mathsTest: $(BUILD_DIR)/$(LIBRARY_NAME) $(OBJECT_DIR)/mathsTest.o
+	@mkdir -p "$(BUILD_DIR)"
+	$(CXX) -o "$(BUILD_DIR)/mathsTest" $(OBJECT_DIR)/mathsTest.o $(CLIENT_CXXFLAGS) $(CLIENT_LDFLAGS) $(MATHSTEST_EXTRA_LDFLAGS)
 
 $(OBJECT_DIR)/helper/%.o: ./src/helper/%.cpp $(HELPER_HEADERS_SOURCE)
 	@mkdir -p "$$(dirname $@)"
@@ -176,14 +180,14 @@ $(OBJECT_DIR)/%.linted: ./src/% .clang-tidy $(ALL_HEADERS_SOURCE)
 	@touch "$@"
 
 
-.PHONY: build demo threads debug library headers install uninstall clean lint run_lint cache icons
+.PHONY: build demo threads maths debug library headers install uninstall clean lint run_lint cache icons
 
 
 # --------------------------------
 # Client phony recipes
 # --------------------------------
 
-build: demo threads
+build: demo threads maths
 demo: $(BUILD_DIR)/demo
 	@if [[ "$(DEBUG)" != "true" ]]; then \
 	  strip --strip-unneeded "$(BUILD_DIR)/demo"; \
@@ -191,6 +195,10 @@ demo: $(BUILD_DIR)/demo
 threads: $(BUILD_DIR)/threadTest
 	@if [[ "$(DEBUG)" != "true" ]]; then \
 	  strip --strip-unneeded "$(BUILD_DIR)/threadTest"; \
+	fi
+maths: $(BUILD_DIR)/mathsTest
+	@if [[ "$(DEBUG)" != "true" ]]; then \
+	  strip --strip-unneeded "$(BUILD_DIR)/mathsTest"; \
 	fi
 debug:
 	@DEBUG="true" $(MAKE) --no-print-directory build
