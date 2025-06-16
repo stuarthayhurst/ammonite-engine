@@ -74,7 +74,7 @@ jobs:
     - name: (clang++) (DEBUG + ASan + UBSan) Build maths tester
       run: |
         make clean
-        CXX="clang++-14" DEBUG="true" make maths -j$(nproc)
+        CXX="clang++-19" DEBUG="true" make maths -j$(nproc)
 
     - name: (clang++) (DEBUG + ASan + UBSan) Run maths tester
       run: |
