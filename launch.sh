@@ -9,10 +9,10 @@ if [[ "$1" == "--loop" || "$1" == "--loops" ]]; then
       exit 1
     fi
   done
-fi
-
-if [[ "$1" == "--thread" || "$1" == "--threads" ]]; then
+elif [[ "$1" == "--thread" || "$1" == "--threads" ]]; then
   target="$buildDir/threadTest"
+elif [[ "$1" == "--math" || "$1" == "--maths" ]]; then
+  target="$buildDir/mathsTest"
 else
   target="$buildDir/demo"
 fi
