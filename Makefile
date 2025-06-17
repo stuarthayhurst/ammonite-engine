@@ -189,7 +189,7 @@ $(OBJECT_DIR)/%.linted: ./src/% .clang-tidy $(ALL_HEADERS_SOURCE)
 	@touch "$@"
 
 
-.PHONY: build demo threads maths debug library headers install uninstall clean lint run_lint cache icons
+.PHONY: build tests all demo threads maths debug library headers install uninstall clean lint run_lint cache icons
 
 
 # --------------------------------
@@ -197,6 +197,8 @@ $(OBJECT_DIR)/%.linted: ./src/% .clang-tidy $(ALL_HEADERS_SOURCE)
 # --------------------------------
 
 build: demo
+tests: threads maths
+all: demo tests
 demo: $(BUILD_DIR)/demo
 	@if [[ "$(DEBUG)" != "true" ]]; then \
 	  strip --strip-unneeded "$(BUILD_DIR)/demo"; \
