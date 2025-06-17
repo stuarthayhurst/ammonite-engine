@@ -20,12 +20,17 @@ HELPER_HEADERS_SOURCE = $(shell ls ./src/helper/**/*.hpp)
 DEMO_OBJECTS_SOURCE = $(shell ls ./src/demos/**/*.cpp)
 DEMO_HEADERS_SOURCE = $(shell ls ./src/demos/**/*.hpp)
 
+TEST_OBJECTS_SOURCE = $(shell ls ./src/tests/**/*.cpp)
+TEST_HEADERS_SOURCE = $(shell ls ./src/tests/**/*.hpp)
+
 ROOT_OBJECTS_SOURCE = $(shell ls ./src/*.cpp)
 
 ALL_OBJECTS_SOURCE = $(ROOT_OBJECTS_SOURCE) $(AMMONITE_OBJECTS_SOURCE) \
-                     $(HELPER_OBJECTS_SOURCE) $(DEMO_OBJECTS_SOURCE)
+                     $(HELPER_OBJECTS_SOURCE) $(DEMO_OBJECTS_SOURCE) \
+                     $(TEST_OBJECTS_SOURCE)
 ALL_HEADERS_SOURCE = $(AMMONITE_HEADERS_SOURCE) $(AMMONITE_INCLUDE_HEADERS_SOURCE) \
-                     $(HELPER_HEADERS_SOURCE) $(DEMO_HEADERS_SOURCE)
+                     $(HELPER_HEADERS_SOURCE) $(DEMO_HEADERS_SOURCE) \
+                     $(TEST_HEADERS_SOURCE)
 LINT_FILES = $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.cpp.linted,$(ALL_OBJECTS_SOURCE)))
 LINT_FILES += $(subst ./src,$(OBJECT_DIR),$(subst .hpp,.hpp.linted,$(ALL_HEADERS_SOURCE)))
 
@@ -33,6 +38,7 @@ OBJECT_DIR = $(BUILD_DIR)/objects
 AMMONITE_OBJECTS = $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.o,$(AMMONITE_OBJECTS_SOURCE)))
 HELPER_OBJECTS = $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.o,$(HELPER_OBJECTS_SOURCE)))
 DEMO_OBJECTS = $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.o,$(DEMO_OBJECTS_SOURCE)))
+TEST_OBJECTS = $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.o,$(TEST_OBJECTS_SOURCE)))
 ROOT_OBJECTS = $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.o,$(ROOT_OBJECTS_SOURCE)))
 
 #Global arguments
@@ -135,14 +141,17 @@ $(BUILD_DIR)/demo: $(BUILD_DIR)/$(LIBRARY_NAME) $(HELPER_OBJECTS) $(DEMO_OBJECTS
 $(BUILD_DIR)/threadTest: $(BUILD_DIR)/$(LIBRARY_NAME) $(OBJECT_DIR)/threadTest.o
 	@mkdir -p "$(BUILD_DIR)"
 	$(CXX) -o "$(BUILD_DIR)/threadTest" $(OBJECT_DIR)/threadTest.o $(CLIENT_CXXFLAGS) $(CLIENT_LDFLAGS) $(THREADTEST_EXTRA_LDFLAGS)
-$(BUILD_DIR)/mathsTest: $(BUILD_DIR)/$(LIBRARY_NAME) $(OBJECT_DIR)/mathsTest.o
+$(BUILD_DIR)/mathsTest: $(BUILD_DIR)/$(LIBRARY_NAME) $(OBJECT_DIR)/mathsTest.o $(TEST_OBJECTS)
 	@mkdir -p "$(BUILD_DIR)"
-	$(CXX) -o "$(BUILD_DIR)/mathsTest" $(OBJECT_DIR)/mathsTest.o $(CLIENT_CXXFLAGS) $(CLIENT_LDFLAGS) $(MATHSTEST_EXTRA_LDFLAGS)
+	$(CXX) -o "$(BUILD_DIR)/mathsTest" $(OBJECT_DIR)/mathsTest.o $(TEST_OBJECTS) $(CLIENT_CXXFLAGS) $(CLIENT_LDFLAGS) $(MATHSTEST_EXTRA_LDFLAGS)
 
 $(OBJECT_DIR)/helper/%.o: ./src/helper/%.cpp $(HELPER_HEADERS_SOURCE)
 	@mkdir -p "$$(dirname $@)"
 	$(EXTRACT) "$<" -c $(CLIENT_CXXFLAGS) -o "$@"
 $(OBJECT_DIR)/demos/%.o: ./src/demos/%.cpp $(DEMO_HEADERS_SOURCE) $(AMMONITE_HEADERS_SOURCE) $(AMMONITE_INCLUDE_HEADERS_SOURCE)
+	@mkdir -p "$$(dirname $@)"
+	$(EXTRACT) "$<" -c $(CLIENT_CXXFLAGS) -o "$@"
+$(OBJECT_DIR)/tests/%.o: ./src/tests/%.cpp $(TEST_HEADERS_SOURCE) $(AMMONITE_HEADERS_SOURCE) $(AMMONITE_INCLUDE_HEADERS_SOURCE)
 	@mkdir -p "$$(dirname $@)"
 	$(EXTRACT) "$<" -c $(CLIENT_CXXFLAGS) -o "$@"
 $(OBJECT_DIR)/%.o: ./src/%.cpp $(AMMONITE_HEADERS_SOURCE) $(HELPER_HEADERS_SOURCE) $(AMMONITE_INCLUDE_HEADERS_SOURCE)
