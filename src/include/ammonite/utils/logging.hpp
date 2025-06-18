@@ -73,6 +73,7 @@ namespace ammonite {
     extern OutputHelper error;
     extern OutputHelper warning;
     extern OutputHelper status;
+    extern OutputHelper normal;
     //NOLINTEND(cppcoreguidelines-avoid-non-const-global-variables)
   }
 }

@@ -44,6 +44,7 @@ namespace ammonite {
     OutputHelper error(std::cerr, "ERROR: ", colour::red);
     OutputHelper warning(std::cerr, "WARNING: ", colour::yellow);
     OutputHelper status(std::cout, "STATUS: ", colour::green);
+    OutputHelper normal(std::cout, "", colour::none);
     /*NOLINTEND(cppcoreguidelines-avoid-non-const-global-variables,
                 cppcoreguidelines-interfaces-global-init)*/
   }
