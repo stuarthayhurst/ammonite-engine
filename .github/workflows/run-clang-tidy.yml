@@ -26,14 +26,14 @@ jobs:
         sudo apt-get install clang-tidy-19
         sudo apt-get install --no-install-recommends libglm-dev libglfw3-dev libepoxy-dev libstb-dev libassimp-dev
 
-    - name: Run the linting target
+    - name: Run the global linting target
       run: |
-        TIDY="clang-tidy-19" make lint -j$(nproc)
+        TIDY="clang-tidy-19" make lint_all -j$(nproc)
 
     - name: Clean the build area
       run: |
         make clean
 
-    - name: (DEBUG + FAST) Run the linting target
+    - name: (DEBUG + FAST) Run the global linting target
       run: |
-        TIDY="clang-tidy-19" DEBUG="true" FAST="true" make lint -j$(nproc)
+        TIDY="clang-tidy-19" DEBUG="true" FAST="true" make lint_all -j$(nproc)

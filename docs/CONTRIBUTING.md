@@ -12,7 +12,7 @@
 
 ## Build system:
   - ### Targets:
-    - `build`, `all`, `tests`, `debug`, `library`, `demo`, `threads`, `maths` and `lint` support `-j[CORE COUNT]`
+    - `build`, `all`, `tests`, `debug`, `library`, `demo`, `threads`, `maths` and `lint*` support `-j[CORE COUNT]`
     - `make build` - Builds the demo
     - `make all` - Builds the demo and the tests
     - `make tests` - Builds the tests
@@ -28,7 +28,9 @@
     - `make uninstall` - Removes installed library and headers
       - Custom install locations must be specified the same way as they were installed
     - `make icons` - Creates `assets/icons/icon-*.png` from `assets/icons/icon.svg`
-    - `make lint` - Lints the project using `clang-tidy`
+    - `make lint` - Lints the engine and calling code using `clang-tidy`
+      - `make lint_tests` - Only lints the test implementations in `src/tests/`
+      - `make lint_all` - Lints everything
     - `make clean` - Cleans the build area (`build/`) and default runtime cache (`cache/`)
     - `make cache` - Clears the default runtime binary cache, useful if running into issues with caching
   - ### Flags:

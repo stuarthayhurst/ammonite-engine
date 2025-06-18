@@ -25,14 +25,15 @@ TEST_HEADERS_SOURCE = $(shell ls ./src/tests/**/*.hpp)
 
 ROOT_OBJECTS_SOURCE = $(shell ls ./src/*.cpp)
 
-ALL_OBJECTS_SOURCE = $(ROOT_OBJECTS_SOURCE) $(AMMONITE_OBJECTS_SOURCE) \
-                     $(HELPER_OBJECTS_SOURCE) $(DEMO_OBJECTS_SOURCE) \
-                     $(TEST_OBJECTS_SOURCE)
-ALL_HEADERS_SOURCE = $(AMMONITE_HEADERS_SOURCE) $(AMMONITE_INCLUDE_HEADERS_SOURCE) \
-                     $(HELPER_HEADERS_SOURCE) $(DEMO_HEADERS_SOURCE) \
-                     $(TEST_HEADERS_SOURCE)
-LINT_FILES = $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.cpp.linted,$(ALL_OBJECTS_SOURCE)))
-LINT_FILES += $(subst ./src,$(OBJECT_DIR),$(subst .hpp,.hpp.linted,$(ALL_HEADERS_SOURCE)))
+LINT_OBJECTS_SOURCE = $(ROOT_OBJECTS_SOURCE) $(AMMONITE_OBJECTS_SOURCE) \
+                     $(HELPER_OBJECTS_SOURCE) $(DEMO_OBJECTS_SOURCE)
+LINT_HEADERS_SOURCE = $(AMMONITE_HEADERS_SOURCE) $(AMMONITE_INCLUDE_HEADERS_SOURCE) \
+                     $(HELPER_HEADERS_SOURCE) $(DEMO_HEADERS_SOURCE)
+
+LINT_FILES = $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.cpp.linted,$(LINT_OBJECTS_SOURCE)))
+LINT_FILES += $(subst ./src,$(OBJECT_DIR),$(subst .hpp,.hpp.linted,$(LINT_HEADERS_SOURCE)))
+TEST_LINT_FILES = $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.cpp.linted,$(TEST_OBJECTS_SOURCE)))
+TEST_LINT_FILES += $(subst ./src,$(OBJECT_DIR),$(subst .hpp,.hpp.linted,$(TEST_HEADERS_SOURCE)))
 
 OBJECT_DIR = $(BUILD_DIR)/objects
 AMMONITE_OBJECTS = $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.o,$(AMMONITE_OBJECTS_SOURCE)))
@@ -182,14 +183,18 @@ $(OBJECT_DIR)/ammonite/%.o: ./src/ammonite/%.cpp $(AMMONITE_HEADERS_SOURCE) $(AM
 # --------------------------------
 
 $(BUILD_DIR)/compile_commands.json:
-	@DUMMY="true" $(MAKE) $(AMMONITE_OBJECTS) $(HELPER_OBJECTS) $(DEMO_OBJECTS) $(ROOT_OBJECTS)
-$(OBJECT_DIR)/%.linted: ./src/% .clang-tidy $(ALL_HEADERS_SOURCE)
+	@DUMMY="true" $(MAKE) $(AMMONITE_OBJECTS) $(HELPER_OBJECTS) $(DEMO_OBJECTS) $(ROOT_OBJECTS) $(TEST_OBJECTS)
+$(OBJECT_DIR)/%.linted: ./src/% .clang-tidy $(LINT_HEADERS_SOURCE)
+	$(TIDY) --quiet -p "$(BUILD_DIR)" "$<"
+	@mkdir -p "$$(dirname $@)"
+	@touch "$@"
+$(OBJECT_DIR)/tests/%.linted: ./src/tests/% .clang-tidy $(TEST_HEADERS_SOURCE) $(AMMONITE_INCLUDE_HEADERS_SOURCE)
 	$(TIDY) --quiet -p "$(BUILD_DIR)" "$<"
 	@mkdir -p "$$(dirname $@)"
 	@touch "$@"
 
 
-.PHONY: build tests all demo threads maths debug library headers install uninstall clean lint run_lint cache icons
+.PHONY: build tests all demo threads maths debug library headers install uninstall run_lint lint run_lint_tests lint_tests lint_all clean cache icons
 
 
 # --------------------------------
@@ -246,15 +251,25 @@ uninstall:
 
 
 # --------------------------------
+# Linting phony recipes
+# --------------------------------
+
+run_lint: $(LINT_FILES)
+lint:
+	@$(MAKE) -B --no-print-directory $(BUILD_DIR)/compile_commands.json
+	@$(MAKE) --no-print-directory run_lint
+run_lint_tests: $(TEST_LINT_FILES)
+lint_tests:
+	@$(MAKE) -B --no-print-directory $(BUILD_DIR)/compile_commands.json
+	@$(MAKE) --no-print-directory run_lint_tests
+lint_all: lint lint_tests
+
+# --------------------------------
 # Utility / support phony recipes
 # --------------------------------
 
 clean: cache
 	@rm -rfv "$(BUILD_DIR)"
-run_lint: $(LINT_FILES)
-lint:
-	@$(MAKE) -B --no-print-directory $(BUILD_DIR)/compile_commands.json
-	@$(MAKE) --no-print-directory run_lint
 cache:
 	@rm -rfv "$(CACHE_DIR)"
 icons:
