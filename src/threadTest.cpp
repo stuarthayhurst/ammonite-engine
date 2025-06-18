@@ -14,9 +14,6 @@ namespace {
   //NOLINTBEGIN(cppcoreguidelines-interfaces-global-init)
   std::stringstream outputCapture("");
   ammonite::utils::OutputHelper outputTester(outputCapture, "PREFIX: ");
-
-  //Thread-safe output
-  ammonite::utils::OutputHelper output(std::cout, "", ammonite::utils::colour::none);
   //NOLINTEND(cppcoreguidelines-interfaces-global-init)
 }
 
@@ -107,9 +104,9 @@ namespace {
   }
 
   void printTimers(ammonite::utils::Timer* timers) {
-    output << "  Submit done : " << timers[0].getTime() << "s" << std::endl;
-    output << "  Finish work : " << timers[1].getTime() << "s" << std::endl;
-    output << "  Total time  : " << timers[2].getTime() << "s" << std::endl;
+    ammonite::utils::normal << "  Submit done : " << timers[0].getTime() << "s" << std::endl;
+    ammonite::utils::normal << "  Finish work : " << timers[1].getTime() << "s" << std::endl;
+    ammonite::utils::normal << "  Total time  : " << timers[2].getTime() << "s" << std::endl;
   }
 
   unsigned int* createValues(unsigned int jobCount) {
@@ -492,7 +489,9 @@ namespace {
 
       switch (ammonite::utils::randomUInt(0, jobTypeCount - 1)) {
       case 0:
-        output << "  " << testIndex << ": Testing regular submit, with explicit sync" << std::endl;
+        ammonite::utils::normal << "  " << testIndex \
+                                << ": Testing regular submit, with explicit sync" \
+                                << std::endl;
         {
           BatchInfo& batchInfo = batchInfoVector.emplace_back();
           batchInfo.waitCount = batchSize;
@@ -502,11 +501,15 @@ namespace {
           break;
         }
       case 1:
-        output << "  " << testIndex << ": Testing regular submit, without explicit sync" << std::endl;
+        ammonite::utils::normal << "  " << testIndex \
+                                << ": Testing regular submit, without explicit sync" \
+                                << std::endl;
         submitShortSyncJobs(batchSize, offsetValues, nullptr);
         break;
       case 2:
-        output << "  " << testIndex << ": Testing submit multiple, sync on jobs" << std::endl;
+        ammonite::utils::normal << "  " << testIndex \
+                                << ": Testing submit multiple, sync on jobs" \
+                                << std::endl;
         {
           BatchInfo& batchInfo = batchInfoVector.emplace_back();
           batchInfo.waitCount = batchSize;
@@ -518,7 +521,9 @@ namespace {
           break;
         }
       case 3:
-        output << "  " << testIndex << ": Testing submit multiple, sync on submit" << std::endl;
+        ammonite::utils::normal << "  " << testIndex \
+                                << ": Testing submit multiple, sync on submit" \
+                                << std::endl;
         {
           BatchInfo& batchInfo = batchInfoVector.emplace_back();
           batchInfo.waitCount = 1;
@@ -530,7 +535,9 @@ namespace {
           break;
         }
       case 4:
-        output << "  " << testIndex << ": Testing submit multiple, synchronous submit" << std::endl;
+        ammonite::utils::normal << "  " << testIndex \
+                                << ": Testing submit multiple, synchronous submit" \
+                                << std::endl;
         {
           BatchInfo& batchInfo = batchInfoVector.emplace_back();
           batchInfo.waitCount = batchSize;
@@ -542,7 +549,8 @@ namespace {
           break;
         }
       case 5:
-        output << "  " << testIndex << ": Testing submit multiple, blocked" << std::endl;
+        ammonite::utils::normal << "  " << testIndex \
+                                << ": Testing submit multiple, blocked" << std::endl;
         {
           BatchInfo& batchInfo = batchInfoVector.emplace_back();
           batchInfo.waitCount = batchSize;
@@ -556,7 +564,8 @@ namespace {
           break;
         }
       case 6:
-        output << "  " << testIndex << ": Testing chained jobs" << std::endl;
+        ammonite::utils::normal << "  " << testIndex \
+                                << ": Testing chained jobs" << std::endl;
         {
           BatchInfo& batchInfo = batchInfoVector.emplace_back();
           batchInfo.waitCount = batchSize;
@@ -777,70 +786,70 @@ int main() noexcept(false) {
   const unsigned int jobCount = (2 << 16);
 
   //Begin regular tests
-  output << "Testing standard submit, wait, destroy" << std::endl;
+  ammonite::utils::normal << "Testing standard submit, wait, destroy" << std::endl;
   failed |= !testCreateSubmitWaitDestroy(jobCount);
 
-  output << "Testing alternative sync" << std::endl;
+  ammonite::utils::normal << "Testing alternative sync" << std::endl;
   failed |= !testCreateSubmitBlockUnblockDestroy(jobCount);
 
-  output << "Testing no sync" << std::endl;
+  ammonite::utils::normal << "Testing no sync" << std::endl;
   failed |= !testCreateSubmitDestroy(jobCount);
 
-  output << "Testing blocked queue" << std::endl;
+  ammonite::utils::normal << "Testing blocked queue" << std::endl;
   failed |= !testCreateBlockSubmitUnblockWaitDestroy(jobCount);
 
-  output << "Testing queue limits (8x regular over 2 batches)" << std::endl;
+  ammonite::utils::normal << "Testing queue limits (8x regular over 2 batches)" << std::endl;
   failed |= !testQueueLimits(jobCount);
 
-  output << "Testing nested jobs" << std::endl;
+  ammonite::utils::normal << "Testing nested jobs" << std::endl;
   failed |= !testNestedJobs(jobCount);
 
-  output << "Testing chained jobs" << std::endl;
+  ammonite::utils::normal << "Testing chained jobs" << std::endl;
   failed |= !testChainJobs(jobCount);
 
-  output << "Testing submit multiple" << std::endl;
+  ammonite::utils::normal << "Testing submit multiple" << std::endl;
   failed |= !testSubmitMultiple(jobCount);
 
-  output << "Testing submit multiple, minimal" << std::endl;
+  ammonite::utils::normal << "Testing submit multiple, minimal" << std::endl;
   failed |= !testSubmitMultiple(1);
 
-  output << "Testing submit multiple, thread count" << std::endl;
+  ammonite::utils::normal << "Testing submit multiple, thread count" << std::endl;
   failed |= !testSubmitMultiple(ammonite::utils::thread::getThreadPoolSize());
 
-  output << "Testing submit multiple (4x regular over 4 batches)" << std::endl;
+  ammonite::utils::normal << "Testing submit multiple (4x regular over 4 batches)" << std::endl;
   failed |= !testSubmitMultipleMultiple(jobCount);
 
-  output << "Testing submit multiple, synchronous submit" << std::endl;
+  ammonite::utils::normal << "Testing submit multiple, synchronous submit" << std::endl;
   failed |= !testSubmitMultipleSyncSubmit(jobCount);
 
-  output << "Testing submit multiple, no job sync" << std::endl;
+  ammonite::utils::normal << "Testing submit multiple, no job sync" << std::endl;
   failed |= !testSubmitMultipleNoSync(jobCount);
 
-  output << "Testing random workloads" << std::endl;
+  ammonite::utils::normal << "Testing random workloads" << std::endl;
   failed |= !testRandomWorkloads(jobCount);
 
-  output << "Testing synchronised output helpers" << std::endl;
+  ammonite::utils::normal << "Testing synchronised output helpers" << std::endl;
   const unsigned int threadCount = ammonite::utils::thread::getHardwareThreadCount();
   failed |= !testOutputHelpers(threadCount * 4);
 
   //Begin blocking tests
-  output << "Testing double block, double unblock" << std::endl;
+  ammonite::utils::normal << "Testing double block, double unblock" << std::endl;
   failed |= !testCreateBlockBlockUnblockUnblockSubmitDestroy(jobCount);
 
-  output << "Testing double block, single unblock" << std::endl;
+  ammonite::utils::normal << "Testing double block, single unblock" << std::endl;
   failed |= !testCreateBlockBlockUnblockSubmitDestroy(jobCount);
 
-  output << "Testing double block, submit jobs, single unblock" << std::endl;
+  ammonite::utils::normal << "Testing double block, submit jobs, single unblock" << std::endl;
   failed |= !testCreateBlockBlockSubmitUnblockDestroy(jobCount);
 
-  output << "Testing single block, double unblock" << std::endl;
+  ammonite::utils::normal << "Testing single block, double unblock" << std::endl;
   failed |= !testCreateBlockUnblockUnblockSubmitDestroy(jobCount);
 
-  output << "Testing unblock without block" << std::endl;
+  ammonite::utils::normal << "Testing unblock without block" << std::endl;
   failed |= !testCreateUnblockSubmitDestroy(jobCount);
 
   //Check system is still functional
-  output << "Double-checking standard submit, wait, destroy" << std::endl;
+  ammonite::utils::normal << "Double-checking standard submit, wait, destroy" << std::endl;
   failed |= !testCreateSubmitWaitDestroy(jobCount);
 
   return failed ? EXIT_FAILURE : EXIT_SUCCESS;
