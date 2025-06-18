@@ -5,6 +5,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <type_traits>
 #include <utility>
 
 #include "../maths/vec.hpp"
@@ -46,6 +47,8 @@ namespace ammonite {
       OutputHelper& operator << (std::ostream& (*)(std::ostream&));
 
       template<typename T, std::size_t size> requires ammonite::validVector<T, size>
+      OutputHelper& operator << (const ammonite::Vec<T, size>&);
+      template<typename T, std::size_t size> requires ammonite::validVector<T, size>
       OutputHelper& operator << (ammonite::Vec<T, size>&);
 
       void printEmptyLine();
@@ -57,15 +60,35 @@ namespace ammonite {
     }
 
     template<typename T, std::size_t size> requires ammonite::validVector<T, size>
-    OutputHelper& OutputHelper::operator << (ammonite::Vec<T, size>& vector) {
+    OutputHelper& OutputHelper::operator << (const ammonite::Vec<T, size>& vector) {
       for (std::size_t i = 0; i < size; i++) {
         if (i != 0) {
           storageStream << ", ";
         }
 
-        storageStream << vector[i];
+        //Always print vector elements numerically
+        if constexpr (std::is_same_v<std::remove_cv_t<T>, signed char>) {
+          storageStream << (int)vector[i];
+        } else if constexpr (std::is_same_v<std::remove_cv_t<T>, unsigned char>) {
+          storageStream << (unsigned int)vector[i];
+        } else if constexpr (std::is_same_v<std::remove_cv_t<T>, char>) {
+          if constexpr (std::is_signed_v<char>) {
+            storageStream << (int)vector[i];
+          } else {
+            storageStream << (unsigned int)vector[i];
+          }
+        } else {
+          storageStream << vector[i];
+        }
       }
 
+      return *this;
+    }
+
+    //Hand off to the const version
+    template<typename T, std::size_t size> requires ammonite::validVector<T, size>
+    OutputHelper& OutputHelper::operator << (ammonite::Vec<T, size>& vector) {
+      *this << const_cast<const ammonite::Vec<T, size>&>(vector);
       return *this;
     }
 
