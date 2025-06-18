@@ -28,44 +28,30 @@ namespace {
     }
   }
 
-  template <typename T, std::size_t size> requires ammonite::validVector<T, size>
-  void print(const ammonite::Vec<T, size>& a) {
-    for (std::size_t i = 0; i < size; i++) {
-      if constexpr (std::is_same_v<T, signed char>) {
-        std::cout << (int)a[i] << " ";
-      } else if constexpr (std::is_same_v<T, unsigned char>) {
-        std::cout << (unsigned int)a[i] << " ";
-      } else {
-        std::cout << a[i] << " ";
-      }
-    }
-    std::cout << std::endl;
-  }
-
   template <typename T, std::size_t size, typename S> requires ammonite::validVector<T, size>
   void reportFailure(std::string_view message, const ammonite::Vec<T, size>& a, S b) {
-    std::cout << message << std::endl;
-    print(a);
-    std::cout << b << std::endl;
-    std::cout << std::endl;
+    ammonite::utils::error << message << std::endl;
+    ammonite::utils::error << a << std::endl;
+    ammonite::utils::error << b << std::endl;
+    ammonite::utils::error << std::endl;
   }
 
   template <typename T, std::size_t sizeA, typename S, std::size_t sizeB> requires ammonite::validVector<T, sizeA> && ammonite::validVector<S, sizeB>
   void reportFailure(std::string_view message, const ammonite::Vec<T, sizeA>& a, const ammonite::Vec<S, sizeB>& b) {
-    std::cout << message << std::endl;
-    print(a);
-    print(b);
-    std::cout << std::endl;
+    ammonite::utils::error << message << std::endl;
+    ammonite::utils::error << a << std::endl;
+    ammonite::utils::error << b << std::endl;
+    ammonite::utils::error << std::endl;
   }
 
   template <typename T, std::size_t sizeA, typename S, std::size_t sizeB, typename U, std::size_t sizeC> requires ammonite::validVector<T, sizeA> && ammonite::validVector<S, sizeB> && ammonite::validVector<U, sizeC>
   void reportFailure(std::string_view message, const ammonite::Vec<T, sizeA>& a,
                      const ammonite::Vec<S, sizeB>& b, const ammonite::Vec<U, sizeC>& c) {
-    std::cout << message << std::endl;
-    print(a);
-    print(b);
-    print(c);
-    std::cout << std::endl;
+    ammonite::utils::error << message << std::endl;
+    ammonite::utils::error << a << std::endl;
+    ammonite::utils::error << b << std::endl;
+    ammonite::utils::error << c << std::endl;
+    ammonite::utils::error << std::endl;
   }
 }
 
@@ -77,10 +63,10 @@ namespace {
     ammonite::NamedVec<T, size> namedAVec(aVec);
 
     if (&namedAVec.x != aVec.data()) {
-      std::cout << "Named vector has a different address to its underlying vector" << std::endl;
-      std::cout << "Named vector address: " << (void*)&namedAVec.x \
-                << ", vector address: " << (void*)aVec.data() << std::endl;
-      std::cout << std::endl;
+      ammonite::utils::error << "Named vector has a different address to its underlying vector" << std::endl;
+      ammonite::utils::error << "Named vector address: " << (void*)&namedAVec.x \
+                              << ", vector address: " << (void*)aVec.data() << std::endl;
+      ammonite::utils::error << std::endl;
       return false;
     }
 
@@ -505,7 +491,7 @@ namespace {
 
   template <typename T, std::size_t size> requires ammonite::validVector<T, size>
   bool testVectors(std::string_view typeName) {
-    std::cout << "Testing " << size << "x " << typeName << " vectors" << std::endl;
+    ammonite::utils::normal << "Testing " << size << "x " << typeName << " vectors" << std::endl;
 
     //Test NamedVec
     if (!testNamedVec<T, size>()) {
@@ -581,7 +567,7 @@ namespace {
 namespace tests {
   template <typename T, std::size_t size> requires ammonite::validVector<T, size>
   bool testVectors(std::string_view typeName) {
-    std::cout << "Testing " << size << "x " << typeName << " vectors" << std::endl;
+    ammonite::utils::normal << "Testing " << size << "x " << typeName << " vectors" << std::endl;
 
     //Test NamedVec
     if (!testNamedVec<T, size>()) {
