@@ -1,3 +1,4 @@
+#include <cstdlib>
 #include <iostream>
 
 #include <ammonite/ammonite.hpp>
@@ -43,8 +44,8 @@ int main() {
   if (!passed) {
     ammonite::utils::normal << std::endl;
     ammonite::utils::error << "Vector tests failed" << std::endl;
-    return 1;
+    return EXIT_FAILURE;
   }
 
-  return 0;
+  return EXIT_SUCCESS;
 }
