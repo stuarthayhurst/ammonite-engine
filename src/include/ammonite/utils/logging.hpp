@@ -1,10 +1,13 @@
 #ifndef AMMONITELOGGING
 #define AMMONITELOGGING
 
+#include <cstddef>
 #include <iostream>
 #include <sstream>
 #include <string>
 #include <utility>
+
+#include "../maths/vec.hpp"
 
 namespace ammonite {
   namespace utils {
@@ -41,11 +44,28 @@ namespace ammonite {
       OutputHelper(std::ostream& output, const std::string& pre, const char* colour);
       template<typename T> OutputHelper& operator << (T&& input);
       OutputHelper& operator << (std::ostream& (*)(std::ostream&));
+
+      template<typename T, std::size_t size> requires ammonite::validVector<T, size>
+      OutputHelper& operator << (ammonite::Vec<T, size>&);
+
       void printEmptyLine();
     };
 
     template<typename T> OutputHelper& OutputHelper::operator << (T&& input) {
       storageStream << std::forward<T>(input);
+      return *this;
+    }
+
+    template<typename T, std::size_t size> requires ammonite::validVector<T, size>
+    OutputHelper& OutputHelper::operator << (ammonite::Vec<T, size>& vector) {
+      for (std::size_t i = 0; i < size; i++) {
+        if (i != 0) {
+          storageStream << ", ";
+        }
+
+        storageStream << vector[i];
+      }
+
       return *this;
     }
 
