@@ -1,5 +1,7 @@
 #include <iostream>
 
+#include <ammonite/ammonite.hpp>
+
 #include "tests/vectorTestTemplates.hpp"
 
 int main() {
@@ -39,7 +41,8 @@ int main() {
   passed &= tests::testDoublex4();
 
   if (!passed) {
-    std::cout << "Vector tests failed" << std::endl;
+    ammonite::utils::normal << std::endl;
+    ammonite::utils::error << "Vector tests failed" << std::endl;
     return 1;
   }
 
