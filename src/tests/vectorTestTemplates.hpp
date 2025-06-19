@@ -28,32 +28,6 @@ namespace {
     }
   }
 
-  template <typename T, std::size_t size, typename S> requires ammonite::validVector<T, size>
-  void reportFailure(std::string_view message, const ammonite::Vec<T, size>& a, S b) {
-    ammonite::utils::error << message << std::endl;
-    ammonite::utils::error << a << std::endl;
-    ammonite::utils::error << b << std::endl;
-    ammonite::utils::normal << std::endl;
-  }
-
-  template <typename T, std::size_t sizeA, typename S, std::size_t sizeB> requires ammonite::validVector<T, sizeA> && ammonite::validVector<S, sizeB>
-  void reportFailure(std::string_view message, const ammonite::Vec<T, sizeA>& a, const ammonite::Vec<S, sizeB>& b) {
-    ammonite::utils::error << message << std::endl;
-    ammonite::utils::error << a << std::endl;
-    ammonite::utils::error << b << std::endl;
-    ammonite::utils::normal << std::endl;
-  }
-
-  template <typename T, std::size_t sizeA, typename S, std::size_t sizeB, typename U, std::size_t sizeC> requires ammonite::validVector<T, sizeA> && ammonite::validVector<S, sizeB> && ammonite::validVector<U, sizeC>
-  void reportFailure(std::string_view message, const ammonite::Vec<T, sizeA>& a,
-                     const ammonite::Vec<S, sizeB>& b, const ammonite::Vec<U, sizeC>& c) {
-    ammonite::utils::error << message << std::endl;
-    ammonite::utils::error << a << std::endl;
-    ammonite::utils::error << b << std::endl;
-    ammonite::utils::error << c << std::endl;
-    ammonite::utils::normal << std::endl;
-  }
-
   template <typename T> requires ammonite::vectorType<T>
   bool roughly(T a, T b) {
     if constexpr (std::is_integral_v<T>) {
@@ -73,9 +47,8 @@ namespace {
 
     if (&namedAVec.x != aVec.data()) {
       ammonite::utils::error << "Named vector has a different address to its underlying vector" << std::endl;
-      ammonite::utils::error << "Named vector address: " << (void*)&namedAVec.x \
-                              << ", vector address: " << (void*)aVec.data() << std::endl;
-      ammonite::utils::normal << std::endl;
+      ammonite::utils::normal << "  Result:   " << (void*)&namedAVec.x \
+                              << "\n  Expected: " << (void*)aVec.data() << std::endl;
       return false;
     }
 
@@ -95,7 +68,8 @@ namespace {
 
     //Check ammonite::equal() on equal vectors
     if (!ammonite::equal(aVec, bVec)) {
-      reportFailure("Equal vector comparison failed", aVec, bVec);
+      ammonite::utils::error << "Equal vector comparison failed" << std::endl;
+      ammonite::utils::normal << "  Input: " << aVec << "\n  Input: " << bVec << std::endl;
       return false;
     }
 
@@ -107,7 +81,8 @@ namespace {
 
     //Check ammonite::equal() on unequal vectors
     if (ammonite::equal(aVec, bVec)) {
-      reportFailure("Unequal vector comparison failed", aVec, bVec);
+      ammonite::utils::error << "Unequal vector comparison failed" << std::endl;
+      ammonite::utils::normal << "  Input: " << aVec << "\n  Input: " << bVec << std::endl;
       return false;
     }
 
@@ -119,28 +94,34 @@ namespace {
     ammonite::Vec<T, size> aVec = {0};
     ammonite::Vec<T, size> bVec = {0};
     randomFillVector(aVec);
-    ammonite::copy(aVec, bVec);
 
+    ammonite::copy(aVec, bVec);
     if (!ammonite::equal(aVec, bVec)) {
-      reportFailure("Vector copy failed", aVec, bVec);
+      ammonite::utils::error << "Vector copy failed" << std::endl;
+      ammonite::utils::normal << "  Result:   " << bVec \
+                              << "\n  Expected: " << aVec << std::endl;
       return false;
     }
 
     //Check vectors are fully preserved when copying to a max size vector
     ammonite::Vec<T, 4> cVec = {0};
+    ammonite::copy(aVec, bVec);
     ammonite::copy(aVec, cVec);
     ammonite::copy(cVec, aVec);
     if (!ammonite::equal(aVec, bVec)) {
-      reportFailure("Vector grow copy failed", aVec, bVec);
+      ammonite::utils::error << "Vector grow copy failed" << std::endl;
+      ammonite::utils::normal << "  Result:   " << aVec \
+                              << "\n  Expected: " << bVec << std::endl;
       return false;
     }
 
     //Check relevant parts are preserved when copying to a min size vector
     ammonite::Vec<T, 2> dVec = {0};
     ammonite::copy(aVec, dVec);
-    ammonite::copy(dVec, aVec);
-    if (aVec[0] != bVec[0] || aVec[1] != bVec[1]) {
-      reportFailure("Vector shrink copy failed", aVec, bVec);
+    if (aVec[0] != dVec[0] || aVec[1] != dVec[1]) {
+      ammonite::utils::error << "Vector shrink copy failed" << std::endl;
+      ammonite::utils::normal << "  Result:   " << dVec \
+                              << "\n  Expected: " << aVec << std::endl;
       return false;
     }
 
@@ -156,7 +137,9 @@ namespace {
     ammonite::copyCast(aVec, bVec);
     for (std::size_t i = 0; i < size; i++) {
       if ((double)aVec[i] != bVec[i]) {
-        reportFailure("Vector copy cast failed", aVec, bVec);
+        ammonite::utils::error << "Vector copy cast failed" << std::endl;
+        ammonite::utils::normal << "  Result:   " << bVec \
+                                << "\n  Expected: " << aVec << std::endl;
         return false;
       }
     }
@@ -164,10 +147,11 @@ namespace {
     //Check vectors are fully preserved when copying to a max size vector
     ammonite::Vec<double, 4> cVec = {0};
     ammonite::copyCast(aVec, cVec);
-
     for (std::size_t i = 0; i < size; i++) {
       if ((double)aVec[i] != cVec[i]) {
-        reportFailure("Vector grow copy cast failed", aVec, cVec);
+        ammonite::utils::error << "Vector grow copy cast failed" << std::endl;
+        ammonite::utils::normal << "  Result:   " << cVec \
+                                << "\n  Expected: " << aVec << std::endl;
         return false;
       }
     }
@@ -176,7 +160,9 @@ namespace {
     ammonite::Vec<T, 2> dVec = {0};
     ammonite::copy(aVec, dVec);
     if ((double)aVec[0] != dVec[0] || (double)aVec[1] != dVec[1]) {
-      reportFailure("Vector shrink copy cast failed", aVec, dVec);
+      ammonite::utils::error << "Vector shrink copy cast failed" << std::endl;
+      ammonite::utils::normal << "  Result:   " << dVec \
+                              << "\n  Expected: " << aVec << std::endl;
       return false;
     }
 
@@ -195,7 +181,9 @@ namespace {
     ammonite::add(aVec, bVec, cVec);
     for (std::size_t i = 0; i < size; i++) {
       if ((T)(aVec[i] + bVec[i]) != cVec[i]) {
-        reportFailure("Vector addition failed", aVec, bVec, cVec);
+        ammonite::utils::error << "Vector addition failed" << std::endl;
+        ammonite::utils::normal << "  Input:  " << aVec << "\n  Input:  " << bVec \
+                                << "\n  Result: " << cVec << std::endl;
         return false;
       }
     }
@@ -205,7 +193,9 @@ namespace {
     ammonite::add(cVec, bVec);
     for (std::size_t i = 0; i < size; i++) {
       if ((T)(aVec[i] + bVec[i]) != cVec[i]) {
-        reportFailure("In-place vector addition failed", aVec, bVec, cVec);
+        ammonite::utils::error << "In-place vector addition failed" << std::endl;
+        ammonite::utils::normal << "  Input:  " << aVec << "\n  Input:  " << bVec \
+                                << "\n  Result: " << cVec << std::endl;
         return false;
       }
     }
@@ -214,7 +204,9 @@ namespace {
     ammonite::add(aVec, bVec[0], cVec);
     for (std::size_t i = 0; i < size; i++) {
       if ((T)(aVec[i] + bVec[0]) != cVec[i]) {
-        reportFailure("Constant vector addition failed", aVec, bVec, cVec);
+        ammonite::utils::error << "Constant vector addition failed" << std::endl;
+        ammonite::utils::normal << "  Input:  " << aVec << "\n  Input:  " << bVec \
+                                << "\n  Result: " << cVec << std::endl;
         return false;
       }
     }
@@ -224,7 +216,9 @@ namespace {
     ammonite::add(cVec, bVec[0]);
     for (std::size_t i = 0; i < size; i++) {
       if ((T)(aVec[i] + bVec[0]) != cVec[i]) {
-        reportFailure("In-place constant vector addition failed", aVec, bVec, cVec);
+        ammonite::utils::error << "In-place constant vector addition failed" << std::endl;
+        ammonite::utils::normal << "  Input:  " << aVec << "\n  Input:  " << bVec \
+                                << "\n  Result: " << cVec << std::endl;
         return false;
       }
     }
@@ -244,7 +238,9 @@ namespace {
     ammonite::sub(aVec, bVec, cVec);
     for (std::size_t i = 0; i < size; i++) {
       if ((T)(aVec[i] - bVec[i]) != cVec[i]) {
-        reportFailure("Vector subtraction failed", aVec, bVec, cVec);
+        ammonite::utils::error << "Vector subtraction failed" << std::endl;
+        ammonite::utils::normal << "  Input:  " << aVec << "\n  Input:  " << bVec \
+                                << "\n  Result: " << cVec << std::endl;
         return false;
       }
     }
@@ -254,7 +250,9 @@ namespace {
     ammonite::sub(cVec, bVec);
     for (std::size_t i = 0; i < size; i++) {
       if ((T)(aVec[i] - bVec[i]) != cVec[i]) {
-        reportFailure("In-place vector subtraction failed", aVec, bVec, cVec);
+        ammonite::utils::error << "In-place vector subtraction failed" << std::endl;
+        ammonite::utils::normal << "  Input:  " << aVec << "\n  Input:  " << bVec \
+                                << "\n  Result: " << cVec << std::endl;
         return false;
       }
     }
@@ -263,7 +261,9 @@ namespace {
     ammonite::sub(aVec, bVec[0], cVec);
     for (std::size_t i = 0; i < size; i++) {
       if ((T)(aVec[i] - bVec[0]) != cVec[i]) {
-        reportFailure("Constant vector subtraction failed", aVec, bVec, cVec);
+        ammonite::utils::error << "Constant vector subtraction failed" << std::endl;
+        ammonite::utils::normal << "  Input:  " << aVec << "\n  Input:  " << bVec \
+                                << "\n  Result: " << cVec << std::endl;
         return false;
       }
     }
@@ -273,7 +273,9 @@ namespace {
     ammonite::sub(cVec, bVec[0]);
     for (std::size_t i = 0; i < size; i++) {
       if ((T)(aVec[i] - bVec[0]) != cVec[i]) {
-        reportFailure("In-place constant vector subtraction failed", aVec, bVec, cVec);
+        ammonite::utils::error << "In-place constant vector subtraction failed" << std::endl;
+        ammonite::utils::normal << "  Input:  " << aVec << "\n  Input:  " << bVec \
+                                << "\n  Result: " << cVec << std::endl;
         return false;
       }
     }
@@ -293,7 +295,9 @@ namespace {
     ammonite::scale(aVec, bVec[0], cVec);
     for (std::size_t i = 0; i < size; i++) {
       if ((T)(aVec[i] * bVec[0]) != cVec[i]) {
-        reportFailure("Vector scaling failed", aVec, bVec, cVec);
+        ammonite::utils::error << "Vector scaling failed" << std::endl;
+        ammonite::utils::normal << "  Input:  " << aVec << "\n  Input:  " << bVec \
+                                << "\n  Result: " << cVec << std::endl;
         return false;
       }
     }
@@ -303,7 +307,9 @@ namespace {
     ammonite::scale(cVec, bVec[0]);
     for (std::size_t i = 0; i < size; i++) {
       if ((T)(aVec[i] * bVec[0]) != cVec[i]) {
-        reportFailure("In-place vector scaling failed", aVec, bVec, cVec);
+        ammonite::utils::error << "In-place vector scaling failed" << std::endl;
+        ammonite::utils::normal << "  Input:  " << aVec << "\n  Input:  " << bVec \
+                                << "\n  Result: " << cVec << std::endl;
         return false;
       }
     }
@@ -328,7 +334,9 @@ namespace {
     ammonite::div(aVec, bVec[0], cVec);
     for (std::size_t i = 0; i < size; i++) {
       if ((T)(aVec[i] / bVec[0]) != cVec[i]) {
-        reportFailure("Vector division failed", aVec, bVec, cVec);
+        ammonite::utils::error << "Vector division failed" << std::endl;
+        ammonite::utils::normal << "  Input:  " << aVec << "\n  Input:  " << bVec \
+                                << "\n  Result: " << cVec << std::endl;
         return false;
       }
     }
@@ -338,7 +346,9 @@ namespace {
     ammonite::div(cVec, bVec[0]);
     for (std::size_t i = 0; i < size; i++) {
       if ((T)(aVec[i] / bVec[0]) != cVec[i]) {
-        reportFailure("In-place vector division failed", aVec, bVec, cVec);
+        ammonite::utils::error << "In-place vector division failed" << std::endl;
+        ammonite::utils::normal << "  Input:  " << aVec << "\n  Input:  " << bVec \
+                                << "\n  Result: " << cVec << std::endl;
         return false;
       }
     }
@@ -380,7 +390,11 @@ namespace {
     ammonite::normalise(aVec, bVec);
     for (std::size_t i = 0; i < size; i++) {
       if (!roughly((T)(aVec[i] / length), bVec[i])) {
-        reportFailure("Vector normalisation failed", aVec, bVec);
+        ammonite::utils::error << "Vector normalisation failed" << std::endl;
+        ammonite::utils::normal << "  Input:    " << aVec \
+                                << "\n  Result:   " << bVec \
+                                << "\n  Expected: " << (T)(aVec[i] / length) \
+                                << " at index " << i << std::endl;
         return false;
       }
     }
@@ -390,7 +404,11 @@ namespace {
     ammonite::normalise(bVec);
     for (std::size_t i = 0; i < size; i++) {
       if (!roughly((T)(aVec[i] / length), bVec[i])) {
-        reportFailure("In-place vector normalisation failed", aVec, bVec);
+        ammonite::utils::error << "In-place vector normalisation failed" << std::endl;
+        ammonite::utils::normal << "  Input:    " << aVec \
+                                << "\n  Result:   " << bVec \
+                                << "\n  Expected: " << (T)(aVec[i] / length) \
+                                << " at index " << i << std::endl;
         return false;
       }
     }
@@ -412,7 +430,11 @@ namespace {
 
     //Test dot product
     if (!roughly(ammonite::dot(aVec, bVec), sum)) {
-      reportFailure("Vector dot product failed", aVec, bVec);
+      ammonite::utils::error << "Vector dot product failed" << std::endl;
+      ammonite::utils::normal << "  Input:    " << aVec \
+                              << "\n  Input:    " << bVec \
+                              << "\n  Result:   " << ammonite::dot(aVec, bVec) \
+                              << "\n  Expected: " << sum << std::endl;
       return false;
     }
 
@@ -435,7 +457,13 @@ namespace {
         const std::size_t twoOffset = (i + 2) % 3;
         T component = (aVec[oneOffset] * bVec[twoOffset]) - (aVec[twoOffset] * bVec[oneOffset]);
         if (cVec[i] != component) {
-          reportFailure("Vector cross product failed", aVec, bVec, cVec);
+          ammonite::utils::error << "Vector cross product failed" << std::endl;
+          ammonite::utils::normal << "  Input:    " << aVec \
+                                  << "\n  Input:    " << bVec \
+                                  << "\n  Result:   " << cVec \
+                                  << "\n  Expected: " << component \
+                                  << " at index " << i << std::endl;
+
           return false;
         }
       }
@@ -457,7 +485,11 @@ namespace {
 
     //Test vector length
     if (!roughly(ammonite::length(aVec), length)) {
-      reportFailure("Vector length failed", aVec, length);
+      ammonite::utils::error << "Vector length product failed" << std::endl;
+      ammonite::utils::normal << "  Input:    " << aVec \
+                              << "\n  Result:   " << ammonite::length(aVec) \
+                              << "\n  Expected: " << length << std::endl;
+
       return false;
     }
 
@@ -491,7 +523,11 @@ namespace {
 
     //Test vector distance
     if (!roughly(ammonite::distance(aVec, bVec), distance)) {
-      reportFailure("Vector distance failed", aVec, bVec);
+      ammonite::utils::error << "Vector distance failed" << std::endl;
+      ammonite::utils::normal << "  Input:    " << aVec \
+                              << "\n  Input:    " << bVec \
+                              << "\n  Result:   " << ammonite::distance(aVec, bVec) \
+                              << "\n  Expected: " << distance << std::endl;
       return false;
     }
 
