@@ -3,7 +3,11 @@
 buildDir="build"
 
 if [[ "$1" == "--loop" || "$1" == "--loops" ]]; then
-  target="$buildDir/threadTest"
+  if [[ "$2" == "math" || "$2" == "maths" ]]; then
+    target="$buildDir/mathsTest"
+  else
+    target="$buildDir/threadTest"
+  fi
   while true; do
     if ! LD_LIBRARY_PATH="$buildDir" "$target" "$@"; then
       exit 1
