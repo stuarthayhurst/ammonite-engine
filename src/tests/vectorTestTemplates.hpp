@@ -33,7 +33,7 @@ namespace {
     ammonite::utils::error << message << std::endl;
     ammonite::utils::error << a << std::endl;
     ammonite::utils::error << b << std::endl;
-    ammonite::utils::error << std::endl;
+    ammonite::utils::normal << std::endl;
   }
 
   template <typename T, std::size_t sizeA, typename S, std::size_t sizeB> requires ammonite::validVector<T, sizeA> && ammonite::validVector<S, sizeB>
@@ -41,7 +41,7 @@ namespace {
     ammonite::utils::error << message << std::endl;
     ammonite::utils::error << a << std::endl;
     ammonite::utils::error << b << std::endl;
-    ammonite::utils::error << std::endl;
+    ammonite::utils::normal << std::endl;
   }
 
   template <typename T, std::size_t sizeA, typename S, std::size_t sizeB, typename U, std::size_t sizeC> requires ammonite::validVector<T, sizeA> && ammonite::validVector<S, sizeB> && ammonite::validVector<U, sizeC>
@@ -51,7 +51,7 @@ namespace {
     ammonite::utils::error << a << std::endl;
     ammonite::utils::error << b << std::endl;
     ammonite::utils::error << c << std::endl;
-    ammonite::utils::error << std::endl;
+    ammonite::utils::normal << std::endl;
   }
 
   template <typename T> requires ammonite::vectorType<T>
@@ -75,7 +75,7 @@ namespace {
       ammonite::utils::error << "Named vector has a different address to its underlying vector" << std::endl;
       ammonite::utils::error << "Named vector address: " << (void*)&namedAVec.x \
                               << ", vector address: " << (void*)aVec.data() << std::endl;
-      ammonite::utils::error << std::endl;
+      ammonite::utils::normal << std::endl;
       return false;
     }
 
