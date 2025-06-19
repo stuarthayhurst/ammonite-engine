@@ -29,6 +29,14 @@ namespace ammonite {
     /*
      - Treat a typed, fixed-size block of memory as a vector
        - Since this is an std::array, it's passed by value by default
+     - In-place operations on references are slower than using an intermediate local variable,
+       then copying back in the final operation
+     - For references (a, b, c) and local variable x:
+       - Prefer "add(a, b, x); add(x, b, c)" to "add(a, b, a); add(a, b, c)"
+         - However, this means "a" won't be modified
+       - Prefer "add(a, b, x); add(x, b, a)" to "add(a, b, a); add(a, b, a)"
+     - For best results, make vectors constant and / or references where possible,
+       and (re)use intermediates
     */
     template <typename T, std::size_t size> requires validVector<T, size>
     using Vec = std::array<T, size>;
