@@ -23,7 +23,7 @@ namespace {
       } else if constexpr (std::is_integral_v<T>) {
         vec[i] = (T)ammonite::utils::randomInt((T)std::sqrt(std::numeric_limits<T>::max() / size));
       } else {
-        vec[i] = (T)ammonite::utils::randomDouble(10000.0f);
+        vec[i] = (T)ammonite::utils::randomDouble(1000000.0f);
       }
     }
   }
