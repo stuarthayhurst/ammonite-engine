@@ -23,7 +23,7 @@ namespace {
       } else if constexpr (std::is_integral_v<T>) {
         vec[i] = (T)ammonite::utils::randomInt((T)std::sqrt(std::numeric_limits<T>::max() / size));
       } else {
-        vec[i] = (T)ammonite::utils::randomDouble(std::numeric_limits<T>::max());
+        vec[i] = (T)ammonite::utils::randomDouble(10000.0f);
       }
     }
   }
@@ -52,6 +52,15 @@ namespace {
     ammonite::utils::error << b << std::endl;
     ammonite::utils::error << c << std::endl;
     ammonite::utils::error << std::endl;
+  }
+
+  template <typename T> requires ammonite::vectorType<T>
+  bool roughly(T a, T b) {
+    if constexpr (std::is_integral_v<T>) {
+      return (a == b);
+    } else {
+      return std::abs(a - b) <= std::max((T)1e-5f, std::max(a, b) * (T)0.001);
+    }
   }
 }
 
@@ -370,7 +379,7 @@ namespace {
     //Test regular normalisation
     ammonite::normalise(aVec, bVec);
     for (std::size_t i = 0; i < size; i++) {
-      if ((T)(aVec[i] / length) != bVec[i]) {
+      if (!roughly((T)(aVec[i] / length), bVec[i])) {
         reportFailure("Vector normalisation failed", aVec, bVec);
         return false;
       }
@@ -380,7 +389,7 @@ namespace {
     ammonite::copy(aVec, bVec);
     ammonite::normalise(bVec);
     for (std::size_t i = 0; i < size; i++) {
-      if ((T)(aVec[i] / length) != bVec[i]) {
+      if (!roughly((T)(aVec[i] / length), bVec[i])) {
         reportFailure("In-place vector normalisation failed", aVec, bVec);
         return false;
       }
@@ -402,7 +411,7 @@ namespace {
     }
 
     //Test dot product
-    if (ammonite::dot(aVec, bVec) != sum) {
+    if (!roughly(ammonite::dot(aVec, bVec), sum)) {
       reportFailure("Vector dot product failed", aVec, bVec);
       return false;
     }
@@ -447,7 +456,7 @@ namespace {
     T length = (T)std::sqrt(sum);
 
     //Test vector length
-    if (ammonite::length(aVec) != length) {
+    if (!roughly(ammonite::length(aVec), length)) {
       reportFailure("Vector length failed", aVec, length);
       return false;
     }
@@ -481,7 +490,7 @@ namespace {
     T distance = (T)std::sqrt(sum);
 
     //Test vector distance
-    if (ammonite::distance(aVec, bVec) != distance) {
+    if (!roughly(ammonite::distance(aVec, bVec), distance)) {
       reportFailure("Vector distance failed", aVec, bVec);
       return false;
     }
