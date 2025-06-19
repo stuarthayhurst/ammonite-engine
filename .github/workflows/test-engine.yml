@@ -26,10 +26,14 @@ jobs:
         sudo apt-get install g++-14 clang-19
         sudo apt-get install --no-install-recommends libglm-dev libglfw3-dev libepoxy-dev libstb-dev libassimp-dev
 
-    - name: (g++) (DEBUG + ASan + UBSan) Build thread tester
+    - name: (g++) (DEBUG + ASan + UBSan) Build tests
       run: |
         make clean
-        CXX="g++-14" DEBUG="true" make threads -j$(nproc)
+        CXX="g++-14" DEBUG="true" make tests -j$(nproc)
+
+    - name: (g++) (DEBUG + ASan + UBSan) Run maths tester
+      run: |
+        ./launch.sh --maths
 
     - name: (g++) (DEBUG + ASan + UBSan) Run thread tester
       run: |
@@ -44,19 +48,14 @@ jobs:
       run: |
         ./launch.sh --threads
 
-    - name: (g++) (DEBUG + ASan + UBSan) Build maths tester
+    - name: (clang++) (DEBUG + ASan + UBSan) Build tests
       run: |
         make clean
-        CXX="g++-14" DEBUG="true" make maths -j$(nproc)
+        CXX="clang++-19" DEBUG="true" make tests -j$(nproc)
 
-    - name: (g++) (DEBUG + ASan + UBSan) Run maths tester
+    - name: (clang++) (DEBUG + ASan + UBSan) Run maths tester
       run: |
         ./launch.sh --maths
-
-    - name: (clang++) (DEBUG + ASan + UBSan) Build thread tester
-      run: |
-        make clean
-        CXX="clang++-19" DEBUG="true" make threads -j$(nproc)
 
     - name: (clang++) (DEBUG + ASan + UBSan) Run thread tester
       run: |
@@ -70,13 +69,4 @@ jobs:
     - name: (clang++) (DEBUG + TSan) Run thread tester
       run: |
         ./launch.sh --threads
-
-    - name: (clang++) (DEBUG + ASan + UBSan) Build maths tester
-      run: |
-        make clean
-        CXX="clang++-19" DEBUG="true" make maths -j$(nproc)
-
-    - name: (clang++) (DEBUG + ASan + UBSan) Run maths tester
-      run: |
-        ./launch.sh --maths
 
