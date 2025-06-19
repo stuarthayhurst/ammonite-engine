@@ -107,7 +107,7 @@ namespace {
 
     //Check ammonite::equal() on unequal vectors
     if (ammonite::equal(aVec, bVec)) {
-      reportFailure("Enequal vector comparison failed", aVec, bVec);
+      reportFailure("Unequal vector comparison failed", aVec, bVec);
       return false;
     }
 
