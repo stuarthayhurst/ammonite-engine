@@ -1,7 +1,10 @@
 #ifndef INTERNALDEBUGHEADER
 #define INTERNALDEBUGHEADER
 
-//Output sent to ammoniteInternalDebug will disappear unless DEBUG is set
+/*
+ - Output sent to ammoniteInternalDebug will disappear unless AMMONITE_DEBUG is defined
+ - Expressions won't even be evaluated, logging to debug is free in production
+*/
 #ifdef AMMONITE_DEBUG
   #include "logging.hpp"
   //NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
@@ -10,7 +13,7 @@
   //NOLINTNEXTLINE(misc-include-cleaner)
   #include <iostream>
   #define ammoniteInternalDebug \
-  if(false) std::cout
+  if constexpr (false) std::cout
 #endif
 
 //Include public interface
