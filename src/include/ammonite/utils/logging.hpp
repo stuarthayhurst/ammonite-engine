@@ -1,14 +1,10 @@
 #ifndef AMMONITELOGGING
 #define AMMONITELOGGING
 
-#include <cstddef>
 #include <iostream>
 #include <sstream>
 #include <string>
-#include <type_traits>
 #include <utility>
-
-#include "../maths/vec.hpp"
 
 namespace ammonite {
   namespace utils {
@@ -60,35 +56,6 @@ namespace ammonite {
     extern OutputHelper status;
     extern OutputHelper normal;
     //NOLINTEND(cppcoreguidelines-avoid-non-const-global-variables)
-  }
-
-  namespace utils {
-    template<typename T, std::size_t size> requires ammonite::validVector<T, size>
-    std::string formatVector(const ammonite::Vec<T, size>& vector) {
-      std::string result;
-      for (std::size_t i = 0; i < size; i++) {
-        if (i != 0) {
-          result += ", ";
-        }
-
-        //Always print vector elements numerically
-        if constexpr (std::is_same_v<std::remove_cv_t<T>, signed char>) {
-          result += std::to_string((int)vector[i]);
-        } else if constexpr (std::is_same_v<std::remove_cv_t<T>, unsigned char>) {
-          result += std::to_string((unsigned int)vector[i]);
-        } else if constexpr (std::is_same_v<std::remove_cv_t<T>, char>) {
-          if constexpr (std::is_signed_v<char>) {
-            result += std::to_string((int)vector[i]);
-          } else {
-            result += std::to_string((unsigned int)vector[i]);
-          }
-        } else {
-          result += std::to_string(vector[i]);
-        }
-      }
-
-      return result;
-    }
   }
 }
 

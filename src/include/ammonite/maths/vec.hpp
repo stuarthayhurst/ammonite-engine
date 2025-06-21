@@ -4,6 +4,7 @@
 #include <cmath>
 #include <cstring>
 #include <functional>
+#include <string>
 #include <type_traits>
 
 //TODO: Convert to <simd> with C++26, drop header filter regex
@@ -11,6 +12,7 @@
 #include <experimental/simd>
 
 namespace ammonite {
+  //Definitions, concepts and constructors for vectors
   inline namespace maths {
     //Allowed vector element types
     template <typename T>
@@ -74,8 +76,10 @@ namespace ammonite {
       NamedVec(Vec<T, 4>& vector): x(vector[0]), y(vector[1]), z(vector[2]), w(vector[3]) {};
     };
     //NOLINTEND(cppcoreguidelines-avoid-const-or-ref-data-members)
+  }
 
-
+  //Maths operations
+  inline namespace maths {
     //Copy from src to dest, using the size of the smaller vector as the size of the copy
     template <typename T, std::size_t sizeA, std::size_t sizeB> requires validVector<T, sizeA> && validVector<T, sizeB>
     void copy(const Vec<T, sizeA>& src, Vec<T, sizeB>& dest) {
@@ -300,6 +304,36 @@ namespace ammonite {
       std::experimental::fixed_size_simd<T, size> cSimd = bSimd - aSimd;
 
       return (T)std::sqrt(std::experimental::reduce(cSimd * cSimd, std::plus{}));
+    }
+  }
+
+  //Utility / support functions
+  inline namespace maths {
+    template<typename T, std::size_t size> requires validVector<T, size>
+    std::string formatVector(const Vec<T, size>& vector) {
+      std::string result;
+      for (std::size_t i = 0; i < size; i++) {
+        if (i != 0) {
+          result += ", ";
+        }
+
+        //Always print vector elements numerically
+        if constexpr (std::is_same_v<std::remove_cv_t<T>, signed char>) {
+          result += std::to_string((int)vector[i]);
+        } else if constexpr (std::is_same_v<std::remove_cv_t<T>, unsigned char>) {
+          result += std::to_string((unsigned int)vector[i]);
+        } else if constexpr (std::is_same_v<std::remove_cv_t<T>, char>) {
+          if constexpr (std::is_signed_v<char>) {
+            result += std::to_string((int)vector[i]);
+          } else {
+            result += std::to_string((unsigned int)vector[i]);
+          }
+        } else {
+          result += std::to_string(vector[i]);
+        }
+      }
+
+      return result;
     }
   }
 }
