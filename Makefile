@@ -30,10 +30,10 @@ LINT_OBJECTS_SOURCE = $(ROOT_OBJECTS_SOURCE) $(AMMONITE_OBJECTS_SOURCE) \
 LINT_HEADERS_SOURCE = $(AMMONITE_HEADERS_SOURCE) $(AMMONITE_INCLUDE_HEADERS_SOURCE) \
                      $(HELPER_HEADERS_SOURCE) $(DEMO_HEADERS_SOURCE)
 
-LINT_FILES = $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.cpp.linted,$(LINT_OBJECTS_SOURCE)))
-LINT_FILES += $(subst ./src,$(OBJECT_DIR),$(subst .hpp,.hpp.linted,$(LINT_HEADERS_SOURCE)))
-TEST_LINT_FILES = $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.cpp.linted,$(TEST_OBJECTS_SOURCE)))
-TEST_LINT_FILES += $(subst ./src,$(OBJECT_DIR),$(subst .hpp,.hpp.linted,$(TEST_HEADERS_SOURCE)))
+LINT_FILES = $(subst ./src,$(OBJECT_DIR),$(subst .hpp,.hpp.linted,$(LINT_HEADERS_SOURCE)))
+LINT_FILES += $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.cpp.linted,$(LINT_OBJECTS_SOURCE)))
+TEST_LINT_FILES = $(subst ./src,$(OBJECT_DIR),$(subst .hpp,.hpp.linted,$(TEST_HEADERS_SOURCE)))
+TEST_LINT_FILES += $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.cpp.linted,$(TEST_OBJECTS_SOURCE)))
 
 OBJECT_DIR = $(BUILD_DIR)/objects
 AMMONITE_OBJECTS = $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.o,$(AMMONITE_OBJECTS_SOURCE)))
