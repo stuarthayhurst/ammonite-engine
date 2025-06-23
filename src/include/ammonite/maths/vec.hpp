@@ -5,7 +5,6 @@
 #include <cstring>
 #include <functional>
 #include <string>
-#include <type_traits>
 
 //TODO: Convert to <simd> with C++26, drop header filter regex
 //NOLINTNEXTLINE(misc-include-cleaner)
