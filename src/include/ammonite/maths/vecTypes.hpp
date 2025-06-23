@@ -9,7 +9,7 @@ namespace ammonite {
   inline namespace maths {
     //Allowed vector element types
     template <typename T>
-    concept vectorType = std::is_arithmetic_v<T>;
+    concept vectorType = std::is_arithmetic_v<T> && (sizeof(T) >= 4);
 
     //Allowed vector sizes
     template <std::size_t size>
@@ -24,7 +24,7 @@ namespace ammonite {
      - Treat a typed, fixed-size block of memory as a vector
        - Since this is a raw array, it's passed by reference by default
      - These should always be passed as references, to preserve size information
-       - If you specifically want a reference, leave it as once
+       - If you specifically want a reference, leave it as one
        - If you didn't need a reference, make it a const&
        - If you specifically don't want a reference, make it a const& and copy() to an intermediate
      - In-place operations are slower than using an intermediate local variable,

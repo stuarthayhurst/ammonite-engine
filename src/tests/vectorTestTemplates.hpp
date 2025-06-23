@@ -17,8 +17,7 @@ namespace {
   template <typename T, std::size_t size> requires ammonite::validVector<T, size>
   void randomFillVector(ammonite::Vec<T, size>& vec) {
     for (std::size_t i = 0; i < size; i++) {
-      if constexpr (std::is_unsigned_v<T> && !std::is_same_v<T, unsigned char> &&
-                    !std::is_same_v<T, unsigned short>) {
+      if constexpr (std::is_unsigned_v<T>) {
         vec[i] = (T)ammonite::utils::randomUInt(std::numeric_limits<T>::max());
       } else if constexpr (std::is_integral_v<T>) {
         vec[i] = (T)ammonite::utils::randomInt((T)std::sqrt(std::numeric_limits<T>::max() / size));
@@ -646,34 +645,22 @@ namespace tests {
 }
 
 namespace tests {
-  bool testInt8x2();
-  bool testInt16x2();
   bool testInt32x2();
   bool testInt64x2();
-  bool testUInt8x2();
-  bool testUInt16x2();
   bool testUInt32x2();
   bool testUInt64x2();
   bool testFloatx2();
   bool testDoublex2();
 
-  bool testInt8x3();
-  bool testInt16x3();
   bool testInt32x3();
   bool testInt64x3();
-  bool testUInt8x3();
-  bool testUInt16x3();
   bool testUInt32x3();
   bool testUInt64x3();
   bool testFloatx3();
   bool testDoublex3();
 
-  bool testInt8x4();
-  bool testInt16x4();
   bool testInt32x4();
   bool testInt64x4();
-  bool testUInt8x4();
-  bool testUInt16x4();
   bool testUInt32x4();
   bool testUInt64x4();
   bool testFloatx4();

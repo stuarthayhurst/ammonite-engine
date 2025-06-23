@@ -253,20 +253,7 @@ namespace ammonite {
           result += ", ";
         }
 
-        //Always print vector elements numerically
-        if constexpr (std::is_same_v<std::remove_cv_t<T>, signed char>) {
-          result += std::to_string((int)vector[i]);
-        } else if constexpr (std::is_same_v<std::remove_cv_t<T>, unsigned char>) {
-          result += std::to_string((unsigned int)vector[i]);
-        } else if constexpr (std::is_same_v<std::remove_cv_t<T>, char>) {
-          if constexpr (std::is_signed_v<char>) {
-            result += std::to_string((int)vector[i]);
-          } else {
-            result += std::to_string((unsigned int)vector[i]);
-          }
-        } else {
-          result += std::to_string(vector[i]);
-        }
+        result += std::to_string(vector[i]);
       }
 
       return result;
