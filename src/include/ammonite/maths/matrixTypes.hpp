@@ -19,7 +19,7 @@ namespace ammonite {
 
     //Allowed vector element type and size combinations
     template <typename T, std::size_t cols, std::size_t rows>
-    concept validMatrix = matrixType<T> && matrixSize<cols> && matrixSize<cols>;
+    concept validMatrix = matrixType<T> && matrixSize<cols> && matrixSize<rows>;
 
 
     /*
