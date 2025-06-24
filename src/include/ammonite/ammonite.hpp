@@ -10,6 +10,8 @@
 #include "input/input.hpp"
 #include "input/keycodes.hpp"
 #include "lighting/lighting.hpp"
+#include "maths/mat.hpp"
+#include "maths/matTypes.hpp"
 #include "maths/vec.hpp"
 #include "maths/vecTypes.hpp"
 #include "models/models.hpp"
