@@ -28,7 +28,8 @@ namespace ammonite {
      - These are designed for GLSL, so they're column-major
      - The same suggestions for vectors apply here too
     */
-    template <typename T, std::size_t cols, std::size_t rows> requires validMatrix<T, cols, rows>
+    template <typename T, std::size_t cols, std::size_t rows>
+              requires validMatrix<T, cols, rows>
     using Mat = Vec<T, rows>[cols];
   }
 }

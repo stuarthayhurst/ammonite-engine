@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <cstring>
+#include <string>
 
 //TODO: Convert to <simd> with C++26, drop header filter regex
 //NOLINTNEXTLINE(misc-include-cleaner)
@@ -74,6 +75,30 @@ namespace ammonite {
               requires validMatrix<T, cols, rows>
     bool equal(const Mat<T, cols, rows>& a, const Mat<T, cols, rows>& b) {
       return (std::memcmp(&a[0], &b[0], sizeof(a)) == 0);
+    }
+  }
+
+  //Utility / support functions
+  inline namespace maths {
+    template<typename T, std::size_t cols, std::size_t rows>
+             requires validMatrix<T, cols, rows>
+    std::string formatMatrix(const Mat<T, cols, rows>& matrix) {
+      std::string result;
+      for (std::size_t row = 0; row < rows; row++) {
+        if (row != 0) {
+          result += "\n";
+        }
+
+        for (std::size_t col = 0; col < cols; col++) {
+          if (col != 0) {
+            result += ", ";
+          }
+
+          result += std::to_string(matrix[col][row]);
+        }
+      }
+
+      return result;
     }
   }
 }
