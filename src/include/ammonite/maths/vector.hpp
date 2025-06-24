@@ -16,7 +16,8 @@ namespace ammonite {
   //Maths operations
   inline namespace maths {
     //Copy from src to dest, using the size of the smaller vector as the size of the copy
-    template <typename T, std::size_t sizeA, std::size_t sizeB> requires validVector<T, sizeA> && validVector<T, sizeB>
+    template <typename T, std::size_t sizeA, std::size_t sizeB>
+              requires validVector<T, sizeA> && validVector<T, sizeB>
     void copy(const Vec<T, sizeA>& src, Vec<T, sizeB>& dest) {
       if constexpr (sizeA <= sizeB) {
         std::memcpy(&dest[0], &src[0], sizeof(src));
@@ -29,7 +30,8 @@ namespace ammonite {
      - Copy from src to dest, using the size of the smaller vector as the size of the copy
      - Additionally, cast each element during the copy
     */
-    template <typename T, std::size_t sizeA, typename S, std::size_t sizeB> requires validVector<T, sizeA> && validVector<S, sizeB>
+    template <typename T, std::size_t sizeA, typename S, std::size_t sizeB>
+              requires validVector<T, sizeA> && validVector<S, sizeB>
     constexpr void copyCast(const Vec<T, sizeA>& src, Vec<S, sizeB>& dest) {
       if constexpr (sizeA <= sizeB) {
         std::copy(&src[0], &src[sizeA], &dest[0]);
