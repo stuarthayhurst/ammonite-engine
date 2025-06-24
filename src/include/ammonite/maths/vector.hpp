@@ -42,7 +42,6 @@ namespace ammonite {
 
     /*
      - Return true if two vectors of the same size and type have identical elements
-     - This must not be used if the vectors overlap
     */
     template <typename T, std::size_t size> requires validVector<T, size>
     bool equal(const Vec<T, size>& a, const Vec<T, size>& b) {
