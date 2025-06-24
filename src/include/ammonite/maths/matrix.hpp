@@ -1,7 +1,6 @@
 #ifndef AMMONITEMATRIX
 #define AMMONITEMATRIX
 
-#include <bit>
 #include <cstring>
 
 //TODO: Convert to <simd> with C++26, drop header filter regex
@@ -11,17 +10,6 @@
 #include "matrixTypes.hpp"
 
 namespace ammonite {
-  //Matrix size helpers
-  namespace {
-    constexpr std::size_t layoutRowCount(std::size_t rows) {
-      return std::bit_ceil(rows);
-    }
-
-    constexpr std::size_t layoutElementCount(std::size_t cols, std::size_t rows) {
-      return cols * layoutRowCount(rows);
-    }
-  }
-
   //Maths operations
   inline namespace maths {
     //Copy from src to dest
@@ -39,7 +27,7 @@ namespace ammonite {
               requires validMatrix<T, cols, rows> && validMatrix<S, cols, rows> &&
                        (m == cols) && (n == rows)
     constexpr void copyCast(const Mat<T, cols, rows>& src, Mat<S, cols, rows>& dest) {
-      std::copy(&src[0], &src[layoutElementCount(cols, rows)], &dest[0]);
+      std::copy(&src[0], &src[cols * rows], &dest[0]);
     }
   }
 }

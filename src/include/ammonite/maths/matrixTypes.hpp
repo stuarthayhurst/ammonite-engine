@@ -1,9 +1,10 @@
 #ifndef AMMONITEMATRIXTYPES
 #define AMMONITEMATRIXTYPES
 
-#include <bit>
 #include <cstddef>
 #include <type_traits>
+
+#include "vectorTypes.hpp"
 
 namespace ammonite {
   //Definitions, concepts and constructors for matrix types
@@ -25,11 +26,10 @@ namespace ammonite {
      - Treat a typed, fixed-size block of memory as a matrix
        - Since this is a raw array, it's passed by reference by default
      - These are designed for GLSL, so they're column-major
-       - Mx3 matrices get rounded up to Mx4 internally
      - The same suggestions for vectors apply here too
     */
     template <typename T, std::size_t cols, std::size_t rows> requires validMatrix<T, cols, rows>
-    using Mat = T[cols][std::bit_ceil(rows)];
+    using Mat = Vec<T, rows>[cols];
   }
 }
 
