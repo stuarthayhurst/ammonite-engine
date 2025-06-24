@@ -61,8 +61,8 @@ namespace {
     randomFillVector(aVec);
 
     //Set bVec to aVec
-    for (std::size_t e = 0; e < size; e++) {
-      bVec[e] = aVec[e];
+    for (std::size_t i = 0; i < size; i++) {
+      bVec[i] = aVec[i];
     }
 
     //Check ammonite::equal() on equal vectors

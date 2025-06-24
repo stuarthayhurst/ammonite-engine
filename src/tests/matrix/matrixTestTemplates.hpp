@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <cstddef>
+#include <cstdint>
 #include <cstring>
 #include <iostream>
 #include <string_view>
@@ -37,13 +38,56 @@ namespace {
 namespace {
   template <typename T, std::size_t cols, std::size_t rows>
             requires ammonite::validMatrix<T, cols, rows>
+  bool testEqual() {
+    ammonite::Mat<T, cols, rows> aMat = {{0}};
+    ammonite::Mat<T, cols, rows> bMat = {{0}};
+    randomFillMatrix(aMat);
+
+    //Set bMat to aMat
+    for (std::size_t col = 0; col < cols; col++) {
+      for (std::size_t row = 0; row < rows; row++) {
+        bMat[col][row] = aMat[col][row];
+      }
+    }
+
+    //Check ammonite::equal() on equal matrices
+    if (!ammonite::equal(aMat, bMat)) {
+      ammonite::utils::error << "Equal matrix comparison failed" << std::endl;
+      ammonite::utils::normal << "  Input:\n" << ammonite::formatMatrix(aMat) \
+                              << "\n  Input:\n" << ammonite::formatMatrix(bMat) \
+                              << std::endl;
+      return false;
+    }
+
+    //Safely guarantee a modification to bMat
+    uintmax_t tmp = 0;
+    std::memcpy(&tmp, &bMat[0][0], sizeof(bMat[0][0]));
+    tmp ^= 1;
+    std::memcpy(&bMat[0][0], &tmp, sizeof(bMat[0][0]));
+
+    //Check ammonite::equal() on unequal vectors
+    if (ammonite::equal(aMat, bMat)) {
+      ammonite::utils::error << "Unequal matrix comparison failed" << std::endl;
+      ammonite::utils::normal << "  Input:\n" << ammonite::formatMatrix(aMat) \
+                              << "\n  Input:\n" << ammonite::formatMatrix(bMat) \
+                              << std::endl;
+      return false;
+    }
+
+    return true;
+  }
+
+  template <typename T, std::size_t cols, std::size_t rows>
+            requires ammonite::validMatrix<T, cols, rows>
   bool testCopy() {
+    //TODO
     return true;
   }
 
   template <typename T, std::size_t cols, std::size_t rows>
             requires ammonite::validMatrix<T, cols, rows>
   bool testCopyCast() {
+    //TODO
     return true;
   }
 }
@@ -56,7 +100,10 @@ namespace tests {
                             << typeName << " matrices" << std::endl;
 
     for (int i = 0; i < 10000; i++) {
-      //TODO: Test ammonite::equal() here
+      //Test ammonite::equal()
+      if (!testEqual<T, cols, rows>()) {
+        return false;
+      }
 
       //Test ammonite::copy()
       if (!testCopy<T, cols, rows>()) {
