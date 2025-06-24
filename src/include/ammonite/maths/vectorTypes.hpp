@@ -9,7 +9,7 @@ namespace ammonite {
   inline namespace maths {
     //Allowed vector element types
     template <typename T>
-    concept vectorType = std::is_arithmetic_v<T> && (sizeof(T) >= 4);
+    concept vectorType = std::is_arithmetic_v<T> && (std::is_floating_point_v<T> || sizeof(T) >= 4);
 
     //Allowed vector sizes
     template <std::size_t size>

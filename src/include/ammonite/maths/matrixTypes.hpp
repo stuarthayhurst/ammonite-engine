@@ -11,7 +11,7 @@ namespace ammonite {
   inline namespace maths {
     //Allowed matrix element types
     template <typename T>
-    concept matrixType = std::is_floating_point_v<T> && (sizeof(T) >= 4);
+    concept matrixType = std::is_arithmetic_v<T> && (std::is_floating_point_v<T> || sizeof(T) >= 4);
 
     //Allowed matrix dimensions
     template <std::size_t size>
