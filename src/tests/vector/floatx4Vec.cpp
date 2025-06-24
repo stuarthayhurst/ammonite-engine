@@ -2,6 +2,6 @@
 
 namespace tests {
   bool testFloatx4() {
-    return testVectors<float, 4>("float");
+    return testVector<float, 4>("float");
   }
 }

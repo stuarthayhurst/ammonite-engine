@@ -3,7 +3,7 @@
 #include "vectorTestTemplates.hpp"
 
 namespace tests {
-  bool testInt64x3() {
-    return testVectors<int64_t, 3>("int64_t");
+  bool testUInt32x4() {
+    return testVector<uint32_t, 4>("uint32_t");
   }
 }

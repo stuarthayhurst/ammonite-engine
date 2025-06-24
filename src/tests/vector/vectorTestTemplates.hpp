@@ -570,7 +570,7 @@ namespace {
 
 namespace tests {
   template <typename T, std::size_t size> requires ammonite::validVector<T, size>
-  bool testVectors(std::string_view typeName) {
+  bool testVector(std::string_view typeName) {
     ammonite::utils::normal << "Testing " << size << "x " << typeName << " vectors" << std::endl;
 
     //Test NamedVec

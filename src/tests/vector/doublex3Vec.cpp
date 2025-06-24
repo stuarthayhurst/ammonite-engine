@@ -2,6 +2,6 @@
 
 namespace tests {
   bool testDoublex3() {
-    return testVectors<double, 3>("double");
+    return testVector<double, 3>("double");
   }
 }
