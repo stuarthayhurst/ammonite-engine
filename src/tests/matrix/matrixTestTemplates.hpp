@@ -53,7 +53,7 @@ namespace tests {
             requires ammonite::validMatrix<T, cols, rows>
   bool testMatrix(std::string_view typeName) {
     ammonite::utils::normal << "Testing " << cols << "x" << rows << " " \
-                            << typeName << " vectors" << std::endl;
+                            << typeName << " matrices" << std::endl;
 
     for (int i = 0; i < 10000; i++) {
       //TODO: Test ammonite::equal() here
