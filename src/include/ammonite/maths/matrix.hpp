@@ -66,6 +66,15 @@ namespace ammonite {
         }
       }
     }
+
+    /*
+     - Return true if two matrices of the same size and type have identical elements
+    */
+    template <typename T, std::size_t cols, std::size_t rows>
+              requires validMatrix<T, cols, rows>
+    bool equal(const Mat<T, cols, rows>& a, const Mat<T, cols, rows>& b) {
+      return (std::memcmp(&a[0], &b[0], sizeof(a)) == 0);
+    }
   }
 }
 
