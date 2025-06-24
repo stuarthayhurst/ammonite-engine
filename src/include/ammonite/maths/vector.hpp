@@ -10,7 +10,7 @@
 //NOLINTNEXTLINE(misc-include-cleaner)
 #include <experimental/simd>
 
-#include "vecTypes.hpp"
+#include "vectorTypes.hpp"
 
 namespace ammonite {
   //Maths operations

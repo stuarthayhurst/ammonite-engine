@@ -7,7 +7,7 @@
 //NOLINTNEXTLINE(misc-include-cleaner)
 #include <experimental/simd>
 
-#include "matTypes.hpp"
+#include "matrixTypes.hpp"
 
 namespace ammonite {
   //Maths operations
