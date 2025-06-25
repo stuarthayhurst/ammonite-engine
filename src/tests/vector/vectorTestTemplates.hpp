@@ -74,19 +74,24 @@ namespace {
       return false;
     }
 
-    //Safely guarantee a modification to bVec
-    uintmax_t tmp = 0;
-    std::memcpy(&tmp, &bVec[0], sizeof(bVec[0]));
-    tmp ^= 1;
-    std::memcpy(&bVec[0], &tmp, sizeof(bVec[0]));
+    for (std::size_t i = 0; i < size; i++) {
+      //Safely guarantee a modification to bVec
+      uintmax_t tmp = 0;
+      std::memcpy(&tmp, &bVec[i], sizeof(bVec[i]));
+      tmp ^= 1;
+      std::memcpy(&bVec[i], &tmp, sizeof(bVec[i]));
 
-    //Check ammonite::equal() on unequal vectors
-    if (ammonite::equal(aVec, bVec)) {
-      ammonite::utils::error << "Unequal vector comparison failed" << std::endl;
-      ammonite::utils::normal << "  Input: " << ammonite::formatVector(aVec) \
-                              << "\n  Input: " << ammonite::formatVector(bVec) \
-                              << std::endl;
-      return false;
+      //Check ammonite::equal() on unequal vectors
+      if (ammonite::equal(aVec, bVec)) {
+        ammonite::utils::error << "Unequal vector comparison failed" << std::endl;
+        ammonite::utils::normal << "  Input: " << ammonite::formatVector(aVec) \
+                                << "\n  Input: " << ammonite::formatVector(bVec) \
+                                << std::endl;
+        return false;
+      }
+
+      //Revert the change
+      bVec[i] = aVec[i];
     }
 
     return true;

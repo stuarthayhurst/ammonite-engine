@@ -59,19 +59,26 @@ namespace {
       return false;
     }
 
-    //Safely guarantee a modification to bMat
-    uintmax_t tmp = 0;
-    std::memcpy(&tmp, &bMat[0][0], sizeof(bMat[0][0]));
-    tmp ^= 1;
-    std::memcpy(&bMat[0][0], &tmp, sizeof(bMat[0][0]));
+    for (std::size_t col = 0; col < cols; col++) {
+      for (std::size_t row = 0; row < rows; row++) {
+        //Safely guarantee a modification to bMat
+        uintmax_t tmp = 0;
+        std::memcpy(&tmp, &bMat[col][row], sizeof(bMat[col][row]));
+        tmp ^= 1;
+        std::memcpy(&bMat[col][row], &tmp, sizeof(bMat[col][row]));
 
-    //Check ammonite::equal() on unequal vectors
-    if (ammonite::equal(aMat, bMat)) {
-      ammonite::utils::error << "Unequal matrix comparison failed" << std::endl;
-      ammonite::utils::normal << "  Input:\n" << ammonite::formatMatrix(aMat) \
-                              << "\n  Input:\n" << ammonite::formatMatrix(bMat) \
-                              << std::endl;
-      return false;
+        //Check ammonite::equal() on unequal matrices
+        if (ammonite::equal(aMat, bMat)) {
+          ammonite::utils::error << "Unequal matrix comparison failed" << std::endl;
+          ammonite::utils::normal << "  Input:\n" << ammonite::formatMatrix(aMat) \
+                                  << "\n  Input:\n" << ammonite::formatMatrix(bMat) \
+                                  << std::endl;
+          return false;
+        }
+
+        //Revert the change
+        bMat[col][row] = aMat[col][row];
+      }
     }
 
     return true;
@@ -93,7 +100,7 @@ namespace {
       return false;
     }
 
-    //Check vectors are fully preserved when copying to a max column count matrix
+    //Check matrices are fully preserved when copying to a max column count matrix
     ammonite::Mat<T, 4, rows> cMat = {{0}};
     ammonite::copy(aMat, bMat);
     ammonite::copy(aMat, cMat);
@@ -106,7 +113,7 @@ namespace {
       return false;
     }
 
-    //Check vectors are fully preserved when copying to a min column count matrix
+    //Check matrices are fully preserved when copying to a min column count matrix
     ammonite::Mat<T, 2, rows> dMat = {{0}};
     ammonite::copy(aMat, dMat);
     for (std::size_t col = 0; col < 2; col++) {
@@ -121,7 +128,7 @@ namespace {
       }
     }
 
-    //Check vectors are fully preserved when copying to a max row count matrix
+    //Check matrices are fully preserved when copying to a max row count matrix
     ammonite::Mat<T, cols, 4> eMat = {{0}};
     ammonite::copy(aMat, bMat);
     ammonite::copy(aMat, eMat);
@@ -134,7 +141,7 @@ namespace {
       return false;
     }
 
-    //Check vectors are fully preserved when copying to a min row count matrix
+    //Check matrices are fully preserved when copying to a min row count matrix
     ammonite::Mat<T, cols, 2> fMat = {{0}};
     ammonite::copy(aMat, fMat);
     for (std::size_t col = 0; col < cols; col++) {
@@ -172,7 +179,7 @@ namespace {
       }
     }
 
-    //Check vectors are fully preserved when copying to a max column count matrix
+    //Check matrices are fully preserved when copying to a max column count matrix
     ammonite::Mat<double, 4, rows> cMat = {{0}};
     ammonite::copyCast(aMat, cMat);
     for (std::size_t col = 0; col < cols; col++) {
@@ -187,7 +194,7 @@ namespace {
       }
     }
 
-    //Check vectors are fully preserved when copying to a min column count matrix
+    //Check matrices are fully preserved when copying to a min column count matrix
     ammonite::Mat<double, 2, rows> dMat = {{0}};
     ammonite::copyCast(aMat, dMat);
     for (std::size_t col = 0; col < 2; col++) {
@@ -202,7 +209,7 @@ namespace {
       }
     }
 
-    //Check vectors are fully preserved when copying to a max row count matrix
+    //Check matrices are fully preserved when copying to a max row count matrix
     ammonite::Mat<double, cols, 4> eMat = {{0}};
     ammonite::copyCast(aMat, eMat);
     for (std::size_t col = 0; col < cols; col++) {
@@ -217,7 +224,7 @@ namespace {
       }
     }
 
-    //Check vectors are fully preserved when copying to a min row count matrix
+    //Check matrices are fully preserved when copying to a min row count matrix
     ammonite::Mat<double, cols, 2> fMat = {{0}};
     ammonite::copyCast(aMat, fMat);
     for (std::size_t col = 0; col < cols; col++) {
