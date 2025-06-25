@@ -114,14 +114,14 @@ namespace {
         if (aMat[col][row] != dMat[col][row]) {
           ammonite::utils::error << "Matrix column count shrink copy failed" << std::endl;
           ammonite::utils::normal << "  Result:\n" << ammonite::formatMatrix(dMat) \
-                                  << "\n  Expected:\n" << ammonite::formatMatrix(bMat) \
+                                  << "\n  Expected:\n" << ammonite::formatMatrix(aMat) \
                                   << std::endl;
           return false;
         }
       }
     }
 
-    //Check vectors are fully preserved when copying to a max column count matrix
+    //Check vectors are fully preserved when copying to a max row count matrix
     ammonite::Mat<T, cols, 4> eMat = {{0}};
     ammonite::copy(aMat, bMat);
     ammonite::copy(aMat, eMat);
@@ -134,7 +134,7 @@ namespace {
       return false;
     }
 
-    //Check vectors are fully preserved when copying to a min column count matrix
+    //Check vectors are fully preserved when copying to a min row count matrix
     ammonite::Mat<T, cols, 2> fMat = {{0}};
     ammonite::copy(aMat, fMat);
     for (std::size_t col = 0; col < cols; col++) {
@@ -142,7 +142,7 @@ namespace {
         if (aMat[col][row] != fMat[col][row]) {
           ammonite::utils::error << "Matrix row count shrink copy failed" << std::endl;
           ammonite::utils::normal << "  Result:\n" << ammonite::formatMatrix(fMat) \
-                                  << "\n  Expected:\n" << ammonite::formatMatrix(bMat) \
+                                  << "\n  Expected:\n" << ammonite::formatMatrix(aMat) \
                                   << std::endl;
           return false;
         }
@@ -155,7 +155,83 @@ namespace {
   template <typename T, std::size_t cols, std::size_t rows>
             requires ammonite::validMatrix<T, cols, rows>
   bool testCopyCast() {
-    //TODO
+    ammonite::Mat<T, cols, rows> aMat = {{0}};
+    ammonite::Mat<double, cols, rows> bMat = {{0}};
+    randomFillMatrix(aMat);
+
+    ammonite::copyCast(aMat, bMat);
+    for (std::size_t col = 0; col < cols; col++) {
+      for (std::size_t row = 0; row < rows; row++) {
+        if ((double)aMat[col][row] != bMat[col][row]) {
+          ammonite::utils::error << "Matrix copy cast failed" << std::endl;
+          ammonite::utils::normal << "  Result:\n" << ammonite::formatMatrix(bMat) \
+                                  << "\n  Expected:\n" << ammonite::formatMatrix(aMat) \
+                                  << std::endl;
+          return false;
+        }
+      }
+    }
+
+    //Check vectors are fully preserved when copying to a max column count matrix
+    ammonite::Mat<double, 4, rows> cMat = {{0}};
+    ammonite::copyCast(aMat, cMat);
+    for (std::size_t col = 0; col < cols; col++) {
+      for (std::size_t row = 0; row < rows; row++) {
+        if ((double)aMat[col][row] != cMat[col][row]) {
+          ammonite::utils::error << "Matrix column count grow copy cast failed" << std::endl;
+          ammonite::utils::normal << "  Result:\n" << ammonite::formatMatrix(cMat) \
+                                  << "\n  Expected:\n" << ammonite::formatMatrix(aMat) \
+                                  << std::endl;
+          return false;
+        }
+      }
+    }
+
+    //Check vectors are fully preserved when copying to a min column count matrix
+    ammonite::Mat<double, 2, rows> dMat = {{0}};
+    ammonite::copyCast(aMat, dMat);
+    for (std::size_t col = 0; col < 2; col++) {
+      for (std::size_t row = 0; row < rows; row++) {
+        if ((double)aMat[col][row] != dMat[col][row]) {
+          ammonite::utils::error << "Matrix column count shrink copy cast failed" << std::endl;
+          ammonite::utils::normal << "  Result:\n" << ammonite::formatMatrix(dMat) \
+                                  << "\n  Expected:\n" << ammonite::formatMatrix(aMat) \
+                                  << std::endl;
+          return false;
+        }
+      }
+    }
+
+    //Check vectors are fully preserved when copying to a max row count matrix
+    ammonite::Mat<double, cols, 4> eMat = {{0}};
+    ammonite::copyCast(aMat, eMat);
+    for (std::size_t col = 0; col < cols; col++) {
+      for (std::size_t row = 0; row < rows; row++) {
+        if ((double)aMat[col][row] != eMat[col][row]) {
+          ammonite::utils::error << "Matrix row count grow copy cast failed" << std::endl;
+          ammonite::utils::normal << "  Result:\n" << ammonite::formatMatrix(eMat) \
+                                  << "\n  Expected:\n" << ammonite::formatMatrix(aMat) \
+                                  << std::endl;
+          return false;
+        }
+      }
+    }
+
+    //Check vectors are fully preserved when copying to a min row count matrix
+    ammonite::Mat<double, cols, 2> fMat = {{0}};
+    ammonite::copyCast(aMat, fMat);
+    for (std::size_t col = 0; col < cols; col++) {
+      for (std::size_t row = 0; row < 2; row++) {
+        if ((double)aMat[col][row] != fMat[col][row]) {
+          ammonite::utils::error << "Matrix row count shrink copy cast failed" << std::endl;
+          ammonite::utils::normal << "  Result:\n" << ammonite::formatMatrix(fMat) \
+                                  << "\n  Expected:\n" << ammonite::formatMatrix(aMat) \
+                                  << std::endl;
+          return false;
+        }
+      }
+    }
+
     return true;
   }
 }
