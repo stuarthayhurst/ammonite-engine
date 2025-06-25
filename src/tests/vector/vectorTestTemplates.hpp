@@ -165,8 +165,8 @@ namespace {
     }
 
     //Check relevant parts are preserved when copying to a min size vector
-    ammonite::Vec<T, 2> dVec = {0};
-    ammonite::copy(aVec, dVec);
+    ammonite::Vec<double, 2> dVec = {0};
+    ammonite::copyCast(aVec, dVec);
     if ((double)aVec[0] != dVec[0] || (double)aVec[1] != dVec[1]) {
       ammonite::utils::error << "Vector shrink copy cast failed" << std::endl;
       ammonite::utils::normal << "  Result:   " << ammonite::formatVector(dVec) \
