@@ -1,10 +1,12 @@
 #ifndef AMMONITEVECTOR
 #define AMMONITEVECTOR
 
+#include <algorithm>
 #include <cmath>
 #include <cstring>
 #include <functional>
 #include <string>
+#include <type_traits>
 
 //TODO: Convert to <simd> with C++26, drop header filter regex
 //NOLINTNEXTLINE(misc-include-cleaner)
@@ -18,11 +20,13 @@ namespace ammonite {
     //Copy from src to dest, using the size of the smaller vector as the size of the copy
     template <typename T, std::size_t sizeA, std::size_t sizeB>
               requires validVector<T, sizeA> && validVector<T, sizeB>
-    void copy(const Vec<T, sizeA>& src, Vec<T, sizeB>& dest) {
-      if constexpr (sizeA <= sizeB) {
-        std::memcpy(&dest[0], &src[0], sizeof(src));
+    constexpr void copy(const Vec<T, sizeA>& src, Vec<T, sizeB>& dest) {
+      constexpr std::size_t minSize = std::min(sizeA, sizeB);
+      if (std::is_constant_evaluated()) {
+        //Slower, constexpr-friendly copy
+        std::copy(&src[0], &src[minSize], &dest[0]);
       } else {
-        std::memcpy(&dest[0], &src[0], sizeof(dest));
+        std::memcpy(&dest[0], &src[0], minSize * sizeof(src[0]));
       }
     }
 
@@ -33,10 +37,12 @@ namespace ammonite {
     template <typename T, std::size_t sizeA, typename S, std::size_t sizeB>
               requires validVector<T, sizeA> && validVector<S, sizeB>
     constexpr void copyCast(const Vec<T, sizeA>& src, Vec<S, sizeB>& dest) {
-      if constexpr (sizeA <= sizeB) {
-        std::copy(&src[0], &src[sizeA], &dest[0]);
+      if constexpr (std::is_same_v<T, S>) {
+        //Faster runtime copies for equal types
+        ammonite::copy(src, dest);
       } else {
-        std::copy(&src[0], &src[sizeB], &dest[0]);
+        constexpr std::size_t minSize = std::min(sizeA, sizeB);
+        std::copy(&src[0], &src[minSize], &dest[0]);
       }
     }
 
@@ -44,8 +50,21 @@ namespace ammonite {
      - Return true if two vectors of the same size and type have identical elements
     */
     template <typename T, std::size_t size> requires validVector<T, size>
-    bool equal(const Vec<T, size>& a, const Vec<T, size>& b) {
-      return (std::memcmp(&a[0], &b[0], sizeof(a)) == 0);
+    constexpr bool equal(const Vec<T, size>& a, const Vec<T, size>& b) {
+      //NOLINTBEGIN(readability-else-after-return)
+      if (std::is_constant_evaluated()) {
+        //Slower, constexpr-friendly equality check
+        for (std::size_t i = 0; i < size; i++) {
+          if (a[i] != b[i]) {
+            return false;
+          }
+        }
+
+        return true;
+      } else {
+        return (std::memcmp(&a[0], &b[0], sizeof(a)) == 0);
+      }
+      //NOLINTEND(readability-else-after-return)
     }
 
     //Add two vectors of the same size and type, storing the result in dest
