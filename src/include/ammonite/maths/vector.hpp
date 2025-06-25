@@ -22,7 +22,7 @@ namespace ammonite {
               requires validVector<T, sizeA> && validVector<T, sizeB>
     constexpr void copy(const Vec<T, sizeA>& src, Vec<T, sizeB>& dest) {
       constexpr std::size_t minSize = std::min(sizeA, sizeB);
-      if (std::is_constant_evaluated()) {
+      if consteval {
         //Slower, constexpr-friendly copy
         std::copy(&src[0], &src[minSize], &dest[0]);
       } else {
@@ -50,7 +50,7 @@ namespace ammonite {
     template <typename T, std::size_t size> requires validVector<T, size>
     constexpr bool equal(const Vec<T, size>& a, const Vec<T, size>& b) {
       //NOLINTBEGIN(readability-else-after-return)
-      if (std::is_constant_evaluated()) {
+      if consteval {
         //Slower, constexpr-friendly equality check
         for (std::size_t i = 0; i < size; i++) {
           if (a[i] != b[i]) {

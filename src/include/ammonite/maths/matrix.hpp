@@ -19,7 +19,7 @@ namespace ammonite {
     //Copy from src to dest for two equally sized and typed matrices
     template <typename T, std::size_t cols, std::size_t rows> requires validMatrix<T, cols, rows>
     constexpr void copy(const Mat<T, cols, rows>& src, Mat<T, cols, rows>& dest) {
-      if (std::is_constant_evaluated()) {
+      if consteval {
         //Slower, constexpr-friendly copy
         std::copy(&src[0][0], &src[cols - 1][rows], &dest[0][0]);
       } else {
@@ -35,7 +35,7 @@ namespace ammonite {
       constexpr std::size_t minCols = std::min(colsA, colsB);
       if constexpr (rowsA == rowsB) {
         //Columns are equally sized, copy up to the size of the smaller matrix
-        if (std::is_constant_evaluated()) {
+        if consteval {
           //Slower, constexpr-friendly copy
           std::copy(&src[0][0], &src[minCols - 1][rowsA], &dest[0][0]);
         } else {
@@ -95,7 +95,7 @@ namespace ammonite {
               requires validMatrix<T, cols, rows>
     constexpr bool equal(const Mat<T, cols, rows>& a, const Mat<T, cols, rows>& b) {
       //NOLINTBEGIN(readability-else-after-return)
-      if (std::is_constant_evaluated()) {
+      if consteval {
         //Slower, constexpr-friendly equality check
         for (std::size_t col = 0; col < cols; col++) {
           for (std::size_t row = 0; row < rows; row++) {
