@@ -33,7 +33,7 @@ namespace ammonite {
       } else {
         //Columns are differently sized, copy each column individually
         for (std::size_t i = 0; i < minCols; i++) {
-          copy(src[i], dest[i]);
+          ammonite::copy(src[i], dest[i]);
         }
       }
     }
@@ -45,7 +45,7 @@ namespace ammonite {
     template <typename T, typename S, std::size_t cols, std::size_t rows>
               requires validMatrix<T, cols, rows> && validMatrix<S, cols, rows>
     void copyCast(const Mat<T, cols, rows>& src, Mat<S, cols, rows>& dest) {
-      std::copy(&src[0], &src[cols * rows], &dest[0]);
+      std::copy(&src[0][0], &src[cols - 1][rows], &dest[0][0]);
     }
 
     /*
@@ -54,17 +54,17 @@ namespace ammonite {
     */
     template <typename T, std::size_t colsA, std::size_t rowsA,
               typename S, std::size_t colsB, std::size_t rowsB>
-              requires validMatrix<T, colsA, rowsA> && validMatrix<T, colsB, rowsB> &&
-              (!std::is_same_v<T, S> && (colsA != colsB || rowsA != rowsB))
-    void copyCast(const Mat<T, colsA, rowsA>& src, Mat<T, colsB, rowsB>& dest) {
+              requires validMatrix<T, colsA, rowsA> && validMatrix<S, colsB, rowsB> &&
+              (colsA != colsB || rowsA != rowsB)
+    void copyCast(const Mat<T, colsA, rowsA>& src, Mat<S, colsB, rowsB>& dest) {
       constexpr std::size_t minCols = std::min(colsA, colsB);
       if constexpr (rowsA == rowsB) {
         //Columns are equally sized, copy up to the size of the smaller matrix
-        std::copy(&src[0], &src[minCols * rowsA], sizeof(Mat<T, minCols, rowsA>));
+        std::copy(&src[0][0], &src[minCols - 1][rowsA], &dest[0][0]);
       } else {
         //Columns are differently sized, copy each column individually
         for (std::size_t i = 0; i < minCols; i++) {
-          copy(src[i], dest[i]);
+          ammonite::copyCast(src[i], dest[i]);
         }
       }
     }
