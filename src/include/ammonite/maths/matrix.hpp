@@ -10,6 +10,7 @@
 #include <experimental/simd>
 
 #include "matrixTypes.hpp"
+#include "vector.hpp"
 
 namespace ammonite {
   //Maths operations
