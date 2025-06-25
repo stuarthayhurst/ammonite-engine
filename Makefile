@@ -194,7 +194,7 @@ $(OBJECT_DIR)/tests/%.linted: ./src/tests/% .clang-tidy $(TEST_HEADERS_SOURCE) $
 	@touch "$@"
 
 
-.PHONY: build tests all demo threads maths debug library headers install uninstall run_lint lint run_lint_tests lint_tests lint_all clean cache icons
+.PHONY: build tests all demo threads maths debug library headers install uninstall lint_compile_commands run_lint run_lint_tests lint lint_tests lint_all clean cache icons
 
 
 # --------------------------------
@@ -254,13 +254,13 @@ uninstall:
 # Linting phony recipes
 # --------------------------------
 
+lint_compile_commands:
+	@$(MAKE) -B --no-print-directory $(BUILD_DIR)/compile_commands.json
 run_lint: $(LINT_FILES)
-lint:
-	@$(MAKE) -B --no-print-directory $(BUILD_DIR)/compile_commands.json
-	@$(MAKE) --no-print-directory run_lint
 run_lint_tests: $(TEST_LINT_FILES)
-lint_tests:
-	@$(MAKE) -B --no-print-directory $(BUILD_DIR)/compile_commands.json
+lint: lint_compile_commands
+	@$(MAKE) --no-print-directory run_lint
+lint_tests: lint_compile_commands
 	@$(MAKE) --no-print-directory run_lint_tests
 lint_all: lint lint_tests
 
