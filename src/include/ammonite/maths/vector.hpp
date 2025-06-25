@@ -46,9 +46,7 @@ namespace ammonite {
       }
     }
 
-    /*
-     - Return true if two vectors of the same size and type have identical elements
-    */
+    //Return true if two vectors of the same size and type have identical elements
     template <typename T, std::size_t size> requires validVector<T, size>
     constexpr bool equal(const Vec<T, size>& a, const Vec<T, size>& b) {
       //NOLINTBEGIN(readability-else-after-return)
