@@ -12,6 +12,7 @@
 
 #include "matrixTypes.hpp"
 #include "vector.hpp"
+#include "vectorTypes.hpp"
 
 namespace ammonite {
   //Maths operations
@@ -110,6 +111,31 @@ namespace ammonite {
         return (std::memcmp(&a[0], &b[0], sizeof(a)) == 0);
       }
       //NOLINTEND(readability-else-after-return)
+    }
+
+    //Set the diagonal of the matrix to a scalar
+    template <typename T, std::size_t cols, std::size_t rows>
+              requires validMatrix<T, cols, rows>
+    constexpr void diagonal(Mat<T, cols, rows>& a, T scalar) {
+      constexpr std::size_t minSize = std::min(cols, rows);
+      for (std::size_t i = 0; i < minSize; i++) {
+        a[i][i] = scalar;
+      }
+    }
+
+    /*
+     - Set the diagonal of the matrix to a vector
+     - The vector's length must match one dimension, and not exceed the other
+    */
+    template <typename T, std::size_t cols, std::size_t rows,
+              typename S, std::size_t size>
+              requires validMatrix<T, cols, rows> && validVector<T, size> &&
+              (((size == cols) && (size <= rows)) ||
+              ((size == rows) && (size <= cols)))
+    constexpr void diagonal(Mat<T, cols, rows>& a, Vec<T, size> b) {
+      for (std::size_t i = 0; i < size; i++) {
+        a[i][i] = b[i];
+      }
     }
   }
 
