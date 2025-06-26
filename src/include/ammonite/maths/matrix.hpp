@@ -18,7 +18,8 @@ namespace ammonite {
   //Maths operations
   inline namespace maths {
     //Copy from src to dest for two equally sized and typed matrices
-    template <typename T, std::size_t cols, std::size_t rows> requires validMatrix<T, cols, rows>
+    template <typename T, unsigned int cols, unsigned int rows>
+              requires validMatrix<T, cols, rows>
     constexpr void copy(const Mat<T, cols, rows>& src, Mat<T, cols, rows>& dest) {
       if consteval {
         //Slower, constexpr-friendly copy
@@ -29,11 +30,12 @@ namespace ammonite {
     }
 
     //Copy from src to dest for two equally typed but differently sized matrices
-    template <typename T, std::size_t colsA, std::size_t rowsA, std::size_t colsB, std::size_t rowsB>
+    template <typename T, unsigned int colsA, unsigned int rowsA,
+              unsigned int colsB, unsigned int rowsB>
               requires validMatrix<T, colsA, rowsA> && validMatrix<T, colsB, rowsB> &&
               (colsA != colsB || rowsA != rowsB)
     constexpr void copy(const Mat<T, colsA, rowsA>& src, Mat<T, colsB, rowsB>& dest) {
-      constexpr std::size_t minCols = std::min(colsA, colsB);
+      constexpr unsigned int minCols = std::min(colsA, colsB);
       if constexpr (rowsA == rowsB) {
         //Columns are equally sized, copy up to the size of the smaller matrix
         if consteval {
@@ -44,7 +46,7 @@ namespace ammonite {
         }
       } else {
         //Columns are differently sized, copy each column individually
-        for (std::size_t i = 0; i < minCols; i++) {
+        for (unsigned int i = 0; i < minCols; i++) {
           ammonite::copy(src[i], dest[i]);
         }
       }
@@ -54,7 +56,7 @@ namespace ammonite {
      - Copy from src to dest for two equally sized but differently typed matrices
      - Cast every element during the copy
     */
-    template <typename T, typename S, std::size_t cols, std::size_t rows>
+    template <typename T, typename S, unsigned int cols, unsigned int rows>
               requires validMatrix<T, cols, rows> && validMatrix<S, cols, rows>
     constexpr void copyCast(const Mat<T, cols, rows>& src, Mat<S, cols, rows>& dest) {
       if constexpr (std::is_same_v<T, S>) {
@@ -69,8 +71,8 @@ namespace ammonite {
      - Copy from src to dest for two differently typed and differently sized matrices
      - Cast every element during the copy
     */
-    template <typename T, std::size_t colsA, std::size_t rowsA,
-              typename S, std::size_t colsB, std::size_t rowsB>
+    template <typename T, unsigned int colsA, unsigned int rowsA,
+              typename S, unsigned int colsB, unsigned int rowsB>
               requires validMatrix<T, colsA, rowsA> && validMatrix<S, colsB, rowsB> &&
               (colsA != colsB || rowsA != rowsB)
     constexpr void copyCast(const Mat<T, colsA, rowsA>& src, Mat<S, colsB, rowsB>& dest) {
@@ -78,13 +80,13 @@ namespace ammonite {
         //Faster runtime copies for equal types
         ammonite::copy(src, dest);
       } else {
-        constexpr std::size_t minCols = std::min(colsA, colsB);
+        constexpr unsigned int minCols = std::min(colsA, colsB);
         if constexpr (rowsA == rowsB) {
           //Columns are equally sized, copy up to the size of the smaller matrix
           std::copy(&src[0][0], &src[minCols - 1][rowsA], &dest[0][0]);
         } else {
           //Columns are differently sized, copy each column individually
-          for (std::size_t i = 0; i < minCols; i++) {
+          for (unsigned int i = 0; i < minCols; i++) {
             ammonite::copyCast(src[i], dest[i]);
           }
         }
@@ -92,14 +94,14 @@ namespace ammonite {
     }
 
     //Return true if two matrices of the same size and type have identical elements
-    template <typename T, std::size_t cols, std::size_t rows>
+    template <typename T, unsigned int cols, unsigned int rows>
               requires validMatrix<T, cols, rows>
     constexpr bool equal(const Mat<T, cols, rows>& a, const Mat<T, cols, rows>& b) {
       //NOLINTBEGIN(readability-else-after-return)
       if consteval {
         //Slower, constexpr-friendly equality check
-        for (std::size_t col = 0; col < cols; col++) {
-          for (std::size_t row = 0; row < rows; row++) {
+        for (unsigned int col = 0; col < cols; col++) {
+          for (unsigned int row = 0; row < rows; row++) {
             if (a[col][row] != b[col][row]) {
               return false;
             }
@@ -114,11 +116,11 @@ namespace ammonite {
     }
 
     //Set the diagonal of the matrix to a scalar
-    template <typename T, std::size_t cols, std::size_t rows>
+    template <typename T, unsigned int cols, unsigned int rows>
               requires validMatrix<T, cols, rows>
     constexpr void diagonal(Mat<T, cols, rows>& a, T scalar) {
-      constexpr std::size_t minSize = std::min(cols, rows);
-      for (std::size_t i = 0; i < minSize; i++) {
+      constexpr unsigned int minSize = std::min(cols, rows);
+      for (unsigned int i = 0; i < minSize; i++) {
         a[i][i] = scalar;
       }
     }
@@ -127,12 +129,12 @@ namespace ammonite {
      - Set the diagonal of the matrix to a vector
      - The vector's length must match one dimension, and not exceed the other
     */
-    template <typename T, std::size_t cols, std::size_t rows, std::size_t size>
+    template <typename T, unsigned int cols, unsigned int rows, unsigned int size>
               requires validMatrix<T, cols, rows> && validVector<T, size> &&
               (((size == cols) && (size <= rows)) ||
               ((size == rows) && (size <= cols)))
     constexpr void diagonal(Mat<T, cols, rows>& a, const Vec<T, size>& b) {
-      for (std::size_t i = 0; i < size; i++) {
+      for (unsigned int i = 0; i < size; i++) {
         a[i][i] = b[i];
       }
     }
@@ -140,16 +142,16 @@ namespace ammonite {
 
   //Utility / support functions
   inline namespace maths {
-    template<typename T, std::size_t cols, std::size_t rows>
+    template<typename T, unsigned int cols, unsigned int rows>
              requires validMatrix<T, cols, rows>
     std::string formatMatrix(const Mat<T, cols, rows>& matrix) {
       std::string result;
-      for (std::size_t row = 0; row < rows; row++) {
+      for (unsigned int row = 0; row < rows; row++) {
         if (row != 0) {
           result += "\n";
         }
 
-        for (std::size_t col = 0; col < cols; col++) {
+        for (unsigned int col = 0; col < cols; col++) {
           if (col != 0) {
             result += ", ";
           }

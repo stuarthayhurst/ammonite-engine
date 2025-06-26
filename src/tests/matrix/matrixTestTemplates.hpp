@@ -3,7 +3,6 @@
 
 #include <algorithm>
 #include <cmath>
-#include <cstddef>
 #include <cstdint>
 #include <cstring>
 #include <iostream>
@@ -16,17 +15,17 @@
 
 //Test helpers
 namespace {
-  template <typename T, std::size_t cols, std::size_t rows>
+  template <typename T, unsigned int cols, unsigned int rows>
             requires ammonite::validMatrix<T, cols, rows>
   void randomFillMatrix(ammonite::Mat<T, cols, rows>& mat) {
-    for (std::size_t col = 0; col < cols; col++) {
-      for (std::size_t row = 0; row < rows; row++) {
+    for (unsigned int col = 0; col < cols; col++) {
+      for (unsigned int row = 0; row < rows; row++) {
         mat[col][row] = (T)ammonite::utils::randomDouble(1000000.0f);
       }
     }
   }
 
-  template <typename T, std::size_t cols, std::size_t rows>
+  template <typename T, unsigned int cols, unsigned int rows>
             requires ammonite::validMatrix<T, cols, rows>
   bool roughly(T a, T b) {
     if constexpr (std::is_integral_v<T>) {
@@ -39,7 +38,7 @@ namespace {
 
 //Tests
 namespace {
-  template <typename T, std::size_t cols, std::size_t rows>
+  template <typename T, unsigned int cols, unsigned int rows>
             requires ammonite::validMatrix<T, cols, rows>
   bool testEqual() {
     ammonite::Mat<T, cols, rows> aMat = {{0}};
@@ -47,8 +46,8 @@ namespace {
     randomFillMatrix(aMat);
 
     //Set bMat to aMat
-    for (std::size_t col = 0; col < cols; col++) {
-      for (std::size_t row = 0; row < rows; row++) {
+    for (unsigned int col = 0; col < cols; col++) {
+      for (unsigned int row = 0; row < rows; row++) {
         bMat[col][row] = aMat[col][row];
       }
     }
@@ -62,8 +61,8 @@ namespace {
       return false;
     }
 
-    for (std::size_t col = 0; col < cols; col++) {
-      for (std::size_t row = 0; row < rows; row++) {
+    for (unsigned int col = 0; col < cols; col++) {
+      for (unsigned int row = 0; row < rows; row++) {
         //Safely guarantee a modification to bMat
         uintmax_t tmp = 0;
         std::memcpy(&tmp, &bMat[col][row], sizeof(bMat[col][row]));
@@ -87,7 +86,7 @@ namespace {
     return true;
   }
 
-  template <typename T, std::size_t cols, std::size_t rows>
+  template <typename T, unsigned int cols, unsigned int rows>
             requires ammonite::validMatrix<T, cols, rows>
   bool testCopy() {
     ammonite::Mat<T, cols, rows> aMat = {{0}};
@@ -119,8 +118,8 @@ namespace {
     //Check matrices are fully preserved when copying to a min column count matrix
     ammonite::Mat<T, 2, rows> dMat = {{0}};
     ammonite::copy(aMat, dMat);
-    for (std::size_t col = 0; col < 2; col++) {
-      for (std::size_t row = 0; row < rows; row++) {
+    for (unsigned int col = 0; col < 2; col++) {
+      for (unsigned int row = 0; row < rows; row++) {
         if (aMat[col][row] != dMat[col][row]) {
           ammonite::utils::error << "Matrix column count shrink copy failed" << std::endl;
           ammonite::utils::normal << "  Result:\n" << ammonite::formatMatrix(dMat) \
@@ -147,8 +146,8 @@ namespace {
     //Check matrices are fully preserved when copying to a min row count matrix
     ammonite::Mat<T, cols, 2> fMat = {{0}};
     ammonite::copy(aMat, fMat);
-    for (std::size_t col = 0; col < cols; col++) {
-      for (std::size_t row = 0; row < 2; row++) {
+    for (unsigned int col = 0; col < cols; col++) {
+      for (unsigned int row = 0; row < 2; row++) {
         if (aMat[col][row] != fMat[col][row]) {
           ammonite::utils::error << "Matrix row count shrink copy failed" << std::endl;
           ammonite::utils::normal << "  Result:\n" << ammonite::formatMatrix(fMat) \
@@ -162,7 +161,7 @@ namespace {
     return true;
   }
 
-  template <typename T, std::size_t cols, std::size_t rows>
+  template <typename T, unsigned int cols, unsigned int rows>
             requires ammonite::validMatrix<T, cols, rows>
   bool testCopyCast() {
     ammonite::Mat<T, cols, rows> aMat = {{0}};
@@ -170,8 +169,8 @@ namespace {
     randomFillMatrix(aMat);
 
     ammonite::copyCast(aMat, bMat);
-    for (std::size_t col = 0; col < cols; col++) {
-      for (std::size_t row = 0; row < rows; row++) {
+    for (unsigned int col = 0; col < cols; col++) {
+      for (unsigned int row = 0; row < rows; row++) {
         if ((double)aMat[col][row] != bMat[col][row]) {
           ammonite::utils::error << "Matrix copy cast failed" << std::endl;
           ammonite::utils::normal << "  Result:\n" << ammonite::formatMatrix(bMat) \
@@ -185,8 +184,8 @@ namespace {
     //Check matrices are fully preserved when copying to a max column count matrix
     ammonite::Mat<double, 4, rows> cMat = {{0}};
     ammonite::copyCast(aMat, cMat);
-    for (std::size_t col = 0; col < cols; col++) {
-      for (std::size_t row = 0; row < rows; row++) {
+    for (unsigned int col = 0; col < cols; col++) {
+      for (unsigned int row = 0; row < rows; row++) {
         if ((double)aMat[col][row] != cMat[col][row]) {
           ammonite::utils::error << "Matrix column count grow copy cast failed" << std::endl;
           ammonite::utils::normal << "  Result:\n" << ammonite::formatMatrix(cMat) \
@@ -200,8 +199,8 @@ namespace {
     //Check matrices are fully preserved when copying to a min column count matrix
     ammonite::Mat<double, 2, rows> dMat = {{0}};
     ammonite::copyCast(aMat, dMat);
-    for (std::size_t col = 0; col < 2; col++) {
-      for (std::size_t row = 0; row < rows; row++) {
+    for (unsigned int col = 0; col < 2; col++) {
+      for (unsigned int row = 0; row < rows; row++) {
         if ((double)aMat[col][row] != dMat[col][row]) {
           ammonite::utils::error << "Matrix column count shrink copy cast failed" << std::endl;
           ammonite::utils::normal << "  Result:\n" << ammonite::formatMatrix(dMat) \
@@ -215,8 +214,8 @@ namespace {
     //Check matrices are fully preserved when copying to a max row count matrix
     ammonite::Mat<double, cols, 4> eMat = {{0}};
     ammonite::copyCast(aMat, eMat);
-    for (std::size_t col = 0; col < cols; col++) {
-      for (std::size_t row = 0; row < rows; row++) {
+    for (unsigned int col = 0; col < cols; col++) {
+      for (unsigned int row = 0; row < rows; row++) {
         if ((double)aMat[col][row] != eMat[col][row]) {
           ammonite::utils::error << "Matrix row count grow copy cast failed" << std::endl;
           ammonite::utils::normal << "  Result:\n" << ammonite::formatMatrix(eMat) \
@@ -230,8 +229,8 @@ namespace {
     //Check matrices are fully preserved when copying to a min row count matrix
     ammonite::Mat<double, cols, 2> fMat = {{0}};
     ammonite::copyCast(aMat, fMat);
-    for (std::size_t col = 0; col < cols; col++) {
-      for (std::size_t row = 0; row < 2; row++) {
+    for (unsigned int col = 0; col < cols; col++) {
+      for (unsigned int row = 0; row < 2; row++) {
         if ((double)aMat[col][row] != fMat[col][row]) {
           ammonite::utils::error << "Matrix row count shrink copy cast failed" << std::endl;
           ammonite::utils::normal << "  Result:\n" << ammonite::formatMatrix(fMat) \
@@ -245,17 +244,17 @@ namespace {
     return true;
   }
 
-  template <typename T, std::size_t cols, std::size_t rows>
+  template <typename T, unsigned int cols, unsigned int rows>
             requires ammonite::validMatrix<T, cols, rows>
   bool testDiagonal() {
-    constexpr std::size_t minSize = std::min(cols, rows);
+    constexpr unsigned int minSize = std::min(cols, rows);
     ammonite::Mat<T, cols, rows> aMat = {{0}};
     ammonite::Vec<T, minSize> minLengthVec = {0};
     randomFillVector(minLengthVec);
 
     //Test scalar diagonal
     ammonite::diagonal(aMat, minLengthVec[0]);
-    for (std::size_t i = 0; i < minSize; i++) {
+    for (unsigned int i = 0; i < minSize; i++) {
       if (aMat[i][i] != minLengthVec[0]) {
         ammonite::utils::error << "Matrix scalar diagonal set failed" << std::endl;
         ammonite::utils::normal << "  Result:\n" << ammonite::formatMatrix(aMat) \
@@ -267,7 +266,7 @@ namespace {
 
     //Test vector diagonal
     ammonite::diagonal(aMat, minLengthVec);
-    for (std::size_t i = 0; i < minSize; i++) {
+    for (unsigned int i = 0; i < minSize; i++) {
       if (aMat[i][i] != minLengthVec[i]) {
         ammonite::utils::error << "Matrix vector diagonal set failed" << std::endl;
         ammonite::utils::normal << "  Result:\n" << ammonite::formatMatrix(aMat) \
@@ -282,7 +281,7 @@ namespace {
 }
 
 namespace tests {
-  template <typename T, std::size_t cols, std::size_t rows>
+  template <typename T, unsigned int cols, unsigned int rows>
             requires ammonite::validMatrix<T, cols, rows>
   bool testMatrix(std::string_view typeName) {
     ammonite::utils::normal << "Testing " << cols << "x" << rows << " " \

@@ -18,10 +18,10 @@ namespace ammonite {
   //Maths operations
   inline namespace maths {
     //Copy from src to dest, using the size of the smaller vector as the size of the copy
-    template <typename T, std::size_t sizeA, std::size_t sizeB>
+    template <typename T, unsigned int sizeA, unsigned int sizeB>
               requires validVector<T, sizeA> && validVector<T, sizeB>
     constexpr void copy(const Vec<T, sizeA>& src, Vec<T, sizeB>& dest) {
-      constexpr std::size_t minSize = std::min(sizeA, sizeB);
+      constexpr unsigned int minSize = std::min(sizeA, sizeB);
       if consteval {
         //Slower, constexpr-friendly copy
         std::copy(&src[0], &src[minSize], &dest[0]);
@@ -34,25 +34,25 @@ namespace ammonite {
      - Copy from src to dest, using the size of the smaller vector as the size of the copy
      - Additionally, cast each element during the copy
     */
-    template <typename T, std::size_t sizeA, typename S, std::size_t sizeB>
+    template <typename T, unsigned int sizeA, typename S, unsigned int sizeB>
               requires validVector<T, sizeA> && validVector<S, sizeB>
     constexpr void copyCast(const Vec<T, sizeA>& src, Vec<S, sizeB>& dest) {
       if constexpr (std::is_same_v<T, S>) {
         //Faster runtime copies for equal types
         ammonite::copy(src, dest);
       } else {
-        constexpr std::size_t minSize = std::min(sizeA, sizeB);
+        constexpr unsigned int minSize = std::min(sizeA, sizeB);
         std::copy(&src[0], &src[minSize], &dest[0]);
       }
     }
 
     //Return true if two vectors of the same size and type have identical elements
-    template <typename T, std::size_t size> requires validVector<T, size>
+    template <typename T, unsigned int size> requires validVector<T, size>
     constexpr bool equal(const Vec<T, size>& a, const Vec<T, size>& b) {
       //NOLINTBEGIN(readability-else-after-return)
       if consteval {
         //Slower, constexpr-friendly equality check
-        for (std::size_t i = 0; i < size; i++) {
+        for (unsigned int i = 0; i < size; i++) {
           if (a[i] != b[i]) {
             return false;
           }
@@ -66,7 +66,7 @@ namespace ammonite {
     }
 
     //Add two vectors of the same size and type, storing the result in dest
-    template <typename T, std::size_t size> requires validVector<T, size>
+    template <typename T, unsigned int size> requires validVector<T, size>
     void add(const Vec<T, size>& a, const Vec<T, size>& b, Vec<T, size>& dest) {
       std::experimental::fixed_size_simd<T, size> aSimd(&a[0], std::experimental::element_aligned);
       std::experimental::fixed_size_simd<T, size> bSimd(&b[0], std::experimental::element_aligned);
@@ -76,7 +76,7 @@ namespace ammonite {
     }
 
     //Add two vectors of the same size and type, storing the result in the first vector
-    template <typename T, std::size_t size> requires validVector<T, size>
+    template <typename T, unsigned int size> requires validVector<T, size>
     void add(Vec<T, size>& a, const Vec<T, size>& b) {
       add(a, b, a);
     }
@@ -85,7 +85,7 @@ namespace ammonite {
      - Add a constant to each element of a vector, storing the result in dest
        - The constant and elements must have the same type
     */
-    template <typename T, std::size_t size> requires validVector<T, size>
+    template <typename T, unsigned int size> requires validVector<T, size>
     void add(const Vec<T, size>& a, T b, Vec<T, size>& dest) {
       std::experimental::fixed_size_simd<T, size> aSimd(&a[0], std::experimental::element_aligned);
       std::experimental::fixed_size_simd<T, size> bSimd = b;
@@ -98,13 +98,13 @@ namespace ammonite {
      - Add a constant to each element of a vector, storing the result in the same vector
        - The constant and elements must have the same type
     */
-    template <typename T, std::size_t size> requires validVector<T, size>
+    template <typename T, unsigned int size> requires validVector<T, size>
     void add(Vec<T, size>& a, T b) {
       add(a, b, a);
     }
 
     //Subtract vector b from vector a of the same size and type, storing the result in dest
-    template <typename T, std::size_t size> requires validVector<T, size>
+    template <typename T, unsigned int size> requires validVector<T, size>
     void sub(const Vec<T, size>& a, const Vec<T, size>& b, Vec<T, size>& dest) {
       std::experimental::fixed_size_simd<T, size> aSimd(&a[0], std::experimental::element_aligned);
       std::experimental::fixed_size_simd<T, size> bSimd(&b[0], std::experimental::element_aligned);
@@ -114,7 +114,7 @@ namespace ammonite {
     }
 
     //Subtract vector b from vector a of the same size and type, storing the result in vector a
-    template <typename T, std::size_t size> requires validVector<T, size>
+    template <typename T, unsigned int size> requires validVector<T, size>
     void sub(Vec<T, size>& a, const Vec<T, size>& b) {
       sub(a, b, a);
     }
@@ -123,7 +123,7 @@ namespace ammonite {
      - Subtract a constant from each element of a vector, storing the result in dest
        - The constant and elements must have the same type
     */
-    template <typename T, std::size_t size> requires validVector<T, size>
+    template <typename T, unsigned int size> requires validVector<T, size>
     void sub(const Vec<T, size>& a, T b, Vec<T, size>& dest) {
       std::experimental::fixed_size_simd<T, size> aSimd(&a[0], std::experimental::element_aligned);
       std::experimental::fixed_size_simd<T, size> bSimd = b;
@@ -136,7 +136,7 @@ namespace ammonite {
      - Subtract a constant from each element of a vector, storing the result in the same vector
        - The constant and elements must have the same type
     */
-    template <typename T, std::size_t size> requires validVector<T, size>
+    template <typename T, unsigned int size> requires validVector<T, size>
     void sub(Vec<T, size>& a, T b) {
       sub(a, b, a);
     }
@@ -145,7 +145,7 @@ namespace ammonite {
      - Multiply each element of a vector by a constant, storing the result in dest
        - The constant and elements must have the same type
     */
-    template <typename T, std::size_t size> requires validVector<T, size>
+    template <typename T, unsigned int size> requires validVector<T, size>
     void scale(const Vec<T, size>& a, T b, Vec<T, size>& dest) {
       std::experimental::fixed_size_simd<T, size> aSimd(&a[0], std::experimental::element_aligned);
       std::experimental::fixed_size_simd<T, size> bSimd = b;
@@ -158,7 +158,7 @@ namespace ammonite {
      - Multiply each element of a vector by a constant, storing the result in the same vector
        - The constant and elements must have the same type
     */
-    template <typename T, std::size_t size> requires validVector<T, size>
+    template <typename T, unsigned int size> requires validVector<T, size>
     void scale(Vec<T, size>& a, T b) {
       scale(a, b, a);
     }
@@ -167,7 +167,7 @@ namespace ammonite {
      - Divide each element of a vector by a constant, storing the result in dest
        - The constant and elements must have the same type
     */
-    template <typename T, std::size_t size> requires validVector<T, size>
+    template <typename T, unsigned int size> requires validVector<T, size>
     void div(const Vec<T, size>& a, T b, Vec<T, size>& dest) {
       std::experimental::fixed_size_simd<T, size> aSimd(&a[0], std::experimental::element_aligned);
       std::experimental::fixed_size_simd<T, size> bSimd = b;
@@ -180,7 +180,7 @@ namespace ammonite {
      - Divide each element of a vector by a constant, storing the result in the same vector
        - The constant and elements must have the same type
     */
-    template <typename T, std::size_t size> requires validVector<T, size>
+    template <typename T, unsigned int size> requires validVector<T, size>
     void div(Vec<T, size>& a, T b) {
       div(a, b, a);
     }
@@ -190,7 +190,7 @@ namespace ammonite {
        - Intermediate calculations are done with the element's type
        - This may give strange results for integral types
     */
-    template <typename T, std::size_t size> requires validVector<T, size>
+    template <typename T, unsigned int size> requires validVector<T, size>
     void normalise(const Vec<T, size>& a, Vec<T, size>& dest) {
       std::experimental::fixed_size_simd<T, size> aSimd(&a[0], std::experimental::element_aligned);
 
@@ -205,13 +205,13 @@ namespace ammonite {
        - Intermediate calculations are done with the element's type
        - This may give strange results for integral types
     */
-    template <typename T, std::size_t size> requires validVector<T, size>
+    template <typename T, unsigned int size> requires validVector<T, size>
     void normalise(Vec<T, size>& a) {
       normalise(a, a);
     }
 
     //Calculate the dot product a vector
-    template <typename T, std::size_t size> requires validVector<T, size>
+    template <typename T, unsigned int size> requires validVector<T, size>
     T dot(const Vec<T, size>& a, const Vec<T, size>& b) {
       std::experimental::fixed_size_simd<T, size> aSimd(&a[0], std::experimental::element_aligned);
       std::experimental::fixed_size_simd<T, size> bSimd(&b[0], std::experimental::element_aligned);
@@ -236,7 +236,7 @@ namespace ammonite {
        - Intermediate calculations are done with the element's type
        - This may give strange results for integral types
     */
-    template <typename T, std::size_t size> requires validVector<T, size>
+    template <typename T, unsigned int size> requires validVector<T, size>
     T length(const Vec<T, size>& a) {
       std::experimental::fixed_size_simd<T, size> aSimd(&a[0], std::experimental::element_aligned);
 
@@ -249,7 +249,7 @@ namespace ammonite {
        - This may give strange results for integral types
      - Logically, this is equivalent to length(b - a)
     */
-    template <typename T, std::size_t size> requires validVector<T, size>
+    template <typename T, unsigned int size> requires validVector<T, size>
     T distance(const Vec<T, size>& a, const Vec<T, size>& b) {
       std::experimental::fixed_size_simd<T, size> aSimd(&a[0], std::experimental::element_aligned);
       std::experimental::fixed_size_simd<T, size> bSimd(&b[0], std::experimental::element_aligned);
@@ -262,10 +262,10 @@ namespace ammonite {
 
   //Utility / support functions
   inline namespace maths {
-    template<typename T, std::size_t size> requires validVector<T, size>
+    template<typename T, unsigned int size> requires validVector<T, size>
     std::string formatVector(const Vec<T, size>& vector) {
       std::string result;
-      for (std::size_t i = 0; i < size; i++) {
+      for (unsigned int i = 0; i < size; i++) {
         if (i != 0) {
           result += ", ";
         }

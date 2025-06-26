@@ -1,7 +1,6 @@
 #ifndef AMMONITEVECTORTYPES
 #define AMMONITEVECTORTYPES
 
-#include <cstddef>
 #include <type_traits>
 
 namespace ammonite {
@@ -12,11 +11,11 @@ namespace ammonite {
     concept vectorType = std::is_arithmetic_v<T> && (std::is_floating_point_v<T> || sizeof(T) >= 4);
 
     //Allowed vector sizes
-    template <std::size_t size>
+    template <unsigned int size>
     concept vectorSize = size >= 2 && size <= 4;
 
     //Allowed vector element type and size combinations
-    template <typename T, std::size_t size>
+    template <typename T, unsigned int size>
     concept validVector = vectorType<T> && vectorSize<size>;
 
 
@@ -34,11 +33,11 @@ namespace ammonite {
          - However, this means "a" won't be modified
        - Prefer "add(a, b, x); add(x, b, a)" to "add(a, b, a); add(a, b, a)"
     */
-    template <typename T, std::size_t size> requires validVector<T, size>
+    template <typename T, unsigned int size> requires validVector<T, size>
     using Vec = T[size];
 
     //Access elements of a Vec using named attributes as references
-    template <typename T, std::size_t size> requires validVector<T, size>
+    template <typename T, unsigned int size> requires validVector<T, size>
     struct NamedVec { };
 
     //NOLINTBEGIN(cppcoreguidelines-avoid-const-or-ref-data-members)

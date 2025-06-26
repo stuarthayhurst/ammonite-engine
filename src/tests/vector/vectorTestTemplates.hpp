@@ -2,7 +2,6 @@
 #define VECTORTESTTEMPLATES
 
 #include <cmath>
-#include <cstddef>
 #include <cstdint>
 #include <cstring>
 #include <iostream>
@@ -14,9 +13,9 @@
 
 //Test helpers
 namespace {
-  template <typename T, std::size_t size> requires ammonite::validVector<T, size>
+  template <typename T, unsigned int size> requires ammonite::validVector<T, size>
   void randomFillVector(ammonite::Vec<T, size>& vec) {
-    for (std::size_t i = 0; i < size; i++) {
+    for (unsigned int i = 0; i < size; i++) {
       if constexpr (std::is_unsigned_v<T>) {
         vec[i] = (T)ammonite::utils::randomUInt(std::numeric_limits<T>::max());
       } else if constexpr (std::is_integral_v<T>) {
@@ -39,7 +38,7 @@ namespace {
 
 //Tests
 namespace {
-  template <typename T, std::size_t size> requires ammonite::validVector<T, size>
+  template <typename T, unsigned int size> requires ammonite::validVector<T, size>
   bool testNamedVec() {
     ammonite::Vec<T, size> aVec = {0};
     ammonite::NamedVec<T, size> namedAVec(aVec);
@@ -54,14 +53,14 @@ namespace {
     return true;
   }
 
-  template <typename T, std::size_t size> requires ammonite::validVector<T, size>
+  template <typename T, unsigned int size> requires ammonite::validVector<T, size>
   bool testEqual() {
     ammonite::Vec<T, size> aVec = {0};
     ammonite::Vec<T, size> bVec = {0};
     randomFillVector(aVec);
 
     //Set bVec to aVec
-    for (std::size_t i = 0; i < size; i++) {
+    for (unsigned int i = 0; i < size; i++) {
       bVec[i] = aVec[i];
     }
 
@@ -74,7 +73,7 @@ namespace {
       return false;
     }
 
-    for (std::size_t i = 0; i < size; i++) {
+    for (unsigned int i = 0; i < size; i++) {
       //Safely guarantee a modification to bVec
       uintmax_t tmp = 0;
       std::memcpy(&tmp, &bVec[i], sizeof(bVec[i]));
@@ -97,7 +96,7 @@ namespace {
     return true;
   }
 
-  template <typename T, std::size_t size> requires ammonite::validVector<T, size>
+  template <typename T, unsigned int size> requires ammonite::validVector<T, size>
   bool testCopy() {
     ammonite::Vec<T, size> aVec = {0};
     ammonite::Vec<T, size> bVec = {0};
@@ -139,14 +138,14 @@ namespace {
     return true;
   }
 
-  template <typename T, std::size_t size> requires ammonite::validVector<T, size>
+  template <typename T, unsigned int size> requires ammonite::validVector<T, size>
   bool testCopyCast() {
     ammonite::Vec<T, size> aVec = {0};
     ammonite::Vec<double, size> bVec = {0};
     randomFillVector(aVec);
 
     ammonite::copyCast(aVec, bVec);
-    for (std::size_t i = 0; i < size; i++) {
+    for (unsigned int i = 0; i < size; i++) {
       if ((double)aVec[i] != bVec[i]) {
         ammonite::utils::error << "Vector copy cast failed" << std::endl;
         ammonite::utils::normal << "  Result:   " << ammonite::formatVector(bVec) \
@@ -159,7 +158,7 @@ namespace {
     //Check vectors are fully preserved when copying to a max size vector
     ammonite::Vec<double, 4> cVec = {0};
     ammonite::copyCast(aVec, cVec);
-    for (std::size_t i = 0; i < size; i++) {
+    for (unsigned int i = 0; i < size; i++) {
       if ((double)aVec[i] != cVec[i]) {
         ammonite::utils::error << "Vector grow copy cast failed" << std::endl;
         ammonite::utils::normal << "  Result:   " << ammonite::formatVector(cVec) \
@@ -183,7 +182,7 @@ namespace {
     return true;
   }
 
-  template <typename T, std::size_t size> requires ammonite::validVector<T, size>
+  template <typename T, unsigned int size> requires ammonite::validVector<T, size>
   bool testAdd() {
     ammonite::Vec<T, size> aVec = {0};
     ammonite::Vec<T, size> bVec = {0};
@@ -193,7 +192,7 @@ namespace {
 
     //Test regular addition
     ammonite::add(aVec, bVec, cVec);
-    for (std::size_t i = 0; i < size; i++) {
+    for (unsigned int i = 0; i < size; i++) {
       if ((T)(aVec[i] + bVec[i]) != cVec[i]) {
         ammonite::utils::error << "Vector addition failed" << std::endl;
         ammonite::utils::normal << "  Input:  " << ammonite::formatVector(aVec) \
@@ -207,7 +206,7 @@ namespace {
     //Test in-place addition
     ammonite::copy(aVec, cVec);
     ammonite::add(cVec, bVec);
-    for (std::size_t i = 0; i < size; i++) {
+    for (unsigned int i = 0; i < size; i++) {
       if ((T)(aVec[i] + bVec[i]) != cVec[i]) {
         ammonite::utils::error << "In-place vector addition failed" << std::endl;
         ammonite::utils::normal << "  Input:  " << ammonite::formatVector(aVec) \
@@ -220,7 +219,7 @@ namespace {
 
     //Test constant addition
     ammonite::add(aVec, bVec[0], cVec);
-    for (std::size_t i = 0; i < size; i++) {
+    for (unsigned int i = 0; i < size; i++) {
       if ((T)(aVec[i] + bVec[0]) != cVec[i]) {
         ammonite::utils::error << "Constant vector addition failed" << std::endl;
         ammonite::utils::normal << "  Input:  " << ammonite::formatVector(aVec) \
@@ -234,7 +233,7 @@ namespace {
     //Test in-place constant addition
     ammonite::copy(aVec, cVec);
     ammonite::add(cVec, bVec[0]);
-    for (std::size_t i = 0; i < size; i++) {
+    for (unsigned int i = 0; i < size; i++) {
       if ((T)(aVec[i] + bVec[0]) != cVec[i]) {
         ammonite::utils::error << "In-place constant vector addition failed" << std::endl;
         ammonite::utils::normal << "  Input:  " << ammonite::formatVector(aVec) \
@@ -248,7 +247,7 @@ namespace {
     return true;
   }
 
-  template <typename T, std::size_t size> requires ammonite::validVector<T, size>
+  template <typename T, unsigned int size> requires ammonite::validVector<T, size>
   bool testSub() {
     ammonite::Vec<T, size> aVec = {0};
     ammonite::Vec<T, size> bVec = {0};
@@ -258,7 +257,7 @@ namespace {
 
     //Test regular subtraction
     ammonite::sub(aVec, bVec, cVec);
-    for (std::size_t i = 0; i < size; i++) {
+    for (unsigned int i = 0; i < size; i++) {
       if ((T)(aVec[i] - bVec[i]) != cVec[i]) {
         ammonite::utils::error << "Vector subtraction failed" << std::endl;
         ammonite::utils::normal << "  Input:  " << ammonite::formatVector(aVec) \
@@ -272,7 +271,7 @@ namespace {
     //Test in-place subtraction
     ammonite::copy(aVec, cVec);
     ammonite::sub(cVec, bVec);
-    for (std::size_t i = 0; i < size; i++) {
+    for (unsigned int i = 0; i < size; i++) {
       if ((T)(aVec[i] - bVec[i]) != cVec[i]) {
         ammonite::utils::error << "In-place vector subtraction failed" << std::endl;
         ammonite::utils::normal << "  Input:  " << ammonite::formatVector(aVec) \
@@ -285,7 +284,7 @@ namespace {
 
     //Test constant subtraction
     ammonite::sub(aVec, bVec[0], cVec);
-    for (std::size_t i = 0; i < size; i++) {
+    for (unsigned int i = 0; i < size; i++) {
       if ((T)(aVec[i] - bVec[0]) != cVec[i]) {
         ammonite::utils::error << "Constant vector subtraction failed" << std::endl;
         ammonite::utils::normal << "  Input:  " << ammonite::formatVector(aVec) \
@@ -299,7 +298,7 @@ namespace {
     //Test in-place constant subtraction
     ammonite::copy(aVec, cVec);
     ammonite::sub(cVec, bVec[0]);
-    for (std::size_t i = 0; i < size; i++) {
+    for (unsigned int i = 0; i < size; i++) {
       if ((T)(aVec[i] - bVec[0]) != cVec[i]) {
         ammonite::utils::error << "In-place constant vector subtraction failed" << std::endl;
         ammonite::utils::normal << "  Input:  " << ammonite::formatVector(aVec) \
@@ -313,7 +312,7 @@ namespace {
     return true;
   }
 
-  template <typename T, std::size_t size> requires ammonite::validVector<T, size>
+  template <typename T, unsigned int size> requires ammonite::validVector<T, size>
   bool testScale() {
     ammonite::Vec<T, size> aVec = {0};
     ammonite::Vec<T, size> bVec = {0};
@@ -323,7 +322,7 @@ namespace {
 
     //Test regular scaling
     ammonite::scale(aVec, bVec[0], cVec);
-    for (std::size_t i = 0; i < size; i++) {
+    for (unsigned int i = 0; i < size; i++) {
       if ((T)(aVec[i] * bVec[0]) != cVec[i]) {
         ammonite::utils::error << "Vector scaling failed" << std::endl;
         ammonite::utils::normal << "  Input:  " << ammonite::formatVector(aVec) \
@@ -337,7 +336,7 @@ namespace {
     //Test in-place scaling
     ammonite::copy(aVec, cVec);
     ammonite::scale(cVec, bVec[0]);
-    for (std::size_t i = 0; i < size; i++) {
+    for (unsigned int i = 0; i < size; i++) {
       if ((T)(aVec[i] * bVec[0]) != cVec[i]) {
         ammonite::utils::error << "In-place vector scaling failed" << std::endl;
         ammonite::utils::normal << "  Input:  " << ammonite::formatVector(aVec) \
@@ -351,7 +350,7 @@ namespace {
     return true;
   }
 
-  template <typename T, std::size_t size> requires ammonite::validVector<T, size>
+  template <typename T, unsigned int size> requires ammonite::validVector<T, size>
   bool testDiv() {
     ammonite::Vec<T, size> aVec = {0};
     ammonite::Vec<T, size> bVec = {0};
@@ -366,7 +365,7 @@ namespace {
 
     //Test regular division
     ammonite::div(aVec, bVec[0], cVec);
-    for (std::size_t i = 0; i < size; i++) {
+    for (unsigned int i = 0; i < size; i++) {
       if ((T)(aVec[i] / bVec[0]) != cVec[i]) {
         ammonite::utils::error << "Vector division failed" << std::endl;
         ammonite::utils::normal << "  Input:  " << ammonite::formatVector(aVec) \
@@ -380,7 +379,7 @@ namespace {
     //Test in-place division
     ammonite::copy(aVec, cVec);
     ammonite::div(cVec, bVec[0]);
-    for (std::size_t i = 0; i < size; i++) {
+    for (unsigned int i = 0; i < size; i++) {
       if ((T)(aVec[i] / bVec[0]) != cVec[i]) {
         ammonite::utils::error << "In-place vector division failed" << std::endl;
         ammonite::utils::normal << "  Input:  " << ammonite::formatVector(aVec) \
@@ -394,7 +393,7 @@ namespace {
     return true;
   }
 
-  template <typename T, std::size_t size> requires ammonite::validVector<T, size>
+  template <typename T, unsigned int size> requires ammonite::validVector<T, size>
   bool testNormalise() {
     ammonite::Vec<T, size> aVec = {0};
     ammonite::Vec<T, size> bVec = {0};
@@ -402,7 +401,7 @@ namespace {
 
     //Adjust all-zero vectors
     bool allZero = true;
-    for (std::size_t i = 0; i < size; i++) {
+    for (unsigned int i = 0; i < size; i++) {
       if (aVec[i] != (T)0) {
         allZero = false;
         break;
@@ -414,7 +413,7 @@ namespace {
     }
 
     T sum = (T)0;
-    for (std::size_t i = 0; i < size; i++) {
+    for (unsigned int i = 0; i < size; i++) {
       sum += aVec[i] * aVec[i];
     }
     T length = (T)std::sqrt(sum);
@@ -426,7 +425,7 @@ namespace {
 
     //Test regular normalisation
     ammonite::normalise(aVec, bVec);
-    for (std::size_t i = 0; i < size; i++) {
+    for (unsigned int i = 0; i < size; i++) {
       if (!roughly((T)(aVec[i] / length), bVec[i])) {
         ammonite::utils::error << "Vector normalisation failed" << std::endl;
         ammonite::utils::normal << "  Input:    " << ammonite::formatVector(aVec) \
@@ -440,7 +439,7 @@ namespace {
     //Test in-place normalisation
     ammonite::copy(aVec, bVec);
     ammonite::normalise(bVec);
-    for (std::size_t i = 0; i < size; i++) {
+    for (unsigned int i = 0; i < size; i++) {
       if (!roughly((T)(aVec[i] / length), bVec[i])) {
         ammonite::utils::error << "In-place vector normalisation failed" << std::endl;
         ammonite::utils::normal << "  Input:    " << ammonite::formatVector(aVec) \
@@ -454,7 +453,7 @@ namespace {
     return true;
   }
 
-  template <typename T, std::size_t size> requires ammonite::validVector<T, size>
+  template <typename T, unsigned int size> requires ammonite::validVector<T, size>
   bool testDot() {
     ammonite::Vec<T, size> aVec = {0};
     ammonite::Vec<T, size> bVec = {0};
@@ -462,7 +461,7 @@ namespace {
     randomFillVector(bVec);
 
     T sum = (T)0;
-    for (std::size_t i = 0; i < size; i++) {
+    for (unsigned int i = 0; i < size; i++) {
       sum += aVec[i] * bVec[i];
     }
 
@@ -479,7 +478,7 @@ namespace {
     return true;
   }
 
-  template <typename T, std::size_t size> requires ammonite::validVector<T, size>
+  template <typename T, unsigned int size> requires ammonite::validVector<T, size>
   bool testCross() {
     if constexpr (size == 3) {
       ammonite::Vec<T, 3> aVec = {0};
@@ -490,9 +489,9 @@ namespace {
 
       //Test cross product
       ammonite::cross(aVec, bVec, cVec);
-      for (std::size_t i = 0; i < 3; i++) {
-        const std::size_t oneOffset = (i + 1) % 3;
-        const std::size_t twoOffset = (i + 2) % 3;
+      for (unsigned int i = 0; i < 3; i++) {
+        const unsigned int oneOffset = (i + 1) % 3;
+        const unsigned int twoOffset = (i + 2) % 3;
         T component = (aVec[oneOffset] * bVec[twoOffset]) - (aVec[twoOffset] * bVec[oneOffset]);
         if (cVec[i] != component) {
           ammonite::utils::error << "Vector cross product failed" << std::endl;
@@ -510,13 +509,13 @@ namespace {
     return true;
   }
 
-  template <typename T, std::size_t size> requires ammonite::validVector<T, size>
+  template <typename T, unsigned int size> requires ammonite::validVector<T, size>
   bool testLength() {
     ammonite::Vec<T, size> aVec = {0};
     randomFillVector(aVec);
 
     T sum = (T)0;
-    for (std::size_t i = 0; i < size; i++) {
+    for (unsigned int i = 0; i < size; i++) {
       sum += aVec[i] * aVec[i];
     }
     T length = (T)std::sqrt(sum);
@@ -534,7 +533,7 @@ namespace {
     return true;
   }
 
-  template <typename T, std::size_t size> requires ammonite::validVector<T, size>
+  template <typename T, unsigned int size> requires ammonite::validVector<T, size>
   bool testDistance() {
     ammonite::Vec<T, size> aVec = {0};
     ammonite::Vec<T, size> bVec = {0};
@@ -543,7 +542,7 @@ namespace {
 
     //Swap elements that would cause a negative for promoted types
     if constexpr (std::is_same_v<T, unsigned char> || std::is_same_v<T, unsigned short>) {
-      for (std::size_t i = 0; i < size; i++) {
+      for (unsigned int i = 0; i < size; i++) {
         if (aVec[i] > bVec[i]) {
           T temp = aVec[i];
           aVec[i] = bVec[i];
@@ -553,7 +552,7 @@ namespace {
     }
 
     T sum = (T)0;
-    for (std::size_t i = 0; i < size; i++) {
+    for (unsigned int i = 0; i < size; i++) {
       T diff = bVec[i] - aVec[i];
       sum += (T)(diff * diff);
     }
@@ -574,7 +573,7 @@ namespace {
 }
 
 namespace tests {
-  template <typename T, std::size_t size> requires ammonite::validVector<T, size>
+  template <typename T, unsigned int size> requires ammonite::validVector<T, size>
   bool testVector(std::string_view typeName) {
     ammonite::utils::normal << "Testing " << size << "x " << typeName << " vectors" << std::endl;
 
