@@ -1,6 +1,7 @@
 #ifndef MATRIXTESTTEMPLATES
 #define MATRIXTESTTEMPLATES
 
+#include <algorithm>
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
@@ -10,6 +11,8 @@
 #include <type_traits>
 
 #include <ammonite/ammonite.hpp>
+
+#include "../vector/vectorTestTemplates.hpp"
 
 //Test helpers
 namespace {
@@ -241,6 +244,41 @@ namespace {
 
     return true;
   }
+
+  template <typename T, std::size_t cols, std::size_t rows>
+            requires ammonite::validMatrix<T, cols, rows>
+  bool testDiagonal() {
+    constexpr std::size_t minSize = std::min(cols, rows);
+    ammonite::Mat<T, cols, rows> aMat = {{0}};
+    ammonite::Vec<T, minSize> minLengthVec = {0};
+    randomFillVector(minLengthVec);
+
+    //Test scalar diagonal
+    ammonite::diagonal(aMat, minLengthVec[0]);
+    for (std::size_t i = 0; i < minSize; i++) {
+      if (aMat[i][i] != minLengthVec[0]) {
+        ammonite::utils::error << "Matrix scalar diagonal set failed" << std::endl;
+        ammonite::utils::normal << "  Result:\n" << ammonite::formatMatrix(aMat) \
+                                << "\n  Expected: " << minLengthVec[0] \
+                                << " at column " << i << ", row " << i << std::endl;
+        return false;
+      }
+    }
+
+    //Test vector diagonal
+    ammonite::diagonal(aMat, minLengthVec);
+    for (std::size_t i = 0; i < minSize; i++) {
+      if (aMat[i][i] != minLengthVec[i]) {
+        ammonite::utils::error << "Matrix vector diagonal set failed" << std::endl;
+        ammonite::utils::normal << "  Result:\n" << ammonite::formatMatrix(aMat) \
+                                << "\n  Expected: " << minLengthVec[i] \
+                                << " at column " << i << ", row " << i << std::endl;
+        return false;
+      }
+    }
+
+    return true;
+  }
 }
 
 namespace tests {
@@ -263,6 +301,11 @@ namespace tests {
 
       //Test ammonite::copyCast()
       if (!testCopyCast<T, cols, rows>()) {
+        return false;
+      }
+
+      //Test ammonite::diagonal()
+      if (!testDiagonal<T, cols, rows>()) {
         return false;
       }
     }
