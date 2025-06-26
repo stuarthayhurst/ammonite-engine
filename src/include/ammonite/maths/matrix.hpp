@@ -127,12 +127,11 @@ namespace ammonite {
      - Set the diagonal of the matrix to a vector
      - The vector's length must match one dimension, and not exceed the other
     */
-    template <typename T, std::size_t cols, std::size_t rows,
-              typename S, std::size_t size>
+    template <typename T, std::size_t cols, std::size_t rows, std::size_t size>
               requires validMatrix<T, cols, rows> && validVector<T, size> &&
               (((size == cols) && (size <= rows)) ||
               ((size == rows) && (size <= cols)))
-    constexpr void diagonal(Mat<T, cols, rows>& a, Vec<T, size> b) {
+    constexpr void diagonal(Mat<T, cols, rows>& a, const Vec<T, size>& b) {
       for (std::size_t i = 0; i < size; i++) {
         a[i][i] = b[i];
       }
