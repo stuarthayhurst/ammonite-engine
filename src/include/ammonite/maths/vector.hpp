@@ -82,8 +82,8 @@ namespace ammonite {
     }
 
     /*
-     - Add a constant to each element of a vector, storing the result in dest
-       - The constant and elements must have the same type
+     - Add a scalar to each element of a vector, storing the result in dest
+       - The scalar and elements must have the same type
     */
     template <typename T, unsigned int size> requires validVector<T, size>
     void add(const Vec<T, size>& a, T b, Vec<T, size>& dest) {
@@ -95,8 +95,8 @@ namespace ammonite {
     }
 
     /*
-     - Add a constant to each element of a vector, storing the result in the same vector
-       - The constant and elements must have the same type
+     - Add a scalar to each element of a vector, storing the result in the same vector
+       - The scalar and elements must have the same type
     */
     template <typename T, unsigned int size> requires validVector<T, size>
     void add(Vec<T, size>& a, T b) {
@@ -120,8 +120,8 @@ namespace ammonite {
     }
 
     /*
-     - Subtract a constant from each element of a vector, storing the result in dest
-       - The constant and elements must have the same type
+     - Subtract a scalar from each element of a vector, storing the result in dest
+       - The scalar and elements must have the same type
     */
     template <typename T, unsigned int size> requires validVector<T, size>
     void sub(const Vec<T, size>& a, T b, Vec<T, size>& dest) {
@@ -133,8 +133,8 @@ namespace ammonite {
     }
 
     /*
-     - Subtract a constant from each element of a vector, storing the result in the same vector
-       - The constant and elements must have the same type
+     - Subtract a scalar from each element of a vector, storing the result in the same vector
+       - The scalar and elements must have the same type
     */
     template <typename T, unsigned int size> requires validVector<T, size>
     void sub(Vec<T, size>& a, T b) {
@@ -142,8 +142,8 @@ namespace ammonite {
     }
 
     /*
-     - Multiply each element of a vector by a constant, storing the result in dest
-       - The constant and elements must have the same type
+     - Multiply each element of a vector by a scalar, storing the result in dest
+       - The scalar and elements must have the same type
     */
     template <typename T, unsigned int size> requires validVector<T, size>
     void scale(const Vec<T, size>& a, T b, Vec<T, size>& dest) {
@@ -155,8 +155,8 @@ namespace ammonite {
     }
 
     /*
-     - Multiply each element of a vector by a constant, storing the result in the same vector
-       - The constant and elements must have the same type
+     - Multiply each element of a vector by a scalar, storing the result in the same vector
+       - The scalar and elements must have the same type
     */
     template <typename T, unsigned int size> requires validVector<T, size>
     void scale(Vec<T, size>& a, T b) {
@@ -164,8 +164,8 @@ namespace ammonite {
     }
 
     /*
-     - Divide each element of a vector by a constant, storing the result in dest
-       - The constant and elements must have the same type
+     - Divide each element of a vector by a scalar, storing the result in dest
+       - The scalar and elements must have the same type
     */
     template <typename T, unsigned int size> requires validVector<T, size>
     void div(const Vec<T, size>& a, T b, Vec<T, size>& dest) {
@@ -177,8 +177,8 @@ namespace ammonite {
     }
 
     /*
-     - Divide each element of a vector by a constant, storing the result in the same vector
-       - The constant and elements must have the same type
+     - Divide each element of a vector by a scalar, storing the result in the same vector
+       - The scalar and elements must have the same type
     */
     template <typename T, unsigned int size> requires validVector<T, size>
     void div(Vec<T, size>& a, T b) {

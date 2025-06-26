@@ -319,12 +319,12 @@ namespace {
       }
     }
 
-    //Test constant addition
+    //Test scalar addition
     ammonite::add(aMat, bMat[0][0], cMat);
     for (unsigned int col = 0; col < cols; col++) {
       for (unsigned int row = 0; row < rows; row++) {
         if ((T)(aMat[col][row] + bMat[0][0]) != cMat[col][row]) {
-          ammonite::utils::error << "Constant matrix addition failed" << std::endl;
+          ammonite::utils::error << "Scalar matrix addition failed" << std::endl;
           ammonite::utils::normal << "  Input:\n" << ammonite::formatMatrix(aMat) \
                                   << "\n  Input:\n" << ammonite::formatMatrix(bMat) \
                                   << "\n  Result:\n" << ammonite::formatMatrix(cMat) \
@@ -334,13 +334,13 @@ namespace {
       }
     }
 
-    //Test in-place constant addition
+    //Test in-place scalar addition
     ammonite::copy(aMat, cMat);
     ammonite::add(cMat, bMat[0][0]);
     for (unsigned int col = 0; col < cols; col++) {
       for (unsigned int row = 0; row < rows; row++) {
         if ((T)(aMat[col][row] + bMat[0][0]) != cMat[col][row]) {
-          ammonite::utils::error << "In-place constant matrix addition failed" << std::endl;
+          ammonite::utils::error << "In-place scalar matrix addition failed" << std::endl;
           ammonite::utils::normal << "  Input:\n" << ammonite::formatMatrix(aMat) \
                                   << "\n  Input:\n" << ammonite::formatMatrix(bMat) \
                                   << "\n  Result:\n" << ammonite::formatMatrix(cMat) \

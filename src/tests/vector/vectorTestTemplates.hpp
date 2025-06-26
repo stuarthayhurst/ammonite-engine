@@ -217,11 +217,11 @@ namespace {
       }
     }
 
-    //Test constant addition
+    //Test scalar addition
     ammonite::add(aVec, bVec[0], cVec);
     for (unsigned int i = 0; i < size; i++) {
       if ((T)(aVec[i] + bVec[0]) != cVec[i]) {
-        ammonite::utils::error << "Constant vector addition failed" << std::endl;
+        ammonite::utils::error << "Scalar vector addition failed" << std::endl;
         ammonite::utils::normal << "  Input:  " << ammonite::formatVector(aVec) \
                                 << "\n  Input:  " << ammonite::formatVector(bVec) \
                                 << "\n  Result: " << ammonite::formatVector(cVec) \
@@ -230,12 +230,12 @@ namespace {
       }
     }
 
-    //Test in-place constant addition
+    //Test in-place scalar addition
     ammonite::copy(aVec, cVec);
     ammonite::add(cVec, bVec[0]);
     for (unsigned int i = 0; i < size; i++) {
       if ((T)(aVec[i] + bVec[0]) != cVec[i]) {
-        ammonite::utils::error << "In-place constant vector addition failed" << std::endl;
+        ammonite::utils::error << "In-place scalar vector addition failed" << std::endl;
         ammonite::utils::normal << "  Input:  " << ammonite::formatVector(aVec) \
                                 << "\n  Input:  " << ammonite::formatVector(bVec) \
                                 << "\n  Result: " << ammonite::formatVector(cVec) \
@@ -282,11 +282,11 @@ namespace {
       }
     }
 
-    //Test constant subtraction
+    //Test scalar subtraction
     ammonite::sub(aVec, bVec[0], cVec);
     for (unsigned int i = 0; i < size; i++) {
       if ((T)(aVec[i] - bVec[0]) != cVec[i]) {
-        ammonite::utils::error << "Constant vector subtraction failed" << std::endl;
+        ammonite::utils::error << "Scalar vector subtraction failed" << std::endl;
         ammonite::utils::normal << "  Input:  " << ammonite::formatVector(aVec) \
                                 << "\n  Input:  " << ammonite::formatVector(bVec) \
                                 << "\n  Result: " << ammonite::formatVector(cVec) \
@@ -295,12 +295,12 @@ namespace {
       }
     }
 
-    //Test in-place constant subtraction
+    //Test in-place scalar subtraction
     ammonite::copy(aVec, cVec);
     ammonite::sub(cVec, bVec[0]);
     for (unsigned int i = 0; i < size; i++) {
       if ((T)(aVec[i] - bVec[0]) != cVec[i]) {
-        ammonite::utils::error << "In-place constant vector subtraction failed" << std::endl;
+        ammonite::utils::error << "In-place scalar vector subtraction failed" << std::endl;
         ammonite::utils::normal << "  Input:  " << ammonite::formatVector(aVec) \
                                 << "\n  Input:  " << ammonite::formatVector(bVec) \
                                 << "\n  Result: " << ammonite::formatVector(cVec) \

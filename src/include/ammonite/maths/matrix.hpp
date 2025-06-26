@@ -158,8 +158,8 @@ namespace ammonite {
     }
 
     /*
-     - Add a constant to each element of a matrix, storing the result in dest
-       - The constant and elements must have the same type
+     - Add a scalar to each element of a matrix, storing the result in dest
+       - The scalar and elements must have the same type
     */
     template <typename T, unsigned int cols, unsigned int rows>
               requires validMatrix<T, cols, rows>
@@ -172,8 +172,8 @@ namespace ammonite {
     }
 
     /*
-     - Add a constant to each element of a matrix, storing the result in the same matrix
-       - The constant and elements must have the same type
+     - Add a scalar to each element of a matrix, storing the result in the same matrix
+       - The scalar and elements must have the same type
     */
     template <typename T, unsigned int cols, unsigned int rows>
               requires validMatrix<T, cols, rows>
