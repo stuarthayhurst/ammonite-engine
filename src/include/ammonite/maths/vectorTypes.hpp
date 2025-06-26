@@ -42,7 +42,7 @@ namespace ammonite {
        only the view
     */
     template <typename T, unsigned int size> requires validVector<T, size>
-    struct NamedVec { };
+    struct NamedVec;
 
     //NOLINTBEGIN(cppcoreguidelines-avoid-const-or-ref-data-members)
     template <typename T> requires vectorType<T>
