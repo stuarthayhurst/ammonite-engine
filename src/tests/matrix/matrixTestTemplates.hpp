@@ -278,6 +278,80 @@ namespace {
 
     return true;
   }
+
+  template <typename T, unsigned int cols, unsigned int rows>
+            requires ammonite::validMatrix<T, cols, rows>
+  bool testAdd() {
+    ammonite::Mat<T, cols, rows> aMat = {{0}};
+    ammonite::Mat<T, cols, rows> bMat = {{0}};
+    ammonite::Mat<T, cols, rows> cMat = {{0}};
+    randomFillMatrix(aMat);
+    randomFillMatrix(bMat);
+
+    //Test regular addition
+    ammonite::add(aMat, bMat, cMat);
+    for (unsigned int col = 0; col < cols; col++) {
+      for (unsigned int row = 0; row < rows; row++) {
+        if ((T)(aMat[col][row] + bMat[col][row]) != cMat[col][row]) {
+          ammonite::utils::error << "Matrix addition failed" << std::endl;
+          ammonite::utils::normal << "  Input:\n" << ammonite::formatMatrix(aMat) \
+                                  << "\n  Input:\n" << ammonite::formatMatrix(bMat) \
+                                  << "\n  Result:\n" << ammonite::formatMatrix(cMat) \
+                                  << std::endl;
+          return false;
+        }
+      }
+    }
+
+    //Test in-place addition
+    ammonite::copy(aMat, cMat);
+    ammonite::add(cMat, bMat);
+    for (unsigned int col = 0; col < cols; col++) {
+      for (unsigned int row = 0; row < rows; row++) {
+        if ((T)(aMat[col][row] + bMat[col][row]) != cMat[col][row]) {
+          ammonite::utils::error << "In-place matrix addition failed" << std::endl;
+          ammonite::utils::normal << "  Input:\n" << ammonite::formatMatrix(aMat) \
+                                  << "\n  Input:\n" << ammonite::formatMatrix(bMat) \
+                                  << "\n  Result:\n" << ammonite::formatMatrix(cMat) \
+                                  << std::endl;
+          return false;
+        }
+      }
+    }
+
+    //Test constant addition
+    ammonite::add(aMat, bMat[0][0], cMat);
+    for (unsigned int col = 0; col < cols; col++) {
+      for (unsigned int row = 0; row < rows; row++) {
+        if ((T)(aMat[col][row] + bMat[0][0]) != cMat[col][row]) {
+          ammonite::utils::error << "Constant matrix addition failed" << std::endl;
+          ammonite::utils::normal << "  Input:\n" << ammonite::formatMatrix(aMat) \
+                                  << "\n  Input:\n" << ammonite::formatMatrix(bMat) \
+                                  << "\n  Result:\n" << ammonite::formatMatrix(cMat) \
+                                  << std::endl;
+          return false;
+        }
+      }
+    }
+
+    //Test in-place constant addition
+    ammonite::copy(aMat, cMat);
+    ammonite::add(cMat, bMat[0][0]);
+    for (unsigned int col = 0; col < cols; col++) {
+      for (unsigned int row = 0; row < rows; row++) {
+        if ((T)(aMat[col][row] + bMat[0][0]) != cMat[col][row]) {
+          ammonite::utils::error << "In-place constant matrix addition failed" << std::endl;
+          ammonite::utils::normal << "  Input:\n" << ammonite::formatMatrix(aMat) \
+                                  << "\n  Input:\n" << ammonite::formatMatrix(bMat) \
+                                  << "\n  Result:\n" << ammonite::formatMatrix(cMat) \
+                                  << std::endl;
+          return false;
+        }
+      }
+    }
+
+    return true;
+  }
 }
 
 namespace tests {
@@ -305,6 +379,11 @@ namespace tests {
 
       //Test ammonite::diagonal()
       if (!testDiagonal<T, cols, rows>()) {
+        return false;
+      }
+
+      //Test ammonite::add()
+      if (!testAdd<T, cols, rows>()) {
         return false;
       }
     }

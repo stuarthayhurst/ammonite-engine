@@ -138,6 +138,49 @@ namespace ammonite {
         a[i][i] = b[i];
       }
     }
+
+    //Add two matrices of the same size and type, storing the result in dest
+    template <typename T, unsigned int cols, unsigned int rows>
+              requires validMatrix<T, cols, rows>
+    void add(const Mat<T, cols, rows>& a, const Mat<T, cols, rows>& b, Mat<T, cols, rows>& dest) {
+      std::experimental::fixed_size_simd<T, cols * rows> aSimd(&a[0][0], std::experimental::element_aligned);
+      std::experimental::fixed_size_simd<T, cols * rows> bSimd(&b[0][0], std::experimental::element_aligned);
+
+      aSimd += bSimd;
+      aSimd.copy_to(&dest[0][0], std::experimental::element_aligned);
+    }
+
+    //Add two matrices of the same size and type, storing the result in the first matrix
+    template <typename T, unsigned int cols, unsigned int rows>
+              requires validMatrix<T, cols, rows>
+    void add(Mat<T, cols, rows>& a, const Mat<T, cols, rows>& b) {
+      add(a, b, a);
+    }
+
+    /*
+     - Add a constant to each element of a matrix, storing the result in dest
+       - The constant and elements must have the same type
+    */
+    template <typename T, unsigned int cols, unsigned int rows>
+              requires validMatrix<T, cols, rows>
+    void add(const Mat<T, cols, rows>& a, T b, Mat<T, cols, rows>& dest) {
+      std::experimental::fixed_size_simd<T, cols * rows> aSimd(&a[0][0], std::experimental::element_aligned);
+      std::experimental::fixed_size_simd<T, cols * rows> bSimd = b;
+
+      aSimd += bSimd;
+      aSimd.copy_to(&dest[0][0], std::experimental::element_aligned);
+    }
+
+    /*
+     - Add a constant to each element of a matrix, storing the result in the same matrix
+       - The constant and elements must have the same type
+    */
+    template <typename T, unsigned int cols, unsigned int rows>
+              requires validMatrix<T, cols, rows>
+    void add(Mat<T, cols, rows>& a, T b) {
+      add(a, b, a);
+    }
+
   }
 
   //Utility / support functions
