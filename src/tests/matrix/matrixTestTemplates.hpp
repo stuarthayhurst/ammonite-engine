@@ -326,7 +326,7 @@ namespace {
         if ((T)(aMat[col][row] + bMat[0][0]) != cMat[col][row]) {
           ammonite::utils::error << "Scalar matrix addition failed" << std::endl;
           ammonite::utils::normal << "  Input:\n" << ammonite::formatMatrix(aMat) \
-                                  << "\n  Input:\n" << ammonite::formatMatrix(bMat) \
+                                  << "\n  Input:\n" << bMat[0][0] \
                                   << "\n  Result:\n" << ammonite::formatMatrix(cMat) \
                                   << std::endl;
           return false;
@@ -342,7 +342,7 @@ namespace {
         if ((T)(aMat[col][row] + bMat[0][0]) != cMat[col][row]) {
           ammonite::utils::error << "In-place scalar matrix addition failed" << std::endl;
           ammonite::utils::normal << "  Input:\n" << ammonite::formatMatrix(aMat) \
-                                  << "\n  Input:\n" << ammonite::formatMatrix(bMat) \
+                                  << "\n  Input:\n" << bMat[0][0] \
                                   << "\n  Result:\n" << ammonite::formatMatrix(cMat) \
                                   << std::endl;
           return false;

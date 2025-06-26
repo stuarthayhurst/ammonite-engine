@@ -223,7 +223,7 @@ namespace {
       if ((T)(aVec[i] + bVec[0]) != cVec[i]) {
         ammonite::utils::error << "Scalar vector addition failed" << std::endl;
         ammonite::utils::normal << "  Input:  " << ammonite::formatVector(aVec) \
-                                << "\n  Input:  " << ammonite::formatVector(bVec) \
+                                << "\n  Input:  " << bVec[0] \
                                 << "\n  Result: " << ammonite::formatVector(cVec) \
                                 << std::endl;
         return false;
@@ -237,7 +237,7 @@ namespace {
       if ((T)(aVec[i] + bVec[0]) != cVec[i]) {
         ammonite::utils::error << "In-place scalar vector addition failed" << std::endl;
         ammonite::utils::normal << "  Input:  " << ammonite::formatVector(aVec) \
-                                << "\n  Input:  " << ammonite::formatVector(bVec) \
+                                << "\n  Input:  " << bVec[0] \
                                 << "\n  Result: " << ammonite::formatVector(cVec) \
                                 << std::endl;
         return false;
@@ -288,7 +288,7 @@ namespace {
       if ((T)(aVec[i] - bVec[0]) != cVec[i]) {
         ammonite::utils::error << "Scalar vector subtraction failed" << std::endl;
         ammonite::utils::normal << "  Input:  " << ammonite::formatVector(aVec) \
-                                << "\n  Input:  " << ammonite::formatVector(bVec) \
+                                << "\n  Input:  " << bVec[0] \
                                 << "\n  Result: " << ammonite::formatVector(cVec) \
                                 << std::endl;
         return false;
@@ -302,7 +302,7 @@ namespace {
       if ((T)(aVec[i] - bVec[0]) != cVec[i]) {
         ammonite::utils::error << "In-place scalar vector subtraction failed" << std::endl;
         ammonite::utils::normal << "  Input:  " << ammonite::formatVector(aVec) \
-                                << "\n  Input:  " << ammonite::formatVector(bVec) \
+                                << "\n  Input:  " << bVec[0] \
                                 << "\n  Result: " << ammonite::formatVector(cVec) \
                                 << std::endl;
         return false;
@@ -326,7 +326,7 @@ namespace {
       if ((T)(aVec[i] * bVec[0]) != cVec[i]) {
         ammonite::utils::error << "Vector scaling failed" << std::endl;
         ammonite::utils::normal << "  Input:  " << ammonite::formatVector(aVec) \
-                                << "\n  Input:  " << ammonite::formatVector(bVec) \
+                                << "\n  Input:  " << bVec[0] \
                                 << "\n  Result: " << ammonite::formatVector(cVec) \
                                 << std::endl;
         return false;
@@ -340,7 +340,7 @@ namespace {
       if ((T)(aVec[i] * bVec[0]) != cVec[i]) {
         ammonite::utils::error << "In-place vector scaling failed" << std::endl;
         ammonite::utils::normal << "  Input:  " << ammonite::formatVector(aVec) \
-                                << "\n  Input:  " << ammonite::formatVector(bVec) \
+                                << "\n  Input:  " << bVec[0] \
                                 << "\n  Result: " << ammonite::formatVector(cVec) \
                                 << std::endl;
         return false;
@@ -369,7 +369,7 @@ namespace {
       if ((T)(aVec[i] / bVec[0]) != cVec[i]) {
         ammonite::utils::error << "Vector division failed" << std::endl;
         ammonite::utils::normal << "  Input:  " << ammonite::formatVector(aVec) \
-                                << "\n  Input:  " << ammonite::formatVector(bVec) \
+                                << "\n  Input:  " << bVec[0] \
                                 << "\n  Result: " << ammonite::formatVector(cVec) \
                                 << std::endl;
         return false;
@@ -383,7 +383,7 @@ namespace {
       if ((T)(aVec[i] / bVec[0]) != cVec[i]) {
         ammonite::utils::error << "In-place vector division failed" << std::endl;
         ammonite::utils::normal << "  Input:  " << ammonite::formatVector(aVec) \
-                                << "\n  Input:  " << ammonite::formatVector(bVec) \
+                                << "\n  Input:  " << bVec[0] \
                                 << "\n  Result: " << ammonite::formatVector(cVec) \
                                 << std::endl;
         return false;
