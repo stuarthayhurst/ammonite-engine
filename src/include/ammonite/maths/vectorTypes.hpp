@@ -36,7 +36,11 @@ namespace ammonite {
     template <typename T, unsigned int size> requires validVector<T, size>
     using Vec = T[size];
 
-    //Access elements of a Vec using named attributes as references
+    /*
+     - Access elements of a Vec using named attributes as references
+     - Since the elements are references, copying this will not copy the vector,
+       only the view
+    */
     template <typename T, unsigned int size> requires validVector<T, size>
     struct NamedVec { };
 
