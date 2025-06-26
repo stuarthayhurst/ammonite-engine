@@ -181,6 +181,47 @@ namespace ammonite {
       add(a, b, a);
     }
 
+    //Subtract matrix b from matrix a of the same size and type, storing the result in dest
+    template <typename T, unsigned int cols, unsigned int rows>
+              requires validMatrix<T, cols, rows>
+    void sub(const Mat<T, cols, rows>& a, const Mat<T, cols, rows>& b, Mat<T, cols, rows>& dest) {
+      std::experimental::fixed_size_simd<T, cols * rows> aSimd(&a[0][0], std::experimental::element_aligned);
+      std::experimental::fixed_size_simd<T, cols * rows> bSimd(&b[0][0], std::experimental::element_aligned);
+
+      aSimd -= bSimd;
+      aSimd.copy_to(&dest[0][0], std::experimental::element_aligned);
+    }
+
+    //Subtract matrix b from matrix a of the same size and type, storing the result in matrix a
+    template <typename T, unsigned int cols, unsigned int rows>
+              requires validMatrix<T, cols, rows>
+    void sub(Mat<T, cols, rows>& a, const Mat<T, cols, rows>& b) {
+      sub(a, b, a);
+    }
+
+    /*
+     - Subtract a scalar from each element of a matrix, storing the result in dest
+       - The scalar and elements must have the same type
+    */
+    template <typename T, unsigned int cols, unsigned int rows>
+              requires validMatrix<T, cols, rows>
+    void sub(const Mat<T, cols, rows>& a, T b, Mat<T, cols, rows>& dest) {
+      std::experimental::fixed_size_simd<T, cols * rows> aSimd(&a[0][0], std::experimental::element_aligned);
+      std::experimental::fixed_size_simd<T, cols * rows> bSimd = b;
+
+      aSimd -= bSimd;
+      aSimd.copy_to(&dest[0][0], std::experimental::element_aligned);
+    }
+
+    /*
+     - Subtract a scalar from each element of a matrix, storing the result in the same matrix
+       - The scalar and elements must have the same type
+    */
+    template <typename T, unsigned int cols, unsigned int rows>
+              requires validMatrix<T, cols, rows>
+    void sub(Mat<T, cols, rows>& a, T b) {
+      sub(a, b, a);
+    }
   }
 
   //Utility / support functions
