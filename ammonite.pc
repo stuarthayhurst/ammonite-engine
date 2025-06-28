@@ -9,6 +9,6 @@ Version: 0.0.1
 Requires: glm
 Requires.private: glm glfw3 epoxy stb assimp
 Cflags: -I${includedir}
-Libs: -L${libdir} -lammonite
+Libs: -L${libdir} -lammonite -lm
 Cflags.private: -pthread
 Libs.private: -lm -latomic -lpthread
