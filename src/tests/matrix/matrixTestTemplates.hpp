@@ -426,6 +426,49 @@ namespace {
 
     return true;
   }
+
+  template <typename T, unsigned int cols, unsigned int rows>
+            requires ammonite::validMatrix<T, cols, rows>
+  bool testTranspose() {
+    ammonite::Mat<T, cols, rows> aMat = {{0}};
+    ammonite::Mat<T, rows, cols> bMat = {{0}};
+    randomFillMatrix(aMat);
+
+    //Test transpose
+    ammonite::transpose(aMat, bMat);
+    for (unsigned int col = 0; col < cols; col++) {
+      for (unsigned int row = 0; row < rows; row++) {
+        if (aMat[col][row] != bMat[row][col]) {
+          ammonite::utils::error << "Matrix transpose failed" << std::endl;
+          ammonite::utils::normal << "  Input:\n" << ammonite::formatMatrix(aMat) \
+                                  << "\n  Result:\n" << ammonite::formatMatrix(bMat) \
+                                  << "\n  Expected: " << aMat[col][row] \
+                                  << " at output column " << row << ", row " << col << std::endl;
+          return false;
+        }
+      }
+    }
+
+    //Test in-place square matrix transpose
+    if constexpr (cols == rows) {
+      ammonite::copy(aMat, bMat);
+      ammonite::transpose(aMat, aMat);
+      for (unsigned int col = 0; col < cols; col++) {
+        for (unsigned int row = 0; row < rows; row++) {
+          if (aMat[col][row] != bMat[row][col]) {
+            ammonite::utils::error << "In-place matrix transpose failed" << std::endl;
+            ammonite::utils::normal << "  Input:\n" << ammonite::formatMatrix(bMat) \
+                                    << "\n  Result:\n" << ammonite::formatMatrix(aMat) \
+                                    << "\n  Expected: " << bMat[col][row] \
+                                    << " at output column " << row << ", row " << col << std::endl;
+            return false;
+          }
+        }
+      }
+    }
+
+    return true;
+  }
 }
 
 namespace tests {
@@ -463,6 +506,11 @@ namespace tests {
 
       //Test ammonite::sub()
       if (!testSub<T, cols, rows>()) {
+        return false;
+      }
+
+      //Test ammonite::transpose()
+      if (!testTranspose<T, cols, rows>()) {
         return false;
       }
     }

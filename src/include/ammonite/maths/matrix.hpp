@@ -10,6 +10,9 @@
 //NOLINTNEXTLINE(misc-include-cleaner)
 #include <experimental/simd>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 #include "matrixTypes.hpp"
 #include "vector.hpp"
 #include "vectorTypes.hpp"
@@ -221,6 +224,27 @@ namespace ammonite {
               requires validMatrix<T, cols, rows>
     void sub(Mat<T, cols, rows>& a, T b) {
       sub(a, b, a);
+    }
+
+    //TODO: Implement with <simd>
+    //Transpose a matrix
+    template <typename T, unsigned int colsA, unsigned int rowsA>
+              requires validMatrix<T, colsA, rowsA>
+    void transpose(const Mat<T, colsA, rowsA>& src, Mat<T, rowsA, colsA>& dest) {
+      glm::mat<colsA, rowsA, T, glm::defaultp> srcMat;
+      glm::mat<rowsA, colsA, T, glm::defaultp> destMat;
+
+      std::memcpy(glm::value_ptr(srcMat), &src[0], sizeof(Mat<T, colsA, rowsA>));
+
+      destMat = glm::transpose(srcMat);
+      std::memcpy(&dest[0], glm::value_ptr(destMat), sizeof(Mat<T, rowsA, colsA>));
+    }
+
+    //Transpose a square matrix in-place
+    template <typename T, unsigned int cols, unsigned int rows>
+              requires validMatrix<T, cols, rows>
+    void transpose(Mat<T, cols, rows>& src) {
+      transpose(src, src);
     }
   }
 
