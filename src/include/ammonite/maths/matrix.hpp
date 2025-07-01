@@ -246,6 +246,90 @@ namespace ammonite {
     void transpose(Mat<T, cols, rows>& src) {
       transpose(src, src);
     }
+
+    //TODO: Implement with <simd>
+    /*
+     - Multiply a matrix by a matrix, storing the result in dest
+       - The scalar and elements must have the same type
+    */
+    template <typename T, unsigned int colsA, unsigned int rowsA, unsigned int colsB>
+              requires validMatrix<T, colsA, rowsA> && validMatrix<T, colsB, colsA> &&
+              validMatrix<T, colsB, rowsA>
+    void mul(const Mat<T, colsA, rowsA>& a, const Mat<T, colsB, colsA>& b, Mat<T, colsB, rowsA>& dest) {
+      glm::mat<colsA, rowsA, T, glm::defaultp> aMat;
+      glm::mat<colsB, colsA, T, glm::defaultp> bMat;
+      glm::mat<colsB, rowsA, T, glm::defaultp> destMat;
+
+      std::memcpy(glm::value_ptr(aMat), &a[0], sizeof(Mat<T, colsA, rowsA>));
+      std::memcpy(glm::value_ptr(bMat), &b[0], sizeof(Mat<T, colsB, colsA>));
+
+      destMat = aMat * bMat;
+      std::memcpy(&dest[0], glm::value_ptr(destMat), sizeof(Mat<T, colsB, rowsA>));
+    }
+
+    /*
+     - Multiply a matrix by a vector, storing the result in the first matrix
+       - The scalar and elements must have the same type
+    */
+    template <typename T, unsigned int cols, unsigned int rows>
+              requires validMatrix<T, cols, rows>
+    void mul(Mat<T, cols, rows>& a, const Mat<T, cols, cols>& b) {
+      mul(a, b, a);
+    }
+
+    //TODO: Implement with <simd>
+    /*
+     - Multiply a matrix by a vector, storing the result in dest
+       - The scalar and elements must have the same type
+    */
+    template <typename T, unsigned int cols, unsigned int rows>
+              requires validMatrix<T, cols, rows> && validVector<T, cols> &&
+              validVector<T, rows>
+    void mul(const Mat<T, cols, rows>& a, const Vec<T, cols>& b, Vec<T, rows>& dest) {
+      glm::mat<cols, rows, T, glm::defaultp> aMat;
+      glm::vec<cols, T, glm::defaultp> bVec;
+      glm::vec<rows, T, glm::defaultp> destVec;
+
+      std::memcpy(glm::value_ptr(aMat), &a[0], sizeof(Mat<T, cols, rows>));
+      std::memcpy(glm::value_ptr(bVec), &b[0], sizeof(Vec<T, cols>));
+
+      destVec = aMat * bVec;
+      std::memcpy(&dest[0], glm::value_ptr(destVec), sizeof(Vec<T, rows>));
+    }
+
+    /*
+     - Multiply a square matrix by a vector, storing the result in the same vector
+       - The scalar and elements must have the same type
+    */
+    template <typename T, unsigned int cols, unsigned int rows>
+              requires validMatrix<T, cols, rows> && validVector<T, cols>
+    void mul(const Mat<T, cols, rows>& a, Vec<T, cols>& b) {
+      mul(a, b, b);
+    }
+
+    /*
+     - Multiply a matrix by a scalar, storing the result in dest
+       - The scalar and elements must have the same type
+    */
+    template <typename T, unsigned int cols, unsigned int rows>
+              requires validMatrix<T, cols, rows>
+    void mul(const Mat<T, cols, rows>& a, T b, Mat<T, cols, rows>& dest) {
+      std::experimental::fixed_size_simd<T, cols * rows> aSimd(&a[0][0], std::experimental::element_aligned);
+      std::experimental::fixed_size_simd<T, cols * rows> bSimd = b;
+
+      aSimd *= bSimd;
+      aSimd.copy_to(&dest[0][0], std::experimental::element_aligned);
+    }
+
+    /*
+     - Multiply a matrix by a scalar, storing the result in the same matrix
+       - The scalar and elements must have the same type
+    */
+    template <typename T, unsigned int cols, unsigned int rows>
+              requires validMatrix<T, cols, rows>
+    void mul(Mat<T, cols, rows>& a, T b) {
+      mul(a, b, a);
+    }
   }
 
   //Utility / support functions

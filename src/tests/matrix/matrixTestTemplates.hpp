@@ -443,7 +443,8 @@ namespace {
           ammonite::utils::normal << "  Input:\n" << ammonite::formatMatrix(aMat) \
                                   << "\n  Result:\n" << ammonite::formatMatrix(bMat) \
                                   << "\n  Expected: " << aMat[col][row] \
-                                  << " at output column " << row << ", row " << col << std::endl;
+                                  << " at output column " << row << ", row " << col \
+                                  << std::endl;
           return false;
         }
       }
@@ -460,9 +461,163 @@ namespace {
             ammonite::utils::normal << "  Input:\n" << ammonite::formatMatrix(bMat) \
                                     << "\n  Result:\n" << ammonite::formatMatrix(aMat) \
                                     << "\n  Expected: " << bMat[col][row] \
-                                    << " at output column " << row << ", row " << col << std::endl;
+                                    << " at output column " << row << ", row " << col \
+                                    << std::endl;
             return false;
           }
+        }
+      }
+    }
+
+    return true;
+  }
+
+  template <typename T, unsigned int colsA, unsigned int rowsA, unsigned int colsB>
+            requires ammonite::validMatrix<T, colsA, rowsA> &&
+            ammonite::validMatrix<T, colsB, colsA> && ammonite::validVector<T, colsA> &&
+            ammonite::validVector<T, rowsA>
+  bool testMul() {
+    ammonite::Mat<T, colsA, rowsA> aMat = {{0}};
+    ammonite::Mat<T, colsB, colsA> bMat = {{0}};
+    ammonite::Mat<T, colsB, rowsA> cMat = {{0}};
+    ammonite::Vec<T, colsA> aVec = {{0}};
+    ammonite::Vec<T, rowsA> bVec = {{0}};
+    randomFillMatrix(aMat);
+    randomFillMatrix(bMat);
+    randomFillVector(aVec);
+
+    //Test matrix-matrix multiplication
+    ammonite::mul(aMat, bMat, cMat);
+    for (unsigned int col = 0; col < colsB; col++) {
+      for (unsigned int row = 0; row < rowsA; row++) {
+        //Calculate expected value for the current index
+        T sum = (T)0.0;
+        for (unsigned int i = 0; i < colsA; i++) {
+          sum += aMat[i][row] * bMat[col][i];
+        }
+
+        //Check returned value matches
+        if (!roughly(sum, cMat[col][row])) {
+          ammonite::utils::error << "Matrix-matrix multiplication failed" << std::endl;
+          ammonite::utils::normal << "  Input:\n" << ammonite::formatMatrix(aMat) \
+                                  << "\n  Input:\n" << ammonite::formatMatrix(bMat) \
+                                  << "\n  Result:\n" << ammonite::formatMatrix(cMat) \
+                                  << "\n  Expected: " << sum \
+                                  << " at column " << col << ", row " << row \
+                                  << std::endl;
+          return false;
+        }
+      }
+    }
+
+    //Test in-place matrix-matrix multiplication
+    if constexpr ((colsA == rowsA) && (colsA == colsB)) {
+      ammonite::Mat<T, colsA, rowsA> dMat = {{0}};
+      ammonite::copy(aMat, dMat);
+      ammonite::mul(aMat, bMat);
+      for (unsigned int col = 0; col < colsA; col++) {
+        for (unsigned int row = 0; row < rowsA; row++) {
+          //Calculate expected value for the current index
+          T sum = (T)0.0;
+          for (unsigned int i = 0; i < colsA; i++) {
+            sum += dMat[i][row] * bMat[col][i];
+          }
+
+          //Check returned value matches
+          if (!roughly(sum, aMat[col][row])) {
+            ammonite::utils::error << "In-place matrix-matrix multiplication failed" << std::endl;
+            ammonite::utils::normal << "  Input:\n" << ammonite::formatMatrix(dMat) \
+                                    << "\n  Input:\n" << ammonite::formatMatrix(bMat) \
+                                    << "\n  Result:\n" << ammonite::formatMatrix(aMat) \
+                                    << "\n  Expected: " << sum \
+                                    << " at column " << col << ", row " << row \
+                                    << std::endl;
+            return false;
+          }
+        }
+      }
+    }
+
+    //Test matrix-vector multiplication
+    ammonite::mul(aMat, aVec, bVec);
+    for (unsigned int row = 0; row < rowsA; row++) {
+      //Calculate expected value for the current index
+      T sum = (T)0.0;
+      for (unsigned int col = 0; col < colsA; col++) {
+        sum += aMat[col][row] * aVec[col];
+      }
+
+      //Check returned value matches
+      if (!roughly(sum, bVec[row])) {
+        ammonite::utils::error << "Matrix-vector multiplication failed" << std::endl;
+        ammonite::utils::normal << "  Input:\n" << ammonite::formatMatrix(aMat) \
+                                << "\n  Input:\n" << ammonite::formatVector(aVec) \
+                                << "\n  Result:\n" << ammonite::formatVector(bVec) \
+                                << "\n  Expected: " << sum \
+                                << " at index " << row << std::endl;
+        return false;
+      }
+    }
+
+    //Test in-place matrix-vector multiplication
+    if constexpr ((colsA == rowsA) && (colsA == colsB)) {
+      ammonite::copy(aVec, bVec);
+      ammonite::mul(aMat, aVec);
+      for (unsigned int row = 0; row < rowsA; row++) {
+        //Calculate expected value for the current index
+        T sum = (T)0.0;
+        for (unsigned int col = 0; col < colsA; col++) {
+          sum += aMat[col][row] * bVec[col];
+        }
+
+        //Check returned value matches
+        if (!roughly(sum, aVec[row])) {
+          ammonite::utils::error << "In-place matrix-vector multiplication failed" << std::endl;
+          ammonite::utils::normal << "  Input:\n" << ammonite::formatMatrix(aMat) \
+                                  << "\n  Input:\n" << ammonite::formatVector(bVec) \
+                                  << "\n  Result:\n" << ammonite::formatVector(aVec) \
+                                  << "\n  Expected: " << sum \
+                                  << " at index " << row << std::endl;
+          return false;
+        }
+      }
+
+      //Restore aVec
+      ammonite::copy(bVec, aVec);
+    }
+
+    //Test scalar multiplication
+    ammonite::Mat<T, colsA, rowsA> eMat = {{0}};
+    ammonite::mul(aMat, aVec[0], eMat);
+    for (unsigned int col = 0; col < colsA; col++) {
+      for (unsigned int row = 0; row < rowsA; row++) {
+        if ((T)(aMat[col][row] * aVec[0]) != eMat[col][row]) {
+          ammonite::utils::error << "Matrix-scalar multiplication failed" << std::endl;
+          ammonite::utils::normal << "  Input:\n" << ammonite::formatMatrix(aMat) \
+                                  << "\n  Input:\n" << aVec[0] \
+                                  << "\n  Result:\n" << ammonite::formatMatrix(eMat) \
+                                  << "\n  Expected: " << (T)(aMat[col][row] * aVec[0]) \
+                                  << " at output column " << col << ", row " << row \
+                                  << std::endl;
+          return false;
+        }
+      }
+    }
+
+    //Test in-place scalar multiplication
+    ammonite::copy(aMat, eMat);
+    ammonite::mul(eMat, aVec[0]);
+    for (unsigned int col = 0; col < colsA; col++) {
+      for (unsigned int row = 0; row < rowsA; row++) {
+        if ((T)(aMat[col][row] * aVec[0]) != eMat[col][row]) {
+          ammonite::utils::error << "In-place matrix-scalar multiplication failed" << std::endl;
+          ammonite::utils::normal << "  Input:\n" << ammonite::formatMatrix(aMat) \
+                                  << "\n  Input:\n" << aVec[0] \
+                                  << "\n  Result:\n" << ammonite::formatMatrix(eMat) \
+                                  << "\n  Expected: " << (T)(aMat[col][row] * aVec[0]) \
+                                  << " at output column " << col << ", row " << row \
+                                  << std::endl;
+          return false;
         }
       }
     }
@@ -511,6 +666,17 @@ namespace tests {
 
       //Test ammonite::transpose()
       if (!testTranspose<T, cols, rows>()) {
+        return false;
+      }
+
+      //Test ammonite::mul()
+      if (!testMul<T, cols, rows, 2>()) {
+        return false;
+      }
+      if (!testMul<T, cols, rows, 3>()) {
+        return false;
+      }
+      if (!testMul<T, cols, rows, 4>()) {
         return false;
       }
     }
