@@ -11,7 +11,6 @@
 
 #include "../support.hpp"
 
-//Tests
 namespace {
   template <typename T, unsigned int cols, unsigned int rows>
             requires ammonite::validMatrix<T, cols, rows>

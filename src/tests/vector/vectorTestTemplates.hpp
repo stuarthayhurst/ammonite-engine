@@ -12,7 +12,6 @@
 
 #include "../support.hpp"
 
-//Tests
 namespace {
   template <typename T, unsigned int size> requires ammonite::validVector<T, size>
   bool testNamedVec() {
