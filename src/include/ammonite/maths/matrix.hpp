@@ -331,6 +331,17 @@ namespace ammonite {
     void mul(Mat<T, cols, rows>& a, T b) {
       mul(a, b, a);
     }
+
+    //Calculate the determinant for a square matrix
+    template <typename T, unsigned int size>
+              requires validMatrix<T, size, size>
+    T determinant(const Mat<T, size, size>& a) {
+      glm::mat<size, size, T, glm::defaultp> aMat;
+
+      std::memcpy(glm::value_ptr(aMat), &a[0], sizeof(Mat<T, size, size>));
+
+      return (T)glm::determinant(aMat);
+    }
   }
 
   //Utility / support functions

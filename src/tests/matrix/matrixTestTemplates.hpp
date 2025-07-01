@@ -598,6 +598,35 @@ namespace {
 
     return true;
   }
+
+  template <typename T, unsigned int cols, unsigned int rows>
+            requires ammonite::validMatrix<T, cols, rows>
+  bool testDeterminant() {
+    if constexpr (cols == rows) {
+      ammonite::Mat<T, cols, rows> aMat = {{0}};
+      ammonite::Vec<T, cols> aVec = {0};
+      randomFillVector(aVec);
+
+      T expected = (T)1.0;
+      for (unsigned int i = 0; i < cols; i++) {
+        expected *= aVec[i];
+      }
+
+      //Test determinant
+      ammonite::diagonal(aMat, aVec);
+      T determinant = ammonite::determinant(aMat);
+      if (!roughly(determinant, expected)) {
+        ammonite::utils::error << "Matrix determinant failed" << std::endl;
+        ammonite::utils::normal << "  Input:\n" << ammonite::formatMatrix(aMat) \
+                                << "\n  Result: " << determinant \
+                                << "\n  Expected: " << expected \
+                                << std::endl;
+        return false;
+      }
+    }
+
+    return true;
+  }
 }
 
 namespace tests {
@@ -651,6 +680,11 @@ namespace tests {
         return false;
       }
       if (!testMul<T, cols, rows, 4>()) {
+        return false;
+      }
+
+      //Test ammonite::determinant()
+      if (!testDeterminant<T, cols, rows>()) {
         return false;
       }
     }
