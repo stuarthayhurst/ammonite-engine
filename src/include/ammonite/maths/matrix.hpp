@@ -241,9 +241,9 @@ namespace ammonite {
     }
 
     //Transpose a square matrix in-place
-    template <typename T, unsigned int cols, unsigned int rows>
-              requires validMatrix<T, cols, rows>
-    void transpose(Mat<T, cols, rows>& src) {
+    template <typename T, unsigned int size>
+              requires validMatrix<T, size, size>
+    void transpose(Mat<T, size, size>& src) {
       transpose(src, src);
     }
 
@@ -268,12 +268,13 @@ namespace ammonite {
     }
 
     /*
-     - Multiply a matrix by a vector, storing the result in the first matrix
+     - Multiply a matrix by a matrix, storing the result in the first matrix
+       - Both matrices must be square with an equal size
        - The scalar and elements must have the same type
     */
-    template <typename T, unsigned int cols, unsigned int rows>
-              requires validMatrix<T, cols, rows>
-    void mul(Mat<T, cols, rows>& a, const Mat<T, cols, cols>& b) {
+    template <typename T, unsigned int size>
+              requires validMatrix<T, size, size>
+    void mul(Mat<T, size, size>& a, const Mat<T, size, size>& b) {
       mul(a, b, a);
     }
 
@@ -301,9 +302,9 @@ namespace ammonite {
      - Multiply a square matrix by a vector, storing the result in the same vector
        - The scalar and elements must have the same type
     */
-    template <typename T, unsigned int cols, unsigned int rows>
-              requires validMatrix<T, cols, rows> && validVector<T, cols>
-    void mul(const Mat<T, cols, rows>& a, Vec<T, cols>& b) {
+    template <typename T, unsigned int size>
+              requires validMatrix<T, size, size> && validVector<T, size>
+    void mul(const Mat<T, size, size>& a, Vec<T, size>& b) {
       mul(a, b, b);
     }
 
