@@ -5,36 +5,12 @@
 #include <cstdint>
 #include <cstring>
 #include <iostream>
-#include <limits>
 #include <string_view>
 #include <type_traits>
 
 #include <ammonite/ammonite.hpp>
 
-//Test helpers
-namespace {
-  template <typename T, unsigned int size> requires ammonite::validVector<T, size>
-  void randomFillVector(ammonite::Vec<T, size>& vec) {
-    for (unsigned int i = 0; i < size; i++) {
-      if constexpr (std::is_unsigned_v<T>) {
-        vec[i] = (T)ammonite::utils::randomUInt(std::numeric_limits<T>::max());
-      } else if constexpr (std::is_integral_v<T>) {
-        vec[i] = (T)ammonite::utils::randomInt((T)std::sqrt(std::numeric_limits<T>::max() / size));
-      } else {
-        vec[i] = (T)ammonite::utils::randomDouble(1000000.0f);
-      }
-    }
-  }
-
-  template <typename T> requires ammonite::vectorType<T>
-  bool roughly(T a, T b) {
-    if constexpr (std::is_integral_v<T>) {
-      return (a == b);
-    } else {
-      return std::abs(a - b) <= std::max((T)1e-5f, std::max(a, b) * (T)0.001);
-    }
-  }
-}
+#include "../support.hpp"
 
 //Tests
 namespace {
