@@ -16,7 +16,7 @@ void randomFillVector(ammonite::Vec<T, size>& vec) {
     } else if constexpr (std::is_integral_v<T>) {
       vec[i] = (T)ammonite::utils::randomInt((T)std::sqrt(std::numeric_limits<T>::max() / size));
     } else {
-      vec[i] = (T)ammonite::utils::randomDouble(-1000000.0f, 1000000.0f);
+      vec[i] = (T)ammonite::utils::randomDouble(1000000.0f);
     }
   }
 }
@@ -26,7 +26,7 @@ template <typename T, unsigned int cols, unsigned int rows>
 void randomFillMatrix(ammonite::Mat<T, cols, rows>& mat) {
   for (unsigned int col = 0; col < cols; col++) {
     for (unsigned int row = 0; row < rows; row++) {
-      mat[col][row] = (T)ammonite::utils::randomDouble(-1000000.0f, 1000000.0f);
+      mat[col][row] = (T)ammonite::utils::randomDouble(1000000.0f);
     }
   }
 }
