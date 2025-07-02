@@ -7,6 +7,17 @@
 
 #include <ammonite/ammonite.hpp>
 
+template <typename T>
+T randomScalar(double limit = 10000.0) {
+  if constexpr (std::is_unsigned_v<T>) {
+    return (T)ammonite::utils::randomUInt(std::numeric_limits<T>::max());
+  } else if constexpr (std::is_integral_v<T>) {
+    return (T)ammonite::utils::randomInt((T)std::sqrt(std::numeric_limits<T>::max()));
+  } else {
+    return (T)ammonite::utils::randomDouble((T)limit);
+  }
+}
+
 template <typename T, unsigned int size>
          requires ammonite::validVector<T, size>
 void randomFillVector(ammonite::Vec<T, size>& vec, double limit = 10000.0) {
