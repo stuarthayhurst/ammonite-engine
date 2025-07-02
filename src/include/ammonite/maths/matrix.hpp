@@ -360,6 +360,25 @@ namespace ammonite {
       destMat = glm::inverse(aMat);
       std::memcpy(&dest[0], glm::value_ptr(destMat), sizeof(Mat<T, size, size>));
     }
+
+    //TODO: Implement with <simd>
+    /*
+     - Calculate a rotation matrix from an existing matrix, an angle in radians and an axis
+     - Store the result in dest
+     - The axis to rotate around must be normalised
+    */
+    template <typename T> requires validMatrix<T, 4, 4> && validVector<T, 3>
+    void rotate(const Mat<T, 4, 4>& a, T angle, const Vec<T, 3> b, Mat<T, 4, 4>& dest) {
+      glm::mat<4, 4, T, glm::defaultp> aMat;
+      glm::vec<3, T, glm::defaultp> bVec;
+      glm::mat<4, 4, T, glm::defaultp> destMat;
+
+      std::memcpy(glm::value_ptr(aMat), &a[0], sizeof(Mat<T, 4, 4>));
+      std::memcpy(glm::value_ptr(bVec), &b[0], sizeof(Vec<T, 3>));
+
+      destMat = glm::rotate(aMat, angle, bVec);
+      std::memcpy(&dest[0], glm::value_ptr(destMat), sizeof(Mat<T, 4, 4>));
+    }
   }
 
   //Utility / support functions

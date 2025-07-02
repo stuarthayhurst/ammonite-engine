@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <cstring>
 #include <iostream>
+#include <numbers>
 #include <string_view>
 
 #include <ammonite/ammonite.hpp>
@@ -664,6 +665,65 @@ namespace {
 
     return true;
   }
+
+  template <typename T, unsigned int cols, unsigned int rows>
+            requires ammonite::validMatrix<T, cols, rows>
+  bool testRotate() {
+    //Test rotation matrix calculation
+    if constexpr (cols != 4 || rows != 4) {
+      const ammonite::Vec<T, 4> x = {(T)1.0, (T)0.0, (T)0.0, (T)1.0};
+      const ammonite::Vec<T, 4> y = {(T)0.0, (T)1.0, (T)0.0, (T)1.0};
+      const ammonite::Vec<T, 4> z = {(T)0.0, (T)0.0, (T)1.0, (T)1.0};
+
+      //NOLINTBEGIN(cppcoreguidelines-avoid-const-or-ref-data-members)
+      struct TestData {
+        const ammonite::Vec<T, 4>& axis;
+        const ammonite::Vec<T, 4>& in;
+        const ammonite::Vec<T, 4>& out;
+        T angle;
+      };
+      //NOLINTEND(cppcoreguidelines-avoid-const-or-ref-data-members)
+
+      TestData tests[3] = {
+        {y, x, z, -std::numbers::pi / 2},
+        {z, y, x, -std::numbers::pi / 2},
+        {x, z, y, -std::numbers::pi / 2}
+      };
+
+      const int totalTests = sizeof(tests) / sizeof(TestData);
+      for (int testIndex = 0; testIndex < totalTests; testIndex++) {
+        //Prepare matrix storage
+        ammonite::Mat<T, 4, 4> identity = {{0}};
+        ammonite::Mat<T, 4, 4> rotMat = {{0}};
+        ammonite::diagonal(identity, (T)1.0);
+
+        //Correct the axis vector size
+        ammonite::Vec<T, 3> axis = {0};
+        ammonite::copy(tests[testIndex].axis, axis);
+
+        //Calculate the matrix and rotate the point
+        ammonite::Vec<T, 4> result = {0};
+        ammonite::rotate(identity, tests[testIndex].angle, axis, rotMat);
+        ammonite::mul(rotMat, tests[testIndex].in, result);
+
+        //Check calculated point matches expected
+        for (unsigned int i = 0; i < 4; i++) {
+          if (!roughly(result[i], tests[testIndex].out[i])) {
+            ammonite::utils::error << "Matrix rotate failed" << std::endl;
+            ammonite::utils::normal << "  Input axis:\n" << ammonite::formatVector(axis) \
+                                    << "\n  Input point:\n" << ammonite::formatVector(tests[testIndex].in) \
+                                    << "\n  Rotation matrix:\n" << ammonite::formatMatrix(rotMat) \
+                                    << "\n  Output point:\n" << ammonite::formatVector(result) \
+                                    << "\n  Expected output point:\n" << ammonite::formatVector(tests[testIndex].in) \
+                                    << std::endl;
+            return false;
+          }
+        }
+      }
+    }
+
+    return true;
+  }
 }
 
 namespace tests {
@@ -731,7 +791,8 @@ namespace tests {
       }
     }
 
-    return true;
+    //Test ammonite::rotate()
+    return testRotate<T, cols, rows>();
   }
 }
 
