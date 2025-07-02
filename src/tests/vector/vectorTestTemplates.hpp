@@ -158,6 +158,27 @@ namespace {
   }
 
   template <typename T, unsigned int size> requires ammonite::validVector<T, size>
+  bool testSet() {
+    ammonite::Vec<T, size> aVec = {0};
+    ammonite::Vec<T, size> bVec = {0};
+    randomFillVector(aVec);
+
+    //Test vector scalar initialisation
+    ammonite::set(aVec, bVec[0]);
+    for (unsigned int i = 0; i < size; i++) {
+      if (aVec[i] != bVec[0]) {
+        ammonite::utils::error << "Vector set failed" << std::endl;
+        ammonite::utils::normal << "  Result:   " << ammonite::formatVector(aVec) \
+                                << "\n  Expected: " << bVec[0] \
+                                << " at index " << i << std::endl;
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  template <typename T, unsigned int size> requires ammonite::validVector<T, size>
   bool testAdd() {
     ammonite::Vec<T, size> aVec = {0};
     ammonite::Vec<T, size> bVec = {0};
@@ -570,6 +591,11 @@ namespace tests {
 
       //Test ammonite::copyCast()
       if (!testCopyCast<T, size>()) {
+        return false;
+      }
+
+      //Test ammonite::set()
+      if (!testSet<T, size>()) {
         return false;
       }
 

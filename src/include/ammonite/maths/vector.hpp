@@ -65,6 +65,14 @@ namespace ammonite {
       //NOLINTEND(readability-else-after-return)
     }
 
+    //Set every element of the vector to a scalar
+    template <typename T, unsigned int size> requires validVector<T, size>
+    constexpr void set(Vec<T, size>& a, T b) {
+      for (unsigned int i = 0; i < size; i++) {
+        a[i] = b;
+      }
+    }
+
     //Add two vectors of the same size and type, storing the result in dest
     template <typename T, unsigned int size> requires validVector<T, size>
     void add(const Vec<T, size>& a, const Vec<T, size>& b, Vec<T, size>& dest) {
