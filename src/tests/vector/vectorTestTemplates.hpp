@@ -350,7 +350,7 @@ namespace {
   }
 
   template <typename T, unsigned int size> requires ammonite::validVector<T, size>
-  bool testDiv() {
+  bool testDivide() {
     ammonite::Vec<T, size> aVec = {0};
     ammonite::Vec<T, size> bVec = {0};
     T c = randomScalar<T>();
@@ -363,7 +363,7 @@ namespace {
     }
 
     //Test regular division
-    ammonite::div(aVec, c, bVec);
+    ammonite::divide(aVec, c, bVec);
     for (unsigned int i = 0; i < size; i++) {
       if ((T)(aVec[i] / c) != bVec[i]) {
         ammonite::utils::error << "Vector division failed" << std::endl;
@@ -377,7 +377,7 @@ namespace {
 
     //Test in-place division
     ammonite::copy(aVec, bVec);
-    ammonite::div(bVec, c);
+    ammonite::divide(bVec, c);
     for (unsigned int i = 0; i < size; i++) {
       if ((T)(aVec[i] / c) != bVec[i]) {
         ammonite::utils::error << "In-place vector division failed" << std::endl;
@@ -617,8 +617,8 @@ namespace tests {
         return false;
       }
 
-      //Test ammonite::div()
-      if (!testDiv<T, size>()) {
+      //Test ammonite::divide()
+      if (!testDivide<T, size>()) {
         return false;
       }
 

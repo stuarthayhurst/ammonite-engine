@@ -451,7 +451,7 @@ namespace {
             requires ammonite::validMatrix<T, colsA, rowsA> &&
             ammonite::validMatrix<T, colsB, colsA> && ammonite::validVector<T, colsA> &&
             ammonite::validVector<T, rowsA>
-  bool testMul() {
+  bool testMultiply() {
     ammonite::Mat<T, colsA, rowsA> aMat = {{0}};
     ammonite::Mat<T, colsB, colsA> bMat = {{0}};
     ammonite::Mat<T, colsB, rowsA> cMat = {{0}};
@@ -462,7 +462,7 @@ namespace {
     randomFillVector(aVec);
 
     //Test matrix-matrix multiplication
-    ammonite::mul(aMat, bMat, cMat);
+    ammonite::multiply(aMat, bMat, cMat);
     for (unsigned int col = 0; col < colsB; col++) {
       for (unsigned int row = 0; row < rowsA; row++) {
         //Calculate expected value for the current index
@@ -489,7 +489,7 @@ namespace {
     if constexpr ((colsA == rowsA) && (colsA == colsB)) {
       ammonite::Mat<T, colsA, rowsA> dMat = {{0}};
       ammonite::copy(aMat, dMat);
-      ammonite::mul(aMat, bMat);
+      ammonite::multiply(aMat, bMat);
       for (unsigned int col = 0; col < colsA; col++) {
         for (unsigned int row = 0; row < rowsA; row++) {
           //Calculate expected value for the current index
@@ -514,7 +514,7 @@ namespace {
     }
 
     //Test matrix-vector multiplication
-    ammonite::mul(aMat, aVec, bVec);
+    ammonite::multiply(aMat, aVec, bVec);
     for (unsigned int row = 0; row < rowsA; row++) {
       //Calculate expected value for the current index
       T sum = (T)0.0;
@@ -537,7 +537,7 @@ namespace {
     //Test in-place matrix-vector multiplication
     if constexpr ((colsA == rowsA) && (colsA == colsB)) {
       ammonite::copy(aVec, bVec);
-      ammonite::mul(aMat, aVec);
+      ammonite::multiply(aMat, aVec);
       for (unsigned int row = 0; row < rowsA; row++) {
         //Calculate expected value for the current index
         T sum = (T)0.0;
@@ -563,7 +563,7 @@ namespace {
 
     //Test scalar multiplication
     ammonite::Mat<T, colsA, rowsA> eMat = {{0}};
-    ammonite::mul(aMat, aVec[0], eMat);
+    ammonite::multiply(aMat, aVec[0], eMat);
     for (unsigned int col = 0; col < colsA; col++) {
       for (unsigned int row = 0; row < rowsA; row++) {
         if ((T)(aMat[col][row] * aVec[0]) != eMat[col][row]) {
@@ -581,7 +581,7 @@ namespace {
 
     //Test in-place scalar multiplication
     ammonite::copy(aMat, eMat);
-    ammonite::mul(eMat, aVec[0]);
+    ammonite::multiply(eMat, aVec[0]);
     for (unsigned int col = 0; col < colsA; col++) {
       for (unsigned int row = 0; row < rowsA; row++) {
         if ((T)(aMat[col][row] * aVec[0]) != eMat[col][row]) {
@@ -645,7 +645,7 @@ namespace {
         ammonite::diagonal(identityMat, (T)1.0);
 
         ammonite::inverse(aMat, bMat);
-        ammonite::mul(aMat, bMat, cMat);
+        ammonite::multiply(aMat, bMat, cMat);
         for (unsigned int col = 0; col < cols; col++) {
           for (unsigned int row = 0; row < rows; row++) {
             if (!roughly(std::round(cMat[col][row]), identityMat[col][row], (T)0.001)) {
@@ -704,7 +704,7 @@ namespace {
         //Calculate the matrix and rotate the point
         ammonite::Vec<T, 4> result = {0};
         ammonite::rotate(identity, tests[testIndex].angle, axis, rotMat);
-        ammonite::mul(rotMat, tests[testIndex].in, result);
+        ammonite::multiply(rotMat, tests[testIndex].in, result);
 
         //Check calculated point matches expected
         for (unsigned int i = 0; i < 4; i++) {
@@ -769,14 +769,14 @@ namespace tests {
         return false;
       }
 
-      //Test ammonite::mul()
-      if (!testMul<T, cols, rows, 2>()) {
+      //Test ammonite::multiply()
+      if (!testMultiply<T, cols, rows, 2>()) {
         return false;
       }
-      if (!testMul<T, cols, rows, 3>()) {
+      if (!testMultiply<T, cols, rows, 3>()) {
         return false;
       }
-      if (!testMul<T, cols, rows, 4>()) {
+      if (!testMultiply<T, cols, rows, 4>()) {
         return false;
       }
 

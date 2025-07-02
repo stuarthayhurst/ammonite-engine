@@ -255,7 +255,8 @@ namespace ammonite {
     template <typename T, unsigned int colsA, unsigned int rowsA, unsigned int colsB>
               requires validMatrix<T, colsA, rowsA> && validMatrix<T, colsB, colsA> &&
               validMatrix<T, colsB, rowsA>
-    void mul(const Mat<T, colsA, rowsA>& a, const Mat<T, colsB, colsA>& b, Mat<T, colsB, rowsA>& dest) {
+    void multiply(const Mat<T, colsA, rowsA>& a, const Mat<T, colsB, colsA>& b,
+                  Mat<T, colsB, rowsA>& dest) {
       glm::mat<colsA, rowsA, T, glm::defaultp> aMat;
       glm::mat<colsB, colsA, T, glm::defaultp> bMat;
       glm::mat<colsB, rowsA, T, glm::defaultp> destMat;
@@ -274,8 +275,8 @@ namespace ammonite {
     */
     template <typename T, unsigned int size>
               requires validMatrix<T, size, size>
-    void mul(Mat<T, size, size>& a, const Mat<T, size, size>& b) {
-      mul(a, b, a);
+    void multiply(Mat<T, size, size>& a, const Mat<T, size, size>& b) {
+      multiply(a, b, a);
     }
 
     //TODO: Implement with <simd>
@@ -286,7 +287,7 @@ namespace ammonite {
     template <typename T, unsigned int cols, unsigned int rows>
               requires validMatrix<T, cols, rows> && validVector<T, cols> &&
               validVector<T, rows>
-    void mul(const Mat<T, cols, rows>& a, const Vec<T, cols>& b, Vec<T, rows>& dest) {
+    void multiply(const Mat<T, cols, rows>& a, const Vec<T, cols>& b, Vec<T, rows>& dest) {
       glm::mat<cols, rows, T, glm::defaultp> aMat;
       glm::vec<cols, T, glm::defaultp> bVec;
       glm::vec<rows, T, glm::defaultp> destVec;
@@ -304,8 +305,8 @@ namespace ammonite {
     */
     template <typename T, unsigned int size>
               requires validMatrix<T, size, size> && validVector<T, size>
-    void mul(const Mat<T, size, size>& a, Vec<T, size>& b) {
-      mul(a, b, b);
+    void multiply(const Mat<T, size, size>& a, Vec<T, size>& b) {
+      multiply(a, b, b);
     }
 
     /*
@@ -314,7 +315,7 @@ namespace ammonite {
     */
     template <typename T, unsigned int cols, unsigned int rows>
               requires validMatrix<T, cols, rows>
-    void mul(const Mat<T, cols, rows>& a, T b, Mat<T, cols, rows>& dest) {
+    void multiply(const Mat<T, cols, rows>& a, T b, Mat<T, cols, rows>& dest) {
       std::experimental::fixed_size_simd<T, cols * rows> aSimd(&a[0][0], std::experimental::element_aligned);
       std::experimental::fixed_size_simd<T, cols * rows> bSimd = b;
 
@@ -328,8 +329,8 @@ namespace ammonite {
     */
     template <typename T, unsigned int cols, unsigned int rows>
               requires validMatrix<T, cols, rows>
-    void mul(Mat<T, cols, rows>& a, T b) {
-      mul(a, b, a);
+    void multiply(Mat<T, cols, rows>& a, T b) {
+      multiply(a, b, a);
     }
 
     //TODO: Implement with <simd>

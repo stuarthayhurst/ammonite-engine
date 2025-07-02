@@ -176,7 +176,7 @@ namespace ammonite {
        - The scalar and elements must have the same type
     */
     template <typename T, unsigned int size> requires validVector<T, size>
-    void div(const Vec<T, size>& a, T b, Vec<T, size>& dest) {
+    void divide(const Vec<T, size>& a, T b, Vec<T, size>& dest) {
       std::experimental::fixed_size_simd<T, size> aSimd(&a[0], std::experimental::element_aligned);
       std::experimental::fixed_size_simd<T, size> bSimd = b;
 
@@ -189,8 +189,8 @@ namespace ammonite {
        - The scalar and elements must have the same type
     */
     template <typename T, unsigned int size> requires validVector<T, size>
-    void div(Vec<T, size>& a, T b) {
-      div(a, b, a);
+    void divide(Vec<T, size>& a, T b) {
+      divide(a, b, a);
     }
 
     /*
