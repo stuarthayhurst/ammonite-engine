@@ -32,6 +32,7 @@ namespace ammonite {
        - Prefer "add(a, b, x); add(x, b, c)" to "add(a, b, a); add(a, b, c)"
          - However, this means "a" won't be modified
        - Prefer "add(a, b, x); add(x, b, a)" to "add(a, b, a); add(a, b, a)"
+     - Effectively, avoid writing to an input until the end, if at all
     */
     template <typename T, unsigned int size> requires validVector<T, size>
     using Vec = T[size];
