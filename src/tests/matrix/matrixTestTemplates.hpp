@@ -670,10 +670,26 @@ namespace {
             requires ammonite::validMatrix<T, cols, rows>
   bool testRotate() {
     //Test rotation matrix calculation
-    if constexpr (cols != 4 || rows != 4) {
+    if constexpr (cols == 4 && rows == 4) {
       const ammonite::Vec<T, 4> x = {(T)1.0, (T)0.0, (T)0.0, (T)1.0};
       const ammonite::Vec<T, 4> y = {(T)0.0, (T)1.0, (T)0.0, (T)1.0};
       const ammonite::Vec<T, 4> z = {(T)0.0, (T)0.0, (T)1.0, (T)1.0};
+      const ammonite::Vec<T, 4> negY = {(T)0.0, (T)-1.0, (T)0.0, (T)1.0};
+
+      //Calculate 3D normalised vector between x and z
+      ammonite::Vec<T, 4> xz = {0};
+      ammonite::add(x, z, xz);
+      xz[3] = (T)0.0;
+      ammonite::normalise(xz);
+      xz[3] = (T)1.0;
+
+      //Calculate 3D normalised vector between x, y and z
+      ammonite::Vec<T, 4> xyz = {0};
+      ammonite::add(x, y, xyz);
+      ammonite::add(xyz, z, xyz);
+      xyz[3] = (T)0.0;
+      ammonite::normalise(xyz);
+      xyz[3] = (T)1.0;
 
       //NOLINTBEGIN(cppcoreguidelines-avoid-const-or-ref-data-members)
       struct TestData {
@@ -684,10 +700,25 @@ namespace {
       };
       //NOLINTEND(cppcoreguidelines-avoid-const-or-ref-data-members)
 
-      TestData tests[3] = {
+      TestData tests[11] = {
+        //Convert between axes
         {y, x, z, -std::numbers::pi / 2},
         {z, y, x, -std::numbers::pi / 2},
-        {x, z, y, -std::numbers::pi / 2}
+        {x, z, y, -std::numbers::pi / 2},
+
+        //Reflect axes
+        {xz, x, z, std::numbers::pi},
+        {xz, z, x, std::numbers::pi},
+        {xz, y, negY, std::numbers::pi},
+
+        //Roll axes
+        {xyz, y, z, (std::numbers::pi * 2) / 3},
+        {xyz, z, x, (std::numbers::pi * 2) / 3},
+        {xyz, x, y, (std::numbers::pi * 2) / 3},
+
+        //Recover x and z from xz
+        {y, xz, x, std::numbers::pi / 4},
+        {y, xz, z, -std::numbers::pi / 4}
       };
 
       const int totalTests = sizeof(tests) / sizeof(TestData);
@@ -714,7 +745,7 @@ namespace {
                                     << "\n  Input point:\n" << ammonite::formatVector(tests[testIndex].in) \
                                     << "\n  Rotation matrix:\n" << ammonite::formatMatrix(rotMat) \
                                     << "\n  Output point:\n" << ammonite::formatVector(result) \
-                                    << "\n  Expected output point:\n" << ammonite::formatVector(tests[testIndex].in) \
+                                    << "\n  Expected output point:\n" << ammonite::formatVector(tests[testIndex].out) \
                                     << std::endl;
             return false;
           }
