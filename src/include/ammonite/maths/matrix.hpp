@@ -332,6 +332,7 @@ namespace ammonite {
       mul(a, b, a);
     }
 
+    //TODO: Implement with <simd>
     //Calculate the determinant for a square matrix
     template <typename T, unsigned int size>
               requires validMatrix<T, size, size>
@@ -343,6 +344,7 @@ namespace ammonite {
       return (T)glm::determinant(aMat);
     }
 
+    //TODO: Implement with <simd>
     /*
      - Calculate the inverse of a square matrix, storing the result in dest
      - This doesn't check for invertibility first
