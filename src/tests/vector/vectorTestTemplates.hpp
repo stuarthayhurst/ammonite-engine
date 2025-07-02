@@ -160,16 +160,16 @@ namespace {
   template <typename T, unsigned int size> requires ammonite::validVector<T, size>
   bool testSet() {
     ammonite::Vec<T, size> aVec = {0};
-    ammonite::Vec<T, size> bVec = {0};
     randomFillVector(aVec);
+    T b = randomScalar<T>();
 
     //Test vector scalar initialisation
-    ammonite::set(aVec, bVec[0]);
+    ammonite::set(aVec, b);
     for (unsigned int i = 0; i < size; i++) {
-      if (aVec[i] != bVec[0]) {
+      if (aVec[i] != b) {
         ammonite::utils::error << "Vector set failed" << std::endl;
         ammonite::utils::normal << "  Result:   " << ammonite::formatVector(aVec) \
-                                << "\n  Expected: " << bVec[0] \
+                                << "\n  Expected: " << b \
                                 << " at index " << i << std::endl;
         return false;
       }
@@ -183,6 +183,7 @@ namespace {
     ammonite::Vec<T, size> aVec = {0};
     ammonite::Vec<T, size> bVec = {0};
     ammonite::Vec<T, size> cVec = {0};
+    T d = randomScalar<T>();
     randomFillVector(aVec);
     randomFillVector(bVec);
 
@@ -214,12 +215,12 @@ namespace {
     }
 
     //Test scalar addition
-    ammonite::add(aVec, bVec[0], cVec);
+    ammonite::add(aVec, d, cVec);
     for (unsigned int i = 0; i < size; i++) {
-      if ((T)(aVec[i] + bVec[0]) != cVec[i]) {
+      if ((T)(aVec[i] + d) != cVec[i]) {
         ammonite::utils::error << "Scalar vector addition failed" << std::endl;
         ammonite::utils::normal << "  Input:  " << ammonite::formatVector(aVec) \
-                                << "\n  Input:  " << bVec[0] \
+                                << "\n  Input:  " << d \
                                 << "\n  Result: " << ammonite::formatVector(cVec) \
                                 << std::endl;
         return false;
@@ -228,12 +229,12 @@ namespace {
 
     //Test in-place scalar addition
     ammonite::copy(aVec, cVec);
-    ammonite::add(cVec, bVec[0]);
+    ammonite::add(cVec, d);
     for (unsigned int i = 0; i < size; i++) {
-      if ((T)(aVec[i] + bVec[0]) != cVec[i]) {
+      if ((T)(aVec[i] + d) != cVec[i]) {
         ammonite::utils::error << "In-place scalar vector addition failed" << std::endl;
         ammonite::utils::normal << "  Input:  " << ammonite::formatVector(aVec) \
-                                << "\n  Input:  " << bVec[0] \
+                                << "\n  Input:  " << d \
                                 << "\n  Result: " << ammonite::formatVector(cVec) \
                                 << std::endl;
         return false;
@@ -248,6 +249,7 @@ namespace {
     ammonite::Vec<T, size> aVec = {0};
     ammonite::Vec<T, size> bVec = {0};
     ammonite::Vec<T, size> cVec = {0};
+    T d = randomScalar<T>();
     randomFillVector(aVec);
     randomFillVector(bVec);
 
@@ -279,12 +281,12 @@ namespace {
     }
 
     //Test scalar subtraction
-    ammonite::sub(aVec, bVec[0], cVec);
+    ammonite::sub(aVec, d, cVec);
     for (unsigned int i = 0; i < size; i++) {
-      if ((T)(aVec[i] - bVec[0]) != cVec[i]) {
+      if ((T)(aVec[i] - d) != cVec[i]) {
         ammonite::utils::error << "Scalar vector subtraction failed" << std::endl;
         ammonite::utils::normal << "  Input:  " << ammonite::formatVector(aVec) \
-                                << "\n  Input:  " << bVec[0] \
+                                << "\n  Input:  " << d \
                                 << "\n  Result: " << ammonite::formatVector(cVec) \
                                 << std::endl;
         return false;
@@ -293,12 +295,12 @@ namespace {
 
     //Test in-place scalar subtraction
     ammonite::copy(aVec, cVec);
-    ammonite::sub(cVec, bVec[0]);
+    ammonite::sub(cVec, d);
     for (unsigned int i = 0; i < size; i++) {
-      if ((T)(aVec[i] - bVec[0]) != cVec[i]) {
+      if ((T)(aVec[i] - d) != cVec[i]) {
         ammonite::utils::error << "In-place scalar vector subtraction failed" << std::endl;
         ammonite::utils::normal << "  Input:  " << ammonite::formatVector(aVec) \
-                                << "\n  Input:  " << bVec[0] \
+                                << "\n  Input:  " << d \
                                 << "\n  Result: " << ammonite::formatVector(cVec) \
                                 << std::endl;
         return false;
@@ -313,16 +315,17 @@ namespace {
     ammonite::Vec<T, size> aVec = {0};
     ammonite::Vec<T, size> bVec = {0};
     ammonite::Vec<T, size> cVec = {0};
+    T d = randomScalar<T>();
     randomFillVector(aVec);
     randomFillVector(bVec);
 
     //Test regular scaling
-    ammonite::scale(aVec, bVec[0], cVec);
+    ammonite::scale(aVec, d, cVec);
     for (unsigned int i = 0; i < size; i++) {
-      if ((T)(aVec[i] * bVec[0]) != cVec[i]) {
+      if ((T)(aVec[i] * d) != cVec[i]) {
         ammonite::utils::error << "Vector scaling failed" << std::endl;
         ammonite::utils::normal << "  Input:  " << ammonite::formatVector(aVec) \
-                                << "\n  Input:  " << bVec[0] \
+                                << "\n  Input:  " << d \
                                 << "\n  Result: " << ammonite::formatVector(cVec) \
                                 << std::endl;
         return false;
@@ -331,12 +334,12 @@ namespace {
 
     //Test in-place scaling
     ammonite::copy(aVec, cVec);
-    ammonite::scale(cVec, bVec[0]);
+    ammonite::scale(cVec, d);
     for (unsigned int i = 0; i < size; i++) {
-      if ((T)(aVec[i] * bVec[0]) != cVec[i]) {
+      if ((T)(aVec[i] * d) != cVec[i]) {
         ammonite::utils::error << "In-place vector scaling failed" << std::endl;
         ammonite::utils::normal << "  Input:  " << ammonite::formatVector(aVec) \
-                                << "\n  Input:  " << bVec[0] \
+                                << "\n  Input:  " << d \
                                 << "\n  Result: " << ammonite::formatVector(cVec) \
                                 << std::endl;
         return false;
@@ -350,37 +353,37 @@ namespace {
   bool testDiv() {
     ammonite::Vec<T, size> aVec = {0};
     ammonite::Vec<T, size> bVec = {0};
-    ammonite::Vec<T, size> cVec = {0};
+    T c = randomScalar<T>();
     randomFillVector(aVec);
-    randomFillVector(bVec);
+
 
     //Avoid division by zero
-    if (bVec[0] == (T)0) {
-      bVec[0]++;
+    if (c == (T)0) {
+      c++;
     }
 
     //Test regular division
-    ammonite::div(aVec, bVec[0], cVec);
+    ammonite::div(aVec, c, bVec);
     for (unsigned int i = 0; i < size; i++) {
-      if ((T)(aVec[i] / bVec[0]) != cVec[i]) {
+      if ((T)(aVec[i] / c) != bVec[i]) {
         ammonite::utils::error << "Vector division failed" << std::endl;
         ammonite::utils::normal << "  Input:  " << ammonite::formatVector(aVec) \
-                                << "\n  Input:  " << bVec[0] \
-                                << "\n  Result: " << ammonite::formatVector(cVec) \
+                                << "\n  Input:  " << c \
+                                << "\n  Result: " << ammonite::formatVector(bVec) \
                                 << std::endl;
         return false;
       }
     }
 
     //Test in-place division
-    ammonite::copy(aVec, cVec);
-    ammonite::div(cVec, bVec[0]);
+    ammonite::copy(aVec, bVec);
+    ammonite::div(bVec, c);
     for (unsigned int i = 0; i < size; i++) {
-      if ((T)(aVec[i] / bVec[0]) != cVec[i]) {
+      if ((T)(aVec[i] / c) != bVec[i]) {
         ammonite::utils::error << "In-place vector division failed" << std::endl;
         ammonite::utils::normal << "  Input:  " << ammonite::formatVector(aVec) \
-                                << "\n  Input:  " << bVec[0] \
-                                << "\n  Result: " << ammonite::formatVector(cVec) \
+                                << "\n  Input:  " << c \
+                                << "\n  Result: " << ammonite::formatVector(bVec) \
                                 << std::endl;
         return false;
       }
