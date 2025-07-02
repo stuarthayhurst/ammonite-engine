@@ -342,6 +342,22 @@ namespace ammonite {
 
       return (T)glm::determinant(aMat);
     }
+
+    /*
+     - Calculate the inverse of a square matrix, storing the result in dest
+     - This doesn't check for invertibility first
+    */
+    template <typename T, unsigned int size>
+              requires validMatrix<T, size, size>
+    void inverse(const Mat<T, size, size>& a, Mat<T, size, size>& dest) {
+      glm::mat<size, size, T, glm::defaultp> aMat;
+      glm::mat<size, size, T, glm::defaultp> destMat;
+
+      std::memcpy(glm::value_ptr(aMat), &a[0], sizeof(Mat<T, size, size>));
+
+      destMat = glm::inverse(aMat);
+      std::memcpy(&dest[0], glm::value_ptr(destMat), sizeof(Mat<T, size, size>));
+    }
   }
 
   //Utility / support functions
