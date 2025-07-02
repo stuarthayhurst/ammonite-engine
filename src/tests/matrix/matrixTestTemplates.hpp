@@ -627,6 +627,43 @@ namespace {
 
     return true;
   }
+
+  template <typename T, unsigned int cols, unsigned int rows>
+            requires ammonite::validMatrix<T, cols, rows>
+  bool testInverse() {
+    //Only run tests for square matrices with enough precision for intermediates
+    if constexpr ((cols == rows) && sizeof(T) >= 8) {
+      ammonite::Mat<T, cols, rows> aMat = {{0}};
+      ammonite::Mat<T, cols, rows> bMat = {{0}};
+      ammonite::Mat<T, cols, rows> cMat = {{0}};
+      randomFillMatrix(aMat, (T)10);
+
+      //Test matrix inverse if aMat is invertible
+      if (ammonite::determinant(aMat) != (T)0) {
+        ammonite::Mat<T, cols, rows> identityMat = {{0}};
+        ammonite::diagonal(identityMat, (T)1.0);
+
+        ammonite::inverse(aMat, bMat);
+        ammonite::mul(aMat, bMat, cMat);
+        for (unsigned int col = 0; col < cols; col++) {
+          for (unsigned int row = 0; row < rows; row++) {
+            if (!roughly(std::round(cMat[col][row]), identityMat[col][row], (T)0.001)) {
+              ammonite::utils::error << "Matrix inverse failed" << std::endl;
+              ammonite::utils::normal << "  Input:\n" << ammonite::formatMatrix(aMat) \
+                                      << "\n  Result:\n" << ammonite::formatMatrix(bMat) \
+                                      << "\n  Product:\n" << ammonite::formatMatrix(cMat) \
+                                      << "\n  Expected: " << identityMat[col][row] \
+                                      << " at product column " << col << ", row " << row \
+                                      << std::endl;
+              return false;
+            }
+          }
+        }
+      }
+    }
+
+    return true;
+  }
 }
 
 namespace tests {
@@ -685,6 +722,11 @@ namespace tests {
 
       //Test ammonite::determinant()
       if (!testDeterminant<T, cols, rows>()) {
+        return false;
+      }
+
+      //Test ammonite::inverse()
+      if (!testInverse<T, cols, rows>()) {
         return false;
       }
     }
