@@ -36,7 +36,7 @@ bool roughly(T a, T b) {
   if constexpr (std::is_integral_v<T>) {
     return (a == b);
   } else {
-    return std::abs(a - b) <= std::max((T)1e-5f, std::abs(std::max(a, b) * (T)0.001));
+    return std::abs(a - b) <= std::max((T)1e-5f, std::max(std::abs(a), std::abs(b)) * (T)0.001);
   }
 }
 
