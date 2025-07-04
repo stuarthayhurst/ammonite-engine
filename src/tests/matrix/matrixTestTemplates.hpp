@@ -817,6 +817,56 @@ namespace {
 
     return true;
   }
+
+  template <typename T, unsigned int cols, unsigned int rows>
+            requires ammonite::validMatrix<T, cols, rows>
+  bool testTranslate() {
+    //Test translation matrix calculation
+    if constexpr (cols == 4 && rows == 4) {
+      //Prepare input and translation
+      ammonite::Vec<T, 4> inVec = {0};
+      ammonite::Vec<T, 4> outVec = {0};
+      ammonite::Vec<T, 3> translationVec = {0};
+      randomFillVector(inVec);
+      randomFillVector(translationVec);
+      inVec[3] = (T)1.0;
+
+      //Create the translation matrix
+      ammonite::Mat<T, 4, 4> identity = {{0}};
+      ammonite::Mat<T, 4, 4> translationMat = {{0}};
+      ammonite::diagonal(identity, (T)1.0);
+      ammonite::translate(identity, translationVec, translationMat);
+
+      //Translate the point and verify it
+      ammonite::multiply(translationMat, inVec, outVec);
+      for (unsigned int i = 0; i < 3; i++) {
+        if (!roughly(inVec[i] + translationVec[i], outVec[i])) {
+          ammonite::utils::error << "Matrix translation failed" << std::endl;
+          ammonite::utils::normal << "  Input translation:\n" << ammonite::formatVector(translationVec) \
+                                  << "\n  Input point:\n" << ammonite::formatVector(inVec) \
+                                  << "\n  Translation matrix:\n" << ammonite::formatMatrix(translationMat) \
+                                  << "\n  Output point:\n" << ammonite::formatVector(outVec) \
+                                  << "\n  Expected: " << inVec[i] + translationVec[i] \
+                                  << " at index " << i << std::endl;
+          return false;
+        }
+      }
+
+      //Create the translation matrix in-place, then verify it
+      ammonite::Mat<T, 4, 4> newTranslationMat = {{0}};
+      ammonite::diagonal(newTranslationMat, (T)1.0);
+      ammonite::translate(newTranslationMat, translationVec);
+      if (!ammonite::equal(newTranslationMat, translationMat)) {
+        ammonite::utils::error << "In-place matrix translation failed" << std::endl;
+        ammonite::utils::normal << "  Result:\n" << ammonite::formatMatrix(newTranslationMat) \
+                                << "\n  Expected:\n" << ammonite::formatMatrix(translationMat) \
+                                << std::endl;
+        return false;
+      }
+    }
+
+    return true;
+  }
 }
 
 namespace tests {
@@ -885,6 +935,11 @@ namespace tests {
 
       //Test ammonite::scale()
       if (!testScale<T, cols, rows>()) {
+        return false;
+      }
+
+      //Test ammonite::translate()
+      if (!testTranslate<T, cols, rows>()) {
         return false;
       }
     }

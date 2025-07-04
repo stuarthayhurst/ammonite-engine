@@ -417,6 +417,33 @@ namespace ammonite {
     void scale(Mat<T, 4, 4>& a, const Vec<T, 3> b) {
       scale(a, b, a);
     }
+
+    //TODO: Implement with <simd>
+    /*
+     - Calculate a translation matrix from an existing matrix and a translation vector
+     - Store the result in dest
+    */
+    template <typename T> requires validMatrix<T, 4, 4> && validVector<T, 3>
+    void translate(const Mat<T, 4, 4>& a, const Vec<T, 3> b, Mat<T, 4, 4>& dest) {
+      glm::mat<4, 4, T, glm::defaultp> aMat;
+      glm::vec<3, T, glm::defaultp> bVec;
+      glm::mat<4, 4, T, glm::defaultp> destMat;
+
+      std::memcpy(glm::value_ptr(aMat), &a[0], sizeof(Mat<T, 4, 4>));
+      std::memcpy(glm::value_ptr(bVec), &b[0], sizeof(Vec<T, 3>));
+
+      destMat = glm::translate(aMat, bVec);
+      std::memcpy(&dest[0], glm::value_ptr(destMat), sizeof(Mat<T, 4, 4>));
+    }
+
+    /*
+     - Calculate a translation matrix from an existing matrix and a translation vector
+     - Store the result in the same matrix
+    */
+    template <typename T> requires validMatrix<T, 4, 4> && validVector<T, 3>
+    void translate(Mat<T, 4, 4>& a, const Vec<T, 3> b) {
+      translate(a, b, a);
+    }
   }
 
   //Utility / support functions
