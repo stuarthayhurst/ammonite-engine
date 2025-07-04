@@ -750,6 +750,18 @@ namespace {
             return false;
           }
         }
+
+        //Create the rotation matrix in-place, then verify it
+        ammonite::Mat<T, 4, 4> newRotMat = {{0}};
+        ammonite::diagonal(newRotMat, (T)1.0);
+        ammonite::rotate(newRotMat, tests[testIndex].angle, axis);
+        if (!ammonite::equal(newRotMat, rotMat)) {
+          ammonite::utils::error << "In-place matrix rotate failed" << std::endl;
+          ammonite::utils::normal << "  Result:\n" << ammonite::formatMatrix(newRotMat) \
+                                  << "\n  Expected:\n" << ammonite::formatMatrix(rotMat) \
+                                  << std::endl;
+          return false;
+        }
       }
     }
 

@@ -381,6 +381,16 @@ namespace ammonite {
       std::memcpy(&dest[0], glm::value_ptr(destMat), sizeof(Mat<T, 4, 4>));
     }
 
+    /*
+     - Calculate a rotation matrix from an existing matrix, an angle in radians and an axis
+     - Store the result in the same matrix
+     - The axis to rotate around must be normalised
+    */
+    template <typename T> requires validMatrix<T, 4, 4> && validVector<T, 3>
+    void rotate(Mat<T, 4, 4>& a, T angle, const Vec<T, 3> b) {
+      rotate(a, angle, b, a);
+    }
+
     //TODO: Implement with <simd>
     /*
      - Calculate a scale matrix from an existing matrix and a vector of scaling ratios
