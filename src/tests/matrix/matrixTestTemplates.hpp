@@ -755,6 +755,56 @@ namespace {
 
     return true;
   }
+
+  template <typename T, unsigned int cols, unsigned int rows>
+            requires ammonite::validMatrix<T, cols, rows>
+  bool testScale() {
+    //Test scale matrix calculation
+    if constexpr (cols == 4 && rows == 4) {
+      //Prepare input and ratios
+      ammonite::Vec<T, 4> inVec = {0};
+      ammonite::Vec<T, 4> outVec = {0};
+      ammonite::Vec<T, 3> scaleVec = {0};
+      randomFillVector(inVec);
+      randomFillVector(scaleVec);
+      inVec[3] = (T)1.0;
+
+      //Create the scale matrix
+      ammonite::Mat<T, 4, 4> identity = {{0}};
+      ammonite::Mat<T, 4, 4> scaleMat = {{0}};
+      ammonite::diagonal(identity, (T)1.0);
+      ammonite::scale(identity, scaleVec, scaleMat);
+
+      //Scale the point and verify it
+      ammonite::multiply(scaleMat, inVec, outVec);
+      for (unsigned int i = 0; i < 3; i++) {
+        if (!roughly(inVec[i] * scaleVec[i], outVec[i])) {
+          ammonite::utils::error << "Matrix scale failed" << std::endl;
+          ammonite::utils::normal << "  Input scale:\n" << ammonite::formatVector(scaleVec) \
+                                  << "\n  Input point:\n" << ammonite::formatVector(inVec) \
+                                  << "\n  Scale matrix:\n" << ammonite::formatMatrix(scaleMat) \
+                                  << "\n  Output point:\n" << ammonite::formatVector(outVec) \
+                                  << "\n  Expected: " << inVec[i] * scaleVec[i] \
+                                  << " at index " << i << std::endl;
+          return false;
+        }
+      }
+
+      //Create the scale matrix in-place, then verify it
+      ammonite::Mat<T, 4, 4> newScaleMat = {{0}};
+      ammonite::diagonal(newScaleMat, (T)1.0);
+      ammonite::scale(newScaleMat, scaleVec);
+      if (!ammonite::equal(newScaleMat, scaleMat)) {
+        ammonite::utils::error << "In-place matrix scale failed" << std::endl;
+        ammonite::utils::normal << "  Result:\n" << ammonite::formatMatrix(newScaleMat) \
+                                << "\n  Expected:\n" << ammonite::formatMatrix(scaleMat) \
+                                << std::endl;
+        return false;
+      }
+    }
+
+    return true;
+  }
 }
 
 namespace tests {
@@ -818,6 +868,11 @@ namespace tests {
 
       //Test ammonite::inverse()
       if (!testInverse<T, cols, rows>()) {
+        return false;
+      }
+
+      //Test ammonite::scale()
+      if (!testScale<T, cols, rows>()) {
         return false;
       }
     }
