@@ -142,6 +142,13 @@ namespace ammonite {
       }
     }
 
+    //Set each element of a matrix's diagonal to 1.0
+    template <typename T, unsigned int cols, unsigned int rows>
+              requires validMatrix<T, cols, rows>
+    constexpr void identity(Mat<T, cols, rows>& a) {
+      diagonal(a, (T)1.0);
+    }
+
     //Add two matrices of the same size and type, storing the result in dest
     template <typename T, unsigned int cols, unsigned int rows>
               requires validMatrix<T, cols, rows>

@@ -251,6 +251,18 @@ namespace {
       }
     }
 
+    //Test matrix identity
+    ammonite::identity(aMat);
+    for (unsigned int i = 0; i < minSize; i++) {
+      if (aMat[i][i] != (T)1.0) {
+        ammonite::utils::error << "Matrix identity set failed" << std::endl;
+        ammonite::utils::normal << "  Result:\n" << ammonite::formatMatrix(aMat) \
+                                << "\n  Expected: " << (T)1.0 \
+                                << " at column " << i << ", row " << i << std::endl;
+        return false;
+      }
+    }
+
     return true;
   }
 
@@ -888,7 +900,7 @@ namespace tests {
         return false;
       }
 
-      //Test ammonite::diagonal()
+      //Test ammonite::diagonal() and ammonite::identity()
       if (!testDiagonal<T, cols, rows>()) {
         return false;
       }
