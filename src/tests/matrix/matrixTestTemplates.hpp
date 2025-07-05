@@ -654,7 +654,7 @@ namespace {
       //Test matrix inverse if aMat is invertible
       if (ammonite::determinant(aMat) != (T)0) {
         ammonite::Mat<T, cols, rows> identityMat = {{0}};
-        ammonite::diagonal(identityMat, (T)1.0);
+        ammonite::identity(identityMat);
 
         ammonite::inverse(aMat, bMat);
         ammonite::multiply(aMat, bMat, cMat);
@@ -732,9 +732,9 @@ namespace {
       const int totalTests = sizeof(tests) / sizeof(TestData);
       for (int testIndex = 0; testIndex < totalTests; testIndex++) {
         //Prepare matrix storage
-        ammonite::Mat<T, 4, 4> identity = {{0}};
+        ammonite::Mat<T, 4, 4> identityMat = {{0}};
         ammonite::Mat<T, 4, 4> rotMat = {{0}};
-        ammonite::diagonal(identity, (T)1.0);
+        ammonite::identity(identityMat);
 
         //Correct the axis vector size
         ammonite::Vec<T, 3> axis = {0};
@@ -742,7 +742,7 @@ namespace {
 
         //Calculate the matrix and rotate the point
         ammonite::Vec<T, 4> result = {0};
-        ammonite::rotate(identity, tests[testIndex].angle, axis, rotMat);
+        ammonite::rotate(identityMat, tests[testIndex].angle, axis, rotMat);
         ammonite::multiply(rotMat, tests[testIndex].in, result);
 
         //Check calculated point matches expected
@@ -761,7 +761,7 @@ namespace {
 
         //Create the rotation matrix in-place, then verify it
         ammonite::Mat<T, 4, 4> newRotMat = {{0}};
-        ammonite::diagonal(newRotMat, (T)1.0);
+        ammonite::identity(newRotMat);
         ammonite::rotate(newRotMat, tests[testIndex].angle, axis);
         if (!ammonite::equal(newRotMat, rotMat)) {
           ammonite::utils::error << "In-place matrix rotate failed" << std::endl;
@@ -790,10 +790,10 @@ namespace {
       inVec[3] = (T)1.0;
 
       //Create the scale matrix
-      ammonite::Mat<T, 4, 4> identity = {{0}};
+      ammonite::Mat<T, 4, 4> identityMat = {{0}};
       ammonite::Mat<T, 4, 4> scaleMat = {{0}};
-      ammonite::diagonal(identity, (T)1.0);
-      ammonite::scale(identity, scaleVec, scaleMat);
+      ammonite::identity(identityMat);
+      ammonite::scale(identityMat, scaleVec, scaleMat);
 
       //Scale the point and verify it
       ammonite::multiply(scaleMat, inVec, outVec);
@@ -812,7 +812,7 @@ namespace {
 
       //Create the scale matrix in-place, then verify it
       ammonite::Mat<T, 4, 4> newScaleMat = {{0}};
-      ammonite::diagonal(newScaleMat, (T)1.0);
+      ammonite::identity(newScaleMat);
       ammonite::scale(newScaleMat, scaleVec);
       if (!ammonite::equal(newScaleMat, scaleMat)) {
         ammonite::utils::error << "In-place matrix scale failed" << std::endl;
@@ -840,10 +840,10 @@ namespace {
       inVec[3] = (T)1.0;
 
       //Create the translation matrix
-      ammonite::Mat<T, 4, 4> identity = {{0}};
+      ammonite::Mat<T, 4, 4> identityMat = {{0}};
       ammonite::Mat<T, 4, 4> translationMat = {{0}};
-      ammonite::diagonal(identity, (T)1.0);
-      ammonite::translate(identity, translationVec, translationMat);
+      ammonite::identity(identityMat);
+      ammonite::translate(identityMat, translationVec, translationMat);
 
       //Translate the point and verify it
       ammonite::multiply(translationMat, inVec, outVec);
@@ -862,7 +862,7 @@ namespace {
 
       //Create the translation matrix in-place, then verify it
       ammonite::Mat<T, 4, 4> newTranslationMat = {{0}};
-      ammonite::diagonal(newTranslationMat, (T)1.0);
+      ammonite::identity(newTranslationMat);
       ammonite::translate(newTranslationMat, translationVec);
       if (!ammonite::equal(newTranslationMat, translationMat)) {
         ammonite::utils::error << "In-place matrix translation failed" << std::endl;
