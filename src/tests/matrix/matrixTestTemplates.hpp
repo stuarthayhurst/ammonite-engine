@@ -875,6 +875,82 @@ namespace {
 
     return true;
   }
+
+  template <typename T, unsigned int cols, unsigned int rows>
+            requires ammonite::validMatrix<T, cols, rows>
+  bool testLookAt() {
+    //Test view matrix calculation
+    if constexpr ((cols == 4 && rows == 4) && sizeof(T) >= 8) {
+      //Prepare view matrix parameters
+      ammonite::Vec<T, 3> cameraVec = {0};
+      ammonite::Vec<T, 3> targetVec = {0};
+      ammonite::Vec<T, 3> upVec = {0};
+      randomFillVector(cameraVec, (T)10.0);
+      randomFillVector(targetVec, (T)10.0);
+      randomFillVector(upVec, (T)10.0);
+
+      //Create the view matrix
+      ammonite::Mat<T, 4, 4> viewMat = {{0}};
+      ammonite::normalise(upVec);
+      ammonite::lookAt(cameraVec, targetVec, upVec, viewMat);
+
+      //Vectors for tests
+      ammonite::Vec<T, 4> originWideVec = {0};
+      ammonite::Vec<T, 4> cameraWideVec = {0};
+      ammonite::Vec<T, 4> targetWideVec = {0};
+      ammonite::Vec<T, 4> negZVec = {(T)0.0, (T)0.0, (T)-1.0, (T)0.0};
+      ammonite::copyCast(cameraVec, cameraWideVec);
+      ammonite::copyCast(targetVec, targetWideVec);
+
+      //Coordinate 1 unit away from the camera, towards the target
+      ammonite::Vec<T, 4> cameraTargetPosWideVec = {0};
+      ammonite::sub(targetWideVec, cameraWideVec, cameraTargetPosWideVec);
+      ammonite::normalise(cameraTargetPosWideVec);
+      ammonite::add(cameraTargetPosWideVec, cameraWideVec, cameraTargetPosWideVec);
+
+      //Set 4th components
+      cameraWideVec[3] = (T)1.0;
+      originWideVec[3] = (T)1.0;
+      cameraTargetPosWideVec[3] = (T)1.0;
+      negZVec[3] = (T)1.0;
+
+      //NOLINTBEGIN(cppcoreguidelines-avoid-const-or-ref-data-members)
+      struct TestData {
+        const ammonite::Vec<T, 4>& in;
+        const ammonite::Vec<T, 4>& out;
+      };
+      //NOLINTEND(cppcoreguidelines-avoid-const-or-ref-data-members)
+
+      TestData tests[2] = {
+        {cameraWideVec, originWideVec},
+        {cameraTargetPosWideVec, negZVec}
+      };
+
+      const int totalTests = sizeof(tests) / sizeof(TestData);
+      for (int testIndex = 0; testIndex < totalTests; testIndex++) {
+        //Apply the view matrix and verify it
+        ammonite::Vec<T, 4> outVec = {0};
+        ammonite::multiply(viewMat, tests[testIndex].in, outVec);
+
+        for (unsigned int i = 0; i < 3; i++) {
+          if (!roughly(tests[testIndex].out[i], outVec[i])) {
+            ammonite::utils::error << "View matrix calculation failed" << std::endl;
+            ammonite::utils::normal << "  Input camera position:\n" << ammonite::formatVector(cameraVec) \
+                                    << "\n  Input target position:\n" << ammonite::formatVector(targetVec) \
+                                    << "\n  Input up vector:\n" << ammonite::formatVector(upVec) \
+                                    << "\n  Input point:\n" << ammonite::formatVector(tests[testIndex].in) \
+                                    << "\n  View matrix:\n" << ammonite::formatMatrix(viewMat) \
+                                    << "\n  Output point:\n" << ammonite::formatVector(outVec) \
+                                    << "\n  Expected:\n" << ammonite::formatVector(tests[testIndex].out) \
+                                    << std::endl;
+            return false;
+          }
+        }
+      }
+    }
+
+    return true;
+  }
 }
 
 namespace tests {
@@ -948,6 +1024,11 @@ namespace tests {
 
       //Test ammonite::translate()
       if (!testTranslate<T, cols, rows>()) {
+        return false;
+      }
+
+      //Test ammonite::lookAt()
+      if (!testLookAt<T, cols, rows>()) {
         return false;
       }
     }

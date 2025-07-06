@@ -451,6 +451,28 @@ namespace ammonite {
     void translate(Mat<T, 4, 4>& a, const Vec<T, 3> b) {
       translate(a, b, a);
     }
+
+    //TODO: Implement with <simd>
+    /*
+     - Calculate a view matrix from a camera position, camera target and an up vector
+     - Store the result in dest
+    */
+    template <typename T> requires validMatrix<T, 4, 4> && validVector<T, 3>
+    void lookAt(const Vec<T, 3>& camera, const Vec<T, 3>& target, const Vec<T, 3>& up,
+                Mat<T, 4, 4>& dest) {
+      glm::vec<3, T, glm::defaultp> cameraVec;
+      glm::vec<3, T, glm::defaultp> targetVec;
+      glm::vec<3, T, glm::defaultp> upVec;
+      glm::mat<4, 4, T, glm::defaultp> destMat;
+
+
+      std::memcpy(glm::value_ptr(cameraVec), &camera[0], sizeof(Vec<T, 3>));
+      std::memcpy(glm::value_ptr(targetVec), &target[0], sizeof(Vec<T, 3>));
+      std::memcpy(glm::value_ptr(upVec), &up[0], sizeof(Vec<T, 3>));
+
+      destMat = glm::lookAt(cameraVec, targetVec, upVec);
+      std::memcpy(&dest[0], glm::value_ptr(destMat), sizeof(Mat<T, 4, 4>));
+    }
   }
 
   //Utility / support functions
