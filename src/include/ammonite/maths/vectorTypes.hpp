@@ -26,13 +26,13 @@ namespace ammonite {
        - If you specifically want a reference, leave it as one
        - If you didn't need a reference, make it a const&
        - If you specifically don't want a reference, make it a const& and copy() to an intermediate
-     - In-place operations are slower than using an intermediate local variable,
-       then copying back in the final operation
+     - In-place operations on external references are slower than using
+       an intermediate local variable, then copying back in the final operation
      - For references (a, b, c) and local variable x:
        - Prefer "add(a, b, x); add(x, b, c)" to "add(a, b, a); add(a, b, c)"
          - However, this means "a" won't be modified
        - Prefer "add(a, b, x); add(x, b, a)" to "add(a, b, a); add(a, b, a)"
-     - Effectively, avoid writing to an input until the end, if at all
+     - Effectively, avoid writing to an external reference until the end, if at all
     */
     template <typename T, unsigned int size> requires validVector<T, size>
     using Vec = T[size];
