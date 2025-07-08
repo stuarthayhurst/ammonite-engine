@@ -951,6 +951,60 @@ namespace {
 
     return true;
   }
+
+  template <typename T, unsigned int cols, unsigned int rows>
+            requires ammonite::validMatrix<T, cols, rows>
+  bool testPerspective() {
+    //Test perspective projection matrix calculation
+    if constexpr ((cols == 4 && rows == 4)) {
+      ammonite::Vec<T, 4> inVec = {(T)0.0, (T)0.0, (T)0.0, (T)1.0};
+      ammonite::Vec<T, 4> outVec = {0};
+
+      //Pick random matrix parameters and calculate the matrix
+      T fov = randomScalar<T>();
+      T aspectRatio = randomScalar<T>();
+      T nearPlane = (T)0.1;
+      T farPlane = (T)100.0;
+      ammonite::Mat<T, 4, 4> perspectiveMat = {{0}};
+      ammonite::perspective(fov, aspectRatio, nearPlane, farPlane, perspectiveMat);
+
+      //Test near plane perspective divide
+      inVec[2] = -nearPlane;
+      ammonite::multiply(perspectiveMat, inVec, outVec);
+      ammonite::divide(outVec, outVec[3]);
+      if (!roughly(outVec[2], -(T)1.0)) {
+        ammonite::utils::error << "Perspective projection matrix calculation failed" << std::endl;
+        ammonite::utils::normal << "  Input field of view: " << fov \
+                                << "\n  Input aspect ratio: " << aspectRatio \
+                                << "\n  Input near plane: " << nearPlane \
+                                << "\n  Input far plane: " << farPlane \
+                                << "\n  Perspective projection matrix:\n" << ammonite::formatMatrix(perspectiveMat) \
+                                << "\n  Output vector:\n" << ammonite::formatVector(outVec) \
+                                << "\n  Expected: " << -(T)1.0 << " at index 2 " \
+                                << std::endl;
+        return false;
+      }
+
+      //Test far plane perspective divide
+      inVec[2] = -farPlane;
+      ammonite::multiply(perspectiveMat, inVec, outVec);
+      ammonite::divide(outVec, outVec[3]);
+      if (!roughly(outVec[2], (T)1.0)) {
+        ammonite::utils::error << "Perspective projection matrix calculation failed" << std::endl;
+        ammonite::utils::normal << "  Input field of view: " << fov \
+                                << "\n  Input aspect ratio: " << aspectRatio \
+                                << "\n  Input near plane: " << nearPlane \
+                                << "\n  Input far plane: " << farPlane \
+                                << "\n  Perspective projection matrix:\n" << ammonite::formatMatrix(perspectiveMat) \
+                                << "\n  Output vector:\n" << ammonite::formatVector(outVec) \
+                                << "\n  Expected: " << (T)1.0 << " at index 2 " \
+                                << std::endl;
+        return false;
+      }
+    }
+
+    return true;
+  }
 }
 
 namespace tests {
@@ -1029,6 +1083,11 @@ namespace tests {
 
       //Test ammonite::lookAt()
       if (!testLookAt<T, cols, rows>()) {
+        return false;
+      }
+
+      //Test ammonite::perspective()
+      if (!testPerspective<T, cols, rows>()) {
         return false;
       }
     }

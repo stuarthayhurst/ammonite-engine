@@ -465,12 +465,25 @@ namespace ammonite {
       glm::vec<3, T, glm::defaultp> upVec;
       glm::mat<4, 4, T, glm::defaultp> destMat;
 
-
       std::memcpy(glm::value_ptr(cameraVec), &camera[0], sizeof(Vec<T, 3>));
       std::memcpy(glm::value_ptr(targetVec), &target[0], sizeof(Vec<T, 3>));
       std::memcpy(glm::value_ptr(upVec), &up[0], sizeof(Vec<T, 3>));
 
       destMat = glm::lookAt(cameraVec, targetVec, upVec);
+      std::memcpy(&dest[0], glm::value_ptr(destMat), sizeof(Mat<T, 4, 4>));
+    }
+
+    //TODO: Implement with <simd>
+    /*
+     - Calculate a perspective projection matrix from a field of view, an aspect ratio,
+       a near plane and a far plane
+     - Store the result in dest
+    */
+    template <typename T> requires validMatrix<T, 4, 4>
+    void perspective(T fov, T aspectRatio, T nearPlane, T farPlane, Mat<T, 4, 4>& dest) {
+      glm::mat<4, 4, T, glm::defaultp> destMat;
+
+      destMat = glm::perspective(fov, aspectRatio, nearPlane, farPlane);
       std::memcpy(&dest[0], glm::value_ptr(destMat), sizeof(Mat<T, 4, 4>));
     }
   }
