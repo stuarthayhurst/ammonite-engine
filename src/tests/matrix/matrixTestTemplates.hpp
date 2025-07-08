@@ -888,10 +888,20 @@ namespace {
       randomFillVector(cameraVec, (T)10.0);
       randomFillVector(targetVec, (T)10.0);
       randomFillVector(upVec, (T)10.0);
+      ammonite::normalise(upVec);
+
+      //Filter out scenarios where the camera is exactly up or down
+      ammonite::Vec<T, 3> cameraDirectionVec = {0};
+      ammonite::sub(targetVec, cameraVec, cameraDirectionVec);
+      ammonite::normalise(cameraDirectionVec);
+      for (unsigned int i = 0; i < 3; i++) {
+        if (roughly(cameraDirectionVec[i], upVec[i])) {
+          return true;
+        }
+      }
 
       //Create the view matrix
       ammonite::Mat<T, 4, 4> viewMat = {{0}};
-      ammonite::normalise(upVec);
       ammonite::lookAt(cameraVec, targetVec, upVec, viewMat);
 
       //Vectors for tests
