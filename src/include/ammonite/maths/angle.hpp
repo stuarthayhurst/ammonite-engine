@@ -7,13 +7,18 @@
 namespace ammonite {
   inline namespace maths {
     template <typename T> requires std::is_floating_point_v<T>
+    constexpr T pi() {
+      return std::numbers::pi_v<T>;
+    }
+
+    template <typename T> requires std::is_floating_point_v<T>
     constexpr T radians(T angle) {
-      return (angle / (T)180.0) * std::numbers::pi_v<T>;
+      return (angle / (T)180.0) * ammonite::pi<T>();
     }
 
     template <typename T> requires std::is_floating_point_v<T>
     constexpr T degrees(T angle) {
-      return (angle / std::numbers::pi_v<T>) * (T)180.0;
+      return (angle / ammonite::pi<T>()) * (T)180.0;
     }
   }
 }
