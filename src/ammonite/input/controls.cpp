@@ -38,7 +38,7 @@ namespace ammonite {
         } multipliers;
 
         //Default to a 120 degree field of view limit
-        float fovLimit = glm::two_pi<float>() / 3;
+        float fovLimit = (2.0f * ammonite::pi<float>()) / 3.0f;
 
         //Final sensitivities
         float movementSpeed = baseSettings.movementSpeed;
@@ -134,8 +134,8 @@ namespace ammonite {
                                             std::cos(horizontalAngle));
 
         //Right vector, relative to the camera
-        const glm::vec3 right = glm::vec3(std::sin(horizontalAngle - glm::half_pi<double>()), 0,
-                                          std::cos(horizontalAngle - glm::half_pi<double>()));
+        const double angleRight = horizontalAngle - (ammonite::pi<double>() / 2.0);
+        const glm::vec3 right = glm::vec3(std::sin(angleRight), 0, std::cos(angleRight));
 
         //Get the current camera position
         glm::vec3 position = ammonite::camera::getPosition(activeCameraId);
@@ -198,7 +198,7 @@ namespace ammonite {
         if (isCameraActive) {
           if (button == AMMONITE_MOUSE_BUTTON_MIDDLE && action == AMMONITE_PRESSED) {
             ammonite::camera::setFieldOfView(ammonite::camera::getActiveCamera(),
-                                             glm::quarter_pi<float>());
+                                             ammonite::pi<float>() / 4.0f);
           }
         }
       }

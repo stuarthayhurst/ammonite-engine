@@ -8,6 +8,7 @@
 #include "camera.hpp"
 
 #include "graphics/renderer.hpp"
+#include "maths/angle.hpp"
 #include "utils/id.hpp"
 #include "window/window.hpp"
 
@@ -16,9 +17,9 @@ namespace ammonite {
     namespace {
       struct Camera {
         glm::vec3 position = glm::vec3(0.0f);
-        double horizontalAngle = glm::pi<double>();
+        double horizontalAngle = ammonite::pi<double>();
         double verticalAngle = 0.0f;
-        float fov = glm::quarter_pi<float>();
+        float fov = ammonite::pi<float>() / 4.0f;
       } defaultCamera;
 
       //View and projection matrices
@@ -71,9 +72,9 @@ namespace ammonite {
 
         //Right vector, relative to the camera
         const glm::vec3 right = glm::vec3(
-          std::sin(activeCamera->horizontalAngle - glm::half_pi<double>()),
+          std::sin(activeCamera->horizontalAngle - (ammonite::pi<double>() / 2.0)),
           0,
-          std::cos(activeCamera->horizontalAngle - glm::half_pi<double>())
+          std::cos(activeCamera->horizontalAngle - (ammonite::pi<double>() / 2.0))
         );
 
         //Up vector, relative to the camera
@@ -166,7 +167,7 @@ namespace ammonite {
         return cameraTrackerMap[cameraId].fov;
       }
 
-      return glm::quarter_pi<float>();
+      return ammonite::pi<float>() / 4.0f;
     }
 
     //Set position

@@ -5,7 +5,6 @@
 #include <cstdint>
 #include <cstring>
 #include <iostream>
-#include <numbers>
 #include <string_view>
 
 #include <ammonite/ammonite.hpp>
@@ -710,23 +709,23 @@ namespace {
 
       TestData tests[11] = {
         //Convert between axes
-        {y, x, z, -std::numbers::pi / 2},
-        {z, y, x, -std::numbers::pi / 2},
-        {x, z, y, -std::numbers::pi / 2},
+        {y, x, z, -ammonite::pi<T>() / 2},
+        {z, y, x, -ammonite::pi<T>() / 2},
+        {x, z, y, -ammonite::pi<T>() / 2},
 
         //Reflect axes
-        {xz, x, z, std::numbers::pi},
-        {xz, z, x, std::numbers::pi},
-        {xz, y, negY, std::numbers::pi},
+        {xz, x, z, ammonite::pi<T>()},
+        {xz, z, x, ammonite::pi<T>()},
+        {xz, y, negY, ammonite::pi<T>()},
 
         //Roll axes
-        {xyz, y, z, (std::numbers::pi * 2) / 3},
-        {xyz, z, x, (std::numbers::pi * 2) / 3},
-        {xyz, x, y, (std::numbers::pi * 2) / 3},
+        {xyz, y, z, (ammonite::pi<T>() * 2) / 3},
+        {xyz, z, x, (ammonite::pi<T>() * 2) / 3},
+        {xyz, x, y, (ammonite::pi<T>() * 2) / 3},
 
         //Recover x and z from xz
-        {y, xz, x, std::numbers::pi / 4},
-        {y, xz, z, -std::numbers::pi / 4}
+        {y, xz, x, ammonite::pi<T>() / 4},
+        {y, xz, z, -ammonite::pi<T>() / 4}
       };
 
       const int totalTests = sizeof(tests) / sizeof(TestData);
