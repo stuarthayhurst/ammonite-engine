@@ -86,7 +86,7 @@ namespace sponzaDemo {
     //Set the camera position
     const AmmoniteId cameraId = ammonite::camera::getActiveCamera();
     ammonite::camera::setPosition(cameraId, glm::vec3(5.0f, 1.5f, 0.0f));
-    ammonite::camera::setAngle(cameraId, glm::radians(270.0f), glm::radians(10.0f));
+    ammonite::camera::setAngle(cameraId, ammonite::radians(270.0f), ammonite::radians(10.0f));
 
     return true;
   }

@@ -10,6 +10,7 @@
 #include "keycodes.hpp"
 
 #include "../camera.hpp"
+#include "../maths/angle.hpp"
 #include "../utils/id.hpp"
 #include "../utils/timer.hpp"
 
@@ -214,7 +215,7 @@ namespace ammonite {
 
           //Only accept vertical angle if it won't create an impossible movement
           double newVerticalAngle = verticalAngle - (controlSettings.mouseSpeed * yOffset);
-          const double limit = glm::radians(90.0);
+          const double limit = ammonite::radians(90.0);
           if (newVerticalAngle > limit) { //Vertical max
             newVerticalAngle = limit;
           } else if (newVerticalAngle < -limit) { //Vertical min

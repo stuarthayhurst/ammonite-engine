@@ -87,7 +87,7 @@ namespace monkeyDemo {
     //Set the camera position
     const AmmoniteId cameraId = ammonite::camera::getActiveCamera();
     ammonite::camera::setPosition(cameraId, glm::vec3(0.0f, 0.0f, 5.0f));
-    ammonite::camera::setAngle(cameraId, glm::radians(180.0f), glm::radians(0.0f));
+    ammonite::camera::setAngle(cameraId, ammonite::radians(180.0f), ammonite::radians(0.0f));
 
     return true;
   }

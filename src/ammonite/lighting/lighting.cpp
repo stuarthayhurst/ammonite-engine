@@ -13,6 +13,7 @@ extern "C" {
 #include "lighting.hpp"
 
 #include "../graphics/renderer.hpp"
+#include "../maths/angle.hpp"
 #include "../models/models.hpp"
 #include "../utils/id.hpp"
 #include "../utils/thread.hpp"
@@ -161,7 +162,7 @@ namespace ammonite {
         }
 
         const float shadowFarPlane = renderer::settings::getShadowFarPlane();
-        shadowProj = glm::perspective(glm::radians(90.0f), 1.0f, 0.0f, shadowFarPlane);
+        shadowProj = glm::perspective(ammonite::radians(90.0f), 1.0f, 0.0f, shadowFarPlane);
 
         //Resize buffers
         if (prevLightCount != lightCount) {
