@@ -1,8 +1,7 @@
 #ifndef AMMONITECAMERA
 #define AMMONITECAMERA
 
-#include <glm/glm.hpp>
-
+#include "maths/vectorTypes.hpp"
 #include "utils/id.hpp"
 
 namespace ammonite {
@@ -13,14 +12,14 @@ namespace ammonite {
     AmmoniteId getActiveCamera();
     void setActiveCamera(AmmoniteId cameraId);
 
-    glm::vec3 getPosition(AmmoniteId cameraId);
-    glm::vec3 getDirection(AmmoniteId cameraId);
+    void getPosition(AmmoniteId cameraId, ammonite::Vec<float, 3>& position);
+    void getDirection(AmmoniteId cameraId, ammonite::Vec<float, 3>& direction);
     double getHorizontal(AmmoniteId cameraId);
     double getVertical(AmmoniteId cameraId);
     float getFieldOfView(AmmoniteId cameraId);
 
-    void setPosition(AmmoniteId cameraId, glm::vec3 position);
-    void setDirection(AmmoniteId cameraId, glm::vec3 direction);
+    void setPosition(AmmoniteId cameraId, const ammonite::Vec<float, 3>& position);
+    void setDirection(AmmoniteId cameraId, const ammonite::Vec<float, 3>& direction);
     void setAngle(AmmoniteId cameraId, double horizontal, double vertical);
     void setFieldOfView(AmmoniteId cameraId, float fov);
   }

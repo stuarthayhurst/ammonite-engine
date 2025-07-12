@@ -1,8 +1,6 @@
 #include <cmath>
 #include <vector>
 
-#include <glm/glm.hpp>
-
 #include "controls.hpp"
 
 #include "input.hpp"
@@ -157,8 +155,8 @@ namespace ammonite {
         const ammonite::Vec<float, 3> worldUp = {0.0f, 1.0f, 0.0f};
 
         //Get the current camera position
-        glm::vec3 glmPosition = ammonite::camera::getPosition(activeCameraId);
-        ammonite::Vec<float, 3> position = {glmPosition.x, glmPosition.y, glmPosition.z};
+        ammonite::Vec<float, 3> position = {0};
+        ammonite::camera::getPosition(activeCameraId, position);
 
         //Determine movement direction
         ammonite::Vec<float, 3> movementDirection = {0};
@@ -185,14 +183,12 @@ namespace ammonite {
 
         //Calculate new position
         ammonite::Vec<float, 3> positionDelta = {0};
+        ammonite::Vec<float, 3> newPosition = {0};
         ammonite::scale(movementDirection, unitDelta, positionDelta);
-        ammonite::add(position, positionDelta);
+        ammonite::add(position, positionDelta, newPosition);
 
         //Update the camera position
-        glmPosition.x = position[0];
-        glmPosition.y = position[1];
-        glmPosition.z = position[2];
-        ammonite::camera::setPosition(activeCameraId, glmPosition);
+        ammonite::camera::setPosition(activeCameraId, newPosition);
       }
     }
 

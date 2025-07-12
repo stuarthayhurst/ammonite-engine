@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <cstring>
 #include <iostream>
 #include <string>
 #include <utility>
@@ -18,6 +19,8 @@ extern "C" {
 #include "shaders.hpp"
 #include "../camera.hpp"
 #include "../lighting/lighting.hpp"
+#include "../maths/vector.hpp"
+#include "../maths/matrix.hpp"
 #include "../models/models.hpp"
 #include "../skybox.hpp"
 #include "../splash.hpp"
@@ -61,8 +64,8 @@ namespace ammonite {
       GLuint colourRenderBufferId = 0;
       GLuint colourBufferMultisampleFBO;
 
-      glm::mat4* viewMatrix = ammonite::camera::internal::getViewMatrixPtr();
-      glm::mat4* projectionMatrix = ammonite::camera::internal::getProjectionMatrixPtr();
+      ammonite::Mat<float, 4, 4>* viewMatrixPtr = ammonite::camera::internal::getViewMatrixPtr();
+      ammonite::Mat<float, 4, 4>* projectionMatrixPtr = ammonite::camera::internal::getProjectionMatrixPtr();
 
       //Store model data pointers for regular models and light models
       ammonite::models::internal::ModelInfo** modelPtrs = nullptr;
@@ -70,9 +73,6 @@ namespace ammonite {
 
       unsigned int maxLightCount = 0;
       GLint maxSampleCount = 0;
-
-      //View projection combined matrix
-      glm::mat4 viewProjectionMatrix;
 
       //Render modes for drawModels()
       enum AmmoniteRenderMode : unsigned char {
@@ -424,24 +424,33 @@ namespace ammonite {
         }
 
         //Fetch the model matrix
-        glm::mat4 modelMatrix = drawObject->positionData.modelMatrix;
+        glm::mat4 glmModelMatrix = drawObject->positionData.modelMatrix;
+        ammonite::Mat<float, 4, 4> modelMatrix = {{0}};
+        std::memcpy(&modelMatrix[0][0], glm::value_ptr(glmModelMatrix), sizeof(modelMatrix));
 
         //Handle pass-specific matrices and uniforms
-        glm::mat4 mvp;
+        ammonite::Mat<float, 4, 4> mvp = {{0}};
+        ammonite::Mat<float, 4, 4> vp = {{0}};
         switch (renderMode) {
         case AMMONITE_DEPTH_PASS:
-          glUniformMatrix4fv(depthShader.modelMatrixId, 1, GL_FALSE, glm::value_ptr(modelMatrix));
+          glUniformMatrix4fv(depthShader.modelMatrixId, 1, GL_FALSE, &modelMatrix[0][0]);
           break;
         case AMMONITE_RENDER_PASS:
-          mvp = viewProjectionMatrix * modelMatrix;
-          glUniformMatrix4fv(modelShader.matrixId, 1, GL_FALSE, glm::value_ptr(mvp));
-          glUniformMatrix4fv(modelShader.modelMatrixId, 1, GL_FALSE, glm::value_ptr(modelMatrix));
+          //Calculate model view projection matrix
+          ammonite::multiply(*projectionMatrixPtr, *viewMatrixPtr, vp);
+          ammonite::multiply(vp, modelMatrix, mvp);
+
+          glUniformMatrix4fv(modelShader.matrixId, 1, GL_FALSE, &mvp[0][0]);
+          glUniformMatrix4fv(modelShader.modelMatrixId, 1, GL_FALSE, &modelMatrix[0][0]);
           glUniformMatrix3fv(modelShader.normalMatrixId, 1, GL_FALSE,
                              glm::value_ptr(drawObject->positionData.normalMatrix));
           break;
         case AMMONITE_EMISSION_PASS:
-          mvp = viewProjectionMatrix * modelMatrix;
-          glUniformMatrix4fv(lightShader.lightMatrixId, 1, GL_FALSE, glm::value_ptr(mvp));
+          //Calculate model view projection matrix
+          ammonite::multiply(*projectionMatrixPtr, *viewMatrixPtr, vp);
+          ammonite::multiply(vp, modelMatrix, mvp);
+
+          glUniformMatrix4fv(lightShader.lightMatrixId, 1, GL_FALSE, &mvp[0][0]);
           glUniform1ui(lightShader.lightIndexId, drawObject->lightIndex);
           break;
         case AMMONITE_DATA_REFRESH:
@@ -508,10 +517,16 @@ namespace ammonite {
       void drawSkybox(AmmoniteId activeSkyboxId) {
         //Swap to skybox shader and pass uniforms
         skyboxShader.useShader();
+
+        ammonite::Mat<float, 3, 3> viewMatrixSmall = {{0}};
+        ammonite::Mat<float, 4, 4> viewMatrixCut = {{0}};
+        ammonite::copy(*viewMatrixPtr, viewMatrixSmall);
+        ammonite::copy(viewMatrixSmall, viewMatrixCut);
+
         glUniformMatrix4fv(skyboxShader.viewMatrixId, 1, GL_FALSE,
-                           glm::value_ptr(glm::mat4(glm::mat3(*viewMatrix))));
+                           &viewMatrixCut[0][0]);
         glUniformMatrix4fv(skyboxShader.projectionMatrixId, 1, GL_FALSE,
-                           glm::value_ptr(*projectionMatrix));
+                           &(*projectionMatrixPtr)[0][0]);
 
         //Prepare and draw the skybox
         glBindVertexArray(skyboxVertexArrayId);
@@ -682,16 +697,14 @@ namespace ammonite {
         modelShader.useShader();
         glBindTextureUnit(2, depthCubeMapId);
 
-        //Calculate view projection matrix
-        viewProjectionMatrix = *projectionMatrix * *viewMatrix;
-
         //Get ambient light and camera position
         glm::vec3 ambientLight = ammonite::lighting::getAmbientLight();
-        glm::vec3 cameraPosition = ammonite::camera::getPosition(ammonite::camera::getActiveCamera());
+        ammonite::Vec<float, 3> cameraPosition = {0};
+        ammonite::camera::getPosition(ammonite::camera::getActiveCamera(), cameraPosition);
 
         //Pass uniforms and render regular models
         glUniform3fv(modelShader.ambientLightId, 1, glm::value_ptr(ambientLight));
-        glUniform3fv(modelShader.cameraPosId, 1, glm::value_ptr(cameraPosition));
+        glUniform3fv(modelShader.cameraPosId, 1, &cameraPosition[0]);
         glUniform1f(modelShader.shadowFarPlaneId, shadowFarPlane);
         glUniform1ui(modelShader.lightCountId, activeLights);
         drawModelsCached(&modelPtrs, AMMONITE_MODEL, AMMONITE_RENDER_PASS);

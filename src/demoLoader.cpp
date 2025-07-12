@@ -6,7 +6,6 @@
 #include <vector>
 
 #include <ammonite/ammonite.hpp>
-#include <glm/glm.hpp>
 
 #include "helper/argHandler.hpp"
 #include "demos/object-field.hpp"
@@ -283,7 +282,8 @@ int main(int argc, char** argv) noexcept(false) {
     AMMONITE_SPACE, AMMONITE_LEFT_SHIFT, AMMONITE_D, AMMONITE_A);
 
   //Set the non-default camera to the start position
-  ammonite::camera::setPosition(cameraData.cameraIds[1], glm::vec3(0.0f, 0.0f, 2.0f));
+  const ammonite::Vec<float, 3> cameraPosition = {0.0f, 0.0f, 2.0f};
+  ammonite::camera::setPosition(cameraData.cameraIds[1], cameraPosition);
 
   //Set keybinds
   std::vector<AmmoniteId> keybindIds;

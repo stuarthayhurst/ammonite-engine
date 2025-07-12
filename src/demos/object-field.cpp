@@ -98,10 +98,13 @@ namespace objectFieldDemo {
       const double horiz = ammonite::camera::getHorizontal(activeCameraId);
       const double vert = ammonite::camera::getVertical(activeCameraId);
 
+      ammonite::Vec<float, 3> cameraPosition = {0};
+      ammonite::camera::getPosition(activeCameraId, cameraPosition);
+
       ammonite::models::position::setRotation(modelId, glm::vec3(-vert, horiz, 0.0f));
       ammonite::models::position::setScale(modelId, 0.25f);
       ammonite::models::position::setPosition(modelId,
-                                              ammonite::camera::getPosition(activeCameraId));
+        glm::vec3(cameraPosition[0], cameraPosition[1], cameraPosition[2]));
 
       ammonite::utils::status << "Spawned object" << std::endl;
     }
@@ -333,7 +336,8 @@ namespace objectFieldDemo {
 
     //Set the camera position
     const AmmoniteId cameraId = ammonite::camera::getActiveCamera();
-    ammonite::camera::setPosition(cameraId, glm::vec3(10.0f, 17.0f, 17.0f));
+    const ammonite::Vec<float, 3> cameraPosition = {10.0f, 17.0f, 17.0f};
+    ammonite::camera::setPosition(cameraId, cameraPosition);
     ammonite::camera::setAngle(cameraId, 4.75f * ammonite::pi<float>() / 4.0f, -0.7f);
 
     return true;

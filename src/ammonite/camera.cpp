@@ -1,14 +1,12 @@
 #include <cmath>
 #include <unordered_map>
 
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/constants.hpp>
-
 #include "camera.hpp"
 
 #include "graphics/renderer.hpp"
 #include "maths/angle.hpp"
+#include "maths/vector.hpp"
+#include "maths/matrix.hpp"
 #include "utils/id.hpp"
 #include "window/window.hpp"
 
@@ -16,15 +14,15 @@ namespace ammonite {
   namespace camera {
     namespace {
       struct Camera {
-        glm::vec3 position = glm::vec3(0.0f);
+        ammonite::Vec<float, 3> position = {0};
         double horizontalAngle = ammonite::pi<double>();
         double verticalAngle = 0.0f;
         float fov = ammonite::pi<float>() / 4.0f;
       } defaultCamera;
 
       //View and projection matrices
-      glm::mat4 viewMatrix;
-      glm::mat4 projectionMatrix;
+      ammonite::Mat<float, 4, 4> viewMatrix = {{0}};
+      ammonite::Mat<float, 4, 4> projectionMatrix = {{0}};
 
       //Create map to track cameras, with default camera
       AmmoniteId lastCameraId = 1;
@@ -33,32 +31,40 @@ namespace ammonite {
     }
 
     namespace {
-      glm::vec3 calculateDirection(double horizontal, double vertical) {
-        return glm::normalize(glm::vec3(
+      void calculateDirection(float horizontal, float vertical,
+                              ammonite::Vec<float, 3>& dest) {
+        const ammonite::Vec<float, 3> direction = {
           std::cos(vertical) * std::sin(horizontal),
           std::sin(vertical),
           std::cos(vertical) * std::cos(horizontal)
-        ));
+        };
+
+        ammonite::normalise(direction, dest);
       }
 
-      double calculateVerticalAngle(glm::vec3 direction) {
-        return std::asin(glm::normalize(direction).y);
+      double calculateVerticalAngle(const ammonite::Vec<float, 3>& direction) {
+        ammonite::Vec<float, 3> normalisedDirection = {0};
+        ammonite::normalise(direction, normalisedDirection);
+        return std::asin(normalisedDirection[1]);
       }
 
-      double calculateHorizontalAngle(glm::vec3 direction) {
-        direction.y = 0.0f;
-        direction = glm::normalize(direction);
-        return std::atan2(direction.x, direction.z);
+      double calculateHorizontalAngle(const ammonite::Vec<float, 3>& direction) {
+        ammonite::Vec<float, 3> normalisedDirection = {0};
+        ammonite::copy(direction, normalisedDirection);
+        normalisedDirection[1] = 0.0f;
+
+        ammonite::normalise(normalisedDirection);
+        return std::atan2(normalisedDirection[0], normalisedDirection[2]);
       }
     }
 
     //Pointer and update methods exposed internally
     namespace internal {
-      glm::mat4* getViewMatrixPtr() {
+      ammonite::Mat<float, 4, 4>* getViewMatrixPtr() {
         return &viewMatrix;
       }
 
-      glm::mat4* getProjectionMatrixPtr() {
+      ammonite::Mat<float, 4, 4>* getProjectionMatrixPtr() {
         return &projectionMatrix;
       }
 
@@ -67,28 +73,31 @@ namespace ammonite {
         const Camera* activeCamera = &cameraTrackerMap[activeCameraId];
 
         //Calculate the direction vector
-        const glm::vec3 direction = calculateDirection(activeCamera->horizontalAngle,
-                                                       activeCamera->verticalAngle);
+        ammonite::Vec<float, 3> direction = {0};
+        calculateDirection((float)activeCamera->horizontalAngle,
+                           (float)activeCamera->verticalAngle, direction);
 
         //Right vector, relative to the camera
-        const glm::vec3 right = glm::vec3(
-          std::sin(activeCamera->horizontalAngle - (ammonite::pi<double>() / 2.0)),
-          0,
-          std::cos(activeCamera->horizontalAngle - (ammonite::pi<double>() / 2.0))
-        );
+        const ammonite::Vec<float, 3> right = {
+          std::sin((float)activeCamera->horizontalAngle - (ammonite::pi<float>() / 2.0f)),
+          0.0f,
+          std::cos((float)activeCamera->horizontalAngle - (ammonite::pi<float>() / 2.0f))
+        };
 
         //Up vector, relative to the camera
-        const glm::vec3 up = glm::cross(right, direction);
+        ammonite::Vec<float, 3> up = {0};
+        ammonite::cross(right, direction, up);
 
         //Calculate the projection matrix from FoV, aspect ratio and display range
         const float aspectRatio = ammonite::window::internal::getGraphicsAspectRatio();
         const float renderFarPlane = ammonite::renderer::settings::getRenderFarPlane();
-        projectionMatrix = glm::perspective(activeCamera->fov,
-                                            aspectRatio, 0.1f, renderFarPlane);
+        ammonite::perspective(activeCamera->fov, aspectRatio, 0.1f,
+                              renderFarPlane, projectionMatrix);
 
         //Calculate view matrix from position, where it's looking, and relative up
-        viewMatrix = glm::lookAt(activeCamera->position,
-                                 activeCamera->position + direction, up);
+        ammonite::Vec<float, 3> cameraTarget = {0};
+        ammonite::add(activeCamera->position, direction, cameraTarget);
+        ammonite::lookAt(activeCamera->position, cameraTarget, up, viewMatrix);
       }
     }
 
@@ -126,21 +135,24 @@ namespace ammonite {
     }
 
     //Get position
-    glm::vec3 getPosition(AmmoniteId cameraId) {
+    void getPosition(AmmoniteId cameraId, ammonite::Vec<float, 3>& position) {
       if (cameraTrackerMap.contains(cameraId)) {
-        return cameraTrackerMap[cameraId].position;
+        ammonite::copy(cameraTrackerMap[cameraId].position, position);
+        return;
       }
 
-      return glm::vec3(0.0f);
+      ammonite::set(position, 0.0f);
     }
 
-    glm::vec3 getDirection(AmmoniteId cameraId) {
+    void getDirection(AmmoniteId cameraId, ammonite::Vec<float, 3>& direction) {
       if (cameraTrackerMap.contains(cameraId)) {
         const Camera& activeCamera = cameraTrackerMap[cameraId];
-        return calculateDirection(activeCamera.horizontalAngle, activeCamera.verticalAngle);
+        calculateDirection((float)activeCamera.horizontalAngle,
+                           (float)activeCamera.verticalAngle, direction);
+        return;
       }
 
-      return glm::vec3(0.0f);
+      ammonite::set(direction, 0.0f);
     }
 
     //Get horizontal angle (radians)
@@ -171,15 +183,15 @@ namespace ammonite {
     }
 
     //Set position
-    void setPosition(AmmoniteId cameraId, glm::vec3 position) {
+    void setPosition(AmmoniteId cameraId, const ammonite::Vec<float, 3>& position) {
       //Find the target camera and update position
       if (cameraTrackerMap.contains(cameraId)) {
-        cameraTrackerMap[cameraId].position = position;
+        ammonite::copy(position, cameraTrackerMap[cameraId].position);
       }
     }
 
     //Set direction
-    void setDirection(AmmoniteId cameraId, glm::vec3 direction) {
+    void setDirection(AmmoniteId cameraId, const ammonite::Vec<float, 3>& direction) {
       //Find the target camera and update direction
       if (cameraTrackerMap.contains(cameraId)) {
         Camera& activeCamera = cameraTrackerMap[cameraId];

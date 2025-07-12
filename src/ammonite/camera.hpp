@@ -1,9 +1,9 @@
 #ifndef INTERNALCAMERA
 #define INTERNALCAMERA
 
-#include <glm/glm.hpp>
-
 #include "internal.hpp"
+
+#include "maths/matrix.hpp"
 
 //Include public interface
 #include "../include/ammonite/camera.hpp" // IWYU pragma: export
@@ -11,8 +11,8 @@
 namespace ammonite {
   namespace camera {
     namespace AMMONITE_INTERNAL internal {
-      glm::mat4* getViewMatrixPtr();
-      glm::mat4* getProjectionMatrixPtr();
+      ammonite::Mat<float, 4, 4>* getViewMatrixPtr();
+      ammonite::Mat<float, 4, 4>* getProjectionMatrixPtr();
       void updateMatrices();
     }
   }
