@@ -2,7 +2,6 @@
 #include <vector>
 
 #include <glm/glm.hpp>
-#include <glm/gtc/constants.hpp>
 
 #include "controls.hpp"
 
@@ -11,6 +10,7 @@
 
 #include "../camera.hpp"
 #include "../maths/angle.hpp"
+#include "../maths/vector.hpp"
 #include "../utils/id.hpp"
 #include "../utils/timer.hpp"
 
@@ -128,52 +128,71 @@ namespace ammonite {
         //Get active camera
         const AmmoniteId activeCameraId = ammonite::camera::getActiveCamera();
 
-        //Vector for current direction, without vertical component
-        const double horizontalAngle = ammonite::camera::getHorizontal(activeCameraId);
-        const glm::vec3 horizontalDirection(std::sin(horizontalAngle), 0,
-                                            std::cos(horizontalAngle));
-
-        //Right vector, relative to the camera
-        const double angleRight = horizontalAngle - (ammonite::pi<double>() / 2.0);
-        const glm::vec3 right = glm::vec3(std::sin(angleRight), 0, std::cos(angleRight));
-
-        //Get the current camera position
-        glm::vec3 position = ammonite::camera::getPosition(activeCameraId);
-
-        //Calculate the new position
-        const float unitDelta = (float)directionTimer->getTime() * controlSettings.movementSpeed;
-        switch (directionData->directionEnum) {
-        case DIRECTION_FORWARD:
-          position += horizontalDirection * unitDelta;
-          break;
-        case DIRECTION_BACK:
-          position -= horizontalDirection * unitDelta;
-          break;
-        case DIRECTION_UP:
-          position += glm::vec3(0, 1, 0) * unitDelta;
-          break;
-        case DIRECTION_DOWN:
-          position -= glm::vec3(0, 1, 0) * unitDelta;
-          break;
-        case DIRECTION_RIGHT:
-          position += right * unitDelta;
-          break;
-        case DIRECTION_LEFT:
-          position -= right * unitDelta;
-          break;
-        }
-
-        //Update the camera position
-        if (isCameraActive) {
-          ammonite::camera::setPosition(activeCameraId, position);
-        }
-
         //Reset time between inputs
+        const float unitDelta = (float)directionTimer->getTime() * controlSettings.movementSpeed;
         if (action == AMMONITE_RELEASED) {
           //If it's a key release, stop the timer
           directionTimer->pause();
         }
         directionTimer->reset();
+
+        //Skip if the camera is inactive
+        if (!isCameraActive) {
+          return;
+        }
+
+        //Vector for current direction, without vertical component
+        const float horizontalAngle = (float)ammonite::camera::getHorizontal(activeCameraId);
+        const ammonite::Vec<float, 3> horizontalDirection = {
+          std::sin(horizontalAngle), 0.0f, std::cos(horizontalAngle)
+        };
+
+        //Right vector, relative to the camera
+        const float angleRight = horizontalAngle - (ammonite::pi<float>() / 2.0f);
+        const ammonite::Vec<float, 3> right = {
+          std::sin(angleRight), 0.0f, std::cos(angleRight)
+        };
+
+        //Up vector, relative to the world
+        const ammonite::Vec<float, 3> worldUp = {0.0f, 1.0f, 0.0f};
+
+        //Get the current camera position
+        glm::vec3 glmPosition = ammonite::camera::getPosition(activeCameraId);
+        ammonite::Vec<float, 3> position = {glmPosition.x, glmPosition.y, glmPosition.z};
+
+        //Determine movement direction
+        ammonite::Vec<float, 3> movementDirection = {0};
+        switch (directionData->directionEnum) {
+        case DIRECTION_FORWARD:
+          ammonite::add(movementDirection, horizontalDirection);
+          break;
+        case DIRECTION_BACK:
+          ammonite::sub(movementDirection, horizontalDirection);
+          break;
+        case DIRECTION_UP:
+          ammonite::add(movementDirection, worldUp);
+          break;
+        case DIRECTION_DOWN:
+          ammonite::sub(movementDirection, worldUp);
+          break;
+        case DIRECTION_RIGHT:
+          ammonite::add(movementDirection, right);
+          break;
+        case DIRECTION_LEFT:
+          ammonite::sub(movementDirection, right);
+          break;
+        }
+
+        //Calculate new position
+        ammonite::Vec<float, 3> positionDelta = {0};
+        ammonite::scale(movementDirection, unitDelta, positionDelta);
+        ammonite::add(position, positionDelta);
+
+        //Update the camera position
+        glmPosition.x = position[0];
+        glmPosition.y = position[1];
+        glmPosition.z = position[2];
+        ammonite::camera::setPosition(activeCameraId, glmPosition);
       }
     }
 
