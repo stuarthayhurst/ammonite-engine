@@ -21,8 +21,8 @@ namespace ammonite {
       } defaultCamera;
 
       //View and projection matrices
-      ammonite::Mat<float, 4, 4> viewMatrix = {{0}};
-      ammonite::Mat<float, 4, 4> projectionMatrix = {{0}};
+      ammonite::Mat<float, 4> viewMatrix = {{0}};
+      ammonite::Mat<float, 4> projectionMatrix = {{0}};
 
       //Create map to track cameras, with default camera
       AmmoniteId lastCameraId = 1;
@@ -60,11 +60,11 @@ namespace ammonite {
 
     //Pointer and update methods exposed internally
     namespace internal {
-      ammonite::Mat<float, 4, 4>* getViewMatrixPtr() {
+      ammonite::Mat<float, 4>* getViewMatrixPtr() {
         return &viewMatrix;
       }
 
-      ammonite::Mat<float, 4, 4>* getProjectionMatrixPtr() {
+      ammonite::Mat<float, 4>* getProjectionMatrixPtr() {
         return &projectionMatrix;
       }
 

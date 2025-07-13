@@ -11,8 +11,8 @@
 namespace ammonite {
   namespace camera {
     namespace AMMONITE_INTERNAL internal {
-      ammonite::Mat<float, 4, 4>* getViewMatrixPtr();
-      ammonite::Mat<float, 4, 4>* getProjectionMatrixPtr();
+      ammonite::Mat<float, 4>* getViewMatrixPtr();
+      ammonite::Mat<float, 4>* getProjectionMatrixPtr();
       void updateMatrices();
     }
   }

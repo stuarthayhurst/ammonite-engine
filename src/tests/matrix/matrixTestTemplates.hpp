@@ -731,8 +731,8 @@ namespace {
       const int totalTests = sizeof(tests) / sizeof(TestData);
       for (int testIndex = 0; testIndex < totalTests; testIndex++) {
         //Prepare matrix storage
-        ammonite::Mat<T, 4, 4> identityMat = {{0}};
-        ammonite::Mat<T, 4, 4> rotMat = {{0}};
+        ammonite::Mat<T, 4> identityMat = {{0}};
+        ammonite::Mat<T, 4> rotMat = {{0}};
         ammonite::identity(identityMat);
 
         //Correct the axis vector size
@@ -759,7 +759,7 @@ namespace {
         }
 
         //Create the rotation matrix in-place, then verify it
-        ammonite::Mat<T, 4, 4> newRotMat = {{0}};
+        ammonite::Mat<T, 4> newRotMat = {{0}};
         ammonite::identity(newRotMat);
         ammonite::rotate(newRotMat, tests[testIndex].angle, axis);
         if (!ammonite::equal(newRotMat, rotMat)) {
@@ -789,8 +789,8 @@ namespace {
       inVec[3] = (T)1.0;
 
       //Create the scale matrix
-      ammonite::Mat<T, 4, 4> identityMat = {{0}};
-      ammonite::Mat<T, 4, 4> scaleMat = {{0}};
+      ammonite::Mat<T, 4> identityMat = {{0}};
+      ammonite::Mat<T, 4> scaleMat = {{0}};
       ammonite::identity(identityMat);
       ammonite::scale(identityMat, scaleVec, scaleMat);
 
@@ -810,7 +810,7 @@ namespace {
       }
 
       //Create the scale matrix in-place, then verify it
-      ammonite::Mat<T, 4, 4> newScaleMat = {{0}};
+      ammonite::Mat<T, 4> newScaleMat = {{0}};
       ammonite::identity(newScaleMat);
       ammonite::scale(newScaleMat, scaleVec);
       if (!ammonite::equal(newScaleMat, scaleMat)) {
@@ -839,8 +839,8 @@ namespace {
       inVec[3] = (T)1.0;
 
       //Create the translation matrix
-      ammonite::Mat<T, 4, 4> identityMat = {{0}};
-      ammonite::Mat<T, 4, 4> translationMat = {{0}};
+      ammonite::Mat<T, 4> identityMat = {{0}};
+      ammonite::Mat<T, 4> translationMat = {{0}};
       ammonite::identity(identityMat);
       ammonite::translate(identityMat, translationVec, translationMat);
 
@@ -860,7 +860,7 @@ namespace {
       }
 
       //Create the translation matrix in-place, then verify it
-      ammonite::Mat<T, 4, 4> newTranslationMat = {{0}};
+      ammonite::Mat<T, 4> newTranslationMat = {{0}};
       ammonite::identity(newTranslationMat);
       ammonite::translate(newTranslationMat, translationVec);
       if (!ammonite::equal(newTranslationMat, translationMat)) {
@@ -900,7 +900,7 @@ namespace {
       }
 
       //Create the view matrix
-      ammonite::Mat<T, 4, 4> viewMat = {{0}};
+      ammonite::Mat<T, 4> viewMat = {{0}};
       ammonite::lookAt(cameraVec, targetVec, upVec, viewMat);
 
       //Vectors for tests
@@ -974,7 +974,7 @@ namespace {
       T aspectRatio = randomScalar<T>();
       T nearPlane = (T)0.1;
       T farPlane = (T)100.0;
-      ammonite::Mat<T, 4, 4> perspectiveMat = {{0}};
+      ammonite::Mat<T, 4> perspectiveMat = {{0}};
       ammonite::perspective(fov, aspectRatio, nearPlane, farPlane, perspectiveMat);
 
       //Test near plane perspective divide

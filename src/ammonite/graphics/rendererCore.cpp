@@ -64,8 +64,8 @@ namespace ammonite {
       GLuint colourRenderBufferId = 0;
       GLuint colourBufferMultisampleFBO;
 
-      ammonite::Mat<float, 4, 4>* viewMatrixPtr = ammonite::camera::internal::getViewMatrixPtr();
-      ammonite::Mat<float, 4, 4>* projectionMatrixPtr = ammonite::camera::internal::getProjectionMatrixPtr();
+      ammonite::Mat<float, 4>* viewMatrixPtr = ammonite::camera::internal::getViewMatrixPtr();
+      ammonite::Mat<float, 4>* projectionMatrixPtr = ammonite::camera::internal::getProjectionMatrixPtr();
 
       //Store model data pointers for regular models and light models
       ammonite::models::internal::ModelInfo** modelPtrs = nullptr;
@@ -425,12 +425,12 @@ namespace ammonite {
 
         //Fetch the model matrix
         glm::mat4 glmModelMatrix = drawObject->positionData.modelMatrix;
-        ammonite::Mat<float, 4, 4> modelMatrix = {{0}};
+        ammonite::Mat<float, 4> modelMatrix = {{0}};
         std::memcpy(&modelMatrix[0][0], glm::value_ptr(glmModelMatrix), sizeof(modelMatrix));
 
         //Handle pass-specific matrices and uniforms
-        ammonite::Mat<float, 4, 4> mvp = {{0}};
-        ammonite::Mat<float, 4, 4> vp = {{0}};
+        ammonite::Mat<float, 4> mvp = {{0}};
+        ammonite::Mat<float, 4> vp = {{0}};
         switch (renderMode) {
         case AMMONITE_DEPTH_PASS:
           glUniformMatrix4fv(depthShader.modelMatrixId, 1, GL_FALSE, &modelMatrix[0][0]);
@@ -518,8 +518,8 @@ namespace ammonite {
         //Swap to skybox shader and pass uniforms
         skyboxShader.useShader();
 
-        ammonite::Mat<float, 3, 3> viewMatrixSmall = {{0}};
-        ammonite::Mat<float, 4, 4> viewMatrixCut = {{0}};
+        ammonite::Mat<float, 3> viewMatrixSmall = {{0}};
+        ammonite::Mat<float, 4> viewMatrixCut = {{0}};
         ammonite::copy(*viewMatrixPtr, viewMatrixSmall);
         ammonite::copy(viewMatrixSmall, viewMatrixCut);
 

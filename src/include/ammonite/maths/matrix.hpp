@@ -376,16 +376,16 @@ namespace ammonite {
      - The axis to rotate around must be normalised
     */
     template <typename T> requires validMatrix<T, 4, 4> && validVector<T, 3>
-    void rotate(const Mat<T, 4, 4>& a, T angle, const Vec<T, 3> b, Mat<T, 4, 4>& dest) {
+    void rotate(const Mat<T, 4>& a, T angle, const Vec<T, 3> b, Mat<T, 4>& dest) {
       glm::mat<4, 4, T, glm::defaultp> aMat;
       glm::vec<3, T, glm::defaultp> bVec;
       glm::mat<4, 4, T, glm::defaultp> destMat;
 
-      std::memcpy(glm::value_ptr(aMat), &a[0], sizeof(Mat<T, 4, 4>));
+      std::memcpy(glm::value_ptr(aMat), &a[0], sizeof(Mat<T, 4>));
       std::memcpy(glm::value_ptr(bVec), &b[0], sizeof(Vec<T, 3>));
 
       destMat = glm::rotate(aMat, angle, bVec);
-      std::memcpy(&dest[0], glm::value_ptr(destMat), sizeof(Mat<T, 4, 4>));
+      std::memcpy(&dest[0], glm::value_ptr(destMat), sizeof(Mat<T, 4>));
     }
 
     /*
@@ -394,7 +394,7 @@ namespace ammonite {
      - The axis to rotate around must be normalised
     */
     template <typename T> requires validMatrix<T, 4, 4> && validVector<T, 3>
-    void rotate(Mat<T, 4, 4>& a, T angle, const Vec<T, 3> b) {
+    void rotate(Mat<T, 4>& a, T angle, const Vec<T, 3> b) {
       rotate(a, angle, b, a);
     }
 
@@ -404,16 +404,16 @@ namespace ammonite {
      - Store the result in dest
     */
     template <typename T> requires validMatrix<T, 4, 4> && validVector<T, 3>
-    void scale(const Mat<T, 4, 4>& a, const Vec<T, 3> b, Mat<T, 4, 4>& dest) {
+    void scale(const Mat<T, 4>& a, const Vec<T, 3> b, Mat<T, 4>& dest) {
       glm::mat<4, 4, T, glm::defaultp> aMat;
       glm::vec<3, T, glm::defaultp> bVec;
       glm::mat<4, 4, T, glm::defaultp> destMat;
 
-      std::memcpy(glm::value_ptr(aMat), &a[0], sizeof(Mat<T, 4, 4>));
+      std::memcpy(glm::value_ptr(aMat), &a[0], sizeof(Mat<T, 4>));
       std::memcpy(glm::value_ptr(bVec), &b[0], sizeof(Vec<T, 3>));
 
       destMat = glm::scale(aMat, bVec);
-      std::memcpy(&dest[0], glm::value_ptr(destMat), sizeof(Mat<T, 4, 4>));
+      std::memcpy(&dest[0], glm::value_ptr(destMat), sizeof(Mat<T, 4>));
     }
 
     /*
@@ -421,7 +421,7 @@ namespace ammonite {
      - Store the result in the same matrix
     */
     template <typename T> requires validMatrix<T, 4, 4> && validVector<T, 3>
-    void scale(Mat<T, 4, 4>& a, const Vec<T, 3> b) {
+    void scale(Mat<T, 4>& a, const Vec<T, 3> b) {
       scale(a, b, a);
     }
 
@@ -431,16 +431,16 @@ namespace ammonite {
      - Store the result in dest
     */
     template <typename T> requires validMatrix<T, 4, 4> && validVector<T, 3>
-    void translate(const Mat<T, 4, 4>& a, const Vec<T, 3> b, Mat<T, 4, 4>& dest) {
+    void translate(const Mat<T, 4>& a, const Vec<T, 3> b, Mat<T, 4>& dest) {
       glm::mat<4, 4, T, glm::defaultp> aMat;
       glm::vec<3, T, glm::defaultp> bVec;
       glm::mat<4, 4, T, glm::defaultp> destMat;
 
-      std::memcpy(glm::value_ptr(aMat), &a[0], sizeof(Mat<T, 4, 4>));
+      std::memcpy(glm::value_ptr(aMat), &a[0], sizeof(Mat<T, 4>));
       std::memcpy(glm::value_ptr(bVec), &b[0], sizeof(Vec<T, 3>));
 
       destMat = glm::translate(aMat, bVec);
-      std::memcpy(&dest[0], glm::value_ptr(destMat), sizeof(Mat<T, 4, 4>));
+      std::memcpy(&dest[0], glm::value_ptr(destMat), sizeof(Mat<T, 4>));
     }
 
     /*
@@ -448,7 +448,7 @@ namespace ammonite {
      - Store the result in the same matrix
     */
     template <typename T> requires validMatrix<T, 4, 4> && validVector<T, 3>
-    void translate(Mat<T, 4, 4>& a, const Vec<T, 3> b) {
+    void translate(Mat<T, 4>& a, const Vec<T, 3> b) {
       translate(a, b, a);
     }
 
@@ -459,7 +459,7 @@ namespace ammonite {
     */
     template <typename T> requires validMatrix<T, 4, 4> && validVector<T, 3>
     void lookAt(const Vec<T, 3>& camera, const Vec<T, 3>& target, const Vec<T, 3>& up,
-                Mat<T, 4, 4>& dest) {
+                Mat<T, 4>& dest) {
       glm::vec<3, T, glm::defaultp> cameraVec;
       glm::vec<3, T, glm::defaultp> targetVec;
       glm::vec<3, T, glm::defaultp> upVec;
@@ -470,7 +470,7 @@ namespace ammonite {
       std::memcpy(glm::value_ptr(upVec), &up[0], sizeof(Vec<T, 3>));
 
       destMat = glm::lookAt(cameraVec, targetVec, upVec);
-      std::memcpy(&dest[0], glm::value_ptr(destMat), sizeof(Mat<T, 4, 4>));
+      std::memcpy(&dest[0], glm::value_ptr(destMat), sizeof(Mat<T, 4>));
     }
 
     //TODO: Implement with <simd>
@@ -480,11 +480,11 @@ namespace ammonite {
      - Store the result in dest
     */
     template <typename T> requires validMatrix<T, 4, 4>
-    void perspective(T fov, T aspectRatio, T nearPlane, T farPlane, Mat<T, 4, 4>& dest) {
+    void perspective(T fov, T aspectRatio, T nearPlane, T farPlane, Mat<T, 4>& dest) {
       glm::mat<4, 4, T, glm::defaultp> destMat;
 
       destMat = glm::perspective(fov, aspectRatio, nearPlane, farPlane);
-      std::memcpy(&dest[0], glm::value_ptr(destMat), sizeof(Mat<T, 4, 4>));
+      std::memcpy(&dest[0], glm::value_ptr(destMat), sizeof(Mat<T, 4>));
     }
   }
 

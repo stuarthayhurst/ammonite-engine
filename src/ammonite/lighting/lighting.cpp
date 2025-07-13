@@ -37,13 +37,13 @@ namespace ammonite {
 
       //Data structure to match shader light sources in shader
       using ShaderLightSource = ammonite::Vec<float, 4>[3];
-      using ShaderShadowTransform = ammonite::Mat<float, 4, 4>[6];
+      using ShaderShadowTransform = ammonite::Mat<float, 4>[6];
 
       //Data used by the light worker
       struct LightWorkerData {
         unsigned int i;
       };
-      ammonite::Mat<float, 4, 4> shadowProj = {{0}};
+      ammonite::Mat<float, 4> shadowProj = {{0}};
 
       ShaderLightSource* shaderLightData = nullptr;
       ShaderShadowTransform* shaderShadowData = nullptr;
@@ -99,7 +99,7 @@ namespace ammonite {
           ammonite::Vec<float, 3> targetPosition = {0};
           ammonite::add(lightSource->geometry, targetVectors[matIndex], targetPosition);
 
-          ammonite::Mat<float, 4, 4> transformMat = {{0}};
+          ammonite::Mat<float, 4> transformMat = {{0}};
           ammonite::lookAt(lightSource->geometry, targetPosition, upVectors[matIndex], transformMat);
           ammonite::multiply(shadowProj, transformMat, shaderShadowData[lightSource->lightIndex][matIndex]);
         }
