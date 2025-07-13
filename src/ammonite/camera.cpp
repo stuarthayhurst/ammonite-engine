@@ -5,8 +5,8 @@
 
 #include "graphics/renderer.hpp"
 #include "maths/angle.hpp"
-#include "maths/vector.hpp"
 #include "maths/matrix.hpp"
+#include "maths/vector.hpp"
 #include "utils/id.hpp"
 #include "window/window.hpp"
 
