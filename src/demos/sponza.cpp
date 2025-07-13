@@ -3,6 +3,7 @@
 #include <vector>
 
 #include <ammonite/ammonite.hpp>
+#include <glm/glm.hpp>
 
 #include "sponza.hpp"
 
