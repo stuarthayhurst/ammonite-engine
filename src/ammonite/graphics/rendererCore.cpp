@@ -698,12 +698,13 @@ namespace ammonite {
         glBindTextureUnit(2, depthCubeMapId);
 
         //Get ambient light and camera position
-        glm::vec3 ambientLight = ammonite::lighting::getAmbientLight();
+        ammonite::Vec<float, 3> ambientLight = {0};
         ammonite::Vec<float, 3> cameraPosition = {0};
+        ammonite::lighting::getAmbientLight(ambientLight);
         ammonite::camera::getPosition(ammonite::camera::getActiveCamera(), cameraPosition);
 
         //Pass uniforms and render regular models
-        glUniform3fv(modelShader.ambientLightId, 1, glm::value_ptr(ambientLight));
+        glUniform3fv(modelShader.ambientLightId, 1, &ambientLight[0]);
         glUniform3fv(modelShader.cameraPosId, 1, &cameraPosition[0]);
         glUniform1f(modelShader.shadowFarPlaneId, shadowFarPlane);
         glUniform1ui(modelShader.lightCountId, activeLights);

@@ -35,6 +35,8 @@ namespace objectFieldDemo {
     LightData* lightData = nullptr;
     unsigned int lightCount;
 
+    const ammonite::Vec<float, 3> ambientLight = {0.1f, 0.1f, 0.1f};
+
     //General orbit config / data
     float transferProbability = 0.5f;
     unsigned int totalOrbits;
@@ -315,7 +317,7 @@ namespace objectFieldDemo {
     ammonite::renderer::drawFrame();
 
     //Setup each light and model
-    ammonite::lighting::setAmbientLight(glm::vec3(0.1f, 0.1f, 0.1f));
+    ammonite::lighting::setAmbientLight(ambientLight);
     for (unsigned int i = 0; i < lightCount; i++) {
       const AmmoniteId lightId = ammonite::lighting::createLightSource();
       ammonite::models::position::setScale(loadedModelIds[i], lightData[i].scale);

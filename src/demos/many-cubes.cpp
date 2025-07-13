@@ -16,7 +16,9 @@ namespace manyCubesDemo {
 
     const int unsigned lightCount = 50;
     AmmoniteId lightSourceIds[lightCount];
-    glm::vec3 lightSourcePositions[lightCount];
+    ammonite::Vec<float, 3> lightSourcePositions[lightCount] = {{0}};
+
+    const ammonite::Vec<float, 3> ambientLight = {0.1f, 0.1f, 0.1f};
   }
 
   bool demoExit() {
@@ -76,17 +78,21 @@ namespace manyCubesDemo {
     }
 
     //Create light sources
-    ammonite::lighting::setAmbientLight(glm::vec3(0.1f, 0.1f, 0.1f));
+    ammonite::lighting::setAmbientLight(ambientLight);
     for (unsigned int i = 0; i < lightCount; i++) {
       lightSourceIds[i] = ammonite::lighting::createLightSource();
-      lightSourcePositions[i] = glm::vec3(ammonite::utils::randomInt(0, sideLength),
-                                          4.0f,
-                                          ammonite::utils::randomInt(0, sideLength));
-      const float red = (float)ammonite::utils::randomDouble(1.0);
-      const float green = (float)ammonite::utils::randomDouble(1.0);
-      const float blue = (float)ammonite::utils::randomDouble(1.0);
+      lightSourcePositions[i][0] = (float)ammonite::utils::randomDouble(0, (double)sideLength);
+      lightSourcePositions[i][1] = 4.0f;
+      lightSourcePositions[i][2] = (float)ammonite::utils::randomDouble(0, (double)sideLength);
+
+      const ammonite::Vec<float, 3> colour = {
+        (float)ammonite::utils::randomDouble(1.0),
+        (float)ammonite::utils::randomDouble(1.0),
+        (float)ammonite::utils::randomDouble(1.0)
+      };
+
       ammonite::lighting::properties::setPower(lightSourceIds[i], 50.0f);
-      ammonite::lighting::properties::setColour(lightSourceIds[i], glm::vec3(red, green, blue));
+      ammonite::lighting::properties::setColour(lightSourceIds[i], colour);
     }
 
     //Set the camera position
@@ -108,8 +114,8 @@ namespace manyCubesDemo {
         x = (float)ammonite::utils::randomDouble(-1.0, 1.0);
         z = (float)ammonite::utils::randomDouble(-1.0, 1.0);
 
-        x += lightSourcePositions[i].x;
-        z += lightSourcePositions[i].z;
+        x += lightSourcePositions[i][0];
+        z += lightSourcePositions[i][2];
         if (x >= 0.0f && x <= (float)sideLength) {
           if (z >= 0.0f && z <= (float)sideLength) {
             invalid = false;
@@ -117,7 +123,8 @@ namespace manyCubesDemo {
         }
       }
 
-      lightSourcePositions[i] = glm::vec3(x, 4.0f, z);
+      lightSourcePositions[i][0] = x;
+      lightSourcePositions[i][2] = z;
       ammonite::lighting::properties::setGeometry(currLightSourceId, lightSourcePositions[i]);
     }
 

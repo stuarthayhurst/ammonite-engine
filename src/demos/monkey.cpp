@@ -9,6 +9,7 @@
 namespace monkeyDemo {
   namespace {
     std::vector<AmmoniteId> loadedModelIds;
+    const ammonite::Vec<float, 3> ambientLight = {0.1f, 0.1f, 0.1f};
   }
 
   bool demoExit() {
@@ -82,7 +83,7 @@ namespace monkeyDemo {
     const AmmoniteId lightId = ammonite::lighting::createLightSource();
     ammonite::lighting::properties::setPower(lightId, 50.0f);
     ammonite::lighting::linkModel(lightId, loadedModelIds[modelCount - 1]);
-    ammonite::lighting::setAmbientLight(glm::vec3(0.1f, 0.1f, 0.1f));
+    ammonite::lighting::setAmbientLight(ambientLight);
 
     //Set the camera position
     const AmmoniteId cameraId = ammonite::camera::getActiveCamera();

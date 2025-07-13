@@ -1,13 +1,12 @@
 #ifndef INTERNALLIGHTING
 #define INTERNALLIGHTING
 
-#include <glm/glm.hpp>
-
 extern "C" {
   #include <epoxy/gl.h>
 }
 
 #include "../internal.hpp"
+#include "../maths/vector.hpp"
 #include "../utils/id.hpp"
 
 //Include public interface
@@ -17,9 +16,9 @@ namespace ammonite {
   namespace lighting {
     namespace AMMONITE_INTERNAL internal {
       struct LightSource {
-        glm::vec3 geometry = glm::vec3(0.0f, 0.0f, 0.0f);
-        glm::vec3 diffuse = glm::vec3(1.0f, 1.0f, 1.0f);
-        glm::vec3 specular = glm::vec3(0.3f, 0.3f, 0.3f);
+        ammonite::Vec<float, 3> geometry = {0.0f, 0.0f, 0.0f};
+        ammonite::Vec<float, 3> diffuse = {1.0f, 1.0f, 1.0f};
+        ammonite::Vec<float, 3> specular = {0.3f, 0.3f, 0.3f};
         float power = 1.0f;
         AmmoniteId lightId = 0;
         AmmoniteId modelId = 0;
