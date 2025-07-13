@@ -29,6 +29,20 @@ namespace {
   }
 
   template <typename T, unsigned int size> requires ammonite::validVector<T, size>
+  bool testData() {
+    ammonite::Vec<T, size> aVec = {0};
+
+    if ((void*)ammonite::data(aVec) != (void*)&aVec) {
+      ammonite::utils::error << "Data pointer has a different address to the vector" << std::endl;
+      ammonite::utils::normal << "  Result:   " << (void*)ammonite::data(aVec) \
+                              << "\n  Expected: " << (void*)&aVec << std::endl;
+      return false;
+    }
+
+    return true;
+  }
+
+  template <typename T, unsigned int size> requires ammonite::validVector<T, size>
   bool testEqual() {
     ammonite::Vec<T, size> aVec = {0};
     ammonite::Vec<T, size> bVec = {0};
@@ -578,6 +592,11 @@ namespace tests {
 
     //Test NamedVec
     if (!testNamedVec<T, size>()) {
+      return false;
+    }
+
+    //Test ammonite::data()
+    if (!testData<T, size>()) {
       return false;
     }
 

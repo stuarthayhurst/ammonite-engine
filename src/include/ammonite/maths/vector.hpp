@@ -17,6 +17,27 @@
 namespace ammonite {
   //Maths operations
   inline namespace maths {
+    /*
+     - Return the address of the first element
+     - Guaranteed to be the same as the vector, with a different type
+    */
+    template <typename T, unsigned int size>
+              requires validVector<T, size>
+    constexpr T* data(Vec<T, size>& a) {
+      return &a[0];
+    }
+
+    /*
+     - Return the address of the first element
+     - Guaranteed to be the same as the vector, with a different type
+     - const version of the above
+    */
+    template <typename T, unsigned int size>
+              requires validVector<T, size>
+    constexpr const T* data(const Vec<T, size>& a) {
+      return &a[0];
+    }
+
     //Copy from src to dest, using the size of the smaller vector as the size of the copy
     template <typename T, unsigned int sizeA, unsigned int sizeB>
               requires validVector<T, sizeA> && validVector<T, sizeB>

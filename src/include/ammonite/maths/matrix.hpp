@@ -20,6 +20,27 @@
 namespace ammonite {
   //Maths operations
   inline namespace maths {
+    /*
+     - Return the address of the first element
+     - Guaranteed to be the same as the matrix, with a different type
+    */
+    template <typename T, unsigned int cols, unsigned int rows>
+              requires validMatrix<T, cols, rows>
+    constexpr T* data(Mat<T, cols, rows>& a) {
+      return &a[0][0];
+    }
+
+    /*
+     - Return the address of the first element
+     - Guaranteed to be the same as the matrix, with a different type
+     - const version of the above
+    */
+    template <typename T, unsigned int cols, unsigned int rows>
+              requires validMatrix<const T, cols, rows>
+    constexpr const T* data(const Mat<T, cols, rows>& a) {
+      return &a[0][0];
+    }
+
     //Copy from src to dest for two equally sized and typed matrices
     template <typename T, unsigned int cols, unsigned int rows>
               requires validMatrix<T, cols, rows>

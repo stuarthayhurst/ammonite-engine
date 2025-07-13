@@ -14,6 +14,21 @@
 namespace {
   template <typename T, unsigned int cols, unsigned int rows>
             requires ammonite::validMatrix<T, cols, rows>
+  bool testData() {
+    ammonite::Mat<T, cols, rows> aMat = {{0}};
+
+    if ((void*)ammonite::data(aMat) != (void*)&aMat) {
+      ammonite::utils::error << "Data pointer has a different address to the matrix" << std::endl;
+      ammonite::utils::normal << "  Result:   " << (void*)ammonite::data(aMat) \
+                              << "\n  Expected: " << (void*)&aMat << std::endl;
+      return false;
+    }
+
+    return true;
+  }
+
+  template <typename T, unsigned int cols, unsigned int rows>
+            requires ammonite::validMatrix<T, cols, rows>
   bool testEqual() {
     ammonite::Mat<T, cols, rows> aMat = {{0}};
     ammonite::Mat<T, cols, rows> bMat = {{0}};
@@ -1022,6 +1037,11 @@ namespace tests {
   bool testMatrix(std::string_view typeName) {
     ammonite::utils::normal << "Testing " << cols << "x" << rows << " " \
                             << typeName << " matrices" << std::endl;
+
+    //Test ammonite::data()
+    if (!testData<T, cols, rows>()) {
+      return false;
+    }
 
     for (int i = 0; i < 10000; i++) {
       //Test ammonite::equal()
