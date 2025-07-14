@@ -81,9 +81,9 @@ namespace manyCubesDemo {
     ammonite::lighting::setAmbientLight(ambientLight);
     for (unsigned int i = 0; i < lightCount; i++) {
       lightSourceIds[i] = ammonite::lighting::createLightSource();
-      lightSourcePositions[i][0] = (float)ammonite::utils::randomDouble(0, (double)sideLength);
-      lightSourcePositions[i][1] = 4.0f;
-      lightSourcePositions[i][2] = (float)ammonite::utils::randomDouble(0, (double)sideLength);
+      ammonite::set(lightSourcePositions[i],
+        (float)ammonite::utils::randomDouble(0, (double)sideLength), 4.0f,
+        (float)ammonite::utils::randomDouble(0, (double)sideLength));
 
       const ammonite::Vec<float, 3> colour = {
         (float)ammonite::utils::randomDouble(1.0),
@@ -123,8 +123,7 @@ namespace manyCubesDemo {
         }
       }
 
-      lightSourcePositions[i][0] = x;
-      lightSourcePositions[i][2] = z;
+      ammonite::set(lightSourcePositions[i], x, 4.0f, z);
       ammonite::lighting::properties::setGeometry(currLightSourceId, lightSourcePositions[i]);
     }
 

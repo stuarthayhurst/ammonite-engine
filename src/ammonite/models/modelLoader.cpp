@@ -34,20 +34,19 @@ namespace ammonite {
           //Fill the mesh with vertex data
           bool hasWarnedMesh = false;
           for (unsigned int i = 0; i < meshPtr->mNumVertices; i++) {
-            newMesh->meshData[i].vertex[0] = meshPtr->mVertices[i].x;
-            newMesh->meshData[i].vertex[1] = meshPtr->mVertices[i].y;
-            newMesh->meshData[i].vertex[2] = meshPtr->mVertices[i].z;
+            ammonite::set(newMesh->meshData[i].vertex, meshPtr->mVertices[i].x,
+                          meshPtr->mVertices[i].y, meshPtr->mVertices[i].z);
 
-            newMesh->meshData[i].normal[0] = meshPtr->mNormals[i].x;
-            newMesh->meshData[i].normal[1] = meshPtr->mNormals[i].y;
-            newMesh->meshData[i].normal[2] = meshPtr->mNormals[i].z;
+            ammonite::set(newMesh->meshData[i].normal, meshPtr->mNormals[i].x,
+                          meshPtr->mNormals[i].y, meshPtr->mNormals[i].z);
 
             if (meshPtr->mTextureCoords[0] != nullptr) {
-              newMesh->meshData[i].texturePoint[0] = meshPtr->mTextureCoords[0][i].x;
-              newMesh->meshData[i].texturePoint[1] = meshPtr->mTextureCoords[0][i].y;
+              ammonite::set(newMesh->meshData[i].texturePoint,
+                            meshPtr->mTextureCoords[0][i].x,
+                            meshPtr->mTextureCoords[0][i].y);
             } else {
               if (!hasWarnedMesh) {
-                ammonite::utils::warning << "Missing texture coord data for mesh" << std::endl;
+                ammonite::utils::warning << "Missing texture coordinate data for mesh" << std::endl;
                 hasWarnedMesh = true;
               }
               ammonite::set(newMesh->meshData[i].texturePoint, 0.0f);
