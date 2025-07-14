@@ -162,22 +162,22 @@ namespace ammonite {
         ammonite::Vec<float, 3> movementDirection = {0};
         switch (directionData->directionEnum) {
         case DIRECTION_FORWARD:
-          ammonite::add(movementDirection, horizontalDirection);
+          ammonite::copy(horizontalDirection, movementDirection);
           break;
         case DIRECTION_BACK:
-          ammonite::sub(movementDirection, horizontalDirection);
+          ammonite::negate(horizontalDirection, movementDirection);
           break;
         case DIRECTION_UP:
-          ammonite::add(movementDirection, worldUp);
+          ammonite::copy(worldUp, movementDirection);
           break;
         case DIRECTION_DOWN:
-          ammonite::sub(movementDirection, worldUp);
+          ammonite::negate(worldUp, movementDirection);
           break;
         case DIRECTION_RIGHT:
-          ammonite::add(movementDirection, right);
+          ammonite::copy(right, movementDirection);
           break;
         case DIRECTION_LEFT:
-          ammonite::sub(movementDirection, right);
+          ammonite::negate(right, movementDirection);
           break;
         }
 
