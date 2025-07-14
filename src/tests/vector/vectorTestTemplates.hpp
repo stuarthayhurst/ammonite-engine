@@ -197,19 +197,40 @@ namespace {
       ammonite::set(aVec, bVec, b);
       for (unsigned int i = 0; i < size - 1; i++) {
         if (aVec[i] != bVec[i]) {
-          ammonite::utils::error << "Vector set failed" << std::endl;
+          ammonite::utils::error << "Vector-scalar set failed" << std::endl;
           ammonite::utils::normal << "  Result:   " << ammonite::formatVector(aVec) \
                                   << "\n  Expected: " << bVec[i] \
-                                 << " at index " << i << std::endl;
+                                  << " at index " << i << std::endl;
           return false;
         }
       }
 
       if (aVec[size - 1] != b) {
-        ammonite::utils::error << "Vector set failed" << std::endl;
+        ammonite::utils::error << "Individual scalar set failed" << std::endl;
         ammonite::utils::normal << "  Result:   " << ammonite::formatVector(aVec) \
                                 << "\n  Expected: " << b \
                                 << " at index " << size - 1 << std::endl;
+        return false;
+      }
+    }
+
+    //Test full, individual vector initialisation
+    ammonite::Vec<T, size> cVec = {0};
+    randomFillVector(cVec);
+    if constexpr (size == 2) {
+      ammonite::set(aVec, cVec[0], cVec[1]);
+    } else if constexpr (size == 3) {
+      ammonite::set(aVec, cVec[0], cVec[1], cVec[2]);
+    } else if constexpr (size == 4) {
+      ammonite::set(aVec, cVec[0], cVec[1], cVec[2], cVec[3]);
+    }
+
+    for (unsigned int i = 0; i < size - 1; i++) {
+      if (aVec[i] != cVec[i]) {
+        ammonite::utils::error << "Vector set failed" << std::endl;
+        ammonite::utils::normal << "  Result:   " << ammonite::formatVector(aVec) \
+                                << "\n  Expected: " << ammonite::formatVector(cVec) \
+                                << std::endl;
         return false;
       }
     }

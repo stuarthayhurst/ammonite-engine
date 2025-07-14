@@ -102,6 +102,30 @@ namespace ammonite {
       a[size - 1] = c;
     }
 
+    //Individually set each element of vector a of length 4 to scalars
+    template <typename T> requires validVector<T, 4>
+    constexpr void set(Vec<T, 4>& a, T b, T c, T d, T e) {
+      a[0] = b;
+      a[1] = c;
+      a[2] = d;
+      a[3] = e;
+    }
+
+    //Individually set each element of vector a of length 3 to scalars
+    template <typename T> requires validVector<T, 3>
+    constexpr void set(Vec<T, 3>& a, T b, T c, T d) {
+      a[0] = b;
+      a[1] = c;
+      a[2] = d;
+    }
+
+    //Individually set each element of vector a of length 2 to scalars
+    template <typename T> requires validVector<T, 2>
+    constexpr void set(Vec<T, 2>& a, T b, T c) {
+      a[0] = b;
+      a[1] = c;
+    }
+
     //Add two vectors of the same size and type, storing the result in dest
     template <typename T, unsigned int size> requires validVector<T, size>
     void add(const Vec<T, size>& a, const Vec<T, size>& b, Vec<T, size>& dest) {
