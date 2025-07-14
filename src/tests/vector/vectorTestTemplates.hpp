@@ -189,6 +189,31 @@ namespace {
       }
     }
 
+    //Test vector vector-scalar initialisation
+    if constexpr (size >= 3) {
+      ammonite::Vec<T, size - 1> bVec = {0};
+      randomFillVector(bVec);
+
+      ammonite::set(aVec, bVec, b);
+      for (unsigned int i = 0; i < size - 1; i++) {
+        if (aVec[i] != bVec[i]) {
+          ammonite::utils::error << "Vector set failed" << std::endl;
+          ammonite::utils::normal << "  Result:   " << ammonite::formatVector(aVec) \
+                                  << "\n  Expected: " << bVec[i] \
+                                 << " at index " << i << std::endl;
+          return false;
+        }
+      }
+
+      if (aVec[size - 1] != b) {
+        ammonite::utils::error << "Vector set failed" << std::endl;
+        ammonite::utils::normal << "  Result:   " << ammonite::formatVector(aVec) \
+                                << "\n  Expected: " << b \
+                                << " at index " << size - 1 << std::endl;
+        return false;
+      }
+    }
+
     return true;
   }
 

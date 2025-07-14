@@ -94,6 +94,14 @@ namespace ammonite {
       }
     }
 
+    //Set elements of vector a to the elements of vector b and a scalar
+    template <typename T, unsigned int size>
+              requires validVector<T, size> && validVector<T, size - 1>
+    constexpr void set(Vec<T, size>& a, const Vec<T, size - 1>& b, T c) {
+      copy(b, a);
+      a[size - 1] = c;
+    }
+
     //Add two vectors of the same size and type, storing the result in dest
     template <typename T, unsigned int size> requires validVector<T, size>
     void add(const Vec<T, size>& a, const Vec<T, size>& b, Vec<T, size>& dest) {
