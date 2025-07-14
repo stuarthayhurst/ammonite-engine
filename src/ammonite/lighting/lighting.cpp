@@ -75,12 +75,9 @@ namespace ammonite {
         }
 
         //Repack lighting information
-        ammonite::copy(lightSource->geometry, shaderLightData[i][0]);
-        ammonite::copy(lightSource->diffuse, shaderLightData[i][1]);
-        ammonite::copy(lightSource->specular, shaderLightData[i][2]);
-        shaderLightData[i][0][3] = 0.0f;
-        shaderLightData[i][1][3] = 0.0f;
-        shaderLightData[i][2][3] = lightSource->power;
+        ammonite::set(shaderLightData[i][0], lightSource->geometry, 0.0f);
+        ammonite::set(shaderLightData[i][1], lightSource->diffuse, 0.0f);
+        ammonite::set(shaderLightData[i][2], lightSource->specular, lightSource->power);
 
         const ammonite::Vec<float, 3> targetVectors[6] = {
           {1.0f, 0.0f, 0.0f}, {-1.0f, 0.0f, 0.0f},
