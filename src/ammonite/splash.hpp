@@ -1,9 +1,8 @@
 #ifndef INTERNALSPLASH
 #define INTERNALSPLASH
 
-#include <glm/glm.hpp>
-
 #include "internal.hpp"
+#include "maths/vector.hpp"
 #include "utils/id.hpp"
 
 //Include public interface
@@ -17,9 +16,9 @@ namespace ammonite {
         float width = 0.85f;
         float height = 0.04f;
         float heightOffset = 0.86f;
-        glm::vec3 backgroundColour = glm::vec3(1.0f);
-        glm::vec3 trackColour = glm::vec3(0.7f);
-        glm::vec3 progressColour = glm::vec3(0.0f, 0.6f, 0.8f);
+        ammonite::Vec<float, 3> backgroundColour = {1.0f, 1.0f, 1.0f};
+        ammonite::Vec<float, 3> trackColour = {0.7f, 0.7f, 0.7f};
+        ammonite::Vec<float, 3> progressColour = {0.0f, 0.6f, 0.8f};
       };
 
       SplashScreen* getSplashScreenPtr(AmmoniteId splashScreenId);

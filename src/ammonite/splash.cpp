@@ -83,17 +83,18 @@ namespace ammonite {
       }
     }
 
-    void setSplashScreenColours(AmmoniteId targetScreenId, glm::vec3 backgroundColour,
-                                 glm::vec3 trackColour, glm::vec3 progressColour) {
+    void setSplashScreenColours(AmmoniteId targetScreenId,
+                                const ammonite::Vec<float, 3>& backgroundColour,
+                                const ammonite::Vec<float, 3>& trackColour,
+                                const ammonite::Vec<float, 3>& progressColour) {
       if (splashScreenTracker.contains(targetScreenId)) {
-        splashScreenTracker[targetScreenId].backgroundColour = backgroundColour;
-        splashScreenTracker[targetScreenId].trackColour = trackColour;
-        splashScreenTracker[targetScreenId].progressColour = progressColour;
+        ammonite::copy(backgroundColour, splashScreenTracker[targetScreenId].backgroundColour);
+        ammonite::copy(trackColour, splashScreenTracker[targetScreenId].trackColour);
+        ammonite::copy(progressColour, splashScreenTracker[targetScreenId].progressColour);
       } else {
            ammonite::utils::warning << "Requested splash screen doesn't exist (ID " \
                                  << targetScreenId << ")" << std::endl;
       }
     }
-
   }
 }

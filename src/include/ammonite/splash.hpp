@@ -1,8 +1,7 @@
 #ifndef AMMONITESPLASH
 #define AMMONITESPLASH
 
-#include <glm/glm.hpp>
-
+#include "maths/vectorTypes.hpp"
 #include "utils/id.hpp"
 
 namespace ammonite {
@@ -14,9 +13,11 @@ namespace ammonite {
 
     void setSplashScreenProgress(AmmoniteId targetScreenId, float progress);
     void setSplashScreenGeometry(AmmoniteId targetScreenId, float width,
-                                  float height, float heightOffset);
-    void setSplashScreenColours(AmmoniteId targetScreenId, glm::vec3 backgroundColour,
-                                 glm::vec3 trackColour, glm::vec3 progressColour);
+                                 float height, float heightOffset);
+    void setSplashScreenColours(AmmoniteId targetScreenId,
+                                const ammonite::Vec<float, 3>& backgroundColour,
+                                const ammonite::Vec<float, 3>& trackColour,
+                                const ammonite::Vec<float, 3>& progressColour);
   }
 }
 

@@ -550,19 +550,20 @@ namespace ammonite {
         internal::prepareScreen(0, width, height, false);
 
         //Prepare to draw the screen
-        const glm::vec3 backgroundColour = splashScreen->backgroundColour;
-        glClearColor(backgroundColour.x, backgroundColour.y, backgroundColour.z, 1.0f);
+        glClearColor(splashScreen->backgroundColour[0],
+                     splashScreen->backgroundColour[1],
+                     splashScreen->backgroundColour[2], 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         glBindVertexArray(screenQuadVertexArrayId);
 
         //Draw the track
         glUniform1f(splashShader.progressId, 1.0f);
-        glUniform3fv(splashShader.progressColourId, 1, glm::value_ptr(splashScreen->trackColour));
+        glUniform3fv(splashShader.progressColourId, 1, &splashScreen->trackColour[0]);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, nullptr);
 
         //Fill in the bar
         glUniform1f(splashShader.progressId, splashScreen->progress);
-        glUniform3fv(splashShader.progressColourId, 1, glm::value_ptr(splashScreen->progressColour));
+        glUniform3fv(splashShader.progressColourId, 1, &splashScreen->progressColour[0]);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, nullptr);
       }
     }
@@ -796,3 +797,4 @@ namespace ammonite {
     }
   }
 }
+
