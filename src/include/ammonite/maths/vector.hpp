@@ -215,6 +215,27 @@ namespace ammonite {
     }
 
     /*
+     - Flip the sign of every element of the vector, storing the result in dest
+       - The vector's type must be signed
+    */
+    template <typename T, unsigned int size> requires validVector<T, size>
+    void negate(const Vec<T, size>& a, Vec<T, size>& dest) {
+      std::experimental::fixed_size_simd<T, size> aSimd(&a[0], std::experimental::element_aligned);
+
+      aSimd = -aSimd;
+      aSimd.copy_to(&dest[0], std::experimental::element_aligned);
+    }
+
+    /*
+     - Flip the sign of every element of the vector, storing the result in the same vector
+       - The vector's type must be signed
+    */
+    template <typename T, unsigned int size> requires validVector<T, size>
+    void negate(Vec<T, size>& a) {
+      negate(a, a);
+    }
+
+    /*
      - Normalise a vector, storing the result in dest
        - Intermediate calculations are done with the element's type
        - This may give strange results for integral types

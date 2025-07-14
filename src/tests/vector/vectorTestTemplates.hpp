@@ -407,6 +407,42 @@ namespace {
   }
 
   template <typename T, unsigned int size> requires ammonite::validVector<T, size>
+  bool testNegate() {
+    if constexpr (std::is_signed_v<T>) {
+      ammonite::Vec<T, size> aVec = {0};
+      ammonite::Vec<T, size> bVec = {0};
+      randomFillVector(aVec);
+
+      //Test regular negation
+      ammonite::negate(aVec, bVec);
+      for (unsigned int i = 0; i < size; i++) {
+        if (aVec[i] != -bVec[i]) {
+          ammonite::utils::error << "Vector negation failed" << std::endl;
+          ammonite::utils::normal << "  Input:  " << ammonite::formatVector(aVec) \
+                                  << "\n  Result: " << ammonite::formatVector(bVec) \
+                                  << std::endl;
+          return false;
+        }
+      }
+
+      //Test in-place negtation
+      ammonite::copy(aVec, bVec);
+      ammonite::negate(aVec);
+      for (unsigned int i = 0; i < size; i++) {
+        if (aVec[i] != -bVec[i]) {
+          ammonite::utils::error << "In-place vector negation failed" << std::endl;
+          ammonite::utils::normal << "  Input:  " << ammonite::formatVector(bVec) \
+                                  << "\n  Result: " << ammonite::formatVector(aVec) \
+                                  << std::endl;
+          return false;
+        }
+      }
+    }
+
+    return true;
+  }
+
+  template <typename T, unsigned int size> requires ammonite::validVector<T, size>
   bool testNormalise() {
     ammonite::Vec<T, size> aVec = {0};
     ammonite::Vec<T, size> bVec = {0};
@@ -638,6 +674,11 @@ namespace tests {
 
       //Test ammonite::divide()
       if (!testDivide<T, size>()) {
+        return false;
+      }
+
+      //Test ammonite::negate()
+      if (!testNegate<T, size>()) {
         return false;
       }
 
