@@ -14,6 +14,7 @@
 #include "models.hpp"
 
 #include "../graphics/textures.hpp"
+#include "../maths/vector.hpp"
 #include "../utils/logging.hpp"
 
 namespace ammonite {

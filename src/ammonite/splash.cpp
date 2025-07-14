@@ -3,6 +3,7 @@
 
 #include "splash.hpp"
 
+#include "maths/vector.hpp"
 #include "utils/id.hpp"
 #include "utils/logging.hpp"
 
