@@ -12,6 +12,7 @@ extern "C" {
 }
 
 #include "../internal.hpp"
+#include "../maths/vector.hpp"
 #include "../utils/id.hpp"
 
 //Include public interface
@@ -33,8 +34,9 @@ namespace ammonite {
       };
 
       struct VertexData {
-        glm::vec3 vertex, normal;
-        glm::vec2 texturePoint;
+        ammonite::Vec<float, 3> vertex;
+        ammonite::Vec<float, 3> normal;
+        ammonite::Vec<float, 2> texturePoint;
       };
 
       struct TextureIdGroup {
