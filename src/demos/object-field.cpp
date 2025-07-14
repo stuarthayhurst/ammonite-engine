@@ -6,7 +6,6 @@
 
 #include <ammonite/ammonite.hpp>
 #include <glm/glm.hpp>
-#include <glm/gtc/constants.hpp>
 
 #include "object-field.hpp"
 
@@ -52,20 +51,26 @@ namespace objectFieldDemo {
 
   //Non-orbit internal functions
   namespace {
-    void genRandomPosData(glm::vec3* objectData, unsigned int objectCount) {
+    glm::vec3 toVec3(const ammonite::Vec<float, 3>& inVec) {
+      return glm::vec3(inVec[0], inVec[1], inVec[2]);
+    }
+
+    void genRandomPosData(ammonite::Vec<float, 3>* objectData, unsigned int objectCount) {
       for (unsigned int i = 0; i < objectCount; i++) {
         //Position;
-        objectData[(i * 3) + 0].x = (float)ammonite::utils::randomDouble(-10.0, 10.0);
-        objectData[(i * 3) + 0].y = (float)ammonite::utils::randomDouble(-2.0, 1.0);
-        objectData[(i * 3) + 0].z = (float)ammonite::utils::randomDouble(-10.0, 10.0);
+        ammonite::set(objectData[(i * 3) + 0],
+                      (float)ammonite::utils::randomDouble(-10.0, 10.0),
+                      (float)ammonite::utils::randomDouble(-2.0, 1.0),
+                      (float)ammonite::utils::randomDouble(-10.0, 10.0));
 
         //Rotation
-        objectData[(i * 3) + 1].x = (float)ammonite::utils::randomDouble(0.0, ammonite::pi<float>() * 2.0f);
-        objectData[(i * 3) + 1].y = (float)ammonite::utils::randomDouble(0.0, ammonite::pi<float>() * 2.0f);
-        objectData[(i * 3) + 1].z = (float)ammonite::utils::randomDouble(0.0, ammonite::pi<float>() * 2.0f);
+        ammonite::set(objectData[(i * 3) + 1],
+                      (float)ammonite::utils::randomDouble(0.0, ammonite::pi<float>() * 2.0f),
+                      (float)ammonite::utils::randomDouble(0.0, ammonite::pi<float>() * 2.0f),
+                      (float)ammonite::utils::randomDouble(0.0, ammonite::pi<float>() * 2.0f));
 
         //Scale
-        objectData[(i * 3) + 2] = glm::vec3((float)ammonite::utils::randomDouble(0.0, 1.2));
+        ammonite::set(objectData[(i * 3) + 2], (float)ammonite::utils::randomDouble(0.0, 1.2));
       }
     }
 
@@ -73,7 +78,7 @@ namespace objectFieldDemo {
       //Hold data for randomised cube positions
       const unsigned int offset = lightCount + 1;
       const unsigned int cubeCount = loadedModelIds.size() - offset;
-      glm::vec3* cubeData = new glm::vec3[(std::size_t)(cubeCount) * 3];
+      ammonite::Vec<float, 3>* cubeData = new ammonite::Vec<float, 3>[(std::size_t)(cubeCount) * 3];
 
       //Generate random position, rotation and scales, skip first item
       genRandomPosData(cubeData, cubeCount);
@@ -81,11 +86,11 @@ namespace objectFieldDemo {
       for (unsigned int i = 0; i < cubeCount; i++) {
         //Position the cube
         ammonite::models::position::setPosition(loadedModelIds[(std::size_t)i + offset],
-          cubeData[(i * 3) + 0]);
+          toVec3(cubeData[(i * 3) + 0]));
         ammonite::models::position::setRotation(loadedModelIds[(std::size_t)i + offset],
-          cubeData[(i * 3) + 1]);
+          toVec3(cubeData[(i * 3) + 1]));
         ammonite::models::position::setScale(loadedModelIds[(std::size_t)i + offset],
-          cubeData[(i * 3) + 2]);
+          toVec3(cubeData[(i * 3) + 2]));
       }
 
       delete [] cubeData;
@@ -127,8 +132,8 @@ namespace objectFieldDemo {
     }
 
     //Return the position of an orbit's centre, so that each orbit in a shape meets the next
-    constexpr glm::vec2 calculateOrbitPosition(unsigned int orbitCount,
-                                               unsigned int orbitIndex, float radius) {
+    constexpr void calculateOrbitPosition(unsigned int orbitCount, unsigned int orbitIndex,
+                                          float radius, ammonite::Vec<float, 2>& dest) {
       const float nucleusAngle = (ammonite::pi<float>() * 2.0f * (float)orbitIndex) / (float)orbitCount;
 
       //Correct for overlapping orbits
@@ -136,7 +141,8 @@ namespace objectFieldDemo {
       const float opp = ammonite::pi<float>() - (2 * indexOffsetAngle);
       const float nucleusDistance = radius * 2 * std::sin(indexOffsetAngle) / std::sin(opp);
 
-      return nucleusDistance * glm::vec2(std::sin(nucleusAngle), std::cos(nucleusAngle));
+      ammonite::set(dest, std::sin(nucleusAngle), std::cos(nucleusAngle));
+      ammonite::scale(dest, nucleusDistance);
     }
 
     /*
@@ -243,7 +249,7 @@ namespace objectFieldDemo {
     const AmmoniteId screenId = ammonite::splash::getActiveSplashScreenId();
 
     //Generate random positions, orientations and sizes, skipping first item
-    glm::vec3 cubeData[cubeCount][3];
+    ammonite::Vec<float, 3> cubeData[cubeCount][3];
     genRandomPosData(&cubeData[0][0], cubeCount);
 
     //Load models from a set of objects and textures
@@ -299,9 +305,9 @@ namespace objectFieldDemo {
       vertexCount += ammonite::models::getVertexCount(loadedModelIds[modelCount]);
 
       //Position the cube
-      ammonite::models::position::setPosition(loadedModelIds[modelCount], cubeData[i][0]);
-      ammonite::models::position::setRotation(loadedModelIds[modelCount], cubeData[i][1]);
-      ammonite::models::position::setScale(loadedModelIds[modelCount], cubeData[i][2]);
+      ammonite::models::position::setPosition(loadedModelIds[modelCount], toVec3(cubeData[i][0]));
+      ammonite::models::position::setRotation(loadedModelIds[modelCount], toVec3(cubeData[i][1]));
+      ammonite::models::position::setScale(loadedModelIds[modelCount], toVec3(cubeData[i][2]));
 
       //Update splash screen
       modelCount++;
@@ -347,8 +353,9 @@ namespace objectFieldDemo {
 
   bool rendererMainloop() {
     for (unsigned int i = 0; i < lightCount; i++) {
-      const glm::vec2 lightOrbitPosition = calculateOrbitPosition(totalOrbits,
-        lightData[i].orbitIndex, lightData[i].orbitRadius);
+      ammonite::Vec<float, 2> lightOrbitPosition = {0};
+      calculateOrbitPosition(totalOrbits, lightData[i].orbitIndex,
+                             lightData[i].orbitRadius, lightOrbitPosition);
 
       //Snapshot the time, reset timer if it has overrun
       float orbitTime = (float)lightData[i].orbitTimer.getTime();
@@ -406,9 +413,9 @@ namespace objectFieldDemo {
 
       //Calculate and set final position of light
       const float lightPositionX = (lightData[i].orbitRadius * std::cos(targetAngle)) + \
-        lightOrbitPosition.x;
+        lightOrbitPosition[0];
       const float lightPositionY = (-lightData[i].orbitRadius * std::sin(targetAngle)) + \
-        lightOrbitPosition.y;
+        lightOrbitPosition[1];
       ammonite::models::position::setPosition(lightData[i].linkedModelId,
         glm::vec3(lightPositionX, 5.0f, lightPositionY));
     }
