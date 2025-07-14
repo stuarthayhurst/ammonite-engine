@@ -923,8 +923,8 @@ namespace {
       ammonite::Vec<T, 4> cameraWideVec = {0};
       ammonite::Vec<T, 4> targetWideVec = {0};
       ammonite::Vec<T, 4> negZVec = {(T)0.0, (T)0.0, (T)-1.0, (T)0.0};
-      ammonite::copyCast(cameraVec, cameraWideVec);
-      ammonite::copyCast(targetVec, targetWideVec);
+      ammonite::copy(cameraVec, cameraWideVec);
+      ammonite::copy(targetVec, targetWideVec);
 
       //Coordinate 1 unit away from the camera, towards the target
       ammonite::Vec<T, 4> cameraTargetPosWideVec = {0};
