@@ -3,8 +3,7 @@
 
 #include <string>
 
-#include <glm/glm.hpp>
-
+#include "../maths/vectorTypes.hpp"
 #include "../utils/id.hpp"
 
 static constexpr bool ASSUME_FLIP_MODEL_UVS = true;
@@ -26,21 +25,21 @@ enum AmmoniteDrawEnum : unsigned char {
 namespace ammonite {
   namespace models {
     namespace position {
-      glm::vec3 getPosition(AmmoniteId modelId);
-      glm::vec3 getScale(AmmoniteId modelId);
-      glm::vec3 getRotation(AmmoniteId modelId);
+      void getPosition(AmmoniteId modelId, ammonite::Vec<float, 3>& position);
+      void getScale(AmmoniteId modelId, ammonite::Vec<float, 3>& scale);
+      void getRotation(AmmoniteId modelId, ammonite::Vec<float, 3>& rotation);
 
       //Absolute movements
-      void setPosition(AmmoniteId modelId, glm::vec3 position);
-      void setScale(AmmoniteId modelId, glm::vec3 scale);
+      void setPosition(AmmoniteId modelId, const ammonite::Vec<float, 3>& position);
+      void setScale(AmmoniteId modelId, const ammonite::Vec<float, 3>& scale);
       void setScale(AmmoniteId modelId, float scaleMultiplier);
-      void setRotation(AmmoniteId modelId, glm::vec3 rotation);
+      void setRotation(AmmoniteId modelId, const ammonite::Vec<float, 3>& rotation);
 
       //Relative adjustments
-      void translateModel(AmmoniteId modelId, glm::vec3 translation);
-      void scaleModel(AmmoniteId modelId, glm::vec3 scale);
+      void translateModel(AmmoniteId modelId, const ammonite::Vec<float, 3>& translation);
+      void scaleModel(AmmoniteId modelId, const ammonite::Vec<float, 3>& scale);
       void scaleModel(AmmoniteId modelId, float scaleMultiplier);
-      void rotateModel(AmmoniteId modelId, glm::vec3 rotation);
+      void rotateModel(AmmoniteId modelId, const ammonite::Vec<float, 3>& rotation);
     }
 
     AmmoniteId createModel(const std::string& objectPath);

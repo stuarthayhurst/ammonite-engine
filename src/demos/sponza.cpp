@@ -3,14 +3,16 @@
 #include <vector>
 
 #include <ammonite/ammonite.hpp>
-#include <glm/glm.hpp>
 
 #include "sponza.hpp"
 
 namespace sponzaDemo {
   namespace {
     std::vector<AmmoniteId> loadedModelIds;
+
+    const ammonite::Vec<float, 3> cameraPosition = {5.0f, 1.5f, 0.0f};
     const ammonite::Vec<float, 3> ambientLight = {0.1f, 0.1f, 0.1f};
+    const ammonite::Vec<float, 3> lightModelPosition = {0.0f, 20.0f, 0.0f};
   }
 
   bool demoExit() {
@@ -63,7 +65,7 @@ namespace sponzaDemo {
     }
 
     //Copy last loaded model
-    ammonite::models::position::setPosition(loadedModelIds[modelCount - 1], glm::vec3(0.0f, 20.0f, 0.0f));
+    ammonite::models::position::setPosition(loadedModelIds[modelCount - 1], lightModelPosition);
     ammonite::models::position::scaleModel(loadedModelIds[modelCount - 1], 0.25f);
 
     const AmmoniteId skyboxId = ammonite::skybox::loadDirectory("assets-experimental/skybox/");
@@ -87,7 +89,6 @@ namespace sponzaDemo {
 
     //Set the camera position
     const AmmoniteId cameraId = ammonite::camera::getActiveCamera();
-    const ammonite::Vec<float, 3> cameraPosition = {5.0f, 1.5f, 0.0f};
     ammonite::camera::setPosition(cameraId, cameraPosition);
     ammonite::camera::setAngle(cameraId, ammonite::radians(270.0f), ammonite::radians(10.0f));
 

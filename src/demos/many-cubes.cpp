@@ -5,7 +5,6 @@
 #include <vector>
 
 #include <ammonite/ammonite.hpp>
-#include <glm/glm.hpp>
 
 #include "many-cubes.hpp"
 
@@ -18,6 +17,7 @@ namespace manyCubesDemo {
     AmmoniteId lightSourceIds[lightCount];
     ammonite::Vec<float, 3> lightSourcePositions[lightCount] = {{0}};
 
+    const ammonite::Vec<float, 3> cameraPosition = {0.0f, 12.0f, 0.0f};
     const ammonite::Vec<float, 3> ambientLight = {0.1f, 0.1f, 0.1f};
   }
 
@@ -72,8 +72,9 @@ namespace manyCubesDemo {
     sideLength = (unsigned int)std::sqrt(modelCount);
     for (unsigned int x = 0; x < sideLength; x++) {
       for (unsigned int y = 0; y < sideLength; y++) {
+        const ammonite::Vec<float, 3> position = {2.0f * (float)x, 0.0f, 2.0f * (float)y};
         ammonite::models::position::setPosition(loadedModelIds[((std::size_t)x * sideLength) + y],
-          glm::vec3(2.0f * float(x), 0.0f, 2.0f * float(y)));
+          position);
       }
     }
 
@@ -97,7 +98,6 @@ namespace manyCubesDemo {
 
     //Set the camera position
     const AmmoniteId cameraId = ammonite::camera::getActiveCamera();
-    const ammonite::Vec<float, 3> cameraPosition = {0.0f, 12.0f, 0.0f};
     ammonite::camera::setPosition(cameraId, cameraPosition);
     ammonite::camera::setAngle(cameraId, ammonite::radians(45.0f), ammonite::radians(-20.0f));
 

@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <cstddef>
+#include <cstring>
 #include <iostream>
 #include <iterator>
 #include <map>
@@ -7,7 +8,7 @@
 #include <unordered_map>
 
 #include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/quaternion.hpp>
 
 extern "C" {
@@ -19,6 +20,8 @@ extern "C" {
 #include "../enums.hpp"
 #include "../graphics/textures.hpp"
 #include "../lighting/lighting.hpp"
+#include "../maths/matrix.hpp"
+#include "../maths/vector.hpp"
 #include "../utils/id.hpp"
 #include "../utils/logging.hpp"
 
@@ -274,12 +277,17 @@ namespace ammonite {
 
     void calcModelMatrices(models::internal::PositionData* positionData) {
       //Recalculate the model matrix when a component changes
-      positionData->modelMatrix = positionData->translationMatrix
-                                * glm::toMat4(positionData->rotationQuat)
-                                * positionData->scaleMatrix;
+      ammonite::Mat<float, 4> rotationScaleMatrix = {{0}};
+      ammonite::multiply(positionData->rotationMatrix, positionData->scaleMatrix,
+                         rotationScaleMatrix);
+      ammonite::multiply(positionData->translationMatrix, rotationScaleMatrix,
+                         positionData->modelMatrix);
 
       //Normal matrix
-      positionData->normalMatrix = glm::transpose(glm::inverse(positionData->modelMatrix));
+      ammonite::Mat<float, 4> inverseModelMatrix = {{0}};
+      ammonite::inverse(positionData->modelMatrix, inverseModelMatrix);
+      ammonite::transpose(inverseModelMatrix);
+      ammonite::copy(inverseModelMatrix, positionData->normalMatrix);
     }
   }
 
@@ -322,10 +330,10 @@ namespace ammonite {
       modelObject.textureIds = modelObject.modelData->textureIds;
 
       internal::PositionData positionData;
-      positionData.translationMatrix = glm::mat4(1.0f);
-      positionData.scaleMatrix = glm::mat4(1.0f);
+      ammonite::identity(positionData.translationMatrix);
+      ammonite::identity(positionData.scaleMatrix);
+      ammonite::identity(positionData.rotationMatrix);
       positionData.rotationQuat = glm::quat(glm::vec3(0, 0, 0));
-
       modelObject.positionData = positionData;
 
       //Calculate model and normal matrices
@@ -511,42 +519,53 @@ namespace ammonite {
 
     //Return position, scale and rotation of a model
     namespace position {
-      glm::vec3 getPosition(AmmoniteId modelId) {
+      void getPosition(AmmoniteId modelId, ammonite::Vec<float, 3>& position) {
         //Get the model and check it exists
         const models::internal::ModelInfo* modelObject = modelIdPtrMap[modelId];
         if (modelObject == nullptr) {
-          return glm::vec3(0.0f);
+          ammonite::set(position, 0.0f);
+          return;
         }
 
-        return glm::vec3(modelObject->positionData.translationMatrix * \
-          glm::vec4(glm::vec3(0, 0, 0), 1));
+        const ammonite::Vec<float, 4> origin = {0.0f, 0.0f, 0.0f, 1.0f};
+        ammonite::Vec<float, 4> rawPosition = {0};
+        ammonite::multiply(modelObject->positionData.translationMatrix, origin, rawPosition);
+        ammonite::copy(rawPosition, position);
       }
 
-      glm::vec3 getScale(AmmoniteId modelId) {
+      void getScale(AmmoniteId modelId, ammonite::Vec<float, 3>& scale) {
         //Get the model and check it exists
         const models::internal::ModelInfo* modelObject = modelIdPtrMap[modelId];
         if (modelObject == nullptr) {
-          return glm::vec3(0.0f);
+          ammonite::set(scale, 0.0f);
+          return;
         }
 
-        return glm::vec3(modelObject->positionData.scaleMatrix * glm::vec4(glm::vec3(1, 1, 1), 1));
+        const ammonite::Vec<float, 4> ones = {1.0f, 1.0f, 1.0f, 1.0f};
+        ammonite::Vec<float, 4> rawScale = {0};
+        ammonite::multiply(modelObject->positionData.scaleMatrix, ones, rawScale);
+        ammonite::copy(rawScale, scale);
       }
 
       //Return rotation, in radians
-      glm::vec3 getRotation(AmmoniteId modelId) {
+      void getRotation(AmmoniteId modelId, ammonite::Vec<float, 3>& rotation) {
         //Get the model and check it exists
         const models::internal::ModelInfo* modelObject = modelIdPtrMap[modelId];
         if (modelObject == nullptr) {
-          return glm::vec3(0.0f);
+          ammonite::set(rotation, 0.0f);
+          return;
         }
 
-        return glm::eulerAngles(modelObject->positionData.rotationQuat);
+        const glm::vec3 angles = glm::eulerAngles(modelObject->positionData.rotationQuat);
+        rotation[0] = angles.x;
+        rotation[1] = angles.y;
+        rotation[2] = angles.z;
       }
     }
 
     //Set absolute position, scale and rotation of models
     namespace position {
-      void setPosition(AmmoniteId modelId, glm::vec3 position) {
+      void setPosition(AmmoniteId modelId, const ammonite::Vec<float, 3>& position) {
         //Get the model and check it exists
         models::internal::ModelInfo* modelObject = modelIdPtrMap[modelId];
         if (modelObject == nullptr) {
@@ -554,7 +573,9 @@ namespace ammonite {
         }
 
         //Set the position
-        modelObject->positionData.translationMatrix = glm::translate(glm::mat4(1.0f), position);
+        ammonite::Mat<float, 4> identityMat = {{0}};
+        ammonite::identity(identityMat);
+        ammonite::translate(identityMat, position, modelObject->positionData.translationMatrix);
 
         if (modelObject->lightEmitterId != 0) {
           ammonite::lighting::internal::setLightSourcesChanged();
@@ -564,7 +585,7 @@ namespace ammonite {
         calcModelMatrices(&modelObject->positionData);
       }
 
-      void setScale(AmmoniteId modelId, glm::vec3 scale) {
+      void setScale(AmmoniteId modelId, const ammonite::Vec<float, 3>& scale) {
         //Get the model and check it exists
         models::internal::ModelInfo* modelObject = modelIdPtrMap[modelId];
         if (modelObject == nullptr) {
@@ -572,7 +593,9 @@ namespace ammonite {
         }
 
         //Set the scale
-        modelObject->positionData.scaleMatrix = glm::scale(glm::mat4(1.0f), scale);
+        ammonite::Mat<float, 4> identityMat = {{0}};
+        ammonite::identity(identityMat);
+        ammonite::scale(identityMat, scale, modelObject->positionData.scaleMatrix);
 
         if (modelObject->lightEmitterId != 0) {
           ammonite::lighting::internal::setLightSourcesChanged();
@@ -583,11 +606,12 @@ namespace ammonite {
       }
 
       void setScale(AmmoniteId modelId, float scaleMultiplier) {
-        setScale(modelId, glm::vec3(scaleMultiplier, scaleMultiplier, scaleMultiplier));
+        const ammonite::Vec<float, 3> scale = {scaleMultiplier, scaleMultiplier, scaleMultiplier};
+        setScale(modelId, scale);
       }
 
       //Rotation, in radians
-      void setRotation(AmmoniteId modelId, glm::vec3 rotation) {
+      void setRotation(AmmoniteId modelId, const ammonite::Vec<float, 3>& rotation) {
         //Get the model and check it exists
         models::internal::ModelInfo* modelObject = modelIdPtrMap[modelId];
         if (modelObject == nullptr) {
@@ -595,8 +619,12 @@ namespace ammonite {
         }
 
         //Set the rotation
-        modelObject->positionData.rotationQuat = glm::quat(rotation) * \
+        const glm::vec3 glmRotation = glm::vec3(rotation[0], rotation[1], rotation[2]);
+        modelObject->positionData.rotationQuat = glm::quat(glmRotation) * \
           glm::quat(glm::vec3(0, 0, 0));
+        const glm::mat4 rotMat = glm::toMat4(modelObject->positionData.rotationQuat);
+        std::memcpy(modelObject->positionData.rotationMatrix, glm::value_ptr(rotMat),
+                    sizeof(modelObject->positionData.rotationMatrix));
 
         if (modelObject->lightEmitterId != 0) {
           ammonite::lighting::internal::setLightSourcesChanged();
@@ -609,17 +637,16 @@ namespace ammonite {
 
     //Translate, scale and rotate models
     namespace position {
-      void translateModel(AmmoniteId modelId, glm::vec3 translation) {
+      void translateModel(AmmoniteId modelId, const ammonite::Vec<float, 3>& translation) {
         //Get the model and check it exists
         models::internal::ModelInfo* modelObject = modelIdPtrMap[modelId];
         if (modelObject == nullptr) {
           return;
         }
 
-        //Translate it
-        modelObject->positionData.translationMatrix = glm::translate(
-          modelObject->positionData.translationMatrix,
-          translation);
+        //Translate the matrix
+        ammonite::translate(modelObject->positionData.translationMatrix, translation,
+                            modelObject->positionData.translationMatrix);
 
         if (modelObject->lightEmitterId != 0) {
           ammonite::lighting::internal::setLightSourcesChanged();
@@ -629,17 +656,16 @@ namespace ammonite {
         calcModelMatrices(&modelObject->positionData);
       }
 
-      void scaleModel(AmmoniteId modelId, glm::vec3 scaleVector) {
+      void scaleModel(AmmoniteId modelId, const ammonite::Vec<float, 3>& scale) {
         //Get the model and check it exists
         models::internal::ModelInfo* modelObject = modelIdPtrMap[modelId];
         if (modelObject == nullptr) {
           return;
         }
 
-        //Scale it
-        modelObject->positionData.scaleMatrix = glm::scale(
-          modelObject->positionData.scaleMatrix,
-          scaleVector);
+        //Scale the matrix
+        ammonite::scale(modelObject->positionData.scaleMatrix, scale,
+                        modelObject->positionData.scaleMatrix);
 
         if (modelObject->lightEmitterId != 0) {
           ammonite::lighting::internal::setLightSourcesChanged();
@@ -650,20 +676,25 @@ namespace ammonite {
       }
 
       void scaleModel(AmmoniteId modelId, float scaleMultiplier) {
-        scaleModel(modelId, glm::vec3(scaleMultiplier, scaleMultiplier, scaleMultiplier));
+        const ammonite::Vec<float, 3> scale = {scaleMultiplier, scaleMultiplier, scaleMultiplier};
+        scaleModel(modelId, scale);
       }
 
       //Rotation, in radians
-      void rotateModel(AmmoniteId modelId, glm::vec3 rotation) {
+      void rotateModel(AmmoniteId modelId, const ammonite::Vec<float, 3>& rotation) {
         //Get the model and check it exists
         models::internal::ModelInfo* modelObject = modelIdPtrMap[modelId];
         if (modelObject == nullptr) {
           return;
         }
 
-        //Rotate it
-        modelObject->positionData.rotationQuat = glm::quat(rotation) * \
+        //Rotate the matrix
+        const glm::vec3 glmRotation = glm::vec3(rotation[0], rotation[1], rotation[2]);
+        modelObject->positionData.rotationQuat = glm::quat(glmRotation) * \
           modelObject->positionData.rotationQuat;
+        const glm::mat4 rotMat = glm::toMat4(modelObject->positionData.rotationQuat);
+        std::memcpy(modelObject->positionData.rotationMatrix, glm::value_ptr(rotMat),
+                    sizeof(modelObject->positionData.rotationMatrix));
 
         if (modelObject->lightEmitterId != 0) {
           ammonite::lighting::internal::setLightSourcesChanged();

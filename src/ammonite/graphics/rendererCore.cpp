@@ -1,12 +1,8 @@
 #include <algorithm>
-#include <cstring>
 #include <iostream>
 #include <string>
 #include <utility>
 #include <vector>
-
-#include <glm/glm.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
 extern "C" {
   #include <epoxy/gl.h>
@@ -423,32 +419,29 @@ namespace ammonite {
           internal::setWireframe(false);
         }
 
-        //Fetch the model matrix
-        glm::mat4 glmModelMatrix = drawObject->positionData.modelMatrix;
-        ammonite::Mat<float, 4> modelMatrix = {{0}};
-        std::memcpy(&modelMatrix[0][0], glm::value_ptr(glmModelMatrix), sizeof(modelMatrix));
-
         //Handle pass-specific matrices and uniforms
         ammonite::Mat<float, 4> mvp = {{0}};
         ammonite::Mat<float, 4> vp = {{0}};
         switch (renderMode) {
         case AMMONITE_DEPTH_PASS:
-          glUniformMatrix4fv(depthShader.modelMatrixId, 1, GL_FALSE, &modelMatrix[0][0]);
+          glUniformMatrix4fv(depthShader.modelMatrixId, 1, GL_FALSE,
+                             &drawObject->positionData.modelMatrix[0][0]);
           break;
         case AMMONITE_RENDER_PASS:
           //Calculate model view projection matrix
           ammonite::multiply(*projectionMatrixPtr, *viewMatrixPtr, vp);
-          ammonite::multiply(vp, modelMatrix, mvp);
+          ammonite::multiply(vp, drawObject->positionData.modelMatrix, mvp);
 
           glUniformMatrix4fv(modelShader.matrixId, 1, GL_FALSE, &mvp[0][0]);
-          glUniformMatrix4fv(modelShader.modelMatrixId, 1, GL_FALSE, &modelMatrix[0][0]);
+          glUniformMatrix4fv(modelShader.modelMatrixId, 1, GL_FALSE,
+                             &drawObject->positionData.modelMatrix[0][0]);
           glUniformMatrix3fv(modelShader.normalMatrixId, 1, GL_FALSE,
-                             glm::value_ptr(drawObject->positionData.normalMatrix));
+                             &drawObject->positionData.normalMatrix[0][0]);
           break;
         case AMMONITE_EMISSION_PASS:
           //Calculate model view projection matrix
           ammonite::multiply(*projectionMatrixPtr, *viewMatrixPtr, vp);
-          ammonite::multiply(vp, modelMatrix, mvp);
+          ammonite::multiply(vp, drawObject->positionData.modelMatrix, mvp);
 
           glUniformMatrix4fv(lightShader.lightMatrixId, 1, GL_FALSE, &mvp[0][0]);
           glUniform1ui(lightShader.lightIndexId, drawObject->lightIndex);

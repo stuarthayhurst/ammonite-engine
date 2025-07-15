@@ -3,14 +3,20 @@
 #include <vector>
 
 #include <ammonite/ammonite.hpp>
-#include <glm/glm.hpp>
 
 #include "monkey.hpp"
 
 namespace monkeyDemo {
   namespace {
     std::vector<AmmoniteId> loadedModelIds;
+
+    const ammonite::Vec<float, 3> cameraPosition = {0.0f, 0.0f, 5.0f};
     const ammonite::Vec<float, 3> ambientLight = {0.1f, 0.1f, 0.1f};
+    const ammonite::Vec<float, 3> monkeyPosition = {-2.0f, 0.0f, 0.0f};
+    const ammonite::Vec<float, 3> lightPosition = {4.0f, 4.0f, 4.0f};
+    const float monkeyScale = 0.8f;
+    const float lightScale = 0.25f;
+    const ammonite::Vec<float, 3> monkeyRotation = {0.0f, 0.0f, 0.0f};
   }
 
   bool demoExit() {
@@ -65,8 +71,8 @@ namespace monkeyDemo {
     //Copy last loaded model
     loadedModelIds.push_back(ammonite::models::copyModel(loadedModelIds[modelCount - 1]));
     vertexCount += ammonite::models::getVertexCount(loadedModelIds[modelCount]);
-    ammonite::models::position::setPosition(loadedModelIds[modelCount], glm::vec3(4.0f, 4.0f, 4.0f));
-    ammonite::models::position::scaleModel(loadedModelIds[modelCount], 0.25f);
+    ammonite::models::position::setPosition(loadedModelIds[modelCount], lightPosition);
+    ammonite::models::position::scaleModel(loadedModelIds[modelCount], lightScale);
     modelCount++;
 
     ammonite::utils::status << "Loaded " << vertexCount << " vertices" << std::endl;
@@ -76,9 +82,9 @@ namespace monkeyDemo {
     ammonite::renderer::drawFrame();
 
     //Example translation, scale and rotation
-    ammonite::models::position::translateModel(loadedModelIds[0], glm::vec3(-2.0f, 0.0f, 0.0f));
-    ammonite::models::position::scaleModel(loadedModelIds[0], 0.8f);
-    ammonite::models::position::rotateModel(loadedModelIds[0], glm::vec3(0.0f, 0.0f, 0.0f));
+    ammonite::models::position::translateModel(loadedModelIds[0], monkeyPosition);
+    ammonite::models::position::scaleModel(loadedModelIds[0], monkeyScale);
+    ammonite::models::position::rotateModel(loadedModelIds[0], monkeyRotation);
 
     //Set light source properties
     const AmmoniteId lightId = ammonite::lighting::createLightSource();
@@ -88,7 +94,6 @@ namespace monkeyDemo {
 
     //Set the camera position
     const AmmoniteId cameraId = ammonite::camera::getActiveCamera();
-    const ammonite::Vec<float, 3> cameraPosition = {0.0f, 0.0f, 5.0f};
     ammonite::camera::setPosition(cameraId, cameraPosition);
     ammonite::camera::setAngle(cameraId, ammonite::radians(180.0f), ammonite::radians(0.0f));
 

@@ -12,6 +12,7 @@ extern "C" {
 }
 
 #include "../internal.hpp"
+#include "../maths/matrix.hpp"
 #include "../maths/vector.hpp"
 #include "../utils/id.hpp"
 
@@ -61,10 +62,11 @@ namespace ammonite {
       };
 
       struct PositionData {
-        glm::mat4 modelMatrix;
-        glm::mat3 normalMatrix;
-        glm::mat4 translationMatrix;
-        glm::mat4 scaleMatrix;
+        ammonite::Mat<float, 4> modelMatrix = {{0}};
+        ammonite::Mat<float, 3> normalMatrix = {{0}};
+        ammonite::Mat<float, 4> translationMatrix = {{0}};
+        ammonite::Mat<float, 4> scaleMatrix = {{0}};
+        ammonite::Mat<float, 4> rotationMatrix = {{0}};
         glm::quat rotationQuat;
       };
 

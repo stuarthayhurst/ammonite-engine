@@ -3,8 +3,6 @@
 #include <iterator>
 #include <unordered_map>
 
-#include <glm/glm.hpp>
-
 extern "C" {
   #include <epoxy/gl.h>
 }
@@ -64,10 +62,7 @@ namespace ammonite {
         //Override position for light emitting models, and add to tracker
         if (lightSource->modelId != 0) {
           //Override light position, using linked model
-          const glm::vec3 glmGeometry = ammonite::models::position::getPosition(lightSource->modelId);
-          lightSource->geometry[0] = glmGeometry.x;
-          lightSource->geometry[1] = glmGeometry.y;
-          lightSource->geometry[2] = glmGeometry.z;
+          ammonite::models::position::getPosition(lightSource->modelId, lightSource->geometry);
 
           //Update lightIndex for rendering light emitting models
           auto modelPtr = ammonite::models::internal::getModelPtr(lightSource->modelId);

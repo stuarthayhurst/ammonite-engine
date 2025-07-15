@@ -5,7 +5,6 @@
 #include <vector>
 
 #include <ammonite/ammonite.hpp>
-#include <glm/glm.hpp>
 
 #include "object-field.hpp"
 
@@ -34,10 +33,13 @@ namespace objectFieldDemo {
     LightData* lightData = nullptr;
     unsigned int lightCount;
 
+    const ammonite::Vec<float, 3> cameraPosition = {10.0f, 17.0f, 17.0f};
     const ammonite::Vec<float, 3> ambientLight = {0.1f, 0.1f, 0.1f};
+    const ammonite::Vec<float, 3> floorPosition = {0.0f, -1.0f, 0.0f};
+    const ammonite::Vec<float, 3> floorScale = {10.0f, 0.1f, 10.0f};
 
     //General orbit config / data
-    float transferProbability = 0.5f;
+    const float transferProbability = 0.5f;
     unsigned int totalOrbits;
 
     //2D structures to store indices and ratios for orbit changes
@@ -51,10 +53,6 @@ namespace objectFieldDemo {
 
   //Non-orbit internal functions
   namespace {
-    glm::vec3 toVec3(const ammonite::Vec<float, 3>& inVec) {
-      return glm::vec3(inVec[0], inVec[1], inVec[2]);
-    }
-
     void genRandomPosData(ammonite::Vec<float, 3>* objectData, unsigned int objectCount) {
       for (unsigned int i = 0; i < objectCount; i++) {
         //Position;
@@ -86,11 +84,11 @@ namespace objectFieldDemo {
       for (unsigned int i = 0; i < cubeCount; i++) {
         //Position the cube
         ammonite::models::position::setPosition(loadedModelIds[(std::size_t)i + offset],
-          toVec3(cubeData[(i * 3) + 0]));
+                                                cubeData[(i * 3) + 0]);
         ammonite::models::position::setRotation(loadedModelIds[(std::size_t)i + offset],
-          toVec3(cubeData[(i * 3) + 1]));
+                                                cubeData[(i * 3) + 1]);
         ammonite::models::position::setScale(loadedModelIds[(std::size_t)i + offset],
-          toVec3(cubeData[(i * 3) + 2]));
+                                             cubeData[(i * 3) + 2]);
       }
 
       delete [] cubeData;
@@ -105,13 +103,13 @@ namespace objectFieldDemo {
       const double horiz = ammonite::camera::getHorizontal(activeCameraId);
       const double vert = ammonite::camera::getVertical(activeCameraId);
 
-      ammonite::Vec<float, 3> cameraPosition = {0};
-      ammonite::camera::getPosition(activeCameraId, cameraPosition);
+      ammonite::Vec<float, 3> cubePosition = {0};
+      ammonite::camera::getPosition(activeCameraId, cubePosition);
 
-      ammonite::models::position::setRotation(modelId, glm::vec3(-vert, horiz, 0.0f));
+      const ammonite::Vec<float, 3> cubeRotation = {-(float)vert, (float)horiz, 0.0f};
+      ammonite::models::position::setRotation(modelId, cubeRotation);
       ammonite::models::position::setScale(modelId, 0.25f);
-      ammonite::models::position::setPosition(modelId,
-        glm::vec3(cameraPosition[0], cameraPosition[1], cameraPosition[2]));
+      ammonite::models::position::setPosition(modelId, cubePosition);
 
       ammonite::utils::status << "Spawned object" << std::endl;
     }
@@ -295,9 +293,8 @@ namespace objectFieldDemo {
     }
 
     //Position the floor
-    ammonite::models::position::setPosition(floorId, glm::vec3(0.0f, -1.0f, 0.0f));
-    ammonite::models::position::setRotation(floorId, glm::vec3(0.0f));
-    ammonite::models::position::setScale(floorId, glm::vec3(10.0f, 0.1f, 10.0f));
+    ammonite::models::position::setPosition(floorId, floorPosition);
+    ammonite::models::position::setScale(floorId, floorScale);
 
     for (unsigned int i = 0; i < cubeCount; i++) {
       //Load the cube
@@ -305,9 +302,9 @@ namespace objectFieldDemo {
       vertexCount += ammonite::models::getVertexCount(loadedModelIds[modelCount]);
 
       //Position the cube
-      ammonite::models::position::setPosition(loadedModelIds[modelCount], toVec3(cubeData[i][0]));
-      ammonite::models::position::setRotation(loadedModelIds[modelCount], toVec3(cubeData[i][1]));
-      ammonite::models::position::setScale(loadedModelIds[modelCount], toVec3(cubeData[i][2]));
+      ammonite::models::position::setPosition(loadedModelIds[modelCount], cubeData[i][0]);
+      ammonite::models::position::setRotation(loadedModelIds[modelCount], cubeData[i][1]);
+      ammonite::models::position::setScale(loadedModelIds[modelCount], cubeData[i][2]);
 
       //Update splash screen
       modelCount++;
@@ -344,7 +341,6 @@ namespace objectFieldDemo {
 
     //Set the camera position
     const AmmoniteId cameraId = ammonite::camera::getActiveCamera();
-    const ammonite::Vec<float, 3> cameraPosition = {10.0f, 17.0f, 17.0f};
     ammonite::camera::setPosition(cameraId, cameraPosition);
     ammonite::camera::setAngle(cameraId, 4.75f * ammonite::pi<float>() / 4.0f, -0.7f);
 
@@ -416,8 +412,8 @@ namespace objectFieldDemo {
         lightOrbitPosition[0];
       const float lightPositionY = (-lightData[i].orbitRadius * std::sin(targetAngle)) + \
         lightOrbitPosition[1];
-      ammonite::models::position::setPosition(lightData[i].linkedModelId,
-        glm::vec3(lightPositionX, 5.0f, lightPositionY));
+      const ammonite::Vec<float, 3> lightPosition = {lightPositionX, 5.0f, lightPositionY};
+      ammonite::models::position::setPosition(lightData[i].linkedModelId, lightPosition);
     }
 
     //Draw the frame
