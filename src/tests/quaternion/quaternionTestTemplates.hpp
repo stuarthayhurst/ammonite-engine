@@ -30,12 +30,14 @@ namespace {
     randomFillQuaternion(aQuat);
 
     ammonite::copy(aQuat, bQuat);
-    if (!ammonite::equal(aQuat, bQuat)) { //TODO
-      ammonite::utils::error << "Quaternion copy failed" << std::endl;
-      ammonite::utils::normal << "  Result:   " << ammonite::formatQuaternion(bQuat) \
-                              << "\n  Expected: " << ammonite::formatQuaternion(aQuat) \
-                              << std::endl;
-      return false;
+    for (unsigned int i = 0; i < 4; i++) {
+      if (aQuat[0][i] != bQuat[0][i]) {
+        ammonite::utils::error << "Quaternion copy failed" << std::endl;
+        ammonite::utils::normal << "  Result:   " << ammonite::formatQuaternion(bQuat) \
+                                << "\n  Expected: " << ammonite::formatQuaternion(aQuat) \
+                                << std::endl;
+        return false;
+      }
     }
 
     return true;
@@ -85,15 +87,10 @@ namespace tests {
     }
 
     for (int i = 0; i < 10000; i++) {
-      //Test ammonite::equal()
-//      if (!testEqual<T>()) { //TODO: consider
-  //      return false;
-    //  }
-
       //Test ammonite::copy()
-//      if (!testCopy<T>()) { //TODO: finish
-//        return false;
-//      }
+      if (!testCopy<T>()) {
+        return false;
+      }
 
       //Test ammonite::copyCast()
       if (!testCopyCast<T>()) {
