@@ -13,6 +13,8 @@
 #include "maths/angle.hpp"
 #include "maths/matrix.hpp"
 #include "maths/matrixTypes.hpp"
+#include "maths/quaternion.hpp"
+#include "maths/quaternionTypes.hpp"
 #include "maths/vector.hpp"
 #include "maths/vectorTypes.hpp"
 #include "models/models.hpp"
