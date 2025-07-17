@@ -4,6 +4,7 @@
 #include <ammonite/ammonite.hpp>
 
 #include "tests/matrix/matrixTestTemplates.hpp"
+#include "tests/quaternion/quaternionTestTemplates.hpp"
 #include "tests/vector/vectorTestTemplates.hpp"
 
 int main() {
@@ -51,9 +52,12 @@ int main() {
   passed &= tests::testDoublex4x3();
   passed &= tests::testDoublex4x4();
 
+  passed &= tests::testFloatQuat();
+  passed &= tests::testDoubleQuat();
+
   if (!passed) {
     ammonite::utils::normal << std::endl;
-    ammonite::utils::error << "Vector / matrix tests failed" << std::endl;
+    ammonite::utils::error << "Vector / matrix / quaternion tests failed" << std::endl;
     return EXIT_FAILURE;
   }
 

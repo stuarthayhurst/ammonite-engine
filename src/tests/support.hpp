@@ -42,7 +42,16 @@ void randomFillMatrix(ammonite::Mat<T, cols, rows>& mat, double limit = 10000.0)
   }
 }
 
-template <typename T> requires ammonite::vectorType<T> || ammonite::matrixType<T>
+template <typename T> requires ammonite::validQuaternion<T>
+void randomFillQuaternion(ammonite::Quat<T>& quat, double limit = 10000.0) {
+  for (unsigned int i = 0; i < 4; i++) {
+    quat[0][i] = (T)ammonite::utils::randomDouble((T)limit);
+  }
+}
+
+template <typename T>
+          requires ammonite::vectorType<T> || ammonite::matrixType<T> ||
+          ammonite::validQuaternion<T>
 bool roughly(T a, T b, double epsilon = 1e-5) {
   if constexpr (std::is_integral_v<T>) {
     return (a == b);
