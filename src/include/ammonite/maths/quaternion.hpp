@@ -15,6 +15,25 @@
 namespace ammonite {
   //Maths operations
   inline namespace maths {
+    /*
+     - Return the address of the first element
+     - Guaranteed to be the same as the quaternion, with a different type
+    */
+    template <typename T> requires validQuaternion<T>
+    constexpr T* data(Quat<T>& a) {
+      return &a[0][0];
+    }
+
+    /*
+     - Return the address of the first element
+     - Guaranteed to be the same as the quaternion, with a different type
+     - const version of the above
+    */
+    template <typename T> requires validQuaternion<const T>
+    constexpr const T* data(const Quat<T>& a) {
+      return &a[0][0];
+    }
+
     //Copy from src to dest
     template <typename T> requires validQuaternion<T>
     constexpr void copy(const Quat<T>& src, Quat<T>& dest) {
