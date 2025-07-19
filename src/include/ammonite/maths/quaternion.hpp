@@ -14,6 +14,7 @@
 #include <glm/gtx/quaternion.hpp>
 
 #include "quaternionTypes.hpp"
+#include "vectorTypes.hpp"
 
 namespace ammonite {
   //Maths operations
@@ -71,6 +72,12 @@ namespace ammonite {
       dest[0][1] = glmQuat.y;
       dest[0][2] = glmQuat.z;
       dest[0][3] = glmQuat.w;
+    }
+
+    //Initialise the quaternion dest with a vector of Euler angles x, y and z
+    template <typename T> requires validQuaternion<T>
+    void fromEuler(Quat<T>& dest, const Vec<T, 3>& angles) {
+      fromEuler(dest, angles[0], angles[1], angles[2]);
     }
   }
 

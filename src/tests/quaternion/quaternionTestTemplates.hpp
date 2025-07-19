@@ -55,7 +55,7 @@ namespace {
       if ((float)aQuat[0][i] != bQuat[0][i]) {
         ammonite::utils::error << "Quaternion copy cast failed" << std::endl;
         ammonite::utils::normal << "  Result:   " << ammonite::formatQuaternion(bQuat) \
-                                << "\n  Expected: " << ammonite::formatQuaternion(aQuat)
+                                << "\n  Expected: " << ammonite::formatQuaternion(aQuat) \
                                 << std::endl;
         return false;
       }
@@ -66,7 +66,7 @@ namespace {
       if ((double)aQuat[0][i] != cQuat[0][i]) {
         ammonite::utils::error << "Quaternion copy cast failed" << std::endl;
         ammonite::utils::normal << "  Result:   " << ammonite::formatQuaternion(cQuat) \
-                                << "\n  Expected: " << ammonite::formatQuaternion(aQuat)
+                                << "\n  Expected: " << ammonite::formatQuaternion(aQuat) \
                                 << std::endl;
         return false;
       }
@@ -117,7 +117,23 @@ namespace {
         if (!roughly(outQuat[0][i], tests[testIndex].out[0][i])) {
           ammonite::utils::error << "Quaternion Euler angle initialisation failed" << std::endl;
           ammonite::utils::normal << "  Result:   " << ammonite::formatQuaternion(outQuat) \
-                                  << "\n  Expected: " << ammonite::formatQuaternion(tests[testIndex].out)
+                                  << "\n  Expected: " << ammonite::formatQuaternion(tests[testIndex].out) \
+                                  << std::endl;
+          return false;
+        }
+      }
+
+      //Check the same results are given from a vector of angles
+      ammonite::Quat<T> outQuatAlt = {{0}};
+      ammonite::Vec<T, 3> angleVec = {
+        tests[testIndex].xAngle, tests[testIndex].yAngle, tests[testIndex].zAngle
+      };
+      ammonite::fromEuler(outQuatAlt, angleVec);
+      for (int i = 0; i < 3; i++) {
+        if (outQuatAlt[0][i] != outQuat[0][i]) {
+          ammonite::utils::error << "Quaternion Euler angle vector initialisation failed" << std::endl;
+          ammonite::utils::normal << "  Result:   " << ammonite::formatQuaternion(outQuatAlt) \
+                                  << "\n  Expected: " << ammonite::formatQuaternion(outQuatAlt) \
                                   << std::endl;
           return false;
         }
