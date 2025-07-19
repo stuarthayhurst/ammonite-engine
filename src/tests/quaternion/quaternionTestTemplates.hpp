@@ -74,6 +74,58 @@ namespace {
 
     return true;
   }
+
+  template <typename T> requires ammonite::validQuaternion<T>
+  bool testEuler() {
+    //NOLINTBEGIN(cppcoreguidelines-avoid-const-or-ref-data-members)
+    struct TestData {
+      T xAngle;
+      T yAngle;
+      T zAngle;
+      ammonite::Quat<T> out;
+    };
+    //NOLINTEND(cppcoreguidelines-avoid-const-or-ref-data-members)
+
+    TestData tests[9] = {
+      //No rotation
+      {(T)0.0, (T)0.0, (T)0.0, {{(T)0.0, (T)0.0, (T)0.0, (T)1.0}}},
+
+      //Complete rotation in each axis
+      {(T)2.0 * ammonite::pi<T>(), (T)0.0, (T)0.0, {{(T)0.0, (T)0.0, (T)0.0, (T)-1.0}}},
+      {(T)0.0, (T)2.0 * ammonite::pi<T>(), (T)0.0, {{(T)0.0, (T)0.0, (T)0.0, (T)-1.0}}},
+      {(T)0.0, (T)0.0, (T)2.0 * ammonite::pi<T>(), {{(T)0.0, (T)0.0, (T)0.0, (T)-1.0}}},
+      {(T)2.0 * ammonite::pi<T>(), (T)2.0 * ammonite::pi<T>(), (T)2.0 * ammonite::pi<T>(), {{(T)0.0, (T)0.0, (T)0.0, (T)-1.0}}},
+
+      //Half rotation in each axis
+      {ammonite::pi<T>(), (T)0.0, (T)0.0, {{(T)1.0, (T)0.0, (T)0.0, (T)0.0}}},
+      {(T)0.0, ammonite::pi<T>(), (T)0.0, {{(T)0.0, (T)1.0, (T)0.0, (T)0.0}}},
+      {(T)0.0, (T)0.0, ammonite::pi<T>(), {{(T)0.0, (T)0.0, (T)1.0, (T)0.0}}},
+      {ammonite::pi<T>(), ammonite::pi<T>(), ammonite::pi<T>(), {{(T)0.0, (T)0.0, (T)0.0, (T)1.0}}}
+    };
+
+    const int totalTests = sizeof(tests) / sizeof(TestData);
+    for (int testIndex = 0; testIndex < totalTests; testIndex++) {
+      //Prepare quaternion storage
+      ammonite::Quat<T> outQuat = {{0}};
+
+      //Initialise the quaternion
+      ammonite::fromEuler(outQuat, tests[testIndex].xAngle,
+                          tests[testIndex].yAngle, tests[testIndex].zAngle);
+
+      //Compare the result to the expected
+      for (int i = 0; i < 4; i++) {
+        if (!roughly(outQuat[0][i], tests[testIndex].out[0][i])) {
+          ammonite::utils::error << "Quaternion Euler angle initialisation failed" << std::endl;
+          ammonite::utils::normal << "  Result:   " << ammonite::formatQuaternion(outQuat) \
+                                  << "\n  Expected: " << ammonite::formatQuaternion(tests[testIndex].out)
+                                  << std::endl;
+          return false;
+        }
+      }
+    }
+
+    return true;
+  }
 }
 
 namespace tests {
@@ -98,7 +150,8 @@ namespace tests {
       }
     }
 
-    return true;
+    //Test ammonite::fromEuler()
+    return testEuler<T>();
   }
 }
 

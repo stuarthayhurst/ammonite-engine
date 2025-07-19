@@ -10,6 +10,9 @@
 //NOLINTNEXTLINE(misc-include-cleaner)
 #include <experimental/simd>
 
+#include <glm/glm.hpp>
+#include <glm/gtx/quaternion.hpp>
+
 #include "quaternionTypes.hpp"
 
 namespace ammonite {
@@ -57,6 +60,17 @@ namespace ammonite {
       } else {
         std::copy(&src[0][0], &src[0][4], &dest[0][0]);
       }
+    }
+
+    //Initialise the quaternion dest with Euler angles x, y and z
+    template <typename T> requires validQuaternion<T>
+    void fromEuler(Quat<T>& dest, T x, T y, T z) {
+      glm::vec<3, T, glm::defaultp> angles(x, y, z);
+      glm::qua<T> glmQuat(angles);
+      dest[0][0] = glmQuat.x;
+      dest[0][1] = glmQuat.y;
+      dest[0][2] = glmQuat.z;
+      dest[0][3] = glmQuat.w;
     }
   }
 
