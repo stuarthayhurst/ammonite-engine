@@ -1,6 +1,7 @@
 #ifndef QUATERNIONTESTTEMPLATES
 #define QUATERNIONTESTTEMPLATES
 
+#include <cmath>
 #include <iostream>
 #include <string_view>
 
@@ -76,7 +77,7 @@ namespace {
   }
 
   template <typename T> requires ammonite::validQuaternion<T>
-  bool testEuler() {
+  bool testInit() {
     //NOLINTBEGIN(cppcoreguidelines-avoid-const-or-ref-data-members)
     struct TestData {
       T xAngle;
@@ -142,6 +143,40 @@ namespace {
 
     return true;
   }
+
+  template <typename T> requires ammonite::validQuaternion<T>
+  bool testToEuler() {
+    ammonite::Quat<T> aQuat = {{0}};
+    ammonite::Vec<T, 3> aVec = {0};
+    ammonite::Vec<T, 3> angleVec = {0};
+    angleVec[0] = std::fmod(randomScalar<T>(), (T)2.0 * ammonite::pi<T>());
+    angleVec[1] = std::fmod(randomScalar<T>(), (T)2.0 * ammonite::pi<T>());
+    angleVec[2] = std::fmod(randomScalar<T>(), (T)2.0 * ammonite::pi<T>());
+
+    //Initialise a quaternion using the angles
+    ammonite::fromEuler(aQuat, angleVec);
+
+    //Get angles out of the quaternion
+    ammonite::toEuler(aQuat, aVec);
+
+    //Check the angles match
+    T sumA = (T)0.0;
+    T sumB = (T)0.0;
+    for (int i = 0; i < 3; i++) {
+      sumA *= std::sin(aVec[i]);
+      sumB *= std::sin(angleVec[i]);
+    }
+
+    if (!roughly(sumA, sumB)) {
+      ammonite::utils::error << "Quaternion Euler angle recovery failed" << std::endl;
+      ammonite::utils::normal << "  Result:   " << ammonite::formatVector(aVec) \
+                              << "\n  Expected: " << ammonite::formatVector(angleVec) \
+                              << std::endl;
+      return false;
+    }
+
+    return true;
+  }
 }
 
 namespace tests {
@@ -164,10 +199,15 @@ namespace tests {
       if (!testCopyCast<T>()) {
         return false;
       }
+
+      //Test ammonite::toEuler()
+      if (!testToEuler<T>()) {
+        return false;
+      }
     }
 
     //Test ammonite::fromEuler()
-    return testEuler<T>();
+    return testInit<T>();
   }
 }
 

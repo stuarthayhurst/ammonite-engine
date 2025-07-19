@@ -63,6 +63,7 @@ namespace ammonite {
       }
     }
 
+    //TODO: Implement with <simd>
     //Initialise the quaternion dest with Euler angles x, y and z
     template <typename T> requires validQuaternion<T>
     void fromEuler(Quat<T>& dest, T x, T y, T z) {
@@ -78,6 +79,17 @@ namespace ammonite {
     template <typename T> requires validQuaternion<T>
     void fromEuler(Quat<T>& dest, const Vec<T, 3>& angles) {
       fromEuler(dest, angles[0], angles[1], angles[2]);
+    }
+
+    //TODO: Implement with <simd>
+    //Convert the quaternion src to Euler angles x, y and z, storing them in the vector dest
+    template <typename T> requires validQuaternion<T>
+    void toEuler(const Quat<T>& src, Vec<T, 3>& dest) {
+      glm::qua<T> glmQuat(src[0][3], src[0][0], src[0][1], src[0][2]);
+      glm::vec<3, T, glm::defaultp> glmAngles = glm::eulerAngles(glmQuat);
+      dest[0] = glmAngles.x;
+      dest[1] = glmAngles.y;
+      dest[2] = glmAngles.z;
     }
   }
 
