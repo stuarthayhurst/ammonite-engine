@@ -139,7 +139,23 @@ namespace ammonite {
       //NOLINTEND(readability-else-after-return)
     }
 
-    //Set the diagonal of the matrix to a scalar
+    //Set every element of the matrix to a scalar
+    template <typename T, unsigned int cols, unsigned int rows>
+              requires validMatrix<T, cols, rows>
+    constexpr void set(Mat<T, cols, rows>& a, T b) {
+      for (unsigned int col = 0; col < cols; col++) {
+        for (unsigned int row = 0; row < rows; row++) {
+          a[col][row] = b;
+        }
+      }
+    }
+
+    /*
+     - Set the diagonal of the matrix to a scalar
+     - Only the diagonal elements are modified
+       - This isn't suitable for initialising a matrix, use set(a, 0) first, or
+         initialise the matrix with {{0}}
+    */
     template <typename T, unsigned int cols, unsigned int rows>
               requires validMatrix<T, cols, rows>
     constexpr void diagonal(Mat<T, cols, rows>& a, T scalar) {
@@ -152,6 +168,9 @@ namespace ammonite {
     /*
      - Set the diagonal of the matrix to a vector
      - The vector's length must match one dimension, and not exceed the other
+     - Only the diagonal elements are modified
+       - This isn't suitable for initialising a matrix, use set(a, 0) first, or
+         initialise the matrix with {{0}}
     */
     template <typename T, unsigned int cols, unsigned int rows, unsigned int size>
               requires validMatrix<T, cols, rows> && validVector<T, size> &&
@@ -163,7 +182,12 @@ namespace ammonite {
       }
     }
 
-    //Set each element of a matrix's diagonal to 1.0
+    /*
+     - Set each element of a matrix's diagonal to 1.0
+     - Only the diagonal elements are modified
+       - This isn't suitable for initialising a matrix, use set(a, 0) first, or
+         initialise the matrix with {{0}}
+    */
     template <typename T, unsigned int cols, unsigned int rows>
               requires validMatrix<T, cols, rows>
     constexpr void identity(Mat<T, cols, rows>& a) {

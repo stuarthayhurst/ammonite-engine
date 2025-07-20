@@ -235,6 +235,30 @@ namespace {
 
   template <typename T, unsigned int cols, unsigned int rows>
             requires ammonite::validMatrix<T, cols, rows>
+  bool testSet() {
+    ammonite::Mat<T, cols, rows> aMat = {{0}};
+    T a = randomScalar<T>();
+    randomFillMatrix(aMat);
+
+    //Test scalar set
+    ammonite::set(aMat, a);
+    for (unsigned int col = 0; col < cols; col++) {
+      for (unsigned int row = 0; row < rows; row++) {
+        if (aMat[col][row] != a) {
+          ammonite::utils::error << "Matrix scalar set failed" << std::endl;
+          ammonite::utils::normal << "  Result:\n" << ammonite::formatMatrix(aMat) \
+                                  << "\n  Expected: " << a \
+                                  << " at column " << col << ", row " << row << std::endl;
+          return false;
+        }
+      }
+    }
+
+    return true;
+  }
+
+  template <typename T, unsigned int cols, unsigned int rows>
+            requires ammonite::validMatrix<T, cols, rows>
   bool testDiagonal() {
     constexpr unsigned int minSize = std::min(cols, rows);
     ammonite::Mat<T, cols, rows> aMat = {{0}};
@@ -1056,6 +1080,11 @@ namespace tests {
 
       //Test ammonite::copyCast()
       if (!testCopyCast<T, cols, rows>()) {
+        return false;
+      }
+
+      //Test ammonite::set()
+      if (!testSet<T, cols, rows>()) {
         return false;
       }
 
