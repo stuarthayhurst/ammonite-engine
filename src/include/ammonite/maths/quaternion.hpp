@@ -91,6 +91,33 @@ namespace ammonite {
       dest[1] = glmAngles.y;
       dest[2] = glmAngles.z;
     }
+
+    /*
+     - Initialise the quaternion dest with pitch, yaw and roll angles
+     - This is identical to fromEuler()
+    */
+    template <typename T> requires validQuaternion<T>
+    void fromPitchYawRoll(Quat<T>& dest, T pitch, T yaw, T roll) {
+      fromEuler(dest, pitch, yaw, roll);
+    }
+
+    /*
+     - Initialise the quaternion dest with a vector of pitch, yaw and roll angles
+     - This is identical to fromEuler()
+    */
+    template <typename T> requires validQuaternion<T>
+    void fromPitchYawRoll(Quat<T>& dest, const Vec<T, 3>& angles) {
+      fromEuler(dest, angles[0], angles[1], angles[2]);
+    }
+
+    /*
+     - Convert the quaternion src to pitch, yaw and roll, storing them in the vector dest
+     - This is identical to toEuler()
+    */
+    template <typename T> requires validQuaternion<T>
+    void toPitchYawRoll(const Quat<T>& src, Vec<T, 3>& dest) {
+      toEuler(src, dest);
+    }
   }
 
   //Utility / support functions
