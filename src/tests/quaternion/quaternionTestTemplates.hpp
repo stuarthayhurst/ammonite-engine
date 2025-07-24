@@ -146,33 +146,109 @@ namespace {
 
   template <typename T> requires ammonite::validQuaternion<T>
   bool testToEuler() {
-    ammonite::Quat<T> aQuat = {{0}};
-    ammonite::Vec<T, 3> aVec = {0};
-    ammonite::Vec<T, 3> angleVec = {0};
-    angleVec[0] = std::fmod(randomScalar<T>(), (T)2.0 * ammonite::pi<T>());
-    angleVec[1] = std::fmod(randomScalar<T>(), (T)2.0 * ammonite::pi<T>());
-    angleVec[2] = std::fmod(randomScalar<T>(), (T)2.0 * ammonite::pi<T>());
+    if constexpr (sizeof(T) >= 8) {
+      ammonite::Quat<T> aQuat = {{0}};
+      ammonite::Vec<T, 3> aVec = {0};
+      ammonite::Vec<T, 3> angleVec = {0};
+      randomFillVector(angleVec, (T)2.0 * ammonite::pi<T>());
 
-    //Initialise a quaternion using the angles
-    ammonite::fromEuler(aQuat, angleVec);
+      //Initialise a quaternion using the angles
+      ammonite::fromEuler(aQuat, angleVec);
 
-    //Get angles out of the quaternion
-    ammonite::toEuler(aQuat, aVec);
+      //Get angles out of the quaternion
+      ammonite::toEuler(aQuat, aVec);
 
-    //Check the angles match
-    T sumA = (T)0.0;
-    T sumB = (T)0.0;
-    for (int i = 0; i < 3; i++) {
-      sumA *= std::sin(aVec[i]);
-      sumB *= std::sin(angleVec[i]);
+      //Check the angles match
+      T sumA = (T)1.0;
+      T sumB = (T)1.0;
+      for (int i = 0; i < 3; i++) {
+        sumA *= std::sin(aVec[i]);
+        sumB *= std::sin(angleVec[i]);
+      }
+
+      if (!roughly(sumA, sumB)) {
+        ammonite::utils::error << "Quaternion Euler angle recovery failed" << std::endl;
+        ammonite::utils::normal << "  Result:   " << ammonite::formatVector(aVec) \
+                                << "\n  Expected: " << ammonite::formatVector(angleVec) \
+                                << std::endl;
+        return false;
+      }
     }
 
-    if (!roughly(sumA, sumB)) {
-      ammonite::utils::error << "Quaternion Euler angle recovery failed" << std::endl;
-      ammonite::utils::normal << "  Result:   " << ammonite::formatVector(aVec) \
-                              << "\n  Expected: " << ammonite::formatVector(angleVec) \
+    return true;
+  }
+
+  template <typename T> requires ammonite::validQuaternion<T>
+  bool testDot() {
+    ammonite::Quat<T> aQuat = {{0}};
+    ammonite::Quat<T> bQuat = {{0}};
+    ammonite::Vec<T, 3> angleVecA = {0};
+    ammonite::Vec<T, 3> angleVecB = {0};
+    randomFillVector(angleVecA, (T)2.0 * ammonite::pi<T>());
+    randomFillVector(angleVecB, (T)2.0 * ammonite::pi<T>());
+
+    ammonite::fromEuler(aQuat, angleVecA);
+    ammonite::fromEuler(bQuat, angleVecB);
+
+    T sum = (T)0;
+    for (int i = 0; i < 4; i++) {
+      sum += aQuat[0][i] * bQuat[0][i];
+    }
+
+    //Test dot product
+    if (!roughly(ammonite::dot(aQuat, bQuat), sum)) {
+      ammonite::utils::error << "Quaternion dot product failed" << std::endl;
+      ammonite::utils::normal << "  Input:    " << ammonite::formatQuaternion(aQuat) \
+                              << "\n  Input:    " << ammonite::formatQuaternion(bQuat) \
+                              << "\n  Result:   " << ammonite::dot(aQuat, bQuat) \
+                              << "\n  Expected: " << sum << std::endl;
+      return false;
+    }
+
+    return true;
+  }
+
+  template <typename T> requires ammonite::validQuaternion<T>
+  bool testMultiplyQuat() {
+    ammonite::Quat<T> aQuat = {{0}};
+    ammonite::Quat<T> bQuat = {{0}};
+    ammonite::Quat<T> cQuat = {{0}};
+    ammonite::Quat<T> dQuat = {{0}};
+    ammonite::Quat<T> eQuat = {{0}};
+    ammonite::Quat<T> fQuat = {{0}};
+    ammonite::Vec<T, 3> angleVec = {0};
+    randomFillVector(angleVec, (T)2.0 * ammonite::pi<T>());
+
+    //Initialise quaternions using the angles
+    ammonite::fromEuler(aQuat, angleVec[0], (T)0.0, (T)0.0);
+    ammonite::fromEuler(bQuat, (T)0.0, angleVec[1], (T)0.0);
+    ammonite::fromEuler(cQuat, (T)0.0, (T)0.0, angleVec[2]);
+
+    //Multiply each axis quaternion together
+    ammonite::multiply(bQuat, aQuat, dQuat);
+    ammonite::multiply(cQuat, dQuat, eQuat);
+
+    //Test multiplied quaternion matches initialised quaternion
+    ammonite::fromEuler(fQuat, angleVec);
+    if (!roughly(std::abs(ammonite::dot(fQuat, eQuat)), (T)1.0)) {
+      ammonite::utils::error << "Quaternion-quaternion multiplication failed" << std::endl;
+      ammonite::utils::normal << "  Result:   " << ammonite::formatQuaternion(eQuat) \
+                              << "\n  Expected: " << ammonite::formatQuaternion(fQuat) \
                               << std::endl;
       return false;
+    }
+
+    //Test the in-place variant matches the regular variant
+    ammonite::multiply(bQuat, aQuat);
+    ammonite::multiply(cQuat, bQuat);
+    for (int i = 0; i < 4; i++) {
+      if (cQuat[0][i] != eQuat[0][i]) {
+        ammonite::utils::error << "In-place quaternion-quaternion multiplication failed" << std::endl;
+        ammonite::utils::normal << "  Result:   " << ammonite::formatQuaternion(cQuat) \
+                                << "\n  Expected: " << ammonite::formatQuaternion(eQuat) \
+                                << std::endl;
+        return false;
+      }
     }
 
     return true;
@@ -202,6 +278,16 @@ namespace tests {
 
       //Test ammonite::toEuler()
       if (!testToEuler<T>()) {
+        return false;
+      }
+
+      //Test ammonite::dot()
+      if (!testDot<T>()) {
+        return false;
+      }
+
+      //Test ammonite::multiply()
+      if (!testMultiplyQuat<T>()) {
         return false;
       }
     }

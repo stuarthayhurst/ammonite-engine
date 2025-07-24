@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <cstring>
+#include <functional>
 #include <string>
 #include <type_traits>
 
@@ -117,6 +118,36 @@ namespace ammonite {
     template <typename T> requires validQuaternion<T>
     void toPitchYawRoll(const Quat<T>& src, Vec<T, 3>& dest) {
       toEuler(src, dest);
+    }
+
+    //Calculate the dot product a quaternion
+    template <typename T> requires validQuaternion<T>
+    T dot(const Quat<T>& a, const Quat<T>& b) {
+      std::experimental::fixed_size_simd<T, 4> aSimd(&a[0][0], std::experimental::element_aligned);
+      std::experimental::fixed_size_simd<T, 4> bSimd(&b[0][0], std::experimental::element_aligned);
+
+      return std::experimental::reduce(aSimd * bSimd, std::plus{});
+    }
+
+    //TODO: Implement with <simd>
+    //Multiply quaternion a by quaternion b, sorting the result in dest
+    template <typename T> requires validQuaternion<T>
+    void multiply(const Quat<T>& a, const Quat<T>& b, Quat<T>& dest) {
+      glm::qua<T> glmQuatA(a[0][3], a[0][0], a[0][1], a[0][2]);
+      glm::qua<T> glmQuatB(b[0][3], b[0][0], b[0][1], b[0][2]);
+
+      glm::qua<T> glmResult = glmQuatA * glmQuatB;
+
+      dest[0][0] = glmResult.x;
+      dest[0][1] = glmResult.y;
+      dest[0][2] = glmResult.z;
+      dest[0][3] = glmResult.w;
+    }
+
+    //Multiply quaternion a by quaternion b, sorting the result in the first quaternion
+    template <typename T> requires validQuaternion<T>
+    void multiply(Quat<T>& a, const Quat<T>& b) {
+      multiply(a, b, a);
     }
   }
 
