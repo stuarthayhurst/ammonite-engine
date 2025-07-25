@@ -209,6 +209,50 @@ namespace {
   }
 
   template <typename T> requires ammonite::validQuaternion<T>
+  bool testConjugate() {
+    ammonite::Quat<T> aQuat = {{0}};
+    ammonite::Quat<T> bQuat = {{0}};
+    ammonite::Quat<T> cQuat = {{0}};
+    ammonite::Vec<T, 3> angleVecA = {0};
+    randomFillVector(angleVecA, (T)2.0 * ammonite::pi<T>());
+    ammonite::fromEuler(aQuat, angleVecA);
+
+    //Test conjugate calculation
+    ammonite::conjugate(aQuat, bQuat);
+    bool valid = true;
+    for (int i = 0; i < 3; i++) {
+      if (-aQuat[0][i] != bQuat[0][i]) {
+        valid = false;
+        break;
+      }
+    }
+
+    if (!valid || aQuat[0][3] != bQuat[0][3]) {
+      ammonite::utils::error << "Quaternion conjugate calculation failed" << std::endl;
+      ammonite::utils::normal << "  Input:  " << ammonite::formatQuaternion(aQuat) \
+                              << "\n  Result: " << ammonite::formatQuaternion(bQuat) \
+                              << std::endl;
+      return false;
+    }
+
+    //Test in-place conjugate calculation
+    ammonite::copy(aQuat, cQuat);
+    ammonite::conjugate(aQuat);
+    for (int i = 0; i < 4; i++) {
+      if (aQuat[0][i] != bQuat[0][i]) {
+        ammonite::utils::error << "In-place quaternion conjugate calculation failed" << std::endl;
+        ammonite::utils::normal << "  Input:    " << ammonite::formatQuaternion(cQuat) \
+                                << "\n  Result:   " << ammonite::formatQuaternion(aQuat) \
+                                << "\n  Expected: " << ammonite::formatQuaternion(bQuat) \
+                                << std::endl;
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  template <typename T> requires ammonite::validQuaternion<T>
   bool testMultiplyQuat() {
     ammonite::Quat<T> aQuat = {{0}};
     ammonite::Quat<T> bQuat = {{0}};
@@ -283,6 +327,11 @@ namespace tests {
 
       //Test ammonite::dot()
       if (!testDot<T>()) {
+        return false;
+      }
+
+      //Test ammonite::conjugate()
+      if (!testConjugate<T>()) {
         return false;
       }
 

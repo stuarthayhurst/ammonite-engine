@@ -120,13 +120,29 @@ namespace ammonite {
       toEuler(src, dest);
     }
 
-    //Calculate the dot product a quaternion
+    //Calculate the dot product of a quaternion
     template <typename T> requires validQuaternion<T>
     T dot(const Quat<T>& a, const Quat<T>& b) {
       std::experimental::fixed_size_simd<T, 4> aSimd(&a[0][0], std::experimental::element_aligned);
       std::experimental::fixed_size_simd<T, 4> bSimd(&b[0][0], std::experimental::element_aligned);
 
       return std::experimental::reduce(aSimd * bSimd, std::plus{});
+    }
+
+    //Calculate the conjugate of a quaternion, storing the result in dest
+    template <typename T> requires validQuaternion<T>
+    void conjugate(const Quat<T>& a, Quat<T>& dest) {
+      std::experimental::fixed_size_simd<T, 3> aSimd(&a[0][0], std::experimental::element_aligned);
+
+      aSimd = -aSimd;
+      aSimd.copy_to(&dest[0][0], std::experimental::element_aligned);
+      dest[0][3] = a[0][3];
+    }
+
+    //Calculate the conjugate of a quaternion, storing the result in the same quaternion
+    template <typename T> requires validQuaternion<T>
+    void conjugate(Quat<T>& a) {
+      conjugate(a, a);
     }
 
     //TODO: Implement with <simd>
