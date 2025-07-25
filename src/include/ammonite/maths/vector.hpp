@@ -268,6 +268,18 @@ namespace ammonite {
     }
 
     /*
+     - Calculate the length of a vector
+       - Intermediate calculations are done with the element's type
+       - This may give strange results for integral types
+    */
+    template <typename T, unsigned int size> requires validVector<T, size>
+    T length(const Vec<T, size>& a) {
+      std::experimental::fixed_size_simd<T, size> aSimd(&a[0], std::experimental::element_aligned);
+
+      return (T)std::sqrt(std::experimental::reduce(aSimd * aSimd, std::plus{}));
+    }
+
+    /*
      - Normalise a vector, storing the result in dest
        - Intermediate calculations are done with the element's type
        - This may give strange results for integral types
@@ -311,18 +323,6 @@ namespace ammonite {
       dest[0] = (a[1] * b[2]) - (a[2] * b[1]);
       dest[1] = (a[2] * b[0]) - (a[0] * b[2]);
       dest[2] = (a[0] * b[1]) - (a[1] * b[0]);
-    }
-
-    /*
-     - Calculate the length of a vector
-       - Intermediate calculations are done with the element's type
-       - This may give strange results for integral types
-    */
-    template <typename T, unsigned int size> requires validVector<T, size>
-    T length(const Vec<T, size>& a) {
-      std::experimental::fixed_size_simd<T, size> aSimd(&a[0], std::experimental::element_aligned);
-
-      return (T)std::sqrt(std::experimental::reduce(aSimd * aSimd, std::plus{}));
     }
 
     /*

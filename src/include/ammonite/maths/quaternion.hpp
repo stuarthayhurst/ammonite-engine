@@ -145,6 +145,31 @@ namespace ammonite {
       conjugate(a, a);
     }
 
+    //Calculate the length of a quaternion
+    template <typename T> requires validQuaternion<T>
+    T length(const Quat<T>& a) {
+      std::experimental::fixed_size_simd<T, 4> aSimd(&a[0][0], std::experimental::element_aligned);
+
+      return (T)std::sqrt(std::experimental::reduce(aSimd * aSimd, std::plus{}));
+    }
+
+    //Normalise a quaternion, storing the result in dest
+    template <typename T> requires validQuaternion<T>
+    void normalise(const Quat<T>& a, Quat<T>& dest) {
+      std::experimental::fixed_size_simd<T, 4> aSimd(&a[0][0], std::experimental::element_aligned);
+
+      T sum = std::experimental::reduce(aSimd * aSimd, std::plus{});
+      aSimd /= (T)std::sqrt(sum);
+
+      aSimd.copy_to(&dest[0][0], std::experimental::element_aligned);
+    }
+
+    //Normalise a quaternion, storing the result in the same quaternion
+    template <typename T> requires validQuaternion<T>
+    void normalise(Quat<T>& a) {
+      normalise(a, a);
+    }
+
     //TODO: Implement with <simd>
     //Multiply quaternion a by quaternion b, sorting the result in dest
     template <typename T> requires validQuaternion<T>

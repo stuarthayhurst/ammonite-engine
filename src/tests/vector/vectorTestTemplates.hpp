@@ -489,23 +489,9 @@ namespace {
   }
 
   template <typename T, unsigned int size> requires ammonite::validVector<T, size>
-  bool testNormalise() {
+  bool testLength() {
     ammonite::Vec<T, size> aVec = {0};
-    ammonite::Vec<T, size> bVec = {0};
     randomFillVector(aVec);
-
-    //Adjust all-zero vectors
-    bool allZero = true;
-    for (unsigned int i = 0; i < size; i++) {
-      if (aVec[i] != (T)0) {
-        allZero = false;
-        break;
-      }
-    }
-
-    if (allZero) {
-      aVec[0]++;
-    }
 
     T sum = (T)0;
     for (unsigned int i = 0; i < size; i++) {
@@ -513,7 +499,27 @@ namespace {
     }
     T length = (T)std::sqrt(sum);
 
+    //Test vector length
+    if (!roughly(ammonite::length(aVec), length)) {
+      ammonite::utils::error << "Vector length calculation failed" << std::endl;
+      ammonite::utils::normal << "  Input:    " << ammonite::formatVector(aVec) \
+                              << "\n  Result:   " << ammonite::length(aVec) \
+                              << "\n  Expected: " << length << std::endl;
+
+      return false;
+    }
+
+    return true;
+  }
+
+  template <typename T, unsigned int size> requires ammonite::validVector<T, size>
+  bool testNormalise() {
+    ammonite::Vec<T, size> aVec = {0};
+    ammonite::Vec<T, size> bVec = {0};
+    randomFillVector(aVec);
+
     //Skip (effectively) zero length vectors
+    T length = ammonite::length(aVec);
     if (length == 0) {
       return true;
     }
@@ -599,30 +605,6 @@ namespace {
           return false;
         }
       }
-    }
-
-    return true;
-  }
-
-  template <typename T, unsigned int size> requires ammonite::validVector<T, size>
-  bool testLength() {
-    ammonite::Vec<T, size> aVec = {0};
-    randomFillVector(aVec);
-
-    T sum = (T)0;
-    for (unsigned int i = 0; i < size; i++) {
-      sum += aVec[i] * aVec[i];
-    }
-    T length = (T)std::sqrt(sum);
-
-    //Test vector length
-    if (!roughly(ammonite::length(aVec), length)) {
-      ammonite::utils::error << "Vector length product failed" << std::endl;
-      ammonite::utils::normal << "  Input:    " << ammonite::formatVector(aVec) \
-                              << "\n  Result:   " << ammonite::length(aVec) \
-                              << "\n  Expected: " << length << std::endl;
-
-      return false;
     }
 
     return true;
@@ -728,6 +710,11 @@ namespace tests {
         return false;
       }
 
+      //Test ammonite::length()
+      if (!testLength<T, size>()) {
+        return false;
+      }
+
       //Test ammonite::normalise()
       if (!testNormalise<T, size>()) {
         return false;
@@ -740,11 +727,6 @@ namespace tests {
 
       //Test ammonite::cross()
       if (!testCross<T, size>()) {
-        return false;
-      }
-
-      //Test ammonite::length()
-      if (!testLength<T, size>()) {
         return false;
       }
 

@@ -213,9 +213,9 @@ namespace {
     ammonite::Quat<T> aQuat = {{0}};
     ammonite::Quat<T> bQuat = {{0}};
     ammonite::Quat<T> cQuat = {{0}};
-    ammonite::Vec<T, 3> angleVecA = {0};
-    randomFillVector(angleVecA, (T)2.0 * ammonite::pi<T>());
-    ammonite::fromEuler(aQuat, angleVecA);
+    ammonite::Vec<T, 3> angleVec = {0};
+    randomFillVector(angleVec, (T)2.0 * ammonite::pi<T>());
+    ammonite::fromEuler(aQuat, angleVec);
 
     //Test conjugate calculation
     ammonite::conjugate(aQuat, bQuat);
@@ -245,6 +245,76 @@ namespace {
                                 << "\n  Result:   " << ammonite::formatQuaternion(aQuat) \
                                 << "\n  Expected: " << ammonite::formatQuaternion(bQuat) \
                                 << std::endl;
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  template <typename T> requires ammonite::validQuaternion<T>
+  bool testLength() {
+    ammonite::Quat<T> aQuat = {{0}};
+    ammonite::Vec<T, 3> angleVec = {0};
+    randomFillVector(angleVec, (T)2.0 * ammonite::pi<T>());
+    ammonite::fromEuler(aQuat, angleVec);
+
+    T sum = (T)0;
+    for (int i = 0; i < 4; i++) {
+      sum += aQuat[0][i] * aQuat[0][i];
+    }
+    T length = (T)std::sqrt(sum);
+
+    //Test vector length
+    if (!roughly(ammonite::length(aQuat), length)) {
+      ammonite::utils::error << "Quaternion length calculation failed" << std::endl;
+      ammonite::utils::normal << "  Input:    " << ammonite::formatQuaternion(aQuat) \
+                              << "\n  Result:   " << ammonite::length(aQuat) \
+                              << "\n  Expected: " << length << std::endl;
+
+      return false;
+    }
+
+    return true;
+  }
+
+  template <typename T> requires ammonite::validQuaternion<T>
+  bool testNormalise() {
+    ammonite::Quat<T> aQuat = {{0}};
+    ammonite::Quat<T> bQuat = {{0}};
+    ammonite::Vec<T, 3> angleVec = {0};
+    randomFillVector(angleVec, (T)2.0 * ammonite::pi<T>());
+    ammonite::fromEuler(aQuat, angleVec);
+
+    //Skip (effectively) zero length quaternions
+    T length = ammonite::length(aQuat);
+    if (length == 0) {
+      return true;
+    }
+
+    //Test regular normalisation
+    ammonite::normalise(aQuat, bQuat);
+    for (int i = 0; i < 4; i++) {
+      if (!roughly((T)(aQuat[0][i] / length), bQuat[0][i])) {
+        ammonite::utils::error << "Quaternion normalisation failed" << std::endl;
+        ammonite::utils::normal << "  Input:    " << ammonite::formatQuaternion(aQuat) \
+                                << "\n  Result:   " << ammonite::formatQuaternion(bQuat) \
+                                << "\n  Expected: " << (T)(aQuat[0][i] / length) \
+                                << " at index " << i << std::endl;
+        return false;
+      }
+    }
+
+    //Test in-place normalisation
+    ammonite::copy(aQuat, bQuat);
+    ammonite::normalise(bQuat);
+    for (int i = 0; i < 4; i++) {
+      if (!roughly((T)(aQuat[0][i] / length), bQuat[0][i])) {
+        ammonite::utils::error << "In-place quaternion normalisation failed" << std::endl;
+        ammonite::utils::normal << "  Input:    " << ammonite::formatQuaternion(aQuat) \
+                                << "\n  Result:   " << ammonite::formatQuaternion(bQuat) \
+                                << "\n  Expected: " << (T)(aQuat[0][i] / length) \
+                                << " at index " << i << std::endl;
         return false;
       }
     }
@@ -332,6 +402,16 @@ namespace tests {
 
       //Test ammonite::conjugate()
       if (!testConjugate<T>()) {
+        return false;
+      }
+
+      //Test ammonite::length()
+      if (!testLength<T>()) {
+        return false;
+      }
+
+      //Test ammonite::normalise()
+      if (!testNormalise<T>()) {
         return false;
       }
 
