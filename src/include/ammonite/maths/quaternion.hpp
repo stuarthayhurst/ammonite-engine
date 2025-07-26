@@ -170,6 +170,26 @@ namespace ammonite {
       normalise(a, a);
     }
 
+    //Calculate the inverse of a quaternion, storing the result in dest
+    template <typename T> requires validQuaternion<T>
+    void inverse(const Quat<T>& a, Quat<T>& dest) {
+      std::experimental::fixed_size_simd<T, 4> aSimd(&a[0][0], std::experimental::element_aligned);
+      const T negData[4] = {(T)-1, (T)-1, (T)-1, (T)1};
+      std::experimental::fixed_size_simd<T, 4> negSimd(&negData[0], std::experimental::element_aligned);
+
+      T sum = std::experimental::reduce(aSimd * aSimd, std::plus{});
+      aSimd /= (T)std::sqrt(sum);
+      aSimd *= negSimd;
+
+      aSimd.copy_to(&dest[0][0], std::experimental::element_aligned);
+    }
+
+    //Calculate the inverse of a quaternion, storing the result in the same quaternion
+    template <typename T> requires validQuaternion<T>
+    void inverse(Quat<T>& a) {
+      inverse(a, a);
+    }
+
     //TODO: Implement with <simd>
     //Multiply quaternion a by quaternion b, sorting the result in dest
     template <typename T> requires validQuaternion<T>

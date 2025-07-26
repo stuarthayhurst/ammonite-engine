@@ -323,6 +323,52 @@ namespace {
   }
 
   template <typename T> requires ammonite::validQuaternion<T>
+  bool testInverse() {
+    ammonite::Quat<T> aQuat = {{0}};
+    ammonite::Quat<T> bQuat = {{0}};
+    ammonite::Quat<T> cQuat = {{0}};
+    ammonite::Quat<T> dQuat = {{0}};
+    ammonite::Vec<T, 3> angleVecA = {0};
+    ammonite::Vec<T, 3> angleVecB = {0};
+    randomFillVector(angleVecA, (T)2.0 * ammonite::pi<T>());
+    randomFillVector(angleVecB, (T)2.0 * ammonite::pi<T>());
+
+    ammonite::fromEuler(aQuat, angleVecA);
+    ammonite::fromEuler(bQuat, angleVecB);
+
+    ammonite::inverse(aQuat, cQuat);
+
+    //Check that multiplying aQuat by its inverse gives no rotation
+    ammonite::multiply(aQuat, cQuat, dQuat);
+    ammonite::Quat<T> expectedQuat = {{(T)0.0, (T)0.0, (T)0.0, (T)1.0}};
+    for (int i = 0; i < 4; i++) {
+      if (!roughly(dQuat[0][i], expectedQuat[0][i])) {
+        ammonite::utils::error << "Quaternion inverse failed" << std::endl;
+        ammonite::utils::normal << "  Input:  " << ammonite::formatQuaternion(aQuat) \
+                                << "\n  Result: " << ammonite::formatQuaternion(cQuat) \
+                                << std::endl;
+        return false;
+      }
+    }
+
+    //Test in-place quaternion inverse
+    ammonite::copy(aQuat, bQuat);
+    ammonite::inverse(aQuat);
+    for (int i = 0; i < 4; i++) {
+      if (!roughly(aQuat[0][i], cQuat[0][i])) {
+        ammonite::utils::error << "In-place quaternion inverse failed" << std::endl;
+        ammonite::utils::normal << "  Input:    " << ammonite::formatQuaternion(bQuat) \
+                                << "\n  Result:   " << ammonite::formatQuaternion(aQuat) \
+                                << "\n  Expected: " << ammonite::formatQuaternion(cQuat) \
+                                << std::endl;
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  template <typename T> requires ammonite::validQuaternion<T>
   bool testMultiplyQuat() {
     ammonite::Quat<T> aQuat = {{0}};
     ammonite::Quat<T> bQuat = {{0}};
@@ -412,6 +458,11 @@ namespace tests {
 
       //Test ammonite::normalise()
       if (!testNormalise<T>()) {
+        return false;
+      }
+
+      //Test ammonite::inverse()
+      if (!testInverse<T>()) {
         return false;
       }
 
