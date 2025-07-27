@@ -134,7 +134,7 @@ namespace {
         if (outQuatAlt[0][i] != outQuat[0][i]) {
           ammonite::utils::error << "Quaternion Euler angle vector initialisation failed" << std::endl;
           ammonite::utils::normal << "  Result:   " << ammonite::formatQuaternion(outQuatAlt) \
-                                  << "\n  Expected: " << ammonite::formatQuaternion(outQuatAlt) \
+                                  << "\n  Expected: " << ammonite::formatQuaternion(outQuat) \
                                   << std::endl;
           return false;
         }
@@ -413,6 +413,132 @@ namespace {
 
     return true;
   }
+
+  template <typename T> requires ammonite::validQuaternion<T>
+  bool testMultiplyVec() {
+    //NOLINTBEGIN(cppcoreguidelines-avoid-const-or-ref-data-members)
+    struct TestData {
+      const ammonite::Vec<T, 3> angleVec;
+      ammonite::Vec<T, 3> in;
+      ammonite::Vec<T, 3> out;
+    };
+    //NOLINTEND(cppcoreguidelines-avoid-const-or-ref-data-members)
+
+    TestData tests[8] = {
+      { //Convert between axes
+        {-ammonite::pi<T>() / 2, (T)0.0, (T)0.0},
+        {(T)0.0, (T)0.0, (T)1.0},
+        {(T)0.0, (T)1.0, (T)0.0}
+      }, {
+        {(T)0.0, -ammonite::pi<T>() / 2, (T)0.0},
+        {(T)1.0, (T)0.0, (T)0.0},
+        {(T)0.0, (T)0.0, (T)1.0}
+      }, {
+        {(T)0.0, (T)0.0, -ammonite::pi<T>() / 2},
+        {(T)0.0, (T)1.0, (T)0.0},
+        {(T)1.0, (T)0.0, (T)0.0}
+      },
+
+      { //Complete turns
+        {ammonite::pi<T>() * 2, ammonite::pi<T>() * 2, ammonite::pi<T>() * 2},
+        {(T)1.0, (T)0.0, (T)0.0},
+        {(T)1.0, (T)0.0, (T)0.0}
+      }, {
+        {ammonite::pi<T>() * 2, ammonite::pi<T>() * 2, ammonite::pi<T>() * 2},
+        {(T)0.0, (T)1.0, (T)0.0},
+        {(T)0.0, (T)1.0, (T)0.0}
+      }, {
+        {ammonite::pi<T>() * 2, ammonite::pi<T>() * 2, ammonite::pi<T>() * 2},
+        {(T)0.0, (T)0.0, (T)1.0},
+        {(T)0.0, (T)0.0, (T)1.0}
+      },
+
+      { //Recover x and z from xz
+        {(T)0.0, ammonite::pi<T>() / 4, (T)0.0},
+        {(T)1.0, (T)0.0, (T)1.0},
+        {(T)1.0, (T)0.0, (T)0.0}
+      }, {
+        {(T)0.0, -ammonite::pi<T>() / 4, (T)0.0},
+        {(T)1.0, (T)0.0, (T)1.0},
+        {(T)0.0, (T)0.0, (T)1.0}
+      }
+    };
+
+    const int totalTests = sizeof(tests) / sizeof(TestData);
+    for (int testIndex = 0; testIndex < totalTests; testIndex++) {
+      //Prepare the quaternion
+      ammonite::Quat<T> aQuat = {{0}};
+      ammonite::fromEuler(aQuat, tests[testIndex].angleVec);
+
+      //Normalise test data
+      ammonite::normalise(tests[testIndex].in);
+      ammonite::normalise(tests[testIndex].out);
+
+      //Rotate the point
+      ammonite::Vec<T, 3> outVec = {0};
+      ammonite::multiply(aQuat, tests[testIndex].in, outVec);
+
+      //Check the rotated point matches the expected
+      for (int i = 0; i < 3; i++) {
+        if (!roughly(outVec[i], tests[testIndex].out[i])) {
+          ammonite::utils::error << "Quaternion-vector multiplication failed" << std::endl;
+          ammonite::utils::normal << "  Quaternion: " << ammonite::formatQuaternion(aQuat) \
+                                  << "\n  Result:     " << ammonite::formatVector(outVec) \
+                                  << "\n  Expected:   " << ammonite::formatVector(tests[testIndex].out) \
+                                  << std::endl;
+          return false;
+        }
+      }
+
+      //Repeat with a widened vector
+      ammonite::Vec<T, 4> outVecWide = {0};
+      ammonite::Vec<T, 4> inVecWide = {0};
+      ammonite::set(inVecWide, tests[testIndex].in, (T)1.0);
+      ammonite::multiply(aQuat, inVecWide, outVecWide);
+
+      //Check the wider rotated point matches the expected
+      ammonite::Vec<T, 4> expectedOutVecWide = {0};
+      ammonite::set(expectedOutVecWide, tests[testIndex].out, (T)1.0);
+      for (int i = 0; i < 4; i++) {
+        if (!roughly(outVecWide[i], expectedOutVecWide[i])) {
+          ammonite::utils::error << "Quaternion-vector multiplication failed" << std::endl;
+          ammonite::utils::normal << "  Quaternion: " << ammonite::formatQuaternion(aQuat) \
+                                  << "\n  Result:     " << ammonite::formatVector(outVecWide) \
+                                  << "\n  Expected:   " << ammonite::formatVector(expectedOutVecWide) \
+                                  << std::endl;
+          return false;
+        }
+      }
+
+      //Repeat regular length test in-place
+      ammonite::Vec<T, 3> inVec = {0};
+      ammonite::copy(tests[testIndex].in, inVec);
+      ammonite::multiply(aQuat, inVec);
+      if (!ammonite::equal(inVec, outVec)) {
+        ammonite::utils::error << "Quaternion-vector multiplication failed" << std::endl;
+        ammonite::utils::normal << "  Quaternion: " << ammonite::formatQuaternion(aQuat) \
+                                << "\n  Result:     " << ammonite::formatVector(inVec) \
+                                << "\n  Expected:   " << ammonite::formatVector(outVec) \
+                                << std::endl;
+        return false;
+      }
+
+      //Repeat wide length test in-place
+      ammonite::Vec<T, 4> inVecWideInplace = {0};
+      ammonite::copy(inVecWide, inVecWideInplace);
+      ammonite::multiply(aQuat, inVecWideInplace);
+      if (!ammonite::equal(inVecWideInplace, outVecWide)) {
+        ammonite::utils::error << "Quaternion-vector multiplication failed" << std::endl;
+        ammonite::utils::normal << "  Quaternion: " << ammonite::formatQuaternion(aQuat) \
+                                << "\n  Result:     " << ammonite::formatVector(inVecWideInplace) \
+                                << "\n  Expected:   " << ammonite::formatVector(outVecWide) \
+                                << std::endl;
+        return false;
+      }
+    }
+
+    return true;
+  }
 }
 
 namespace tests {
@@ -466,8 +592,13 @@ namespace tests {
         return false;
       }
 
-      //Test ammonite::multiply()
+      //Test ammonite::multiply() for quaternion-quaternion
       if (!testMultiplyQuat<T>()) {
+        return false;
+      }
+
+      //Test ammonite::multiply() for quaternion-vector
+      if (!testMultiplyVec<T>()) {
         return false;
       }
     }

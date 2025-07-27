@@ -12,6 +12,7 @@
 #include <experimental/simd>
 
 #include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/quaternion.hpp>
 
 #include "quaternionTypes.hpp"
@@ -191,7 +192,7 @@ namespace ammonite {
     }
 
     //TODO: Implement with <simd>
-    //Multiply quaternion a by quaternion b, sorting the result in dest
+    //Multiply quaternion a by quaternion b, storing the result in dest
     template <typename T> requires validQuaternion<T>
     void multiply(const Quat<T>& a, const Quat<T>& b, Quat<T>& dest) {
       glm::qua<T> glmQuatA(a[0][3], a[0][0], a[0][1], a[0][2]);
@@ -205,10 +206,31 @@ namespace ammonite {
       dest[0][3] = glmResult.w;
     }
 
-    //Multiply quaternion a by quaternion b, sorting the result in the first quaternion
+    //Multiply quaternion a by quaternion b, storing the result in the first quaternion
     template <typename T> requires validQuaternion<T>
     void multiply(Quat<T>& a, const Quat<T>& b) {
       multiply(a, b, a);
+    }
+
+    //TODO: Implement with <simd>
+    //Multiply a quaternion by a vector, storing the result in dest
+    template <typename T, unsigned int size>
+              requires validQuaternion<T> && validVector<T, size> && (size >= 3)
+    void multiply(const Quat<T>& a, const Vec<T, size>& b, Vec<T, size>& dest) {
+      glm::qua<T> glmQuat(a[0][3], a[0][0], a[0][1], a[0][2]);
+      glm::vec<size, T, glm::defaultp> glmVec;
+
+      std::memcpy(glm::value_ptr(glmVec), &b[0], sizeof(Vec<T, size>));
+
+      glm::vec<size, T, glm::defaultp> glmDestVec = glmQuat * glmVec;
+      std::memcpy(&dest[0], glm::value_ptr(glmDestVec), sizeof(Vec<T, size>));
+    }
+
+    //Multiply a quaternion by a vector, storing the result in the first quaternion
+    template <typename T, unsigned int size>
+              requires validQuaternion<T> && validVector<T, size> && (size >= 3)
+    void multiply(const Quat<T>& a, Vec<T, size>& b) {
+      multiply(a, b, b);
     }
   }
 
