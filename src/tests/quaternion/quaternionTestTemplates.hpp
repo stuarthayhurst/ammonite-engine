@@ -539,6 +539,70 @@ namespace {
 
     return true;
   }
+
+  template <typename T> requires ammonite::validQuaternion<T>
+  bool testToMatrix() {
+    ammonite::Quat<T> aQuat = {{0}};
+    ammonite::Vec<T, 4> aVec = {0};
+    ammonite::Vec<T, 4> bVec = {0};
+    ammonite::Vec<T, 4> cVec = {0};
+    ammonite::Vec<T, 3> angleVec = {0};
+    randomFillVector(angleVec, (T)2.0 * ammonite::pi<T>());
+    randomFillVector(aVec);
+    ammonite::fromEuler(aQuat, angleVec);
+
+    //Apply the quaternion to a point
+    ammonite::multiply(aQuat, aVec, bVec);
+
+    //Calculate rotation matrix equivalent, apply to another point
+    ammonite::Mat<T, 4> aMat = {{0}};
+    ammonite::toMatrix(aQuat, aMat);
+    ammonite::multiply(aMat, aVec, cVec);
+
+    //Check 4x4 matrix conversion results
+    for (int i = 0; i < 4; i++) {
+      if (!roughly(bVec[i], cVec[i], (T)0.01)) {
+        ammonite::utils::error << "Quaternion to 4x4 matrix conversion failed" << std::endl;
+        ammonite::utils::normal << "  Quaternion: " << ammonite::formatQuaternion(aQuat) \
+                                << "\n  Matrix result:\n" << ammonite::formatMatrix(aMat) \
+                                << "\n  Input vector:\n" << ammonite::formatVector(aVec) \
+                                << "\n  Quaternion output vector:\n" << ammonite::formatVector(bVec) \
+                                << "\n  Matrix output vector:\n" << ammonite::formatVector(cVec) \
+                                << std::endl;
+        return false;
+      }
+    }
+
+    //Repeat with a 3x3 matrix
+    ammonite::Vec<T, 3> aVecShort = {0};
+    ammonite::Vec<T, 3> bVecShort = {0};
+    ammonite::Vec<T, 3> cVecShort = {0};
+    randomFillVector(aVecShort);
+
+    //Apply the quaternion to a point
+    ammonite::multiply(aQuat, aVecShort, bVecShort);
+
+    //Calculate rotation matrix equivalent, apply to another point
+    ammonite::Mat<T, 3> bMat = {{0}};
+    ammonite::toMatrix(aQuat, bMat);
+    ammonite::multiply(bMat, aVecShort, cVecShort);
+
+    //Check 3x3 matrix conversion results
+    for (int i = 0; i < 3; i++) {
+      if (!roughly(bVecShort[i], cVecShort[i], (T)0.01)) {
+        ammonite::utils::error << "Quaternion to 3x3 matrix conversion failed" << std::endl;
+        ammonite::utils::normal << "  Quaternion: " << ammonite::formatQuaternion(aQuat) \
+                                << "\n  Matrix result:\n" << ammonite::formatMatrix(bMat) \
+                                << "\n  Input vector:\n" << ammonite::formatVector(aVecShort) \
+                                << "\n  Quaternion output vector:\n" << ammonite::formatVector(bVecShort) \
+                                << "\n  Matrix output vector:\n" << ammonite::formatVector(cVecShort) \
+                                << std::endl;
+        return false;
+      }
+    }
+
+    return true;
+  }
 }
 
 namespace tests {
@@ -597,10 +661,15 @@ namespace tests {
         return false;
       }
 
-      //Test ammonite::multiply() for quaternion-vector
-      if (!testMultiplyVec<T>()) {
+      //Test ammonite::toMatrix()
+      if (!testToMatrix<T>()) {
         return false;
       }
+    }
+
+    //Test ammonite::multiply() for quaternion-vector
+    if (!testMultiplyVec<T>()) {
+      return false;
     }
 
     //Test ammonite::fromEuler()

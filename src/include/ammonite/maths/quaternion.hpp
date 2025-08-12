@@ -15,6 +15,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/quaternion.hpp>
 
+#include "matrixTypes.hpp"
 #include "quaternionTypes.hpp"
 #include "vectorTypes.hpp"
 
@@ -231,6 +232,23 @@ namespace ammonite {
               requires validQuaternion<T> && validVector<T, size> && (size >= 3)
     void multiply(const Quat<T>& a, Vec<T, size>& b) {
       multiply(a, b, b);
+    }
+
+    //TODO: Implement with <simd>
+    //Convert quaternion a to a rotation matrix, storing the result in dest
+    template <typename T, unsigned int size>
+              requires validQuaternion<T> && validMatrix<T, size, size> && (size >= 3)
+    void toMatrix(const Quat<T>& a, Mat<T, size>& dest) {
+      glm::qua<T> glmQuat(a[0][3], a[0][0], a[0][1], a[0][2]);
+      glm::mat<size, size, T, glm::defaultp> destMat;
+
+      if constexpr (size == 3) {
+        destMat = glm::toMat3(glmQuat);
+      } else {
+        destMat = glm::toMat4(glmQuat);
+      }
+
+      std::memcpy(&dest[0], glm::value_ptr(destMat), sizeof(Mat<T, 4>));
     }
   }
 
