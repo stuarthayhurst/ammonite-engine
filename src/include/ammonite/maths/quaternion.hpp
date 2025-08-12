@@ -248,7 +248,7 @@ namespace ammonite {
         destMat = glm::toMat4(glmQuat);
       }
 
-      std::memcpy(&dest[0], glm::value_ptr(destMat), sizeof(Mat<T, 4>));
+      std::memcpy(&dest[0], glm::value_ptr(destMat), sizeof(Mat<T, size>));
     }
   }
 
