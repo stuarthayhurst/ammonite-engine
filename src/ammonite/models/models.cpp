@@ -7,10 +7,6 @@
 #include <string>
 #include <unordered_map>
 
-#include <glm/glm.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <glm/gtx/quaternion.hpp>
-
 extern "C" {
   #include <epoxy/gl.h>
 }
@@ -21,6 +17,7 @@ extern "C" {
 #include "../graphics/textures.hpp"
 #include "../lighting/lighting.hpp"
 #include "../maths/matrix.hpp"
+#include "../maths/quaternion.hpp"
 #include "../maths/vector.hpp"
 #include "../utils/id.hpp"
 #include "../utils/logging.hpp"
@@ -329,12 +326,11 @@ namespace ammonite {
       //Load default texture IDs per mesh
       modelObject.textureIds = modelObject.modelData->textureIds;
 
-      internal::PositionData positionData;
-      ammonite::identity(positionData.translationMatrix);
-      ammonite::identity(positionData.scaleMatrix);
-      ammonite::identity(positionData.rotationMatrix);
-      positionData.rotationQuat = glm::quat(glm::vec3(0, 0, 0));
-      modelObject.positionData = positionData;
+      //Initialise position data
+      ammonite::identity(modelObject.positionData.translationMatrix);
+      ammonite::identity(modelObject.positionData.scaleMatrix);
+      ammonite::identity(modelObject.positionData.rotationMatrix);
+      ammonite::fromEuler(modelObject.positionData.rotationQuat, 0.0f, 0.0f, 0.0f);
 
       //Calculate model and normal matrices
       calcModelMatrices(&modelObject.positionData);
@@ -556,10 +552,7 @@ namespace ammonite {
           return;
         }
 
-        const glm::vec3 angles = glm::eulerAngles(modelObject->positionData.rotationQuat);
-        rotation[0] = angles.x;
-        rotation[1] = angles.y;
-        rotation[2] = angles.z;
+        ammonite::toEuler(modelObject->positionData.rotationQuat, rotation);
       }
     }
 
@@ -619,12 +612,9 @@ namespace ammonite {
         }
 
         //Set the rotation
-        const glm::vec3 glmRotation = glm::vec3(rotation[0], rotation[1], rotation[2]);
-        modelObject->positionData.rotationQuat = glm::quat(glmRotation) * \
-          glm::quat(glm::vec3(0, 0, 0));
-        const glm::mat4 rotMat = glm::toMat4(modelObject->positionData.rotationQuat);
-        std::memcpy(modelObject->positionData.rotationMatrix, glm::value_ptr(rotMat),
-                    sizeof(modelObject->positionData.rotationMatrix));
+        ammonite::fromEuler(modelObject->positionData.rotationQuat, rotation);
+        ammonite::toMatrix(modelObject->positionData.rotationQuat,
+                           modelObject->positionData.rotationMatrix);
 
         if (modelObject->lightEmitterId != 0) {
           ammonite::lighting::internal::setLightSourcesChanged();
@@ -689,12 +679,12 @@ namespace ammonite {
         }
 
         //Rotate the matrix
-        const glm::vec3 glmRotation = glm::vec3(rotation[0], rotation[1], rotation[2]);
-        modelObject->positionData.rotationQuat = glm::quat(glmRotation) * \
-          modelObject->positionData.rotationQuat;
-        const glm::mat4 rotMat = glm::toMat4(modelObject->positionData.rotationQuat);
-        std::memcpy(modelObject->positionData.rotationMatrix, glm::value_ptr(rotMat),
-                    sizeof(modelObject->positionData.rotationMatrix));
+        ammonite::Quat<float> newRotation = {{0}};
+        ammonite::fromEuler(newRotation, rotation);
+        ammonite::multiply(newRotation, modelObject->positionData.rotationQuat,
+                           modelObject->positionData.rotationQuat);
+        ammonite::toMatrix(modelObject->positionData.rotationQuat,
+                           modelObject->positionData.rotationMatrix);
 
         if (modelObject->lightEmitterId != 0) {
           ammonite::lighting::internal::setLightSourcesChanged();

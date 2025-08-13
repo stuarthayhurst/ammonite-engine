@@ -4,15 +4,13 @@
 #include <string>
 #include <vector>
 
-#include <glm/glm.hpp>
-#include <glm/gtx/quaternion.hpp>
-
 extern "C" {
   #include <epoxy/gl.h>
 }
 
 #include "../internal.hpp"
 #include "../maths/matrix.hpp"
+#include "../maths/quaternion.hpp"
 #include "../maths/vector.hpp"
 #include "../utils/id.hpp"
 
@@ -67,7 +65,7 @@ namespace ammonite {
         ammonite::Mat<float, 4> translationMatrix = {{0}};
         ammonite::Mat<float, 4> scaleMatrix = {{0}};
         ammonite::Mat<float, 4> rotationMatrix = {{0}};
-        glm::quat rotationQuat;
+        ammonite::Quat<float> rotationQuat = {{0}};
       };
 
       struct ModelInfo {
