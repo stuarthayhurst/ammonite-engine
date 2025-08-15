@@ -12,38 +12,34 @@ namespace {
   void createBuffers(ammonite::models::internal::ModelData* modelData,
                      std::vector<ammonite::models::internal::RawMeshData>* rawMeshDataVec) {
     //Generate buffers for every mesh
-    for (unsigned int i = 0; i < rawMeshDataVec->size(); i++) {
-      modelData->meshInfo.emplace_back();
-      ammonite::models::internal::RawMeshData* rawMeshData = &(*rawMeshDataVec)[i];
-      ammonite::models::internal::MeshInfoGroup* meshInfo = &modelData->meshInfo[i];
+    for (const ammonite::models::internal::RawMeshData& rawMeshData : *rawMeshDataVec) {
+      ammonite::models::internal::MeshInfoGroup& meshInfo = modelData->meshInfo.emplace_back();
 
       //Copy point count information
-      meshInfo->vertexCount = rawMeshData->vertexCount;
-      meshInfo->indexCount = rawMeshData->indexCount;
+      meshInfo.vertexCount = rawMeshData.vertexCount;
+      meshInfo.indexCount = rawMeshData.indexCount;
 
       //Create vertex and index buffers
-      glCreateBuffers(1, &meshInfo->vertexBufferId);
-      glCreateBuffers(1, &meshInfo->elementBufferId);
+      glCreateBuffers(1, &meshInfo.vertexBufferId);
+      glCreateBuffers(1, &meshInfo.elementBufferId);
 
       //Fill interleaved vertex + normal + texture buffer and index buffer
-      glNamedBufferData(meshInfo->vertexBufferId,
-                        meshInfo->vertexCount * (long)sizeof(ammonite::models::internal::VertexData),
-                        &rawMeshData->vertexData[0], GL_STATIC_DRAW);
-      glNamedBufferData(meshInfo->elementBufferId,
-                        meshInfo->indexCount * (long)sizeof(unsigned int),
-                        &rawMeshData->indices[0], GL_STATIC_DRAW);
+      glNamedBufferData(meshInfo.vertexBufferId,
+                        meshInfo.vertexCount * (long)sizeof(ammonite::models::internal::VertexData),
+                        &rawMeshData.vertexData[0], GL_STATIC_DRAW);
+      glNamedBufferData(meshInfo.elementBufferId,
+                        meshInfo.indexCount * (long)sizeof(unsigned int),
+                        &rawMeshData.indices[0], GL_STATIC_DRAW);
 
       //Destroy mesh data early
-      delete [] rawMeshData->vertexData;
-      delete [] rawMeshData->indices;
-      rawMeshData->vertexData = nullptr;
-      rawMeshData->indices = nullptr;
+      delete [] rawMeshData.vertexData;
+      delete [] rawMeshData.indices;
 
       //Create the vertex attribute buffer
-      glCreateVertexArrays(1, &meshInfo->vertexArrayId);
+      glCreateVertexArrays(1, &meshInfo.vertexArrayId);
 
-      const GLuint vaoId = meshInfo->vertexArrayId;
-      const GLuint vboId = meshInfo->vertexBufferId;
+      const GLuint vaoId = meshInfo.vertexArrayId;
+      const GLuint vboId = meshInfo.vertexBufferId;
       const int stride = sizeof(ammonite::models::internal::VertexData);
 
       //Vertex attribute
@@ -68,7 +64,7 @@ namespace {
       glVertexArrayAttribBinding(vaoId, 2, 2);
 
       //Element buffer
-      glVertexArrayElementBuffer(vaoId, meshInfo->elementBufferId);
+      glVertexArrayElementBuffer(vaoId, meshInfo.elementBufferId);
     }
   }
 
