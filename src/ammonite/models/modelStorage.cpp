@@ -3,6 +3,10 @@
 #include <string>
 #include <vector>
 
+extern "C" {
+  #include <epoxy/gl.h>
+}
+
 #include "models.hpp"
 
 #include "../graphics/textures.hpp"
