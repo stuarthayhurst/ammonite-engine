@@ -26,12 +26,6 @@ enum AMMONITE_INTERNAL ModelTypeEnum : unsigned char {
 namespace ammonite {
   namespace models {
     namespace AMMONITE_INTERNAL internal {
-      struct ModelLoadInfo {
-        std::string modelDirectory;
-        bool flipTexCoords;
-        bool srgbTextures;
-      };
-
       struct VertexData {
         ammonite::Vec<float, 3> vertex;
         ammonite::Vec<float, 3> normal;
@@ -69,28 +63,48 @@ namespace ammonite {
       };
 
       struct ModelInfo {
+        //Mesh, position and texture info
         ModelData* modelData;
         PositionData positionData;
         std::vector<TextureIdGroup> textureIds;
+
+        //Model identification
+        std::string modelName;
+        AmmoniteId modelId = 0;
+
+        //Model selection factors
+        ModelTypeEnum modelType = AMMONITE_MODEL;
         AmmoniteDrawEnum drawMode = AMMONITE_DRAW_ACTIVE;
         AmmoniteId lightEmitterId = 0;
         unsigned int lightIndex;
-        std::string modelName;
-        AmmoniteId modelId = 0;
-        ModelTypeEnum modelType = AMMONITE_MODEL;
       };
 
+      struct ModelLoadInfo {
+        std::string modelDirectory;
+        bool flipTexCoords;
+        bool srgbTextures;
+      };
+
+      //Model data storage management
+      std::string getModelName(const std::string& objectPath,
+                               const ModelLoadInfo& modelLoadInfo);
+      ModelData* addModelData(const std::string& objectPath,
+                              const ModelLoadInfo& modelLoadInfo);
+      ModelData* copyModelData(const std::string& modelName);
+      bool deleteModelData(const std::string& modelName);
+
+      //Model info retrieval
       unsigned int getModelCount(ModelTypeEnum modelType);
       void getModels(ModelTypeEnum modelType, unsigned int modelCount,
                      ModelInfo* modelArr[]);
-
       ModelInfo* getModelPtr(AmmoniteId modelId);
       bool* getModelsMovedPtr();
+
       void setLightEmitterId(AmmoniteId modelId, AmmoniteId lightEmitterId);
       AmmoniteId getLightEmitterId(AmmoniteId modelId);
 
-      bool loadObject(const std::string& objectPath,
-                      models::internal::ModelData* modelObjectData,
+      //Model loading management
+      bool loadObject(const std::string& objectPath, ModelData* modelObjectData,
                       const ModelLoadInfo& modelLoadInfo);
     }
   }
