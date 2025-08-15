@@ -21,116 +21,146 @@ extern "C" {
 #include "../utils/id.hpp"
 #include "../utils/logging.hpp"
 
-//Class definitions
-namespace {
-  using ModelInfoMap = std::map<AmmoniteId, ammonite::models::internal::ModelInfo>;
-  using ModelPtrTrackerMap = std::unordered_map<AmmoniteId, ammonite::models::internal::ModelInfo*>;
-
-  ModelPtrTrackerMap modelIdPtrMap;
-  bool haveModelsMoved = false;
-
-  class ModelTracker {
-  private:
-    ModelInfoMap modelInfoMapSelector[2];
-
-  public:
-    unsigned int getModelCount(ModelTypeEnum modelType) {
-      return modelInfoMapSelector[modelType].size();
-    }
-
-    void getModels(ModelTypeEnum modelType, unsigned int modelCount,
-                   ammonite::models::internal::ModelInfo* modelArr[]) {
-      //Select the right model tracker
-      ModelInfoMap* modelMapPtr = &modelInfoMapSelector[modelType];
-
-      //Fill modelArr with first number modelCount of items
-      auto it = modelMapPtr->begin();
-      modelCount = std::min(modelCount, (unsigned int)modelMapPtr->size());
-      for (unsigned int i = 0; i < modelCount; i++) {
-        modelArr[i] = &it->second;
-        std::advance(it, 1);
-      }
-    }
-
-    void addModelInfo(AmmoniteId modelId, const ammonite::models::internal::ModelInfo& modelInfo) {
-      ModelInfoMap* targetMapPtr = &modelInfoMapSelector[modelInfo.modelType];
-      (*targetMapPtr)[modelId] = modelInfo;
-      modelIdPtrMap[modelId] = &(*targetMapPtr)[modelId];
-      haveModelsMoved = true;
-    }
-
-    void copyModelFromPtr(AmmoniteId modelId, ammonite::models::internal::ModelInfo* modelInfo) {
-      ModelInfoMap* targetMapPtr = &modelInfoMapSelector[modelInfo->modelType];
-      (*targetMapPtr)[modelId] = *modelInfo;
-      modelIdPtrMap[modelId] = &(*targetMapPtr)[modelId];
-      haveModelsMoved = true;
-    }
-
-    void deleteModelInfo(AmmoniteId modelId) {
-      //Get the type of model, so the right tracker can be selected
-      const ModelTypeEnum modelType = modelIdPtrMap[modelId]->modelType;
-      ModelInfoMap* targetMapPtr = &modelInfoMapSelector[modelType];
-
-      //Delete the model and id to pointer map entry
-      targetMapPtr->erase(modelId);
-      modelIdPtrMap.erase(modelId);
-      haveModelsMoved = true;
-    }
-
-    void changeModelType(AmmoniteId modelId, ModelTypeEnum targetType) {
-      //Get the type of model, so the right tracker can be selected
-      const ModelTypeEnum modelType = modelIdPtrMap[modelId]->modelType;
-
-      //Return early if no work needs to be done
-      if (modelType == targetType) {
-        return;
-      }
-
-      //Select current and target trackers
-      ModelInfoMap* currentMapPtr = &modelInfoMapSelector[modelType];
-      ModelInfoMap* targetMapPtr = &modelInfoMapSelector[targetType];
-
-      if (currentMapPtr->contains(modelId)) {
-        (*targetMapPtr)[modelId] = (*currentMapPtr)[modelId];
-        currentMapPtr->erase(modelId);
-
-        //Update the id to pointer map
-        ammonite::models::internal::ModelInfo* modelPtr = &(*targetMapPtr)[modelId];
-        modelIdPtrMap[modelId] = modelPtr;
-
-        //Update the type saved on the model
-        modelPtr->modelType = targetType;
-      }
-
-      haveModelsMoved = true;
-    }
-
-    bool hasModel(AmmoniteId modelId) {
-      //Return false if the model isn't tracked at all
-      if (!modelIdPtrMap.contains(modelId)) {
-        return false;
-      }
-
-      //Get the type of model, so the right tracker can be selected
-      const ModelTypeEnum modelType = modelIdPtrMap[modelId]->modelType;
-      const ModelInfoMap* targetMapPtr = &modelInfoMapSelector[modelType];
-
-      //Return whether the selected tracker holds the model
-      return targetMapPtr->contains(modelId);
-    }
-  };
-}
 
 namespace ammonite {
-  namespace {
-    //Track all loaded models
-    AmmoniteId lastModelId = 0;
-    ModelTracker activeModelTracker;
-    ModelTracker inactiveModelTracker;
-  }
-
-  //Internally exposed model handling functions
   namespace models {
+    //Model tracker class and instances
+    namespace {
+      using ModelInfoMap = std::map<AmmoniteId, internal::ModelInfo>;
+      using ModelPtrTrackerMap = std::unordered_map<AmmoniteId, internal::ModelInfo*>;
+
+      ModelPtrTrackerMap modelIdPtrMap;
+      bool haveModelsMoved = false;
+
+      class ModelTracker {
+      private:
+        ModelInfoMap modelInfoMapSelector[2];
+
+      public:
+        unsigned int getModelCount(ModelTypeEnum modelType) {
+          return modelInfoMapSelector[modelType].size();
+        }
+
+        void getModels(ModelTypeEnum modelType, unsigned int modelCount,
+                       internal::ModelInfo* modelArr[]) {
+          //Select the right model tracker
+          ModelInfoMap* modelMapPtr = &modelInfoMapSelector[modelType];
+
+          //Fill model array with first modelCount of items
+          auto it = modelMapPtr->begin();
+          modelCount = std::min(modelCount, (unsigned int)modelMapPtr->size());
+          for (unsigned int i = 0; i < modelCount; i++) {
+            modelArr[i] = &it->second;
+            std::advance(it, 1);
+          }
+        }
+
+        void addModelInfo(AmmoniteId modelId, const internal::ModelInfo& modelInfo) {
+          ModelInfoMap* targetMapPtr = &modelInfoMapSelector[modelInfo.modelType];
+          (*targetMapPtr)[modelId] = modelInfo;
+          modelIdPtrMap[modelId] = &(*targetMapPtr)[modelId];
+          haveModelsMoved = true;
+        }
+
+        void copyModelInfoFromPtr(AmmoniteId modelId, internal::ModelInfo* modelInfo) {
+          ModelInfoMap* targetMapPtr = &modelInfoMapSelector[modelInfo->modelType];
+          (*targetMapPtr)[modelId] = *modelInfo;
+          modelIdPtrMap[modelId] = &(*targetMapPtr)[modelId];
+          haveModelsMoved = true;
+        }
+
+        void deleteModelInfo(AmmoniteId modelId) {
+          //Get the type of model, so the right tracker can be selected
+          const ModelTypeEnum modelType = modelIdPtrMap[modelId]->modelType;
+          ModelInfoMap* targetMapPtr = &modelInfoMapSelector[modelType];
+
+          //Delete the model and id to pointer map entry
+          targetMapPtr->erase(modelId);
+          modelIdPtrMap.erase(modelId);
+          haveModelsMoved = true;
+        }
+
+        void changeModelType(AmmoniteId modelId, ModelTypeEnum targetType) {
+          //Get the type of model, so the right tracker can be selected
+          const ModelTypeEnum modelType = modelIdPtrMap[modelId]->modelType;
+
+          //Return early if no work needs to be done
+          if (modelType == targetType) {
+            return;
+          }
+
+          //Select current and target trackers
+          ModelInfoMap* currentMapPtr = &modelInfoMapSelector[modelType];
+          ModelInfoMap* targetMapPtr = &modelInfoMapSelector[targetType];
+
+          if (currentMapPtr->contains(modelId)) {
+            (*targetMapPtr)[modelId] = (*currentMapPtr)[modelId];
+            currentMapPtr->erase(modelId);
+
+            //Update the id to pointer map
+            internal::ModelInfo* modelPtr = &(*targetMapPtr)[modelId];
+            modelIdPtrMap[modelId] = modelPtr;
+
+            //Update the type saved on the model
+            modelPtr->modelType = targetType;
+          }
+
+          haveModelsMoved = true;
+        }
+
+        bool hasModel(AmmoniteId modelId) {
+          //Return false if the model isn't tracked at all
+          if (!modelIdPtrMap.contains(modelId)) {
+            return false;
+          }
+
+          //Get the type of model, so the right tracker can be selected
+          const ModelTypeEnum modelType = modelIdPtrMap[modelId]->modelType;
+          const ModelInfoMap* targetMapPtr = &modelInfoMapSelector[modelType];
+
+          //Return whether the selected tracker holds the model
+          return targetMapPtr->contains(modelId);
+        }
+      };
+
+      AmmoniteId lastModelId = 0;
+      ModelTracker activeModelTracker;
+      ModelTracker inactiveModelTracker;
+    }
+
+    //Model movement and modification helpers
+    namespace {
+      void moveModelToActive(AmmoniteId modelId, internal::ModelInfo* modelPtr) {
+        //Move from inactive to active tracker, update model pointer map
+        const internal::ModelInfo modelInfo = *modelPtr;
+        inactiveModelTracker.deleteModelInfo(modelId);
+        activeModelTracker.addModelInfo(modelId, modelInfo);
+      }
+
+      void moveModelToInactive(AmmoniteId modelId, internal::ModelInfo* modelPtr) {
+        //Move from active to inactive tracker, update model pointer map
+        const internal::ModelInfo modelInfo = *modelPtr;
+        activeModelTracker.deleteModelInfo(modelId);
+        inactiveModelTracker.addModelInfo(modelId, modelInfo);
+      }
+
+      void calcModelMatrices(internal::PositionData* positionData) {
+        //Recalculate the model matrix when a component changes
+        ammonite::Mat<float, 4> rotationScaleMatrix = {{0}};
+        ammonite::multiply(positionData->rotationMatrix, positionData->scaleMatrix,
+                           rotationScaleMatrix);
+        ammonite::multiply(positionData->translationMatrix, rotationScaleMatrix,
+                           positionData->modelMatrix);
+
+        //Normal matrix
+        ammonite::Mat<float, 4> inverseModelMatrix = {{0}};
+        ammonite::inverse(positionData->modelMatrix, inverseModelMatrix);
+        ammonite::transpose(inverseModelMatrix);
+        ammonite::copy(inverseModelMatrix, positionData->normalMatrix);
+      }
+    }
+
+    //Internally exposed model handling functions
     namespace internal {
       unsigned int getModelCount(ModelTypeEnum modelType) {
         return activeModelTracker.getModelCount(modelType);
@@ -184,41 +214,8 @@ namespace ammonite {
         return 0;
       }
     }
-  }
 
-  namespace {
-    void moveModelToActive(AmmoniteId modelId, ammonite::models::internal::ModelInfo* modelPtr) {
-      //Move from inactive to active tracker, update model pointer map
-      const models::internal::ModelInfo modelInfo = *modelPtr;
-      inactiveModelTracker.deleteModelInfo(modelId);
-      activeModelTracker.addModelInfo(modelId, modelInfo);
-    }
-
-    void moveModelToInactive(AmmoniteId modelId, ammonite::models::internal::ModelInfo* modelPtr) {
-      //Move from active to inactive tracker, update model pointer map
-      const models::internal::ModelInfo modelInfo = *modelPtr;
-      activeModelTracker.deleteModelInfo(modelId);
-      inactiveModelTracker.addModelInfo(modelId, modelInfo);
-    }
-
-    void calcModelMatrices(models::internal::PositionData* positionData) {
-      //Recalculate the model matrix when a component changes
-      ammonite::Mat<float, 4> rotationScaleMatrix = {{0}};
-      ammonite::multiply(positionData->rotationMatrix, positionData->scaleMatrix,
-                         rotationScaleMatrix);
-      ammonite::multiply(positionData->translationMatrix, rotationScaleMatrix,
-                         positionData->modelMatrix);
-
-      //Normal matrix
-      ammonite::Mat<float, 4> inverseModelMatrix = {{0}};
-      ammonite::inverse(positionData->modelMatrix, inverseModelMatrix);
-      ammonite::transpose(inverseModelMatrix);
-      ammonite::copy(inverseModelMatrix, positionData->normalMatrix);
-    }
-  }
-
-  //Exposed model handling functions
-  namespace models {
+    //Exposed model handling functions
     AmmoniteId createModel(const std::string& objectPath, bool flipTexCoords,
                            bool srgbTextures) {
       //Generate info required to load model
@@ -268,7 +265,7 @@ namespace ammonite {
 
       //Add model to the tracker via pointer
       const AmmoniteId newModelId = utils::internal::setNextId(&lastModelId, modelIdPtrMap);
-      activeModelTracker.copyModelFromPtr(newModelId, existingModelInfo);
+      activeModelTracker.copyModelInfoFromPtr(newModelId, existingModelInfo);
       internal::copyModelData(existingModelInfo->modelName);
 
       //Correct its ID and reference counter
