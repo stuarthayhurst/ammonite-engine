@@ -401,19 +401,19 @@ namespace ammonite {
       /*
        - Helper functions to draw / wrap components
       */
-      void drawModel(ammonite::models::internal::ModelInfo *drawObject,
+      void drawModel(ammonite::models::internal::ModelInfo* drawObjectInfo,
                             AmmoniteRenderMode renderMode) {
         //Get model draw data
-        ammonite::models::internal::ModelData* drawObjectData = drawObject->modelData;
+        ammonite::models::internal::ModelData* drawObjectData = drawObjectInfo->modelData;
 
         //Set the requested draw mode (normal, wireframe, points)
         GLenum mode = GL_TRIANGLES;
-        if (drawObject->drawMode == AMMONITE_DRAW_WIREFRAME) {
+        if (drawObjectInfo->drawMode == AMMONITE_DRAW_WIREFRAME) {
           //Use wireframe if requested
           internal::setWireframe(true);
         } else {
           //Draw points if requested
-          if (drawObject->drawMode == AMMONITE_DRAW_POINTS) {
+          if (drawObjectInfo->drawMode == AMMONITE_DRAW_POINTS) {
             mode = GL_POINTS;
           }
           internal::setWireframe(false);
@@ -425,26 +425,26 @@ namespace ammonite {
         switch (renderMode) {
         case AMMONITE_DEPTH_PASS:
           glUniformMatrix4fv(depthShader.modelMatrixId, 1, GL_FALSE,
-                             &drawObject->positionData.modelMatrix[0][0]);
+                             &drawObjectInfo->positionData.modelMatrix[0][0]);
           break;
         case AMMONITE_RENDER_PASS:
           //Calculate model view projection matrix
           ammonite::multiply(*projectionMatrixPtr, *viewMatrixPtr, vp);
-          ammonite::multiply(vp, drawObject->positionData.modelMatrix, mvp);
+          ammonite::multiply(vp, drawObjectInfo->positionData.modelMatrix, mvp);
 
           glUniformMatrix4fv(modelShader.matrixId, 1, GL_FALSE, &mvp[0][0]);
           glUniformMatrix4fv(modelShader.modelMatrixId, 1, GL_FALSE,
-                             &drawObject->positionData.modelMatrix[0][0]);
+                             &drawObjectInfo->positionData.modelMatrix[0][0]);
           glUniformMatrix3fv(modelShader.normalMatrixId, 1, GL_FALSE,
-                             &drawObject->positionData.normalMatrix[0][0]);
+                             &drawObjectInfo->positionData.normalMatrix[0][0]);
           break;
         case AMMONITE_EMISSION_PASS:
           //Calculate model view projection matrix
           ammonite::multiply(*projectionMatrixPtr, *viewMatrixPtr, vp);
-          ammonite::multiply(vp, drawObject->positionData.modelMatrix, mvp);
+          ammonite::multiply(vp, drawObjectInfo->positionData.modelMatrix, mvp);
 
           glUniformMatrix4fv(lightShader.lightMatrixId, 1, GL_FALSE, &mvp[0][0]);
-          glUniform1ui(lightShader.lightIndexId, drawObject->lightIndex);
+          glUniform1ui(lightShader.lightIndexId, drawObjectInfo->lightIndex);
           break;
         case AMMONITE_DATA_REFRESH:
           //How did we get here?
@@ -456,14 +456,14 @@ namespace ammonite {
         for (unsigned int i = 0; i < drawObjectData->meshInfo.size(); i++) {
           //Set texture for regular shading pass
           if (renderMode == AMMONITE_RENDER_PASS) {
-            if (drawObject->textureIds[i].diffuseId != 0) {
-              glBindTextureUnit(0, drawObject->textureIds[i].diffuseId);
+            if (drawObjectInfo->textureIds[i].diffuseId != 0) {
+              glBindTextureUnit(0, drawObjectInfo->textureIds[i].diffuseId);
             } else {
               ammoniteInternalDebug << "No diffuse texture supplied, skipping" << std::endl;
             }
 
-            if (drawObject->textureIds[i].specularId != 0) {
-              glBindTextureUnit(1, drawObject->textureIds[i].specularId);
+            if (drawObjectInfo->textureIds[i].specularId != 0) {
+              glBindTextureUnit(1, drawObjectInfo->textureIds[i].specularId);
             }
           }
 
