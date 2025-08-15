@@ -32,24 +32,29 @@ namespace ammonite {
         ammonite::Vec<float, 2> texturePoint;
       };
 
-      struct TextureIdGroup {
-        GLuint diffuseId = 0;
-        GLuint specularId = 0;
-      };
-
-      struct MeshData {
-        VertexData* meshData = nullptr;
+      struct RawMeshData {
+        VertexData* vertexData = nullptr;
         unsigned int vertexCount = 0;
         unsigned int* indices = nullptr;
+        unsigned int indexCount = 0;
+      };
+
+      struct MeshInfoGroup {
+        unsigned int vertexCount = 0;
         unsigned int indexCount = 0;
         GLuint vertexBufferId = 0;
         GLuint elementBufferId = 0;
         GLuint vertexArrayId = 0;
       };
 
+      struct TextureIdGroup {
+        GLuint diffuseId = 0;
+        GLuint specularId = 0;
+      };
+
       struct ModelData {
         unsigned int refCount = 0;
-        std::vector<MeshData> meshes;
+        std::vector<MeshInfoGroup> meshInfo;
         std::vector<TextureIdGroup> textureIds;
       };
 
@@ -104,7 +109,8 @@ namespace ammonite {
       AmmoniteId getLightEmitterId(AmmoniteId modelId);
 
       //Model loading management
-      bool loadObject(const std::string& objectPath, ModelData* modelObjectData,
+      bool loadObject(const std::string& objectPath, ModelData* modelData,
+                      std::vector<RawMeshData>* rawMeshDataVec,
                       const ModelLoadInfo& modelLoadInfo);
     }
   }

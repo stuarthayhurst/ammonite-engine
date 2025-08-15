@@ -336,19 +336,18 @@ namespace ammonite {
 
     bool applyTexture(AmmoniteId modelId, AmmoniteTextureEnum textureType,
                       const std::string& texturePath, bool srgbTexture) {
-      internal::ModelInfo* modelPtr = modelIdPtrMap[modelId];
-      if (modelPtr == nullptr) {
+      internal::ModelInfo* modelInfoPtr = modelIdPtrMap[modelId];
+      if (modelInfoPtr == nullptr) {
         return false;
       }
 
       //Apply texture to every mesh on the model
-      const internal::ModelData* modelData = modelPtr->modelData;
-      for (unsigned int i = 0; i < modelData->meshes.size(); i++) {
+      for (internal::TextureIdGroup& textureIdGroup : modelInfoPtr->textureIds) {
         GLuint* textureIdPtr = nullptr;
         if (textureType == AMMONITE_DIFFUSE_TEXTURE) {
-          textureIdPtr = &modelPtr->textureIds[i].diffuseId;
+          textureIdPtr = &textureIdGroup.diffuseId;
         } else if (textureType == AMMONITE_SPECULAR_TEXTURE) {
-          textureIdPtr = &modelPtr->textureIds[i].specularId;
+          textureIdPtr = &textureIdGroup.specularId;
         } else {
           ammonite::utils::warning << "Invalid texture type specified" << std::endl;
           return false;
@@ -385,10 +384,10 @@ namespace ammonite {
         return 0;
       }
 
+      //Sum indices between all meshes
       unsigned int indexCount = 0;
-      internal::ModelData* modelData = modelPtr->modelData;
-      for (unsigned int i = 0; i < modelData->meshes.size(); i++) {
-        indexCount += modelData->meshes[i].indexCount;
+      for (const internal::MeshInfoGroup& meshInfo : modelPtr->modelData->meshInfo) {
+        indexCount += meshInfo.indexCount;
       }
 
       return indexCount;
@@ -401,10 +400,10 @@ namespace ammonite {
         return 0;
       }
 
+      //Sum vertices between all meshes
       unsigned int vertexCount = 0;
-      internal::ModelData* modelData = modelPtr->modelData;
-      for (unsigned int i = 0; i < modelData->meshes.size(); i++) {
-        vertexCount += modelData->meshes[i].vertexCount;
+      for (const internal::MeshInfoGroup& meshInfo : modelPtr->modelData->meshInfo) {
+        vertexCount += meshInfo.vertexCount;
       }
 
       return vertexCount;

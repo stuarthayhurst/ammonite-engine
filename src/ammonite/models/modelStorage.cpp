@@ -1,6 +1,7 @@
 #include <cstddef>
 #include <map>
 #include <string>
+#include <vector>
 
 #include "models.hpp"
 
@@ -8,34 +9,41 @@
 
 //TODO: Move to the graphics system
 namespace {
-  void createBuffers(ammonite::models::internal::ModelData* modelObjectData) {
+  void createBuffers(ammonite::models::internal::ModelData* modelData,
+                     std::vector<ammonite::models::internal::RawMeshData>* rawMeshDataVec) {
     //Generate buffers for every mesh
-    for (unsigned int i = 0; i < modelObjectData->meshes.size(); i++) {
-      ammonite::models::internal::MeshData* meshData = &modelObjectData->meshes[i];
+    for (unsigned int i = 0; i < rawMeshDataVec->size(); i++) {
+      modelData->meshInfo.emplace_back();
+      ammonite::models::internal::RawMeshData* rawMeshData = &(*rawMeshDataVec)[i];
+      ammonite::models::internal::MeshInfoGroup* meshInfo = &modelData->meshInfo[i];
+
+      //Copy point count information
+      meshInfo->vertexCount = rawMeshData->vertexCount;
+      meshInfo->indexCount = rawMeshData->indexCount;
 
       //Create vertex and index buffers
-      glCreateBuffers(1, &meshData->vertexBufferId);
-      glCreateBuffers(1, &meshData->elementBufferId);
+      glCreateBuffers(1, &meshInfo->vertexBufferId);
+      glCreateBuffers(1, &meshInfo->elementBufferId);
 
       //Fill interleaved vertex + normal + texture buffer and index buffer
-      glNamedBufferData(meshData->vertexBufferId,
-                        meshData->vertexCount * (long)sizeof(ammonite::models::internal::VertexData),
-                        &meshData->meshData[0], GL_STATIC_DRAW);
-      glNamedBufferData(meshData->elementBufferId,
-                        meshData->indexCount * (long)sizeof(unsigned int),
-                        &meshData->indices[0], GL_STATIC_DRAW);
+      glNamedBufferData(meshInfo->vertexBufferId,
+                        meshInfo->vertexCount * (long)sizeof(ammonite::models::internal::VertexData),
+                        &rawMeshData->vertexData[0], GL_STATIC_DRAW);
+      glNamedBufferData(meshInfo->elementBufferId,
+                        meshInfo->indexCount * (long)sizeof(unsigned int),
+                        &rawMeshData->indices[0], GL_STATIC_DRAW);
 
       //Destroy mesh data early
-      delete [] meshData->meshData;
-      delete [] meshData->indices;
-      meshData->meshData = nullptr;
-      meshData->indices = nullptr;
+      delete [] rawMeshData->vertexData;
+      delete [] rawMeshData->indices;
+      rawMeshData->vertexData = nullptr;
+      rawMeshData->indices = nullptr;
 
       //Create the vertex attribute buffer
-      glCreateVertexArrays(1, &meshData->vertexArrayId);
+      glCreateVertexArrays(1, &meshInfo->vertexArrayId);
 
-      const GLuint vaoId = meshData->vertexArrayId;
-      const GLuint vboId = meshData->vertexBufferId;
+      const GLuint vaoId = meshInfo->vertexArrayId;
+      const GLuint vboId = meshInfo->vertexBufferId;
       const int stride = sizeof(ammonite::models::internal::VertexData);
 
       //Vertex attribute
@@ -60,18 +68,16 @@ namespace {
       glVertexArrayAttribBinding(vaoId, 2, 2);
 
       //Element buffer
-      glVertexArrayElementBuffer(vaoId, meshData->elementBufferId);
+      glVertexArrayElementBuffer(vaoId, meshInfo->elementBufferId);
     }
   }
 
-  void deleteBuffers(ammonite::models::internal::ModelData* modelObjectData) {
+  void deleteBuffers(ammonite::models::internal::ModelData* modelData) {
     //Delete created buffers and the VAO
-    for (unsigned int i = 0; i < modelObjectData->meshes.size(); i++) {
-      const ammonite::models::internal::MeshData* meshData = &modelObjectData->meshes[i];
-
-      glDeleteBuffers(1, &meshData->vertexBufferId);
-      glDeleteBuffers(1, &meshData->elementBufferId);
-      glDeleteVertexArrays(1, &meshData->vertexArrayId);
+    for (const ammonite::models::internal::MeshInfoGroup& meshInfo : modelData->meshInfo) {
+      glDeleteBuffers(1, &meshInfo.vertexBufferId);
+      glDeleteBuffers(1, &meshInfo.elementBufferId);
+      glDeleteVertexArrays(1, &meshInfo.vertexArrayId);
     }
   }
 }
@@ -101,16 +107,17 @@ namespace ammonite {
         }
 
         //Load the model data
+        std::vector<RawMeshData> rawMeshDataVec;
         modelNameDataMap[modelName] = {};
         ModelData* modelData = &modelNameDataMap[modelName];
         modelData->refCount = 1;
-        if (!internal::loadObject(objectPath, modelData, modelLoadInfo)) {
+        if (!internal::loadObject(objectPath, modelData, &rawMeshDataVec, modelLoadInfo)) {
           modelNameDataMap.erase(modelName);
           return nullptr;
         }
 
         //Create buffers from loaded data
-        createBuffers(modelData);
+        createBuffers(modelData, &rawMeshDataVec);
 
         return modelData;
       }
@@ -134,13 +141,13 @@ namespace ammonite {
         //Delete the model data if this was the last reference
         if (modelData->refCount == 0) {
           //Reduce reference count on model data textures
-          for (unsigned int i = 0; i < modelData->meshes.size(); i++) {
-            if (modelData->textureIds[i].diffuseId != 0) {
-              textures::internal::deleteTexture(modelData->textureIds[i].diffuseId);
+          for (const TextureIdGroup& textureIdGroup : modelData->textureIds) {
+            if (textureIdGroup.diffuseId != 0) {
+              textures::internal::deleteTexture(textureIdGroup.diffuseId);
             }
 
-            if (modelData->textureIds[i].specularId != 0) {
-              textures::internal::deleteTexture(modelData->textureIds[i].specularId);
+            if (textureIdGroup.specularId != 0) {
+              textures::internal::deleteTexture(textureIdGroup.specularId);
             }
           }
 

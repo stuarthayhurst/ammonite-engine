@@ -453,7 +453,7 @@ namespace ammonite {
           break;
         }
 
-        for (unsigned int i = 0; i < drawObjectData->meshes.size(); i++) {
+        for (unsigned int i = 0; i < drawObjectData->meshInfo.size(); i++) {
           //Set texture for regular shading pass
           if (renderMode == AMMONITE_RENDER_PASS) {
             if (drawObject->textureIds[i].diffuseId != 0) {
@@ -468,10 +468,10 @@ namespace ammonite {
           }
 
           //Bind vertex attribute buffer
-          glBindVertexArray(drawObjectData->meshes[i].vertexArrayId);
+          glBindVertexArray(drawObjectData->meshInfo[i].vertexArrayId);
 
           //Draw the triangles
-          glDrawElements(mode, (GLsizei)drawObjectData->meshes[i].indexCount,
+          glDrawElements(mode, (GLsizei)drawObjectData->meshInfo[i].indexCount,
                          GL_UNSIGNED_INT, nullptr);
         }
       }

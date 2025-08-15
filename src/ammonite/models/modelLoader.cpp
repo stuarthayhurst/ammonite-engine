@@ -22,26 +22,26 @@ namespace ammonite {
     namespace internal {
       namespace {
         bool processMesh(aiMesh* meshPtr, const aiScene* scenePtr,
-                         ModelData* modelObjectData,
+                         ModelData* modelData, std::vector<RawMeshData>* rawMeshDataVec,
                          const ModelLoadInfo& modelLoadInfo) {
-          std::vector<models::internal::TextureIdGroup>* textureIds = &modelObjectData->textureIds;
+          std::vector<models::internal::TextureIdGroup>* textureIds = &modelData->textureIds;
 
           //Add a new empty mesh to the mesh vector
-          models::internal::MeshData* newMesh = &modelObjectData->meshes.emplace_back();
+          models::internal::RawMeshData* newMesh = &rawMeshDataVec->emplace_back();
           newMesh->vertexCount = meshPtr->mNumVertices;
-          newMesh->meshData = new VertexData[meshPtr->mNumVertices];
+          newMesh->vertexData = new VertexData[meshPtr->mNumVertices];
 
           //Fill the mesh with vertex data
           bool hasWarnedMesh = false;
           for (unsigned int i = 0; i < meshPtr->mNumVertices; i++) {
-            ammonite::set(newMesh->meshData[i].vertex, meshPtr->mVertices[i].x,
+            ammonite::set(newMesh->vertexData[i].vertex, meshPtr->mVertices[i].x,
                           meshPtr->mVertices[i].y, meshPtr->mVertices[i].z);
 
-            ammonite::set(newMesh->meshData[i].normal, meshPtr->mNormals[i].x,
+            ammonite::set(newMesh->vertexData[i].normal, meshPtr->mNormals[i].x,
                           meshPtr->mNormals[i].y, meshPtr->mNormals[i].z);
 
             if (meshPtr->mTextureCoords[0] != nullptr) {
-              ammonite::set(newMesh->meshData[i].texturePoint,
+              ammonite::set(newMesh->vertexData[i].texturePoint,
                             meshPtr->mTextureCoords[0][i].x,
                             meshPtr->mTextureCoords[0][i].y);
             } else {
@@ -49,7 +49,7 @@ namespace ammonite {
                 ammonite::utils::warning << "Missing texture coordinate data for mesh" << std::endl;
                 hasWarnedMesh = true;
               }
-              ammonite::set(newMesh->meshData[i].texturePoint, 0.0f);
+              ammonite::set(newMesh->vertexData[i].texturePoint, 0.0f);
             }
           }
 
@@ -107,7 +107,8 @@ namespace ammonite {
           return true;
         }
 
-        bool processNodes(const aiScene* scenePtr, ModelData* modelObjectData,
+        bool processNodes(const aiScene* scenePtr, ModelData* modelData,
+                          std::vector<RawMeshData>* rawMeshDataVec,
                           const ModelLoadInfo& modelLoadInfo) {
           std::queue<aiNode*> nodePtrQueue;
           nodePtrQueue.push(scenePtr->mRootNode);
@@ -121,7 +122,7 @@ namespace ammonite {
             //Process meshes
             for (unsigned int i = 0; i < nodePtr->mNumMeshes; i++) {
               passed &= processMesh(scenePtr->mMeshes[nodePtr->mMeshes[i]], scenePtr,
-                                    modelObjectData, modelLoadInfo);
+                                    modelData, rawMeshDataVec, modelLoadInfo);
             }
 
             //Add connected nodes to queue
@@ -136,9 +137,10 @@ namespace ammonite {
 
       /*
        - Load an object from objectPath, using the settings from modelLoadInfo
-       - Store the model's data using the modelObjectData pointer
+       - Store the model's mesh data to rawMeshDataVec and texture data to modelData
       */
-      bool loadObject(const std::string& objectPath, ModelData* modelObjectData,
+      bool loadObject(const std::string& objectPath, ModelData* modelData,
+                      std::vector<RawMeshData>* rawMeshDataVec,
                       const ModelLoadInfo& modelLoadInfo) {
         //Generate post-processing flags
         auto aiProcessFlags = aiProcess_Triangulate |
@@ -166,7 +168,7 @@ namespace ammonite {
         }
 
         //Recursively process nodes
-        return processNodes(scenePtr, modelObjectData, modelLoadInfo);
+        return processNodes(scenePtr, modelData, rawMeshDataVec, modelLoadInfo);
       }
     }
   }
