@@ -30,7 +30,7 @@ namespace ammonite {
           //Convert GLFW values to enums
           const AmmoniteKeycode keycode = (AmmoniteKeycode)rawKeycode;
           KeyStateEnum action = AMMONITE_RELEASED;
-          if (rawAction == GLFW_PRESS) {
+          if (rawAction == GLFW_PRESS || rawAction == GLFW_REPEAT) {
             action = AMMONITE_PRESSED;
           }
 
