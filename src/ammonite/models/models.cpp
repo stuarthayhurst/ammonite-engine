@@ -42,15 +42,15 @@ namespace ammonite {
         }
 
         void getModels(ModelTypeEnum modelType, unsigned int modelCount,
-                       internal::ModelInfo* modelArr[]) {
+                       internal::ModelInfo* modelInfoArray[]) {
           //Select the right model tracker
           ModelInfoMap* modelMapPtr = &modelInfoMapSelector[modelType];
 
-          //Fill model array with first modelCount of items
+          //Fill model info array with first modelCount of items
           auto it = modelMapPtr->begin();
           modelCount = std::min(modelCount, (unsigned int)modelMapPtr->size());
           for (unsigned int i = 0; i < modelCount; i++) {
-            modelArr[i] = &it->second;
+            modelInfoArray[i] = &it->second;
             std::advance(it, 1);
           }
         }
@@ -167,8 +167,8 @@ namespace ammonite {
       }
 
       void getModels(ModelTypeEnum modelType, unsigned int modelCount,
-                     ammonite::models::internal::ModelInfo* modelArr[]) {
-        activeModelTracker.getModels(modelType, modelCount, modelArr);
+                     ModelInfo* modelInfoArray[]) {
+        activeModelTracker.getModels(modelType, modelCount, modelInfoArray);
       }
 
       ModelInfo* getModelPtr(AmmoniteId modelId) {
@@ -354,7 +354,7 @@ namespace ammonite {
       }
 
       unsigned int indexCount = 0;
-      models::internal::ModelData* modelData = modelPtr->modelData;
+      internal::ModelData* modelData = modelPtr->modelData;
       for (unsigned int i = 0; i < modelData->meshes.size(); i++) {
         indexCount += modelData->meshes[i].indexCount;
       }
@@ -370,7 +370,7 @@ namespace ammonite {
       }
 
       unsigned int vertexCount = 0;
-      models::internal::ModelData* modelData = modelPtr->modelData;
+      internal::ModelData* modelData = modelPtr->modelData;
       for (unsigned int i = 0; i < modelData->meshes.size(); i++) {
         vertexCount += modelData->meshes[i].vertexCount;
       }

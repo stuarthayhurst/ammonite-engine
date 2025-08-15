@@ -96,7 +96,7 @@ namespace ammonite {
       //Model info retrieval
       unsigned int getModelCount(ModelTypeEnum modelType);
       void getModels(ModelTypeEnum modelType, unsigned int modelCount,
-                     ModelInfo* modelArr[]);
+                     ModelInfo* modelInfoArray[]);
       ModelInfo* getModelPtr(AmmoniteId modelId);
       bool* getModelsMovedPtr();
 
