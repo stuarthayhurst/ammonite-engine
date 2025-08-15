@@ -96,6 +96,17 @@ namespace ammonite {
         }
       }
 
+      //Increase the reference count of a texture by its ID
+      void copyTexture(GLuint textureId) {
+        if (!idTextureMap.contains(textureId)) {
+          ammonite::utils::warning << "Texture ID (" << textureId \
+                                   << ") doesn't exist, not copying texture" << std::endl;
+          return;
+        }
+
+        idTextureMap[textureId].refCount++;
+      }
+
       /*
        - Create a texture from the data given, return its ID
        - This doesn't generate the mipmaps, but allocates space for them (textureLevels)

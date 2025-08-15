@@ -236,6 +236,15 @@ namespace ammonite {
 
       //Apply default texture IDs per mesh
       modelInfo.textureIds = modelInfo.modelData->textureIds;
+      for (const internal::TextureIdGroup& textureGroup : modelInfo.textureIds) {
+        if (textureGroup.diffuseId != 0) {
+          ammonite::textures::internal::copyTexture(textureGroup.diffuseId);
+        }
+
+        if (textureGroup.specularId != 0) {
+          ammonite::textures::internal::copyTexture(textureGroup.specularId);
+        }
+      }
 
       //Initialise position data
       ammonite::identity(modelInfo.positionData.translationMatrix);
@@ -267,10 +276,22 @@ namespace ammonite {
       const AmmoniteId newModelId = utils::internal::setNextId(&lastModelId, modelIdPtrMap);
       activeModelTracker.copyModelInfoFromPtr(newModelId, existingModelInfo);
       internal::copyModelData(existingModelInfo->modelName);
+      internal::ModelInfo* newModelInfo = modelIdPtrMap[newModelId];
 
-      //Correct its ID and reference counter
-      modelIdPtrMap[newModelId]->modelId = newModelId;
-      modelIdPtrMap[newModelId]->lightEmitterId = 0;
+      //Increase texture reference counters
+      for (const internal::TextureIdGroup& textureGroup : newModelInfo->textureIds) {
+        if (textureGroup.diffuseId != 0) {
+          ammonite::textures::internal::copyTexture(textureGroup.diffuseId);
+        }
+
+        if (textureGroup.specularId != 0) {
+          ammonite::textures::internal::copyTexture(textureGroup.specularId);
+        }
+      }
+
+      //Correct its ID and light linking
+      newModelInfo->modelId = newModelId;
+      newModelInfo->lightEmitterId = 0;
 
       //Return the new ID
       return newModelId;
@@ -280,6 +301,17 @@ namespace ammonite {
       //Check the model actually exists
       if (modelIdPtrMap.contains(modelId)) {
         internal::ModelInfo* modelInfo = modelIdPtrMap[modelId];
+
+        //Release textures
+        for (const internal::TextureIdGroup& textureGroup : modelInfo->textureIds) {
+          if (textureGroup.diffuseId != 0) {
+            ammonite::textures::internal::deleteTexture(textureGroup.diffuseId);
+          }
+
+          if (textureGroup.specularId != 0) {
+            ammonite::textures::internal::deleteTexture(textureGroup.specularId);
+          }
+        }
 
         //Reduce reference count and possibly delete model data
         if (!internal::deleteModelData(modelInfo->modelName)) {
