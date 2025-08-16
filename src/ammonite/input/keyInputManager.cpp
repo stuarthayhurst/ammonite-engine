@@ -61,6 +61,8 @@ namespace ammonite {
           for (int i = 0; i < count; i++) {
             keycodeStateMap[keycodes[i]].refCount--;
             if (keycodeStateMap[keycodes[i]].refCount == 0) {
+              ammoniteInternalDebug << "Deleted storage for keycode state (" << keycodes[i] \
+                                    << ")" << std::endl;
               keycodeStateMap.erase(keycodes[i]);
             }
           }

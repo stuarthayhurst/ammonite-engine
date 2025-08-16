@@ -12,6 +12,7 @@ extern "C" {
 
 #include "textures.hpp"
 
+#include "../utils/debug.hpp"
 #include "../utils/logging.hpp"
 
 namespace ammonite {
@@ -86,6 +87,8 @@ namespace ammonite {
           glDeleteTextures(1, &textureInfoPtr->id);
 
           //Delete the tracker entry
+          ammoniteInternalDebug << "Deleted storage for texture (ID " << textureId \
+                                << ", '" << textureInfoPtr->string << "')" << std::endl;
           idTextureMap.erase(textureId);
         }
       }

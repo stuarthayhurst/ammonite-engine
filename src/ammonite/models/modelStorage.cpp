@@ -1,3 +1,4 @@
+#include <iostream>
 #include <map>
 #include <string>
 #include <vector>
@@ -6,6 +7,7 @@
 
 #include "../graphics/buffers.hpp"
 #include "../graphics/textures.hpp"
+#include "../utils/debug.hpp"
 
 namespace ammonite {
   namespace models {
@@ -80,6 +82,8 @@ namespace ammonite {
 
           //Remove the map entry
           modelNameDataMap.erase(modelName);
+          ammoniteInternalDebug << "Deleted storage for model data (" << modelName \
+                                << ")" << std::endl;
         }
 
         return true;
