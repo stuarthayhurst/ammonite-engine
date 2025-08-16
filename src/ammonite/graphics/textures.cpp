@@ -34,8 +34,8 @@ namespace ammonite {
          - Writes the format of the data to dataFormat
          - Writes the format of the final texture to textureFormat
         */
-        bool decideTextureFormat(int channels, bool srgbTexture, GLenum* textureFormat,
-                                        GLenum* dataFormat) {
+        bool decideTextureFormat(int channels, bool srgbTexture,
+                                 GLenum* textureFormat, GLenum* dataFormat) {
           if (channels == 3) {
             *dataFormat = GL_RGB;
             if (srgbTexture) {
@@ -56,12 +56,6 @@ namespace ammonite {
 
           return true;
         }
-      }
-
-      //Temporary function to transition to new system
-      bool getTextureFormat(int channels, bool srgbTexture, GLenum* textureFormat,
-                            GLenum* dataFormat) {
-        return decideTextureFormat(channels, srgbTexture, textureFormat, dataFormat);
       }
 
       //Calculate the number of mipmaps levels to use
@@ -205,6 +199,78 @@ namespace ammonite {
         //When minifying the image, use a linear blend of two mipmaps
         glTextureParameteri(textureId, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
         //Generate mipmaps
+        glGenerateTextureMipmap(textureId);
+
+        return textureId;
+      }
+
+      /*
+       - Load 6 textures as a cubemap and return its ID
+         - flipTextures controls whether the textures are flipped or not
+         - srgbTextures controls whether the textures are treated as sRGB
+       - Returns 0 on failure
+      */
+      GLuint loadCubemap(std::string texturePaths[6], bool flipTextures, bool srgbTextures) {
+        GLuint textureId = 0;
+        glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &textureId);
+
+        //Load each face into a cubemap
+        bool hasCreatedStorage = false;
+        for (int i = 0; i < 6; i++) {
+          if (flipTextures) {
+            stbi_set_flip_vertically_on_load_thread(1);
+          }
+
+          //Read the image data
+          int width = 0, height = 0, nChannels = 0;
+          unsigned char* imageData = stbi_load(texturePaths[i].c_str(), &width,
+                                               &height, &nChannels, 0);
+
+          //Disable texture flipping, to avoid interfering with future calls
+          if (flipTextures) {
+            stbi_set_flip_vertically_on_load_thread(0);
+          }
+
+          //Decide the format of the texture and data
+          GLenum internalFormat = 0, dataFormat = 0;
+          if (!decideTextureFormat(nChannels, srgbTextures,
+              &internalFormat, &dataFormat)) {
+            //Free image data, destroy texture and return
+            ammonite::utils::warning << "Failed to load '" << texturePaths[i] << "'" << std::endl;
+            stbi_image_free(imageData);
+            glDeleteTextures(1, &textureId);
+
+            return 0;
+          }
+
+          //Only create texture storage once
+          if (!hasCreatedStorage) {
+            glTextureStorage2D(textureId,
+              (GLint)ammonite::textures::internal::calculateMipmapLevels(width, height),
+              internalFormat, width, height);
+            hasCreatedStorage = true;
+          }
+
+          //Fill the texture with each face
+          if (imageData != nullptr) {
+            glTextureSubImage3D(textureId, 0, 0, 0, i, width, height, 1, dataFormat,
+                                GL_UNSIGNED_BYTE, imageData);
+            stbi_image_free(imageData);
+          } else {
+            //Free image data, destroy texture and return
+            ammonite::utils::warning << "Failed to load '" << texturePaths[i] << "'" << std::endl;
+            stbi_image_free(imageData);
+            glDeleteTextures(1, &textureId);
+
+            return 0;
+          }
+        }
+
+        glTextureParameteri(textureId, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTextureParameteri(textureId, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTextureParameteri(textureId, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTextureParameteri(textureId, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTextureParameteri(textureId, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
         glGenerateTextureMipmap(textureId);
 
         return textureId;

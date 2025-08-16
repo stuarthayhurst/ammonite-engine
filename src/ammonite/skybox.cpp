@@ -42,66 +42,11 @@ namespace ammonite {
      - Returns 0 on failure
     */
     AmmoniteId createSkybox(std::string texturePaths[6], bool flipTextures, bool srgbTextures) {
-      GLuint textureId = 0;
-      glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &textureId);
-
-      //Load each face into a cubemap
-      bool hasCreatedStorage = false;
-      for (int i = 0; i < 6; i++) {
-        if (flipTextures) {
-          stbi_set_flip_vertically_on_load_thread(1);
-        }
-
-        //Read the image data
-        int width = 0, height = 0, nChannels = 0;
-        unsigned char* imageData = stbi_load(texturePaths[i].c_str(), &width, &height, &nChannels, 0);
-
-        //Disable texture flipping, to avoid interfering with future calls
-        if (flipTextures) {
-          stbi_set_flip_vertically_on_load_thread(0);
-        }
-
-        //Decide the format of the texture and data
-        GLenum internalFormat = 0, dataFormat = 0;
-        if (!ammonite::textures::internal::getTextureFormat(nChannels, srgbTextures,
-            &internalFormat, &dataFormat)) {
-          //Free image data, destroy texture, set failure and return
-          ammonite::utils::warning << "Failed to load '" << texturePaths[i] << "'" << std::endl;
-          stbi_image_free(imageData);
-          glDeleteTextures(1, &textureId);
-
-          return 0;
-        }
-
-        //Only create texture storage once
-        if (!hasCreatedStorage) {
-          glTextureStorage2D(textureId,
-            (GLint)ammonite::textures::internal::calculateMipmapLevels(width, height),
-            internalFormat, width, height);
-          hasCreatedStorage = true;
-        }
-
-        //Fill the texture with each face
-        if (imageData != nullptr) {
-          glTextureSubImage3D(textureId, 0, 0, 0, i, width, height, 1, dataFormat,
-                              GL_UNSIGNED_BYTE, imageData);
-          stbi_image_free(imageData);
-        } else {
-          //Free image data, destroy texture, set failure and return
-          ammonite::utils::warning << "Failed to load '" << texturePaths[i] << "'" << std::endl;
-          stbi_image_free(imageData);
-          glDeleteTextures(1, &textureId);
-
-          return 0;
-        }
+      GLuint textureId = textures::internal::loadCubemap(texturePaths, flipTextures, srgbTextures);
+      if (textureId == 0) {
+        ammonite::utils::warning << "Failed to create skybox" << std::endl;
+        return 0;
       }
-
-      glTextureParameteri(textureId, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-      glTextureParameteri(textureId, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glTextureParameteri(textureId, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-      glTextureParameteri(textureId, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-      glTextureParameteri(textureId, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-      glGenerateTextureMipmap(textureId);
 
       skyboxTracker.insert(textureId);
       return textureId;

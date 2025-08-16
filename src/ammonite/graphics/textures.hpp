@@ -18,8 +18,8 @@ namespace ammonite {
       void copyTexture(GLuint textureId);
       void deleteTexture(GLuint textureId);
 
-      bool getTextureFormat(int channels, bool srgbTexture, GLenum* textureFormat,
-                            GLenum* dataFormat);
+      GLuint loadCubemap(std::string texturePaths[6], bool flipTextures, bool srgbTextures);
+
       unsigned int calculateMipmapLevels(int width, int height);
     }
   }
