@@ -1,5 +1,6 @@
 #include <cstddef>
 #include <cstring>
+#include <iostream>
 #include <iterator>
 #include <unordered_map>
 
@@ -14,6 +15,7 @@ extern "C" {
 #include "../maths/matrix.hpp"
 #include "../maths/vector.hpp"
 #include "../models/models.hpp"
+#include "../utils/debug.hpp"
 #include "../utils/id.hpp"
 #include "../utils/thread.hpp"
 
@@ -288,6 +290,8 @@ namespace ammonite {
       if (lightTrackerMap.contains(lightId)) {
         //Remove the light source from the tracker
         lightTrackerMap.erase(lightId);
+        ammoniteInternalDebug << "Deleted storage for light source (ID " \
+                              << lightId << ")" << std::endl;
       }
 
       if (lightTrackerMap.empty()) {

@@ -1,4 +1,5 @@
 #include <cmath>
+#include <iostream>
 #include <unordered_map>
 
 #include "camera.hpp"
@@ -7,6 +8,7 @@
 #include "maths/angle.hpp"
 #include "maths/matrix.hpp"
 #include "maths/vector.hpp"
+#include "utils/debug.hpp"
 #include "utils/id.hpp"
 #include "window/window.hpp"
 
@@ -126,6 +128,8 @@ namespace ammonite {
       //Delete the camera if present
       if (cameraTrackerMap.contains(cameraId) && cameraId != 1) {
         cameraTrackerMap.erase(cameraId);
+        ammoniteInternalDebug << "Deleted storage for camera (ID " \
+                              << cameraId << ")" << std::endl;
       }
 
       //If the deleted camera was the active camera, reset

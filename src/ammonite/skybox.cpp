@@ -13,6 +13,7 @@ extern "C" {
 
 #include "enums.hpp"
 #include "graphics/textures.hpp"
+#include "utils/debug.hpp"
 #include "utils/id.hpp"
 #include "utils/logging.hpp"
 
@@ -134,6 +135,8 @@ namespace ammonite {
       if (skyboxTracker.contains(skyboxId)) {
         //Delete from set
         skyboxTracker.erase(skyboxId);
+        ammoniteInternalDebug << "Deleted storage for skybox (ID " << skyboxId \
+                              << ")" << std::endl;
 
         //Delete skybox
         const GLuint skyboxTextureId = skyboxId;

@@ -18,6 +18,7 @@ extern "C" {
 #include "../maths/matrix.hpp"
 #include "../maths/quaternion.hpp"
 #include "../maths/vector.hpp"
+#include "../utils/debug.hpp"
 #include "../utils/id.hpp"
 #include "../utils/logging.hpp"
 
@@ -74,7 +75,12 @@ namespace ammonite {
           const ModelTypeEnum modelType = modelIdPtrMap[modelId]->modelType;
           ModelInfoMap* targetMapPtr = &modelInfoMapSelector[modelType];
 
-          //Delete the model and id to pointer map entry
+          ammoniteInternalDebug << "Deleted storage for model info (ID " \
+                                << modelId << ", '" \
+                                << modelIdPtrMap[modelId]->modelName \
+                                << "')" << std::endl;
+
+          //Delete the model info and id to pointer map entry
           targetMapPtr->erase(modelId);
           modelIdPtrMap.erase(modelId);
           haveModelsMoved = true;

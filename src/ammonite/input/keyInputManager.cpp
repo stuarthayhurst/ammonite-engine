@@ -239,6 +239,8 @@ namespace ammonite {
 
         //Forget the keybind data
         keybindIdDataMap.erase(keybindId);
+        ammoniteInternalDebug << "Deleted storage for keybind (ID " << keybindId \
+                              << ")" << std::endl;
         return true;
       }
 

@@ -4,6 +4,7 @@
 #include "splash.hpp"
 
 #include "maths/vector.hpp"
+#include "utils/debug.hpp"
 #include "utils/id.hpp"
 #include "utils/logging.hpp"
 
@@ -41,6 +42,8 @@ namespace ammonite {
         }
 
         splashScreenTracker.erase(targetScreenId);
+        ammoniteInternalDebug << "Deleted storage for splash screen (ID " \
+                              << targetScreenId << ")" << std::endl;
       } else {
         ammonite::utils::warning << "Requested splash screen doesn't exist (ID " \
                                  << targetScreenId << ")" << std::endl;
