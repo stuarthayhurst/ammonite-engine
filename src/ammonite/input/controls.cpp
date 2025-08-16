@@ -266,7 +266,7 @@ namespace ammonite {
       const AmmoniteKeycode keycodes[6] = {forwardKey, backKey, upKey, downKey, rightKey, leftKey};
       for (int i = 0; i < 6; i++) {
         if (keycodes[i] != 0) {
-          keybindIds[0] = ammonite::input::internal::registerRawKeybind(&keycodes[i], 1,
+          keybindIds[i] = ammonite::input::internal::registerRawKeybind(&keycodes[i], 1,
             AMMONITE_FORCE_RELEASE, false, keyboardCameraCallback, &directionData[i]);
         }
       }
