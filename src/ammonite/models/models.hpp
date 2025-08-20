@@ -2,6 +2,7 @@
 #define INTERNALMODELS
 
 #include <string>
+#include <unordered_set>
 #include <vector>
 
 extern "C" {
@@ -26,12 +27,17 @@ enum AMMONITE_INTERNAL ModelTypeEnum : unsigned char {
 namespace ammonite {
   namespace models {
     namespace AMMONITE_INTERNAL internal {
+      //Store information for a single vertex
       struct VertexData {
         ammonite::Vec<float, 3> vertex;
         ammonite::Vec<float, 3> normal;
         ammonite::Vec<float, 2> texturePoint;
       };
 
+      /*
+       - Store information for each vertex and index in a single mesh
+       - Only exists to be uploaded to the GPU
+      */
       struct RawMeshData {
         VertexData* vertexData = nullptr;
         unsigned int vertexCount = 0;
@@ -39,6 +45,7 @@ namespace ammonite {
         unsigned int indexCount = 0;
       };
 
+      //Store rendering information on an uploaded mesh
       struct MeshInfoGroup {
         unsigned int vertexCount = 0;
         unsigned int indexCount = 0;
@@ -47,17 +54,26 @@ namespace ammonite {
         GLuint vertexArrayId = 0;
       };
 
+      //Store texture IDs for a single mesh
       struct TextureIdGroup {
         GLuint diffuseId = 0;
         GLuint specularId = 0;
       };
 
+      /*
+       - Store information for all meshes in a unique model
+       - Includes uploaded mesh information, texture information and an ID for
+         every model that uses the data
+      */
       struct ModelData {
         unsigned int refCount = 0;
         std::vector<MeshInfoGroup> meshInfo;
         std::vector<TextureIdGroup> textureIds;
+        std::unordered_set<AmmoniteId> activeModelIds;
+        std::unordered_set<AmmoniteId> inactiveModelIds;
       };
 
+      //Store rotation, scale and position information for an instance of a model
       struct PositionData {
         ammonite::Mat<float, 4> modelMatrix = {{0}};
         ammonite::Mat<float, 3> normalMatrix = {{0}};
@@ -67,6 +83,12 @@ namespace ammonite {
         ammonite::Quat<float> rotationQuat = {{0}};
       };
 
+      /*
+       - Store information for an instance of a model
+       - Multiple instances can share a ModelData
+       - Each instance has a unique ID and PositionData
+       - Each instance defaults to the model-provided textures, but can be overridden
+      */
       struct ModelInfo {
         //Mesh, position and texture info
         ModelData* modelData;
@@ -84,6 +106,7 @@ namespace ammonite {
         unsigned int lightIndex;
       };
 
+      //Information used to support model loading
       struct ModelLoadInfo {
         std::string modelDirectory;
         bool flipTexCoords;
@@ -94,9 +117,18 @@ namespace ammonite {
       std::string getModelName(const std::string& objectPath,
                                const ModelLoadInfo& modelLoadInfo);
       ModelData* addModelData(const std::string& objectPath,
-                              const ModelLoadInfo& modelLoadInfo);
-      ModelData* copyModelData(const std::string& modelName);
-      bool deleteModelData(const std::string& modelName);
+                              const ModelLoadInfo& modelLoadInfo,
+                              AmmoniteId modelId);
+      ModelData* copyModelData(const std::string& modelName, AmmoniteId modelId);
+      ModelData* getModelData(const std::string& modelName);
+      bool deleteModelData(const std::string& modelName, AmmoniteId modelId);
+      void setModelInfoActive(AmmoniteId modelId, bool active);
+
+      //Model info retrieval, by model name
+      unsigned int getModelNameCount();
+      unsigned int getModelInfoCount(const std::string& modelName);
+      void getModelNames(std::string modelNameArray[]);
+      void getModelInfos(const std::string& modelName, ModelInfo* modelInfoArray[]);
 
       //Model info retrieval
       unsigned int getModelCount(ModelTypeEnum modelType);

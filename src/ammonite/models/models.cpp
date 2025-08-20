@@ -140,6 +140,7 @@ namespace ammonite {
         const internal::ModelInfo modelInfo = *modelPtr;
         inactiveModelTracker.deleteModelInfo(modelId);
         activeModelTracker.addModelInfo(modelId, modelInfo);
+        internal::setModelInfoActive(modelId, true);
       }
 
       void moveModelToInactive(AmmoniteId modelId, internal::ModelInfo* modelPtr) {
@@ -147,6 +148,7 @@ namespace ammonite {
         const internal::ModelInfo modelInfo = *modelPtr;
         activeModelTracker.deleteModelInfo(modelId);
         inactiveModelTracker.addModelInfo(modelId, modelInfo);
+        internal::setModelInfoActive(modelId, false);
       }
 
       void calcModelMatrices(internal::PositionData* positionData) {
@@ -232,9 +234,11 @@ namespace ammonite {
       //Create the model info entry
       internal::ModelInfo modelInfo;
       modelInfo.modelName = internal::getModelName(objectPath, modelLoadInfo);
+      modelInfo.modelId = utils::internal::setNextId(&lastModelId, modelIdPtrMap);
 
-      //Reuse or load model from scratch
-      modelInfo.modelData = internal::addModelData(objectPath, modelLoadInfo);
+      //Either reuse or load model from scratch
+      modelInfo.modelData = internal::addModelData(objectPath, modelLoadInfo,
+                                                   modelInfo.modelId);
       if (modelInfo.modelData == nullptr) {
         return 0;
       }
@@ -261,7 +265,6 @@ namespace ammonite {
       calcModelMatrices(&modelInfo.positionData);
 
       //Add model to the tracker and return the ID
-      modelInfo.modelId = utils::internal::setNextId(&lastModelId, modelIdPtrMap);
       activeModelTracker.addModelInfo(modelInfo.modelId, modelInfo);
       return modelInfo.modelId;
     }
@@ -280,8 +283,8 @@ namespace ammonite {
       //Add model to the tracker via pointer
       const AmmoniteId newModelId = utils::internal::setNextId(&lastModelId, modelIdPtrMap);
       activeModelTracker.copyModelInfoFromPtr(newModelId, existingModelInfo);
-      internal::copyModelData(existingModelInfo->modelName);
       internal::ModelInfo* newModelInfo = modelIdPtrMap[newModelId];
+      internal::copyModelData(existingModelInfo->modelName, newModelId);
 
       //Increase texture reference counters
       for (const internal::TextureIdGroup& textureGroup : newModelInfo->textureIds) {
@@ -319,7 +322,7 @@ namespace ammonite {
         }
 
         //Reduce reference count and possibly delete model data
-        if (!internal::deleteModelData(modelInfo->modelName)) {
+        if (!internal::deleteModelData(modelInfo->modelName, modelId)) {
           ammonite::utils::warning << "Failed to delete model data (ID " \
                                    << modelId << ")" << std::endl;
         }
