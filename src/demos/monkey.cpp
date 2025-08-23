@@ -69,7 +69,7 @@ namespace monkeyDemo {
     }
 
     //Copy last loaded model
-    loadedModelIds.push_back(ammonite::models::copyModel(loadedModelIds[modelCount - 1]));
+    loadedModelIds.push_back(ammonite::models::copyModel(loadedModelIds[modelCount - 1], false));
     vertexCount += ammonite::models::getVertexCount(loadedModelIds[modelCount]);
     ammonite::models::position::setPosition(loadedModelIds[modelCount], lightPosition);
     ammonite::models::position::scaleModel(loadedModelIds[modelCount], lightScale);

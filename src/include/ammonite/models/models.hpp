@@ -45,7 +45,7 @@ namespace ammonite {
     AmmoniteId createModel(const std::string& objectPath);
     AmmoniteId createModel(const std::string& objectPath, bool flipTexCoords, bool srgbTextures);
     void deleteModel(AmmoniteId modelId);
-    AmmoniteId copyModel(AmmoniteId modelId);
+    AmmoniteId copyModel(AmmoniteId modelId, bool preserveDrawMode);
 
     bool applyTexture(AmmoniteId modelId, AmmoniteTextureEnum textureType, const std::string& texturePath);
     bool applyTexture(AmmoniteId modelId, AmmoniteTextureEnum textureType, const std::string& texturePath,

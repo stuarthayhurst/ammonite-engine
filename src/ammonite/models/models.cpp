@@ -273,18 +273,31 @@ namespace ammonite {
       return createModel(objectPath, ASSUME_FLIP_MODEL_UVS, ASSUME_SRGB_TEXTURES);
     }
 
-    AmmoniteId copyModel(AmmoniteId modelId) {
+    AmmoniteId copyModel(AmmoniteId modelId, bool preserveDrawMode) {
       //Get the model and check it exists
       internal::ModelInfo* existingModelInfo = modelIdPtrMap[modelId];
       if (existingModelInfo == nullptr) {
         return 0;
       }
 
-      //Add model to the tracker via pointer
+      //Add model info to the correct tracker via pointer
       const AmmoniteId newModelId = utils::internal::setNextId(&lastModelId, modelIdPtrMap);
-      activeModelTracker.copyModelInfoFromPtr(newModelId, existingModelInfo);
+      if (!preserveDrawMode || existingModelInfo->drawMode != AMMONITE_DRAW_INACTIVE) {
+        //Active tracker for reset mode or an already active mode
+        activeModelTracker.copyModelInfoFromPtr(newModelId, existingModelInfo);
+      } else {
+        //Inactive tracker for preserving the inactive mode
+        inactiveModelTracker.copyModelInfoFromPtr(newModelId, existingModelInfo);
+      }
+
+      //Update model data storage
       internal::ModelInfo* newModelInfo = modelIdPtrMap[newModelId];
       internal::copyModelData(existingModelInfo->modelName, newModelId);
+
+      //Reset the draw mode unless asked to preserve it
+      if (!preserveDrawMode) {
+        newModelInfo->drawMode = AMMONITE_DRAW_ACTIVE;
+      }
 
       //Increase texture reference counters
       for (const internal::TextureIdGroup& textureGroup : newModelInfo->textureIds) {

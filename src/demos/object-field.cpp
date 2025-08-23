@@ -97,7 +97,7 @@ namespace objectFieldDemo {
 
     void spawnCubeCallback(const std::vector<AmmoniteKeycode>&, KeyStateEnum, void*) {
       const AmmoniteId activeCameraId = ammonite::camera::getActiveCamera();
-      const AmmoniteId modelId = ammonite::models::copyModel(floorId);
+      const AmmoniteId modelId = ammonite::models::copyModel(floorId, false);
       loadedModelIds.push_back(modelId);
 
       const double horiz = ammonite::camera::getHorizontal(activeCameraId);
@@ -298,7 +298,7 @@ namespace objectFieldDemo {
 
     for (unsigned int i = 0; i < cubeCount; i++) {
       //Load the cube
-      loadedModelIds.push_back(ammonite::models::copyModel(floorId));
+      loadedModelIds.push_back(ammonite::models::copyModel(floorId, false));
       vertexCount += ammonite::models::getVertexCount(loadedModelIds[modelCount]);
 
       //Position the cube

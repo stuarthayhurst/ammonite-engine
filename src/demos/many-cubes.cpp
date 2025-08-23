@@ -53,7 +53,7 @@ namespace manyCubesDemo {
 
     for (unsigned int i = 1; i < modelCount; i++) {
       //Load model and count vertices
-      loadedModelIds.push_back(ammonite::models::copyModel(loadedModelIds[0]));
+      loadedModelIds.push_back(ammonite::models::copyModel(loadedModelIds[0], true));
       vertexCount += ammonite::models::getVertexCount(loadedModelIds[i]);
 
       //Update splash screen
