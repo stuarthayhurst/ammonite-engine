@@ -355,7 +355,7 @@ namespace ammonite {
 
           //Check cache file exists
           if (!std::filesystem::exists(*cacheFilePath)) {
-            ammoniteInternalDebug << "Couldn't find " << *cacheFilePath << std::endl;
+            ammoniteInternalDebug << "Couldn't find '" << *cacheFilePath << "'" << std::endl;
             *cacheState = AMMONITE_CACHE_MISS;
             return nullptr;
           }
