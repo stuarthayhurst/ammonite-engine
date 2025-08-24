@@ -43,6 +43,7 @@ namespace ammonite {
         modelNameDataMap[modelName] = {};
         ModelData* modelDataPtr = &modelNameDataMap[modelName];
         modelDataPtr->refCount = 1;
+        modelDataPtr->modelName = modelName;
         if (!internal::loadObject(objectPath, modelDataPtr, &rawMeshDataVec, modelLoadInfo)) {
           modelNameDataMap.erase(modelName);
           return nullptr;
@@ -100,7 +101,7 @@ namespace ammonite {
 
           graphics::internal::deleteModelBuffers(modelData);
 
-          //Remove the map entry
+          //Remove the map entry, potentially invalidating modelName
           modelNameDataMap.erase(modelName);
           ammoniteInternalDebug << "Deleted storage for model data (" << modelName \
                                 << ")" << std::endl;
@@ -110,16 +111,15 @@ namespace ammonite {
       }
 
       void setModelInfoActive(AmmoniteId modelId, bool active) {
-        ModelInfo* modelInfoPtr = getModelPtr(modelId);
-        ModelData& modelData = modelNameDataMap[modelInfoPtr->modelName];
+        ModelData* modelDataPtr = getModelPtr(modelId)->modelData;
         if (active) {
           //Move the model ID to the active set
-          modelData.inactiveModelIds.erase(modelId);
-          modelData.activeModelIds.insert(modelId);
+          modelDataPtr->inactiveModelIds.erase(modelId);
+          modelDataPtr->activeModelIds.insert(modelId);
         } else {
           //Move the model ID to the inactive set
-          modelData.activeModelIds.erase(modelId);
-          modelData.inactiveModelIds.insert(modelId);
+          modelDataPtr->activeModelIds.erase(modelId);
+          modelDataPtr->inactiveModelIds.insert(modelId);
         }
       }
 

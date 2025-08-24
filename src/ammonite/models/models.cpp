@@ -76,7 +76,7 @@ namespace ammonite {
 
           ammoniteInternalDebug << "Deleted storage for model info (ID " \
                                 << modelId << ", '" \
-                                << modelIdPtrMap[modelId]->modelName \
+                                << modelIdPtrMap[modelId]->modelData->modelName \
                                 << "')" << std::endl;
 
           //Delete the model info and id to pointer map entry
@@ -233,7 +233,6 @@ namespace ammonite {
 
       //Create the model info entry
       internal::ModelInfo modelInfo;
-      modelInfo.modelName = internal::getModelName(objectPath, modelLoadInfo);
       modelInfo.modelId = utils::internal::setNextId(&lastModelId, modelIdPtrMap);
 
       //Either reuse or load model from scratch
@@ -292,7 +291,7 @@ namespace ammonite {
 
       //Update model data storage
       internal::ModelInfo* newModelInfo = modelIdPtrMap[newModelId];
-      internal::copyModelData(existingModelInfo->modelName, newModelId);
+      internal::copyModelData(existingModelInfo->modelData->modelName, newModelId);
 
       //Reset the draw mode unless asked to preserve it
       if (!preserveDrawMode) {
@@ -334,22 +333,26 @@ namespace ammonite {
           }
         }
 
-        //Reduce reference count and possibly delete model data
-        if (!internal::deleteModelData(modelInfo->modelName, modelId)) {
-          ammonite::utils::warning << "Failed to delete model data (ID " \
-                                   << modelId << ")" << std::endl;
-        }
-
         //Unlink any attached light source
         ammonite::lighting::internal::unlinkByModel(modelId);
 
-        //Remove the model info from the tracker
+        /*
+         - Remove the model info from the tracker, before the data is deleted
+         - Copy the modelName for future use
+        */
+        const std::string modelName = modelInfo->modelData->modelName;
         if (activeModelTracker.hasModel(modelId)) {
           activeModelTracker.deleteModelInfo(modelId);
         } else if (inactiveModelTracker.hasModel(modelId)) {
           inactiveModelTracker.deleteModelInfo(modelId);
         } else {
           ammonite::utils::warning << "Failed to delete model info (ID " \
+                                   << modelId << ")" << std::endl;
+        }
+
+        //Reduce reference count and possibly delete model data
+        if (!internal::deleteModelData(modelName, modelId)) {
+          ammonite::utils::warning << "Failed to delete model data (ID " \
                                    << modelId << ")" << std::endl;
         }
       }

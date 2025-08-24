@@ -68,6 +68,7 @@ namespace ammonite {
       */
       struct ModelData {
         unsigned int refCount = 0;
+        std::string modelName;
         std::vector<MeshInfoGroup> meshInfo;
         std::vector<TextureIdGroup> textureIds;
         std::unordered_set<AmmoniteId> activeModelIds;
@@ -97,7 +98,6 @@ namespace ammonite {
         std::vector<TextureIdGroup> textureIds;
 
         //Model identification
-        std::string modelName;
         AmmoniteId modelId = 0;
 
         //Model selection factors
