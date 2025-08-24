@@ -8,6 +8,7 @@
 #include "utils/debug.hpp"
 #include "utils/logging.hpp"
 #include "utils/thread.hpp"
+#include "utils/timer.hpp"
 #include "window/window.hpp"
 
 #define MACRO_STRING(value) #value
@@ -30,6 +31,8 @@ namespace ammonite {
 
   bool setupEngine(const std::string& shaderPath, unsigned int width,
                    unsigned int height, const std::string& title) {
+      ammonite::utils::Timer loadTimer;
+
       //Create a thread pool
       if (!ammonite::utils::thread::createThreadPool(0)) {
         ammonite::utils::error << "Failed to create thread pool" << std::endl;
@@ -63,6 +66,7 @@ namespace ammonite {
       return false;
     }
 
+    ammonite::utils::status << "Loaded engine in " << loadTimer.getTime() << "s" << std::endl;
     return true;
   }
 
