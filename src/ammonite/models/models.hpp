@@ -2,6 +2,7 @@
 #define INTERNALMODELS
 
 #include <string>
+#include <string_view>
 #include <unordered_set>
 #include <vector>
 
@@ -121,14 +122,15 @@ namespace ammonite {
                               AmmoniteId modelId);
       ModelData* copyModelData(const std::string& modelName, AmmoniteId modelId);
       ModelData* getModelData(const std::string& modelName);
+      ModelData* getModelData(std::string_view modelName);
       bool deleteModelData(const std::string& modelName, AmmoniteId modelId);
       void setModelInfoActive(AmmoniteId modelId, bool active);
 
       //Model info retrieval, by model name
       unsigned int getModelNameCount();
-      unsigned int getModelInfoCount(const std::string& modelName);
-      void getModelNames(std::string modelNameArray[]);
-      void getModelInfos(const std::string& modelName, ModelInfo* modelInfoArray[]);
+      unsigned int getModelInfoCount(std::string_view modelName);
+      void getModelNames(std::string_view modelNameArray[]);
+      void getModelInfos(std::string_view modelName, ModelInfo* modelInfoArray[]);
 
       //Model info retrieval
       unsigned int getModelCount(ModelTypeEnum modelType);

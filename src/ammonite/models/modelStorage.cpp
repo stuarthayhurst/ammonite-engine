@@ -1,6 +1,8 @@
+#include <functional>
 #include <iostream>
 #include <map>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include "models.hpp"
@@ -14,7 +16,7 @@ namespace ammonite {
   namespace models {
     namespace internal {
       namespace {
-        std::map<std::string, ModelData> modelNameDataMap;
+        std::map<std::string, ModelData, std::less<>> modelNameDataMap;
       }
 
       std::string getModelName(const std::string& objectPath,
@@ -62,6 +64,10 @@ namespace ammonite {
 
       ModelData* getModelData(const std::string& modelName) {
         return &modelNameDataMap[modelName];
+      }
+
+      ModelData* getModelData(std::string_view modelName) {
+        return &modelNameDataMap.find(modelName)->second;
       }
 
       bool deleteModelData(const std::string& modelName, AmmoniteId modelId) {
@@ -123,12 +129,12 @@ namespace ammonite {
       }
 
       //Return the number of ModelInfos for a modelName
-      unsigned int getModelInfoCount(const std::string& modelName) {
-        return (unsigned int)modelNameDataMap[modelName].activeModelIds.size();
+      unsigned int getModelInfoCount(std::string_view modelName) {
+        return (unsigned int)modelNameDataMap.find(modelName)->second.activeModelIds.size();
       }
 
       //Fill an array with each unique model name
-      void getModelNames(std::string* modelNameArray) {
+      void getModelNames(std::string_view modelNameArray[]) {
         unsigned int i = 0;
         for (const auto& entry : modelNameDataMap) {
           modelNameArray[i++] = entry.first;
@@ -136,8 +142,8 @@ namespace ammonite {
       }
 
       //Fill an array with every ModelInfo* for a given modelName
-      void getModelInfos(const std::string& modelName, ModelInfo* modelInfoArray[]) {
-        const ModelData& modelData = modelNameDataMap[modelName];
+      void getModelInfos(std::string_view modelName, ModelInfo* modelInfoArray[]) {
+        const ModelData& modelData = modelNameDataMap.find(modelName)->second;
         unsigned int i = 0;
         for (const AmmoniteId& modelId : modelData.activeModelIds) {
           modelInfoArray[i++] = getModelPtr(modelId);
