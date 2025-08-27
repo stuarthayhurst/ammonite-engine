@@ -20,6 +20,11 @@ enum KeyStateEnum : unsigned char {
   AMMONITE_REPEAT
 };
 
+/*
+ - Callbacks aren't allowed to modify keybinds
+ - If this behaviour is required, add then to a queue and process them after
+   ammonite::input::updateInput() is done
+*/
 using AmmoniteKeyCallback = void (*)(const std::vector<AmmoniteKeycode>& keycodes, KeyStateEnum action, void* userPtr);
 using AmmoniteCursorCallback = void (*)(double xPosition, double yPosition, double xDelta, double yDelta, void* userPtr);
 using AmmoniteButtonCallback = void (*)(AmmoniteButton button, KeyStateEnum action, void* userPtr);
