@@ -6,6 +6,8 @@ Name: Ammonite
 Description: Ammonite, a simple graphics engine for experimentation
 URL: https://github.com/stuarthayhurst/ammonite-engine
 Version: 0.0.1
+License: MIT
+Maintainer: Stuart Hayhurst (https://github.com/stuarthayhurst/ammonite-engine)
 Requires: glm
 Requires.private: glm glfw3 epoxy stb assimp
 Cflags: -I${includedir}
