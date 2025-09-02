@@ -24,7 +24,7 @@ namespace ammonite {
 
     /*
      - Output helper to buffer output data and synchronise with other helpers to display
-     - Prefixes the output with the prefix of the instant used to flush
+     - Prefixes the output with the prefix of the instance used to flush
      - Buffer is shared between all instances on the same thread
      - Colour is only used for the prefix
     */
