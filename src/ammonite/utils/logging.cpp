@@ -18,10 +18,10 @@ namespace ammonite {
       outputStream(output), prefix(colour + pre + colour::reset) {}
 
     //Output the stored string
-    OutputHelper& OutputHelper::operator << (std::ostream& (*)(std::ostream&)) {
+    OutputHelper& OutputHelper::operator << (std::ostream& (*newStream)(std::ostream&)) {
       //Safely output the prefix, buffered string and new line
       outputLock.lock();
-      outputStream << prefix << storageStream.str() << std::endl;
+      outputStream << prefix << storageStream.str() << newStream;
       outputLock.unlock();
 
       //Clear the storage
