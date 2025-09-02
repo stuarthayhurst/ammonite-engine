@@ -8,6 +8,8 @@
 #include <ammonite/ammonite.hpp>
 
 #include "helper/argHandler.hpp"
+#include "helper/commands.hpp"
+
 #include "demos/object-field.hpp"
 #include "demos/many-cubes.hpp"
 #include "demos/monkey.hpp"
@@ -155,6 +157,12 @@ namespace {
     frameRateTimer.reset();
   }
 
+  void enableCommandPromptCallback(const std::vector<AmmoniteKeycode>&,
+                                   KeyStateEnum, void* userPtr) {
+    bool* commandsEnabledPtr = (bool*)userPtr;
+    *commandsEnabledPtr = true;
+  }
+
   void closeWindowCallback(const std::vector<AmmoniteKeycode>&, KeyStateEnum, void* userPtr) {
     *(bool*)userPtr = true;
   }
@@ -287,8 +295,12 @@ int main(int argc, char** argv) noexcept(false) {
 
   //Set keybinds
   std::vector<AmmoniteId> keybindIds;
+  bool commandPromptRequested = false;
   keybindIds.push_back(ammonite::input::registerToggleKeybind(
                        AMMONITE_C, AMMONITE_ALLOW_OVERRIDE, inputFocusCallback, nullptr));
+  keybindIds.push_back(ammonite::input::registerToggleKeybind(
+                       AMMONITE_V, AMMONITE_ALLOW_OVERRIDE,
+                       enableCommandPromptCallback, &commandPromptRequested));
   keybindIds.push_back(ammonite::input::registerToggleKeybind(
                        AMMONITE_F11, AMMONITE_ALLOW_OVERRIDE,
                        fullscreenToggleCallback, nullptr));
@@ -337,6 +349,22 @@ int main(int argc, char** argv) noexcept(false) {
 
     //Process new input since last frame
     ammonite::input::updateInput();
+
+    //Swap to command prompt if requested
+    if (commandPromptRequested) {
+      //Release input focus
+      const bool hadInputFocus = ammonite::input::getInputFocus();
+      ammonite::input::setInputFocus(false);
+
+      if (commands::commandPrompt()) {
+        //Exit if requested
+        closeWindow = true;
+      }
+
+      //Swap input back to window
+      ammonite::input::setInputFocus(hadInputFocus);
+      commandPromptRequested = false;
+    }
 
     //Call demo-specific main loop code
     if (rendererMainloop != nullptr) {
