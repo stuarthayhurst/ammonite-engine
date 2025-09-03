@@ -1,7 +1,7 @@
 #include <iostream>
-#include <map>
 #include <sstream>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include <ammonite/ammonite.hpp>
@@ -44,7 +44,7 @@ namespace commands {
       CommandHandler handler;
     };
 
-    std::map<std::string, CommandInfo> commandMap = {
+    const std::unordered_map<std::string, CommandInfo> commandMap = {
       {"help", {helpCommand}},
       {"exit", {exitCommand}},
       {"stop", {stopCommand}}
@@ -84,7 +84,8 @@ namespace commands {
       }
 
       //Call the handler with the command, then continue or return
-      const ReturnAction action = commandMap[command].handler(&commandLineVec);
+      const CommandInfo& info = commandMap.at(command);
+      const ReturnAction action = info.handler(&commandLineVec);
       if (action != CONTINUE) {
         return (action == EXIT_PROGRAM);
       }
