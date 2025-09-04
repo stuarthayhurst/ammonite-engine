@@ -11,14 +11,14 @@
 
 //Definitions for all commands
 namespace {
-  enum ReturnAction : unsigned char {
+  enum ReturnActionEnum : unsigned char {
     CONTINUE,
     EXIT_COMMANDS,
     EXIT_PROGRAM
   };
 
   constexpr std::string PROMPT_STRING = "> ";
-  using CommandHandler = ReturnAction (*)(const std::vector<std::string>& commandLine);
+  using CommandHandler = ReturnActionEnum (*)(const std::vector<std::string>& commandLine);
 }
 
 /*
@@ -144,7 +144,7 @@ namespace {
 
 //Command implementations
 namespace {
-  ReturnAction helpCommand(const std::vector<std::string>&) {
+  ReturnActionEnum helpCommand(const std::vector<std::string>&) {
     ammonite::utils::normal << "Command help:" << std::endl;
     ammonite::utils::normal << "  'help'              : Display this help page" << std::endl;
     ammonite::utils::normal << "  'get [key]'         : Get the value of a setting key" << std::endl;
@@ -156,7 +156,7 @@ namespace {
     return CONTINUE;
   }
 
-  ReturnAction getCommand(const std::vector<std::string>& arguments) {
+  ReturnActionEnum getCommand(const std::vector<std::string>& arguments) {
     //Print the setting keys if none were given
     if (arguments.size() == 1) {
       dumpKeys(settingKeyMap);
@@ -212,7 +212,7 @@ namespace {
     return CONTINUE;
   }
 
-  ReturnAction setCommand(const std::vector<std::string>& arguments) {
+  ReturnActionEnum setCommand(const std::vector<std::string>& arguments) {
     //Validate argument count
     if (!checkArgumentCount(arguments, 2)) {
       return CONTINUE;
@@ -320,11 +320,11 @@ namespace {
     return CONTINUE;
   }
 
-  ReturnAction exitCommand(const std::vector<std::string>&) {
+  ReturnActionEnum exitCommand(const std::vector<std::string>&) {
     return EXIT_COMMANDS;
   }
 
-  ReturnAction stopCommand(const std::vector<std::string>&) {
+  ReturnActionEnum stopCommand(const std::vector<std::string>&) {
     return EXIT_PROGRAM;
   }
 }
@@ -379,7 +379,7 @@ namespace commands {
 
       //Call the handler with the command, then continue or return
       const CommandInfo& info = commandMap.at(command);
-      const ReturnAction action = info.handler(commandLineVec);
+      const ReturnActionEnum action = info.handler(commandLineVec);
       if (action != CONTINUE) {
         return (action == EXIT_PROGRAM);
       }
