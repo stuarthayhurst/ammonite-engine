@@ -331,12 +331,8 @@ namespace {
 
 namespace commands {
   namespace {
-    struct CommandInfo {
-      CommandHandler handler;
-    };
-
     //Commands added here must have implementations written
-    const std::unordered_map<std::string, CommandInfo> commandMap = {
+    const std::unordered_map<std::string, CommandHandler> commandMap = {
       {"help", {helpCommand}},
       {"get", {getCommand}},
       {"set", {setCommand}},
@@ -378,8 +374,7 @@ namespace commands {
       }
 
       //Call the handler with the command, then continue or return
-      const CommandInfo& info = commandMap.at(command);
-      const ReturnActionEnum action = info.handler(commandLineVec);
+      const ReturnActionEnum action = (commandMap.at(command))(commandLineVec);
       if (action != CONTINUE) {
         return (action == EXIT_PROGRAM);
       }
