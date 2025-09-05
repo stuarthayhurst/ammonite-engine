@@ -14,6 +14,7 @@
   - Model loading, using `libassimp`
   - Shader program caching
   - Key binding and mouse input support
+  - Command prompt for engine control
   - Miscellaneous utilities (thread pool, thread-safe logging, timers, random number generation)
 
 ## Requirements:
