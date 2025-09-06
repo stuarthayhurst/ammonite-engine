@@ -46,7 +46,7 @@ namespace ammonite {
         delete [] modelInfoPtrs;
       }
 
-      ammoniteInternalDebug << std::endl;
+      ammoniteInternalDebug.printEmptyLine();
       delete [] modelNames;
       return true;
 #else
