@@ -150,6 +150,7 @@ namespace {
     ammonite::utils::normal << "  'get [key]'         : Get the value of a setting key" << std::endl;
     ammonite::utils::normal << "                        Leave [key] blank to list keys" << std::endl;
     ammonite::utils::normal << "  'set [key] [value]' : Set the value of a setting key" << std::endl;
+    ammonite::utils::normal << "  'models'            : Dump model system data (debug mode)" << std::endl;
     ammonite::utils::normal << "  'exit'              : Exit the command system" << std::endl;
     ammonite::utils::normal << "  'stop'              : Stop the program" << std::endl;
 
@@ -320,6 +321,15 @@ namespace {
     return CONTINUE;
   }
 
+  ReturnActionEnum modelDumpCommand(const std::vector<std::string>&) {
+#ifndef AMMONITE_DEBUG
+    ammonite::utils::warning << "Demo not compiled in debug mode, model storage querying is unlikely to be available" << std::endl;
+#endif
+    ammonite::models::dumpModelStorageDebug();
+
+    return CONTINUE;
+  }
+
   ReturnActionEnum exitCommand(const std::vector<std::string>&) {
     return EXIT_COMMANDS;
   }
@@ -336,6 +346,7 @@ namespace commands {
       {"help", {helpCommand}},
       {"get", {getCommand}},
       {"set", {setCommand}},
+      {"models", {modelDumpCommand}},
       {"exit", {exitCommand}},
       {"stop", {stopCommand}}
     };
