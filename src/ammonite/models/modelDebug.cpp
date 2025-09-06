@@ -11,7 +11,7 @@
 
 namespace ammonite {
   namespace models {
-    void dumpModelStorageDebug() {
+    bool dumpModelStorageDebug() {
 #ifdef AMMONITE_DEBUG
       //Create storage for model names, query the names
       const unsigned int modelNameCount = internal::getModelNameCount();
@@ -48,6 +48,9 @@ namespace ammonite {
 
       ammoniteInternalDebug << std::endl;
       delete [] modelNames;
+      return true;
+#else
+      return false;
 #endif
     }
   }

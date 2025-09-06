@@ -322,10 +322,9 @@ namespace {
   }
 
   ReturnActionEnum modelDumpCommand(const std::vector<std::string>&) {
-#ifndef AMMONITE_DEBUG
-    ammonite::utils::warning << "Demo not compiled in debug mode, model storage querying is unlikely to be available" << std::endl;
-#endif
-    ammonite::models::dumpModelStorageDebug();
+    if (!ammonite::models::dumpModelStorageDebug()) {
+      ammonite::utils::warning << "Model storage querying is unavailable" << std::endl;
+    }
 
     return CONTINUE;
   }

@@ -54,7 +54,7 @@ namespace ammonite {
     unsigned int getVertexCount(AmmoniteId modelId);
     void setDrawMode(AmmoniteId modelId, AmmoniteDrawEnum drawMode);
 
-    void dumpModelStorageDebug();
+    bool dumpModelStorageDebug();
   }
 }
 
