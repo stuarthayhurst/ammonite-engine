@@ -13,15 +13,18 @@
 namespace {
   /*
    - Return true if at least count arguments are passed, excluding the command
-   - Return false and send a warning message otherwise
+   - Otherwise, send a warning message if requested and return false
   */
-  bool checkArgumentCount(const std::vector<std::string>& arguments, unsigned int count) {
+  bool checkArgumentCount(const std::vector<std::string>& arguments,
+                          unsigned int count, bool showMessage) {
     if (arguments.size() > count) {
       return true;
     }
 
-    ammonite::utils::warning << "At least " << count << " argument(s) expected, " \
-                             << arguments.size() - 1 << " received" << std::endl;
+    if (showMessage) {
+      ammonite::utils::warning << "At least " << count << " argument(s) expected, " \
+                               << arguments.size() - 1 << " received" << std::endl;
+    }
 
     return false;
   }
@@ -192,7 +195,7 @@ namespace {
 
   ReturnActionEnum getCommand(const std::vector<std::string>& arguments) {
     //Print the setting keys if none were given
-    if (arguments.size() == 1) {
+    if (!checkArgumentCount(arguments, 1, false)) {
       dumpKeys(settingKeyMap);
       return CONTINUE;
     }
@@ -247,13 +250,13 @@ namespace {
 
   ReturnActionEnum setCommand(const std::vector<std::string>& arguments) {
     //Print the setting keys if none were given
-    if (arguments.size() == 1) {
+    if (!checkArgumentCount(arguments, 1, false)) {
       dumpKeys(settingKeyMap);
       return CONTINUE;
     }
 
     //Validate argument count
-    if (!checkArgumentCount(arguments, 2)) {
+    if (!checkArgumentCount(arguments, 2, true)) {
       return CONTINUE;
     }
 
@@ -377,7 +380,7 @@ namespace {
 
   void cameraGetCommand(const std::vector<std::string>& arguments) {
     //List keys when no key is given
-    if (arguments.size() == 2) {
+    if (!checkArgumentCount(arguments, 2, false)) {
       dumpKeys(cameraKeyMap);
       return;
     }
@@ -418,7 +421,7 @@ namespace {
 
   void cameraSetCommand(const std::vector<std::string>& arguments) {
     //List keys when no key is given
-    if (arguments.size() == 2) {
+    if (!checkArgumentCount(arguments, 2, false)) {
       dumpKeys(cameraKeyMap);
       return;
     }
@@ -443,10 +446,7 @@ namespace {
     }
 
     //Check that enough values were passed
-    if (arguments.size() - 3 < valueArgCount) {
-      ammonite::utils::warning << "Expected " << valueArgCount \
-                               << " value argument(s), found " \
-                               << arguments.size() - 3 << std::endl;
+    if (!checkArgumentCount(arguments, valueArgCount + 2, true)) {
       return;
     }
 
@@ -489,7 +489,7 @@ namespace {
 
   ReturnActionEnum cameraCommand(const std::vector<std::string>& arguments) {
     //Ignore empty commands
-    if (arguments.size() < 2) {
+    if (!checkArgumentCount(arguments, 1, false)) {
       ammonite::utils::warning << "No mode specified, use 'get' or 'set'" << std::endl;
       return CONTINUE;
     }
