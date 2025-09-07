@@ -181,12 +181,12 @@ namespace {
     ammonite::utils::normal << "Command help:" << std::endl;
     ammonite::utils::normal << "  'help'                        : Display this help page" << std::endl;
     ammonite::utils::normal << "  'get [key]'                   : Get the value of a setting key" << std::endl;
-    ammonite::utils::normal << "                                  Leave [key] blank to list keys" << std::endl;
     ammonite::utils::normal << "  'set [key] [value]'           : Set the value of a setting key" << std::endl;
     ammonite::utils::normal << "  'camera' [mode] [key] [value] : Get / set camera properties" << std::endl;
     ammonite::utils::normal << "  'models'                      : Dump model system data (debug mode)" << std::endl;
     ammonite::utils::normal << "  'exit'                        : Exit the command system" << std::endl;
     ammonite::utils::normal << "  'stop'                        : Stop the program" << std::endl;
+    ammonite::utils::normal << " - Leave [key] blank to list keys" << std::endl;
 
     return CONTINUE;
   }
@@ -248,6 +248,12 @@ namespace {
   }
 
   ReturnActionEnum setCommand(const std::vector<std::string>& arguments) {
+    //Print the setting keys if none were given
+    if (arguments.size() == 1) {
+      dumpKeys(settingKeyMap);
+      return CONTINUE;
+    }
+
     //Validate argument count
     if (!checkArgumentCount(arguments, 2)) {
       return CONTINUE;
