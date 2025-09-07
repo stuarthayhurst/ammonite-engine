@@ -115,16 +115,12 @@ namespace {
    - Return true on success, otherwise return false and send a warning
   */
   bool stringToFloatVector(const std::string* string, ammonite::Vec<float, 3>& value) {
+    bool success = true;
     for (unsigned int i = 0; i < 3; i++) {
-      try {
-        value[i] = std::stof(string[i]);
-      } catch (const std::exception&) {
-        ammonite::utils::warning << "Expected a float, got '" << string << "'" << std::endl;
-        return false;
-      }
+      success &= stringToFloat(string[i], &value[i]);
     }
 
-    return true;
+    return success;
   }
 }
 
