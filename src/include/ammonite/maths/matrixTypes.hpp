@@ -24,6 +24,7 @@ namespace ammonite {
     /*
      - Treat a typed, fixed-size block of memory as a matrix
        - Since this is a raw array, it's passed by reference by default
+       - If allocated with 'new', use 'delete []' to free it
      - These are designed for GLSL, so they're column-major
        - Mat<float, 4, 3> would create a matrix with 4 columns and 3 rows
        - Mat<float, 4> would create a matrix with 4 columns and 4 rows

@@ -22,6 +22,7 @@ namespace ammonite {
     /*
      - Treat a typed, fixed-size block of memory as a vector
        - Since this is a raw array, it's passed by reference by default
+       - If allocated with 'new', use 'delete []' to free it
      - These should always be passed as references, to preserve size information
        - If you specifically want a reference, leave it as one
        - If you didn't need a reference, make it a const&

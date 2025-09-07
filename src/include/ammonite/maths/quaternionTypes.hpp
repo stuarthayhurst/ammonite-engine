@@ -17,6 +17,7 @@ namespace ammonite {
     /*
      - Treat a typed, fixed-size block of memory as a quaternion
        - Since this is a raw array, it's passed by reference by default
+       - If allocated with 'new', use 'delete []' to free it
      - The same suggestions for vectors apply here too
      - This is obviously a stupid type, but it prevents a Quat from being used
        in place of a Vec<T, 4>
