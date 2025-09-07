@@ -9,68 +9,6 @@
 
 #include "commands.hpp"
 
-//Definitions for all commands
-namespace {
-  enum ReturnActionEnum : unsigned char {
-    CONTINUE,
-    EXIT_COMMANDS,
-    EXIT_PROGRAM
-  };
-
-  constexpr std::string PROMPT_STRING = "> ";
-  using CommandHandler = ReturnActionEnum (*)(const std::vector<std::string>& commandLine);
-}
-
-/*
- - Get / set key enum conversion
- - Keys added here must have handlers added in their command
-*/
-namespace {
-  enum SettingKeyEnum : unsigned char {
-    FocalDepthEnabledKey,
-    FocalDepthKey,
-    BlurStrengthKey,
-    VsyncKey,
-    FrameLimitKey,
-    ShadowResolutionKey,
-    RenderResolutionMultiplierKey,
-    AntialiasingSamplesKey,
-    RenderFarPlaneKey,
-    ShadowFarPlaneKey,
-    GammaCorrectionEnabledKey
-  };
-
-  const std::unordered_map<std::string, SettingKeyEnum> settingKeyMap = {
-    {"focalDepthEnabled", FocalDepthEnabledKey},
-    {"focalDepth", FocalDepthKey},
-    {"blurStrength", BlurStrengthKey},
-    {"vsync", VsyncKey},
-    {"frameLimit", FrameLimitKey},
-    {"shadowRes", ShadowResolutionKey},
-    {"renderResMul", RenderResolutionMultiplierKey},
-    {"aaSamples", AntialiasingSamplesKey},
-    {"renderFarPlane", RenderFarPlaneKey},
-    {"shadowFarPlane", ShadowFarPlaneKey},
-    {"gammaCorrection", GammaCorrectionEnabledKey}
-  };
-
-  enum CameraKeyEnum : unsigned char {
-    FieldOfViewKey,
-    PositionKey,
-    DirectionKey,
-    HorizontalKey,
-    VerticalKey
-  };
-
-  const std::unordered_map<std::string, CameraKeyEnum> cameraKeyMap = {
-    {"fov", FieldOfViewKey},
-    {"position", PositionKey},
-    {"direction", DirectionKey},
-    {"horizontal", HorizontalKey},
-    {"vertical", VerticalKey}
-  };
-}
-
 //Command helpers
 namespace {
   /*
@@ -190,7 +128,23 @@ namespace {
   }
 }
 
-//Command implementations
+//Definitions for commands handlers
+namespace {
+  enum ReturnActionEnum : unsigned char {
+    CONTINUE,
+    EXIT_COMMANDS,
+    EXIT_PROGRAM
+  };
+
+  using CommandHandler = ReturnActionEnum (*)(const std::vector<std::string>& commandLine);
+}
+
+/*
+ - Command implementations
+ - Each command is self-contained and anonymous
+ - Commands must be added to commandMap, and have an entry in helpCommand
+*/
+
 namespace {
   ReturnActionEnum helpCommand(const std::vector<std::string>&) {
     ammonite::utils::normal << "Command help:" << std::endl;
@@ -205,6 +159,40 @@ namespace {
 
     return CONTINUE;
   }
+}
+
+namespace {
+  enum SettingKeyEnum : unsigned char {
+    FocalDepthEnabledKey,
+    FocalDepthKey,
+    BlurStrengthKey,
+    VsyncKey,
+    FrameLimitKey,
+    ShadowResolutionKey,
+    RenderResolutionMultiplierKey,
+    AntialiasingSamplesKey,
+    RenderFarPlaneKey,
+    ShadowFarPlaneKey,
+    GammaCorrectionEnabledKey
+  };
+
+  /*
+   - Convert a setting key to an enum for matching
+   - Keys added here must be handled in getCommand() and setCommand()
+  */
+  const std::unordered_map<std::string, SettingKeyEnum> settingKeyMap = {
+    {"focalDepthEnabled", FocalDepthEnabledKey},
+    {"focalDepth", FocalDepthKey},
+    {"blurStrength", BlurStrengthKey},
+    {"vsync", VsyncKey},
+    {"frameLimit", FrameLimitKey},
+    {"shadowRes", ShadowResolutionKey},
+    {"renderResMul", RenderResolutionMultiplierKey},
+    {"aaSamples", AntialiasingSamplesKey},
+    {"renderFarPlane", RenderFarPlaneKey},
+    {"shadowFarPlane", ShadowFarPlaneKey},
+    {"gammaCorrection", GammaCorrectionEnabledKey}
+  };
 
   ReturnActionEnum getCommand(const std::vector<std::string>& arguments) {
     //Print the setting keys if none were given
@@ -312,7 +300,6 @@ namespace {
       break;
     }
 
-
     //Match the key against handlers to set the value
     switch (settingKeyMap.at(arguments[1])) {
     case FocalDepthEnabledKey:
@@ -373,6 +360,24 @@ namespace {
 
     return CONTINUE;
   }
+}
+
+namespace {
+  enum CameraKeyEnum : unsigned char {
+    FieldOfViewKey,
+    PositionKey,
+    DirectionKey,
+    HorizontalKey,
+    VerticalKey
+  };
+
+  const std::unordered_map<std::string, CameraKeyEnum> cameraKeyMap = {
+    {"fov", FieldOfViewKey},
+    {"position", PositionKey},
+    {"direction", DirectionKey},
+    {"horizontal", HorizontalKey},
+    {"vertical", VerticalKey}
+  };
 
   void cameraGetCommand(const std::vector<std::string>& arguments) {
     //List keys when no key is given
@@ -505,7 +510,9 @@ namespace {
 
     return CONTINUE;
   }
+}
 
+namespace {
   ReturnActionEnum modelDumpCommand(const std::vector<std::string>&) {
     if (!ammonite::models::dumpModelStorageDebug()) {
       ammonite::utils::warning << "Model storage querying is unavailable" << std::endl;
@@ -513,19 +520,27 @@ namespace {
 
     return CONTINUE;
   }
+}
 
+namespace {
   ReturnActionEnum exitCommand(const std::vector<std::string>&) {
     return EXIT_COMMANDS;
   }
+}
 
+namespace {
   ReturnActionEnum stopCommand(const std::vector<std::string>&) {
     return EXIT_PROGRAM;
   }
 }
 
+/*
+ - Public command management
+ - Since the commands are self-contained, this just enables the command mode
+*/
+
 namespace commands {
   namespace {
-    //Commands added here must have implementations written
     const std::unordered_map<std::string, CommandHandler> commandMap = {
       {"help", {helpCommand}},
       {"get", {getCommand}},
@@ -535,6 +550,8 @@ namespace commands {
       {"exit", {exitCommand}},
       {"stop", {stopCommand}}
     };
+
+    constexpr std::string PROMPT_STRING = "> ";
   }
 
   /*
