@@ -443,10 +443,10 @@ namespace {
     }
 
     //Check that enough values were passed
-    if (arguments.size() - 2 < valueArgCount) {
+    if (arguments.size() - 3 < valueArgCount) {
       ammonite::utils::warning << "Expected " << valueArgCount \
-                               << "value argument(s), found " \
-                               << arguments.size() - 2 << std::endl;
+                               << " value argument(s), found " \
+                               << arguments.size() - 3 << std::endl;
       return;
     }
 
@@ -500,7 +500,8 @@ namespace {
     } else if (arguments[1] == "set") {
       cameraSetCommand(arguments);
     } else {
-      ammonite::utils::warning << arguments[1] << "isn't a valid mode, use 'get' or 'set'" << std::endl;
+      ammonite::utils::warning << "'" << arguments[1] \
+                               << "' isn't a valid mode, use 'get' or 'set'" << std::endl;
     }
 
 
