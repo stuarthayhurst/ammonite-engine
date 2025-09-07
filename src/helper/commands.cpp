@@ -22,8 +22,8 @@ namespace {
 }
 
 /*
- - Setting key enum conversion
- - Keys added here must have handlers added in getCommand() and setCommand()
+ - Get / set key enum conversion
+ - Keys added here must have handlers added in their command
 */
 namespace {
   enum SettingKeyEnum : unsigned char {
@@ -52,6 +52,22 @@ namespace {
     {"renderFarPlane", RenderFarPlaneKey},
     {"shadowFarPlane", ShadowFarPlaneKey},
     {"gammaCorrection", GammaCorrectionEnabledKey}
+  };
+
+  enum CameraKeyEnum : unsigned char {
+    FieldOfViewKey,
+    PositionKey,
+    DirectionKey,
+    HorizontalKey,
+    VerticalKey
+  };
+
+  const std::unordered_map<std::string, CameraKeyEnum> cameraKeyMap = {
+    {"fov", FieldOfViewKey},
+    {"position", PositionKey},
+    {"direction", DirectionKey},
+    {"horizontal", HorizontalKey},
+    {"vertical", VerticalKey}
   };
 }
 
@@ -140,19 +156,37 @@ namespace {
 
     return true;
   }
+
+  /*
+   - Convert an array of strings to a vector of floats in value
+   - Return true on success, otherwise return false and send a warning
+  */
+  bool stringToFloatVector(const std::string* string, ammonite::Vec<float, 3>& value) {
+    for (unsigned int i = 0; i < 3; i++) {
+      try {
+        value[i] = std::stof(string[i]);
+      } catch (const std::exception&) {
+        ammonite::utils::warning << "Expected a float, got '" << string << "'" << std::endl;
+        return false;
+      }
+    }
+
+    return true;
+  }
 }
 
 //Command implementations
 namespace {
   ReturnActionEnum helpCommand(const std::vector<std::string>&) {
     ammonite::utils::normal << "Command help:" << std::endl;
-    ammonite::utils::normal << "  'help'              : Display this help page" << std::endl;
-    ammonite::utils::normal << "  'get [key]'         : Get the value of a setting key" << std::endl;
-    ammonite::utils::normal << "                        Leave [key] blank to list keys" << std::endl;
-    ammonite::utils::normal << "  'set [key] [value]' : Set the value of a setting key" << std::endl;
-    ammonite::utils::normal << "  'models'            : Dump model system data (debug mode)" << std::endl;
-    ammonite::utils::normal << "  'exit'              : Exit the command system" << std::endl;
-    ammonite::utils::normal << "  'stop'              : Stop the program" << std::endl;
+    ammonite::utils::normal << "  'help'                        : Display this help page" << std::endl;
+    ammonite::utils::normal << "  'get [key]'                   : Get the value of a setting key" << std::endl;
+    ammonite::utils::normal << "                                  Leave [key] blank to list keys" << std::endl;
+    ammonite::utils::normal << "  'set [key] [value]'           : Set the value of a setting key" << std::endl;
+    ammonite::utils::normal << "  'camera' [mode] [key] [value] : Get / set camera properties" << std::endl;
+    ammonite::utils::normal << "  'models'                      : Dump model system data (debug mode)" << std::endl;
+    ammonite::utils::normal << "  'exit'                        : Exit the command system" << std::endl;
+    ammonite::utils::normal << "  'stop'                        : Stop the program" << std::endl;
 
     return CONTINUE;
   }
@@ -321,6 +355,140 @@ namespace {
     return CONTINUE;
   }
 
+  void cameraGetCommand(const std::vector<std::string>& arguments) {
+    //List keys when no key is given
+    if (arguments.size() == 2) {
+      dumpKeys(cameraKeyMap);
+      return;
+    }
+
+    //Filter out unknown keys
+    if (!cameraKeyMap.contains(arguments[2])) {
+      ammonite::utils::warning << "'" << arguments[2] << "' isn't a valid key " << std::endl;
+      return;
+    }
+
+    //Query the key and print it
+    const AmmoniteId cameraId = ammonite::camera::getActiveCamera();
+    switch (cameraKeyMap.at(arguments[2])) {
+    case FieldOfViewKey:
+      ammonite::utils::normal << ammonite::camera::getFieldOfView(cameraId) << std::endl;
+      break;
+    case PositionKey:
+      {
+        ammonite::Vec<float, 3> positionVec = {0};
+        ammonite::camera::getPosition(cameraId, positionVec);
+        ammonite::utils::normal << ammonite::formatVector(positionVec) << std::endl;
+      }
+      break;
+    case DirectionKey:
+      {
+        ammonite::Vec<float, 3> directionVec = {0};
+        ammonite::camera::getDirection(cameraId, directionVec);
+        ammonite::utils::normal << ammonite::formatVector(directionVec) << std::endl;
+      }
+      break;
+    case HorizontalKey:
+      ammonite::utils::normal << ammonite::camera::getHorizontal(cameraId) << std::endl;
+      break;
+    case VerticalKey:
+      ammonite::utils::normal << ammonite::camera::getVertical(cameraId) << std::endl;
+      break;
+    }
+  }
+
+  void cameraSetCommand(const std::vector<std::string>& arguments) {
+    //List keys when no key is given
+    if (arguments.size() == 2) {
+      dumpKeys(cameraKeyMap);
+      return;
+    }
+
+    //Filter out unknown keys
+    if (!cameraKeyMap.contains(arguments[2])) {
+      ammonite::utils::warning << "'" << arguments[2] << "' isn't a valid key " << std::endl;
+      return;
+    }
+
+    //Decide whether to search for a scalar or a vector
+    unsigned int valueArgCount = 0;
+    switch (cameraKeyMap.at(arguments[2])) {
+    case FieldOfViewKey:
+    case HorizontalKey:
+    case VerticalKey:
+      valueArgCount = 1;
+      break;
+    case PositionKey:
+    case DirectionKey:
+      valueArgCount = 3;
+      break;
+    }
+
+    //Check that enough values were passed
+    if (arguments.size() - 2 < valueArgCount) {
+      ammonite::utils::warning << "Expected " << valueArgCount \
+                               << "value argument(s), found " \
+                               << arguments.size() - 2 << std::endl;
+      return;
+    }
+
+    //Read the value in
+    bool success = true;
+    ammonite::Vec<float, 3> floatVector = {0};
+    if (valueArgCount == 1) {
+      success = stringToFloat(arguments[3], &floatVector[0]);
+    } else {
+      success = stringToFloatVector(&arguments[3], floatVector);
+    }
+
+    //Bail if argument conversion failed
+    if (!success) {
+      return;
+    }
+
+    //Set the key
+    const AmmoniteId cameraId = ammonite::camera::getActiveCamera();
+    switch (cameraKeyMap.at(arguments[2])) {
+    case FieldOfViewKey:
+      ammonite::camera::setFieldOfView(cameraId, floatVector[0]);
+      break;
+    case PositionKey:
+      ammonite::camera::setPosition(cameraId, floatVector);
+      break;
+    case DirectionKey:
+      ammonite::camera::setDirection(cameraId, floatVector);
+      break;
+    case HorizontalKey:
+      ammonite::camera::setAngle(cameraId, floatVector[0],
+                                 ammonite::camera::getVertical(cameraId));
+      break;
+    case VerticalKey:
+      ammonite::camera::setAngle(cameraId, ammonite::camera::getHorizontal(cameraId),
+                                 floatVector[0]);
+      break;
+    }
+  }
+
+  ReturnActionEnum cameraCommand(const std::vector<std::string>& arguments) {
+    //Ignore empty commands
+    if (arguments.size() < 2) {
+      ammonite::utils::warning << "No mode specified, use 'get' or 'set'" << std::endl;
+      return CONTINUE;
+    }
+
+    //Handle get and set modes
+    if (arguments[1] == "get") {
+      cameraGetCommand(arguments);
+    } else if (arguments[1] == "set") {
+      cameraSetCommand(arguments);
+    } else {
+      ammonite::utils::warning << arguments[1] << "isn't a valid mode, use 'get' or 'set'" << std::endl;
+    }
+
+
+    return CONTINUE;
+  }
+
   ReturnActionEnum modelDumpCommand(const std::vector<std::string>&) {
     if (!ammonite::models::dumpModelStorageDebug()) {
       ammonite::utils::warning << "Model storage querying is unavailable" << std::endl;
@@ -345,6 +513,7 @@ namespace commands {
       {"help", {helpCommand}},
       {"get", {getCommand}},
       {"set", {setCommand}},
+      {"camera", {cameraCommand}},
       {"models", {modelDumpCommand}},
       {"exit", {exitCommand}},
       {"stop", {stopCommand}}
