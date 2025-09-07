@@ -88,6 +88,21 @@ namespace {
     return false;
   }
 
+  /*
+   - Return true if the key is present
+   - Return false and send a warning message otherwise
+  */
+  template <typename T>
+  bool checkKeyValid(const std::unordered_map<std::string, T>& map,
+                     const std::string& key) {
+    if (!map.contains(key)) {
+      ammonite::utils::warning << "'" << key << "' isn't a valid key " << std::endl;
+      return false;
+    }
+
+    return true;
+  }
+
   //Dump the keys of an unordered_map with string keys
   template <typename T>
   void dumpKeys(const std::unordered_map<std::string, T>& map) {
@@ -199,8 +214,7 @@ namespace {
     }
 
     //Filter out unknown keys
-    if (!settingKeyMap.contains(arguments[1])) {
-      ammonite::utils::warning << "'" << arguments[1] << "' isn't a valid key " << std::endl;
+    if (!checkKeyValid(settingKeyMap, arguments[1])) {
       return CONTINUE;
     }
 
@@ -260,8 +274,7 @@ namespace {
     }
 
     //Filter out unknown keys
-    if (!settingKeyMap.contains(arguments[1])) {
-      ammonite::utils::warning << "'" << arguments[1] << "' isn't a valid key " << std::endl;
+    if (!checkKeyValid(settingKeyMap, arguments[1])) {
       return CONTINUE;
     }
 
@@ -369,8 +382,7 @@ namespace {
     }
 
     //Filter out unknown keys
-    if (!cameraKeyMap.contains(arguments[2])) {
-      ammonite::utils::warning << "'" << arguments[2] << "' isn't a valid key " << std::endl;
+    if (!checkKeyValid(cameraKeyMap, arguments[2])) {
       return;
     }
 
@@ -411,8 +423,7 @@ namespace {
     }
 
     //Filter out unknown keys
-    if (!cameraKeyMap.contains(arguments[2])) {
-      ammonite::utils::warning << "'" << arguments[2] << "' isn't a valid key " << std::endl;
+    if (!checkKeyValid(cameraKeyMap, arguments[2])) {
       return;
     }
 
