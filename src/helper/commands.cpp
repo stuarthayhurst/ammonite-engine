@@ -62,6 +62,28 @@ namespace {
     ammonite::utils::normal << std::endl;
   }
 
+  /*
+   - Print the supported keys if no key was passed
+   - Validate the passed key
+   - Return true if the caller should exit
+  */
+  template <typename T>
+  bool handleKeyEntry(const std::vector<std::string>& arguments, unsigned int keyIndex,
+                      const std::unordered_map<std::string, T>& map) {
+    //Print the keys if none were given
+    if (!checkArgumentCount(arguments, keyIndex, false)) {
+      dumpKeys(map);
+      return true;
+    }
+
+    //Validate the given key
+    if (!checkKeyValid(map, arguments[keyIndex])) {
+      return true;
+    }
+
+    return false;
+  }
+
   std::string boolToString(bool x) {
     return x ? "true" : "false";
   }
@@ -194,14 +216,8 @@ namespace {
   };
 
   ReturnActionEnum getCommand(const std::vector<std::string>& arguments) {
-    //Print the setting keys if none were given
-    if (!checkArgumentCount(arguments, 1, false)) {
-      dumpKeys(settingKeyMap);
-      return CONTINUE;
-    }
-
-    //Filter out unknown keys
-    if (!checkKeyValid(settingKeyMap, arguments[1])) {
+    //Handle common key printing / validation
+    if (handleKeyEntry(arguments, 1, settingKeyMap)) {
       return CONTINUE;
     }
 
@@ -249,19 +265,13 @@ namespace {
   }
 
   ReturnActionEnum setCommand(const std::vector<std::string>& arguments) {
-    //Print the setting keys if none were given
-    if (!checkArgumentCount(arguments, 1, false)) {
-      dumpKeys(settingKeyMap);
+    //Handle common key printing / validation
+    if (handleKeyEntry(arguments, 1, settingKeyMap)) {
       return CONTINUE;
     }
 
     //Validate argument count
     if (!checkArgumentCount(arguments, 2, true)) {
-      return CONTINUE;
-    }
-
-    //Filter out unknown keys
-    if (!checkKeyValid(settingKeyMap, arguments[1])) {
       return CONTINUE;
     }
 
@@ -379,14 +389,8 @@ namespace {
   };
 
   void cameraGetCommand(const std::vector<std::string>& arguments) {
-    //List keys when no key is given
-    if (!checkArgumentCount(arguments, 2, false)) {
-      dumpKeys(cameraKeyMap);
-      return;
-    }
-
-    //Filter out unknown keys
-    if (!checkKeyValid(cameraKeyMap, arguments[2])) {
+    //Handle common key printing / validation
+    if (handleKeyEntry(arguments, 2, cameraKeyMap)) {
       return;
     }
 
@@ -420,14 +424,8 @@ namespace {
   }
 
   void cameraSetCommand(const std::vector<std::string>& arguments) {
-    //List keys when no key is given
-    if (!checkArgumentCount(arguments, 2, false)) {
-      dumpKeys(cameraKeyMap);
-      return;
-    }
-
-    //Filter out unknown keys
-    if (!checkKeyValid(cameraKeyMap, arguments[2])) {
+    //Handle common key printing / validation
+    if (handleKeyEntry(arguments, 2, cameraKeyMap)) {
       return;
     }
 
