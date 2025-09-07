@@ -194,7 +194,8 @@ namespace {
     AntialiasingSamplesKey,
     RenderFarPlaneKey,
     ShadowFarPlaneKey,
-    GammaCorrectionEnabledKey
+    GammaCorrectionEnabledKey,
+    AmbientLightKey
   };
 
   /*
@@ -212,7 +213,8 @@ namespace {
     {"aaSamples", AntialiasingSamplesKey},
     {"renderFarPlane", RenderFarPlaneKey},
     {"shadowFarPlane", ShadowFarPlaneKey},
-    {"gammaCorrection", GammaCorrectionEnabledKey}
+    {"gammaCorrection", GammaCorrectionEnabledKey},
+    {"ambientLight", AmbientLightKey}
   };
 
   ReturnActionEnum getCommand(const std::vector<std::string>& arguments) {
@@ -257,6 +259,13 @@ namespace {
     case GammaCorrectionEnabledKey:
       result = boolToString(ammonite::renderer::settings::getGammaCorrection());
       break;
+    case AmbientLightKey:
+      {
+        ammonite::Vec<float, 3> lightVec = {0};
+        ammonite::lighting::getAmbientLight(lightVec);
+        result = ammonite::formatVector(lightVec);
+        break;
+      }
     }
 
     //Print the key and return
@@ -270,14 +279,21 @@ namespace {
       return CONTINUE;
     }
 
+    //Determine how many arguments are required
+    const SettingKeyEnum settingKey = settingKeyMap.at(arguments[1]);
+    unsigned int requiredArgumentCount = 2;
+    if (settingKey == AmbientLightKey) {
+      requiredArgumentCount = 4;
+    }
+
     //Validate argument count
-    if (!checkArgumentCount(arguments, 2, true)) {
+    if (!checkArgumentCount(arguments, requiredArgumentCount, true)) {
       return CONTINUE;
     }
 
     //Convert the value to the correct type in memory
     void* valuePtr = nullptr;
-    switch (settingKeyMap.at(arguments[1])) {
+    switch (settingKey) {
     case FocalDepthEnabledKey:
     case VsyncKey:
     case GammaCorrectionEnabledKey:
@@ -307,10 +323,17 @@ namespace {
         return CONTINUE;
       };
       break;
+    case AmbientLightKey:
+      valuePtr = new ammonite::Vec<float, 3>;
+      if (!stringToFloatVector(&arguments[2], *((ammonite::Vec<float, 3>*)valuePtr))) {
+        delete [] (ammonite::Vec<float, 3>*)valuePtr;
+        return CONTINUE;
+      };
+      break;
     }
 
     //Match the key against handlers to set the value
-    switch (settingKeyMap.at(arguments[1])) {
+    switch (settingKey) {
     case FocalDepthEnabledKey:
       ammonite::renderer::settings::post::setFocalDepthEnabled(*((bool*)valuePtr));
       break;
@@ -344,10 +367,13 @@ namespace {
     case GammaCorrectionEnabledKey:
       ammonite::renderer::settings::setGammaCorrection(*((bool*)valuePtr));
       break;
+    case AmbientLightKey:
+      ammonite::lighting::setAmbientLight(*((ammonite::Vec<float, 3>*)valuePtr));
+      break;
     }
 
     //Delete the value's memory
-    switch (settingKeyMap.at(arguments[1])) {
+    switch (settingKey) {
     case FocalDepthEnabledKey:
     case VsyncKey:
     case GammaCorrectionEnabledKey:
@@ -364,6 +390,9 @@ namespace {
     case ShadowResolutionKey:
     case AntialiasingSamplesKey:
       delete (unsigned int*)valuePtr;
+      break;
+    case AmbientLightKey:
+      delete [] (ammonite::Vec<float, 3>*)valuePtr;
       break;
     }
 
