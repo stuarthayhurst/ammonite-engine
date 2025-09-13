@@ -1,5 +1,6 @@
 ---
 Checks: [
+  'clang-analyzer-*',
   '-clang-diagnostic-#pragma-messages',
   'bugprone-assert-side-effect',
   'bugprone-assignment-in-if-condition',
