@@ -1,6 +1,7 @@
 #!/bin/bash
 
 buildDir="build"
+NEW_LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$buildDir"
 
 if [[ "$1" == "--loop" || "$1" == "--loops" ]]; then
   if [[ "$2" == "math" || "$2" == "maths" ]]; then
@@ -9,7 +10,7 @@ if [[ "$1" == "--loop" || "$1" == "--loops" ]]; then
     target="$buildDir/threadTest"
   fi
   while true; do
-    if ! LD_LIBRARY_PATH="$buildDir" "$target" "$@"; then
+    if ! LD_LIBRARY_PATH="$NEW_LD_LIBRARY_PATH" "$target" "$@"; then
       exit 1
     fi
   done
@@ -26,4 +27,4 @@ if [[ ! -f "$target" ]]; then
   exit 1
 fi
 
-LD_LIBRARY_PATH="$buildDir" "$target" "$@"
+LD_LIBRARY_PATH="$NEW_LD_LIBRARY_PATH" "$target" "$@"
