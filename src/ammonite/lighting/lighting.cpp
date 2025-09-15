@@ -58,7 +58,7 @@ namespace ammonite {
         //Repacking light sources
         auto lightIt = lightTrackerMap.begin();
         std::advance(lightIt, i);
-        lighting::internal::LightSource* lightSource = &lightIt->second;
+        lighting::internal::LightSource* const lightSource = &lightIt->second;
         lightSource->lightIndex = i;
 
         //Override position for light emitting models, and add to tracker
