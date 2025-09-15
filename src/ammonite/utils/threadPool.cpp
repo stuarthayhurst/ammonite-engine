@@ -60,14 +60,7 @@ namespace {
     }
 
     void pop(WorkItem* workItemPtr) {
-      /*
-       - TODO: libstdc++ has a deadlock in the implementation of counting_semaphore
-         - https://gcc.gnu.org/bugzilla/show_bug.cgi?id=104928
-       - The deadlock is extremely rare, so the performance impact of this workaround
-         shouldn't be too bad
-       - Once this is fixed, just use 'jobCount.acquire();' instead
-      */
-      while(!jobCount.try_acquire_for(std::chrono::milliseconds(1))) {}
+      jobCount.acquire();
       queueLock.lock();
 
       *workItemPtr = queue.front();
@@ -229,8 +222,7 @@ namespace ammonite {
         //Wait for jobCount jobs in group to finish
         void waitGroupComplete(AmmoniteGroup* group, unsigned int jobCount) {
           for (unsigned int i = 0; i < jobCount; i++) {
-            //TODO: Same issue as jobCount, see WorkQueue's implementation above
-            while(!group->try_acquire_for(std::chrono::milliseconds(1))) {}
+            group->acquire();
           }
         }
 
