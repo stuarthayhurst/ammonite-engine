@@ -46,7 +46,7 @@ namespace ammonite {
           }
         }
 
-        const uint64_t* values = (uint64_t*)&last;
+        const uint64_t* const values = (uint64_t*)&last;
         uint64_t result = 0;
         for (int i = 0; i < 8; i++) {
           result += values[i];

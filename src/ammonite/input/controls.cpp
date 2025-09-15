@@ -114,7 +114,7 @@ namespace ammonite {
     namespace {
       void keyboardCameraCallback(const std::vector<AmmoniteKeycode>&,
                                   KeyStateEnum action, void* userPtr) {
-        DirectionData* directionData = (DirectionData*)userPtr;
+        DirectionData* const directionData = (DirectionData*)userPtr;
         ammonite::utils::Timer* directionTimer = &directionData->directionTimer;
         //If it's an initial key press, start the timer and return
         if (action == AMMONITE_PRESSED) {

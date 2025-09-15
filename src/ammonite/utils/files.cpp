@@ -75,7 +75,7 @@ namespace ammonite {
         //Check paths, times and file sizes are correct
         AmmoniteCacheEnum validateInputs(std::string* filePaths, unsigned int fileCount,
                                          unsigned char* extraData, std::size_t extraDataSize) {
-          unsigned char* extraDataCopy = new unsigned char[extraDataSize + 1];
+          unsigned char* const extraDataCopy = new unsigned char[extraDataSize + 1];
           std::memcpy(extraDataCopy, extraData, extraDataSize);
           extraDataCopy[extraDataSize] = '\0';
 
@@ -381,7 +381,7 @@ namespace ammonite {
           *dataSize = blockSizes[0];
           *userData = cacheData + blockSizes[0];
           *userDataSize = blockSizes[1];
-          unsigned char* extraData = *userData + *userDataSize;
+          unsigned char* const extraData = *userData + *userDataSize;
           const std::size_t extraDataSize = blockSizes[2] - sizeof(blockSizes);
 
           //Check size of data is as expected, then validate the loaded cache
@@ -454,7 +454,7 @@ namespace ammonite {
 
         const std::size_t extraSize = extraData.length();
         const std::size_t totalDataSize = dataSize + userDataSize + extraSize + sizeof(blockSizes);
-        unsigned char* fileData = new unsigned char[totalDataSize];
+        unsigned char* const fileData = new unsigned char[totalDataSize];
 
         //blockSize and its size gets special handling, as it's not written to extraData
         blockSizes[0] = dataSize;

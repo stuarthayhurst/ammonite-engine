@@ -74,7 +74,7 @@ namespace ammonite {
                                    << "), it doesn't exist" << std::endl;
           return;
         }
-        TextureInfo* textureInfoPtr = &idTextureMap[textureId];
+        TextureInfo* const textureInfoPtr = &idTextureMap[textureId];
 
         //Decrease the reference counter, delete the texture if now unused
         if (--textureInfoPtr->refCount == 0) {
@@ -148,7 +148,7 @@ namespace ammonite {
         const unsigned char extraData = ((int)flipTexture << 0) | ((int)srgbTexture << 1);
         const std::string textureString = texturePath + std::to_string(extraData);
         if (stringTexturePtrMap.contains(textureString)) {
-          TextureInfo* textureInfo = stringTexturePtrMap[textureString];
+          TextureInfo* const textureInfo = stringTexturePtrMap[textureString];
 
           textureInfo->refCount++;
           return textureInfo->id;
@@ -161,7 +161,7 @@ namespace ammonite {
 
         //Read image data
         int width = 0, height = 0, nChannels = 0;
-        unsigned char* data = stbi_load(texturePath.c_str(), &width, &height, &nChannels, 0);
+        unsigned char* const data = stbi_load(texturePath.c_str(), &width, &height, &nChannels, 0);
         if (flipTexture) {
           stbi_set_flip_vertically_on_load_thread(0);
         }
@@ -193,7 +193,7 @@ namespace ammonite {
         }
 
         //Connect the texture string to the ID and info
-        TextureInfo* textureInfoPtr = &idTextureMap[textureId];
+        TextureInfo* const textureInfoPtr = &idTextureMap[textureId];
         stringTexturePtrMap[textureString] = textureInfoPtr;
         textureInfoPtr->string = textureString;
 
@@ -226,8 +226,8 @@ namespace ammonite {
 
           //Read the image data
           int width = 0, height = 0, nChannels = 0;
-          unsigned char* imageData = stbi_load(texturePaths[i].c_str(), &width,
-                                               &height, &nChannels, 0);
+          unsigned char* const imageData = stbi_load(texturePaths[i].c_str(), &width,
+                                                     &height, &nChannels, 0);
 
           //Disable texture flipping, to avoid interfering with future calls
           if (flipTextures) {

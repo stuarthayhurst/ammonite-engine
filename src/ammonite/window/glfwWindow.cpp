@@ -73,12 +73,12 @@ namespace ammonite {
            - Ignores useDecoratedSize and useDecoratedPos
           */
           if (isWindowFullscreen) {
-            GLFWmonitor* monitorPtr = glfwGetWindowMonitor(windowPtr);
+            GLFWmonitor* const monitorPtr = glfwGetWindowMonitor(windowPtr);
             if (monitorPtr == nullptr) {
               ammonite::utils::warning << "Couldn't determine monitor, window geometry may be incorrect" << std::endl;
             }
 
-            const GLFWvidmode* mode = glfwGetVideoMode(monitorPtr);
+            const GLFWvidmode* const mode = glfwGetVideoMode(monitorPtr);
             storage->width = mode->width;
             storage->height = mode->height;
             storage->xPos = 0;
@@ -112,7 +112,7 @@ namespace ammonite {
 
         GLFWmonitor* getClosestMonitor(GLFWwindow* windowPtr) {
           int monitorCount = 0;
-          GLFWmonitor** monitors = glfwGetMonitors(&monitorCount);
+          GLFWmonitor** const monitors = glfwGetMonitors(&monitorCount);
 
           //Get window position and size
           int wx = 0, wy = 0, ww = 0, wh = 0;
@@ -124,7 +124,7 @@ namespace ammonite {
           GLFWmonitor* bestMonitor = nullptr;
           for (int i = 0; i < monitorCount; i++) {
             int mx = 0, my = 0, mw = 0, mh = 0;
-            const GLFWvidmode* mode = glfwGetVideoMode(monitors[i]);
+            const GLFWvidmode* const mode = glfwGetVideoMode(monitors[i]);
             glfwGetMonitorPos(monitors[i], &mx, &my);
             mw = mode->width;
             mh = mode->height;
@@ -144,7 +144,7 @@ namespace ammonite {
 
         unsigned int getMonitorIndex(GLFWmonitor* monitorPtr) {
           int glfwMonitorCount = 0;
-          GLFWmonitor** monitorPtrs = glfwGetMonitors(&glfwMonitorCount);
+          GLFWmonitor** const monitorPtrs = glfwGetMonitors(&glfwMonitorCount);
 
           //Search provided monitor pointers for the target monitor
           for (int i = 0; i < glfwMonitorCount; i++) {
@@ -160,7 +160,7 @@ namespace ammonite {
 
         GLFWmonitor* getMonitorPtr(unsigned int monitorIndex) {
           int glfwMonitorCount = 0;
-          GLFWmonitor** monitorPtrs = glfwGetMonitors(&glfwMonitorCount);
+          GLFWmonitor** const monitorPtrs = glfwGetMonitors(&glfwMonitorCount);
 
           if (std::cmp_greater_equal(monitorIndex, glfwMonitorCount)) {
             ammonite::utils::warning << "Unknown monitor index '" << monitorIndex << \
@@ -225,8 +225,8 @@ namespace ammonite {
       }
 
       GLFWwindow* createWindow(unsigned int width, unsigned int height) {
-        GLFWwindow* windowPtr = glfwCreateWindow((int)width, (int)height, "",
-                                                 nullptr, nullptr);
+        GLFWwindow* const windowPtr = glfwCreateWindow((int)width, (int)height, "",
+                                                       nullptr, nullptr);
         if (windowPtr == nullptr) {
           glfwTerminate();
           return nullptr;
@@ -268,7 +268,7 @@ namespace ammonite {
       }
 
       void setIcons(GLFWwindow* windowPtr, ImageData* iconData, unsigned int iconCount) {
-        GLFWimage* images = new GLFWimage[iconCount];
+        GLFWimage* const images = new GLFWimage[iconCount];
         for (unsigned int i = 0; i < iconCount; i++) {
           images[i].pixels = iconData[i].data;
           images[i].width = (int)iconData[i].width;
@@ -319,10 +319,10 @@ namespace ammonite {
 
       void setFullscreenMonitor(GLFWwindow* windowPtr, unsigned int monitorIndex) {
         //Convert index to pointer
-        GLFWmonitor* monitorPtr = getMonitorPtr(monitorIndex);
+        GLFWmonitor* const monitorPtr = getMonitorPtr(monitorIndex);
 
         //Set fullscreen mode
-        const GLFWvidmode* mode = glfwGetVideoMode(monitorPtr);
+        const GLFWvidmode* const mode = glfwGetVideoMode(monitorPtr);
         isWindowFullscreen = true;
         glfwSetWindowMonitor(windowPtr, monitorPtr, 0, 0, mode->width, mode->height, GLFW_DONT_CARE);
 

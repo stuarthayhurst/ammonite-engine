@@ -27,7 +27,7 @@ namespace ammonite {
           std::vector<models::internal::TextureIdGroup>* textureIds = &modelData->textureIds;
 
           //Add a new empty mesh to the mesh vector
-          models::internal::RawMeshData* newMesh = &rawMeshDataVec->emplace_back();
+          models::internal::RawMeshData* const newMesh = &rawMeshDataVec->emplace_back();
           newMesh->vertexCount = meshPtr->mNumVertices;
           newMesh->vertexData = new VertexData[meshPtr->mNumVertices];
 
@@ -71,7 +71,7 @@ namespace ammonite {
           }
 
           //Fetch material for the mesh
-          const aiMaterial *material = scenePtr->mMaterials[meshPtr->mMaterialIndex];
+          const aiMaterial* const material = scenePtr->mMaterials[meshPtr->mMaterialIndex];
           aiString localTexturePath;
           std::string fullTexturePath;
           models::internal::TextureIdGroup textureIdGroup;
@@ -116,7 +116,7 @@ namespace ammonite {
           //Process root node, then process any more connected to it
           bool passed = true;
           while (!nodePtrQueue.empty()) {
-            const aiNode* nodePtr = nodePtrQueue.front();
+            const aiNode* const nodePtr = nodePtrQueue.front();
             nodePtrQueue.pop();
 
             //Process meshes
@@ -157,7 +157,7 @@ namespace ammonite {
         }
 
         Assimp::Importer importer;
-        const aiScene* scenePtr = importer.ReadFile(objectPath.c_str(), aiProcessFlags);
+        const aiScene* const scenePtr = importer.ReadFile(objectPath.c_str(), aiProcessFlags);
 
         //Check model loaded correctly
         if (scenePtr == nullptr ||

@@ -36,12 +36,12 @@ namespace {
   }
 
   void resubmitTask(void* userPtr) {
-    const ResubmitData* dataPtr = (ResubmitData*)userPtr;
+    const ResubmitData* const dataPtr = (ResubmitData*)userPtr;
     ammonite::utils::thread::submitWork(shortTask, dataPtr->writePtr, dataPtr->syncPtr);
   }
 
   void chainTask(void* userPtr) {
-    ChainData* dataPtr = (ChainData*)userPtr;
+    ChainData* const dataPtr = (ChainData*)userPtr;
     *(dataPtr->values++) = 1;
     if (dataPtr->totalSubmitted != dataPtr->targetSubmitted) {
       dataPtr->totalSubmitted++;
@@ -143,12 +143,12 @@ namespace {
 
 namespace {
   bool testCreateSubmitWaitDestroy(unsigned int jobCount) {
-    ammonite::utils::Timer* timers = createTimers();
+    ammonite::utils::Timer* const timers = createTimers();
     if (!createThreadPool(0)) {
       destroyTimers(timers);
       return false;
     }
-    unsigned int* values = createValues(jobCount);
+    unsigned int* const values = createValues(jobCount);
     AmmoniteGroup group{0};
 
     //Submit fast 'jobs'
@@ -169,12 +169,12 @@ namespace {
   }
 
   bool testCreateSubmitBlockUnblockDestroy(unsigned int jobCount) {
-    ammonite::utils::Timer* timers = createTimers();
+    ammonite::utils::Timer* const timers = createTimers();
     if (!createThreadPool(0)) {
       destroyTimers(timers);
       return false;
     }
-    unsigned int* values = createValues(jobCount);
+    unsigned int* const values = createValues(jobCount);
 
     //Submit fast 'jobs'
     resetTimers(timers);
@@ -194,12 +194,12 @@ namespace {
   }
 
   bool testCreateSubmitDestroy(unsigned int jobCount) {
-    ammonite::utils::Timer* timers = createTimers();
+    ammonite::utils::Timer* const timers = createTimers();
     if (!createThreadPool(0)) {
       destroyTimers(timers);
       return false;
     }
-    unsigned int* values = createValues(jobCount);
+    unsigned int* const values = createValues(jobCount);
 
     //Submit fast 'jobs'
     resetTimers(timers);
@@ -218,12 +218,12 @@ namespace {
   }
 
   bool testCreateBlockSubmitUnblockWaitDestroy(unsigned int jobCount) {
-    ammonite::utils::Timer* timers = createTimers();
+    ammonite::utils::Timer* const timers = createTimers();
     if (!createThreadPool(0)) {
       destroyTimers(timers);
       return false;
     }
-    unsigned int* values = createValues(jobCount);
+    unsigned int* const values = createValues(jobCount);
     AmmoniteGroup group{0};
 
     ammonite::utils::thread::blockThreads();
@@ -247,7 +247,7 @@ namespace {
   }
 
   bool testQueueLimits(unsigned int jobCount) {
-    ammonite::utils::Timer* timers = createTimers();
+    ammonite::utils::Timer* const timers = createTimers();
     if (!createThreadPool(0)) {
       destroyTimers(timers);
       return false;
@@ -286,17 +286,17 @@ namespace {
 
   bool testNestedJobs(int fullJobCount) {
     const unsigned int jobCount = fullJobCount / 2;
-    ammonite::utils::Timer* timers = createTimers();
+    ammonite::utils::Timer* const timers = createTimers();
     if (!createThreadPool(0)) {
       destroyTimers(timers);
       return false;
     }
-    unsigned int* values = createValues(jobCount);
+    unsigned int* const values = createValues(jobCount);
     AmmoniteGroup group{0};
 
     //Submit nested 'jobs'
     resetTimers(timers);
-    ResubmitData* data = new ResubmitData[jobCount]{};
+    ResubmitData* const data = new ResubmitData[jobCount]{};
     for (unsigned int i = 0; i < jobCount; i++) {
       data[i].writePtr = &values[i];
       data[i].syncPtr = &group;
@@ -318,17 +318,17 @@ namespace {
   }
 
   bool testChainJobs(unsigned int jobCount) {
-    ammonite::utils::Timer* timers = createTimers();
+    ammonite::utils::Timer* const timers = createTimers();
     if (!createThreadPool(0)) {
       destroyTimers(timers);
       return false;
     }
     const unsigned int poolSize = ammonite::utils::thread::getThreadPoolSize();
     const unsigned int totalJobCount = jobCount * poolSize;
-    unsigned int* values = createValues(totalJobCount);
+    unsigned int* const values = createValues(totalJobCount);
     AmmoniteGroup sync{0};
 
-    ChainData* userDataArray = new ChainData[poolSize];
+    ChainData* const userDataArray = new ChainData[poolSize];
     for (std::size_t i = 0; i < poolSize; i++) {
       userDataArray[i].totalSubmitted = 1;
       userDataArray[i].targetSubmitted = jobCount;
@@ -356,12 +356,12 @@ namespace {
   }
 
   bool testSubmitMultiple(unsigned int jobCount) {
-    ammonite::utils::Timer* timers = createTimers();
+    ammonite::utils::Timer* const timers = createTimers();
     if (!createThreadPool(0)) {
       destroyTimers(timers);
       return false;
     }
-    unsigned int* values = createValues(jobCount);
+    unsigned int* const values = createValues(jobCount);
     AmmoniteGroup group{0};
 
     //Submit fast 'jobs'
@@ -383,12 +383,12 @@ namespace {
   }
 
   bool testSubmitMultipleMultiple(unsigned int jobCount) {
-    ammonite::utils::Timer* timers = createTimers();
+    ammonite::utils::Timer* const timers = createTimers();
     if (!createThreadPool(0)) {
       destroyTimers(timers);
       return false;
     }
-    unsigned int* values = createValues(jobCount * 4);
+    unsigned int* const values = createValues(jobCount * 4);
     AmmoniteGroup group{0};
 
     //Submit fast 'jobs'
@@ -412,12 +412,12 @@ namespace {
   }
 
   bool testSubmitMultipleSyncSubmit(unsigned int jobCount) {
-    ammonite::utils::Timer* timers = createTimers();
+    ammonite::utils::Timer* const timers = createTimers();
     if (!createThreadPool(0)) {
       destroyTimers(timers);
       return false;
     }
-    unsigned int* values = createValues(jobCount);
+    unsigned int* const values = createValues(jobCount);
     AmmoniteGroup group{0};
 
     //Submit fast 'jobs'
@@ -439,12 +439,12 @@ namespace {
   }
 
   bool testSubmitMultipleNoSync(unsigned int jobCount) {
-    ammonite::utils::Timer* timers = createTimers();
+    ammonite::utils::Timer* const timers = createTimers();
     if (!createThreadPool(0)) {
       destroyTimers(timers);
       return false;
     }
-    unsigned int* values = createValues(jobCount);
+    unsigned int* const values = createValues(jobCount);
     AmmoniteGroup submitGroup{0};
 
     //Submit fast 'jobs'
@@ -466,14 +466,14 @@ namespace {
   }
 
   bool testRandomWorkloads(unsigned int batchSize) {
-    ammonite::utils::Timer* timers = createTimers();
+    ammonite::utils::Timer* const timers = createTimers();
     if (!createThreadPool(0)) {
       destroyTimers(timers);
       return false;
     }
     const unsigned int testCount = 15;
     const unsigned int totalJobCount = batchSize * testCount;
-    unsigned int* values = createValues(totalJobCount);
+    unsigned int* const values = createValues(totalJobCount);
 
     struct BatchInfo {
       AmmoniteGroup* group;
@@ -485,7 +485,7 @@ namespace {
     std::vector<ChainData*> chainDataVector;
     for (std::size_t testIndex = 0; testIndex < testCount; testIndex++) {
       const unsigned int jobTypeCount = 7;
-      unsigned int* offsetValues = values + (testIndex * batchSize);
+      unsigned int* const offsetValues = values + (testIndex * batchSize);
 
       switch (ammonite::utils::randomUInt(0, jobTypeCount - 1)) {
       case 0:
@@ -571,7 +571,7 @@ namespace {
           batchInfo.waitCount = batchSize;
           batchInfo.group = new AmmoniteGroup{0};
 
-          ChainData* chainData = new ChainData{1, batchSize, chainTask,
+          ChainData* const chainData = new ChainData{1, batchSize, chainTask,
                                                offsetValues, batchInfo.group};
           chainDataVector.push_back(chainData);
           ammonite::utils::thread::submitWork(chainTask, chainData, batchInfo.group);
@@ -611,7 +611,7 @@ namespace {
 
 namespace {
   bool testOutputHelpers(unsigned int jobCount) {
-    ammonite::utils::Timer* timers = createTimers();
+    ammonite::utils::Timer* const timers = createTimers();
     if (!createThreadPool(0)) {
       destroyTimers(timers);
       return false;
@@ -620,7 +620,7 @@ namespace {
 
     //Submit logging jobs
     resetTimers(timers);
-    unsigned int* values = createValues(jobCount);
+    unsigned int* const values = createValues(jobCount);
     for (unsigned int i = 0; i < jobCount; i++) {
       values[i] = i;
       ammonite::utils::thread::submitWork(loggingTask, &values[i], &group);
@@ -690,7 +690,7 @@ namespace {
     if (!createThreadPool(0)) {
       return false;
     }
-    unsigned int* values = createValues(jobCount);
+    unsigned int* const values = createValues(jobCount);
 
     ammonite::utils::thread::blockThreads();
     ammonite::utils::thread::blockThreads();
@@ -709,7 +709,7 @@ namespace {
     if (!createThreadPool(0)) {
       return false;
     }
-    unsigned int* values = createValues(jobCount);
+    unsigned int* const values = createValues(jobCount);
 
     ammonite::utils::thread::blockThreads();
     ammonite::utils::thread::blockThreads();
@@ -727,7 +727,7 @@ namespace {
     if (!createThreadPool(0)) {
       return false;
     }
-    unsigned int* values = createValues(jobCount);
+    unsigned int* const values = createValues(jobCount);
 
     ammonite::utils::thread::blockThreads();
     ammonite::utils::thread::blockThreads();
@@ -746,7 +746,7 @@ namespace {
     if (!createThreadPool(0)) {
       return false;
     }
-    unsigned int* values = createValues(jobCount);
+    unsigned int* const values = createValues(jobCount);
 
     ammonite::utils::thread::blockThreads();
     ammonite::utils::thread::unblockThreads();
@@ -764,7 +764,7 @@ namespace {
     if (!createThreadPool(0)) {
       return false;
     }
-    unsigned int* values = createValues(jobCount);
+    unsigned int* const values = createValues(jobCount);
 
     ammonite::utils::thread::unblockThreads();
 

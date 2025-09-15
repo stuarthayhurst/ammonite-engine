@@ -162,7 +162,7 @@ namespace ammonite {
           };
 
           void submitMultipleJob(void* rawSubmitData) {
-            SubmitData* submitData = (SubmitData*)rawSubmitData;
+            SubmitData* const submitData = (SubmitData*)rawSubmitData;
 
             //Every queue gets at least baseBatchSize jobs
             //TODO: Remove this once clang-tidy-21 is released
@@ -214,7 +214,7 @@ namespace ammonite {
         void submitMultiple(AmmoniteWork work, void* userBuffer, int stride,
                             AmmoniteGroup* group, unsigned int newJobs,
                             AmmoniteGroup* submitGroup) {
-          SubmitData* dataPtr = new SubmitData{work, userBuffer, group, stride, newJobs};
+          SubmitData* const dataPtr = new SubmitData{work, userBuffer, group, stride, newJobs};
           internal::submitWork(submitMultipleJob, dataPtr, submitGroup);
         }
 
@@ -222,7 +222,7 @@ namespace ammonite {
         void submitMultipleSync(AmmoniteWork work, void* userBuffer, int stride,
                                 AmmoniteGroup* group, unsigned int newJobs) {
           //Pack the data into the expected format and just execute the job immediately
-          SubmitData* dataPtr = new SubmitData{work, userBuffer, group, stride, newJobs};
+          SubmitData* const dataPtr = new SubmitData{work, userBuffer, group, stride, newJobs};
           submitMultipleJob(dataPtr);
         }
 

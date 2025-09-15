@@ -115,7 +115,7 @@ namespace {
   }
 
   void cameraCycleCallback(const std::vector<AmmoniteKeycode>&, KeyStateEnum, void* userPtr) {
-    CameraData* cameraData = (CameraData*)userPtr;
+    CameraData* const cameraData = (CameraData*)userPtr;
     cameraData->cameraIndex = (int)((cameraData->cameraIndex + 1) % cameraData->cameraIds.size());
     ammonite::camera::setActiveCamera(cameraData->cameraIds[cameraData->cameraIndex]);
   }
@@ -159,7 +159,7 @@ namespace {
 
   void enableCommandPromptCallback(const std::vector<AmmoniteKeycode>&,
                                    KeyStateEnum, void* userPtr) {
-    bool* commandsEnabledPtr = (bool*)userPtr;
+    bool* const commandsEnabledPtr = (bool*)userPtr;
     *commandsEnabledPtr = true;
   }
 

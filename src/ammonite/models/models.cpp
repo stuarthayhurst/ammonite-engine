@@ -56,14 +56,14 @@ namespace ammonite {
         }
 
         void addModelInfo(AmmoniteId modelId, const internal::ModelInfo& modelInfo) {
-          ModelInfoMap* targetMapPtr = &modelInfoMapSelector[modelInfo.modelType];
+          ModelInfoMap* const targetMapPtr = &modelInfoMapSelector[modelInfo.modelType];
           (*targetMapPtr)[modelId] = modelInfo;
           modelIdPtrMap[modelId] = &(*targetMapPtr)[modelId];
           haveModelsMoved = true;
         }
 
         void copyModelInfoFromPtr(AmmoniteId modelId, internal::ModelInfo* modelInfo) {
-          ModelInfoMap* targetMapPtr = &modelInfoMapSelector[modelInfo->modelType];
+          ModelInfoMap* const targetMapPtr = &modelInfoMapSelector[modelInfo->modelType];
           (*targetMapPtr)[modelId] = *modelInfo;
           modelIdPtrMap[modelId] = &(*targetMapPtr)[modelId];
           haveModelsMoved = true;
@@ -96,14 +96,14 @@ namespace ammonite {
 
           //Select current and target trackers
           ModelInfoMap* currentMapPtr = &modelInfoMapSelector[modelType];
-          ModelInfoMap* targetMapPtr = &modelInfoMapSelector[targetType];
+          ModelInfoMap* const targetMapPtr = &modelInfoMapSelector[targetType];
 
           if (currentMapPtr->contains(modelId)) {
             (*targetMapPtr)[modelId] = (*currentMapPtr)[modelId];
             currentMapPtr->erase(modelId);
 
             //Update the id to pointer map
-            internal::ModelInfo* modelPtr = &(*targetMapPtr)[modelId];
+            internal::ModelInfo* const modelPtr = &(*targetMapPtr)[modelId];
             modelIdPtrMap[modelId] = modelPtr;
 
             //Update the type saved on the model
@@ -121,7 +121,7 @@ namespace ammonite {
 
           //Get the type of model, so the right tracker can be selected
           const ModelTypeEnum modelType = modelIdPtrMap[modelId]->modelType;
-          const ModelInfoMap* targetMapPtr = &modelInfoMapSelector[modelType];
+          const ModelInfoMap* const targetMapPtr = &modelInfoMapSelector[modelType];
 
           //Return whether the selected tracker holds the model
           return targetMapPtr->contains(modelId);
@@ -214,7 +214,7 @@ namespace ammonite {
       }
 
       AmmoniteId getLightEmitterId(AmmoniteId modelId) {
-        const ModelInfo* modelPtr = modelIdPtrMap[modelId];
+        const ModelInfo* const modelPtr = modelIdPtrMap[modelId];
         if (modelPtr != nullptr) {
           return modelPtr->lightEmitterId;
         }
@@ -274,7 +274,7 @@ namespace ammonite {
 
     AmmoniteId copyModel(AmmoniteId modelId, bool preserveDrawMode) {
       //Get the model and check it exists
-      internal::ModelInfo* existingModelInfo = modelIdPtrMap[modelId];
+      internal::ModelInfo* const existingModelInfo = modelIdPtrMap[modelId];
       if (existingModelInfo == nullptr) {
         return 0;
       }
@@ -290,7 +290,7 @@ namespace ammonite {
       }
 
       //Update model data storage
-      internal::ModelInfo* newModelInfo = modelIdPtrMap[newModelId];
+      internal::ModelInfo* const newModelInfo = modelIdPtrMap[newModelId];
       internal::copyModelData(existingModelInfo->modelData->modelName, newModelId);
 
       //Reset the draw mode unless asked to preserve it
@@ -320,7 +320,7 @@ namespace ammonite {
     void deleteModel(AmmoniteId modelId) {
       //Check the model actually exists
       if (modelIdPtrMap.contains(modelId)) {
-        internal::ModelInfo* modelInfo = modelIdPtrMap[modelId];
+        internal::ModelInfo* const modelInfo = modelIdPtrMap[modelId];
 
         //Release textures
         for (const internal::TextureIdGroup& textureGroup : modelInfo->textureIds) {
@@ -360,7 +360,7 @@ namespace ammonite {
 
     bool applyTexture(AmmoniteId modelId, AmmoniteTextureEnum textureType,
                       const std::string& texturePath, bool srgbTexture) {
-      internal::ModelInfo* modelInfoPtr = modelIdPtrMap[modelId];
+      internal::ModelInfo* const modelInfoPtr = modelIdPtrMap[modelId];
       if (modelInfoPtr == nullptr) {
         return false;
       }
@@ -403,7 +403,7 @@ namespace ammonite {
 
     //Return the number of indices on a model
     unsigned int getIndexCount(AmmoniteId modelId) {
-      const internal::ModelInfo* modelPtr = modelIdPtrMap[modelId];
+      const internal::ModelInfo* const modelPtr = modelIdPtrMap[modelId];
       if (modelPtr == nullptr) {
         return 0;
       }
@@ -419,7 +419,7 @@ namespace ammonite {
 
     //Return the number of vertices on a model
     unsigned int getVertexCount(AmmoniteId modelId) {
-      const internal::ModelInfo* modelPtr = modelIdPtrMap[modelId];
+      const internal::ModelInfo* const modelPtr = modelIdPtrMap[modelId];
       if (modelPtr == nullptr) {
         return 0;
       }
@@ -434,7 +434,7 @@ namespace ammonite {
     }
 
     void setDrawMode(AmmoniteId modelId, AmmoniteDrawEnum drawMode) {
-      internal::ModelInfo* modelPtr = modelIdPtrMap[modelId];
+      internal::ModelInfo* const modelPtr = modelIdPtrMap[modelId];
       if (modelPtr != nullptr) {
         if (modelPtr->drawMode == AMMONITE_DRAW_INACTIVE &&
             drawMode != AMMONITE_DRAW_INACTIVE) {
@@ -455,7 +455,7 @@ namespace ammonite {
     namespace position {
       void getPosition(AmmoniteId modelId, ammonite::Vec<float, 3>& position) {
         //Get the model and check it exists
-        const models::internal::ModelInfo* modelInfo = modelIdPtrMap[modelId];
+        const models::internal::ModelInfo* const modelInfo = modelIdPtrMap[modelId];
         if (modelInfo == nullptr) {
           ammonite::set(position, 0.0f);
           return;
@@ -469,7 +469,7 @@ namespace ammonite {
 
       void getScale(AmmoniteId modelId, ammonite::Vec<float, 3>& scale) {
         //Get the model and check it exists
-        const models::internal::ModelInfo* modelInfo = modelIdPtrMap[modelId];
+        const models::internal::ModelInfo* const modelInfo = modelIdPtrMap[modelId];
         if (modelInfo == nullptr) {
           ammonite::set(scale, 0.0f);
           return;
@@ -484,7 +484,7 @@ namespace ammonite {
       //Return rotation, in radians
       void getRotation(AmmoniteId modelId, ammonite::Vec<float, 3>& rotation) {
         //Get the model and check it exists
-        const models::internal::ModelInfo* modelInfo = modelIdPtrMap[modelId];
+        const models::internal::ModelInfo* const modelInfo = modelIdPtrMap[modelId];
         if (modelInfo == nullptr) {
           ammonite::set(rotation, 0.0f);
           return;
@@ -498,7 +498,7 @@ namespace ammonite {
     namespace position {
       void setPosition(AmmoniteId modelId, const ammonite::Vec<float, 3>& position) {
         //Get the model and check it exists
-        models::internal::ModelInfo* modelInfo = modelIdPtrMap[modelId];
+        models::internal::ModelInfo* const modelInfo = modelIdPtrMap[modelId];
         if (modelInfo == nullptr) {
           return;
         }
@@ -518,7 +518,7 @@ namespace ammonite {
 
       void setScale(AmmoniteId modelId, const ammonite::Vec<float, 3>& scale) {
         //Get the model and check it exists
-        models::internal::ModelInfo* modelInfo = modelIdPtrMap[modelId];
+        models::internal::ModelInfo* const modelInfo = modelIdPtrMap[modelId];
         if (modelInfo == nullptr) {
           return;
         }
@@ -544,7 +544,7 @@ namespace ammonite {
       //Rotation, in radians
       void setRotation(AmmoniteId modelId, const ammonite::Vec<float, 3>& rotation) {
         //Get the model and check it exists
-        models::internal::ModelInfo* modelInfo = modelIdPtrMap[modelId];
+        models::internal::ModelInfo* const modelInfo = modelIdPtrMap[modelId];
         if (modelInfo == nullptr) {
           return;
         }
@@ -567,7 +567,7 @@ namespace ammonite {
     namespace position {
       void translateModel(AmmoniteId modelId, const ammonite::Vec<float, 3>& translation) {
         //Get the model and check it exists
-        models::internal::ModelInfo* modelInfo = modelIdPtrMap[modelId];
+        models::internal::ModelInfo* const modelInfo = modelIdPtrMap[modelId];
         if (modelInfo == nullptr) {
           return;
         }
@@ -586,7 +586,7 @@ namespace ammonite {
 
       void scaleModel(AmmoniteId modelId, const ammonite::Vec<float, 3>& scale) {
         //Get the model and check it exists
-        models::internal::ModelInfo* modelInfo = modelIdPtrMap[modelId];
+        models::internal::ModelInfo* const modelInfo = modelIdPtrMap[modelId];
         if (modelInfo == nullptr) {
           return;
         }
@@ -611,7 +611,7 @@ namespace ammonite {
       //Rotation, in radians
       void rotateModel(AmmoniteId modelId, const ammonite::Vec<float, 3>& rotation) {
         //Get the model and check it exists
-        models::internal::ModelInfo* modelInfo = modelIdPtrMap[modelId];
+        models::internal::ModelInfo* const modelInfo = modelIdPtrMap[modelId];
         if (modelInfo == nullptr) {
           return;
         }

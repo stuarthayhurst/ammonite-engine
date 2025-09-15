@@ -41,7 +41,7 @@ namespace ammonite {
         //Load the model data
         std::vector<RawMeshData> rawMeshDataVec;
         modelNameDataMap[modelName] = {};
-        ModelData* modelDataPtr = &modelNameDataMap[modelName];
+        ModelData* const modelDataPtr = &modelNameDataMap[modelName];
         modelDataPtr->refCount = 1;
         modelDataPtr->modelName = modelName;
         if (!internal::loadObject(objectPath, modelDataPtr, &rawMeshDataVec, modelLoadInfo)) {
@@ -78,7 +78,7 @@ namespace ammonite {
         }
 
         //Decrease the reference count of the model data
-        ModelData* modelData = &modelNameDataMap[modelName];
+        ModelData* const modelData = &modelNameDataMap[modelName];
         modelData->refCount--;
         if (modelData->activeModelIds.contains(modelId)) {
           modelData->activeModelIds.erase(modelId);
@@ -111,7 +111,7 @@ namespace ammonite {
       }
 
       void setModelInfoActive(AmmoniteId modelId, bool active) {
-        ModelData* modelDataPtr = getModelPtr(modelId)->modelData;
+        ModelData* const modelDataPtr = getModelPtr(modelId)->modelData;
         if (active) {
           //Move the model ID to the active set
           modelDataPtr->inactiveModelIds.erase(modelId);

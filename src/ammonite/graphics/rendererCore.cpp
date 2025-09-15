@@ -404,7 +404,7 @@ namespace ammonite {
       void drawModel(ammonite::models::internal::ModelInfo* drawObjectInfo,
                             AmmoniteRenderMode renderMode) {
         //Get model draw data
-        ammonite::models::internal::ModelData* drawObjectData = drawObjectInfo->modelData;
+        ammonite::models::internal::ModelData* const drawObjectData = drawObjectInfo->modelData;
 
         //Set the requested draw mode (normal, wireframe, points)
         GLenum mode = GL_TRIANGLES;
@@ -533,7 +533,7 @@ namespace ammonite {
         splashShader.useShader();
 
         //Pass drawing parameters, pointer is only valid for this frame
-        const splash::internal::SplashScreen* splashScreen =
+        const splash::internal::SplashScreen* const splashScreen =
           splash::internal::getSplashScreenPtr(splashScreenId);
         glUniform1f(splashShader.widthId, splashScreen->width);
         glUniform1f(splashShader.heightId, splashScreen->height);
@@ -646,7 +646,7 @@ namespace ammonite {
         glClear(GL_DEPTH_BUFFER_BIT);
 
         //Update cached model pointers, if the models have changed trackers
-        static bool* modelsMovedPtr = ammonite::models::internal::getModelsMovedPtr();
+        static bool* const modelsMovedPtr = ammonite::models::internal::getModelsMovedPtr();
         if (*modelsMovedPtr) {
           drawModelsCached(&modelPtrs, AMMONITE_MODEL, AMMONITE_DATA_REFRESH);
           drawModelsCached(&lightModelPtrs, AMMONITE_LIGHT_EMITTER, AMMONITE_DATA_REFRESH);

@@ -38,7 +38,7 @@ namespace ammonite {
           updatedKeys.push_back({keycode, action});
 
           //Filter out unmapped keys
-          KeyStateEnum* keycodeStatePtr = getKeycodeStatePtr(keycode);
+          KeyStateEnum* const keycodeStatePtr = getKeycodeStatePtr(keycode);
           if (keycodeStatePtr == nullptr) {
             ammoniteInternalDebug << "Keycode '" << keycode << "' not registered" << std::endl;
             return;

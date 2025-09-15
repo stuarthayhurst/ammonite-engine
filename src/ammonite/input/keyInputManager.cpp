@@ -73,7 +73,7 @@ namespace ammonite {
             return;
           }
 
-          const std::vector<KeycodeStatePair>* updatedKeysPtr = getUpdatedKeys();
+          const std::vector<KeycodeStatePair>* const updatedKeysPtr = getUpdatedKeys();
           for (const auto& updatedKey : *updatedKeysPtr) {
             anykeyCallback({updatedKey.keycode}, updatedKey.state, anykeyCallbackData);
           }

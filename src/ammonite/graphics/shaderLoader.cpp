@@ -61,12 +61,12 @@ namespace ammonite {
 
     //Thread pool work to cache a program
     void doCacheWork(void* userPtr) {
-      const CacheWorkerData* data = (CacheWorkerData*)userPtr;
+      const CacheWorkerData* const data = (CacheWorkerData*)userPtr;
 
       //Prepare user data required to load the cache again
       const std::string userData = std::to_string(data->binaryFormat) + "\n";
       const std::size_t userDataSize = userData.length();
-      unsigned char* userBuffer = new unsigned char[userDataSize];
+      unsigned char* const userBuffer = new unsigned char[userDataSize];
       userData.copy((char*)userBuffer, userDataSize, 0);
 
       //Write the cache file, failure messages are also handled by it
@@ -82,7 +82,7 @@ namespace ammonite {
 
     void cacheProgram(const GLuint programId, std::string* shaderPaths,
                       unsigned int shaderCount, std::string* cacheFilePath) {
-      CacheWorkerData* data = new CacheWorkerData;
+      CacheWorkerData* const data = new CacheWorkerData;
       data->shaderCount = shaderCount;
 
       data->cacheFilePath = *cacheFilePath;
@@ -143,7 +143,7 @@ namespace ammonite {
        - Fetch and print the log
        - The extra byte isn't strictly required, but some drivers are buggy
       */
-      GLchar* errorLogBuffer = new GLchar[maxLength + 1];
+      GLchar* const errorLogBuffer = new GLchar[maxLength + 1];
       objectLog(objectId, maxLength, nullptr, errorLogBuffer);
       errorLogBuffer[maxLength] = '\0';
       ammonite::utils::warning << "Failed to " << actionString << " (ID " << objectId \
@@ -189,7 +189,7 @@ namespace ammonite {
 
       //Read the shader's source code
       std::size_t shaderCodeSize = 0;
-      const char* shaderCodePtr = (const char*)ammonite::utils::files::loadFile(shaderPath,
+      const char* const shaderCodePtr = (const char*)ammonite::utils::files::loadFile(shaderPath,
         &shaderCodeSize);
       if (shaderCodePtr == nullptr) {
         ammonite::utils::warning << "Failed to open '" << shaderPath << "'" << std::endl;
@@ -240,7 +240,7 @@ namespace ammonite {
     GLuint createProgramUncached(std::string* shaderPaths, GLenum* shaderTypes,
                                         unsigned int shaderCount) {
       //Since cache wasn't available, generate fresh shaders
-      GLuint* shaderIds = new GLuint[shaderCount];
+      GLuint* const shaderIds = new GLuint[shaderCount];
       bool hasCreatedShaders = true;
       for (unsigned int i = 0; i < shaderCount; i++) {
         shaderIds[i] = loadShader(shaderPaths[i], shaderTypes[i]);
@@ -288,8 +288,9 @@ namespace ammonite {
         AmmoniteCacheEnum cacheState = AMMONITE_CACHE_INVALID;
 
         //Attempt to load the cached program
-        const unsigned char* cacheData = ammonite::utils::files::getCachedFile(&cacheFilePath,
-          shaderPaths, shaderCount, &cacheDataSize, &userData, &userDataSize, &cacheState);
+        const unsigned char* const cacheData = ammonite::utils::files::getCachedFile(
+          &cacheFilePath, shaderPaths, shaderCount, &cacheDataSize, &userData,
+          &userDataSize, &cacheState);
 
         //Fetch and validate binary format
         GLenum binaryFormat = 0;

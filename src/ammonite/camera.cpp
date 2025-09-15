@@ -72,7 +72,7 @@ namespace ammonite {
 
       void updateMatrices() {
         //Get the active camera
-        const Camera* activeCamera = &cameraTrackerMap[activeCameraId];
+        const Camera* const activeCamera = &cameraTrackerMap[activeCameraId];
 
         //Calculate the direction vector
         ammonite::Vec<float, 3> direction = {0};

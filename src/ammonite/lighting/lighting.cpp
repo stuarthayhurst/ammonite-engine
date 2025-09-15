@@ -263,7 +263,7 @@ namespace ammonite {
       ammonite::lighting::internal::unlinkByModel(modelId);
 
       //If the light source is already linked to another model, reset the linked model
-      internal::LightSource* lightSource = &lightTrackerMap[lightId];
+      internal::LightSource* const lightSource = &lightTrackerMap[lightId];
       if (lightSource->modelId != 0) {
         ammonite::models::internal::setLightEmitterId(lightSource->modelId, 0);
       }
@@ -276,7 +276,7 @@ namespace ammonite {
 
     void unlinkModel(AmmoniteId lightId) {
       //Unlink the attached model from the light source
-      internal::LightSource* lightSource = &lightTrackerMap[lightId];
+      internal::LightSource* const lightSource = &lightTrackerMap[lightId];
       ammonite::models::internal::setLightEmitterId(lightSource->modelId, 0);
       lightSource->modelId = 0;
       lightSourcesChanged = true;
@@ -321,7 +321,7 @@ namespace ammonite {
     //Exposed functions to modify light properties
     namespace properties {
       void getGeometry(AmmoniteId lightId, ammonite::Vec<float, 3>& geometry) {
-        const internal::LightSource* lightSource = getLightSourcePtr(lightId);
+        const internal::LightSource* const lightSource = getLightSourcePtr(lightId);
         if (lightSource == nullptr) {
           ammonite::set(geometry, 0.0f);
           return;
@@ -331,7 +331,7 @@ namespace ammonite {
       }
 
       void getColour(AmmoniteId lightId, ammonite::Vec<float, 3>& colour) {
-        const internal::LightSource* lightSource = getLightSourcePtr(lightId);
+        const internal::LightSource* const lightSource = getLightSourcePtr(lightId);
         if (lightSource == nullptr) {
           ammonite::set(colour, 0.0f);
           return;
@@ -341,7 +341,7 @@ namespace ammonite {
       }
 
       float getPower(AmmoniteId lightId) {
-        const internal::LightSource* lightSource = getLightSourcePtr(lightId);
+        const internal::LightSource* const lightSource = getLightSourcePtr(lightId);
         if (lightSource == nullptr) {
           return 0.0f;
         }
@@ -350,7 +350,7 @@ namespace ammonite {
       }
 
       void setGeometry(AmmoniteId lightId, const ammonite::Vec<float, 3>& geometry) {
-        internal::LightSource* lightSource = getLightSourcePtr(lightId);
+        internal::LightSource* const lightSource = getLightSourcePtr(lightId);
         if (lightSource != nullptr) {
           ammonite::copy(geometry, lightSource->geometry);
           lightSourcesChanged = true;
@@ -358,7 +358,7 @@ namespace ammonite {
       }
 
       void setColour(AmmoniteId lightId, const ammonite::Vec<float, 3>& colour) {
-        internal::LightSource* lightSource = getLightSourcePtr(lightId);
+        internal::LightSource* const lightSource = getLightSourcePtr(lightId);
         if (lightSource != nullptr) {
           ammonite::copy(colour, lightSource->diffuse);
           lightSourcesChanged = true;
@@ -366,7 +366,7 @@ namespace ammonite {
       }
 
       void setPower(AmmoniteId lightId, float power) {
-        internal::LightSource* lightSource = getLightSourcePtr(lightId);
+        internal::LightSource* const lightSource = getLightSourcePtr(lightId);
         if (lightSource != nullptr) {
           lightSource->power = power;
           lightSourcesChanged = true;
