@@ -165,8 +165,6 @@ namespace ammonite {
             SubmitData* const submitData = (SubmitData*)rawSubmitData;
 
             //Every queue gets at least baseBatchSize jobs
-            //TODO: Remove this once clang-tidy-21 is released
-            //NOLINTNEXTLINE(clang-analyzer-core.UndefinedBinaryOperatorResult)
             const unsigned int baseBatchSize = submitData->jobCount / queueLaneCount;
 
             //Add the base amount of work to each queue without touching the atomic index
