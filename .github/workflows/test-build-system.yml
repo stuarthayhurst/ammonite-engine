@@ -13,7 +13,8 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-26.04, ubuntu-26.04-arm]
-        compiler: [{package: g++-14, command: g++-14}, {package: clang-19, command: clang++-19}]
+        compiler: [{package: g++-16, command: g++-16}, {package: clang-19, command: clang++-19}]
+        stdlib: [libstdc++-16-dev]
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -27,7 +28,7 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install --no-install-recommends make pkg-config build-essential
-        sudo apt-get install ${{ matrix.compiler.package }} libstdc++-14-dev
+        sudo apt-get install ${{ matrix.compiler.package }} ${{ matrix.stdlib }}
         sudo apt-get install --no-install-recommends libglm-dev libglfw3-dev libepoxy-dev libstb-dev libassimp-dev
 
     - name: Test shared library build target
