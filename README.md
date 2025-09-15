@@ -18,7 +18,7 @@
   - Miscellaneous utilities (thread pool, thread-safe logging, timers, random number generation)
 
 ## Requirements:
-  - A `c++23` compatible compiler (`g++ (14+)` / `clang (18+)`)
+  - A `c++23` compatible compiler (`g++ (16+)` / `clang (18+)`)
     - Toolchain support for thread-local variables
     - All build and runtime dependencies installed
   - A 64-bit Linux system

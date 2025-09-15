@@ -23,13 +23,13 @@ jobs:
         echo "deb http://apt.llvm.org/noble/ llvm-toolchain-noble-19 main" | sudo tee -a /etc/apt/sources.list
         sudo apt-get update
         sudo apt-get install --no-install-recommends make pkg-config build-essential
-        sudo apt-get install g++-14 clang-19
+        sudo apt-get install g++-16 clang-19
         sudo apt-get install --no-install-recommends libglm-dev libglfw3-dev libepoxy-dev libstb-dev libassimp-dev
 
     - name: (g++) (DEBUG + ASan + UBSan) Build tests
       run: |
         make clean
-        CXX="g++-14" DEBUG="true" make tests -j$(nproc)
+        CXX="g++-16" DEBUG="true" make tests -j$(nproc)
 
     - name: (g++) (DEBUG + ASan + UBSan) Run maths tester
       run: |
@@ -42,7 +42,7 @@ jobs:
     - name: (g++) (DEBUG + TSan) Build thread tester
       run: |
         make clean
-        CXX="g++-14" CHECK_THREADS="true" DEBUG="true" make threads -j$(nproc)
+        CXX="g++-16" CHECK_THREADS="true" DEBUG="true" make threads -j$(nproc)
 
     - name: (g++) (DEBUG + TSan) Run thread tester
       run: |

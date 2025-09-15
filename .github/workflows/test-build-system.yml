@@ -23,7 +23,7 @@ jobs:
         echo "deb http://apt.llvm.org/noble/ llvm-toolchain-noble-19 main" | sudo tee -a /etc/apt/sources.list
         sudo apt-get update
         sudo apt-get install --no-install-recommends make pkg-config build-essential
-        sudo apt-get install g++-14 clang-19
+        sudo apt-get install g++-16 clang-19
         sudo apt-get install --no-install-recommends inkscape optipng shellcheck
         sudo apt-get install --no-install-recommends libglm-dev libglfw3-dev libepoxy-dev libstb-dev libassimp-dev
 
@@ -37,15 +37,15 @@ jobs:
 
     - name: (g++) Test shared library build target
       run: |
-        CXX="g++-14" make library -j$(nproc)
+        CXX="g++-16" make library -j$(nproc)
 
     - name: (g++) Test demo build target
       run: |
-        CXX="g++-14" make build -j$(nproc)
+        CXX="g++-16" make build -j$(nproc)
 
     - name: (g++) Test threads and maths build targets
       run: |
-        CXX="g++-14" make threads maths -j$(nproc)
+        CXX="g++-16" make threads maths -j$(nproc)
 
     - name: (g++) Check built objects are present
       run: |
@@ -54,7 +54,7 @@ jobs:
     - name: (g++) (DEBUG + FAST) Test debug build target
       run: |
         make clean
-        CXX="g++-14" FAST="true" make debug -j$(nproc)
+        CXX="g++-16" FAST="true" make debug -j$(nproc)
 
     - name: Clean build area
       run: |
