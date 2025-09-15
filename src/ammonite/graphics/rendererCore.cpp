@@ -533,7 +533,7 @@ namespace ammonite {
         splashShader.useShader();
 
         //Pass drawing parameters, pointer is only valid for this frame
-        splash::internal::SplashScreen* splashScreen =
+        const splash::internal::SplashScreen* splashScreen =
           splash::internal::getSplashScreenPtr(splashScreenId);
         glUniform1f(splashShader.widthId, splashScreen->width);
         glUniform1f(splashShader.heightId, splashScreen->height);

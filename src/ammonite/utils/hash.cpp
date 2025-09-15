@@ -28,7 +28,7 @@ namespace ammonite {
       std::string hashStrings(std::string* filePaths, unsigned int fileCount) {
         __m512i last = _mm512_setzero_epi32();
         for (unsigned int i = 0; i < fileCount; i++) {
-          uint8_t* filePath = (uint8_t*)filePaths[i].c_str();
+          const uint8_t* filePath = (uint8_t*)filePaths[i].c_str();
           unsigned int pathSize = filePaths[i].length();
 
           while (pathSize >= 64) {
@@ -46,7 +46,7 @@ namespace ammonite {
           }
         }
 
-        uint64_t* values = (uint64_t*)&last;
+        const uint64_t* values = (uint64_t*)&last;
         uint64_t result = 0;
         for (int i = 0; i < 8; i++) {
           result += values[i];
