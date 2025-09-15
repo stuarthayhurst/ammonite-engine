@@ -216,6 +216,8 @@ CheckOptions:
     value: true
   - key: cppcoreguidelines-avoid-non-const-global-variables.AllowInternalLinkage
     value: true
+  - key: misc-const-correctness.WarnPointersAsPointers
+    value: false
   - key: misc-include-cleaner.IgnoreHeaders
     value: glm/.*;epoxy/.*;experimental/.*
   - key: readability-operators-representation.BinaryOperators
