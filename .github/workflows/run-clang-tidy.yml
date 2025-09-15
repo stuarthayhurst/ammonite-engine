@@ -20,15 +20,15 @@ jobs:
     - name: Install build dependencies
       run: |
         wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-        echo "deb http://apt.llvm.org/noble/ llvm-toolchain-noble-20 main" | sudo tee -a /etc/apt/sources.list
+        echo "deb http://apt.llvm.org/noble/ llvm-toolchain-noble-21 main" | sudo tee -a /etc/apt/sources.list
         sudo apt-get update
         sudo apt-get install --no-install-recommends make pkg-config build-essential
-        sudo apt-get install clang-tidy-20
+        sudo apt-get install clang-tidy-21
         sudo apt-get install --no-install-recommends libglm-dev libglfw3-dev libepoxy-dev libstb-dev libassimp-dev
 
     - name: Run the global linting target
       run: |
-        TIDY="clang-tidy-20" make lint_all -j$(nproc)
+        TIDY="clang-tidy-21" make lint_all -j$(nproc)
 
     - name: Clean the build area
       run: |
@@ -36,4 +36,4 @@ jobs:
 
     - name: (DEBUG + FAST) Run the global linting target
       run: |
-        TIDY="clang-tidy-20" DEBUG="true" FAST="true" make lint_all -j$(nproc)
+        TIDY="clang-tidy-21" DEBUG="true" FAST="true" make lint_all -j$(nproc)
