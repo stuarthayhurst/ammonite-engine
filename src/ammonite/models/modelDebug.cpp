@@ -15,14 +15,14 @@ namespace ammonite {
 #ifdef AMMONITE_DEBUG
       //Create storage for model names, query the names
       const unsigned int modelNameCount = internal::getModelNameCount();
-      std::string_view* modelNames = new std::string_view[modelNameCount];
+      std::string_view* const modelNames = new std::string_view[modelNameCount];
       internal::getModelNames(modelNames);
 
       for (unsigned int modelNameIndex = 0; modelNameIndex < modelNameCount; modelNameIndex++) {
         //Create storage for ModelInfo pointers, query them
         const std::string_view& modelName = modelNames[modelNameIndex];
         const unsigned int modelInfoCount = internal::getModelInfoCount(modelName);
-        internal::ModelInfo** modelInfoPtrs = new internal::ModelInfo*[modelInfoCount];
+        internal::ModelInfo** const modelInfoPtrs = new internal::ModelInfo*[modelInfoCount];
         internal::getModelInfos(modelName, modelInfoPtrs);
 
         //Debug print the model name
