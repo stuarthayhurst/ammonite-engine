@@ -30,10 +30,15 @@ LINT_OBJECTS_SOURCE = $(ROOT_OBJECTS_SOURCE) $(AMMONITE_OBJECTS_SOURCE) \
 LINT_HEADERS_SOURCE = $(AMMONITE_HEADERS_SOURCE) $(AMMONITE_INCLUDE_HEADERS_SOURCE) \
                      $(HELPER_HEADERS_SOURCE) $(DEMO_HEADERS_SOURCE)
 
-LINT_FILES = $(subst ./src,$(OBJECT_DIR),$(subst .hpp,.hpp.linted,$(LINT_HEADERS_SOURCE)))
-LINT_FILES += $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.cpp.linted,$(LINT_OBJECTS_SOURCE)))
-TEST_LINT_FILES = $(subst ./src,$(OBJECT_DIR),$(subst .hpp,.hpp.linted,$(TEST_HEADERS_SOURCE)))
-TEST_LINT_FILES += $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.cpp.linted,$(TEST_OBJECTS_SOURCE)))
+DEBUG_LINT_STRING = linted
+ifeq ($(DEBUG),true)
+  DEBUG_LINT_STRING = debug.linted
+endif
+
+LINT_FILES = $(subst ./src,$(OBJECT_DIR),$(subst .hpp,.hpp.$(DEBUG_LINT_STRING),$(LINT_HEADERS_SOURCE)))
+LINT_FILES += $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.cpp.$(DEBUG_LINT_STRING),$(LINT_OBJECTS_SOURCE)))
+TEST_LINT_FILES = $(subst ./src,$(OBJECT_DIR),$(subst .hpp,.hpp.$(DEBUG_LINT_STRING),$(TEST_HEADERS_SOURCE)))
+TEST_LINT_FILES += $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.cpp.$(DEBUG_LINT_STRING),$(TEST_OBJECTS_SOURCE)))
 
 OBJECT_DIR = $(BUILD_DIR)/objects
 AMMONITE_OBJECTS = $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.o,$(AMMONITE_OBJECTS_SOURCE)))
@@ -184,11 +189,11 @@ $(OBJECT_DIR)/ammonite/%.o: ./src/ammonite/%.cpp $(AMMONITE_HEADERS_SOURCE) $(AM
 
 $(BUILD_DIR)/compile_commands.json:
 	@DUMMY="true" $(MAKE) $(AMMONITE_OBJECTS) $(HELPER_OBJECTS) $(DEMO_OBJECTS) $(ROOT_OBJECTS) $(TEST_OBJECTS)
-$(OBJECT_DIR)/%.linted: ./src/% .clang-tidy $(LINT_HEADERS_SOURCE)
+$(OBJECT_DIR)/%.$(DEBUG_LINT_STRING): ./src/% .clang-tidy $(LINT_HEADERS_SOURCE)
 	$(TIDY) --quiet -p "$(BUILD_DIR)" "$<"
 	@mkdir -p "$$(dirname $@)"
 	@touch "$@"
-$(OBJECT_DIR)/tests/%.linted: ./src/tests/% .clang-tidy $(TEST_HEADERS_SOURCE) $(AMMONITE_INCLUDE_HEADERS_SOURCE)
+$(OBJECT_DIR)/tests/%.$(DEBUG_LINT_STRING): ./src/tests/% .clang-tidy $(TEST_HEADERS_SOURCE) $(AMMONITE_INCLUDE_HEADERS_SOURCE)
 	$(TIDY) --quiet -p "$(BUILD_DIR)" "$<"
 	@mkdir -p "$$(dirname $@)"
 	@touch "$@"

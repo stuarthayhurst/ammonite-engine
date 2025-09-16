@@ -63,6 +63,7 @@
   - Run `make clean` whenever swapping between regular and debug builds
   - `DEBUG=true make ...` can be used on any target, and only rebuilds changed objects
     - If an initial `make clean` isn't used, the build may fail or produce broken results
+    - `make clean` isn't required for linting targets, but this doesn't mean that regular and debug linting passes can be done in parallel
 
 ## Miscellaneous help:
   - Spellings should use British English for both documentation and code
