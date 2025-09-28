@@ -32,9 +32,9 @@ namespace sponzaDemo {
 
     //Load models from a set of objects and textures
     const std::string models[][4] = {
-      {"assets-experimental/intel-assets/main_sponza/NewSponza_Main_glTF_002.gltf", ""},
-      {"assets-experimental/intel-assets/PKG_A_Curtains/NewSponza_Curtains_glTF.gltf", ""},
-      {"assets-experimental/intel-assets/PKG_B_Ivy/NewSponza_IvyGrowth_glTF.gltf", ""},
+      {"assets-experimental/intel-assets/main_sponza/NewSponza_Main_glTF_003.gltf", ""},
+      {"assets-experimental/intel-assets/pkg_a_curtains/NewSponza_Curtains_glTF.gltf", ""},
+      {"assets-experimental/intel-assets/pkg_b_ivy/NewSponza_IvyGrowth_glTF.gltf", ""},
       {"assets/cube.obj", "assets/flat.png"}
     };
     const unsigned int modelCount = sizeof(models) / sizeof(models[0]);

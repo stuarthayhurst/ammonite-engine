@@ -46,6 +46,10 @@
     - Running the binary directly will only work if `libammonite` is installed to the system
   - `make clean` will clean the build area, to start from fresh
   - Screenshots of some demos can be found at the end of the README
+  - The `sponza` demo requires some Intel assets
+    - Download the Sponza base scene, then extract it to `assets-experimental/intel-assets/main_sponza/`
+    - The Curtains and Ivy packages are also supported
+      - Extract these to `assets-experimental/intel-assets/pkg_a_curtains/` and `assets-experimental/intel-assets/pkg_b_ivy/`
 
 ## Options:
   - Compiled demos have a few arguments supported:
