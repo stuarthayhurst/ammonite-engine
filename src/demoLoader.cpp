@@ -272,16 +272,6 @@ int main(int argc, char** argv) noexcept(false) {
   ammonite::splash::setSplashScreenProgress(screenId, 0.0f);
   ammonite::renderer::drawFrame();
 
-  //Call main demo setup
-  if (postEngineInit != nullptr) {
-    if (!postEngineInit()) {
-      ammonite::utils::error << "Failed to set up demo, exiting" << std::endl;
-      ammonite::splash::deleteSplashScreen(screenId);
-      cleanEngine(setupBits, nullptr);
-      return EXIT_FAILURE;
-    }
-  }
-
   //Camera data store
   CameraData cameraData;
   cameraData.cameraIndex = 0;
@@ -330,6 +320,16 @@ int main(int argc, char** argv) noexcept(false) {
   bool closeWindow = false;
   keybindIds.push_back(ammonite::input::registerToggleKeybind(AMMONITE_ESCAPE,
                        AMMONITE_ALLOW_OVERRIDE, closeWindowCallback, &closeWindow));
+
+  //Call main demo setup
+  if (postEngineInit != nullptr) {
+    if (!postEngineInit()) {
+      ammonite::utils::error << "Failed to set up demo, exiting" << std::endl;
+      ammonite::splash::deleteSplashScreen(screenId);
+      cleanEngine(setupBits, nullptr);
+      return EXIT_FAILURE;
+    }
+  }
 
   //Engine loaded, delete the splash screen
   ammonite::utils::status << "Loaded demo in " << utilityTimer.getTime() << "s\n" << std::endl;
