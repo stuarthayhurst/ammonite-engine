@@ -208,7 +208,7 @@ namespace ammonite {
         }
       }
 
-      //Reset field of view on middle click, (modifier bits are unused)
+      //Reset field of view on middle click
       void zoomResetCallback(AmmoniteButton button, KeyStateEnum action, void*) {
         if (isCameraActive) {
           if (button == AMMONITE_MOUSE_BUTTON_MIDDLE && action == AMMONITE_PRESSED) {
