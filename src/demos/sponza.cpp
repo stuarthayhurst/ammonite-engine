@@ -31,8 +31,10 @@ namespace sponzaDemo {
     const AmmoniteId screenId = ammonite::splash::getActiveSplashScreenId();
 
     //Load models from a set of objects and textures
-    const std::string models[][2] = {
+    const std::string models[][4] = {
       {"assets-experimental/intel-assets/main_sponza/NewSponza_Main_glTF_002.gltf", ""},
+      {"assets-experimental/intel-assets/PKG_A_Curtains/NewSponza_Curtains_glTF.gltf", ""},
+      {"assets-experimental/intel-assets/PKG_B_Ivy/NewSponza_IvyGrowth_glTF.gltf", ""},
       {"assets/cube.obj", "assets/flat.png"}
     };
     const unsigned int modelCount = sizeof(models) / sizeof(models[0]);
