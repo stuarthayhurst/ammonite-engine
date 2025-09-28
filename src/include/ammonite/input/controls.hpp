@@ -15,6 +15,10 @@ namespace ammonite {
       float getMouseSpeed();
       float getZoomSpeed();
       float getFovLimit();
+
+      float getRealMovementSpeed();
+      float getRealMouseSpeed();
+      float getRealZoomSpeed();
     }
 
     void setupFreeCamera(AmmoniteKeycode forwardKey, AmmoniteKeycode backKey,

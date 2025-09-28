@@ -83,6 +83,18 @@ namespace ammonite {
       float getFovLimit() {
         return controlSettings.fovLimit;
       }
+
+      float getRealMovementSpeed() {
+        return controlSettings.movementSpeed;
+      }
+
+      float getRealMouseSpeed() {
+        return controlSettings.mouseSpeed;
+      }
+
+      float getRealZoomSpeed() {
+        return controlSettings.zoomSpeed;
+      }
     }
   }
 }
