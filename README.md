@@ -50,6 +50,26 @@
     - Download the Sponza base scene, then extract it to `assets-experimental/intel-assets/main_sponza/`
     - The Curtains and Ivy packages are also supported
       - Extract these to `assets-experimental/intel-assets/pkg_a_curtains/` and `assets-experimental/intel-assets/pkg_b_ivy/`
+  - All demos support the following keybinds:
+    - `W`, `A`, `S` and `D` for movement
+    - Left control to 'sprint'
+    - Scroll to adjust zoom
+    - Middle-click to reset zoom
+    - `B` to switch camera
+    - `C` to release input
+    - `ESC` to close the demo
+    - `V` to open the command prompt
+    - `F11` to toggle fullscreen
+    - Up or down arrow to adjust the framerate limit
+    - `Z` to toggle focal depth
+    - `[` or `]` to adjust focal depth
+  - The `object-field` demo additionally supports the following keybinds:
+    - `F` to place a new cube at the camera's position
+    - `P` to toggle model placement mode
+      - Left-click to confirm placement
+      - Scroll to adjust distance
+      - Middle-click to reset distance
+    - `R` to shuffle placed objects
 
 ## Options:
   - Compiled demos have a few arguments supported:
