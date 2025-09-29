@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cstddef>
 #include <cmath>
 #include <iostream>
@@ -13,6 +14,7 @@ namespace objectFieldDemo {
     //IDs and pointer data
     AmmoniteId cubeKeybindId;
     AmmoniteId shuffleKeybindId;
+    AmmoniteId placementModeKeybindId;
     std::vector<AmmoniteId> loadedModelIds;
     AmmoniteId floorId;
 
@@ -49,6 +51,11 @@ namespace objectFieldDemo {
     //Model counts
     const unsigned int cubeCount = 30;
     unsigned int modelCount = 0;
+
+    //Model placement mode data
+    bool modelPlacementModeEnabled = false;
+    float modelDistance = 0.0f;
+    AmmoniteId placementModelId = 0;
   }
 
   //Non-orbit internal functions
@@ -112,6 +119,103 @@ namespace objectFieldDemo {
       ammonite::models::position::setPosition(modelId, cubePosition);
 
       ammonite::utils::status << "Spawned object" << std::endl;
+    }
+
+    void resetPlacementDistance() {
+      modelDistance = 3.0f;
+    }
+
+    void mouseButtonCallback(AmmoniteButton button, KeyStateEnum action, void*) {
+      //Disable placement on left-click
+      if (modelPlacementModeEnabled) {
+        if (button == AMMONITE_MOUSE_BUTTON_LEFT) {
+          modelPlacementModeEnabled = false;
+          placementModelId = 0;
+          resetPlacementDistance();
+
+          return;
+        }
+      }
+
+      //Handle zoom reset logic
+      if (ammonite::controls::getCameraActive()) {
+        if (button == AMMONITE_MOUSE_BUTTON_MIDDLE && action == AMMONITE_PRESSED) {
+          if (modelPlacementModeEnabled) {
+            resetPlacementDistance();
+          } else {
+            ammonite::camera::setFieldOfView(ammonite::camera::getActiveCamera(),
+                                             ammonite::pi<float>() / 4.0f);
+          }
+        }
+      }
+    }
+
+    void scrollCallback(double, double yOffset, void*) {
+      if (modelPlacementModeEnabled) {
+        const float zoomSpeed = ammonite::controls::settings::getRealZoomSpeed();
+        const float newModelDistance = modelDistance + ((float)yOffset * zoomSpeed * 4.0f);
+        if (newModelDistance > 1.0f) {
+          modelDistance = newModelDistance;
+        }
+
+        return;
+      }
+
+      //Handle usual zoom logic
+      if (ammonite::controls::getCameraActive()) {
+        const AmmoniteId activeCameraId = ammonite::camera::getActiveCamera();
+        const float fov = ammonite::camera::getFieldOfView(activeCameraId);
+
+        //Only zoom if FoV will be between 1 and FoV limit
+        const float zoomSpeed = ammonite::controls::settings::getRealZoomSpeed();
+        const float fovLimit = ammonite::controls::settings::getFovLimit();
+        const float newFov = fov - ((float)yOffset * zoomSpeed);
+        if (newFov > 0 && newFov <= fovLimit) {
+          ammonite::camera::setFieldOfView(activeCameraId, newFov);
+        }
+      }
+    }
+
+    void placementCallback(const std::vector<AmmoniteKeycode>&, KeyStateEnum, void*) {
+      //Delete the model being placed and return if it's already active
+      if (modelPlacementModeEnabled) {
+        ammonite::models::deleteModel(placementModelId);
+        loadedModelIds.erase(std::ranges::find(loadedModelIds, placementModelId));
+
+        ammonite::utils::status << "Destroyed object" << std::endl;
+        modelPlacementModeEnabled = false;
+        return;
+      }
+
+      //Load a cube and enter placement mode
+      placementModelId = ammonite::models::copyModel(floorId, false);
+      loadedModelIds.push_back(placementModelId);
+      modelPlacementModeEnabled = true;
+      resetPlacementDistance();
+
+      ammonite::utils::status << "Spawned object" << std::endl;
+    }
+
+    void updateModelPosition(AmmoniteId modelId) {
+      //Fetch camera data
+      const AmmoniteId activeCameraId = ammonite::camera::getActiveCamera();
+      ammonite::Vec<float, 3> cameraPosition = {0};
+      ammonite::Vec<float, 3> cameraDirection = {0};
+      ammonite::camera::getPosition(activeCameraId, cameraPosition);
+      ammonite::camera::getDirection(activeCameraId, cameraDirection);
+      const double horiz = ammonite::camera::getHorizontal(activeCameraId);
+      const double vert = ammonite::camera::getVertical(activeCameraId);
+
+      //Calculate position
+      ammonite::Vec<float, 3> modelPosition = {0};
+      ammonite::scale(cameraDirection, modelDistance, modelPosition);
+      ammonite::add(modelPosition, cameraPosition);
+
+      //Place the model
+      const ammonite::Vec<float, 3> modelRotation = {-(float)vert, (float)horiz, 0.0f};
+      ammonite::models::position::setRotation(modelId, modelRotation);
+      ammonite::models::position::setScale(modelId, 0.25f);
+      ammonite::models::position::setPosition(modelId, modelPosition);
     }
   }
 
@@ -204,6 +308,7 @@ namespace objectFieldDemo {
   bool demoExit() {
     ammonite::input::unregisterKeybind(cubeKeybindId);
     ammonite::input::unregisterKeybind(shuffleKeybindId);
+    ammonite::input::unregisterKeybind(placementModeKeybindId);
 
     for (unsigned int i = 0; i < loadedModelIds.size(); i++) {
       ammonite::models::deleteModel(loadedModelIds[i]);
@@ -240,6 +345,7 @@ namespace objectFieldDemo {
     ammonite::utils::status << "Chose " << totalOrbits << " orbits and " << lightCount \
                             << " lights" << std::endl;
 
+    resetPlacementDistance();
     return true;
   }
 
@@ -334,10 +440,16 @@ namespace objectFieldDemo {
       lightData[i].orbitIndex = i % totalOrbits;
     }
 
-    //Set keybinds
+    //Set normal keybinds
     cubeKeybindId = ammonite::input::registerToggleKeybind(AMMONITE_F, spawnCubeCallback, nullptr);
     shuffleKeybindId = ammonite::input::registerToggleKeybind(AMMONITE_R, genCubesCallback,
                                                               nullptr);
+
+    //Setup callbacks and keybinds for model placement mode
+    ammonite::input::setMouseButtonCallback(mouseButtonCallback, nullptr);
+    ammonite::input::setScrollWheelCallback(scrollCallback, nullptr);
+    placementModeKeybindId = ammonite::input::registerToggleKeybind(AMMONITE_P,
+      placementCallback, nullptr);
 
     //Set the camera position
     const AmmoniteId cameraId = ammonite::camera::getActiveCamera();
@@ -348,6 +460,12 @@ namespace objectFieldDemo {
   }
 
   bool rendererMainloop() {
+    //Handle object placement mode
+    if (modelPlacementModeEnabled) {
+      updateModelPosition(placementModelId);
+    }
+
+    //Handle orbits
     for (unsigned int i = 0; i < lightCount; i++) {
       ammonite::Vec<float, 2> lightOrbitPosition = {0};
       calculateOrbitPosition(totalOrbits, lightData[i].orbitIndex,
