@@ -12,7 +12,7 @@
 
 ## Features:
   - Model loading, using `libassimp`
-  - Shader program caching
+  - Shader program caching with a custom hash
   - Key binding and mouse input support
   - Command prompt for engine control
   - Miscellaneous utilities (thread pool, thread-safe logging, timers, random number generation)
