@@ -154,9 +154,7 @@ namespace objectFieldDemo {
       if (modelPlacementModeEnabled) {
         const float zoomSpeed = ammonite::controls::settings::getRealZoomSpeed();
         const float newModelDistance = modelDistance + ((float)yOffset * zoomSpeed * 4.0f);
-        if (newModelDistance > 1.0f) {
-          modelDistance = newModelDistance;
-        }
+        modelDistance = std::max(newModelDistance, 1.0f);
 
         return;
       }
@@ -166,13 +164,11 @@ namespace objectFieldDemo {
         const AmmoniteId activeCameraId = ammonite::camera::getActiveCamera();
         const float fov = ammonite::camera::getFieldOfView(activeCameraId);
 
-        //Only zoom if FoV will be between 1 and FoV limit
+        //Only zoom if FoV will be between 0.1 and FoV limit
         const float zoomSpeed = ammonite::controls::settings::getRealZoomSpeed();
-        const float fovLimit = ammonite::controls::settings::getFovLimit();
         const float newFov = fov - ((float)yOffset * zoomSpeed);
-        if (newFov > 0 && newFov <= fovLimit) {
-          ammonite::camera::setFieldOfView(activeCameraId, newFov);
-        }
+        ammonite::camera::setFieldOfView(activeCameraId,
+          std::clamp(newFov, 0.1f, ammonite::controls::settings::getFovLimit()));
       }
     }
 

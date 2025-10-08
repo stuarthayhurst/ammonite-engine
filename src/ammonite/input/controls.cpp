@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cmath>
 #include <vector>
 
@@ -212,11 +213,10 @@ namespace ammonite {
           const AmmoniteId activeCameraId = ammonite::camera::getActiveCamera();
           const float fov = ammonite::camera::getFieldOfView(activeCameraId);
 
-          //Only zoom if FoV will be between 1 and FoV limit
+          //Only zoom if FoV will be between 0.1 and FoV limit
           const float newFov = fov - ((float)yOffset * controlSettings.zoomSpeed);
-          if (newFov > 0 && newFov <= controlSettings.fovLimit) {
-            ammonite::camera::setFieldOfView(activeCameraId, newFov);
-          }
+          ammonite::camera::setFieldOfView(activeCameraId,
+            std::clamp(newFov, 0.1f, controlSettings.fovLimit));
         }
       }
 
@@ -240,17 +240,11 @@ namespace ammonite {
           //Calculate new horizontal angle
           horizontalAngle -= controlSettings.mouseSpeed * xOffset;
 
-          //Only accept vertical angle if it won't create an impossible movement
-          double newVerticalAngle = verticalAngle - (controlSettings.mouseSpeed * yOffset);
+          //Update the camera, restricting vertical movement
+          const double newVerticalAngle = verticalAngle - (controlSettings.mouseSpeed * yOffset);
           const double limit = ammonite::radians(90.0);
-          if (newVerticalAngle > limit) { //Vertical max
-            newVerticalAngle = limit;
-          } else if (newVerticalAngle < -limit) { //Vertical min
-            newVerticalAngle = -limit;
-          }
-
-          //Update the camera
-          ammonite::camera::setAngle(activeCameraId, horizontalAngle, newVerticalAngle);
+          ammonite::camera::setAngle(activeCameraId, horizontalAngle,
+                                     std::clamp(newVerticalAngle, -limit, limit));
         }
       }
     }
