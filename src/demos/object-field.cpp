@@ -239,8 +239,10 @@ namespace objectFieldDemo {
       const float opp = ammonite::pi<float>() - (2 * indexOffsetAngle);
       const float nucleusDistance = radius * 2 * std::sin(indexOffsetAngle) / std::sin(opp);
 
-      ammonite::set(dest, std::sin(nucleusAngle), std::cos(nucleusAngle));
-      ammonite::scale(dest, nucleusDistance);
+      const ammonite::Vec<float, 2> nucleusDirection = {
+        std::sin(nucleusAngle), std::cos(nucleusAngle)
+      };
+      ammonite::scale(nucleusDirection, nucleusDistance, dest);
     }
 
     /*
