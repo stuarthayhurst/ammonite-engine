@@ -573,8 +573,7 @@ namespace ammonite {
         }
 
         //Translate the matrix
-        ammonite::translate(modelInfo->positionData.translationMatrix, translation,
-                            modelInfo->positionData.translationMatrix);
+        ammonite::translate(modelInfo->positionData.translationMatrix, translation);
 
         if (modelInfo->lightEmitterId != 0) {
           ammonite::lighting::internal::setLightSourcesChanged();
@@ -592,8 +591,7 @@ namespace ammonite {
         }
 
         //Scale the matrix
-        ammonite::scale(modelInfo->positionData.scaleMatrix, scale,
-                        modelInfo->positionData.scaleMatrix);
+        ammonite::scale(modelInfo->positionData.scaleMatrix, scale);
 
         if (modelInfo->lightEmitterId != 0) {
           ammonite::lighting::internal::setLightSourcesChanged();
