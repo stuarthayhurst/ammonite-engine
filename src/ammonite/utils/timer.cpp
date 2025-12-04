@@ -29,7 +29,7 @@ namespace ammonite {
     }
 
     //Creates a new, running timer
-    Timer::Timer(): timerRunning(true)  {
+    Timer::Timer() {
       std::timespec_get(&startTime, TIME_UTC);
     }
 

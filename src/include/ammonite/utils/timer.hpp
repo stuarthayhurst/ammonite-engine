@@ -7,7 +7,7 @@ namespace ammonite {
   namespace utils {
     class Timer {
     private:
-      bool timerRunning;
+      bool timerRunning = true;
       std::timespec startTime;
       std::timespec stopTime;
 
