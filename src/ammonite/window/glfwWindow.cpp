@@ -112,7 +112,7 @@ namespace ammonite {
 
         GLFWmonitor* getClosestMonitor(GLFWwindow* windowPtr) {
           int monitorCount = 0;
-          GLFWmonitor** const monitors = glfwGetMonitors(&monitorCount);
+          GLFWmonitor* const* const monitors = glfwGetMonitors(&monitorCount);
 
           //Get window position and size
           int wx = 0, wy = 0, ww = 0, wh = 0;
@@ -144,7 +144,7 @@ namespace ammonite {
 
         unsigned int getMonitorIndex(GLFWmonitor* monitorPtr) {
           int glfwMonitorCount = 0;
-          GLFWmonitor** const monitorPtrs = glfwGetMonitors(&glfwMonitorCount);
+          GLFWmonitor* const* const monitorPtrs = glfwGetMonitors(&glfwMonitorCount);
 
           //Search provided monitor pointers for the target monitor
           for (int i = 0; i < glfwMonitorCount; i++) {
@@ -160,7 +160,7 @@ namespace ammonite {
 
         GLFWmonitor* getMonitorPtr(unsigned int monitorIndex) {
           int glfwMonitorCount = 0;
-          GLFWmonitor** const monitorPtrs = glfwGetMonitors(&glfwMonitorCount);
+          GLFWmonitor* const* const monitorPtrs = glfwGetMonitors(&glfwMonitorCount);
 
           if (std::cmp_greater_equal(monitorIndex, glfwMonitorCount)) {
             ammonite::utils::warning << "Unknown monitor index '" << monitorIndex << \
