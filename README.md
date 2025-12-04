@@ -135,6 +135,6 @@
    - [OpenGL Tutorial](https://www.opengl-tutorial.org/)
    - [Learn OpenGL](https://learnopengl.com/Introduction)
 
-## License
+## Licence:
   - This project is available under the terms of the MIT License
     - These terms can be found in `LICENCE.txt`
