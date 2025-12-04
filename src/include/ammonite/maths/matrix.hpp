@@ -220,7 +220,7 @@ namespace ammonite {
               requires validMatrix<T, cols, rows>
     void add(const Mat<T, cols, rows>& a, T b, Mat<T, cols, rows>& dest) {
       std::experimental::fixed_size_simd<T, cols * rows> aSimd(&a[0][0], std::experimental::element_aligned);
-      std::experimental::fixed_size_simd<T, cols * rows> bSimd = b;
+      const std::experimental::fixed_size_simd<T, cols * rows> bSimd = b;
 
       aSimd += bSimd;
       aSimd.copy_to(&dest[0][0], std::experimental::element_aligned);
@@ -241,7 +241,7 @@ namespace ammonite {
               requires validMatrix<T, cols, rows>
     void sub(const Mat<T, cols, rows>& a, const Mat<T, cols, rows>& b, Mat<T, cols, rows>& dest) {
       std::experimental::fixed_size_simd<T, cols * rows> aSimd(&a[0][0], std::experimental::element_aligned);
-      std::experimental::fixed_size_simd<T, cols * rows> bSimd(&b[0][0], std::experimental::element_aligned);
+      const std::experimental::fixed_size_simd<T, cols * rows> bSimd(&b[0][0], std::experimental::element_aligned);
 
       aSimd -= bSimd;
       aSimd.copy_to(&dest[0][0], std::experimental::element_aligned);
@@ -262,7 +262,7 @@ namespace ammonite {
               requires validMatrix<T, cols, rows>
     void sub(const Mat<T, cols, rows>& a, T b, Mat<T, cols, rows>& dest) {
       std::experimental::fixed_size_simd<T, cols * rows> aSimd(&a[0][0], std::experimental::element_aligned);
-      std::experimental::fixed_size_simd<T, cols * rows> bSimd = b;
+      const std::experimental::fixed_size_simd<T, cols * rows> bSimd = b;
 
       aSimd -= bSimd;
       aSimd.copy_to(&dest[0][0], std::experimental::element_aligned);
@@ -369,7 +369,7 @@ namespace ammonite {
               requires validMatrix<T, cols, rows>
     void multiply(const Mat<T, cols, rows>& a, T b, Mat<T, cols, rows>& dest) {
       std::experimental::fixed_size_simd<T, cols * rows> aSimd(&a[0][0], std::experimental::element_aligned);
-      std::experimental::fixed_size_simd<T, cols * rows> bSimd = b;
+      const std::experimental::fixed_size_simd<T, cols * rows> bSimd = b;
 
       aSimd *= bSimd;
       aSimd.copy_to(&dest[0][0], std::experimental::element_aligned);
