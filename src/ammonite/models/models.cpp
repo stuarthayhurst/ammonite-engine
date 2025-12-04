@@ -320,7 +320,7 @@ namespace ammonite {
     void deleteModel(AmmoniteId modelId) {
       //Check the model actually exists
       if (modelIdPtrMap.contains(modelId)) {
-        internal::ModelInfo* const modelInfo = modelIdPtrMap[modelId];
+        const internal::ModelInfo* const modelInfo = modelIdPtrMap[modelId];
 
         //Release textures
         for (const internal::TextureIdGroup& textureGroup : modelInfo->textureIds) {
