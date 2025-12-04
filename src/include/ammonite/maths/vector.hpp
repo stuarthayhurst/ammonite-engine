@@ -81,7 +81,9 @@ namespace ammonite {
 
         return true;
       } else {
-        return (std::memcmp(&a[0], &b[0], sizeof(a)) == 0);
+        const std::experimental::fixed_size_simd<T, size> aSimd(&a[0], std::experimental::element_aligned);
+        const std::experimental::fixed_size_simd<T, size> bSimd(&b[0], std::experimental::element_aligned);
+        return (std::experimental::all_of(aSimd == bSimd));
       }
       //NOLINTEND(readability-else-after-return)
     }
