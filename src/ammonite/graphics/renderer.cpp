@@ -62,7 +62,8 @@ namespace ammonite {
           ammonite::window::internal::setContextType(contextType);
           return;
         default:
-          ammonite::utils::warning << "Unknown context type '" << contextType << "' requested" << std::endl;
+          ammonite::utils::warning << "Unknown context type '" << (unsigned int)contextType \
+                                   << "' requested" << std::endl;
           return;
         }
       }
