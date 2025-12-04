@@ -130,7 +130,7 @@ namespace ammonite {
     template <typename T, unsigned int size> requires validVector<T, size>
     void add(const Vec<T, size>& a, const Vec<T, size>& b, Vec<T, size>& dest) {
       std::experimental::fixed_size_simd<T, size> aSimd(&a[0], std::experimental::element_aligned);
-      std::experimental::fixed_size_simd<T, size> bSimd(&b[0], std::experimental::element_aligned);
+      const std::experimental::fixed_size_simd<T, size> bSimd(&b[0], std::experimental::element_aligned);
 
       aSimd += bSimd;
       aSimd.copy_to(&dest[0], std::experimental::element_aligned);
@@ -149,7 +149,7 @@ namespace ammonite {
     template <typename T, unsigned int size> requires validVector<T, size>
     void add(const Vec<T, size>& a, T b, Vec<T, size>& dest) {
       std::experimental::fixed_size_simd<T, size> aSimd(&a[0], std::experimental::element_aligned);
-      std::experimental::fixed_size_simd<T, size> bSimd = b;
+      const std::experimental::fixed_size_simd<T, size> bSimd = b;
 
       aSimd += bSimd;
       aSimd.copy_to(&dest[0], std::experimental::element_aligned);
@@ -168,7 +168,7 @@ namespace ammonite {
     template <typename T, unsigned int size> requires validVector<T, size>
     void sub(const Vec<T, size>& a, const Vec<T, size>& b, Vec<T, size>& dest) {
       std::experimental::fixed_size_simd<T, size> aSimd(&a[0], std::experimental::element_aligned);
-      std::experimental::fixed_size_simd<T, size> bSimd(&b[0], std::experimental::element_aligned);
+      const std::experimental::fixed_size_simd<T, size> bSimd(&b[0], std::experimental::element_aligned);
 
       aSimd -= bSimd;
       aSimd.copy_to(&dest[0], std::experimental::element_aligned);
@@ -187,7 +187,7 @@ namespace ammonite {
     template <typename T, unsigned int size> requires validVector<T, size>
     void sub(const Vec<T, size>& a, T b, Vec<T, size>& dest) {
       std::experimental::fixed_size_simd<T, size> aSimd(&a[0], std::experimental::element_aligned);
-      std::experimental::fixed_size_simd<T, size> bSimd = b;
+      const std::experimental::fixed_size_simd<T, size> bSimd = b;
 
       aSimd -= bSimd;
       aSimd.copy_to(&dest[0], std::experimental::element_aligned);
@@ -209,7 +209,7 @@ namespace ammonite {
     template <typename T, unsigned int size> requires validVector<T, size>
     void scale(const Vec<T, size>& a, T b, Vec<T, size>& dest) {
       std::experimental::fixed_size_simd<T, size> aSimd(&a[0], std::experimental::element_aligned);
-      std::experimental::fixed_size_simd<T, size> bSimd = b;
+      const std::experimental::fixed_size_simd<T, size> bSimd = b;
 
       aSimd *= bSimd;
       aSimd.copy_to(&dest[0], std::experimental::element_aligned);
@@ -231,7 +231,7 @@ namespace ammonite {
     template <typename T, unsigned int size> requires validVector<T, size>
     void divide(const Vec<T, size>& a, T b, Vec<T, size>& dest) {
       std::experimental::fixed_size_simd<T, size> aSimd(&a[0], std::experimental::element_aligned);
-      std::experimental::fixed_size_simd<T, size> bSimd = b;
+      const std::experimental::fixed_size_simd<T, size> bSimd = b;
 
       aSimd /= bSimd;
       aSimd.copy_to(&dest[0], std::experimental::element_aligned);
@@ -274,7 +274,7 @@ namespace ammonite {
     */
     template <typename T, unsigned int size> requires validVector<T, size>
     T length(const Vec<T, size>& a) {
-      std::experimental::fixed_size_simd<T, size> aSimd(&a[0], std::experimental::element_aligned);
+      const std::experimental::fixed_size_simd<T, size> aSimd(&a[0], std::experimental::element_aligned);
 
       return (T)std::sqrt(std::experimental::reduce(aSimd * aSimd, std::plus{}));
     }
@@ -307,8 +307,8 @@ namespace ammonite {
     //Calculate the dot product a vector
     template <typename T, unsigned int size> requires validVector<T, size>
     T dot(const Vec<T, size>& a, const Vec<T, size>& b) {
-      std::experimental::fixed_size_simd<T, size> aSimd(&a[0], std::experimental::element_aligned);
-      std::experimental::fixed_size_simd<T, size> bSimd(&b[0], std::experimental::element_aligned);
+      const std::experimental::fixed_size_simd<T, size> aSimd(&a[0], std::experimental::element_aligned);
+      const std::experimental::fixed_size_simd<T, size> bSimd(&b[0], std::experimental::element_aligned);
 
       return std::experimental::reduce(aSimd * bSimd, std::plus{});
     }
@@ -333,10 +333,10 @@ namespace ammonite {
     */
     template <typename T, unsigned int size> requires validVector<T, size>
     T distance(const Vec<T, size>& a, const Vec<T, size>& b) {
-      std::experimental::fixed_size_simd<T, size> aSimd(&a[0], std::experimental::element_aligned);
-      std::experimental::fixed_size_simd<T, size> bSimd(&b[0], std::experimental::element_aligned);
+      const std::experimental::fixed_size_simd<T, size> aSimd(&a[0], std::experimental::element_aligned);
+      const std::experimental::fixed_size_simd<T, size> bSimd(&b[0], std::experimental::element_aligned);
 
-      std::experimental::fixed_size_simd<T, size> cSimd = bSimd - aSimd;
+      const std::experimental::fixed_size_simd<T, size> cSimd = bSimd - aSimd;
 
       return (T)std::sqrt(std::experimental::reduce(cSimd * cSimd, std::plus{}));
     }
