@@ -746,7 +746,7 @@ namespace {
       };
       //NOLINTEND(cppcoreguidelines-avoid-const-or-ref-data-members)
 
-      TestData tests[11] = {
+      const TestData tests[11] = {
         //Convert between axes
         {y, x, z, -ammonite::pi<T>() / 2},
         {z, y, x, -ammonite::pi<T>() / 2},
@@ -969,7 +969,7 @@ namespace {
       };
       //NOLINTEND(cppcoreguidelines-avoid-const-or-ref-data-members)
 
-      TestData tests[2] = {
+      const TestData tests[2] = {
         {cameraWideVec, originWideVec},
         {cameraTargetPosWideVec, negZVec}
       };
