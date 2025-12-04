@@ -72,8 +72,8 @@ namespace ammonite {
     //Initialise the quaternion dest with Euler angles x, y and z
     template <typename T> requires validQuaternion<T>
     void fromEuler(Quat<T>& dest, T x, T y, T z) {
-      glm::vec<3, T, glm::defaultp> angles(x, y, z);
-      glm::qua<T> glmQuat(angles);
+      const glm::vec<3, T, glm::defaultp> angles(x, y, z);
+      const glm::qua<T> glmQuat(angles);
       dest[0][0] = glmQuat.x;
       dest[0][1] = glmQuat.y;
       dest[0][2] = glmQuat.z;
@@ -90,8 +90,8 @@ namespace ammonite {
     //Convert the quaternion src to Euler angles x, y and z, storing them in the vector dest
     template <typename T> requires validQuaternion<T>
     void toEuler(const Quat<T>& src, Vec<T, 3>& dest) {
-      glm::qua<T> glmQuat(src[0][3], src[0][0], src[0][1], src[0][2]);
-      glm::vec<3, T, glm::defaultp> glmAngles = glm::eulerAngles(glmQuat);
+      const glm::qua<T> glmQuat(src[0][3], src[0][0], src[0][1], src[0][2]);
+      const glm::vec<3, T, glm::defaultp> glmAngles = glm::eulerAngles(glmQuat);
       dest[0] = glmAngles.x;
       dest[1] = glmAngles.y;
       dest[2] = glmAngles.z;
@@ -127,8 +127,8 @@ namespace ammonite {
     //Calculate the dot product of a quaternion
     template <typename T> requires validQuaternion<T>
     T dot(const Quat<T>& a, const Quat<T>& b) {
-      std::experimental::fixed_size_simd<T, 4> aSimd(&a[0][0], std::experimental::element_aligned);
-      std::experimental::fixed_size_simd<T, 4> bSimd(&b[0][0], std::experimental::element_aligned);
+      const std::experimental::fixed_size_simd<T, 4> aSimd(&a[0][0], std::experimental::element_aligned);
+      const std::experimental::fixed_size_simd<T, 4> bSimd(&b[0][0], std::experimental::element_aligned);
 
       return std::experimental::reduce(aSimd * bSimd, std::plus{});
     }
@@ -152,7 +152,7 @@ namespace ammonite {
     //Calculate the length of a quaternion
     template <typename T> requires validQuaternion<T>
     T length(const Quat<T>& a) {
-      std::experimental::fixed_size_simd<T, 4> aSimd(&a[0][0], std::experimental::element_aligned);
+      const std::experimental::fixed_size_simd<T, 4> aSimd(&a[0][0], std::experimental::element_aligned);
 
       return (T)std::sqrt(std::experimental::reduce(aSimd * aSimd, std::plus{}));
     }
@@ -179,7 +179,7 @@ namespace ammonite {
     void inverse(const Quat<T>& a, Quat<T>& dest) {
       std::experimental::fixed_size_simd<T, 4> aSimd(&a[0][0], std::experimental::element_aligned);
       const T negData[4] = {(T)-1, (T)-1, (T)-1, (T)1};
-      std::experimental::fixed_size_simd<T, 4> negSimd(&negData[0], std::experimental::element_aligned);
+      const std::experimental::fixed_size_simd<T, 4> negSimd(&negData[0], std::experimental::element_aligned);
 
       T sum = std::experimental::reduce(aSimd * aSimd, std::plus{});
       aSimd /= (T)std::sqrt(sum);
@@ -198,10 +198,10 @@ namespace ammonite {
     //Multiply quaternion a by quaternion b, storing the result in dest
     template <typename T> requires validQuaternion<T>
     void multiply(const Quat<T>& a, const Quat<T>& b, Quat<T>& dest) {
-      glm::qua<T> glmQuatA(a[0][3], a[0][0], a[0][1], a[0][2]);
-      glm::qua<T> glmQuatB(b[0][3], b[0][0], b[0][1], b[0][2]);
+      const glm::qua<T> glmQuatA(a[0][3], a[0][0], a[0][1], a[0][2]);
+      const glm::qua<T> glmQuatB(b[0][3], b[0][0], b[0][1], b[0][2]);
 
-      glm::qua<T> glmResult = glmQuatA * glmQuatB;
+      const glm::qua<T> glmResult = glmQuatA * glmQuatB;
 
       dest[0][0] = glmResult.x;
       dest[0][1] = glmResult.y;
@@ -220,7 +220,7 @@ namespace ammonite {
     template <typename T, unsigned int size>
               requires validQuaternion<T> && validVector<T, size> && (size >= 3)
     void multiply(const Quat<T>& a, const Vec<T, size>& b, Vec<T, size>& dest) {
-      glm::qua<T> glmQuat(a[0][3], a[0][0], a[0][1], a[0][2]);
+      const glm::qua<T> glmQuat(a[0][3], a[0][0], a[0][1], a[0][2]);
       glm::vec<size, T, glm::defaultp> glmVec;
 
       std::memcpy(glm::value_ptr(glmVec), &b[0], sizeof(Vec<T, size>));
@@ -241,7 +241,7 @@ namespace ammonite {
     template <typename T, unsigned int size>
               requires validQuaternion<T> && validMatrix<T, size, size> && (size >= 3)
     void toMatrix(const Quat<T>& a, Mat<T, size>& dest) {
-      glm::qua<T> glmQuat(a[0][3], a[0][0], a[0][1], a[0][2]);
+      const glm::qua<T> glmQuat(a[0][3], a[0][0], a[0][1], a[0][2]);
       glm::mat<size, size, T, glm::defaultp> destMat;
 
       if constexpr (size == 3) {
