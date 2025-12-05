@@ -3,8 +3,8 @@
 
 #include <string>
 
-#include "exposed.hpp"
 #include "utils/id.hpp"
+#include "visibility.hpp"
 
 static constexpr bool ASSUME_FLIP_SKYBOX_FACES = false;
 

@@ -1,9 +1,9 @@
 #ifndef AMMONITESPLASH
 #define AMMONITESPLASH
 
-#include "exposed.hpp"
 #include "maths/vectorTypes.hpp"
 #include "utils/id.hpp"
+#include "visibility.hpp"
 
 namespace AMMONITE_EXPOSED ammonite {
   namespace splash {

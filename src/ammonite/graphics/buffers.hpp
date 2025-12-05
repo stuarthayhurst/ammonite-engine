@@ -3,8 +3,8 @@
 
 #include <vector>
 
-#include "../internal.hpp"
 #include "../models/models.hpp"
+#include "../visibility.hpp"
 
 namespace ammonite {
   namespace graphics {

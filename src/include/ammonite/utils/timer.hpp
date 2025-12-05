@@ -3,7 +3,7 @@
 
 #include <ctime>
 
-#include "../exposed.hpp"
+#include "../visibility.hpp"
 
 namespace AMMONITE_EXPOSED ammonite {
   namespace utils {

@@ -3,7 +3,7 @@
 
 #include <unordered_map>
 
-#include "../internal.hpp"
+#include "../visibility.hpp"
 
 //Include public interface
 #include "../../include/ammonite/utils/id.hpp" // IWYU pragma: export

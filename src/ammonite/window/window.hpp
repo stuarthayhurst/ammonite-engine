@@ -8,7 +8,7 @@ extern "C" {
 }
 
 #include "../enums.hpp"
-#include "../internal.hpp"
+#include "../visibility.hpp"
 
 //Include public interface
 #include "../../include/ammonite/window/window.hpp" // IWYU pragma: export

@@ -4,7 +4,7 @@
 #include <climits>
 #include <semaphore>
 
-#include "../exposed.hpp"
+#include "../visibility.hpp"
 
 //Functions of this type must not block conditionally on other jobs
 using AmmoniteWork = void (*)(void* userPtr);

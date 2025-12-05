@@ -9,8 +9,8 @@ extern "C" {
 
 #include "keycodes.hpp"
 
-#include "../internal.hpp"
 #include "../utils/id.hpp"
+#include "../visibility.hpp"
 
 //Include public interface
 #include "../../include/ammonite/input/input.hpp" // IWYU pragma: export

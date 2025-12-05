@@ -3,9 +3,9 @@
 
 #include <string>
 
-#include "../exposed.hpp"
 #include "../maths/vectorTypes.hpp"
 #include "../utils/id.hpp"
+#include "../visibility.hpp"
 
 static constexpr bool ASSUME_FLIP_MODEL_UVS = true;
 

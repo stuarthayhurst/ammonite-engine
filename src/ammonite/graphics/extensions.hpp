@@ -1,7 +1,7 @@
 #ifndef INTERNALEXTENSIONS
 #define INTERNALEXTENSIONS
 
-#include "../internal.hpp"
+#include "../visibility.hpp"
 
 namespace ammonite {
   namespace graphics {

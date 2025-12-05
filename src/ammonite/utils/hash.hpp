@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include "../internal.hpp"
+#include "../visibility.hpp"
 
 namespace ammonite {
   namespace utils {

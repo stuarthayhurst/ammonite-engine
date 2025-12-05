@@ -5,8 +5,8 @@
 
 #include "keycodes.hpp"
 
-#include "../exposed.hpp"
 #include "../utils/id.hpp"
+#include "../visibility.hpp"
 
 enum AmmoniteReleaseEnum : unsigned char {
   AMMONITE_ALLOW_OVERRIDE,

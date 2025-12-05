@@ -1,7 +1,7 @@
 #ifndef INTERNALTHREAD
 #define INTERNALTHREAD
 
-#include "../internal.hpp"
+#include "../visibility.hpp"
 
 //Include public interface
 #include "../../include/ammonite/utils/thread.hpp" // IWYU pragma: export

@@ -1,9 +1,9 @@
 #ifndef INTERNALSPLASH
 #define INTERNALSPLASH
 
-#include "internal.hpp"
 #include "maths/vector.hpp"
 #include "utils/id.hpp"
+#include "visibility.hpp"
 
 //Include public interface
 #include "../include/ammonite/splash.hpp" // IWYU pragma: export

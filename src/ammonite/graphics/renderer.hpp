@@ -7,8 +7,8 @@ extern "C" {
   #include <epoxy/gl.h>
 }
 
-#include "../internal.hpp"
 #include "../utils/id.hpp"
+#include "../visibility.hpp"
 
 //Include public interface
 #include "../../include/ammonite/graphics/renderer.hpp" // IWYU pragma: export

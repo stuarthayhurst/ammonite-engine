@@ -1,9 +1,8 @@
 #ifndef INTERNALCAMERA
 #define INTERNALCAMERA
 
-#include "internal.hpp"
-
 #include "maths/matrix.hpp"
+#include "visibility.hpp"
 
 //Include public interface
 #include "../include/ammonite/camera.hpp" // IWYU pragma: export

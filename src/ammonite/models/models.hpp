@@ -10,11 +10,11 @@ extern "C" {
   #include <epoxy/gl.h>
 }
 
-#include "../internal.hpp"
 #include "../maths/matrix.hpp"
 #include "../maths/quaternion.hpp"
 #include "../maths/vector.hpp"
 #include "../utils/id.hpp"
+#include "../visibility.hpp"
 
 //Include public interface
 #include "../../include/ammonite/models/models.hpp" // IWYU pragma: export

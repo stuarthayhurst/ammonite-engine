@@ -7,7 +7,7 @@ extern "C" {
   #include <epoxy/gl.h>
 }
 
-#include "../internal.hpp"
+#include "../visibility.hpp"
 
 namespace ammonite {
   namespace renderer {

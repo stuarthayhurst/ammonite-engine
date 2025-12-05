@@ -5,7 +5,7 @@
 #include <ctime>
 #include <string>
 
-#include "../exposed.hpp"
+#include "../visibility.hpp"
 
 //Cache return values / states
 enum AmmoniteCacheEnum : unsigned char {

@@ -3,7 +3,7 @@
 
 #include "keycodes.hpp"
 
-#include "../exposed.hpp"
+#include "../visibility.hpp"
 
 namespace AMMONITE_EXPOSED ammonite {
   namespace controls {
