@@ -10,6 +10,11 @@ on:
 jobs:
   build:
     runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler: [{package: g++-14, command: g++-14}, {package: clang-19, command: clang++-19}]
+
     steps:
     - uses: actions/checkout@v6
     - name: Set up Python 3.14
@@ -23,7 +28,7 @@ jobs:
         echo "deb http://apt.llvm.org/noble/ llvm-toolchain-noble-19 main" | sudo tee -a /etc/apt/sources.list
         sudo apt-get update
         sudo apt-get install --no-install-recommends make pkg-config build-essential
-        sudo apt-get install g++-14 clang-19
+        sudo apt-get install ${{ matrix.compiler.package }}
         sudo apt-get install --no-install-recommends inkscape optipng shellcheck
         sudo apt-get install --no-install-recommends libglm-dev libglfw3-dev libepoxy-dev libstb-dev libassimp-dev
 
@@ -35,51 +40,26 @@ jobs:
       run: |
         shellcheck launch.sh
 
-    - name: (g++) Test shared library build target
+    - name: Test shared library build target
       run: |
-        CXX="g++-14" make library -j$(nproc)
+        CXX="${{ matrix.compiler.command }}" make library -j$(nproc)
 
-    - name: (g++) Test demo build target
+    - name: Test demo build target
       run: |
-        CXX="g++-14" make build -j$(nproc)
+        CXX="${{ matrix.compiler.command }}" make build -j$(nproc)
 
-    - name: (g++) Test threads and maths build targets
+    - name: Test threads and maths build targets
       run: |
-        CXX="g++-14" make threads maths -j$(nproc)
+        CXX="${{ matrix.compiler.command }}" make threads maths -j$(nproc)
 
-    - name: (g++) Check built objects are present
+    - name: Check built objects are present
       run: |
         ls build/demo build/mathsTest build/libammonite.so
 
-    - name: (g++) (DEBUG + FAST) Test debug build target
+    - name: (DEBUG + FAST) Test debug build target
       run: |
         make clean
-        CXX="g++-14" FAST="true" make debug -j$(nproc)
-
-    - name: Clean build area
-      run: |
-        make clean
-
-    - name: (clang++) Test shared library build target
-      run: |
-        CXX="clang++-19" make library -j$(nproc)
-
-    - name: (clang++) Test demo build target
-      run: |
-        CXX="clang++-19" make build -j$(nproc)
-
-    - name: (g++) Test threads and maths build targets
-      run: |
-        CXX="clang++-19" make threads maths -j$(nproc)
-
-    - name: (clang++) Check built objects are present
-      run: |
-        ls build/demo build/threadTest build/mathsTest build/libammonite.so
-
-    - name: (clang++) (DEBUG + FAST) Test debug demo build target
-      run: |
-        make clean
-        CXX="clang++-19" FAST="true" make debug -j$(nproc)
+        CXX="${{ matrix.compiler.command }}" FAST="true" make debug -j$(nproc)
 
     - name: Test library install target
       run: |

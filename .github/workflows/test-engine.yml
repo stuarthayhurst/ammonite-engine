@@ -10,6 +10,11 @@ on:
 jobs:
   test:
     runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler: [{package: g++-14, command: g++-14}, {package: clang-19, command: clang++-19}]
+
     steps:
     - uses: actions/checkout@v6
     - name: Set up Python 3.14
@@ -23,50 +28,27 @@ jobs:
         echo "deb http://apt.llvm.org/noble/ llvm-toolchain-noble-19 main" | sudo tee -a /etc/apt/sources.list
         sudo apt-get update
         sudo apt-get install --no-install-recommends make pkg-config build-essential
-        sudo apt-get install g++-14 clang-19
+        sudo apt-get install ${{ matrix.compiler.package }}
         sudo apt-get install --no-install-recommends libglm-dev libglfw3-dev libepoxy-dev libstb-dev libassimp-dev
 
-    - name: (g++) (DEBUG + ASan + UBSan) Build tests
+    - name: (DEBUG + ASan + UBSan) Build tests
       run: |
         make clean
-        CXX="g++-14" DEBUG="true" make tests -j$(nproc)
+        CXX="${{ matrix.compiler.command }}" DEBUG="true" make tests -j$(nproc)
 
-    - name: (g++) (DEBUG + ASan + UBSan) Run maths tester
+    - name: (DEBUG + ASan + UBSan) Run maths tester
       run: |
         ./launch.sh --maths
 
-    - name: (g++) (DEBUG + ASan + UBSan) Run thread tester
+    - name: (DEBUG + ASan + UBSan) Run thread tester
       run: |
         ./launch.sh --threads
 
-    - name: (g++) (DEBUG + TSan) Build thread tester
+    - name: (DEBUG + TSan) Build thread tester
       run: |
         make clean
-        CXX="g++-14" CHECK_THREADS="true" DEBUG="true" make threads -j$(nproc)
+        CXX="${{ matrix.compiler.command }}" CHECK_THREADS="true" DEBUG="true" make threads -j$(nproc)
 
-    - name: (g++) (DEBUG + TSan) Run thread tester
+    - name: (DEBUG + TSan) Run thread tester
       run: |
         ./launch.sh --threads
-
-    - name: (clang++) (DEBUG + ASan + UBSan) Build tests
-      run: |
-        make clean
-        CXX="clang++-19" DEBUG="true" make tests -j$(nproc)
-
-    - name: (clang++) (DEBUG + ASan + UBSan) Run maths tester
-      run: |
-        ./launch.sh --maths
-
-    - name: (clang++) (DEBUG + ASan + UBSan) Run thread tester
-      run: |
-        ./launch.sh --threads
-
-    - name: (clang++) (DEBUG + TSan) Build thread tester
-      run: |
-        make clean
-        CXX="clang++-19" CHECK_THREADS="true" DEBUG="true" make threads -j$(nproc)
-
-    - name: (clang++) (DEBUG + TSan) Run thread tester
-      run: |
-        ./launch.sh --threads
-
