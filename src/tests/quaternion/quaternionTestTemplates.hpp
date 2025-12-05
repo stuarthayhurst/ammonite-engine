@@ -87,7 +87,7 @@ namespace {
     };
     //NOLINTEND(cppcoreguidelines-avoid-const-or-ref-data-members)
 
-    TestData tests[9] = {
+    const TestData tests[9] = {
       //No rotation
       {(T)0.0, (T)0.0, (T)0.0, {{(T)0.0, (T)0.0, (T)0.0, (T)1.0}}},
 
@@ -126,7 +126,7 @@ namespace {
 
       //Check the same results are given from a vector of angles
       ammonite::Quat<T> outQuatAlt = {{0}};
-      ammonite::Vec<T, 3> angleVec = {
+      const ammonite::Vec<T, 3> angleVec = {
         tests[testIndex].xAngle, tests[testIndex].yAngle, tests[testIndex].zAngle
       };
       ammonite::fromEuler(outQuatAlt, angleVec);
@@ -340,7 +340,7 @@ namespace {
 
     //Check that multiplying aQuat by its inverse gives no rotation
     ammonite::multiply(aQuat, cQuat, dQuat);
-    ammonite::Quat<T> expectedQuat = {{(T)0.0, (T)0.0, (T)0.0, (T)1.0}};
+    const ammonite::Quat<T> expectedQuat = {{(T)0.0, (T)0.0, (T)0.0, (T)1.0}};
     for (int i = 0; i < 4; i++) {
       if (!roughly(dQuat[0][i], expectedQuat[0][i])) {
         ammonite::utils::error << "Quaternion inverse failed" << std::endl;
