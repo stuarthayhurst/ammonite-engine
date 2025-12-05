@@ -67,11 +67,12 @@ namespace ammonite {
       }
     }
 
+    //TODO: Implement with <simd>
     //Return true if two vectors of the same size and type have identical elements
     template <typename T, unsigned int size> requires validVector<T, size>
     constexpr bool equal(const Vec<T, size>& a, const Vec<T, size>& b) {
       //NOLINTBEGIN(readability-else-after-return)
-      if consteval {
+      //if consteval {
         //Slower, constexpr-friendly equality check
         for (unsigned int i = 0; i < size; i++) {
           if (a[i] != b[i]) {
@@ -80,9 +81,10 @@ namespace ammonite {
         }
 
         return true;
-      } else {
+      /*} else {
+        //TODO: Floats are evil, use <simd> when possible
         return (std::memcmp(&a[0], &b[0], sizeof(a)) == 0);
-      }
+      }*/
       //NOLINTEND(readability-else-after-return)
     }
 

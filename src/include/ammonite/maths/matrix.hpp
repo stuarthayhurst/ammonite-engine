@@ -117,12 +117,13 @@ namespace ammonite {
       }
     }
 
+    //TODO: Implement with <simd>
     //Return true if two matrices of the same size and type have identical elements
     template <typename T, unsigned int cols, unsigned int rows>
               requires validMatrix<T, cols, rows>
     constexpr bool equal(const Mat<T, cols, rows>& a, const Mat<T, cols, rows>& b) {
       //NOLINTBEGIN(readability-else-after-return)
-      if consteval {
+      //if consteval {
         //Slower, constexpr-friendly equality check
         for (unsigned int col = 0; col < cols; col++) {
           for (unsigned int row = 0; row < rows; row++) {
@@ -133,9 +134,10 @@ namespace ammonite {
         }
 
         return true;
-      } else {
+      /*} else {
+        //TODO: Floats are evil, use <simd> when possible
         return (std::memcmp(&a[0], &b[0], sizeof(a)) == 0);
-      }
+      }*/
       //NOLINTEND(readability-else-after-return)
     }
 
