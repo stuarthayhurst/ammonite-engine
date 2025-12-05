@@ -5,7 +5,9 @@
 
 #include "vectorTypes.hpp"
 
-namespace ammonite {
+#include "../visibility.hpp"
+
+namespace AMMONITE_INTERNAL ammonite {
   //Definitions, concepts and constructors for matrix types
   inline namespace maths {
     //Allowed matrix element types

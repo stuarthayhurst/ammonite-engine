@@ -4,7 +4,9 @@
 #include <numbers>
 #include <type_traits>
 
-namespace ammonite {
+#include "../visibility.hpp"
+
+namespace AMMONITE_INTERNAL ammonite {
   inline namespace maths {
     template <typename T> requires std::is_floating_point_v<T>
     constexpr T pi() {

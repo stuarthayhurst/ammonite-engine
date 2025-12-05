@@ -3,7 +3,9 @@
 
 #include <type_traits>
 
-namespace ammonite {
+#include "../visibility.hpp"
+
+namespace AMMONITE_INTERNAL ammonite {
   //Definitions, concepts and constructors for vector types
   inline namespace maths {
     //Allowed vector element types

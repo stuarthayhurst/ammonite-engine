@@ -21,7 +21,9 @@
 #include "quaternionTypes.hpp"
 #include "vectorTypes.hpp"
 
-namespace ammonite {
+#include "../visibility.hpp"
+
+namespace AMMONITE_INTERNAL ammonite {
   //Maths operations
   inline namespace maths {
     /*
