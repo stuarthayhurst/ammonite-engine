@@ -1,7 +1,7 @@
 #ifndef AMMONITEVISIBILITY
 #define AMMONITEVISIBILITY
 
-#if __has_cpp_attribute(visibility)
+#if __has_cpp_attribute(visibility) || __has_cpp_attribute(gnu::visibility)
   #define AMMONITE_EXPOSED __attribute__ ((visibility ("default")))
   #define AMMONITE_INTERNAL __attribute__ ((visibility ("hidden")))
 #else
