@@ -1,8 +1,6 @@
 #ifndef AMMONITEENUMS
 #define AMMONITEENUMS
 
-#include "exposed.hpp"
-
 /*
  - Public constants and enums shared between systems
 */
