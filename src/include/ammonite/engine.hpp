@@ -4,7 +4,9 @@
 #include <string>
 #include <string_view>
 
-namespace ammonite {
+#include "exposed.hpp"
+
+namespace AMMONITE_EXPOSED ammonite {
   std::string_view getEngineName();
   std::string_view getEngineVersion();
 

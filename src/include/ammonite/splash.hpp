@@ -1,10 +1,11 @@
 #ifndef AMMONITESPLASH
 #define AMMONITESPLASH
 
+#include "exposed.hpp"
 #include "maths/vectorTypes.hpp"
 #include "utils/id.hpp"
 
-namespace ammonite {
+namespace AMMONITE_EXPOSED ammonite {
   namespace splash {
     AmmoniteId createSplashScreen();
     void deleteSplashScreen(AmmoniteId targetScreenId);

@@ -3,7 +3,9 @@
 
 #include "keycodes.hpp"
 
-namespace ammonite {
+#include "../exposed.hpp"
+
+namespace AMMONITE_EXPOSED ammonite {
   namespace controls {
     namespace settings {
       void setMovementSpeed(float newMovementSpeed);

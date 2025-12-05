@@ -3,7 +3,9 @@
 
 #include <string>
 
-namespace ammonite {
+#include "../exposed.hpp"
+
+namespace AMMONITE_EXPOSED ammonite {
   namespace window {
     bool createWindow(unsigned int width, unsigned int height, const std::string& title);
     bool createWindow(unsigned int width, unsigned int height);

@@ -3,6 +3,7 @@
 
 #include <string>
 
+#include "../exposed.hpp"
 #include "../maths/vectorTypes.hpp"
 #include "../utils/id.hpp"
 
@@ -22,7 +23,7 @@ enum AmmoniteDrawEnum : unsigned char {
   AMMONITE_DRAW_POINTS
 };
 
-namespace ammonite {
+namespace AMMONITE_EXPOSED ammonite {
   namespace models {
     namespace position {
       void getPosition(AmmoniteId modelId, ammonite::Vec<float, 3>& position);

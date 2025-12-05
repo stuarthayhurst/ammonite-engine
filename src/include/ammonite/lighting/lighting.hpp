@@ -1,10 +1,11 @@
 #ifndef AMMONITELIGHTING
 #define AMMONITELIGHTING
 
+#include "../exposed.hpp"
 #include "../maths/vectorTypes.hpp"
 #include "../utils/id.hpp"
 
-namespace ammonite {
+namespace AMMONITE_EXPOSED ammonite {
   namespace lighting {
     namespace properties {
       void getGeometry(AmmoniteId lightId, ammonite::Vec<float, 3>& geometry);

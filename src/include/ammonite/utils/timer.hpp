@@ -3,7 +3,9 @@
 
 #include <ctime>
 
-namespace ammonite {
+#include "../exposed.hpp"
+
+namespace AMMONITE_EXPOSED ammonite {
   namespace utils {
     class Timer {
     private:

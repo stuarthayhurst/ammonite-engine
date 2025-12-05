@@ -1,10 +1,11 @@
 #ifndef AMMONITECAMERA
 #define AMMONITECAMERA
 
+#include "exposed.hpp"
 #include "maths/vectorTypes.hpp"
 #include "utils/id.hpp"
 
-namespace ammonite {
+namespace AMMONITE_EXPOSED ammonite {
   namespace camera {
     AmmoniteId createCamera();
     void deleteCamera(AmmoniteId cameraId);

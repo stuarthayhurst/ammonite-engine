@@ -5,8 +5,9 @@
 #include <string>
 
 #include "../enums.hpp"
+#include "../exposed.hpp"
 
-namespace ammonite {
+namespace AMMONITE_EXPOSED ammonite {
   namespace renderer {
     namespace setup {
       bool setupRenderer(const std::string& shaderPath);

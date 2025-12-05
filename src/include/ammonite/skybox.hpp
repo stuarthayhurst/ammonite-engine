@@ -3,11 +3,12 @@
 
 #include <string>
 
+#include "exposed.hpp"
 #include "utils/id.hpp"
 
 static constexpr bool ASSUME_FLIP_SKYBOX_FACES = false;
 
-namespace ammonite {
+namespace AMMONITE_EXPOSED ammonite {
   namespace skybox {
     AmmoniteId getActiveSkybox();
     void setActiveSkybox(AmmoniteId skyboxId);

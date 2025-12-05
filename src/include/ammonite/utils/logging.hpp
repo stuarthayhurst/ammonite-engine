@@ -6,7 +6,9 @@
 #include <string>
 #include <utility>
 
-namespace ammonite {
+#include "../exposed.hpp"
+
+namespace AMMONITE_EXPOSED ammonite {
   namespace utils {
     namespace colour {
       constexpr const char* black = "\033[30m";

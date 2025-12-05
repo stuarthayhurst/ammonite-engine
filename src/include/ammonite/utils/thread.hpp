@@ -4,6 +4,8 @@
 #include <climits>
 #include <semaphore>
 
+#include "../exposed.hpp"
+
 //Functions of this type must not block conditionally on other jobs
 using AmmoniteWork = void (*)(void* userPtr);
 
@@ -14,7 +16,7 @@ using AmmoniteWork = void (*)(void* userPtr);
 */
 using AmmoniteGroup = std::counting_semaphore<INT_MAX>;
 
-namespace ammonite {
+namespace AMMONITE_EXPOSED ammonite {
   namespace utils {
     namespace thread {
       unsigned int getHardwareThreadCount();
@@ -41,4 +43,3 @@ namespace ammonite {
 }
 
 #endif
-

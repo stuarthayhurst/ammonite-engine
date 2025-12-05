@@ -3,7 +3,9 @@
 
 #include <cstdint>
 
-namespace ammonite {
+#include "../exposed.hpp"
+
+namespace AMMONITE_EXPOSED ammonite {
   namespace utils {
     uintmax_t randomUInt(uintmax_t lower, uintmax_t upper);
     uintmax_t randomUInt(uintmax_t upper);

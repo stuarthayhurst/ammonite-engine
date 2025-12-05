@@ -5,6 +5,8 @@
 #include <ctime>
 #include <string>
 
+#include "../exposed.hpp"
+
 //Cache return values / states
 enum AmmoniteCacheEnum : unsigned char {
   AMMONITE_CACHE_HIT,
@@ -13,7 +15,7 @@ enum AmmoniteCacheEnum : unsigned char {
   AMMONITE_CACHE_COLLISION
 };
 
-namespace ammonite {
+namespace AMMONITE_EXPOSED ammonite {
   namespace utils {
     namespace files {
       void deleteFile(const std::string& filePath);

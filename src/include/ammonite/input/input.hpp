@@ -5,6 +5,7 @@
 
 #include "keycodes.hpp"
 
+#include "../exposed.hpp"
 #include "../utils/id.hpp"
 
 enum AmmoniteReleaseEnum : unsigned char {
@@ -30,7 +31,7 @@ using AmmoniteCursorCallback = void (*)(double xPosition, double yPosition, doub
 using AmmoniteButtonCallback = void (*)(AmmoniteButton button, KeyStateEnum action, void* userPtr);
 using AmmoniteScrollCallback = void (*)(double xOffset, double yOffset, void* userPtr);
 
-namespace ammonite {
+namespace AMMONITE_EXPOSED ammonite {
   namespace input {
     /*
      - All register(Toggle)Keybind() calls map to registerRawKeybind()
