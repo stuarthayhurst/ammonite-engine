@@ -10,6 +10,11 @@ on:
 jobs:
   lint:
     runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        options: [DEBUG="false" FAST="false", DEBUG="true" FAST="true"]
+
     steps:
     - uses: actions/checkout@v6
     - name: Set up Python 3.14
@@ -28,12 +33,4 @@ jobs:
 
     - name: Run the global linting target
       run: |
-        TIDY="clang-tidy-21" make lint_all -j$(nproc)
-
-    - name: Clean the build area
-      run: |
-        make clean
-
-    - name: (DEBUG + FAST) Run the global linting target
-      run: |
-        TIDY="clang-tidy-21" DEBUG="true" FAST="true" make lint_all -j$(nproc)
+        TIDY="clang-tidy-21" ${{ matrix.options }} make lint_all -j$(nproc)
