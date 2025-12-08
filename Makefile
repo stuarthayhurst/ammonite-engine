@@ -138,7 +138,7 @@ ifneq ($(USE_SYSTEM),true)
 endif
 
 #Library arguments
-LIBRARY_CXXFLAGS := $(CXXFLAGS) -fpic $(CFLAGS_PRIVATE) -DAMMONITE_VERSION=$(LIBRARY_VERSION) \
+LIBRARY_CXXFLAGS := $(CXXFLAGS) -fpic -fvisibility=hidden $(CFLAGS_PRIVATE) -DAMMONITE_VERSION=$(LIBRARY_VERSION) \
                     $(shell pkg-config $(TANGLE_PKG_CONF_ARGS) --cflags $(REQUIRES_PRIVATE))
 LIBRARY_LDFLAGS := $(LDFLAGS) "-Wl,-soname,$(LIBRARY_NAME_MINOR)" $(LDFLAGS_PRIVATE) \
                    $(shell pkg-config $(TANGLE_PKG_CONF_ARGS) --libs $(REQUIRES_PRIVATE))
