@@ -201,7 +201,7 @@ namespace AMMONITE_INTERNAL ammonite {
     //Add two matrices of the same size and type, storing the result in dest
     template <typename T, unsigned int cols, unsigned int rows>
               requires validMatrix<T, cols, rows>
-    void add(const Mat<T, cols, rows>& a, const Mat<T, cols, rows>& b, Mat<T, cols, rows>& dest) {
+    inline void add(const Mat<T, cols, rows>& a, const Mat<T, cols, rows>& b, Mat<T, cols, rows>& dest) {
       std::experimental::fixed_size_simd<T, cols * rows> aSimd(&a[0][0], std::experimental::element_aligned);
       const std::experimental::fixed_size_simd<T, cols * rows> bSimd(&b[0][0], std::experimental::element_aligned);
 
@@ -212,7 +212,7 @@ namespace AMMONITE_INTERNAL ammonite {
     //Add two matrices of the same size and type, storing the result in the first matrix
     template <typename T, unsigned int cols, unsigned int rows>
               requires validMatrix<T, cols, rows>
-    void add(Mat<T, cols, rows>& a, const Mat<T, cols, rows>& b) {
+    inline void add(Mat<T, cols, rows>& a, const Mat<T, cols, rows>& b) {
       add(a, b, a);
     }
 
@@ -222,7 +222,7 @@ namespace AMMONITE_INTERNAL ammonite {
     */
     template <typename T, unsigned int cols, unsigned int rows>
               requires validMatrix<T, cols, rows>
-    void add(const Mat<T, cols, rows>& a, T b, Mat<T, cols, rows>& dest) {
+    inline void add(const Mat<T, cols, rows>& a, T b, Mat<T, cols, rows>& dest) {
       std::experimental::fixed_size_simd<T, cols * rows> aSimd(&a[0][0], std::experimental::element_aligned);
       const std::experimental::fixed_size_simd<T, cols * rows> bSimd = b;
 
@@ -236,14 +236,14 @@ namespace AMMONITE_INTERNAL ammonite {
     */
     template <typename T, unsigned int cols, unsigned int rows>
               requires validMatrix<T, cols, rows>
-    void add(Mat<T, cols, rows>& a, T b) {
+    inline void add(Mat<T, cols, rows>& a, T b) {
       add(a, b, a);
     }
 
     //Subtract matrix b from matrix a of the same size and type, storing the result in dest
     template <typename T, unsigned int cols, unsigned int rows>
               requires validMatrix<T, cols, rows>
-    void sub(const Mat<T, cols, rows>& a, const Mat<T, cols, rows>& b, Mat<T, cols, rows>& dest) {
+    inline void sub(const Mat<T, cols, rows>& a, const Mat<T, cols, rows>& b, Mat<T, cols, rows>& dest) {
       std::experimental::fixed_size_simd<T, cols * rows> aSimd(&a[0][0], std::experimental::element_aligned);
       const std::experimental::fixed_size_simd<T, cols * rows> bSimd(&b[0][0], std::experimental::element_aligned);
 
@@ -254,7 +254,7 @@ namespace AMMONITE_INTERNAL ammonite {
     //Subtract matrix b from matrix a of the same size and type, storing the result in matrix a
     template <typename T, unsigned int cols, unsigned int rows>
               requires validMatrix<T, cols, rows>
-    void sub(Mat<T, cols, rows>& a, const Mat<T, cols, rows>& b) {
+    inline void sub(Mat<T, cols, rows>& a, const Mat<T, cols, rows>& b) {
       sub(a, b, a);
     }
 
@@ -264,7 +264,7 @@ namespace AMMONITE_INTERNAL ammonite {
     */
     template <typename T, unsigned int cols, unsigned int rows>
               requires validMatrix<T, cols, rows>
-    void sub(const Mat<T, cols, rows>& a, T b, Mat<T, cols, rows>& dest) {
+    inline void sub(const Mat<T, cols, rows>& a, T b, Mat<T, cols, rows>& dest) {
       std::experimental::fixed_size_simd<T, cols * rows> aSimd(&a[0][0], std::experimental::element_aligned);
       const std::experimental::fixed_size_simd<T, cols * rows> bSimd = b;
 
@@ -278,7 +278,7 @@ namespace AMMONITE_INTERNAL ammonite {
     */
     template <typename T, unsigned int cols, unsigned int rows>
               requires validMatrix<T, cols, rows>
-    void sub(Mat<T, cols, rows>& a, T b) {
+    inline void sub(Mat<T, cols, rows>& a, T b) {
       sub(a, b, a);
     }
 
@@ -286,7 +286,7 @@ namespace AMMONITE_INTERNAL ammonite {
     //Transpose a matrix
     template <typename T, unsigned int colsA, unsigned int rowsA>
               requires validMatrix<T, colsA, rowsA>
-    void transpose(const Mat<T, colsA, rowsA>& src, Mat<T, rowsA, colsA>& dest) {
+    inline void transpose(const Mat<T, colsA, rowsA>& src, Mat<T, rowsA, colsA>& dest) {
       glm::mat<colsA, rowsA, T, glm::defaultp> srcMat;
       glm::mat<rowsA, colsA, T, glm::defaultp> destMat;
 
@@ -299,7 +299,7 @@ namespace AMMONITE_INTERNAL ammonite {
     //Transpose a square matrix in-place
     template <typename T, unsigned int size>
               requires validMatrix<T, size, size>
-    void transpose(Mat<T, size, size>& src) {
+    inline void transpose(Mat<T, size, size>& src) {
       transpose(src, src);
     }
 
@@ -311,7 +311,7 @@ namespace AMMONITE_INTERNAL ammonite {
     template <typename T, unsigned int colsA, unsigned int rowsA, unsigned int colsB>
               requires validMatrix<T, colsA, rowsA> && validMatrix<T, colsB, colsA> &&
               validMatrix<T, colsB, rowsA>
-    void multiply(const Mat<T, colsA, rowsA>& a, const Mat<T, colsB, colsA>& b,
+    inline void multiply(const Mat<T, colsA, rowsA>& a, const Mat<T, colsB, colsA>& b,
                   Mat<T, colsB, rowsA>& dest) {
       glm::mat<colsA, rowsA, T, glm::defaultp> aMat;
       glm::mat<colsB, colsA, T, glm::defaultp> bMat;
@@ -331,7 +331,7 @@ namespace AMMONITE_INTERNAL ammonite {
     */
     template <typename T, unsigned int size>
               requires validMatrix<T, size, size>
-    void multiply(Mat<T, size, size>& a, const Mat<T, size, size>& b) {
+    inline void multiply(Mat<T, size, size>& a, const Mat<T, size, size>& b) {
       multiply(a, b, a);
     }
 
@@ -343,7 +343,7 @@ namespace AMMONITE_INTERNAL ammonite {
     template <typename T, unsigned int cols, unsigned int rows>
               requires validMatrix<T, cols, rows> && validVector<T, cols> &&
               validVector<T, rows>
-    void multiply(const Mat<T, cols, rows>& a, const Vec<T, cols>& b, Vec<T, rows>& dest) {
+    inline void multiply(const Mat<T, cols, rows>& a, const Vec<T, cols>& b, Vec<T, rows>& dest) {
       glm::mat<cols, rows, T, glm::defaultp> aMat;
       glm::vec<cols, T, glm::defaultp> bVec;
       glm::vec<rows, T, glm::defaultp> destVec;
@@ -361,7 +361,7 @@ namespace AMMONITE_INTERNAL ammonite {
     */
     template <typename T, unsigned int size>
               requires validMatrix<T, size, size> && validVector<T, size>
-    void multiply(const Mat<T, size, size>& a, Vec<T, size>& b) {
+    inline void multiply(const Mat<T, size, size>& a, Vec<T, size>& b) {
       multiply(a, b, b);
     }
 
@@ -371,7 +371,7 @@ namespace AMMONITE_INTERNAL ammonite {
     */
     template <typename T, unsigned int cols, unsigned int rows>
               requires validMatrix<T, cols, rows>
-    void multiply(const Mat<T, cols, rows>& a, T b, Mat<T, cols, rows>& dest) {
+    inline void multiply(const Mat<T, cols, rows>& a, T b, Mat<T, cols, rows>& dest) {
       std::experimental::fixed_size_simd<T, cols * rows> aSimd(&a[0][0], std::experimental::element_aligned);
       const std::experimental::fixed_size_simd<T, cols * rows> bSimd = b;
 
@@ -385,7 +385,7 @@ namespace AMMONITE_INTERNAL ammonite {
     */
     template <typename T, unsigned int cols, unsigned int rows>
               requires validMatrix<T, cols, rows>
-    void multiply(Mat<T, cols, rows>& a, T b) {
+    inline void multiply(Mat<T, cols, rows>& a, T b) {
       multiply(a, b, a);
     }
 
@@ -393,7 +393,7 @@ namespace AMMONITE_INTERNAL ammonite {
     //Calculate the determinant for a square matrix
     template <typename T, unsigned int size>
               requires validMatrix<T, size, size>
-    T determinant(const Mat<T, size, size>& a) {
+    inline T determinant(const Mat<T, size, size>& a) {
       glm::mat<size, size, T, glm::defaultp> aMat;
 
       std::memcpy(glm::value_ptr(aMat), &a[0], sizeof(Mat<T, size, size>));
@@ -408,7 +408,7 @@ namespace AMMONITE_INTERNAL ammonite {
     */
     template <typename T, unsigned int size>
               requires validMatrix<T, size, size>
-    void inverse(const Mat<T, size, size>& a, Mat<T, size, size>& dest) {
+    inline void inverse(const Mat<T, size, size>& a, Mat<T, size, size>& dest) {
       glm::mat<size, size, T, glm::defaultp> aMat;
       glm::mat<size, size, T, glm::defaultp> destMat;
 
@@ -425,7 +425,7 @@ namespace AMMONITE_INTERNAL ammonite {
      - The axis to rotate around must be normalised
     */
     template <typename T> requires validMatrix<T, 4, 4> && validVector<T, 3>
-    void rotate(const Mat<T, 4>& a, T angle, const Vec<T, 3> b, Mat<T, 4>& dest) {
+    inline void rotate(const Mat<T, 4>& a, T angle, const Vec<T, 3> b, Mat<T, 4>& dest) {
       glm::mat<4, 4, T, glm::defaultp> aMat;
       glm::vec<3, T, glm::defaultp> bVec;
       glm::mat<4, 4, T, glm::defaultp> destMat;
@@ -443,7 +443,7 @@ namespace AMMONITE_INTERNAL ammonite {
      - The axis to rotate around must be normalised
     */
     template <typename T> requires validMatrix<T, 4, 4> && validVector<T, 3>
-    void rotate(Mat<T, 4>& a, T angle, const Vec<T, 3> b) {
+    inline void rotate(Mat<T, 4>& a, T angle, const Vec<T, 3> b) {
       rotate(a, angle, b, a);
     }
 
@@ -453,7 +453,7 @@ namespace AMMONITE_INTERNAL ammonite {
      - Store the result in dest
     */
     template <typename T> requires validMatrix<T, 4, 4> && validVector<T, 3>
-    void scale(const Mat<T, 4>& a, const Vec<T, 3> b, Mat<T, 4>& dest) {
+    inline void scale(const Mat<T, 4>& a, const Vec<T, 3> b, Mat<T, 4>& dest) {
       glm::mat<4, 4, T, glm::defaultp> aMat;
       glm::vec<3, T, glm::defaultp> bVec;
       glm::mat<4, 4, T, glm::defaultp> destMat;
@@ -470,7 +470,7 @@ namespace AMMONITE_INTERNAL ammonite {
      - Store the result in the same matrix
     */
     template <typename T> requires validMatrix<T, 4, 4> && validVector<T, 3>
-    void scale(Mat<T, 4>& a, const Vec<T, 3> b) {
+    inline void scale(Mat<T, 4>& a, const Vec<T, 3> b) {
       scale(a, b, a);
     }
 
@@ -480,7 +480,7 @@ namespace AMMONITE_INTERNAL ammonite {
      - Store the result in dest
     */
     template <typename T> requires validMatrix<T, 4, 4> && validVector<T, 3>
-    void translate(const Mat<T, 4>& a, const Vec<T, 3> b, Mat<T, 4>& dest) {
+    inline void translate(const Mat<T, 4>& a, const Vec<T, 3> b, Mat<T, 4>& dest) {
       glm::mat<4, 4, T, glm::defaultp> aMat;
       glm::vec<3, T, glm::defaultp> bVec;
       glm::mat<4, 4, T, glm::defaultp> destMat;
@@ -497,7 +497,7 @@ namespace AMMONITE_INTERNAL ammonite {
      - Store the result in the same matrix
     */
     template <typename T> requires validMatrix<T, 4, 4> && validVector<T, 3>
-    void translate(Mat<T, 4>& a, const Vec<T, 3> b) {
+    inline void translate(Mat<T, 4>& a, const Vec<T, 3> b) {
       translate(a, b, a);
     }
 
@@ -507,7 +507,7 @@ namespace AMMONITE_INTERNAL ammonite {
      - Store the result in dest
     */
     template <typename T> requires validMatrix<T, 4, 4> && validVector<T, 3>
-    void lookAt(const Vec<T, 3>& camera, const Vec<T, 3>& target, const Vec<T, 3>& up,
+    inline void lookAt(const Vec<T, 3>& camera, const Vec<T, 3>& target, const Vec<T, 3>& up,
                 Mat<T, 4>& dest) {
       glm::vec<3, T, glm::defaultp> cameraVec;
       glm::vec<3, T, glm::defaultp> targetVec;
@@ -529,7 +529,7 @@ namespace AMMONITE_INTERNAL ammonite {
      - Store the result in dest
     */
     template <typename T> requires validMatrix<T, 4, 4>
-    void perspective(T fov, T aspectRatio, T nearPlane, T farPlane, Mat<T, 4>& dest) {
+    inline void perspective(T fov, T aspectRatio, T nearPlane, T farPlane, Mat<T, 4>& dest) {
       glm::mat<4, 4, T, glm::defaultp> destMat;
 
       destMat = glm::perspective(fov, aspectRatio, nearPlane, farPlane);
@@ -541,7 +541,7 @@ namespace AMMONITE_INTERNAL ammonite {
   inline namespace maths {
     template<typename T, unsigned int cols, unsigned int rows>
              requires validMatrix<T, cols, rows>
-    std::string formatMatrix(const Mat<T, cols, rows>& matrix) {
+    inline std::string formatMatrix(const Mat<T, cols, rows>& matrix) {
       std::string result;
       for (unsigned int row = 0; row < rows; row++) {
         if (row != 0) {
