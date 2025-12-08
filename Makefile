@@ -110,7 +110,7 @@ LDFLAGS_PRIVATE = $(shell sed -ne 's/^.*Libs.private: //p' ammonite.pc)
 CFLAGS_PRIVATE = $(shell sed -ne 's/^.*Cflags.private: //p' ammonite.pc)
 
 #Library arguments
-LIBRARY_CXXFLAGS := $(CXXFLAGS) -fpic $(CFLAGS_PRIVATE) -DAMMONITE_VERSION=$(LIBRARY_VERSION)
+LIBRARY_CXXFLAGS := $(CXXFLAGS) -fpic -fvisibility=hidden $(CFLAGS_PRIVATE) -DAMMONITE_VERSION=$(LIBRARY_VERSION)
 LIBRARY_LDFLAGS := $(LDFLAGS) "-Wl,-soname,$(LIBRARY_NAME)" $(LDFLAGS_PRIVATE) \
                    $(shell pkg-config --libs $(REQUIRES_PRIVATE))
 
