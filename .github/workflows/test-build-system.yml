@@ -48,14 +48,14 @@ jobs:
       run: |
         CXX="${{ matrix.compiler.command }}" make threads maths -j$(nproc)
 
-    - name: Check built objects are present
+    - name: Verify build and clean up
       run: |
-        ls build/demo build/mathsTest build/libammonite.so
-
-    - name: (DEBUG + FAST) Test debug build target
-      run: |
+        ls build/demo build/threadTest build/mathsTest build/libammonite.so
         make clean
-        CXX="${{ matrix.compiler.command }}" FAST="true" make debug -j$(nproc)
+
+    - name: (FAST) Test experimental optimisations build target
+      run: |
+        CXX="${{ matrix.compiler.command }}" FAST="true" make build -j$(nproc)
 
     - name: Test library install target
       run: |
