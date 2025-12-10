@@ -1,5 +1,5 @@
-# This workflow will thoroughly test the build system
-name: Complete build system test
+# This workflow will build the engine
+name: Engine compilation
 
 on:
   push:
@@ -29,12 +29,8 @@ jobs:
         sudo apt-get update
         sudo apt-get install --no-install-recommends make pkg-config build-essential
         sudo apt-get install ${{ matrix.compiler.package }}
-        sudo apt-get install --no-install-recommends inkscape optipng shellcheck
+        sudo apt-get install --no-install-recommends shellcheck
         sudo apt-get install --no-install-recommends libglm-dev libglfw3-dev libepoxy-dev libstb-dev libassimp-dev
-
-    - name: Test icon generation target
-      run: |
-        make icons
 
     - name: Shellcheck launch.sh
       run: |
