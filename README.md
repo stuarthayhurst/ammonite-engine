@@ -22,7 +22,6 @@
     - All build and runtime dependencies installed
   - A 64-bit Linux system
     - Some functions may have AVX-512 / VAES accelerated versions
-    - Build with `FAST=true` to enable these, if supported
   - An OpenGL 4.5+ compatible driver
   - Alternatively, an OpenGL 3.2+ driver supporting the following extensions can be used
     - `ARB_direct_state_access`
