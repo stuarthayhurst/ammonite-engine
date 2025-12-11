@@ -9,11 +9,12 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
+        os: [ubuntu-24.04, ubuntu-24.04-arm]
         compiler: [{package: g++-14, command: g++-14}, {package: clang-19, command: clang++-19}]
+    runs-on: ${{ matrix.os }}
 
     steps:
     - uses: actions/checkout@v6
