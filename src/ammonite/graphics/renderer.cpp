@@ -4,7 +4,7 @@
 
 #include "renderer.hpp"
 
-#include "../camera.hpp"
+#include "../camera/camera.hpp"
 #include "../enums.hpp"
 #include "../lighting/lighting.hpp"
 #include "../splash.hpp"

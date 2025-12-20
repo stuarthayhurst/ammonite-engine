@@ -2,7 +2,7 @@
 #define AMMONITE
 
 // IWYU pragma: begin_exports
-#include "camera.hpp"
+#include "camera/camera.hpp"
 #include "enums.hpp"
 #include "engine.hpp"
 #include "graphics/renderer.hpp"

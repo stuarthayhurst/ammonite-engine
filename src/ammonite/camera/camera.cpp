@@ -4,13 +4,13 @@
 
 #include "camera.hpp"
 
-#include "graphics/renderer.hpp"
-#include "maths/angle.hpp"
-#include "maths/matrix.hpp"
-#include "maths/vector.hpp"
-#include "utils/debug.hpp"
-#include "utils/id.hpp"
-#include "window/window.hpp"
+#include "../graphics/renderer.hpp"
+#include "../maths/angle.hpp"
+#include "../maths/matrix.hpp"
+#include "../maths/vector.hpp"
+#include "../utils/debug.hpp"
+#include "../utils/id.hpp"
+#include "../window/window.hpp"
 
 namespace ammonite {
   namespace camera {

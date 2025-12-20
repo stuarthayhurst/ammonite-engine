@@ -7,7 +7,7 @@
 #include "input.hpp"
 #include "keycodes.hpp"
 
-#include "../camera.hpp"
+#include "../camera/camera.hpp"
 #include "../maths/angle.hpp"
 #include "../maths/vector.hpp"
 #include "../utils/id.hpp"

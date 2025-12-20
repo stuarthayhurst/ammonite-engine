@@ -13,7 +13,7 @@ extern "C" {
 #include "extensions.hpp"
 #include "shaderLoader.hpp"
 #include "shaders.hpp"
-#include "../camera.hpp"
+#include "../camera/camera.hpp"
 #include "../lighting/lighting.hpp"
 #include "../maths/matrix.hpp"
 #include "../maths/vector.hpp"

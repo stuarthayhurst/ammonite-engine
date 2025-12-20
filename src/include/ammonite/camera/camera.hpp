@@ -1,9 +1,9 @@
 #ifndef AMMONITECAMERA
 #define AMMONITECAMERA
 
-#include "maths/vectorTypes.hpp"
-#include "utils/id.hpp"
-#include "visibility.hpp"
+#include "../maths/vectorTypes.hpp"
+#include "../utils/id.hpp"
+#include "../visibility.hpp"
 
 namespace AMMONITE_EXPOSED ammonite {
   namespace camera {
