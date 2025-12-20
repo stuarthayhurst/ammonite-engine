@@ -43,6 +43,7 @@ namespace AMMONITE_EXPOSED ammonite {
 
       void playPath(AmmoniteId pathId);
       void pausePath(AmmoniteId pathId);
+      void restartPath(AmmoniteId pathId);
     }
   }
 }

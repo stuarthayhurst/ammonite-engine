@@ -269,6 +269,18 @@ namespace ammonite {
          Path& cameraPath = pathTrackerMap[pathId];
          cameraPath.pathTimer.pause();
       }
+
+      void restartPath(AmmoniteId pathId) {
+        if (!pathTrackerMap.contains(pathId)) {
+          ammonite::utils::warning << "Couldn't find camera path with ID '" \
+                                   << pathId << "'" << std::endl;
+          return;
+        }
+
+         Path& cameraPath = pathTrackerMap[pathId];
+         cameraPath.pathTimer.reset();
+         cameraPath.selectedIndex = 0;
+      }
     }
   }
 }
