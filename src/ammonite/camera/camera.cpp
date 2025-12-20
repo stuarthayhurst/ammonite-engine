@@ -10,6 +10,7 @@
 #include "../maths/vector.hpp"
 #include "../utils/debug.hpp"
 #include "../utils/id.hpp"
+#include "../utils/logging.hpp"
 #include "../window/window.hpp"
 
 namespace ammonite {
@@ -20,6 +21,7 @@ namespace ammonite {
         double horizontalAngle = ammonite::pi<double>();
         double verticalAngle = 0.0f;
         float fov = ammonite::pi<float>() / 4.0f;
+        AmmoniteId linkedCameraPathId = 0;
       } defaultCamera;
 
       //View and projection matrices
@@ -72,7 +74,12 @@ namespace ammonite {
 
       void updateMatrices() {
         //Get the active camera
-        const Camera* const activeCamera = &cameraTrackerMap[activeCameraId];
+        Camera* const activeCamera = &cameraTrackerMap[activeCameraId];
+
+        //If the camera is on a path, update it
+        if (activeCamera->linkedCameraPathId != 0) {
+          ammonite::camera::path::internal::updateCamera(activeCamera->linkedCameraPathId);
+        }
 
         //Calculate the direction vector
         ammonite::Vec<float, 3> direction = {0};
@@ -125,8 +132,19 @@ namespace ammonite {
     }
 
     void deleteCamera(AmmoniteId cameraId) {
-      //Delete the camera if present
-      if (cameraTrackerMap.contains(cameraId) && cameraId != 1) {
+      //Check the camera exists
+      if (!cameraTrackerMap.contains(cameraId)) {
+        return;
+      }
+
+      //Reset any camera path link
+      const AmmoniteId linkedPathId = cameraTrackerMap[cameraId].linkedCameraPathId;
+      if (linkedPathId != 0) {
+        path::internal::removeCameraLink(linkedPathId);
+      }
+
+      //Delete the camera, if it's not the default
+      if (cameraId != 1) {
         cameraTrackerMap.erase(cameraId);
         ammoniteInternalDebug << "Deleted storage for camera (ID " \
                               << cameraId << ")" << std::endl;
@@ -218,6 +236,21 @@ namespace ammonite {
       //Find the target camera and update field of view
       if (cameraTrackerMap.contains(cameraId)) {
         cameraTrackerMap[cameraId].fov = fov;
+      }
+    }
+
+    void setLinkedPath(AmmoniteId cameraId, AmmoniteId pathId) {
+      //Store the ID of the linked path
+      if (cameraTrackerMap.contains(cameraId)) {
+        cameraTrackerMap[cameraId].linkedCameraPathId = pathId;
+
+        //Link in the path system too
+        if (!path::internal::setLinkedCamera(pathId, cameraId)) {
+          ammonite::utils::warning << "Failed to link camera (ID " << cameraId \
+                                   << ") and path (ID " << pathId \
+                                   << "), resetting link" << std::endl;
+          cameraTrackerMap[cameraId].linkedCameraPathId = 0;
+        }
       }
     }
   }

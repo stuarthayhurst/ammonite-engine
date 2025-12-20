@@ -2,6 +2,7 @@
 #define INTERNALCAMERA
 
 #include "../maths/matrix.hpp"
+#include "../utils/id.hpp"
 #include "../visibility.hpp"
 
 //Include public interface
@@ -13,6 +14,14 @@ namespace ammonite {
       ammonite::Mat<float, 4>* getViewMatrixPtr();
       ammonite::Mat<float, 4>* getProjectionMatrixPtr();
       void updateMatrices();
+    }
+
+    namespace path {
+      namespace AMMONITE_INTERNAL internal {
+        bool setLinkedCamera(AmmoniteId pathId, AmmoniteId cameraId);
+        void removeCameraLink(AmmoniteId pathId);
+        void updateCamera(AmmoniteId pathId);
+      }
     }
   }
 }

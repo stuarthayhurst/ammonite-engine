@@ -23,6 +23,27 @@ namespace AMMONITE_EXPOSED ammonite {
     void setDirection(AmmoniteId cameraId, const ammonite::Vec<float, 3>& direction);
     void setAngle(AmmoniteId cameraId, double horizontal, double vertical);
     void setFieldOfView(AmmoniteId cameraId, float fov);
+
+    void setLinkedPath(AmmoniteId cameraId, AmmoniteId pathId);
+
+    namespace path {
+      AmmoniteId createCameraPath();
+      void destroyCameraPath(AmmoniteId pathId);
+
+      unsigned int addPathNode(AmmoniteId pathId,
+                               const ammonite::Vec<float, 3>& position,
+                               double horizontal, double vertical,
+                               double time);
+      unsigned int addPathNode(AmmoniteId pathId,
+                               const ammonite::Vec<float, 3>& position,
+                               const ammonite::Vec<float, 3>& direction,
+                               double time);
+      void removePathNode(AmmoniteId pathId, unsigned int nodeIndex);
+      unsigned int getPathNodeCount(AmmoniteId pathId);
+
+      void playPath(AmmoniteId pathId);
+      void pausePath(AmmoniteId pathId);
+    }
   }
 }
 
