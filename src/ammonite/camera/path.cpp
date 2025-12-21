@@ -272,6 +272,7 @@ namespace ammonite {
 
         //Add a new path to the tracker
         pathTrackerMap[pathId] = {};
+        pathTrackerMap[pathId].pathTimer = ammonite::utils::Timer(false);
 
         if (size != 0) {
           pathTrackerMap[pathId].pathNodes.reserve(size);
