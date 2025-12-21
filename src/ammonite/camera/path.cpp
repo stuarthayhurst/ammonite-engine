@@ -27,6 +27,7 @@ namespace ammonite {
         ammonite::utils::Timer pathTimer;
         std::vector<PathNode> pathNodes;
         unsigned int selectedIndex = 0;
+        AmmonitePathMode pathMode = AMMONITE_PATH_FORWARD;
       };
 
       AmmoniteId lastPathId = 1;
@@ -96,26 +97,76 @@ namespace ammonite {
 
         void updateCamera(AmmoniteId pathId) {
           Path& cameraPath = pathTrackerMap[pathId];
-          const double currentTime = cameraPath.pathTimer.getTime();
+          const unsigned int nodeCount = cameraPath.pathNodes.size();
+          const double maxNodeTime = cameraPath.pathNodes[nodeCount - 1].time;
+          double currentTime = cameraPath.pathTimer.getTime();
 
           //Check the node still exists
-          if (cameraPath.selectedIndex >= cameraPath.pathNodes.size()) {
+          if (cameraPath.selectedIndex >= nodeCount) {
             ammoniteInternalDebug << "Selected camera path node no longer exists" << std::endl;
             return;
+          }
+
+          //Reset the time if looping and restarting
+          if (cameraPath.pathMode == AMMONITE_PATH_LOOP){
+            if (currentTime >= maxNodeTime) {
+              //Reset the time, preserving the overshoot
+              const double extraTime = currentTime - maxNodeTime;
+              cameraPath.pathTimer.setTime(extraTime);
+              currentTime = extraTime;
+
+              //Return to the first node
+              cameraPath.selectedIndex = 0;
+            }
           }
 
           //Find the last reached node
           unsigned int selectedIndex = cameraPath.selectedIndex;
           while (true) {
-            //Check for the end of the path
-            const unsigned int nextSelectedIndex = selectedIndex + 1;
-            if (nextSelectedIndex >= cameraPath.pathNodes.size()) {
+            //Select the next node, according to the mode
+            unsigned int nextSelectedIndex = 0;
+            bool isLastNode = false;
+            switch (cameraPath.pathMode) {
+            case AMMONITE_PATH_FORWARD:
+            case AMMONITE_PATH_REVERSE:
+              nextSelectedIndex = selectedIndex + 1;
+              if (nextSelectedIndex >= nodeCount) {
+                isLastNode = true;
+              }
+              break;
+            case AMMONITE_PATH_LOOP:
+              nextSelectedIndex = (selectedIndex + 1) % nodeCount;
+              break;
+            }
+
+            //No more nodes to try
+            if (isLastNode) {
+              break;
+            }
+
+            //Use corresponding index from the other end in reverse mode
+            unsigned int realNextIndex = nextSelectedIndex;
+            if (cameraPath.pathMode == AMMONITE_PATH_REVERSE) {
+              realNextIndex = nodeCount - (nextSelectedIndex + 1);
+            }
+
+            //Determine the node's time
+            const PathNode& nextNode = cameraPath.pathNodes[realNextIndex];
+
+            double nodeTime = 0.0;
+            switch (cameraPath.pathMode) {
+            case AMMONITE_PATH_FORWARD:
+            case AMMONITE_PATH_LOOP:
+              nodeTime = nextNode.time;
+              break;
+            case AMMONITE_PATH_REVERSE:
+              //Subtract the node time from the final node's time
+              nodeTime = maxNodeTime - nextNode.time;
               break;
             }
 
             //Store the new index or break
-            const PathNode& nextNode = cameraPath.pathNodes[nextSelectedIndex];
-            if (nextNode.time <= currentTime) {
+            if (nodeTime <= currentTime) {
               //Node has been reached, try the next
               selectedIndex = nextSelectedIndex;
             } else {
@@ -124,18 +175,62 @@ namespace ammonite {
             }
           }
 
+          //Use corresponding index from the other end in reverse mode
+          unsigned int realSelectedIndex = selectedIndex;
+          if (cameraPath.pathMode == AMMONITE_PATH_REVERSE) {
+            realSelectedIndex = nodeCount - (selectedIndex + 1);
+          }
+
           //Store the selected index and fetch the node
           cameraPath.selectedIndex = selectedIndex;
-          const PathNode& currentNode = cameraPath.pathNodes[selectedIndex];
+          const PathNode& currentNode = cameraPath.pathNodes[realSelectedIndex];
 
-          //Fetch the next node, reusing the current node if we're at the end
-          const bool isEnd = ((unsigned int)(selectedIndex + 1) >= cameraPath.pathNodes.size());
-          const unsigned int nextIndex = isEnd ? selectedIndex : selectedIndex + 1;
-          const PathNode& nextNode = cameraPath.pathNodes[nextIndex];
+          //Select the next node and detect the end
+          bool isEnd = false;
+          unsigned int nextIndex = 0;
+          switch (cameraPath.pathMode) {
+          case AMMONITE_PATH_FORWARD:
+          case AMMONITE_PATH_REVERSE:
+            nextIndex = selectedIndex + 1;
+            isEnd = (nextIndex >= nodeCount);
+            break;
+          case AMMONITE_PATH_LOOP:
+            nextIndex = (selectedIndex + 1) % nodeCount;
+            break;
+          }
 
-          //Interpolate camera position between the node pair
-          const double nodeTimeDelta = nextNode.time - currentNode.time;
-          const double timeDelta = currentTime - currentNode.time;
+          //Reuse the current node if the next node is past the end
+          nextIndex = isEnd ? selectedIndex : nextIndex;
+
+          //Use corresponding index from the other end in reverse mode
+          unsigned int realNextIndex = nextIndex;
+          if (cameraPath.pathMode == AMMONITE_PATH_REVERSE) {
+            realNextIndex = nodeCount - (nextIndex + 1);
+          }
+
+          //Fetch the next node
+          const PathNode& nextNode = cameraPath.pathNodes[realNextIndex];
+
+          //Find the node time delta and the time between now and the current node
+          double nodeTimeDelta = 0.0;
+          double timeDelta = 0.0;
+          if (cameraPath.pathMode != AMMONITE_PATH_REVERSE) {
+            nodeTimeDelta = nextNode.time - currentNode.time;
+            timeDelta = currentTime - currentNode.time;
+          } else {
+            nodeTimeDelta = currentNode.time - nextNode.time;
+            timeDelta = currentNode.time - (maxNodeTime - currentTime);
+          }
+
+          //Override time deltas for loop end
+          if (cameraPath.pathMode == AMMONITE_PATH_LOOP) {
+            if (nextIndex == 0) {
+              nodeTimeDelta = 0.0;
+              timeDelta = 0.0;
+            }
+          }
+
+          //Find the progress between the nodes
           double nodeProgress = 0.0;
           if (nodeTimeDelta != 0.0) {
             nodeProgress = timeDelta / nodeTimeDelta;
@@ -282,7 +377,7 @@ namespace ammonite {
         return pathTrackerMap[pathId].pathNodes.size();
       }
 
-      void playPath(AmmoniteId pathId) {
+      void setPathMode(AmmoniteId pathId, AmmonitePathMode pathMode) {
         if (!pathTrackerMap.contains(pathId)) {
           ammonite::utils::warning << "Couldn't find camera path with ID '" \
                                    << pathId << "'" << std::endl;
@@ -290,7 +385,18 @@ namespace ammonite {
         }
 
          Path& cameraPath = pathTrackerMap[pathId];
-         cameraPath.pathTimer.unpause();
+         cameraPath.pathMode = pathMode;
+      }
+
+      void playPath(AmmoniteId pathId) {
+        if (!pathTrackerMap.contains(pathId)) {
+          ammonite::utils::warning << "Couldn't find camera path with ID '" \
+                                   << pathId << "'" << std::endl;
+          return;
+        }
+
+        Path& cameraPath = pathTrackerMap[pathId];
+        cameraPath.pathTimer.unpause();
       }
 
       void pausePath(AmmoniteId pathId) {
@@ -300,8 +406,8 @@ namespace ammonite {
           return;
         }
 
-         Path& cameraPath = pathTrackerMap[pathId];
-         cameraPath.pathTimer.pause();
+        Path& cameraPath = pathTrackerMap[pathId];
+        cameraPath.pathTimer.pause();
       }
 
       void restartPath(AmmoniteId pathId) {
@@ -311,9 +417,9 @@ namespace ammonite {
           return;
         }
 
-         Path& cameraPath = pathTrackerMap[pathId];
-         cameraPath.pathTimer.reset();
-         cameraPath.selectedIndex = 0;
+        Path& cameraPath = pathTrackerMap[pathId];
+        cameraPath.pathTimer.reset();
+        cameraPath.selectedIndex = 0;
       }
     }
   }

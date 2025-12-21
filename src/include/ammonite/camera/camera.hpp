@@ -5,6 +5,12 @@
 #include "../utils/id.hpp"
 #include "../visibility.hpp"
 
+enum AmmonitePathMode : unsigned char {
+  AMMONITE_PATH_FORWARD,
+  AMMONITE_PATH_REVERSE,
+  AMMONITE_PATH_LOOP
+};
+
 namespace AMMONITE_EXPOSED ammonite {
   namespace camera {
     AmmoniteId createCamera();
@@ -44,6 +50,7 @@ namespace AMMONITE_EXPOSED ammonite {
       void removePathNode(AmmoniteId pathId, unsigned int nodeIndex);
       unsigned int getPathNodeCount(AmmoniteId pathId);
 
+      void setPathMode(AmmoniteId pathId, AmmonitePathMode pathMode);
       void playPath(AmmoniteId pathId);
       void pausePath(AmmoniteId pathId);
       void restartPath(AmmoniteId pathId);
