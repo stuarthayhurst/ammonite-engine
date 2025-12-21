@@ -101,9 +101,8 @@ namespace ammonite {
           const double maxNodeTime = cameraPath.pathNodes[nodeCount - 1].time;
           double currentTime = cameraPath.pathTimer.getTime();
 
-          //Check the node still exists
-          if (cameraPath.selectedIndex >= nodeCount) {
-            ammoniteInternalDebug << "Selected camera path node no longer exists" << std::endl;
+          //Skip 0 length paths
+          if (nodeCount == 0) {
             return;
           }
 
@@ -118,6 +117,12 @@ namespace ammonite {
               //Return to the first node
               cameraPath.selectedIndex = 0;
             }
+          }
+
+          //Check the node still exists
+          if (cameraPath.selectedIndex >= nodeCount) {
+            ammoniteInternalDebug << "Selected camera path node no longer exists, resetting" << std::endl;
+            cameraPath.selectedIndex = 0;
           }
 
           //Find the last reached node
