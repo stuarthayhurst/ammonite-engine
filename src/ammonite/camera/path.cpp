@@ -181,7 +181,7 @@ namespace ammonite {
         //Unlink any linked camera
         const Path* const cameraPathPtr = &pathTrackerMap[pathId];
         if (cameraPathPtr->linkedCameraId != 0) {
-          setLinkedPath(cameraPathPtr->linkedCameraId, 0);
+          camera::removeLinkedPath(cameraPathPtr->linkedCameraId);
         }
 
         //Delete the path

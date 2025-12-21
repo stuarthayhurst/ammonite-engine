@@ -253,5 +253,11 @@ namespace ammonite {
         }
       }
     }
+
+    void removeLinkedPath(AmmoniteId cameraId) {
+      if (cameraTrackerMap.contains(cameraId)) {
+        cameraTrackerMap[cameraId].linkedCameraPathId;
+      }
+    }
   }
 }

@@ -25,6 +25,7 @@ namespace AMMONITE_EXPOSED ammonite {
     void setFieldOfView(AmmoniteId cameraId, float fov);
 
     void setLinkedPath(AmmoniteId cameraId, AmmoniteId pathId);
+    void removeLinkedPath(AmmoniteId cameraId);
 
     namespace path {
       AmmoniteId createCameraPath(unsigned int size);
