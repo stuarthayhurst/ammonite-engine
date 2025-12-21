@@ -27,8 +27,10 @@ namespace AMMONITE_EXPOSED ammonite {
     void setLinkedPath(AmmoniteId cameraId, AmmoniteId pathId);
 
     namespace path {
+      AmmoniteId createCameraPath(unsigned int size);
       AmmoniteId createCameraPath();
       void destroyCameraPath(AmmoniteId pathId);
+      void reserveCameraPath(AmmoniteId pathId, unsigned int size);
 
       unsigned int addPathNode(AmmoniteId pathId,
                                const ammonite::Vec<float, 3>& position,

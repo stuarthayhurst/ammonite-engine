@@ -151,14 +151,22 @@ namespace ammonite {
         }
       }
 
-      AmmoniteId createCameraPath() {
+      AmmoniteId createCameraPath(unsigned int size) {
         //Get an ID for the new path
         const AmmoniteId pathId = utils::internal::setNextId(&lastPathId, pathTrackerMap);
 
         //Add a new path to the tracker
         pathTrackerMap[pathId] = {};
 
+        if (size != 0) {
+          pathTrackerMap[pathId].pathNodes.reserve(size);
+        }
+
         return pathId;
+      }
+
+      AmmoniteId createCameraPath() {
+        return createCameraPath(0);
       }
 
       //Destroy a camera path and all nodes contained
@@ -180,6 +188,17 @@ namespace ammonite {
         pathTrackerMap.erase(pathId);
         ammoniteInternalDebug << "Deleted storage for camera path (ID " \
                               << pathId << ")" << std::endl;
+      }
+
+      //Reserve space for path nodes, for performance
+      void reserveCameraPath(AmmoniteId pathId, unsigned int size) {
+        if (!pathTrackerMap.contains(pathId)) {
+          ammonite::utils::warning << "Couldn't find camera path with ID '" \
+                                   << pathId << "'" << std::endl;
+          return;
+        }
+
+        pathTrackerMap[pathId].pathNodes.reserve(size);
       }
 
       /*
