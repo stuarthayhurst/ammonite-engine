@@ -33,6 +33,16 @@ namespace ammonite {
       std::timespec_get(&startTime, TIME_UTC);
     }
 
+    //Creates a new, optionally running timer
+    Timer::Timer(bool startRunning) {
+      std::timespec_get(&startTime, TIME_UTC);
+
+      if (!startRunning) {
+        this->pause();
+        this->reset();
+      }
+    }
+
     //Writes the length of time the timer has been active
     void Timer::getTime(std::time_t* seconds, std::time_t* nanoseconds) {
       std::timespec now;
