@@ -74,7 +74,7 @@ namespace ammonite {
           return true;
         }
 
-        void removeCameraLink(AmmoniteId pathId) {
+        void removeLinkedCamera(AmmoniteId pathId) {
           pathTrackerMap[pathId].linkedCameraId = 0;
         }
 

@@ -19,7 +19,7 @@ namespace ammonite {
     namespace path {
       namespace AMMONITE_INTERNAL internal {
         bool setLinkedCamera(AmmoniteId pathId, AmmoniteId cameraId);
-        void removeCameraLink(AmmoniteId pathId);
+        void removeLinkedCamera(AmmoniteId pathId);
         void updateCamera(AmmoniteId pathId);
       }
     }
