@@ -109,10 +109,35 @@ namespace ammonite {
         ammonite::lookAt(activeCamera->position, cameraTarget, up, viewMatrix);
       }
 
-      void forceRemoveLinkedPath(AmmoniteId cameraId) {
-        if (cameraTrackerMap.contains(cameraId)) {
-          cameraTrackerMap[cameraId].linkedCameraPathId = 0;
+      //Update the stored link for cameraId, optionally unlink the existing path
+      bool setLinkedPath(AmmoniteId cameraId, AmmoniteId pathId,
+                         bool unlinkExisting) {
+        //Ignore reset requests for camera 0
+        if (pathId == 0 && cameraId == 0) {
+          ammoniteInternalDebug << "Ignored path reset request for camera ID 0" << std::endl;
+          return true;
         }
+
+        //Check the camera exists
+        if (!cameraTrackerMap.contains(cameraId)) {
+          ammonite::utils::warning << "Can't find camera (ID " \
+                                   << cameraId << ") to unlink" << std::endl;
+          return false;
+        }
+
+        //Reset the linked camera on any already linked path, if requested
+        if (unlinkExisting) {
+          if (!path::internal::setLinkedCamera(cameraTrackerMap[cameraId].linkedCameraPathId, 0, false)) {
+            ammonite::utils::warning << "Failed to unlink path (ID " \
+                                     << cameraTrackerMap[cameraId].linkedCameraPathId \
+                                     << ") from camera (ID " << cameraId << ")" << std::endl;
+            return false;
+          }
+        }
+
+        //Set the path on the camera
+        cameraTrackerMap[cameraId].linkedCameraPathId = pathId;
+        return true;
       }
     }
 
@@ -146,7 +171,10 @@ namespace ammonite {
       //Reset any camera path link
       const AmmoniteId linkedPathId = cameraTrackerMap[cameraId].linkedCameraPathId;
       if (linkedPathId != 0) {
-        path::internal::removeLinkedCamera(linkedPathId);
+        if (!path::internal::setLinkedCamera(linkedPathId, 0, false)) {
+          ammonite::utils::warning << "Failed to unlink camera path (ID " \
+                                   << linkedPathId << ")" << std::endl;
+        }
       }
 
       //Delete the camera, if it's not the default
@@ -245,27 +273,43 @@ namespace ammonite {
       }
     }
 
+    /*
+     - Unlink any existing path from cameraId
+     - Unlink any existing camera from pathId
+     - Create a new link between cameraId and pathId
+    */
     void setLinkedPath(AmmoniteId cameraId, AmmoniteId pathId) {
       //Store the ID of the linked path
       if (cameraTrackerMap.contains(cameraId)) {
-        //Remove the old link
-        path::internal::removeLinkedCamera(cameraTrackerMap[cameraId].linkedCameraPathId);
+        //Remove the old linked path from this camera
+        bool success = path::internal::setLinkedCamera(
+          cameraTrackerMap[cameraId].linkedCameraPathId, 0, false);
+        if (!success) {
+          ammonite::utils::warning << "Failed to unlink camera (ID " << cameraId \
+                                   << ")" << std::endl;
+          return;
+        }
 
-        //Record the new link in this system
-        cameraTrackerMap[cameraId].linkedCameraPathId = pathId;
-
-        //Set new link in the path system
-        if (pathId != 0 && !path::internal::setLinkedCamera(pathId, cameraId)) {
+        /*
+         - Unlink the camera from the new linked path
+         - Record the new link in both systems
+        */
+        success = internal::setLinkedPath(cameraId, pathId, true);
+        success &= path::internal::setLinkedCamera(pathId, cameraId, false);
+        if (!success) {
           ammonite::utils::warning << "Failed to link camera (ID " << cameraId \
                                    << ") and path (ID " << pathId \
-                                   << "), resetting link" << std::endl;
-          cameraTrackerMap[cameraId].linkedCameraPathId = 0;
+                                   << ")" << std::endl;
+          return;
         }
       }
     }
 
     void removeLinkedPath(AmmoniteId cameraId) {
-      setLinkedPath(cameraId, 0);
+      //Instruct the path system to unlink
+      if (cameraTrackerMap.contains(cameraId)) {
+        path::internal::setLinkedCamera(cameraId, 0, true);
+      }
     }
   }
 }

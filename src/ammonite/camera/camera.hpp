@@ -14,13 +14,16 @@ namespace ammonite {
       ammonite::Mat<float, 4>* getViewMatrixPtr();
       ammonite::Mat<float, 4>* getProjectionMatrixPtr();
       void updateMatrices();
-      void forceRemoveLinkedPath(AmmoniteId cameraId);
+
+      bool setLinkedPath(AmmoniteId cameraId, AmmoniteId pathId,
+                         bool unlinkExisting);
     }
 
     namespace path {
       namespace AMMONITE_INTERNAL internal {
-        bool setLinkedCamera(AmmoniteId pathId, AmmoniteId cameraId);
-        void removeLinkedCamera(AmmoniteId pathId);
+        bool setLinkedCamera(AmmoniteId pathId, AmmoniteId cameraId,
+                             bool unlinkExisting);
+
         void updateCamera(AmmoniteId pathId);
       }
     }

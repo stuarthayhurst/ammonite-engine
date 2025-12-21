@@ -63,19 +63,35 @@ namespace ammonite {
 
     namespace path {
       namespace internal {
-        bool setLinkedCamera(AmmoniteId pathId, AmmoniteId cameraId) {
+        //Update the stored link for pathId, optionally unlink the existing camera
+        bool setLinkedCamera(AmmoniteId pathId, AmmoniteId cameraId,
+                             bool unlinkExisting) {
+          //Ignore reset requests for path 0
+          if (pathId == 0 && cameraId == 0) {
+            ammoniteInternalDebug << "Ignored camera reset request for path ID 0" << std::endl;
+            return true;
+          }
+
+          //Check the camera path exists
           if (!pathTrackerMap.contains(pathId)) {
-            ammonite::utils::warning << "Couldn't find camera path with ID '" \
-                                     << pathId << "'" << std::endl;
+            ammonite::utils::warning << "Can't find camera path (ID " \
+                                     << cameraId << ") to unlink" << std::endl;
             return false;
           }
 
+          //Reset the linked path on any already linked camera, if requested
+          if (unlinkExisting) {
+            if (!camera::internal::setLinkedPath(pathTrackerMap[pathId].linkedCameraId, 0, false)) {
+              ammonite::utils::warning << "Failed to unlink camera (ID " \
+                                       << pathTrackerMap[pathId].linkedCameraId \
+                                       << ") from path (ID " << pathId << ")" << std::endl;
+              return false;
+            }
+          }
+
+          //Set the camera on the path
           pathTrackerMap[pathId].linkedCameraId = cameraId;
           return true;
-        }
-
-        void removeLinkedCamera(AmmoniteId pathId) {
-          pathTrackerMap[pathId].linkedCameraId = 0;
         }
 
         void updateCamera(AmmoniteId pathId) {
@@ -145,9 +161,8 @@ namespace ammonite {
           const double newVertical = currentNode.verticalAngle + (verticalDelta * nodeProgress);
 
           //Apply the new position and direction
-          const AmmoniteId cameraId = cameraPath.linkedCameraId;
-          ammonite::camera::setPosition(cameraId, newPosition);
-          ammonite::camera::setAngle(cameraId, newHorizontal, newVertical);
+          ammonite::camera::setPosition(cameraPath.linkedCameraId, newPosition);
+          ammonite::camera::setAngle(cameraPath.linkedCameraId, newHorizontal, newVertical);
         }
       }
 
@@ -181,7 +196,7 @@ namespace ammonite {
         //Unlink any linked camera
         const Path* const cameraPathPtr = &pathTrackerMap[pathId];
         if (cameraPathPtr->linkedCameraId != 0) {
-          camera::internal::forceRemoveLinkedPath(cameraPathPtr->linkedCameraId);
+          camera::internal::setLinkedPath(cameraPathPtr->linkedCameraId, 0, false);
         }
 
         //Delete the path
