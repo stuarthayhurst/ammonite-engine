@@ -14,6 +14,7 @@ namespace ammonite {
       ammonite::Mat<float, 4>* getViewMatrixPtr();
       ammonite::Mat<float, 4>* getProjectionMatrixPtr();
       void updateMatrices();
+      void forceRemoveLinkedPath(AmmoniteId cameraId);
     }
 
     namespace path {

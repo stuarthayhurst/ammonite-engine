@@ -108,6 +108,12 @@ namespace ammonite {
         ammonite::add(activeCamera->position, direction, cameraTarget);
         ammonite::lookAt(activeCamera->position, cameraTarget, up, viewMatrix);
       }
+
+      void forceRemoveLinkedPath(AmmoniteId cameraId) {
+        if (cameraTrackerMap.contains(cameraId)) {
+          cameraTrackerMap[cameraId].linkedCameraPathId = 0;
+        }
+      }
     }
 
     AmmoniteId getActiveCamera() {
@@ -242,10 +248,14 @@ namespace ammonite {
     void setLinkedPath(AmmoniteId cameraId, AmmoniteId pathId) {
       //Store the ID of the linked path
       if (cameraTrackerMap.contains(cameraId)) {
+        //Remove the old link
+        path::internal::removeLinkedCamera(cameraTrackerMap[cameraId].linkedCameraPathId);
+
+        //Record the new link in this system
         cameraTrackerMap[cameraId].linkedCameraPathId = pathId;
 
-        //Link in the path system too
-        if (!path::internal::setLinkedCamera(pathId, cameraId)) {
+        //Set new link in the path system
+        if (pathId != 0 && !path::internal::setLinkedCamera(pathId, cameraId)) {
           ammonite::utils::warning << "Failed to link camera (ID " << cameraId \
                                    << ") and path (ID " << pathId \
                                    << "), resetting link" << std::endl;
@@ -255,9 +265,7 @@ namespace ammonite {
     }
 
     void removeLinkedPath(AmmoniteId cameraId) {
-      if (cameraTrackerMap.contains(cameraId)) {
-        cameraTrackerMap[cameraId].linkedCameraPathId;
-      }
+      setLinkedPath(cameraId, 0);
     }
   }
 }
