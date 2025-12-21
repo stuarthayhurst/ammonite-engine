@@ -281,21 +281,13 @@ namespace ammonite {
     void setLinkedPath(AmmoniteId cameraId, AmmoniteId pathId) {
       //Store the ID of the linked path
       if (cameraTrackerMap.contains(cameraId)) {
-        //Remove the old linked path from this camera
-        bool success = path::internal::setLinkedCamera(
-          cameraTrackerMap[cameraId].linkedCameraPathId, 0, false);
-        if (!success) {
-          ammonite::utils::warning << "Failed to unlink camera (ID " << cameraId \
-                                   << ")" << std::endl;
-          return;
-        }
-
         /*
-         - Unlink the camera from the new linked path
+         - Unlink the old camera from the new path
+         - Unlink the old path from the new camera
          - Record the new link in both systems
         */
-        success = internal::setLinkedPath(cameraId, pathId, true);
-        success &= path::internal::setLinkedCamera(pathId, cameraId, false);
+        const bool success = internal::setLinkedPath(cameraId, pathId, true) &&
+                             path::internal::setLinkedCamera(pathId, cameraId, true);
         if (!success) {
           ammonite::utils::warning << "Failed to link camera (ID " << cameraId \
                                    << ") and path (ID " << pathId \
