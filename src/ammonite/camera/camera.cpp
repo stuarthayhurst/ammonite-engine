@@ -297,6 +297,14 @@ namespace ammonite {
       }
     }
 
+    AmmoniteId getLinkedPath(AmmoniteId cameraId) {
+      if (cameraTrackerMap.contains(cameraId)) {
+        return cameraTrackerMap[cameraId].linkedCameraPathId;
+      }
+
+      return 0;
+    }
+
     void removeLinkedPath(AmmoniteId cameraId) {
       //Instruct the path system to unlink
       if (cameraTrackerMap.contains(cameraId)) {

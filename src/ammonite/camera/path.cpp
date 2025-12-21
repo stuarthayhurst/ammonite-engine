@@ -394,6 +394,16 @@ namespace ammonite {
          cameraPath.pathMode = pathMode;
       }
 
+      AmmonitePathMode getPathMode(AmmoniteId pathId) {
+        if (!pathTrackerMap.contains(pathId)) {
+          ammonite::utils::warning << "Couldn't find camera path with ID '" \
+                                   << pathId << "'" << std::endl;
+          return AMMONITE_PATH_FORWARD;
+        }
+
+        return pathTrackerMap[pathId].pathMode;
+      }
+
       void playPath(AmmoniteId pathId) {
         if (!pathTrackerMap.contains(pathId)) {
           ammonite::utils::warning << "Couldn't find camera path with ID '" \
@@ -414,6 +424,16 @@ namespace ammonite {
 
         Path& cameraPath = pathTrackerMap[pathId];
         cameraPath.pathTimer.pause();
+      }
+
+      bool getPathPaused(AmmoniteId pathId) {
+        if (!pathTrackerMap.contains(pathId)) {
+          ammonite::utils::warning << "Couldn't find camera path with ID '" \
+                                   << pathId << "'" << std::endl;
+          return false;
+        }
+
+        return pathTrackerMap[pathId].pathTimer.isRunning();
       }
 
       void restartPath(AmmoniteId pathId) {

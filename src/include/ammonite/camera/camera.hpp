@@ -31,6 +31,7 @@ namespace AMMONITE_EXPOSED ammonite {
     void setFieldOfView(AmmoniteId cameraId, float fov);
 
     void setLinkedPath(AmmoniteId cameraId, AmmoniteId pathId);
+    AmmoniteId getLinkedPath(AmmoniteId cameraId);
     void removeLinkedPath(AmmoniteId cameraId);
 
     namespace path {
@@ -51,8 +52,12 @@ namespace AMMONITE_EXPOSED ammonite {
       unsigned int getPathNodeCount(AmmoniteId pathId);
 
       void setPathMode(AmmoniteId pathId, AmmonitePathMode pathMode);
+      AmmonitePathMode getPathMode(AmmoniteId pathId);
+
       void playPath(AmmoniteId pathId);
       void pausePath(AmmoniteId pathId);
+      bool getPathPaused(AmmoniteId pathId);
+
       void restartPath(AmmoniteId pathId);
     }
   }
