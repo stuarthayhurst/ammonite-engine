@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cmath>
 #include <iostream>
 #include <unordered_map>
@@ -478,6 +479,33 @@ namespace ammonite {
         Path& cameraPath = pathTrackerMap[pathId];
         const PathNode& maxNode = cameraPath.pathNodes[(cameraPath.pathNodes.size() - 1)];
         cameraPath.pathTimer.setTime(maxNode.time * progress);
+      }
+
+      //Return the current point in time
+      double getTime(AmmoniteId pathId) {
+        if (!pathTrackerMap.contains(pathId)) {
+          ammonite::utils::warning << "Couldn't find camera path with ID '" \
+                                   << pathId << "'" << std::endl;
+          return 0.0;
+        }
+
+        const Path& cameraPath = pathTrackerMap[pathId];
+        const PathNode& maxNode = cameraPath.pathNodes[(cameraPath.pathNodes.size() - 1)];
+        return std::min(cameraPath.pathTimer.getTime(), maxNode.time);
+      }
+
+      //Return the current progress, relative to 1.0 as the end
+      double getProgress(AmmoniteId pathId) {
+        if (!pathTrackerMap.contains(pathId)) {
+          ammonite::utils::warning << "Couldn't find camera path with ID '" \
+                                   << pathId << "'" << std::endl;
+          return 0.0;
+        }
+
+        const Path& cameraPath = pathTrackerMap[pathId];
+        const PathNode& maxNode = cameraPath.pathNodes[(cameraPath.pathNodes.size() - 1)];
+        const double progress = cameraPath.pathTimer.getTime() / maxNode.time;
+        return std::min(progress, 1.0);
       }
 
       //Reset a path back to the start
