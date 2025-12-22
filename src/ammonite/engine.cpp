@@ -31,7 +31,7 @@ namespace ammonite {
 
   bool setupEngine(const std::string& shaderPath, unsigned int width,
                    unsigned int height, const std::string& title) {
-      ammonite::utils::Timer loadTimer;
+      const ammonite::utils::Timer loadTimer;
 
       //Create a thread pool
       if (!ammonite::utils::thread::createThreadPool(0)) {

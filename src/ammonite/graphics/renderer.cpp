@@ -27,7 +27,7 @@ namespace ammonite {
     namespace setup {
       bool setupRenderer(const std::string& shaderPath) {
         //Start a timer to measure load time
-        ammonite::utils::Timer loadTimer;
+        const ammonite::utils::Timer loadTimer;
 
         //Check GPU supported required extensions
         unsigned int failureCount = 0;
