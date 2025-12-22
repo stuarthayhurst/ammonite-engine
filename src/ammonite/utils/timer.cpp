@@ -44,7 +44,7 @@ namespace ammonite {
     }
 
     //Writes the length of time the timer has been active
-    void Timer::getTime(std::time_t* seconds, std::time_t* nanoseconds) {
+    void Timer::getTime(std::time_t* seconds, std::time_t* nanoseconds) const {
       std::timespec now;
 
       if (timerRunning) {
@@ -63,7 +63,7 @@ namespace ammonite {
     }
 
     //Returns the length of time the timer has been active
-    double Timer::getTime() {
+    double Timer::getTime() const {
       std::time_t seconds = 0;
       std::time_t nanoseconds = 0;
 
