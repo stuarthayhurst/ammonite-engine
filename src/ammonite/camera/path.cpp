@@ -26,7 +26,7 @@ namespace ammonite {
         AmmoniteId linkedCameraId = 0;
         ammonite::utils::Timer pathTimer;
         std::vector<PathNode> pathNodes;
-        unsigned int selectedIndex = 0;
+        unsigned int selectedIndex = 0; //Used for performance, not config
         AmmonitePathMode pathMode = AMMONITE_PATH_FORWARD;
       };
 
@@ -95,6 +95,10 @@ namespace ammonite {
           return true;
         }
 
+        /*
+         - Calculate the new position, direction and path state for the mode
+         - Write it to the linked camera
+        */
         void updateCamera(AmmoniteId pathId) {
           Path& cameraPath = pathTrackerMap[pathId];
           const unsigned int nodeCount = cameraPath.pathNodes.size();
@@ -266,6 +270,7 @@ namespace ammonite {
         }
       }
 
+      //Create a new camera, reserving 'size' nodes
       AmmoniteId createCameraPath(unsigned int size) {
         //Get an ID for the new path
         const AmmoniteId pathId = utils::internal::setNextId(&lastPathId, pathTrackerMap);
@@ -281,6 +286,7 @@ namespace ammonite {
         return pathId;
       }
 
+      //Create a new camera, without reserving nodes
       AmmoniteId createCameraPath() {
         return createCameraPath(0);
       }
@@ -351,6 +357,7 @@ namespace ammonite {
       /*
        - Removes a node from a path by its index
        - Changes the index of each node following it
+       - If the path shrinks below the currently reached node, it'll restart
       */
       void removePathNode(AmmoniteId pathId, unsigned int nodeIndex) {
         if (!pathTrackerMap.contains(pathId)) {
@@ -381,6 +388,7 @@ namespace ammonite {
         return pathTrackerMap[pathId].pathNodes.size();
       }
 
+      //Set the node traversal mode
       void setPathMode(AmmoniteId pathId, AmmonitePathMode pathMode) {
         if (!pathTrackerMap.contains(pathId)) {
           ammonite::utils::warning << "Couldn't find camera path with ID '" \
@@ -434,6 +442,7 @@ namespace ammonite {
         return pathTrackerMap[pathId].pathTimer.isRunning();
       }
 
+      //Jump to a given node
       void setNode(AmmoniteId pathId, unsigned int nodeIndex) {
         if (!pathTrackerMap.contains(pathId)) {
           ammonite::utils::warning << "Couldn't find camera path with ID '" \
@@ -446,6 +455,7 @@ namespace ammonite {
         cameraPath.pathTimer.setTime(cameraPath.pathNodes[nodeIndex].time);
       }
 
+      //Jump to a given point in time
       void setTime(AmmoniteId pathId, double time) {
         if (!pathTrackerMap.contains(pathId)) {
           ammonite::utils::warning << "Couldn't find camera path with ID '" \
@@ -457,6 +467,7 @@ namespace ammonite {
         cameraPath.pathTimer.setTime(time);
       }
 
+      //Jump to a point in time, relative to 1.0 as the end
       void setProgress(AmmoniteId pathId, double progress) {
         if (!pathTrackerMap.contains(pathId)) {
           ammonite::utils::warning << "Couldn't find camera path with ID '" \
@@ -469,6 +480,7 @@ namespace ammonite {
         cameraPath.pathTimer.setTime(maxNode.time * progress);
       }
 
+      //Reset a path back to the start
       void restartPath(AmmoniteId pathId) {
         if (!pathTrackerMap.contains(pathId)) {
           ammonite::utils::warning << "Couldn't find camera path with ID '" \
