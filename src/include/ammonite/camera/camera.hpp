@@ -64,6 +64,7 @@ namespace AMMONITE_EXPOSED ammonite {
 
       double getTime(AmmoniteId pathId);
       double getProgress(AmmoniteId pathId);
+      bool getPathComplete(AmmoniteId pathId);
 
       void restartPath(AmmoniteId pathId);
     }

@@ -508,6 +508,10 @@ namespace ammonite {
         return std::min(progress, 1.0);
       }
 
+      bool getPathComplete(AmmoniteId pathId) {
+        return (getProgress(pathId) == 1.0);
+      }
+
       //Reset a path back to the start
       void restartPath(AmmoniteId pathId) {
         if (!pathTrackerMap.contains(pathId)) {
