@@ -58,7 +58,9 @@ namespace AMMONITE_EXPOSED ammonite {
       void pausePath(AmmoniteId pathId);
       bool getPathPaused(AmmoniteId pathId);
 
-      void setProgress(AmmoniteId pathId, unsigned int nodeIndex);
+      void setNode(AmmoniteId pathId, unsigned int nodeIndex);
+      void setTime(AmmoniteId pathId, double time);
+      void setProgress(AmmoniteId pathId, double progress);
       void restartPath(AmmoniteId pathId);
     }
   }

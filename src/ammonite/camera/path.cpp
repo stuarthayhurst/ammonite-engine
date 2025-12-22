@@ -434,7 +434,7 @@ namespace ammonite {
         return pathTrackerMap[pathId].pathTimer.isRunning();
       }
 
-      void setProgress(AmmoniteId pathId, unsigned int nodeIndex) {
+      void setNode(AmmoniteId pathId, unsigned int nodeIndex) {
         if (!pathTrackerMap.contains(pathId)) {
           ammonite::utils::warning << "Couldn't find camera path with ID '" \
                                    << pathId << "'" << std::endl;
@@ -444,6 +444,29 @@ namespace ammonite {
         Path& cameraPath = pathTrackerMap[pathId];
         nodeIndex = std::min(nodeIndex, (unsigned int)cameraPath.pathNodes.size() - 1);
         cameraPath.pathTimer.setTime(cameraPath.pathNodes[nodeIndex].time);
+      }
+
+      void setTime(AmmoniteId pathId, double time) {
+        if (!pathTrackerMap.contains(pathId)) {
+          ammonite::utils::warning << "Couldn't find camera path with ID '" \
+                                   << pathId << "'" << std::endl;
+          return;
+        }
+
+        Path& cameraPath = pathTrackerMap[pathId];
+        cameraPath.pathTimer.setTime(time);
+      }
+
+      void setProgress(AmmoniteId pathId, double progress) {
+        if (!pathTrackerMap.contains(pathId)) {
+          ammonite::utils::warning << "Couldn't find camera path with ID '" \
+                                   << pathId << "'" << std::endl;
+          return;
+        }
+
+        Path& cameraPath = pathTrackerMap[pathId];
+        const PathNode& maxNode = cameraPath.pathNodes[(cameraPath.pathNodes.size() - 1)];
+        cameraPath.pathTimer.setTime(maxNode.time * progress);
       }
 
       void restartPath(AmmoniteId pathId) {
