@@ -170,11 +170,9 @@ namespace ammonite {
 
       //Reset any camera path link
       const AmmoniteId linkedPathId = cameraTrackerMap[cameraId].linkedCameraPathId;
-      if (linkedPathId != 0) {
-        if (!path::internal::setLinkedCamera(linkedPathId, 0, false)) {
-          ammonite::utils::warning << "Failed to unlink camera path (ID " \
-                                   << linkedPathId << ")" << std::endl;
-        }
+      if (!path::internal::setLinkedCamera(linkedPathId, 0, false)) {
+        ammonite::utils::warning << "Failed to unlink camera path (ID " \
+                                 << linkedPathId << ")" << std::endl;
       }
 
       //Delete the camera, if it's not the default
