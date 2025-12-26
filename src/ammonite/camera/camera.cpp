@@ -149,6 +149,9 @@ namespace ammonite {
       //If the camera exists, set as active
       if (cameraTrackerMap.contains(cameraId)) {
         activeCameraId = cameraId;
+      } else {
+        ammonite::utils::warning << "Couldn't find camera with ID '" << cameraId \
+                                 << "'" << std::endl;
       }
     }
 
@@ -165,6 +168,8 @@ namespace ammonite {
     void deleteCamera(AmmoniteId cameraId) {
       //Check the camera exists
       if (!cameraTrackerMap.contains(cameraId)) {
+        ammonite::utils::warning << "Couldn't find camera with ID '" << cameraId \
+                                 << "'" << std::endl;
         return;
       }
 
@@ -190,85 +195,116 @@ namespace ammonite {
 
     //Get position
     void getPosition(AmmoniteId cameraId, ammonite::Vec<float, 3>& position) {
-      if (cameraTrackerMap.contains(cameraId)) {
-        ammonite::copy(cameraTrackerMap[cameraId].position, position);
+      if (!cameraTrackerMap.contains(cameraId)) {
+        ammonite::utils::warning << "Couldn't find camera with ID '" << cameraId \
+                                 << "'" << std::endl;
+        ammonite::set(position, 0.0f);
         return;
       }
 
-      ammonite::set(position, 0.0f);
+      ammonite::copy(cameraTrackerMap[cameraId].position, position);
     }
 
     void getDirection(AmmoniteId cameraId, ammonite::Vec<float, 3>& direction) {
-      if (cameraTrackerMap.contains(cameraId)) {
-        const Camera& activeCamera = cameraTrackerMap[cameraId];
-        calculateDirection((float)activeCamera.horizontalAngle,
-                           (float)activeCamera.verticalAngle, direction);
+      if (!cameraTrackerMap.contains(cameraId)) {
+        ammonite::utils::warning << "Couldn't find camera with ID '" << cameraId \
+                                 << "'" << std::endl;
+        ammonite::set(direction, 0.0f);
         return;
       }
 
-      ammonite::set(direction, 0.0f);
+      const Camera& activeCamera = cameraTrackerMap[cameraId];
+      calculateDirection((float)activeCamera.horizontalAngle,
+                         (float)activeCamera.verticalAngle, direction);
     }
 
     //Get horizontal angle (radians)
     double getHorizontal(AmmoniteId cameraId) {
-      if (cameraTrackerMap.contains(cameraId)) {
-        return cameraTrackerMap[cameraId].horizontalAngle;
+      if (!cameraTrackerMap.contains(cameraId)) {
+        ammonite::utils::warning << "Couldn't find camera with ID '" << cameraId \
+                                 << "'" << std::endl;
+        return 0.0;
       }
 
-      return 0.0;
+      return cameraTrackerMap[cameraId].horizontalAngle;
+
     }
 
     //Get vertical angle (radians)
     double getVertical(AmmoniteId cameraId) {
-      if (cameraTrackerMap.contains(cameraId)) {
-        return cameraTrackerMap[cameraId].verticalAngle;
+      if (!cameraTrackerMap.contains(cameraId)) {
+        ammonite::utils::warning << "Couldn't find camera with ID '" << cameraId \
+                                 << "'" << std::endl;
+        return 0.0;
       }
 
-      return 0.0;
+      return cameraTrackerMap[cameraId].verticalAngle;
     }
 
     //Get field of view (radians)
     float getFieldOfView(AmmoniteId cameraId) {
-      if (cameraTrackerMap.contains(cameraId)) {
-        return cameraTrackerMap[cameraId].fov;
+      if (!cameraTrackerMap.contains(cameraId)) {
+        ammonite::utils::warning << "Couldn't find camera with ID '" << cameraId \
+                                 << "'" << std::endl;
+        return ammonite::pi<float>() / 4.0f;
       }
 
-      return ammonite::pi<float>() / 4.0f;
+      return cameraTrackerMap[cameraId].fov;
     }
 
     //Set position
     void setPosition(AmmoniteId cameraId, const ammonite::Vec<float, 3>& position) {
-      //Find the target camera and update position
-      if (cameraTrackerMap.contains(cameraId)) {
-        ammonite::copy(position, cameraTrackerMap[cameraId].position);
+      //Check the camera exists
+      if (!cameraTrackerMap.contains(cameraId)) {
+        ammonite::utils::warning << "Couldn't find camera with ID '" << cameraId \
+                                 << "'" << std::endl;
+        return;
       }
+
+      //Find the target camera and update position
+      ammonite::copy(position, cameraTrackerMap[cameraId].position);
     }
 
     //Set direction
     void setDirection(AmmoniteId cameraId, const ammonite::Vec<float, 3>& direction) {
-      //Find the target camera and update direction
-      if (cameraTrackerMap.contains(cameraId)) {
-        Camera& activeCamera = cameraTrackerMap[cameraId];
-        activeCamera.horizontalAngle = calculateHorizontalAngle(direction);
-        activeCamera.verticalAngle = calculateVerticalAngle(direction);
+      //Check the camera exists
+      if (!cameraTrackerMap.contains(cameraId)) {
+        ammonite::utils::warning << "Couldn't find camera with ID '" << cameraId \
+                                 << "'" << std::endl;
+        return;
       }
+
+      //Find the target camera and update direction
+      Camera& activeCamera = cameraTrackerMap[cameraId];
+      activeCamera.horizontalAngle = calculateHorizontalAngle(direction);
+      activeCamera.verticalAngle = calculateVerticalAngle(direction);
     }
 
     //Set camera direction via angle pair (radians)
     void setAngle(AmmoniteId cameraId, double horizontal, double vertical) {
-      //Convert to a vector and set it
-      if (cameraTrackerMap.contains(cameraId)) {
-        cameraTrackerMap[cameraId].horizontalAngle = horizontal;
-        cameraTrackerMap[cameraId].verticalAngle = vertical;
+      //Check the camera exists
+      if (!cameraTrackerMap.contains(cameraId)) {
+        ammonite::utils::warning << "Couldn't find camera with ID '" << cameraId \
+                                 << "'" << std::endl;
+        return;
       }
+
+      //Convert to a vector and set it
+      cameraTrackerMap[cameraId].horizontalAngle = horizontal;
+      cameraTrackerMap[cameraId].verticalAngle = vertical;
     }
 
     //Set field of view (radians)
     void setFieldOfView(AmmoniteId cameraId, float fov) {
-      //Find the target camera and update field of view
-      if (cameraTrackerMap.contains(cameraId)) {
-        cameraTrackerMap[cameraId].fov = fov;
+      //Check the camera exists
+      if (!cameraTrackerMap.contains(cameraId)) {
+        ammonite::utils::warning << "Couldn't find camera with ID '" << cameraId \
+                                 << "'" << std::endl;
+        return;
       }
+
+      //Find the target camera and update field of view
+      cameraTrackerMap[cameraId].fov = fov;
     }
 
     /*
@@ -277,41 +313,53 @@ namespace ammonite {
      - Create a new link between cameraId and pathId
     */
     void setLinkedPath(AmmoniteId cameraId, AmmoniteId pathId) {
-      //Store the ID of the linked path
-      if (cameraTrackerMap.contains(cameraId)) {
-        /*
-         - Unlink the old camera from the new path
-         - Unlink the old path from the new camera
-         - Record the new link in both systems
-        */
-        const bool success = internal::setLinkedPath(cameraId, pathId, true) &&
-                             path::internal::setLinkedCamera(pathId, cameraId, true);
-        if (!success) {
-          ammonite::utils::warning << "Failed to link camera (ID " << cameraId \
-                                   << ") and path (ID " << pathId \
-                                   << ")" << std::endl;
-          return;
-        }
+      //Check the camera exists
+      if (!cameraTrackerMap.contains(cameraId)) {
+        ammonite::utils::warning << "Couldn't find camera with ID '" << cameraId \
+                                 << "'" << std::endl;
+        return;
+      }
+
+      /*
+       - Unlink the old camera from the new path
+       - Unlink the old path from the new camera
+       - Record the new link in both systems
+      */
+      const bool success = internal::setLinkedPath(cameraId, pathId, true) &&
+                           path::internal::setLinkedCamera(pathId, cameraId, true);
+      if (!success) {
+        ammonite::utils::warning << "Failed to link camera (ID " << cameraId \
+                                 << ") and path (ID " << pathId \
+                                 << ")" << std::endl;
+        return;
       }
     }
 
     AmmoniteId getLinkedPath(AmmoniteId cameraId) {
-      if (cameraTrackerMap.contains(cameraId)) {
-        return cameraTrackerMap[cameraId].linkedCameraPathId;
+      //Check the camera exists
+      if (!cameraTrackerMap.contains(cameraId)) {
+        ammonite::utils::warning << "Couldn't find camera with ID '" << cameraId \
+                                 << "'" << std::endl;
+        return 0;
       }
 
-      return 0;
+      return cameraTrackerMap[cameraId].linkedCameraPathId;
     }
 
     void removeLinkedPath(AmmoniteId cameraId) {
+      //Check the camera exists
+      if (!cameraTrackerMap.contains(cameraId)) {
+        ammonite::utils::warning << "Couldn't find camera with ID '" << cameraId \
+                                 << "'" << std::endl;
+        return;
+      }
+
       //Instruct the path system to unlink
-      if (cameraTrackerMap.contains(cameraId)) {
-        const AmmoniteId pathId = cameraTrackerMap[cameraId].linkedCameraPathId;
-        if (!path::internal::setLinkedCamera(pathId, 0, true)) {
-          ammonite::utils::warning << "Failed to unlink camera (ID " << cameraId \
-                                   << ") and path (ID " << pathId \
-                                   << ")" << std::endl;
-        }
+      const AmmoniteId pathId = cameraTrackerMap[cameraId].linkedCameraPathId;
+      if (!path::internal::setLinkedCamera(pathId, 0, true)) {
+        ammonite::utils::warning << "Failed to unlink camera (ID " << cameraId \
+                                 << ") and path (ID " << pathId \
+                                 << ")" << std::endl;
       }
     }
   }
