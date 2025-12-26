@@ -1,3 +1,4 @@
+#include <cmath>
 #include <cstdlib>
 #include <format>
 #include <iostream>
@@ -312,9 +313,41 @@ int main(int argc, char** argv) noexcept(false) {
   ammonite::controls::setupFreeCamera(AMMONITE_W, AMMONITE_S,
     AMMONITE_SPACE, AMMONITE_LEFT_SHIFT, AMMONITE_D, AMMONITE_A);
 
-  //Set the non-default camera to the start position
-  const ammonite::Vec<float, 3> cameraPosition = {0.0f, 0.0f, 2.0f};
-  ammonite::camera::setPosition(cameraData.cameraIds[1], cameraPosition);
+  //Set up the camera path
+  const unsigned int nodeCount = 100 + 1;
+  const double pathDuration = 6.0;
+  const float pathRadius = 16.0;
+  const float pathHeight = 12.0f;
+  const AmmoniteId pathId = ammonite::camera::path::createCameraPath(nodeCount);
+
+  //Generate and add the path's nodes
+  for (unsigned int i = 0; i < nodeCount; i++) {
+    ammonite::Vec<float, 3> position = {0};
+    ammonite::Vec<float, 3> direction = {0};
+
+    //Calculate the node's coordinates
+    const double progress = (double)(i) / (double)(nodeCount - 1);
+    const float angle = (float)progress * 2.0f * ammonite::pi<float>();
+    position[0] = pathRadius * std::sin(angle);
+    position[1] = pathHeight;
+    position[2] = pathRadius * std::cos(angle);
+
+    //Look towards the origin
+    ammonite::negate(position, direction);
+    ammonite::normalise(direction);
+
+    const double time = progress * pathDuration;
+    ammonite::camera::path::addPathNode(pathId, position, direction, time);
+  }
+
+  //Start the path for the non-default camera and enable looping
+  ammonite::camera::path::setPathMode(pathId, AMMONITE_PATH_LOOP);
+  ammonite::camera::setLinkedPath(cameraData.cameraIds[1], pathId);
+  ammonite::camera::path::playPath(pathId);
+
+  //Register with the command system
+  commands::registerCameraPath(pathId);
+  setupBits |= HAS_SETUP_PATHS;
 
   //Set keybinds
   std::vector<AmmoniteId> keybindIds;
@@ -336,7 +369,6 @@ int main(int argc, char** argv) noexcept(false) {
                        AMMONITE_B, cameraCycleCallback, &cameraData));
   keybindIds.push_back(ammonite::input::registerToggleKeybind(
                        AMMONITE_G, pathRecordToggleCallback, &recordingCameraPathId));
-  setupBits |= HAS_SETUP_PATHS;
 
   //Set keybinds to adjust focal depth
   float positive = 1.0f;
