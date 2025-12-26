@@ -112,10 +112,10 @@ namespace ammonite {
           }
 
           //Reset the time if looping and restarting
-          if (cameraPath.pathMode == AMMONITE_PATH_LOOP){
+          if (cameraPath.pathMode == AMMONITE_PATH_LOOP) {
             if (currentTime >= maxNodeTime) {
               //Reset the time, preserving the overshoot
-              const double extraTime = currentTime - maxNodeTime;
+              const double extraTime = std::fmod(currentTime, maxNodeTime);
               cameraPath.pathTimer.setTime(extraTime);
               currentTime = extraTime;
 
@@ -149,7 +149,7 @@ namespace ammonite {
               break;
             }
 
-            //No more nodes to try
+            //No more nodes to try for linear modes
             if (isLastNode) {
               break;
             }
@@ -163,6 +163,7 @@ namespace ammonite {
             //Determine the node's time
             const PathNode& nextNode = cameraPath.pathNodes[realNextIndex];
 
+            //Find the time this node occurs at
             double nodeTime = 0.0;
             switch (cameraPath.pathMode) {
             case AMMONITE_PATH_FORWARD:
