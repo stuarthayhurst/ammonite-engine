@@ -22,6 +22,18 @@ namespace AMMONITE_INTERNAL ammonite {
     constexpr T degrees(T angle) {
       return (angle / ammonite::pi<T>()) * (T)180.0;
     }
+
+    template <typename T> requires std::is_floating_point_v<T>
+    constexpr T smallestAngleDelta(T angleA, T angleB) {
+      T angleDelta = angleA - angleB;
+      if (angleDelta < -ammonite::pi<T>()) {
+        angleDelta += ammonite::pi<T>() * (T)2.0;
+      } else if (angleDelta > ammonite::pi<T>()) {
+        angleDelta -= ammonite::pi<T>() * (T)2.0;
+      }
+
+      return angleDelta;
+    }
   }
 }
 

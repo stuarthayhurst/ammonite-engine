@@ -35,34 +35,6 @@ namespace ammonite {
       std::unordered_map<AmmoniteId, Path> pathTrackerMap;
     }
 
-    namespace {
-      double calculateVerticalAngle(const ammonite::Vec<float, 3>& direction) {
-        ammonite::Vec<float, 3> normalisedDirection = {0};
-        ammonite::normalise(direction, normalisedDirection);
-        return std::asin(normalisedDirection[1]);
-      }
-
-      double calculateHorizontalAngle(const ammonite::Vec<float, 3>& direction) {
-        ammonite::Vec<float, 3> normalisedDirection = {0};
-        ammonite::copy(direction, normalisedDirection);
-        normalisedDirection[1] = 0.0f;
-
-        ammonite::normalise(normalisedDirection);
-        return std::atan2(normalisedDirection[0], normalisedDirection[2]);
-      }
-
-      double smallestAngleDelta(double angleA, double angleB) {
-        double angleDelta = angleA - angleB;
-        if (angleDelta < -ammonite::pi<float>()) {
-          angleDelta += ammonite::pi<float>() * 2.0f;
-        } else if (angleDelta > ammonite::pi<float>()) {
-          angleDelta -= ammonite::pi<float>() * 2.0f;
-        }
-
-        return angleDelta;
-      }
-    }
-
     namespace path {
       namespace internal {
         //Update the stored link for pathId, optionally unlink the existing camera
@@ -257,10 +229,10 @@ namespace ammonite {
           ammonite::add(newPosition, currentNode.position);
 
           //Find smallest delta between node angles
-          const double horizontalDelta = smallestAngleDelta(nextNode.horizontalAngle,
-                                                            currentNode.horizontalAngle);
-          const double verticalDelta = smallestAngleDelta(nextNode.verticalAngle,
-                                                          currentNode.verticalAngle);
+          const double horizontalDelta =
+            ammonite::smallestAngleDelta(nextNode.horizontalAngle, currentNode.horizontalAngle);
+          const double verticalDelta =
+            ammonite::smallestAngleDelta(nextNode.verticalAngle, currentNode.verticalAngle);
 
           //Apply the deltas
           const double newHorizontal = currentNode.horizontalAngle + (horizontalDelta * nodeProgress);
@@ -351,8 +323,8 @@ namespace ammonite {
                                const ammonite::Vec<float, 3>& position,
                                const ammonite::Vec<float, 3>& direction,
                                double time) {
-        const double horizontal = calculateHorizontalAngle(direction);
-        const double vertical = calculateVerticalAngle(direction);
+        const double horizontal = ammonite::calculateHorizontalAngle(direction);
+        const double vertical = ammonite::calculateVerticalAngle(direction);
         return addPathNode(pathId, position, horizontal, vertical, time);
       }
 

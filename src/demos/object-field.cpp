@@ -219,13 +219,7 @@ namespace objectFieldDemo {
   namespace {
     //Return true if 2 angles are within threshold radians of each other
     constexpr bool isWithinThreshold(float angleA, float angleB, float threshold) {
-      float delta = angleA - angleB;
-      if (delta < -ammonite::pi<float>()) {
-        delta += ammonite::pi<float>() * 2.0f;
-      } else if (delta > ammonite::pi<float>()) {
-        delta -= ammonite::pi<float>() * 2.0f;
-      }
-
+      const float delta = ammonite::smallestAngleDelta(angleA, angleB);
       return (std::abs(delta) <= threshold);
     }
 

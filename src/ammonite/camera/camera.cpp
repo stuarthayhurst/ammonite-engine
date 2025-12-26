@@ -34,34 +34,6 @@ namespace ammonite {
       std::unordered_map<AmmoniteId, Camera> cameraTrackerMap = {{1, defaultCamera}};
     }
 
-    namespace {
-      void calculateDirection(float horizontal, float vertical,
-                              ammonite::Vec<float, 3>& dest) {
-        const ammonite::Vec<float, 3> direction = {
-          std::cos(vertical) * std::sin(horizontal),
-          std::sin(vertical),
-          std::cos(vertical) * std::cos(horizontal)
-        };
-
-        ammonite::normalise(direction, dest);
-      }
-
-      double calculateVerticalAngle(const ammonite::Vec<float, 3>& direction) {
-        ammonite::Vec<float, 3> normalisedDirection = {0};
-        ammonite::normalise(direction, normalisedDirection);
-        return std::asin(normalisedDirection[1]);
-      }
-
-      double calculateHorizontalAngle(const ammonite::Vec<float, 3>& direction) {
-        ammonite::Vec<float, 3> normalisedDirection = {0};
-        ammonite::copy(direction, normalisedDirection);
-        normalisedDirection[1] = 0.0f;
-
-        ammonite::normalise(normalisedDirection);
-        return std::atan2(normalisedDirection[0], normalisedDirection[2]);
-      }
-    }
-
     //Pointer and update methods exposed internally
     namespace internal {
       ammonite::Mat<float, 4>* getViewMatrixPtr() {
@@ -83,8 +55,8 @@ namespace ammonite {
 
         //Calculate the direction vector
         ammonite::Vec<float, 3> direction = {0};
-        calculateDirection((float)activeCamera->horizontalAngle,
-                           (float)activeCamera->verticalAngle, direction);
+        ammonite::calculateDirection((float)activeCamera->horizontalAngle,
+                                     (float)activeCamera->verticalAngle, direction);
 
         //Right vector, relative to the camera
         const ammonite::Vec<float, 3> right = {
@@ -214,8 +186,8 @@ namespace ammonite {
       }
 
       const Camera& activeCamera = cameraTrackerMap[cameraId];
-      calculateDirection((float)activeCamera.horizontalAngle,
-                         (float)activeCamera.verticalAngle, direction);
+      ammonite::calculateDirection((float)activeCamera.horizontalAngle,
+                                   (float)activeCamera.verticalAngle, direction);
     }
 
     //Get horizontal angle (radians)
@@ -276,8 +248,8 @@ namespace ammonite {
 
       //Find the target camera and update direction
       Camera& activeCamera = cameraTrackerMap[cameraId];
-      activeCamera.horizontalAngle = calculateHorizontalAngle(direction);
-      activeCamera.verticalAngle = calculateVerticalAngle(direction);
+      activeCamera.horizontalAngle = ammonite::calculateHorizontalAngle(direction);
+      activeCamera.verticalAngle = ammonite::calculateVerticalAngle(direction);
     }
 
     //Set camera direction via angle pair (radians)
