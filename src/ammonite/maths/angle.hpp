@@ -1,6 +1,9 @@
 #ifndef INTERNALAMMONITEANGLE
 #define INTERNALAMMONITEANGLE
 
+#include <cmath>
+#include <type_traits>
+
 //Include public interface
 #include "../../include/ammonite/maths/angle.hpp" // IWYU pragma: export
 
