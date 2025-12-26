@@ -306,7 +306,12 @@ namespace ammonite {
     void removeLinkedPath(AmmoniteId cameraId) {
       //Instruct the path system to unlink
       if (cameraTrackerMap.contains(cameraId)) {
-        path::internal::setLinkedCamera(cameraId, 0, true);
+        const AmmoniteId pathId = cameraTrackerMap[cameraId].linkedCameraPathId;
+        if (!path::internal::setLinkedCamera(pathId, 0, true)) {
+          ammonite::utils::warning << "Failed to unlink camera (ID " << cameraId \
+                                   << ") and path (ID " << pathId \
+                                   << ")" << std::endl;
+        }
       }
     }
   }
