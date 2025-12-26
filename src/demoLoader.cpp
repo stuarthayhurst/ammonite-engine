@@ -87,7 +87,8 @@ namespace {
 
   enum : unsigned char {
     HAS_SETUP_ENGINE   = (1 << 0),
-    HAS_SETUP_CONTROLS = (1 << 1)
+    HAS_SETUP_CONTROLS = (1 << 1),
+    HAS_SETUP_PATHS    = (1 << 2)
   };
 
   void inputFocusCallback(const std::vector<AmmoniteKeycode>&, KeyStateEnum, void*) {
@@ -118,6 +119,21 @@ namespace {
     CameraData* const cameraData = (CameraData*)userPtr;
     cameraData->cameraIndex = (int)((cameraData->cameraIndex + 1) % cameraData->cameraIds.size());
     ammonite::camera::setActiveCamera(cameraData->cameraIds[cameraData->cameraIndex]);
+  }
+
+  void pathRecordToggleCallback(const std::vector<AmmoniteKeycode>&,
+                                KeyStateEnum action, void* userPtr) {
+    AmmoniteId* const pathIdPtr = (AmmoniteId*)userPtr;
+
+    //Create and register path to record
+    if (action == AMMONITE_PRESSED) {
+      if (*pathIdPtr == 0) {
+        *pathIdPtr = ammonite::camera::path::createCameraPath();
+        commands::registerCameraPath(*pathIdPtr);
+      } else {
+        *pathIdPtr = 0;
+      }
+    }
   }
 
   void changeFocalDepthCallback(const std::vector<AmmoniteKeycode>&,
@@ -181,6 +197,10 @@ namespace {
 
   //Clean up anything that was created
   void cleanEngine(unsigned char setupBits, std::vector<AmmoniteId>* keybindIdsPtr) {
+    if ((setupBits & HAS_SETUP_PATHS) != 0) {
+      commands::deleteCameraPaths();
+    }
+
     if ((setupBits & HAS_SETUP_CONTROLS) != 0) {
       ammonite::controls::releaseFreeCamera();
       if (keybindIdsPtr != nullptr) {
@@ -193,6 +213,19 @@ namespace {
     if ((setupBits & HAS_SETUP_ENGINE) != 0) {
       ammonite::destroyEngine();
     }
+  }
+
+  void recordCameraPathNode(AmmoniteId cameraPathId,
+                            const ammonite::utils::Timer& pathTimer) {
+    ammonite::Vec<float, 3> cameraPosition = {0};
+    const AmmoniteId activeCameraId = ammonite::camera::getActiveCamera();
+
+    ammonite::camera::getPosition(activeCameraId, cameraPosition);
+    const double horizontal = ammonite::camera::getHorizontal(activeCameraId);
+    const double vertical = ammonite::camera::getVertical(activeCameraId);
+
+    ammonite::camera::path::addPathNode(cameraPathId, cameraPosition,
+                                        horizontal, vertical, pathTimer.getTime());
   }
 }
 
@@ -286,6 +319,7 @@ int main(int argc, char** argv) noexcept(false) {
   //Set keybinds
   std::vector<AmmoniteId> keybindIds;
   bool commandPromptRequested = false;
+  AmmoniteId recordingCameraPathId = 0;
   keybindIds.push_back(ammonite::input::registerToggleKeybind(
                        AMMONITE_C, AMMONITE_ALLOW_OVERRIDE, inputFocusCallback, nullptr));
   keybindIds.push_back(ammonite::input::registerToggleKeybind(
@@ -300,6 +334,9 @@ int main(int argc, char** argv) noexcept(false) {
                        AMMONITE_LEFT_CONTROL, sprintToggleCallback, nullptr));
   keybindIds.push_back(ammonite::input::registerToggleKeybind(
                        AMMONITE_B, cameraCycleCallback, &cameraData));
+  keybindIds.push_back(ammonite::input::registerToggleKeybind(
+                       AMMONITE_G, pathRecordToggleCallback, &recordingCameraPathId));
+  setupBits |= HAS_SETUP_PATHS;
 
   //Set keybinds to adjust focal depth
   float positive = 1.0f;
@@ -338,6 +375,7 @@ int main(int argc, char** argv) noexcept(false) {
   //Create and reset timers for performance metrics
   utilityTimer.reset();
   ammonite::utils::Timer frameTimer;
+  ammonite::utils::Timer pathTimer(false);
 
   //Draw frames until window closed
   while(!closeWindow && !ammonite::window::shouldWindowClose()) {
@@ -364,6 +402,26 @@ int main(int argc, char** argv) noexcept(false) {
       //Swap input back to window
       ammonite::input::setInputFocus(hadInputFocus);
       commandPromptRequested = false;
+    }
+
+    //Camera path recording
+    if (recordingCameraPathId != 0) {
+      //Start the path timer, if required
+      if (!pathTimer.isRunning()) {
+        pathTimer.unpause();
+        pathTimer.reset();
+
+        ammonite::utils::status << "Recording camera path" << std::endl;
+      }
+
+      recordCameraPathNode(recordingCameraPathId, pathTimer);
+    } else {
+      //Stop the path timer
+      if (pathTimer.isRunning()) {
+        pathTimer.pause();
+
+        ammonite::utils::status << "Finished recording camera path" << std::endl;
+      }
     }
 
     //Call demo-specific main loop code

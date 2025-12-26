@@ -13,6 +13,7 @@
   - Model loading, using `libassimp`
   - Shader program caching with a custom hash
   - Key binding and mouse input support
+  - Camera path support
   - Command prompt for engine control
   - Miscellaneous utilities (thread pool, thread-safe logging, timers, random number generation)
 
@@ -54,6 +55,7 @@
     - Scroll to adjust zoom
     - Middle-click to reset zoom
     - `B` to switch camera
+    - `G` to record a camera path
     - `C` to release input
     - `ESC` to close the demo
     - `V` to open the command prompt

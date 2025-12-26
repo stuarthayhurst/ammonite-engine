@@ -1,5 +1,6 @@
 #include <exception>
 #include <iostream>
+#include <set>
 #include <sstream>
 #include <string>
 #include <unordered_map>
@@ -173,6 +174,7 @@ namespace {
     ammonite::utils::normal << "  'get [key]'                   : Get the value of a setting key" << std::endl;
     ammonite::utils::normal << "  'set [key] [value]'           : Set the value of a setting key" << std::endl;
     ammonite::utils::normal << "  'camera' [mode] [key] [value] : Get / set camera properties" << std::endl;
+    ammonite::utils::normal << "  'path' [action] [id] [option] : Manage recorded camera paths" << std::endl;
     ammonite::utils::normal << "  'models'                      : Dump model system data (debug mode)" << std::endl;
     ammonite::utils::normal << "  'exit'                        : Exit the command system" << std::endl;
     ammonite::utils::normal << "  'stop'                        : Stop the program" << std::endl;
@@ -531,6 +533,165 @@ namespace {
                                << "' isn't a valid mode, use 'get' or 'set'" << std::endl;
     }
 
+    return CONTINUE;
+  }
+}
+
+namespace {
+  //Track a set of registered camera path IDs
+  std::set<AmmoniteId> cameraPathIds;
+
+  //Path play state enum
+  enum PlayStateEnum : unsigned char {
+    PATH_PLAY,
+    PATH_PAUSE,
+    PATH_RESTART
+  };
+
+  void pathListCommand() {
+    for (const AmmoniteId cameraPathId : cameraPathIds) {
+      ammonite::utils::normal << " - " << cameraPathId << std::endl;
+    }
+  }
+
+  void pathSetCommand(const std::vector<std::string>& arguments) {
+    //Handle missing ID
+    if (!checkArgumentCount(arguments, 2, false)) {
+      ammonite::utils::warning << "No path ID specified" << std::endl;
+      return;
+    }
+
+    //Read the camera path ID in
+    unsigned int pathId = 0;
+    if (!stringToUInt(arguments[2], &pathId)) {
+      return;
+    };
+
+    //Check the ID is valid
+    if (pathId != 0 && !cameraPathIds.contains(pathId)) {
+      ammonite::utils::warning << "No path found with ID '" << pathId << "'" << std::endl;
+      return;
+    }
+
+    //Set or reset the path for the current camera
+    if (pathId == 0) {
+      ammonite::camera::removeLinkedPath(ammonite::camera::getActiveCamera());
+    } else {
+      ammonite::camera::setLinkedPath(ammonite::camera::getActiveCamera(), pathId);
+    }
+  }
+
+  void pathStateCommand(const std::vector<std::string>& arguments, PlayStateEnum state) {
+    //Handle missing ID
+    if (!checkArgumentCount(arguments, 2, false)) {
+      ammonite::utils::warning << "No path ID specified" << std::endl;
+      return;
+    }
+
+    //Read the camera path ID in
+    unsigned int pathId = 0;
+    if (!stringToUInt(arguments[2], &pathId)) {
+      return;
+    };
+
+    //Set the path play state
+    switch (state) {
+    case PATH_PLAY:
+      ammonite::camera::path::playPath(pathId);
+      break;
+    case PATH_PAUSE:
+      ammonite::camera::path::pausePath(pathId);
+      break;
+    case PATH_RESTART:
+      ammonite::camera::path::restartPath(pathId);
+      break;
+    }
+  }
+
+  void pathDeleteCommand(const std::vector<std::string>& arguments) {
+    //Handle missing ID
+    if (!checkArgumentCount(arguments, 2, false)) {
+      ammonite::utils::warning << "No path ID specified" << std::endl;
+      return;
+    }
+
+    //Read the camera path ID in
+    unsigned int pathId = 0;
+    if (!stringToUInt(arguments[2], &pathId)) {
+      return;
+    };
+
+    //Check the ID is valid
+    if (!cameraPathIds.contains(pathId)) {
+      ammonite::utils::warning << "No path found with ID '" << pathId << "'" << std::endl;
+      return;
+    }
+
+    //Delete the path
+    if (pathId != 0) {
+      ammonite::camera::path::destroyCameraPath(pathId);
+    }
+    cameraPathIds.erase(pathId);
+  }
+
+  void pathModeCommand(const std::vector<std::string>& arguments) {
+    //Handle missing ID
+    if (!checkArgumentCount(arguments, 2, false)) {
+      ammonite::utils::warning << "No path ID specified" << std::endl;
+      return;
+    }
+
+    //Read the camera path ID in
+    unsigned int pathId = 0;
+    if (!stringToUInt(arguments[2], &pathId)) {
+      return;
+    };
+
+    //Handle missing path mode
+    if (!checkArgumentCount(arguments, 3, false)) {
+      ammonite::utils::warning << "No path mode specified, use 'forward', 'reverse' or 'loop'" << std::endl;
+      return;
+    }
+
+    //Apply the path mode
+    if (arguments[3] == "forward") {
+      ammonite::camera::path::setPathMode(pathId, AMMONITE_PATH_FORWARD);
+    } else if (arguments[3] == "reverse") {
+      ammonite::camera::path::setPathMode(pathId, AMMONITE_PATH_REVERSE);
+    } else if (arguments[3] == "loop") {
+      ammonite::camera::path::setPathMode(pathId, AMMONITE_PATH_LOOP);
+    } else {
+      ammonite::utils::warning << "'" << arguments[3] \
+                               << "' isn't a valid mode, use 'forward', 'reverse' or 'loop'" << std::endl;
+    }
+  }
+
+  ReturnActionEnum pathCommand(const std::vector<std::string>& arguments) {
+    //Ignore empty commands
+    if (!checkArgumentCount(arguments, 1, false)) {
+      ammonite::utils::warning << "No action specified, use 'list', 'set', 'play', 'pause', 'restart', 'delete' or 'mode'" << std::endl;
+      return CONTINUE;
+    }
+
+    //Handle different modes
+    if (arguments[1] == "list") {
+      pathListCommand();
+    } else if (arguments[1] == "set") {
+      pathSetCommand(arguments);
+    } else if (arguments[1] == "play") {
+      pathStateCommand(arguments, PATH_PLAY);
+    } else if (arguments[1] == "pause") {
+      pathStateCommand(arguments, PATH_PAUSE);
+    } else if (arguments[1] == "restart") {
+      pathStateCommand(arguments, PATH_RESTART);
+    } else if (arguments[1] == "delete") {
+      pathDeleteCommand(arguments);
+    } else if (arguments[1] == "mode") {
+      pathModeCommand(arguments);
+    } else {
+      ammonite::utils::warning << "'" << arguments[1] \
+                               << "' isn't a valid action, use 'list', 'set', 'play', 'pause', 'restart', 'delete' or 'mode'" << std::endl;
+    }
 
     return CONTINUE;
   }
@@ -560,7 +721,6 @@ namespace {
 
 /*
  - Public command management
- - Since the commands are self-contained, this just enables the command mode
 */
 
 namespace commands {
@@ -570,6 +730,7 @@ namespace commands {
       {"get", {getCommand}},
       {"set", {setCommand}},
       {"camera", {cameraCommand}},
+      {"path", {pathCommand}},
       {"models", {modelDumpCommand}},
       {"exit", {exitCommand}},
       {"stop", {stopCommand}}
@@ -616,5 +777,17 @@ namespace commands {
         return (action == EXIT_PROGRAM);
       }
     }
+  }
+
+  void registerCameraPath(AmmoniteId pathId) {
+    cameraPathIds.insert(pathId);
+  }
+
+  void deleteCameraPaths() {
+    for (const AmmoniteId pathId : cameraPathIds) {
+      ammonite::camera::path::destroyCameraPath(pathId);
+    }
+
+    cameraPathIds.clear();
   }
 }
