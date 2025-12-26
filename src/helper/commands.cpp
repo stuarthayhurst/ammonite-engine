@@ -629,7 +629,7 @@ namespace {
 
     //Delete the path
     if (pathId != 0) {
-      ammonite::camera::path::destroyCameraPath(pathId);
+      ammonite::camera::path::deleteCameraPath(pathId);
     }
     cameraPathIds.erase(pathId);
   }
@@ -785,7 +785,7 @@ namespace commands {
 
   void deleteCameraPaths() {
     for (const AmmoniteId pathId : cameraPathIds) {
-      ammonite::camera::path::destroyCameraPath(pathId);
+      ammonite::camera::path::deleteCameraPath(pathId);
     }
 
     cameraPathIds.clear();

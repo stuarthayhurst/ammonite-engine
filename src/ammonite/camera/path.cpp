@@ -293,8 +293,8 @@ namespace ammonite {
         return createCameraPath(0);
       }
 
-      //Destroy a camera path and all nodes contained
-      void destroyCameraPath(AmmoniteId pathId) {
+      //Delete a camera path and all nodes contained
+      void deleteCameraPath(AmmoniteId pathId) {
         //Check the path exists
         if (!pathTrackerMap.contains(pathId)) {
           ammonite::utils::warning << "Couldn't find camera path with ID '" \

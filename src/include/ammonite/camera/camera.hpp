@@ -37,7 +37,7 @@ namespace AMMONITE_EXPOSED ammonite {
     namespace path {
       AmmoniteId createCameraPath(unsigned int size);
       AmmoniteId createCameraPath();
-      void destroyCameraPath(AmmoniteId pathId);
+      void deleteCameraPath(AmmoniteId pathId);
       void reserveCameraPath(AmmoniteId pathId, unsigned int size);
 
       unsigned int addPathNode(AmmoniteId pathId,
