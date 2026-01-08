@@ -48,7 +48,8 @@ TEST_OBJECTS = $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.o,$(TEST_OBJECTS_SOURCE
 ROOT_OBJECTS = $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.o,$(ROOT_OBJECTS_SOURCE)))
 
 #Global arguments
-CXXFLAGS += -Wall -Wextra -Werror -Wpedantic -std=c++23 -flto=auto -O3
+CXXFLAGS += -Wall -Wextra -Werror -Wpedantic -std=c++23
+CXXFLAGS += -fno-math-errno -flto=auto -O3
 
 ifndef ARCH
   CXXFLAGS += -march=native
