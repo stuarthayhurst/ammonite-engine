@@ -458,8 +458,6 @@ namespace ammonite {
           if (renderMode == AMMONITE_RENDER_PASS) {
             if (drawObjectInfo->textureIds[i].diffuseId != 0) {
               glBindTextureUnit(0, drawObjectInfo->textureIds[i].diffuseId);
-            } else {
-              ammoniteInternalDebug << "No diffuse texture supplied, skipping" << std::endl;
             }
 
             if (drawObjectInfo->textureIds[i].specularId != 0) {

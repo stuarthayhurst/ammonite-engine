@@ -15,6 +15,7 @@
 
 #include "../graphics/textures.hpp"
 #include "../maths/vector.hpp"
+#include "../utils/debug.hpp"
 #include "../utils/logging.hpp"
 
 namespace ammonite {
@@ -87,6 +88,8 @@ namespace ammonite {
             }
 
             textureIdGroup.diffuseId = textureId;
+          } else {
+            ammoniteInternalDebug << "No diffuse texture supplied on mesh of model '" << modelData->modelName << "', skipping" << std::endl;
           }
 
           if (material->GetTextureCount(aiTextureType_SPECULAR) > 0) {
