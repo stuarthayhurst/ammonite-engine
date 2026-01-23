@@ -241,6 +241,24 @@ namespace ammonite {
           return group->try_acquire();
         }
 
+        /*
+         - Return the number of unfinished jobs in a group
+           - This is jobCount - the number of successfully acquired jobs
+           - Remaining work may be overestimated, but never underestimated
+         - Acts like synchronisation if successful, decreasing the group's counter
+        */
+        unsigned int getRemainingWork(AmmoniteGroup* group, unsigned int jobCount) {
+          for (unsigned int i = 0; i < jobCount; i++) {
+            if (group->try_acquire()) {
+              jobCount--;
+            } else {
+              return jobCount;
+            }
+          }
+
+          return 0;
+        }
+
         //Create a thread pool of the requested size, if one doesn't already exist
         bool createThreadPool(unsigned int threadCount) {
           //Exit if thread pool already exists
