@@ -24,6 +24,7 @@ namespace ammonite {
                                 AmmoniteGroup* group, unsigned int newJobs);
 
         void waitGroupComplete(AmmoniteGroup* group, unsigned int jobCount);
+        bool isSingleWorkComplete(AmmoniteGroup* group);
 
         void blockThreads();
         void unblockThreads();

@@ -34,6 +34,7 @@ namespace AMMONITE_EXPOSED ammonite {
                               AmmoniteGroup* group, unsigned int jobCount);
 
       void waitGroupComplete(AmmoniteGroup* group, unsigned int jobCount);
+      bool isSingleWorkComplete(AmmoniteGroup* group);
 
       void blockThreads();
       void unblockThreads();

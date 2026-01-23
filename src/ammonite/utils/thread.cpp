@@ -138,6 +138,23 @@ namespace ammonite {
         }
       }
 
+        /*
+         - Check if at least one item of a group has finished
+           - May spuriously fail, returning false when work had finished
+         - Acts like synchronisation if successful, decreasing the group's counter
+           - A second call to a group with 1 complete work item would return false
+           - Using waitGroupComplete() at this point would block
+         - If unsuccessful, nothing in the group is modified
+        */
+      bool isSingleWorkComplete(AmmoniteGroup* group) {
+        if (group != nullptr) {
+          return internal::isSingleWorkComplete(group);
+        }
+
+        ammoniteInternalDebug << "Group is a nullptr, skipping check" << std::endl;
+        return false;
+      }
+
       /*
        - Block the pool from starting new jobs
        - Returns once all threads are blocked

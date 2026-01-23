@@ -232,6 +232,15 @@ namespace ammonite {
           }
         }
 
+        /*
+         - Return true if at least one item of a group has finished
+           - May spuriously fail, returning false when work had finished
+         - Acts like synchronisation if successful, decreasing the group's counter
+        */
+        bool isSingleWorkComplete(AmmoniteGroup* group) {
+          return group->try_acquire();
+        }
+
         //Create a thread pool of the requested size, if one doesn't already exist
         bool createThreadPool(unsigned int threadCount) {
           //Exit if thread pool already exists
