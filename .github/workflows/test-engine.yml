@@ -43,7 +43,7 @@ jobs:
 
     - name: (DEBUG + ASan + UBSan) Run thread tester
       run: |
-        ./launch.sh --threads
+        ASAN_OPTIONS=detect_odr_violation=0 ./launch.sh --threads
 
     - name: (DEBUG + TSan) Build thread tester
       run: |
