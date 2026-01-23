@@ -1,6 +1,9 @@
 #include <algorithm>
+#include <array>
 #include <cmath>
+#include <cstring>
 #include <iostream>
+#include <map>
 #include <string>
 #include <unordered_map>
 
@@ -12,6 +15,7 @@ extern "C" {
 
 #include "textures.hpp"
 
+#include "../maths/vector.hpp"
 #include "../utils/debug.hpp"
 #include "../utils/logging.hpp"
 
@@ -20,13 +24,16 @@ namespace ammonite {
     namespace internal {
       namespace {
         struct TextureInfo {
-          std::string string;
           GLuint id;
           unsigned int refCount = 0;
+          std::string string;
+          std::array<float, 3> colour;
+          bool isColour;
         };
 
-        std::unordered_map<GLuint, TextureInfo> idTextureMap;
+        std::map<GLuint, TextureInfo> idTextureMap;
         std::unordered_map<std::string, TextureInfo*> stringTexturePtrMap;
+        std::map<std::array<float, 3>, TextureInfo*> colourTexturePtrMap;
       }
 
       namespace {
@@ -65,7 +72,7 @@ namespace ammonite {
       }
 
       /*
-       - Deletes a texture created with createTexture() or loadTexture()
+       - Deletes a texture created with createTexture() or load*Texture()
       */
       void deleteTexture(GLuint textureId) {
         //Fetch the texture info, if it exists
@@ -83,12 +90,23 @@ namespace ammonite {
             stringTexturePtrMap.erase(textureInfoPtr->string);
           }
 
+          //Remove the colour entry
+          if (textureInfoPtr->isColour) {
+            colourTexturePtrMap.erase(textureInfoPtr->colour);
+          }
+
           //Delete the texture
           glDeleteTextures(1, &textureInfoPtr->id);
 
           //Delete the tracker entry
-          ammoniteInternalDebug << "Deleted storage for texture (ID " << textureId \
-                                << ", '" << textureInfoPtr->string << "')" << std::endl;
+          if (!textureInfoPtr->isColour) {
+            ammoniteInternalDebug << "Deleted storage for file texture (ID " << textureId \
+                                  << ", '" << textureInfoPtr->string << "')" << std::endl;
+          } else {
+            ammoniteInternalDebug << "Deleted storage for colour texture (ID " << textureId \
+                                  << ")" << std::endl;
+          }
+
           idTextureMap.erase(textureId);
         }
       }
@@ -107,6 +125,7 @@ namespace ammonite {
       /*
        - Create a texture from the data given, return its ID
        - This doesn't generate the mipmaps, but allocates space for them (textureLevels)
+       - Makes no attempt at caching / deduplicating it
        - Returns 0 on failure
       */
       GLuint createTexture(int width, int height, unsigned char* data, GLenum dataFormat,
@@ -132,7 +151,64 @@ namespace ammonite {
                                    << ") already exists, not creating texture" << std::endl;
           return 0;
         }
-        idTextureMap[textureId] = {"", textureId, 1};
+        idTextureMap[textureId] = {textureId, 1, "", {0}, false};
+
+        return textureId;
+      }
+
+      /*
+       - Load a texture from a colour and return its ID
+       - Caches / deduplicates identical solid colour textures
+       - Returns 0 on failure
+      */
+      GLuint loadSolidTexture(const ammonite::Vec<float, 3>& colour) {
+        //Copy the colour into a standard type as a key
+        std::array<float, 3> colourArray;
+        std::memcpy(colourArray.data(), ammonite::data(colour), sizeof(colour));
+
+        //Check if this colour has already been loaded
+        if (colourTexturePtrMap.contains(colourArray)) {
+          TextureInfo* const textureInfo = colourTexturePtrMap[colourArray];
+
+          textureInfo->refCount++;
+          return textureInfo->id;
+        }
+
+        //Decide the format of the texture and data
+        GLenum textureFormat = 0, dataFormat = 0;
+        if (!decideTextureFormat(3, false, &textureFormat, &dataFormat)) {
+          ammonite::utils::warning << "Failed to load texture from colour" << std::endl;
+          return 0;
+        }
+
+        //Convert the colour into the required format
+        ammonite::Vec<float, 3> scaledColour = {0};
+        ammonite::scale(colour, 255.0f, scaledColour);
+        unsigned char data[3] = {
+          (unsigned char)scaledColour[0],
+          (unsigned char)scaledColour[1],
+          (unsigned char)scaledColour[2]
+        };
+
+        //Create the texture and free the image data
+        const unsigned int mipmapLevels = calculateMipmapLevels(1, 1);
+        const GLuint textureId = createTexture(1, 1, data, dataFormat, textureFormat,
+                                               (GLint)mipmapLevels);
+        if (textureId == 0) {
+          ammonite::utils::warning << "Failed to load texture from colour" << std::endl;
+          return 0;
+        }
+
+        //Connect the texture colour to the ID and info
+        TextureInfo* const textureInfoPtr = &idTextureMap[textureId];
+        colourTexturePtrMap[colourArray] = textureInfoPtr;
+        textureInfoPtr->colour = colourArray;
+        textureInfoPtr->isColour = true;
+
+        //Handle filtering and mipmaps
+        glTextureParameteri(textureId, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTextureParameteri(textureId, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glGenerateTextureMipmap(textureId);
 
         return textureId;
       }
@@ -141,6 +217,7 @@ namespace ammonite {
        - Load a texture from a file and return its ID
          - flipTexture controls whether the texture is flipped or not
          - srgbTexture controls whether the texture is treated as sRGB
+       - Caches / deduplicates same-file textures
        - Returns 0 on failure
       */
       GLuint loadTexture(const std::string& texturePath, bool flipTexture, bool srgbTexture) {

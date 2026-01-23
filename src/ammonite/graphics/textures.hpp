@@ -8,6 +8,7 @@ extern "C" {
 }
 
 #include "../visibility.hpp"
+#include "../maths/vector.hpp"
 
 namespace ammonite {
   namespace textures {
@@ -15,6 +16,9 @@ namespace ammonite {
       GLuint createTexture(int width, int height, unsigned char* data, GLenum dataFormat,
                            GLenum textureFormat, GLint textureLevels);
       GLuint loadTexture(const std::string& texturePath, bool flipTexture, bool srgbTexture);
+
+      GLuint loadSolidTexture(const ammonite::Vec<float, 3>& colour);
+
       void copyTexture(GLuint textureId);
       void deleteTexture(GLuint textureId);
 
