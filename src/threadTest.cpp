@@ -416,8 +416,8 @@ namespace {
       destroyTimers(timers);
       return false;
     }
-    AmmoniteGroup group{0};
     unsigned int* const values = createValues(jobCount);
+    AmmoniteGroup group{0};
 
     //Test multiple work complete check before work is submitted
     if (ammonite::utils::thread::getRemainingWork(&group, jobCount) != jobCount) {
@@ -432,13 +432,14 @@ namespace {
     finishSubmitTimer(timers);
 
     //Wait for the jobs to complete
-    while (jobCount != 0) {
-      jobCount = ammonite::utils::thread::getRemainingWork(&group, jobCount);
+    unsigned int remainingJobs = jobCount;
+    while (remainingJobs != 0) {
+      remainingJobs = ammonite::utils::thread::getRemainingWork(&group, remainingJobs);
     }
 
     finishExecutionTimers(timers);
     printTimers(timers);
-    const bool passed = verifyWork(jobCount * 4, values);
+    const bool passed = verifyWork(jobCount, values);
 
     destroyValues(values);
     destroyThreadPool();
