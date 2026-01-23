@@ -60,6 +60,11 @@ namespace {
 
     *(unsigned int*)userPtr = 1;
   }
+
+  void blockingTask(void* userPtr) {
+    std::atomic_flag* const flagPtr = (std::atomic_flag*)userPtr;
+    flagPtr->wait(false);
+  }
 }
 
 namespace {
@@ -349,6 +354,92 @@ namespace {
     const bool passed = verifyWork(totalJobCount, values);
 
     delete [] userDataArray;
+    destroyValues(values);
+    destroyThreadPool();
+    destroyTimers(timers);
+    return passed;
+  }
+
+  bool testSingleSyncHelper(unsigned int jobCount) {
+    ammonite::utils::Timer* const timers = createTimers();
+    if (!createThreadPool(0)) {
+      destroyTimers(timers);
+      return false;
+    }
+    AmmoniteGroup group{0};
+
+    //Test single work complete check before work is submitted
+    if (ammonite::utils::thread::isSingleWorkComplete(&group)) {
+      ammonite::utils::error << "Single work incorrectly reported as complete" << std::endl;
+      return false;
+    }
+
+    //Prepare flags to control job flow
+    std::atomic_flag* const flags = new std::atomic_flag[jobCount]{ATOMIC_FLAG_INIT};
+
+    //Submit controlled blocking jobs
+    resetTimers(timers);
+    for (unsigned int i = 0; i < jobCount; i++) {
+      ammonite::utils::thread::submitWork(blockingTask, &flags[i], &group);
+    }
+    finishSubmitTimer(timers);
+
+    //Process the work
+    for (unsigned int i = 0; i < jobCount; i++) {
+      //Check not jobs have unexpectedly finished
+      if (ammonite::utils::thread::isSingleWorkComplete(&group)) {
+        ammonite::utils::error << "Single work incorrectly reported as complete" << std::endl;
+        delete [] flags;
+        return false;
+      }
+
+      //Allow a job to progress
+      flags[i].test_and_set();
+      flags[i].notify_all();
+
+      //Spin until the job finishes
+      while (!ammonite::utils::thread::isSingleWorkComplete(&group)) {};
+    }
+
+    finishExecutionTimers(timers);
+    printTimers(timers);
+
+    delete [] flags;
+    destroyThreadPool();
+    destroyTimers(timers);
+    return true;
+  }
+
+  bool testMultipleSyncHelper(unsigned int jobCount) {
+    ammonite::utils::Timer* const timers = createTimers();
+    if (!createThreadPool(0)) {
+      destroyTimers(timers);
+      return false;
+    }
+    AmmoniteGroup group{0};
+    unsigned int* const values = createValues(jobCount);
+
+    //Test multiple work complete check before work is submitted
+    if (ammonite::utils::thread::getRemainingWork(&group, jobCount) != jobCount) {
+      ammonite::utils::error << "Work incorrectly reported as complete" << std::endl;
+      return false;
+    }
+
+    //Submit 'fast' jobs
+    resetTimers(timers);
+    ammonite::utils::thread::submitMultiple(shortTask, &values[0], sizeof(values[0]),
+                                            &group, jobCount, nullptr);
+    finishSubmitTimer(timers);
+
+    //Wait for the jobs to complete
+    while (jobCount != 0) {
+      jobCount = ammonite::utils::thread::getRemainingWork(&group, jobCount);
+    }
+
+    finishExecutionTimers(timers);
+    printTimers(timers);
+    const bool passed = verifyWork(jobCount * 4, values);
+
     destroyValues(values);
     destroyThreadPool();
     destroyTimers(timers);
@@ -806,6 +897,12 @@ int main() noexcept(false) {
 
   ammonite::utils::normal << "Testing chained jobs" << std::endl;
   failed |= !testChainJobs(jobCount);
+
+  ammonite::utils::normal << "Testing single synchronisation helper" << std::endl;
+  failed |= !testSingleSyncHelper(jobCount);
+
+  ammonite::utils::normal << "Testing multiple synchronisation helpers" << std::endl;
+  failed |= !testMultipleSyncHelper(jobCount);
 
   ammonite::utils::normal << "Testing submit multiple" << std::endl;
   failed |= !testSubmitMultiple(jobCount);
