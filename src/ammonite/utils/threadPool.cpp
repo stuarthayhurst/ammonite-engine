@@ -248,15 +248,12 @@ namespace ammonite {
          - Acts like synchronisation if successful, decreasing the group's counter
         */
         unsigned int getRemainingWork(AmmoniteGroup* group, unsigned int jobCount) {
-          for (unsigned int i = 0; i < jobCount; i++) {
-            if (group->try_acquire()) {
-              jobCount--;
-            } else {
-              return jobCount;
-            }
-          }
+          unsigned int finishedJobs = 0;
+          while (group->try_acquire()) {
+            finishedJobs++;
+          };
 
-          return 0;
+          return jobCount - finishedJobs;
         }
 
         //Create a thread pool of the requested size, if one doesn't already exist
