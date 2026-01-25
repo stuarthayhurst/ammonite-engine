@@ -28,6 +28,13 @@ namespace ammonite {
   namespace models {
     namespace internal {
       namespace {
+        struct MatKey {
+          const char* key;
+          unsigned int type;
+          unsigned int index;
+        };
+      }
+      namespace {
         bool materialHasTexture(const aiMaterial* materialPtr, aiTextureType textureType) {
           return (materialPtr->GetTextureCount(textureType) > 0);
         }
@@ -43,15 +50,32 @@ namespace ammonite {
 
           aiString localTexturePath;
           materialPtr->GetTexture(textureType, 0, &localTexturePath);
-          std::string fullTexturePath = modelLoadInfo.modelDirectory + '/' + localTexturePath.C_Str();
+          const std::string fullTexturePath = modelLoadInfo.modelDirectory + '/' + localTexturePath.C_Str();
 
           return ammonite::textures::internal::loadTexture(fullTexturePath, false,
                                                            modelLoadInfo.srgbTextures);
         }
 
-        GLuint processColour() {
-          //TODO: Implement me
-          return 0;
+        bool materialHasColour(const aiMaterial* materialPtr, const MatKey& colourKey) {
+          aiColor3D aiColour(0.0f, 0.0f, 0.0f);
+          return (materialPtr->Get(colourKey.key, colourKey.type, colourKey.index, aiColour) == AI_SUCCESS);
+        }
+
+        GLuint processColour(const aiMaterial* materialPtr,
+                             const MatKey& colourKey, const std::string& modelName) {
+          //Bail if we don't have any of this type
+          if (!materialHasColour(materialPtr, colourKey)) {
+            ammoniteInternalDebug << "Attempted to load colour on '" << modelName \
+                                  << "', but none of this type exist" << std::endl;
+            return 0;
+          }
+
+          //Fetch the colour
+          aiColor3D aiColour(0.0f, 0.0f, 0.0f);
+          materialPtr->Get(colourKey.key, colourKey.type, colourKey.index, aiColour);
+
+          const ammonite::Vec<float, 3> colour = {aiColour.r, aiColour.g, aiColour.b};
+          return ammonite::textures::internal::loadSolidTexture(colour);
         }
 
         //Load all components of a material into a TextureIdGroup
@@ -62,31 +86,42 @@ namespace ammonite {
 
           //Array of info required to fill the texture group by texture type
           const unsigned int textureTypeCount = 2;
-          struct TextureLoadInfo {
+          const struct TextureLoadInfo {
             aiTextureType textureType;
-            GLuint& textureIdRef;
+            MatKey colourKey;
+            GLuint* textureIdPtr;
             bool isRequired;
           } textureLoadInfo[textureTypeCount] = {
-            {aiTextureType_DIFFUSE, textureGroup.diffuseId, true},
-            {aiTextureType_SPECULAR, textureGroup.specularId, false}
+            {aiTextureType_DIFFUSE, {AI_MATKEY_COLOR_DIFFUSE}, &textureGroup.diffuseId, true},
+            {aiTextureType_SPECULAR, {AI_MATKEY_COLOR_SPECULAR}, &textureGroup.specularId, false}
           };
 
           //Load each texture type of the material, according to its parameters
+          bool missing = false;
           for (const TextureLoadInfo& loadInfo : textureLoadInfo) {
             //Load the material texture type as a texture or a colour
             if (materialHasTexture(materialPtr, loadInfo.textureType)) {
               //Attempt to load the material as a texture
-              loadInfo.textureIdRef = processTexture(materialPtr, loadInfo.textureType,
-                                                     modelLoadInfo, modelName);
-            } else {
+              *loadInfo.textureIdPtr = processTexture(materialPtr, loadInfo.textureType,
+                                                      modelLoadInfo, modelName);
+            } else if (materialHasColour(materialPtr, loadInfo.colourKey)) {
               //Attempt to load the material as a colour
-              loadInfo.textureIdRef = processColour();
+              *loadInfo.textureIdPtr = processColour(materialPtr, loadInfo.colourKey,
+                                                     modelName);
+            } else {
+              missing = true;
             }
 
-            //Debug warn if the material was required and failed
-            if ((loadInfo.textureIdRef == 0) && loadInfo.isRequired) {
-              ammoniteInternalDebug << "Mandatory texture / colour couldn't be loaded for model '" \
-                                    << modelName << "', skipping" << std::endl;
+            //Debug warnings for missing or failed required material components
+            if (loadInfo.isRequired) {
+              if (missing) {
+                //Debug warn if the material was required and missing
+                ammoniteInternalDebug << "Mandatory texture / colour not supplied for model '" \
+                                      << modelName << "', skipping" << std::endl;
+              } else if (*loadInfo.textureIdPtr == 0) {
+                ammoniteInternalDebug << "Mandatory texture / colour couldn't be loaded for model '" \
+                                      << modelName << "', skipping" << std::endl;
+              }
             }
           }
 
