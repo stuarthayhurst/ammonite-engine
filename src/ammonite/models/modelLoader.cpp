@@ -18,10 +18,81 @@
 #include "../utils/debug.hpp"
 #include "../utils/logging.hpp"
 
+/*
+ - Process a model into internal structures
+ - Load the model from a path and some settings
+ - Fills in the mesh and texture parts of a ModelData
+*/
+
 namespace ammonite {
   namespace models {
     namespace internal {
       namespace {
+        bool materialHasTexture(const aiMaterial* materialPtr, aiTextureType textureType) {
+          return (materialPtr->GetTextureCount(textureType) > 0);
+        }
+
+        GLuint processTexture(const aiMaterial* materialPtr, aiTextureType textureType,
+                              const ModelLoadInfo& modelLoadInfo, const std::string& modelName) {
+          //Bail if we don't have any of this type
+          if (!materialHasTexture(materialPtr, textureType)) {
+            ammoniteInternalDebug << "Attempted to load texture on '" << modelName \
+                                  << "', but none of this type exist" << std::endl;
+            return 0;
+          }
+
+          aiString localTexturePath;
+          materialPtr->GetTexture(textureType, 0, &localTexturePath);
+          std::string fullTexturePath = modelLoadInfo.modelDirectory + '/' + localTexturePath.C_Str();
+
+          return ammonite::textures::internal::loadTexture(fullTexturePath, false,
+                                                           modelLoadInfo.srgbTextures);
+        }
+
+        GLuint processColour() {
+          //TODO: Implement me
+          return 0;
+        }
+
+        //Load all components of a material into a TextureIdGroup
+        TextureIdGroup processMaterial(const aiMaterial* materialPtr,
+                                       const ModelLoadInfo& modelLoadInfo,
+                                       const std::string& modelName) {
+          TextureIdGroup textureGroup = {0};
+
+          //Array of info required to fill the texture group by texture type
+          const unsigned int textureTypeCount = 2;
+          struct TextureLoadInfo {
+            aiTextureType textureType;
+            GLuint& textureIdRef;
+            bool isRequired;
+          } textureLoadInfo[textureTypeCount] = {
+            {aiTextureType_DIFFUSE, textureGroup.diffuseId, true},
+            {aiTextureType_SPECULAR, textureGroup.specularId, false}
+          };
+
+          //Load each texture type of the material, according to its parameters
+          for (const TextureLoadInfo& loadInfo : textureLoadInfo) {
+            //Load the material texture type as a texture or a colour
+            if (materialHasTexture(materialPtr, loadInfo.textureType)) {
+              //Attempt to load the material as a texture
+              loadInfo.textureIdRef = processTexture(materialPtr, loadInfo.textureType,
+                                                     modelLoadInfo, modelName);
+            } else {
+              //Attempt to load the material as a colour
+              loadInfo.textureIdRef = processColour();
+            }
+
+            //Debug warn if the material was required and failed
+            if ((loadInfo.textureIdRef == 0) && loadInfo.isRequired) {
+              ammoniteInternalDebug << "Mandatory texture / colour couldn't be loaded for model '" \
+                                    << modelName << "', skipping" << std::endl;
+            }
+          }
+
+          return textureGroup;
+        }
+
         bool processMesh(aiMesh* meshPtr, const aiScene* scenePtr,
                          ModelData* modelData, std::vector<RawMeshData>* rawMeshDataVec,
                          const ModelLoadInfo& modelLoadInfo) {
@@ -71,42 +142,10 @@ namespace ammonite {
             index += face.mNumIndices;
           }
 
-          //Fetch material for the mesh
-          const aiMaterial* const material = scenePtr->mMaterials[meshPtr->mMaterialIndex];
-          aiString localTexturePath;
-          std::string fullTexturePath;
-          models::internal::TextureIdGroup textureIdGroup;
+          //Process material into a texture ID group
+          const aiMaterial* const materialPtr = scenePtr->mMaterials[meshPtr->mMaterialIndex];
+          textureIds->push_back(processMaterial(materialPtr, modelLoadInfo, modelData->modelName));
 
-          if (material->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
-            material->GetTexture(aiTextureType_DIFFUSE, 0, &localTexturePath);
-            fullTexturePath = modelLoadInfo.modelDirectory + '/' + localTexturePath.C_Str();
-
-            const GLuint textureId = ammonite::textures::internal::loadTexture(
-              fullTexturePath, false, modelLoadInfo.srgbTextures);
-            if (textureId == 0) {
-              return false;
-            }
-
-            textureIdGroup.diffuseId = textureId;
-          } else {
-            ammoniteInternalDebug << "No diffuse texture supplied on mesh of model '" << modelData->modelName << "', skipping" << std::endl;
-          }
-
-          if (material->GetTextureCount(aiTextureType_SPECULAR) > 0) {
-            material->GetTexture(aiTextureType_SPECULAR, 0, &localTexturePath);
-            fullTexturePath = modelLoadInfo.modelDirectory + '/' + localTexturePath.C_Str();
-
-            const GLuint textureId = ammonite::textures::internal::loadTexture(
-              fullTexturePath, false, modelLoadInfo.srgbTextures);
-            if (textureId == 0) {
-              return false;
-            }
-
-            textureIdGroup.specularId = textureId;
-          }
-
-          //Save texture IDs
-          textureIds->push_back(textureIdGroup);
           return true;
         }
 
