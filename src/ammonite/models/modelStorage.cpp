@@ -12,6 +12,19 @@
 #include "../utils/debug.hpp"
 #include "../utils/id.hpp"
 
+/*
+ - Track model data (and transitively infos) against model names
+ - Manage model data storage
+ - Supported queries:
+   - Model name -> model data
+   - Model name -> model infos
+ - System-independent links:
+   - Model info -> model ID
+   - Model info -> model data
+   - Model data -> model name
+ - Use this for querying models by name
+*/
+
 namespace ammonite {
   namespace models {
     namespace internal {

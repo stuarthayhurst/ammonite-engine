@@ -21,6 +21,18 @@ extern "C" {
 #include "../utils/id.hpp"
 #include "../utils/logging.hpp"
 
+/*
+ - Exposes functions to load models, apply textures and modify attributes
+ - Tracks model info by model ID, linking to model data in the storage layer
+ - Supported queries:
+   - Model type -> model infos
+   - Model ID -> model info
+ - System-independent links:
+   - Model info -> model ID
+   - Model info -> model data
+   - Model data -> model name
+ - Use this for querying models by type or ID
+*/
 
 namespace ammonite {
   namespace models {
