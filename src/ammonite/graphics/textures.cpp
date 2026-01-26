@@ -27,13 +27,13 @@ namespace ammonite {
           GLuint id;
           unsigned int refCount = 0;
           std::string string;
-          std::array<float, 3> colour;
+          std::array<float, 4> colour;
           bool isColour;
         };
 
         std::map<GLuint, TextureInfo> idTextureMap;
         std::unordered_map<std::string, TextureInfo*> stringTexturePtrMap;
-        std::map<std::array<float, 3>, TextureInfo*> colourTexturePtrMap;
+        std::map<std::array<float, 4>, TextureInfo*> colourTexturePtrMap;
       }
 
       namespace {
@@ -128,8 +128,8 @@ namespace ammonite {
        - Makes no attempt at caching / deduplicating it
        - Returns 0 on failure
       */
-      GLuint createTexture(int width, int height, unsigned char* data, GLenum dataFormat,
-                           GLenum textureFormat, GLint textureLevels) {
+      GLuint createTexture(int width, int height, unsigned char* data,
+                           GLenum dataFormat, GLenum textureFormat, GLint textureLevels) {
         //Check texture size is within limits
         GLint maxTextureSize = 0;
         glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
@@ -161,56 +161,70 @@ namespace ammonite {
        - Caches / deduplicates identical solid colour textures
        - Returns 0 on failure
       */
+      namespace {
+        template <unsigned int components> requires (components == 3 || components == 4)
+        GLuint loadSolidTextureTemplate(const ammonite::Vec<float, components>& colour) {
+          //Copy the colour into a standard type as a key
+          std::array<float, 4> colourKey{};
+          std::memcpy(colourKey.data(), ammonite::data(colour), sizeof(colour));
+
+          //Check if this colour has already been loaded
+          if (colourTexturePtrMap.contains(colourKey)) {
+            TextureInfo* const textureInfo = colourTexturePtrMap[colourKey];
+
+            textureInfo->refCount++;
+            return textureInfo->id;
+          }
+
+          //Decide the format of the texture and data
+          GLenum textureFormat = 0, dataFormat = 0;
+          if (!decideTextureFormat(components, false, &textureFormat, &dataFormat)) {
+            ammonite::utils::warning << "Failed to load texture from colour" << std::endl;
+            return 0;
+          }
+
+          //Convert the colour into the required format
+          ammonite::Vec<float, components> scaledColour = {0};
+          ammonite::scale(colour, 255.0f, scaledColour);
+          unsigned char data[components] = {
+            (unsigned char)scaledColour[0],
+            (unsigned char)scaledColour[1],
+            (unsigned char)scaledColour[2]
+          };
+          if constexpr (components == 4) {
+            data[3] = (unsigned char)scaledColour[3];
+          }
+
+          //Create the texture and free the image data
+          const unsigned int mipmapLevels = calculateMipmapLevels(1, 1);
+          const GLuint textureId = createTexture(1, 1, data, dataFormat, textureFormat,
+                                                 (GLint)mipmapLevels);
+          if (textureId == 0) {
+            ammonite::utils::warning << "Failed to load texture from colour" << std::endl;
+            return 0;
+          }
+
+          //Connect the texture colour to the ID and info
+          TextureInfo* const textureInfoPtr = &idTextureMap[textureId];
+          colourTexturePtrMap[colourKey] = textureInfoPtr;
+          textureInfoPtr->colour = colourKey;
+          textureInfoPtr->isColour = true;
+
+          //Handle filtering and mipmaps
+          glTextureParameteri(textureId, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+          glTextureParameteri(textureId, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+          glGenerateTextureMipmap(textureId);
+
+          return textureId;
+        }
+      }
+
       GLuint loadSolidTexture(const ammonite::Vec<float, 3>& colour) {
-        //Copy the colour into a standard type as a key
-        std::array<float, 3> colourArray;
-        std::memcpy(colourArray.data(), ammonite::data(colour), sizeof(colour));
+        return loadSolidTextureTemplate(colour);
+      }
 
-        //Check if this colour has already been loaded
-        if (colourTexturePtrMap.contains(colourArray)) {
-          TextureInfo* const textureInfo = colourTexturePtrMap[colourArray];
-
-          textureInfo->refCount++;
-          return textureInfo->id;
-        }
-
-        //Decide the format of the texture and data
-        GLenum textureFormat = 0, dataFormat = 0;
-        if (!decideTextureFormat(3, false, &textureFormat, &dataFormat)) {
-          ammonite::utils::warning << "Failed to load texture from colour" << std::endl;
-          return 0;
-        }
-
-        //Convert the colour into the required format
-        ammonite::Vec<float, 3> scaledColour = {0};
-        ammonite::scale(colour, 255.0f, scaledColour);
-        unsigned char data[3] = {
-          (unsigned char)scaledColour[0],
-          (unsigned char)scaledColour[1],
-          (unsigned char)scaledColour[2]
-        };
-
-        //Create the texture and free the image data
-        const unsigned int mipmapLevels = calculateMipmapLevels(1, 1);
-        const GLuint textureId = createTexture(1, 1, data, dataFormat, textureFormat,
-                                               (GLint)mipmapLevels);
-        if (textureId == 0) {
-          ammonite::utils::warning << "Failed to load texture from colour" << std::endl;
-          return 0;
-        }
-
-        //Connect the texture colour to the ID and info
-        TextureInfo* const textureInfoPtr = &idTextureMap[textureId];
-        colourTexturePtrMap[colourArray] = textureInfoPtr;
-        textureInfoPtr->colour = colourArray;
-        textureInfoPtr->isColour = true;
-
-        //Handle filtering and mipmaps
-        glTextureParameteri(textureId, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTextureParameteri(textureId, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        glGenerateTextureMipmap(textureId);
-
-        return textureId;
+      GLuint loadSolidTexture(const ammonite::Vec<float, 4>& colour) {
+        return loadSolidTextureTemplate(colour);
       }
 
       /*

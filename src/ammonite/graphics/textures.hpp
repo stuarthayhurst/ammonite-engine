@@ -18,6 +18,7 @@ namespace ammonite {
       GLuint loadTexture(const std::string& texturePath, bool flipTexture, bool srgbTexture);
 
       GLuint loadSolidTexture(const ammonite::Vec<float, 3>& colour);
+      GLuint loadSolidTexture(const ammonite::Vec<float, 4>& colour);
 
       void copyTexture(GLuint textureId);
       void deleteTexture(GLuint textureId);
