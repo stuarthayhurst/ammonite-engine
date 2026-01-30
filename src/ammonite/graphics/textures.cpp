@@ -1,5 +1,4 @@
 #include <algorithm>
-#include <array>
 #include <cmath>
 #include <cstring>
 #include <iostream>
@@ -26,14 +25,12 @@ namespace ammonite {
         struct TextureInfo {
           GLuint id;
           unsigned int refCount = 0;
-          std::string string;
-          std::array<float, 4> colour;
-          bool isColour;
+          std::string textureKey;
         };
 
+        const unsigned int maxColourKeySize = sizeof(float) * 4;
         std::map<GLuint, TextureInfo> idTextureMap;
-        std::unordered_map<std::string, TextureInfo*> stringTexturePtrMap;
-        std::map<std::array<float, 4>, TextureInfo*> colourTexturePtrMap;
+        std::unordered_map<std::string, TextureInfo*> textureKeyInfoPtrMap;
       }
 
       namespace {
@@ -64,6 +61,33 @@ namespace ammonite {
 
           return true;
         }
+
+        template <unsigned int components>
+        void calculateTextureKey(const ammonite::Vec<float, components>& colour,
+                                 std::string* stringPtr) {
+          //Only set the colour component
+          const unsigned int colourLength = sizeof(float) * components;
+          stringPtr->resize(colourLength);
+          std::memcpy(stringPtr->data(), &colour[0], colourLength);
+        }
+
+        void calculateTextureKey(const std::string& texturePath,
+                                 bool flipTexture, bool srgbTexture,
+                                 std::string* stringPtr) {
+          //Prepare the key's storage
+          const unsigned int colourLength = maxColourKeySize;
+          const unsigned int texturePathLength = texturePath.size();
+          const unsigned int keyLength = colourLength + texturePathLength + 1;
+          stringPtr->resize(keyLength);
+
+          //Set the colour component with zeros to avoid collisions
+          std::memset(stringPtr->data(), 0, colourLength);
+
+          //Set the string and load data components
+          std::memcpy(stringPtr->data() + colourLength, texturePath.data(), texturePathLength);
+          const unsigned char extraData = ((int)flipTexture << 0) | ((int)srgbTexture << 1);
+          *(stringPtr->data() + colourLength + texturePathLength) = std::to_string(extraData)[0];
+        }
       }
 
       //Calculate the number of mipmaps levels to use
@@ -71,9 +95,7 @@ namespace ammonite {
         return (unsigned int)std::log2(std::max(width, height)) + 1;
       }
 
-      /*
-       - Deletes a texture created with createTexture() or load*Texture()
-      */
+      //Deletes a texture created with createTexture() or load*Texture()
       void deleteTexture(GLuint textureId) {
         //Fetch the texture info, if it exists
         if (!idTextureMap.contains(textureId)) {
@@ -85,28 +107,24 @@ namespace ammonite {
 
         //Decrease the reference counter, delete the texture if now unused
         if (--textureInfoPtr->refCount == 0) {
-          //Remove the string entry
-          if (!textureInfoPtr->string.empty()) {
-            stringTexturePtrMap.erase(textureInfoPtr->string);
-          }
-
-          //Remove the colour entry
-          if (textureInfoPtr->isColour) {
-            colourTexturePtrMap.erase(textureInfoPtr->colour);
+          //Remove the cache entry
+          if (!textureInfoPtr->textureKey.empty()) {
+            textureKeyInfoPtrMap.erase(textureInfoPtr->textureKey);
           }
 
           //Delete the texture
           glDeleteTextures(1, &textureInfoPtr->id);
 
           //Delete the tracker entry
-          if (!textureInfoPtr->isColour) {
-            ammoniteInternalDebug << "Deleted storage for file texture (ID " << textureId \
-                                  << ", '" << textureInfoPtr->string << "')" << std::endl;
-          } else {
-            ammoniteInternalDebug << "Deleted storage for colour texture (ID " << textureId \
-                                  << ")" << std::endl;
+          if (!textureInfoPtr->textureKey.empty()) {
+            if (textureInfoPtr->textureKey.size() <= maxColourKeySize) {
+              ammoniteInternalDebug << "Deleted storage for colour texture (ID " << textureId \
+                                    << ")" << std::endl;
+            } else {
+              ammoniteInternalDebug << "Deleted storage for file texture (ID " << textureId \
+                                    << ", '" << textureInfoPtr->textureKey.substr(maxColourKeySize) << "')" << std::endl;
+            }
           }
-
           idTextureMap.erase(textureId);
         }
       }
@@ -151,7 +169,7 @@ namespace ammonite {
                                    << ") already exists, not creating texture" << std::endl;
           return 0;
         }
-        idTextureMap[textureId] = {textureId, 1, "", {0}, false};
+        idTextureMap[textureId] = {textureId, 1, ""};
 
         return textureId;
       }
@@ -164,13 +182,13 @@ namespace ammonite {
       namespace {
         template <unsigned int components> requires (components == 3 || components == 4)
         GLuint loadSolidTextureTemplate(const ammonite::Vec<float, components>& colour) {
-          //Copy the colour into a standard type as a key
-          std::array<float, 4> colourKey{};
-          std::memcpy(colourKey.data(), ammonite::data(colour), sizeof(colour));
+          //Calculate the texture's cache key
+          std::string textureKey;
+          calculateTextureKey(colour, &textureKey);
 
-          //Check if this colour has already been loaded
-          if (colourTexturePtrMap.contains(colourKey)) {
-            TextureInfo* const textureInfo = colourTexturePtrMap[colourKey];
+          //Check the cache for the texture
+          if (textureKeyInfoPtrMap.contains(textureKey)) {
+            TextureInfo* const textureInfo = textureKeyInfoPtrMap[textureKey];
 
             textureInfo->refCount++;
             return textureInfo->id;
@@ -206,9 +224,8 @@ namespace ammonite {
 
           //Connect the texture colour to the ID and info
           TextureInfo* const textureInfoPtr = &idTextureMap[textureId];
-          colourTexturePtrMap[colourKey] = textureInfoPtr;
-          textureInfoPtr->colour = colourKey;
-          textureInfoPtr->isColour = true;
+          textureKeyInfoPtrMap[textureKey] = textureInfoPtr;
+          textureInfoPtr->textureKey = textureKey;
 
           //Handle filtering and mipmaps
           glTextureParameteri(textureId, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -235,11 +252,13 @@ namespace ammonite {
        - Returns 0 on failure
       */
       GLuint loadTexture(const std::string& texturePath, bool flipTexture, bool srgbTexture) {
-        //Check if texture has already been loaded, with the same settings
-        const unsigned char extraData = ((int)flipTexture << 0) | ((int)srgbTexture << 1);
-        const std::string textureString = texturePath + std::to_string(extraData);
-        if (stringTexturePtrMap.contains(textureString)) {
-          TextureInfo* const textureInfo = stringTexturePtrMap[textureString];
+        //Calculate the texture's cache key
+        std::string textureKey;
+        calculateTextureKey(texturePath, flipTexture, srgbTexture, &textureKey);
+
+        //Check the cache for the texture
+        if (textureKeyInfoPtrMap.contains(textureKey)) {
+          TextureInfo* const textureInfo = textureKeyInfoPtrMap[textureKey];
 
           textureInfo->refCount++;
           return textureInfo->id;
@@ -285,8 +304,8 @@ namespace ammonite {
 
         //Connect the texture string to the ID and info
         TextureInfo* const textureInfoPtr = &idTextureMap[textureId];
-        stringTexturePtrMap[textureString] = textureInfoPtr;
-        textureInfoPtr->string = textureString;
+        textureKeyInfoPtrMap[textureKey] = textureInfoPtr;
+        textureInfoPtr->textureKey = textureKey;
 
         //When magnifying the image, use linear filtering
         glTextureParameteri(textureId, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
