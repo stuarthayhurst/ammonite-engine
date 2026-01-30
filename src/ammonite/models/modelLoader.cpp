@@ -1,5 +1,6 @@
 #include <cstring>
 #include <iostream>
+#include <list>
 #include <queue>
 #include <string>
 #include <vector>
@@ -17,6 +18,7 @@
 #include "../maths/vector.hpp"
 #include "../utils/debug.hpp"
 #include "../utils/logging.hpp"
+#include "../utils/thread.hpp"
 
 /*
  - Process a model into internal structures
@@ -33,7 +35,39 @@ namespace ammonite {
           unsigned int type;
           unsigned int index;
         };
+
+        //Data required by the worker thread to load the texture
+        struct TextureThreadData {
+          std::string texturePath;
+          bool flipTextures;
+          bool srgbTextures;
+          textures::internal::TextureData textureData;
+          bool loadedTexture;
+        };
+
+        //Hold data to load a texture and the sync for its worker
+        struct TextureLoadData {
+          TextureThreadData threadData;
+          GLuint textureId;
+          AmmoniteGroup sync{0};
+        };
+
+        //Store the outstanding texture loads
+        std::list<TextureLoadData> textureQueue;
       }
+
+      namespace {
+        void textureLoadWorker(void* userPtr) {
+          TextureThreadData* const threadData = (TextureThreadData*)userPtr;
+
+          const bool prepared = textures::internal::prepareTextureData(
+            threadData->texturePath, threadData->flipTextures,
+            threadData->srgbTextures, &threadData->textureData);
+
+          threadData->loadedTexture = prepared;
+        }
+      }
+
       namespace {
         bool materialHasTexture(const aiMaterial* materialPtr, aiTextureType textureType) {
           return (materialPtr->GetTextureCount(textureType) > 0);
@@ -52,8 +86,37 @@ namespace ammonite {
           materialPtr->GetTexture(textureType, 0, &localTexturePath);
           const std::string fullTexturePath = modelLoadInfo.modelDirectory + '/' + localTexturePath.C_Str();
 
-          return ammonite::textures::internal::loadTexture(fullTexturePath, false,
-                                                           modelLoadInfo.srgbTextures);
+          //Calculate the texture's key
+          std::string textureKey;
+          textures::internal::calculateTextureKey(fullTexturePath, false, modelLoadInfo.srgbTextures, &textureKey);
+
+          //Use texture cache, if already loaded / reserved
+          if (textures::internal::checkTextureKey(textureKey)) {
+            return textures::internal::acquireTextureKeyId(textureKey);
+          }
+
+          //Reserve the texture key before loading
+          const GLuint textureId = textures::internal::reserveTextureKey(textureKey);
+          if (textureId == 0) {
+            ammonite::utils::warning << "Failed to reserve texture" << std::endl;
+            return 0;
+          }
+
+          //Prepare data for the worker thread
+          TextureLoadData& textureLoadData = textureQueue.emplace_back();
+          textureLoadData.threadData.texturePath = fullTexturePath;
+          textureLoadData.threadData.flipTextures = false;
+          textureLoadData.threadData.srgbTextures = modelLoadInfo.srgbTextures;
+          textureLoadData.threadData.loadedTexture = false;
+
+          //Prepare date for texture upload after sync
+          textureLoadData.textureId = textureId;
+
+          //Submit the texture load to the thread pool
+          ammonite::utils::thread::submitWork(textureLoadWorker,
+            &textureLoadData.threadData, &textureLoadData.sync);
+
+          return textureId;
         }
 
         bool materialHasColour(const aiMaterial* materialPtr, const MatKey& colourKey) {
@@ -245,7 +308,29 @@ namespace ammonite {
         }
 
         //Recursively process nodes
-        return processNodes(scenePtr, modelData, rawMeshDataVec, modelLoadInfo);
+        const bool loadedNodes = processNodes(scenePtr, modelData,
+                                              rawMeshDataVec, modelLoadInfo);
+
+        //Wait for the texture loads to complete, and upload their data
+        bool uploadedTextures = true;
+        for (TextureLoadData& textureLoadData : textureQueue) {
+          ammonite::utils::thread::waitGroupComplete(&textureLoadData.sync, 1);
+
+          //Don't attempt to upload failed textures
+          if (!textureLoadData.threadData.loadedTexture) {
+            uploadedTextures = false;
+            continue;
+          }
+
+          //Upload the loaded texture
+          uploadedTextures &= textures::internal::uploadTextureData(
+            textureLoadData.textureId, textureLoadData.threadData.textureData);
+        }
+
+        //Clear the texture queue
+        textureQueue.clear();
+
+        return loadedNodes && uploadedTextures;
       }
     }
   }
