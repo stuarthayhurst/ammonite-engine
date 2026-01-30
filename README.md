@@ -10,7 +10,7 @@
     - If you found this project interesting, any donations are greatly appreciated :)
 
 ## Features:
-  - Model loading, using `libassimp`
+  - Multi-threaded model loading, using `libassimp` and a thread pool
   - Shader program caching with a custom hash
   - Key binding and mouse input support
   - Camera path support
