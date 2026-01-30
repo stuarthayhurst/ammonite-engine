@@ -116,8 +116,8 @@ namespace ammonite {
 
           //Remove the map entry, potentially invalidating modelName
           modelNameDataMap.erase(modelName);
-          ammoniteInternalDebug << "Deleted storage for model data (" << modelName \
-                                << ")" << std::endl;
+          ammoniteInternalDebug << "Deleted storage for model data ('" << modelName \
+                                << "')" << std::endl;
         }
 
         return true;
