@@ -61,33 +61,184 @@ namespace ammonite {
 
           return true;
         }
+      }
 
+      //Calculate the cache key to use for a texture and load settings
+      void calculateTextureKey(const std::string& texturePath,
+                               bool flipTexture, bool srgbTexture,
+                               std::string* textureKey) {
+        //Prepare the key's storage
+        const unsigned int colourLength = maxColourKeySize;
+        const unsigned int texturePathLength = texturePath.size();
+        const unsigned int keyLength = colourLength + texturePathLength + 1;
+        textureKey->resize(keyLength);
+
+        //Set the colour component with zeros to avoid collisions
+        std::memset(textureKey->data(), 0, colourLength);
+
+        //Set the string and load data components
+        std::memcpy(textureKey->data() + colourLength, texturePath.data(), texturePathLength);
+        const unsigned char extraData = ((int)flipTexture << 0) | ((int)srgbTexture << 1);
+        *(textureKey->data() + colourLength + texturePathLength) = std::to_string(extraData)[0];
+      }
+
+      namespace {
         template <unsigned int components>
-        void calculateTextureKey(const ammonite::Vec<float, components>& colour,
+        void calculateTextureKeyTemplate(const ammonite::Vec<float, components>& colour,
                                  std::string* stringPtr) {
           //Only set the colour component
           const unsigned int colourLength = sizeof(float) * components;
           stringPtr->resize(colourLength);
           std::memcpy(stringPtr->data(), &colour[0], colourLength);
         }
+      }
 
-        void calculateTextureKey(const std::string& texturePath,
-                                 bool flipTexture, bool srgbTexture,
-                                 std::string* stringPtr) {
-          //Prepare the key's storage
-          const unsigned int colourLength = maxColourKeySize;
-          const unsigned int texturePathLength = texturePath.size();
-          const unsigned int keyLength = colourLength + texturePathLength + 1;
-          stringPtr->resize(keyLength);
+      //Calculate the cache key to use for a 3-component colour
+      void calculateTextureKey(const ammonite::Vec<float, 3>& colour, std::string* textureKey) {
+        calculateTextureKeyTemplate(colour, textureKey);
+      }
 
-          //Set the colour component with zeros to avoid collisions
-          std::memset(stringPtr->data(), 0, colourLength);
+      //Calculate the cache key to use for a 4-component colour
+      void calculateTextureKey(const ammonite::Vec<float, 4>& colour, std::string* textureKey) {
+        calculateTextureKeyTemplate(colour, textureKey);
+      }
 
-          //Set the string and load data components
-          std::memcpy(stringPtr->data() + colourLength, texturePath.data(), texturePathLength);
-          const unsigned char extraData = ((int)flipTexture << 0) | ((int)srgbTexture << 1);
-          *(stringPtr->data() + colourLength + texturePathLength) = std::to_string(extraData)[0];
+      //Check if a cache key has been registered
+      bool checkTextureKey(const std::string& textureKey) {
+        return textureKeyInfoPtrMap.contains(textureKey);
+      }
+
+      /*
+       - Return the ID for a reserved texture key
+       - Increases the reference counter
+      */
+      GLuint acquireTextureKeyId(const std::string& textureKey) {
+        if (!textureKeyInfoPtrMap.contains(textureKey)) {
+          ammonite::utils::warning << "Requested ID for unreserved texture" << std::endl;
+          return 0;
         }
+
+        TextureInfo* const textureInfo = textureKeyInfoPtrMap[textureKey];
+        textureInfo->refCount++;
+        return textureInfo->id;
+      }
+
+      /*
+       - Reserve a cache key for future use
+       - Generally, the workflow for this is:
+         - calculateTextureKey() -> reserveTextureKey() ->
+           prepareTextureData() -> uploadTextureData()
+      */
+      GLuint reserveTextureKey(const std::string& textureKey) {
+        //Check the cache for the texture
+        if (textureKeyInfoPtrMap.contains(textureKey)) {
+          const GLuint textureId = textureKeyInfoPtrMap[textureKey]->id;
+          ammonite::utils::warning << "Attempted to reserve an existing texture (ID " \
+                                   << textureId << ")" << std::endl;
+          return 0;
+        }
+
+        //Create a texture
+        GLuint textureId = 0;
+        glCreateTextures(GL_TEXTURE_2D, 1, &textureId);
+        if (textureId == 0) {
+          ammonite::utils::warning << "Failed to create texture" << std::endl;
+          return 0;
+        }
+
+        //Add the texture to the tracker
+        if (idTextureMap.contains(textureId)) {
+          ammonite::utils::warning << "Texture ID (" << textureId \
+                                   << ") already exists, not reserving texture" << std::endl;
+          return 0;
+        }
+        idTextureMap[textureId] = {textureId, 1, ""};
+
+        //Connect the texture string to the ID and info
+        TextureInfo* const textureInfoPtr = &idTextureMap[textureId];
+        textureKeyInfoPtrMap[textureKey] = textureInfoPtr;
+        textureInfoPtr->textureKey = textureKey;
+
+        return textureId;
+      }
+
+      /*
+       - Upload data for the texture of a reserved key
+         - Behaves like the upload parts of loadTexture()
+       - The TextureData structure can't be reused after this
+      */
+      bool uploadTextureData(GLuint textureId, const TextureData& textureData) {
+
+        //Check texture size is within limits
+        GLint maxTextureSize = 0;
+        glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
+        if (textureData.width > maxTextureSize || textureData.height > maxTextureSize) {
+          ammonite::utils::warning << "Attempted to create a texture of unsupported size (" \
+                                   << textureData.width << " x " << textureData.height \
+                                   << ")" << std::endl;
+          return false;
+        }
+
+        //Decide the format of the texture and data
+        GLenum textureFormat = 0, dataFormat = 0;
+        if (!decideTextureFormat(textureData.numChannels, textureData.srgbTexture,
+                                 &textureFormat, &dataFormat)) {
+          ammonite::utils::warning << "Failed to upload texture (ID " << textureId << ")" << std::endl;
+          stbi_image_free(textureData.data);
+          return false;
+        }
+
+        //Create and fill texture storage
+        const unsigned int textureLevels = calculateMipmapLevels(textureData.width,
+                                                                 textureData.height);
+        glTextureStorage2D(textureId, (GLint)textureLevels, textureFormat,
+                           textureData.width, textureData.height);
+        glTextureSubImage2D(textureId, 0, 0, 0, textureData.width, textureData.height,
+                            dataFormat, GL_UNSIGNED_BYTE, textureData.data);
+
+        //Free the texture data's storage
+        stbi_image_free(textureData.data);
+
+        //When magnifying the image, use linear filtering
+        glTextureParameteri(textureId, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        //When minifying the image, use a linear blend of two mipmaps
+        glTextureParameteri(textureId, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        //Generate mipmaps
+        glGenerateTextureMipmap(textureId);
+
+        return true;
+      }
+
+
+      /*
+       - Load texture data for upload
+         - Behaves like the loading parts of loadTexture()
+       - Guaranteed to be thread-safe
+      */
+      bool prepareTextureData(const std::string& texturePath, bool flipTexture,
+                              bool srgbTexture, TextureData* textureData) {
+
+        //Handle texture flips
+        if (flipTexture) {
+          stbi_set_flip_vertically_on_load_thread(1);
+        }
+
+        //Read image data
+        textureData->data = stbi_load(texturePath.c_str(), &textureData->width,
+                                      &textureData->height, &textureData->numChannels, 0);
+        if (flipTexture) {
+          stbi_set_flip_vertically_on_load_thread(0);
+        }
+
+        if (textureData->data == nullptr) {
+          ammonite::utils::warning << "Failed to load texture '" << texturePath << "'" \
+                                   << std::endl;
+          return false;
+        }
+
+        textureData->srgbTexture = srgbTexture;
+
+        return true;
       }
 
       //Calculate the number of mipmaps levels to use
