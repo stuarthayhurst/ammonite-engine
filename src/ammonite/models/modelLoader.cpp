@@ -196,6 +196,10 @@ namespace ammonite {
                          const ModelLoadInfo& modelLoadInfo) {
           std::vector<models::internal::TextureIdGroup>* textureIds = &modelData->textureIds;
 
+          //Process material into a texture ID group as early as possible
+          const aiMaterial* const materialPtr = scenePtr->mMaterials[meshPtr->mMaterialIndex];
+          textureIds->push_back(processMaterial(materialPtr, modelLoadInfo, modelData->modelName));
+
           //Add a new empty mesh to the mesh vector
           models::internal::RawMeshData* const newMesh = &rawMeshDataVec->emplace_back();
           newMesh->vertexCount = meshPtr->mNumVertices;
@@ -239,10 +243,6 @@ namespace ammonite {
             }
             index += face.mNumIndices;
           }
-
-          //Process material into a texture ID group
-          const aiMaterial* const materialPtr = scenePtr->mMaterials[meshPtr->mMaterialIndex];
-          textureIds->push_back(processMaterial(materialPtr, modelLoadInfo, modelData->modelName));
 
           return true;
         }
