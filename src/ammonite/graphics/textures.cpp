@@ -157,6 +157,8 @@ namespace ammonite {
        - Generally, the workflow for this is:
          - calculateTextureKey() -> reserveTextureKey() ->
            prepareTextureData() -> uploadTextureData()
+         - prepareTextureData() is thread-safe, allowing parallelised texture loads
+       - Returns the texture ID on success, 0 on failure
       */
       GLuint reserveTextureKey(const std::string& textureKey) {
         //Check the cache for the texture
@@ -191,8 +193,10 @@ namespace ammonite {
 
       /*
        - Upload data for the texture of a reserved key
-         - Behaves like the upload parts of loadTexture()
+         - Data should come from prepareTextureData();
+         - This must be called before textureId can be rendered from
        - The TextureData structure can't be reused after this
+       - Returns true on success, 0 on failure
       */
       bool uploadTextureData(GLuint textureId, const TextureData& textureData) {
 
@@ -235,9 +239,11 @@ namespace ammonite {
 
 
       /*
-       - Load texture data for upload
-         - Behaves like the loading parts of loadTexture()
+       - Load texture data for future upload
+         - flipTextures controls whether the textures are flipped or not
+         - srgbTextures controls whether the textures are treated as sRGB
        - Guaranteed to be thread-safe
+       - Returns true on success, false on failure
       */
       bool prepareTextureData(const std::string& texturePath, bool flipTexture,
                               bool srgbTexture, TextureData* textureData) {
