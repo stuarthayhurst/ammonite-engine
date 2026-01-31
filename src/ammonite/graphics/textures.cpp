@@ -434,55 +434,31 @@ namespace ammonite {
         std::string textureKey;
         calculateTextureKey(texturePath, flipTexture, srgbTexture, &textureKey);
 
-        //Check the cache for the texture
-        if (textureKeyInfoPtrMap.contains(textureKey)) {
+        //Use texture cache, if already loaded / reserved
+        if (checkTextureKey(textureKey)) {
           return acquireTextureId(textureKey);
         }
 
-        //Handle texture flips
-        if (flipTexture) {
-          stbi_set_flip_vertically_on_load_thread(1);
-        }
-
-        //Read image data
-        int width = 0, height = 0, nChannels = 0;
-        unsigned char* const data = stbi_load(texturePath.c_str(), &width,
-                                              &height, &nChannels, 0);
-        if (flipTexture) {
-          stbi_set_flip_vertically_on_load_thread(0);
-        }
-
-        if (data == nullptr) {
-          ammonite::utils::warning << "Failed to load texture '" << texturePath << "'" \
-                                   << std::endl;
-          return 0;
-        }
-
-        //Decide the format of the texture and data
-        GLenum textureFormat = 0, dataFormat = 0;
-        if (!decideTextureFormat(nChannels, srgbTexture, &textureFormat, &dataFormat)) {
-          ammonite::utils::warning << "Failed to load texture '" << texturePath << "'" \
-                                   << std::endl;
-          stbi_image_free(data);
-          return 0;
-        }
-
-        //Create the texture and free the image data
-        const unsigned int mipmapLevels = calculateMipmapLevels(width, height);
-        const GLuint textureId = createTexture(width, height, data, dataFormat,
-                                               textureFormat, (GLint)mipmapLevels);
-        stbi_image_free(data);
+        //Reserve the texture key before loading
+        const GLuint textureId = textures::internal::reserveTextureKey(textureKey);
         if (textureId == 0) {
-          ammonite::utils::warning << "Failed to load texture '" << texturePath << "'" \
-                                   << std::endl;
+          ammonite::utils::warning << "Failed to reserve texture ID" << std::endl;
           return 0;
         }
 
-        //Connect the texture string to the ID and info
-        connectTextureCache(textureId, textureKey);
+        //Load the texture data
+        TextureData textureData;
+        if (!textures::internal::prepareTextureData(texturePath, flipTexture,
+                                                    srgbTexture, &textureData)) {
+          deleteTexture(textureId);
+          return 0;
+        }
 
-        //Handle filtering and mipmaps
-        enableFilteringMipmap(textureId);
+        //Upload the texture data
+        if (!textures::internal::uploadTextureData(textureId, textureData)) {
+          deleteTexture(textureId);
+          return 0;
+        }
 
         return textureId;
       }
