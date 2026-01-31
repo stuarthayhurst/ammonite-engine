@@ -56,6 +56,7 @@ namespace ammonite {
         std::list<TextureLoadData> textureQueue;
       }
 
+      //Thread workers
       namespace {
         void textureLoadWorker(void* userPtr) {
           TextureThreadData* const threadData = (TextureThreadData*)userPtr;
@@ -71,6 +72,11 @@ namespace ammonite {
       namespace {
         bool materialHasTexture(const aiMaterial* materialPtr, aiTextureType textureType) {
           return (materialPtr->GetTextureCount(textureType) > 0);
+        }
+
+        bool materialHasMultipleTextures(const aiMaterial* materialPtr,
+                                         aiTextureType textureType) {
+          return (materialPtr->GetTextureCount(textureType) > 1);
         }
 
         GLuint processTexture(const aiMaterial* materialPtr, aiTextureType textureType,
@@ -165,26 +171,26 @@ namespace ammonite {
             //Load the material texture type as a texture or a colour
             if (materialHasTexture(materialPtr, loadInfo.textureType)) {
               //Attempt to load the material as a texture
-              *loadInfo.textureIdPtr = processTexture(materialPtr, loadInfo.textureType,
-                                                      modelLoadInfo, modelName);
+              *loadInfo.textureIdPtr = processTexture(materialPtr,
+                loadInfo.textureType, modelLoadInfo, modelName);
             } else if (materialHasColour(materialPtr, loadInfo.colourKey)) {
               //Attempt to load the material as a colour
-              *loadInfo.textureIdPtr = processColour(materialPtr, loadInfo.colourKey,
-                                                     modelName);
+              *loadInfo.textureIdPtr = processColour(materialPtr,
+                                                     loadInfo.colourKey, modelName);
             } else {
               missing = true;
             }
 
-            //Debug warnings for missing or failed required material components
-            if (loadInfo.isRequired) {
-              if (missing) {
-                //Debug warn if the material was required and missing
-                ammoniteInternalDebug << "Mandatory texture / colour not supplied for model '" \
-                                      << modelName << "', skipping" << std::endl;
-              } else if (*loadInfo.textureIdPtr == 0) {
-                ammoniteInternalDebug << "Mandatory texture / colour couldn't be loaded for model '" \
-                                      << modelName << "', skipping" << std::endl;
-              }
+            //Debug warning for unspecified required material components
+            if (loadInfo.isRequired && missing) {
+              ammoniteInternalDebug << "Mandatory texture / colour not supplied for model '" \
+                                    << modelName << "', skipping" << std::endl;
+            }
+
+            //Debug warning for ignored textures
+            if (materialHasMultipleTextures(materialPtr, loadInfo.textureType)) {
+              ammoniteInternalDebug << "Multiple textures of the same type supplied for model '" \
+                                    << modelName << "', ignoring extras" << std::endl;
             }
           }
 
@@ -312,25 +318,20 @@ namespace ammonite {
                                               rawMeshDataVec, modelLoadInfo);
 
         //Wait for the texture loads to complete, and upload their data
-        bool uploadedTextures = true;
         for (TextureLoadData& textureLoadData : textureQueue) {
           ammonite::utils::thread::waitGroupComplete(&textureLoadData.sync, 1);
 
-          //Don't attempt to upload failed textures
-          if (!textureLoadData.threadData.loadedTexture) {
-            uploadedTextures = false;
-            continue;
+          //Attempt to upload the texture data if the load was successful
+          if (textureLoadData.threadData.loadedTexture) {
+            textures::internal::uploadTextureData(textureLoadData.textureId,
+                                                  textureLoadData.threadData.textureData);
           }
-
-          //Upload the loaded texture
-          uploadedTextures &= textures::internal::uploadTextureData(
-            textureLoadData.textureId, textureLoadData.threadData.textureData);
         }
 
         //Clear the texture queue
         textureQueue.clear();
 
-        return loadedNodes && uploadedTextures;
+        return loadedNodes;
       }
     }
   }
