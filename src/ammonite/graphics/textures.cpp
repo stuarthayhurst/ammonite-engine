@@ -113,7 +113,7 @@ namespace ammonite {
       namespace {
         template <unsigned int components>
         void calculateTextureKeyTemplate(const ammonite::Vec<float, components>& colour,
-                                 std::string* stringPtr) {
+                                         std::string* stringPtr) {
           //Only set the colour component
           const unsigned int colourLength = sizeof(float) * components;
           stringPtr->resize(colourLength);
@@ -122,12 +122,14 @@ namespace ammonite {
       }
 
       //Calculate the cache key to use for a 3-component colour
-      void calculateTextureKey(const ammonite::Vec<float, 3>& colour, std::string* textureKey) {
+      void calculateTextureKey(const ammonite::Vec<float, 3>& colour,
+                               std::string* textureKey) {
         calculateTextureKeyTemplate(colour, textureKey);
       }
 
       //Calculate the cache key to use for a 4-component colour
-      void calculateTextureKey(const ammonite::Vec<float, 4>& colour, std::string* textureKey) {
+      void calculateTextureKey(const ammonite::Vec<float, 4>& colour,
+                               std::string* textureKey) {
         calculateTextureKeyTemplate(colour, textureKey);
       }
 
@@ -208,7 +210,8 @@ namespace ammonite {
         GLenum textureFormat = 0, dataFormat = 0;
         if (!decideTextureFormat(textureData.numChannels, textureData.srgbTexture,
                                  &textureFormat, &dataFormat)) {
-          ammonite::utils::warning << "Failed to upload texture (ID " << textureId << ")" << std::endl;
+          ammonite::utils::warning << "Failed to upload texture (ID " \
+                                   << textureId << ")" << std::endl;
           stbi_image_free(textureData.data);
           return false;
         }
@@ -252,8 +255,8 @@ namespace ammonite {
         }
 
         if (textureData->data == nullptr) {
-          ammonite::utils::warning << "Failed to load texture '" << texturePath << "'" \
-                                   << std::endl;
+          ammonite::utils::warning << "Failed to load texture '" << texturePath \
+                                   << "'" << std::endl;
           return false;
         }
 
@@ -290,11 +293,13 @@ namespace ammonite {
           //Delete the tracker entry
           if (!textureInfoPtr->textureKey.empty()) {
             if (textureInfoPtr->textureKey.size() <= maxColourKeySize) {
-              ammoniteInternalDebug << "Deleted storage for colour texture (ID " << textureId \
-                                    << ")" << std::endl;
+              ammoniteInternalDebug << "Deleted storage for colour texture (ID " \
+                                    << textureId << ")" << std::endl;
             } else {
-              ammoniteInternalDebug << "Deleted storage for file texture (ID " << textureId \
-                                    << ", '" << textureInfoPtr->textureKey.substr(maxColourKeySize) << "')" << std::endl;
+              ammoniteInternalDebug << "Deleted storage for file texture (ID " \
+                                    << textureId << ", '" \
+                                    << textureInfoPtr->textureKey.substr(maxColourKeySize) \
+                                    << "')" << std::endl;
             }
           }
           idTextureMap.erase(textureId);
@@ -333,7 +338,8 @@ namespace ammonite {
         GLuint textureId = 0;
         glCreateTextures(GL_TEXTURE_2D, 1, &textureId);
         glTextureStorage2D(textureId, textureLevels, textureFormat, width, height);
-        glTextureSubImage2D(textureId, 0, 0, 0, width, height, dataFormat, GL_UNSIGNED_BYTE, data);
+        glTextureSubImage2D(textureId, 0, 0, 0, width, height, dataFormat,
+                            GL_UNSIGNED_BYTE, data);
 
         //Add the texture to the tracker
         if (idTextureMap.contains(textureId)) {
@@ -416,7 +422,8 @@ namespace ammonite {
        - Caches / deduplicates same-file textures
        - Returns 0 on failure
       */
-      GLuint loadTexture(const std::string& texturePath, bool flipTexture, bool srgbTexture) {
+      GLuint loadTexture(const std::string& texturePath, bool flipTexture,
+                         bool srgbTexture) {
         //Calculate the texture's cache key
         std::string textureKey;
         calculateTextureKey(texturePath, flipTexture, srgbTexture, &textureKey);
@@ -433,7 +440,8 @@ namespace ammonite {
 
         //Read image data
         int width = 0, height = 0, nChannels = 0;
-        unsigned char* const data = stbi_load(texturePath.c_str(), &width, &height, &nChannels, 0);
+        unsigned char* const data = stbi_load(texturePath.c_str(), &width,
+                                              &height, &nChannels, 0);
         if (flipTexture) {
           stbi_set_flip_vertically_on_load_thread(0);
         }
@@ -455,8 +463,8 @@ namespace ammonite {
 
         //Create the texture and free the image data
         const unsigned int mipmapLevels = calculateMipmapLevels(width, height);
-        const GLuint textureId = createTexture(width, height, data, dataFormat, textureFormat,
-                                               (GLint)mipmapLevels);
+        const GLuint textureId = createTexture(width, height, data, dataFormat,
+                                               textureFormat, (GLint)mipmapLevels);
         stbi_image_free(data);
         if (textureId == 0) {
           ammonite::utils::warning << "Failed to load texture '" << texturePath << "'" \
@@ -479,7 +487,8 @@ namespace ammonite {
          - srgbTextures controls whether the textures are treated as sRGB
        - Returns 0 on failure
       */
-      GLuint loadCubemap(std::string texturePaths[6], bool flipTextures, bool srgbTextures) {
+      GLuint loadCubemap(std::string texturePaths[6], bool flipTextures,
+                         bool srgbTextures) {
         GLuint textureId = 0;
         glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &textureId);
 
@@ -505,7 +514,8 @@ namespace ammonite {
           if (!decideTextureFormat(nChannels, srgbTextures,
               &internalFormat, &dataFormat)) {
             //Free image data, destroy texture and return
-            ammonite::utils::warning << "Failed to load '" << texturePaths[i] << "'" << std::endl;
+            ammonite::utils::warning << "Failed to load '" << texturePaths[i] \
+                                     << "'" << std::endl;
             stbi_image_free(imageData);
             glDeleteTextures(1, &textureId);
 
@@ -527,7 +537,8 @@ namespace ammonite {
             stbi_image_free(imageData);
           } else {
             //Free image data, destroy texture and return
-            ammonite::utils::warning << "Failed to load '" << texturePaths[i] << "'" << std::endl;
+            ammonite::utils::warning << "Failed to load '" << texturePaths[i] \
+                                     << "'" << std::endl;
             stbi_image_free(imageData);
             glDeleteTextures(1, &textureId);
 
