@@ -298,9 +298,11 @@ namespace objectFieldDemo {
   }
 
   bool demoExit() {
-    ammonite::input::unregisterKeybind(cubeKeybindId);
-    ammonite::input::unregisterKeybind(shuffleKeybindId);
-    ammonite::input::unregisterKeybind(placementModeKeybindId);
+    if (cubeKeybindId != 0) {
+      ammonite::input::unregisterKeybind(cubeKeybindId);
+      ammonite::input::unregisterKeybind(shuffleKeybindId);
+      ammonite::input::unregisterKeybind(placementModeKeybindId);
+    }
 
     for (unsigned int i = 0; i < loadedModelIds.size(); i++) {
       ammonite::models::deleteModel(loadedModelIds[i]);
