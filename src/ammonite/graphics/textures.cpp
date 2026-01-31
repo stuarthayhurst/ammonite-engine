@@ -81,6 +81,14 @@ namespace ammonite {
           //Add the texture cache entry
           textureKeyInfoPtrMap[textureKey] = textureInfoPtr;
         }
+
+        //Return the texture ID for a key, increasing the reference counter
+        GLuint acquireTextureId (const std::string& textureKey) {
+          TextureInfo* const textureInfo = textureKeyInfoPtrMap[textureKey];
+          textureInfo->refCount++;
+
+          return textureInfo->id;
+        }
       }
 
       //Calculate the cache key to use for a texture and load settings
@@ -131,6 +139,7 @@ namespace ammonite {
       /*
        - Return the ID for a reserved texture key
        - Increases the reference counter
+       - Internally exposed, safer wrapper for acquireTextureId()
       */
       GLuint acquireTextureKeyId(const std::string& textureKey) {
         if (!textureKeyInfoPtrMap.contains(textureKey)) {
@@ -138,9 +147,7 @@ namespace ammonite {
           return 0;
         }
 
-        TextureInfo* const textureInfo = textureKeyInfoPtrMap[textureKey];
-        textureInfo->refCount++;
-        return textureInfo->id;
+        return acquireTextureId(textureKey);
       }
 
       /*
@@ -353,10 +360,7 @@ namespace ammonite {
 
           //Check the cache for the texture
           if (textureKeyInfoPtrMap.contains(textureKey)) {
-            TextureInfo* const textureInfo = textureKeyInfoPtrMap[textureKey];
-
-            textureInfo->refCount++;
-            return textureInfo->id;
+            return acquireTextureId(textureKey);
           }
 
           //Decide the format of the texture and data
@@ -419,10 +423,7 @@ namespace ammonite {
 
         //Check the cache for the texture
         if (textureKeyInfoPtrMap.contains(textureKey)) {
-          TextureInfo* const textureInfo = textureKeyInfoPtrMap[textureKey];
-
-          textureInfo->refCount++;
-          return textureInfo->id;
+          return acquireTextureId(textureKey);
         }
 
         //Handle texture flips
