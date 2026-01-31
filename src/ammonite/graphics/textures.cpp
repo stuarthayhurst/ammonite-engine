@@ -72,6 +72,15 @@ namespace ammonite {
           //Generate mipmaps
           glGenerateTextureMipmap(textureId);
         }
+
+        void connectTextureCache(GLuint textureId, const std::string& textureKey) {
+          //Set the key on the texture's entry
+          TextureInfo* const textureInfoPtr = &idTextureMap[textureId];
+          textureInfoPtr->textureKey = textureKey;
+
+          //Add the texture cache entry
+          textureKeyInfoPtrMap[textureKey] = textureInfoPtr;
+        }
       }
 
       //Calculate the cache key to use for a texture and load settings
@@ -166,9 +175,7 @@ namespace ammonite {
         idTextureMap[textureId] = {textureId, 1, ""};
 
         //Connect the texture string to the ID and info
-        TextureInfo* const textureInfoPtr = &idTextureMap[textureId];
-        textureKeyInfoPtrMap[textureKey] = textureInfoPtr;
-        textureInfoPtr->textureKey = textureKey;
+        connectTextureCache(textureId, textureKey);
 
         return textureId;
       }
@@ -380,10 +387,8 @@ namespace ammonite {
             return 0;
           }
 
-          //Connect the texture colour to the ID and info
-          TextureInfo* const textureInfoPtr = &idTextureMap[textureId];
-          textureKeyInfoPtrMap[textureKey] = textureInfoPtr;
-          textureInfoPtr->textureKey = textureKey;
+          //Connect the texture string to the ID and info
+          connectTextureCache(textureId, textureKey);
 
           //Handle filtering and mipmaps
           enableFilteringMipmap(textureId);
@@ -459,9 +464,7 @@ namespace ammonite {
         }
 
         //Connect the texture string to the ID and info
-        TextureInfo* const textureInfoPtr = &idTextureMap[textureId];
-        textureKeyInfoPtrMap[textureKey] = textureInfoPtr;
-        textureInfoPtr->textureKey = textureKey;
+        connectTextureCache(textureId, textureKey);
 
         //Handle filtering and mipmaps
         enableFilteringMipmap(textureId);
