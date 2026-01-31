@@ -61,6 +61,17 @@ namespace ammonite {
 
           return true;
         }
+
+        void enableFilteringMipmap(GLuint textureId) {
+          //When magnifying the image, use linear filtering
+          glTextureParameteri(textureId, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+          //When minifying the image, use a linear blend of two mipmaps
+          glTextureParameteri(textureId, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+
+          //Generate mipmaps
+          glGenerateTextureMipmap(textureId);
+        }
       }
 
       //Calculate the cache key to use for a texture and load settings
@@ -199,12 +210,8 @@ namespace ammonite {
         //Free the texture data's storage
         stbi_image_free(textureData.data);
 
-        //When magnifying the image, use linear filtering
-        glTextureParameteri(textureId, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        //When minifying the image, use a linear blend of two mipmaps
-        glTextureParameteri(textureId, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        //Generate mipmaps
-        glGenerateTextureMipmap(textureId);
+        //Handle filtering and mipmaps
+        enableFilteringMipmap(textureId);
 
         return true;
       }
@@ -379,9 +386,7 @@ namespace ammonite {
           textureInfoPtr->textureKey = textureKey;
 
           //Handle filtering and mipmaps
-          glTextureParameteri(textureId, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-          glTextureParameteri(textureId, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-          glGenerateTextureMipmap(textureId);
+          enableFilteringMipmap(textureId);
 
           return textureId;
         }
@@ -458,12 +463,8 @@ namespace ammonite {
         textureKeyInfoPtrMap[textureKey] = textureInfoPtr;
         textureInfoPtr->textureKey = textureKey;
 
-        //When magnifying the image, use linear filtering
-        glTextureParameteri(textureId, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        //When minifying the image, use a linear blend of two mipmaps
-        glTextureParameteri(textureId, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        //Generate mipmaps
-        glGenerateTextureMipmap(textureId);
+        //Handle filtering and mipmaps
+        enableFilteringMipmap(textureId);
 
         return textureId;
       }
@@ -530,12 +531,11 @@ namespace ammonite {
           }
         }
 
-        glTextureParameteri(textureId, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        glTextureParameteri(textureId, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        //Handle filtering and mipmaps
         glTextureParameteri(textureId, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTextureParameteri(textureId, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glTextureParameteri(textureId, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-        glGenerateTextureMipmap(textureId);
+        enableFilteringMipmap(textureId);
 
         return textureId;
       }
