@@ -80,10 +80,10 @@ namespace ammonite {
         }
 
         GLuint processTexture(const aiMaterial* materialPtr, aiTextureType textureType,
-                              const ModelLoadInfo& modelLoadInfo, const std::string& modelName) {
+                              const ModelLoadInfo& modelLoadInfo, const std::string& modelKey) {
           //Bail if we don't have any of this type
           if (!materialHasTexture(materialPtr, textureType)) {
-            ammoniteInternalDebug << "Attempted to load texture on '" << modelName \
+            ammoniteInternalDebug << "Attempted to load texture on '" << modelKey \
                                   << "', but none of this type exist" << std::endl;
             return 0;
           }
@@ -131,10 +131,10 @@ namespace ammonite {
         }
 
         GLuint processColour(const aiMaterial* materialPtr,
-                             const MatKey& colourKey, const std::string& modelName) {
+                             const MatKey& colourKey, const std::string& modelKey) {
           //Bail if we don't have any of this type
           if (!materialHasColour(materialPtr, colourKey)) {
-            ammoniteInternalDebug << "Attempted to load colour on '" << modelName \
+            ammoniteInternalDebug << "Attempted to load colour on '" << modelKey \
                                   << "', but none of this type exist" << std::endl;
             return 0;
           }
@@ -150,7 +150,7 @@ namespace ammonite {
         //Load all components of a material into a TextureIdGroup
         TextureIdGroup processMaterial(const aiMaterial* materialPtr,
                                        const ModelLoadInfo& modelLoadInfo,
-                                       const std::string& modelName) {
+                                       const std::string& modelKey) {
           TextureIdGroup textureGroup = {0};
 
           //Array of info required to fill the texture group by texture type
@@ -172,11 +172,11 @@ namespace ammonite {
             if (materialHasTexture(materialPtr, loadInfo.textureType)) {
               //Attempt to load the material as a texture
               *loadInfo.textureIdPtr = processTexture(materialPtr,
-                loadInfo.textureType, modelLoadInfo, modelName);
+                loadInfo.textureType, modelLoadInfo, modelKey);
             } else if (materialHasColour(materialPtr, loadInfo.colourKey)) {
               //Attempt to load the material as a colour
               *loadInfo.textureIdPtr = processColour(materialPtr,
-                                                     loadInfo.colourKey, modelName);
+                                                     loadInfo.colourKey, modelKey);
             } else {
               missing = true;
             }
@@ -184,13 +184,13 @@ namespace ammonite {
             //Debug warning for unspecified required material components
             if (loadInfo.isRequired && missing) {
               ammoniteInternalDebug << "Mandatory texture / colour not supplied for model '" \
-                                    << modelName << "', skipping" << std::endl;
+                                    << modelKey << "', skipping" << std::endl;
             }
 
             //Debug warning for ignored textures
             if (materialHasMultipleTextures(materialPtr, loadInfo.textureType)) {
               ammoniteInternalDebug << "Multiple textures of the same type supplied for model '" \
-                                    << modelName << "', ignoring extras" << std::endl;
+                                    << modelKey << "', ignoring extras" << std::endl;
             }
           }
 
@@ -204,7 +204,7 @@ namespace ammonite {
 
           //Process material into a texture ID group as early as possible
           const aiMaterial* const materialPtr = scenePtr->mMaterials[meshPtr->mMaterialIndex];
-          textureIds->push_back(processMaterial(materialPtr, modelLoadInfo, modelData->modelName));
+          textureIds->push_back(processMaterial(materialPtr, modelLoadInfo, modelData->modelKey));
 
           //Add a new empty mesh to the mesh vector
           models::internal::RawMeshData* const newMesh = &rawMeshDataVec->emplace_back();

@@ -13,39 +13,41 @@
 #include "../utils/id.hpp"
 
 /*
- - Track model data (and transitively infos) against model names
+ - Track model data (and transitively infos) against model keys
  - Manage model data storage
  - Supported queries:
-   - Model name -> model data
-   - Model name -> model infos
+   - Model key -> model data
+   - Model key -> model infos
  - System-independent links:
    - Model info -> model ID
    - Model info -> model data
-   - Model data -> model name
- - Use this for querying models by name
+   - Model data -> model key
+ - Use this for querying models by key
 */
 
 namespace ammonite {
   namespace models {
     namespace internal {
       namespace {
-        std::map<std::string, ModelData, std::less<>> modelNameDataMap;
+        std::map<std::string, ModelData, std::less<>> modelKeyDataMap;
       }
 
-      std::string getModelName(const std::string& objectPath,
-                               const ModelLoadInfo& modelLoadInfo) {
-        const unsigned char extraData = ((int)modelLoadInfo.flipTexCoords << 0) |
-                                        ((int)modelLoadInfo.srgbTextures << 1);
-        return objectPath + std::to_string(extraData);
+      namespace {
+        std::string calculateModelKey(const std::string& objectPath,
+                                      const ModelLoadInfo& modelLoadInfo) {
+          const unsigned char extraData = ((int)modelLoadInfo.flipTexCoords << 0) |
+                                          ((int)modelLoadInfo.srgbTextures << 1);
+          return objectPath + std::to_string(extraData);
+        }
       }
 
       ModelData* addModelData(const std::string& objectPath,
                               const ModelLoadInfo& modelLoadInfo,
                               AmmoniteId modelId) {
         //If the model has already been loaded, update counter, record ID and return it
-        const std::string modelName = getModelName(objectPath, modelLoadInfo);
-        if (modelNameDataMap.contains(modelName)) {
-          ModelData& modelData = modelNameDataMap[modelName];
+        const std::string modelKey = calculateModelKey(objectPath, modelLoadInfo);
+        if (modelKeyDataMap.contains(modelKey)) {
+          ModelData& modelData = modelKeyDataMap[modelKey];
           modelData.refCount++;
           modelData.activeModelIds.insert(modelId);
           return &modelData;
@@ -53,12 +55,12 @@ namespace ammonite {
 
         //Load the model data
         std::vector<RawMeshData> rawMeshDataVec;
-        modelNameDataMap[modelName] = {};
-        ModelData* const modelDataPtr = &modelNameDataMap[modelName];
+        modelKeyDataMap[modelKey] = {};
+        ModelData* const modelDataPtr = &modelKeyDataMap[modelKey];
         modelDataPtr->refCount = 1;
-        modelDataPtr->modelName = modelName;
+        modelDataPtr->modelKey = modelKey;
         if (!internal::loadObject(objectPath, modelDataPtr, &rawMeshDataVec, modelLoadInfo)) {
-          modelNameDataMap.erase(modelName);
+          modelKeyDataMap.erase(modelKey);
           return nullptr;
         }
 
@@ -69,29 +71,29 @@ namespace ammonite {
         return modelDataPtr;
       }
 
-      ModelData* copyModelData(const std::string& modelName, AmmoniteId modelId) {
-        ModelData& modelData = modelNameDataMap[modelName];
+      ModelData* copyModelData(const std::string& modelKey, AmmoniteId modelId) {
+        ModelData& modelData = modelKeyDataMap[modelKey];
         modelData.refCount++;
         modelData.activeModelIds.insert(modelId);
         return &modelData;
       }
 
-      ModelData* getModelData(const std::string& modelName) {
-        return &modelNameDataMap[modelName];
+      ModelData* getModelData(const std::string& modelKey) {
+        return &modelKeyDataMap[modelKey];
       }
 
-      ModelData* getModelData(std::string_view modelName) {
-        return &modelNameDataMap.find(modelName)->second;
+      ModelData* getModelData(std::string_view modelKey) {
+        return &modelKeyDataMap.find(modelKey)->second;
       }
 
-      bool deleteModelData(const std::string& modelName, AmmoniteId modelId) {
+      bool deleteModelData(const std::string& modelKey, AmmoniteId modelId) {
         //Check the model data is tracked
-        if (!modelNameDataMap.contains(modelName)) {
+        if (!modelKeyDataMap.contains(modelKey)) {
           return false;
         }
 
         //Decrease the reference count of the model data
-        ModelData* const modelData = &modelNameDataMap[modelName];
+        ModelData* const modelData = &modelKeyDataMap[modelKey];
         modelData->refCount--;
         if (modelData->activeModelIds.contains(modelId)) {
           modelData->activeModelIds.erase(modelId);
@@ -114,9 +116,9 @@ namespace ammonite {
 
           graphics::internal::deleteModelBuffers(modelData);
 
-          //Remove the map entry, potentially invalidating modelName
-          modelNameDataMap.erase(modelName);
-          ammoniteInternalDebug << "Deleted storage for model data ('" << modelName \
+          //Remove the map entry, potentially invalidating modelKey
+          modelKeyDataMap.erase(modelKey);
+          ammoniteInternalDebug << "Deleted storage for model data ('" << modelKey \
                                 << "')" << std::endl;
         }
 
@@ -136,27 +138,27 @@ namespace ammonite {
         }
       }
 
-      //Return the number of unique model names
-      unsigned int getModelNameCount() {
-        return (unsigned int)modelNameDataMap.size();
+      //Return the number of unique model keys
+      unsigned int getModelKeyCount() {
+        return (unsigned int)modelKeyDataMap.size();
       }
 
-      //Return the number of ModelInfos for a modelName
-      unsigned int getModelInfoCount(std::string_view modelName) {
-        return (unsigned int)modelNameDataMap.find(modelName)->second.activeModelIds.size();
+      //Return the number of ModelInfos for a modelKey
+      unsigned int getModelInfoCount(std::string_view modelKey) {
+        return (unsigned int)modelKeyDataMap.find(modelKey)->second.activeModelIds.size();
       }
 
-      //Fill an array with each unique model name
-      void getModelNames(std::string_view modelNameArray[]) {
+      //Fill an array with each unique model keys
+      void getModelKeys(std::string_view modelKeyArray[]) {
         unsigned int i = 0;
-        for (const auto& entry : modelNameDataMap) {
-          modelNameArray[i++] = entry.first;
+        for (const auto& entry : modelKeyDataMap) {
+          modelKeyArray[i++] = entry.first;
         }
       }
 
-      //Fill an array with every ModelInfo* for a given modelName
-      void getModelInfos(std::string_view modelName, ModelInfo* modelInfoArray[]) {
-        const ModelData& modelData = modelNameDataMap.find(modelName)->second;
+      //Fill an array with every ModelInfo* for a given modelKey
+      void getModelInfos(std::string_view modelKey, ModelInfo* modelInfoArray[]) {
+        const ModelData& modelData = modelKeyDataMap.find(modelKey)->second;
         unsigned int i = 0;
         for (const AmmoniteId& modelId : modelData.activeModelIds) {
           modelInfoArray[i++] = getModelPtr(modelId);

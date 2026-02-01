@@ -30,7 +30,7 @@ extern "C" {
  - System-independent links:
    - Model info -> model ID
    - Model info -> model data
-   - Model data -> model name
+   - Model data -> model key
  - Use this for querying models by type or ID
 */
 
@@ -88,7 +88,7 @@ namespace ammonite {
 
           ammoniteInternalDebug << "Deleted storage for model info (ID " \
                                 << modelId << ", '" \
-                                << modelIdPtrMap[modelId]->modelData->modelName \
+                                << modelIdPtrMap[modelId]->modelData->modelKey \
                                 << "')" << std::endl;
 
           //Delete the model info and id to pointer map entry
@@ -303,7 +303,7 @@ namespace ammonite {
 
       //Update model data storage
       internal::ModelInfo* const newModelInfo = modelIdPtrMap[newModelId];
-      internal::copyModelData(existingModelInfo->modelData->modelName, newModelId);
+      internal::copyModelData(existingModelInfo->modelData->modelKey, newModelId);
 
       //Reset the draw mode unless asked to preserve it
       if (!preserveDrawMode) {
@@ -350,9 +350,9 @@ namespace ammonite {
 
         /*
          - Remove the model info from the tracker, before the data is deleted
-         - Copy the modelName for future use
+         - Copy the modelKey for future use
         */
-        const std::string modelName = modelInfo->modelData->modelName;
+        const std::string modelKey = modelInfo->modelData->modelKey;
         if (activeModelTracker.hasModel(modelId)) {
           activeModelTracker.deleteModelInfo(modelId);
         } else if (inactiveModelTracker.hasModel(modelId)) {
@@ -363,7 +363,7 @@ namespace ammonite {
         }
 
         //Reduce reference count and possibly delete model data
-        if (!internal::deleteModelData(modelName, modelId)) {
+        if (!internal::deleteModelData(modelKey, modelId)) {
           ammonite::utils::warning << "Failed to delete model data (ID " \
                                    << modelId << ")" << std::endl;
         }

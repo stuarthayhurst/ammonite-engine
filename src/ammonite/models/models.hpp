@@ -68,7 +68,7 @@ namespace ammonite {
       */
       struct ModelData {
         unsigned int refCount = 0;
-        std::string modelName;
+        std::string modelKey;
         std::vector<MeshInfoGroup> meshInfo;
         std::vector<TextureIdGroup> textureIds;
         std::unordered_set<AmmoniteId> activeModelIds;
@@ -115,22 +115,22 @@ namespace ammonite {
       };
 
       //Model data storage management
-      std::string getModelName(const std::string& objectPath,
-                               const ModelLoadInfo& modelLoadInfo);
+      std::string getModelKey(const std::string& objectPath,
+                              const ModelLoadInfo& modelLoadInfo);
       ModelData* addModelData(const std::string& objectPath,
                               const ModelLoadInfo& modelLoadInfo,
                               AmmoniteId modelId);
-      ModelData* copyModelData(const std::string& modelName, AmmoniteId modelId);
-      ModelData* getModelData(const std::string& modelName);
-      ModelData* getModelData(std::string_view modelName);
-      bool deleteModelData(const std::string& modelName, AmmoniteId modelId);
+      ModelData* copyModelData(const std::string& modelKey, AmmoniteId modelId);
+      ModelData* getModelData(const std::string& modelKey);
+      ModelData* getModelData(std::string_view modelKey);
+      bool deleteModelData(const std::string& modelKey, AmmoniteId modelId);
       void setModelInfoActive(AmmoniteId modelId, bool active);
 
-      //Model info retrieval, by model name
-      unsigned int getModelNameCount();
-      unsigned int getModelInfoCount(std::string_view modelName);
-      void getModelNames(std::string_view modelNameArray[]);
-      void getModelInfos(std::string_view modelName, ModelInfo* modelInfoArray[]);
+      //Model info retrieval, by model key
+      unsigned int getModelKeyCount();
+      unsigned int getModelInfoCount(std::string_view modelKey);
+      void getModelKeys(std::string_view modelKeyArray[]);
+      void getModelInfos(std::string_view modelKey, ModelInfo* modelInfoArray[]);
 
       //Model info retrieval
       unsigned int getModelCount(ModelTypeEnum modelType);

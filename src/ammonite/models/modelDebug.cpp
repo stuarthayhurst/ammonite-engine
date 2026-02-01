@@ -13,21 +13,21 @@ namespace ammonite {
   namespace models {
     bool dumpModelStorageDebug() {
 #ifdef AMMONITE_DEBUG
-      //Create storage for model names, query the names
-      const unsigned int modelNameCount = internal::getModelNameCount();
-      std::string_view* const modelNames = new std::string_view[modelNameCount];
-      internal::getModelNames(modelNames);
+      //Create storage for model keys, query the names
+      const unsigned int modelKeyCount = internal::getModelKeyCount();
+      std::string_view* const modelKeys = new std::string_view[modelKeyCount];
+      internal::getModelKeys(modelKeys);
 
-      for (unsigned int modelNameIndex = 0; modelNameIndex < modelNameCount; modelNameIndex++) {
+      for (unsigned int modelKeyIndex = 0; modelKeyIndex < modelKeyCount; modelKeyIndex++) {
         //Create storage for ModelInfo pointers, query them
-        const std::string_view& modelName = modelNames[modelNameIndex];
-        const unsigned int modelInfoCount = internal::getModelInfoCount(modelName);
+        const std::string_view& modelKey = modelKeys[modelKeyIndex];
+        const unsigned int modelInfoCount = internal::getModelInfoCount(modelKey);
         internal::ModelInfo** const modelInfoPtrs = new internal::ModelInfo*[modelInfoCount];
-        internal::getModelInfos(modelName, modelInfoPtrs);
+        internal::getModelInfos(modelKey, modelInfoPtrs);
 
-        //Debug print the model name
-        ammoniteInternalDebug << "Model name " << modelNameIndex << ": '" \
-                              << modelName << "'" << std::endl;
+        //Debug print the model key
+        ammoniteInternalDebug << "Model key " << modelKeyIndex << ": '" \
+                              << modelKey << "'" << std::endl;
         ammoniteInternalDebug << "  Active model IDs (" << modelInfoCount << "): ";
 
         //Debug print each ID using the name
@@ -47,7 +47,7 @@ namespace ammonite {
       }
 
       ammoniteInternalDebug.printEmptyLine();
-      delete [] modelNames;
+      delete [] modelKeys;
       return true;
 #else
       return false;
