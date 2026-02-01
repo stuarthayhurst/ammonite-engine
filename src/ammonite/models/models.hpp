@@ -115,8 +115,6 @@ namespace ammonite {
       };
 
       //Model data storage management
-      std::string getModelKey(const std::string& objectPath,
-                              const ModelLoadInfo& modelLoadInfo);
       ModelData* addModelData(const std::string& objectPath,
                               const ModelLoadInfo& modelLoadInfo,
                               AmmoniteId modelId);
@@ -138,6 +136,9 @@ namespace ammonite {
                      ModelInfo* modelInfoArray[]);
       ModelInfo* getModelPtr(AmmoniteId modelId);
       bool* getModelsMovedPtr();
+
+      //Calculate matrices from position, scale and rotation
+      void calcModelMatrices(PositionData* positionData);
 
       void setLightEmitterId(AmmoniteId modelId, AmmoniteId lightEmitterId);
       AmmoniteId getLightEmitterId(AmmoniteId modelId);
