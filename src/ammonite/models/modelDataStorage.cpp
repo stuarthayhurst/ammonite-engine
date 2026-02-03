@@ -1,3 +1,4 @@
+#include <cstdint>
 #include <functional>
 #include <iostream>
 #include <map>
@@ -33,19 +34,32 @@ namespace ammonite {
       }
 
       namespace {
-        std::string calculateModelKey(const std::string& objectPath,
-                                      const ModelLoadInfo& modelLoadInfo) {
-          const unsigned char extraData = ((int)modelLoadInfo.flipTexCoords << 0) |
-                                          ((int)modelLoadInfo.srgbTextures << 1);
-          return objectPath + std::to_string(extraData);
+        std::string calculateModelKey(const ModelLoadInfo& modelLoadInfo) {
+          //Handle file-based model keys
+          if (modelLoadInfo.isFileBased) {
+            const unsigned char extraData = ((int)modelLoadInfo.fileInfo.flipTexCoords << 0) |
+                                            ((int)modelLoadInfo.fileInfo.srgbTextures << 1);
+            return "file:" + modelLoadInfo.fileInfo.objectPath + std::to_string(extraData);
+          }
+
+          /*
+           - Handle memory-based keys, by searching for the first free key
+           - While this is linear, memory based model uploads should be rare
+          */
+          uintmax_t i = 0;
+          while (true) {
+            std::string modelKey = "data:" + std::to_string(i++);
+            if (!modelKeyDataMap.contains(modelKey)) {
+              return modelKey;
+            }
+          }
         }
       }
 
-      ModelData* addModelData(const std::string& objectPath,
-                              const ModelLoadInfo& modelLoadInfo,
+      ModelData* addModelData(const ModelLoadInfo& modelLoadInfo,
                               AmmoniteId modelId) {
         //If the model has already been loaded, update counter, record ID and return it
-        const std::string modelKey = calculateModelKey(objectPath, modelLoadInfo);
+        const std::string modelKey = calculateModelKey(modelLoadInfo);
         if (modelKeyDataMap.contains(modelKey)) {
           ModelData& modelData = modelKeyDataMap[modelKey];
           modelData.refCount++;
@@ -53,15 +67,24 @@ namespace ammonite {
           return &modelData;
         }
 
-        //Load the model data
+        //Prepare the model data structure
         std::vector<RawMeshData> rawMeshDataVec;
         modelKeyDataMap[modelKey] = {};
         ModelData* const modelDataPtr = &modelKeyDataMap[modelKey];
         modelDataPtr->refCount = 1;
         modelDataPtr->modelKey = modelKey;
-        if (!internal::loadObject(objectPath, modelDataPtr, &rawMeshDataVec, modelLoadInfo)) {
-          modelKeyDataMap.erase(modelKey);
-          return nullptr;
+
+        //Process the model data using the correct loader
+        if (modelLoadInfo.isFileBased) {
+          if (!internal::loadFileObject(modelDataPtr, &rawMeshDataVec, modelLoadInfo)) {
+            modelKeyDataMap.erase(modelKey);
+            return nullptr;
+          }
+        } else {
+          if (!internal::loadMemoryObject(modelDataPtr, &rawMeshDataVec, modelLoadInfo)) {
+            modelKeyDataMap.erase(modelKey);
+            return nullptr;
+          }
         }
 
         //Create buffers from loaded data

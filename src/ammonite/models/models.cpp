@@ -219,54 +219,108 @@ namespace ammonite {
       }
     }
 
-    //Exposed model handling functions
+    namespace {
+      AmmoniteId createModel(const internal::ModelLoadInfo& modelLoadInfo) {
+        //Create the model info entry
+        internal::ModelInfo modelInfo;
+        modelInfo.modelId = utils::internal::setNextId(&lastModelId, modelIdPtrMap);
+
+        //Either reuse or load model from scratch
+        modelInfo.modelData = internal::addModelData(modelLoadInfo, modelInfo.modelId);
+        if (modelInfo.modelData == nullptr) {
+          return 0;
+        }
+
+        //Apply default texture IDs per mesh
+        modelInfo.textureIds = modelInfo.modelData->textureIds;
+        for (const internal::TextureIdGroup& textureGroup : modelInfo.textureIds) {
+          if (textureGroup.diffuseId != 0) {
+            ammonite::textures::internal::copyTexture(textureGroup.diffuseId);
+          }
+
+          if (textureGroup.specularId != 0) {
+            ammonite::textures::internal::copyTexture(textureGroup.specularId);
+          }
+        }
+
+        //Initialise position data
+        ammonite::identity(modelInfo.positionData.translationMatrix);
+        ammonite::identity(modelInfo.positionData.scaleMatrix);
+        ammonite::identity(modelInfo.positionData.rotationMatrix);
+        ammonite::fromEuler(modelInfo.positionData.rotationQuat, 0.0f, 0.0f, 0.0f);
+
+        //Calculate model and normal matrices
+        internal::calcModelMatrices(&modelInfo.positionData);
+
+        //Add model to the tracker and return the ID
+        activeModelTracker.addModelInfo(modelInfo.modelId, modelInfo);
+        return modelInfo.modelId;
+      }
+    }
+
     AmmoniteId createModel(const std::string& objectPath, bool flipTexCoords,
                            bool srgbTextures) {
       //Generate info required to load model
-      internal::ModelLoadInfo modelLoadInfo;
-      modelLoadInfo.flipTexCoords = flipTexCoords;
-      modelLoadInfo.srgbTextures = srgbTextures;
-      modelLoadInfo.modelDirectory = objectPath.substr(0, objectPath.find_last_of('/'));
+      const internal::ModelLoadInfo modelLoadInfo = {
+        .fileInfo = {
+          objectPath.substr(0, objectPath.find_last_of('/')),
+          objectPath,
+          flipTexCoords,
+          srgbTextures
+        },
+        .isFileBased = true
+      };
 
-      //Create the model info entry
-      internal::ModelInfo modelInfo;
-      modelInfo.modelId = utils::internal::setNextId(&lastModelId, modelIdPtrMap);
-
-      //Either reuse or load model from scratch
-      modelInfo.modelData = internal::addModelData(objectPath, modelLoadInfo,
-                                                   modelInfo.modelId);
-      if (modelInfo.modelData == nullptr) {
-        return 0;
-      }
-
-      //Apply default texture IDs per mesh
-      modelInfo.textureIds = modelInfo.modelData->textureIds;
-      for (const internal::TextureIdGroup& textureGroup : modelInfo.textureIds) {
-        if (textureGroup.diffuseId != 0) {
-          ammonite::textures::internal::copyTexture(textureGroup.diffuseId);
-        }
-
-        if (textureGroup.specularId != 0) {
-          ammonite::textures::internal::copyTexture(textureGroup.specularId);
-        }
-      }
-
-      //Initialise position data
-      ammonite::identity(modelInfo.positionData.translationMatrix);
-      ammonite::identity(modelInfo.positionData.scaleMatrix);
-      ammonite::identity(modelInfo.positionData.rotationMatrix);
-      ammonite::fromEuler(modelInfo.positionData.rotationQuat, 0.0f, 0.0f, 0.0f);
-
-      //Calculate model and normal matrices
-      internal::calcModelMatrices(&modelInfo.positionData);
-
-      //Add model to the tracker and return the ID
-      activeModelTracker.addModelInfo(modelInfo.modelId, modelInfo);
-      return modelInfo.modelId;
+      return createModel(modelLoadInfo);
     }
 
     AmmoniteId createModel(const std::string& objectPath) {
       return createModel(objectPath, ASSUME_FLIP_MODEL_UVS, ASSUME_SRGB_TEXTURES);
+    }
+
+    /*
+     - Create a model from an array of indexed meshes and materials
+       - Each indexed mesh is an array of AmmoniteVertex
+       - Each indexed mesh has its indices in the corresponding element of meshArray
+     - meshCount specifies the number of meshes
+     - vertexCounts specifies the size of each mesh
+     - indexCounts specifies the number of indices for each mesh
+     - srgbTextures controls whether textures are treated as sRGB or not
+    */
+    AmmoniteId createModel(const AmmoniteVertex* meshArray[],
+                           const unsigned int* indicesArray[],
+                           const AmmoniteMaterial* materials,
+                           unsigned int meshCount, const unsigned int* vertexCounts,
+                           const unsigned int* indexCounts) {
+      //Generate info required to load model
+      const internal::ModelLoadInfo modelLoadInfo = {
+        .memoryInfo = {meshArray, indicesArray, materials,
+                       meshCount, vertexCounts, indexCounts},
+        .isFileBased = false,
+      };
+
+      return createModel(modelLoadInfo);
+    }
+
+    //Map model creation for multiple non-indexed meshes onto createModel()
+    AmmoniteId createModel(const AmmoniteVertex* meshArray[],
+                           const AmmoniteMaterial* materials,
+                           unsigned int meshCount, const unsigned int* vertexCounts) {
+      return createModel(meshArray, nullptr, materials, meshCount, vertexCounts, nullptr);
+    }
+
+    //Map model creation for a single indexed mesh onto createModel()
+    AmmoniteId createModel(const AmmoniteVertex* mesh,
+                           const unsigned int* indices,
+                           const AmmoniteMaterial& material,
+                           unsigned int vertexCount, unsigned int indexCount) {
+      return createModel(&mesh, &indices, &material, 1, &vertexCount, &indexCount);
+    }
+
+    //Map model creation for a single non-indexed mesh onto createModel()
+    AmmoniteId createModel(const AmmoniteVertex* mesh, const AmmoniteMaterial& material,
+                           unsigned int vertexCount) {
+      return createModel(&mesh, nullptr, &material, 1, &vertexCount, nullptr);
     }
 
     AmmoniteId copyModel(AmmoniteId modelId, bool preserveDrawMode) {

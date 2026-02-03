@@ -13,8 +13,7 @@ namespace ammonite {
   namespace models {
     namespace AMMONITE_INTERNAL internal {
       //Model data storage management
-      ModelData* addModelData(const std::string& objectPath,
-                              const ModelLoadInfo& modelLoadInfo,
+      ModelData* addModelData(const ModelLoadInfo& modelLoadInfo,
                               AmmoniteId modelId);
       ModelData* copyModelData(const std::string& modelKey, AmmoniteId modelId);
       ModelData* getModelData(const std::string& modelKey);

@@ -11,11 +11,10 @@ extern "C" {
 
 #include "../maths/matrix.hpp"
 #include "../maths/quaternion.hpp"
-#include "../maths/vector.hpp"
 #include "../utils/id.hpp"
 #include "../visibility.hpp"
 
-//Required for AmmoniteDrawEnum
+//Required for AmmoniteDrawEnum, AmmoniteVertex and AmmoniteMaterial
 #include "../../include/ammonite/models/models.hpp"
 
 //Model types, explicitly enumerated since it's also used as an index
@@ -27,19 +26,12 @@ enum AMMONITE_INTERNAL ModelTypeEnum : unsigned char {
 namespace ammonite {
   namespace models {
     namespace AMMONITE_INTERNAL internal {
-      //Store information for a single vertex
-      struct VertexData {
-        ammonite::Vec<float, 3> vertex;
-        ammonite::Vec<float, 3> normal;
-        ammonite::Vec<float, 2> texturePoint;
-      };
-
       /*
        - Store information for each vertex and index in a single mesh
        - Only exists to be uploaded to the GPU
       */
       struct RawMeshData {
-        VertexData* vertexData = nullptr;
+        AmmoniteVertex* vertexData = nullptr;
         unsigned int vertexCount = 0;
         unsigned int* indices = nullptr;
         unsigned int indexCount = 0;
@@ -106,11 +98,36 @@ namespace ammonite {
         unsigned int lightIndex;
       };
 
-      //Information used to support model loading
+      //Data required to load from a file
+      //NOLINTBEGIN(cppcoreguidelines-avoid-const-or-ref-data-members)
+      struct ModelFileInfo {
+        const std::string& modelDirectory;
+        const std::string& objectPath;
+        const bool flipTexCoords;
+        const bool srgbTextures;
+      };
+      //NOLINTEND(cppcoreguidelines-avoid-const-or-ref-data-members)
+
+      //Data required to load from memory
+      //NOLINTBEGIN(cppcoreguidelines-avoid-const-or-ref-data-members)
+      struct ModelMemoryInfo {
+        const AmmoniteVertex** meshArray;
+        const unsigned int** indicesArray;
+        const AmmoniteMaterial* materials;
+
+        const unsigned int meshCount;
+        const unsigned int* vertexCounts;
+        const unsigned int* indexCounts;
+      };
+      //NOLINTEND(cppcoreguidelines-avoid-const-or-ref-data-members)
+
+      //Information used to support model loading from various sources
       struct ModelLoadInfo {
-        std::string modelDirectory;
-        bool flipTexCoords;
-        bool srgbTextures;
+        union {
+          ModelFileInfo fileInfo;
+          ModelMemoryInfo memoryInfo;
+        };
+        bool isFileBased;
       };
     }
   }

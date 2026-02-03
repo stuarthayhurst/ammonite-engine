@@ -1,6 +1,5 @@
 #include <cstring>
 #include <iostream>
-#include <list>
 #include <queue>
 #include <string>
 #include <vector>
@@ -12,16 +11,15 @@
 #include <assimp/scene.h>
 #include <assimp/types.h>
 
-#include "models.hpp"
+#include "../models.hpp"
 
-#include "../graphics/textures.hpp"
-#include "../maths/vector.hpp"
-#include "../utils/debug.hpp"
-#include "../utils/logging.hpp"
-#include "../utils/thread.hpp"
+#include "../../graphics/textures.hpp"
+#include "../../maths/vector.hpp"
+#include "../../utils/debug.hpp"
+#include "../../utils/logging.hpp"
 
 /*
- - Process a model into internal structures
+ - Process a (file-based) model into internal structures
  - Load the model from a path and some settings
  - Fills in the mesh and texture parts of a ModelData
 */
@@ -35,38 +33,6 @@ namespace ammonite {
           unsigned int type;
           unsigned int index;
         };
-
-        //Data required by the worker thread to load the texture
-        struct TextureThreadData {
-          std::string texturePath;
-          bool flipTextures;
-          bool srgbTextures;
-          textures::internal::TextureData textureData;
-          bool loadedTexture;
-        };
-
-        //Hold data to load a texture and the sync for its worker
-        struct TextureLoadData {
-          TextureThreadData threadData;
-          GLuint textureId;
-          AmmoniteGroup sync{0};
-        };
-
-        //Store the outstanding texture loads
-        std::list<TextureLoadData> textureQueue;
-      }
-
-      //Thread workers
-      namespace {
-        void textureLoadWorker(void* userPtr) {
-          TextureThreadData* const threadData = (TextureThreadData*)userPtr;
-
-          const bool prepared = textures::internal::prepareTextureData(
-            threadData->texturePath, threadData->flipTextures,
-            threadData->srgbTextures, &threadData->textureData);
-
-          threadData->loadedTexture = prepared;
-        }
       }
 
       namespace {
@@ -90,39 +56,10 @@ namespace ammonite {
 
           aiString localTexturePath;
           materialPtr->GetTexture(textureType, 0, &localTexturePath);
-          const std::string fullTexturePath = modelLoadInfo.modelDirectory + '/' + localTexturePath.C_Str();
+          const std::string fullTexturePath = modelLoadInfo.fileInfo.modelDirectory + '/' + localTexturePath.C_Str();
 
-          //Calculate the texture's key
-          std::string textureKey;
-          textures::internal::calculateTextureKey(fullTexturePath, false, modelLoadInfo.srgbTextures, &textureKey);
-
-          //Use texture cache, if already loaded / reserved
-          if (textures::internal::checkTextureKey(textureKey)) {
-            return textures::internal::acquireTextureKeyId(textureKey);
-          }
-
-          //Reserve the texture key before loading
-          const GLuint textureId = textures::internal::reserveTextureKey(textureKey);
-          if (textureId == 0) {
-            ammonite::utils::warning << "Failed to reserve texture" << std::endl;
-            return 0;
-          }
-
-          //Prepare data for the worker thread
-          TextureLoadData& textureLoadData = textureQueue.emplace_back();
-          textureLoadData.threadData.texturePath = fullTexturePath;
-          textureLoadData.threadData.flipTextures = false;
-          textureLoadData.threadData.srgbTextures = modelLoadInfo.srgbTextures;
-          textureLoadData.threadData.loadedTexture = false;
-
-          //Prepare date for texture upload after sync
-          textureLoadData.textureId = textureId;
-
-          //Submit the texture load to the thread pool
-          ammonite::utils::thread::submitWork(textureLoadWorker,
-            &textureLoadData.threadData, &textureLoadData.sync);
-
-          return textureId;
+          //Queue the texture load and return its ID
+          return queueTextureLoad(fullTexturePath, false, modelLoadInfo.fileInfo.srgbTextures);
         }
 
         bool materialHasColour(const aiMaterial* materialPtr, const MatKey& colourKey) {
@@ -209,7 +146,7 @@ namespace ammonite {
           //Add a new empty mesh to the mesh vector
           models::internal::RawMeshData* const newMesh = &rawMeshDataVec->emplace_back();
           newMesh->vertexCount = meshPtr->mNumVertices;
-          newMesh->vertexData = new VertexData[meshPtr->mNumVertices];
+          newMesh->vertexData = new AmmoniteVertex[meshPtr->mNumVertices];
 
           //Fill the mesh with vertex data
           bool hasWarnedMesh = false;
@@ -285,9 +222,9 @@ namespace ammonite {
        - Load an object from objectPath, using the settings from modelLoadInfo
        - Store the model's mesh data to rawMeshDataVec and texture data to modelData
       */
-      bool loadObject(const std::string& objectPath, ModelData* modelData,
-                      std::vector<RawMeshData>* rawMeshDataVec,
-                      const ModelLoadInfo& modelLoadInfo) {
+      bool loadFileObject(ModelData* modelData,
+                          std::vector<RawMeshData>* rawMeshDataVec,
+                          const ModelLoadInfo& modelLoadInfo) {
         //Generate post-processing flags
         auto aiProcessFlags = aiProcess_Triangulate |
                               aiProcess_GenNormals |
@@ -298,12 +235,13 @@ namespace ammonite {
                               aiProcess_PreTransformVertices;
 
         //Flip texture coords, if requested
-        if (modelLoadInfo.flipTexCoords) {
+        if (modelLoadInfo.fileInfo.flipTexCoords) {
           aiProcessFlags = aiProcessFlags | aiProcess_FlipUVs;
         }
 
         Assimp::Importer importer;
-        const aiScene* const scenePtr = importer.ReadFile(objectPath.c_str(), aiProcessFlags);
+        const char* const objectString = modelLoadInfo.fileInfo.objectPath.c_str();
+        const aiScene* const scenePtr = importer.ReadFile(objectString, aiProcessFlags);
 
         //Check model loaded correctly
         if (scenePtr == nullptr ||
@@ -317,19 +255,8 @@ namespace ammonite {
         const bool loadedNodes = processNodes(scenePtr, modelData,
                                               rawMeshDataVec, modelLoadInfo);
 
-        //Wait for the texture loads to complete, and upload their data
-        for (TextureLoadData& textureLoadData : textureQueue) {
-          ammonite::utils::thread::waitGroupComplete(&textureLoadData.sync, 1);
-
-          //Attempt to upload the texture data if the load was successful
-          if (textureLoadData.threadData.loadedTexture) {
-            textures::internal::uploadTextureData(textureLoadData.textureId,
-                                                  textureLoadData.threadData.textureData);
-          }
-        }
-
-        //Clear the texture queue
-        textureQueue.clear();
+        //Sync the queued texture loads
+        uploadQueuedTextures();
 
         return loadedNodes;
       }

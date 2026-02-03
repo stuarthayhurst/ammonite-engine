@@ -2,7 +2,7 @@
 #define INTERNALMODELS
 
 //Include other model components
-#include "modelLoader.hpp" // IWYU pragma: export
+#include "loaders/modelLoader.hpp" // IWYU pragma: export
 #include "modelPosition.hpp" // IWYU pragma: export
 #include "modelDataStorage.hpp" // IWYU pragma: export
 #include "modelTypes.hpp" // IWYU pragma: export

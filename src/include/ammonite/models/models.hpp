@@ -5,6 +5,7 @@
 
 #include "../maths/vectorTypes.hpp"
 #include "../utils/id.hpp"
+#include "../enums.hpp"
 #include "../visibility.hpp"
 
 static constexpr bool ASSUME_FLIP_MODEL_UVS = true;
@@ -43,8 +44,65 @@ namespace AMMONITE_EXPOSED ammonite {
       void rotateModel(AmmoniteId modelId, const ammonite::Vec<float, 3>& rotation);
     }
 
+    /*
+     - Store data for a single vertex
+     - Changes to this structure require changes to VertexCompare
+    */
+    struct AmmoniteVertex {
+      ammonite::Vec<float, 3> vertex;
+      ammonite::Vec<float, 3> normal;
+      ammonite::Vec<float, 2> texturePoint;
+    };
+
+    /*
+     - Store data for a single material
+     - Set each union to the desired material component source
+       - Set the booleans describing how to use that component
+     - *isTexture determines whether to treat the corresponding union as a texture
+       or a colour
+     - *isSrgbTexture determines whether to treat corresponding texture as sRGB or not
+    */
+    //NOLINTBEGIN(cppcoreguidelines-avoid-const-or-ref-data-members)
+    union AmmoniteMaterialComponent {
+      const ammonite::Vec<float, 3> colour;
+      const std::string* texturePath;
+    };
+
+    struct AmmoniteMaterial {
+      AmmoniteMaterialComponent diffuse;
+      AmmoniteMaterialComponent specular;
+
+      const bool diffuseIsTexture;
+      const bool specularIsTexture;
+
+      bool diffuseIsSrgbTexture = ASSUME_SRGB_TEXTURES;
+      bool specularIsSrgbTexture = ASSUME_SRGB_TEXTURES;
+    };
+    //NOLINTEND(cppcoreguidelines-avoid-const-or-ref-data-members)
+
+    //File-based object creation
+    AmmoniteId createModel(const std::string& objectPath, bool flipTexCoords,
+                           bool srgbTextures);
     AmmoniteId createModel(const std::string& objectPath);
-    AmmoniteId createModel(const std::string& objectPath, bool flipTexCoords, bool srgbTextures);
+
+    //Multiple mesh object creation
+    AmmoniteId createModel(const AmmoniteVertex* meshArray[],
+                           const unsigned int* indicesArray[],
+                           const AmmoniteMaterial* materials,
+                           unsigned int meshCount, const unsigned int* vertexCounts,
+                           const unsigned int* indexCounts);
+    AmmoniteId createModel(const AmmoniteVertex* meshArray[],
+                           const AmmoniteMaterial* materials,
+                           unsigned int meshCount, const unsigned int* vertexCounts);
+
+    //Single mesh model creation
+    AmmoniteId createModel(const AmmoniteVertex* mesh,
+                           const unsigned int* indices,
+                           const AmmoniteMaterial& material,
+                           unsigned int vertexCount, unsigned int indexCount);
+    AmmoniteId createModel(const AmmoniteVertex* mesh, const AmmoniteMaterial& material,
+                           unsigned int vertexCount);
+
     void deleteModel(AmmoniteId modelId);
     AmmoniteId copyModel(AmmoniteId modelId, bool preserveDrawMode);
 

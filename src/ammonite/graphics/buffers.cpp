@@ -28,7 +28,7 @@ namespace ammonite {
 
           //Fill interleaved vertex + normal + texture buffer and index buffer
           glNamedBufferData(meshInfo.vertexBufferId,
-                            meshInfo.vertexCount * (long)sizeof(models::internal::VertexData),
+                            meshInfo.vertexCount * (long)sizeof(models::AmmoniteVertex),
                             &rawMeshData.vertexData[0], GL_STATIC_DRAW);
           glNamedBufferData(meshInfo.elementBufferId,
                             meshInfo.indexCount * (long)sizeof(unsigned int),
@@ -43,26 +43,26 @@ namespace ammonite {
 
           const GLuint vaoId = meshInfo.vertexArrayId;
           const GLuint vboId = meshInfo.vertexBufferId;
-          const int stride = sizeof(models::internal::VertexData);
+          const int stride = sizeof(models::AmmoniteVertex);
 
           //Vertex attribute
           glEnableVertexArrayAttrib(vaoId, 0);
           glVertexArrayVertexBuffer(vaoId, 0, vboId,
-                                    offsetof(models::internal::VertexData, vertex), stride);
+                                    offsetof(models::AmmoniteVertex, vertex), stride);
           glVertexArrayAttribFormat(vaoId, 0, 3, GL_FLOAT, GL_FALSE, 0);
           glVertexArrayAttribBinding(vaoId, 0, 0);
 
           //Normal attribute
           glEnableVertexArrayAttrib(vaoId, 1);
           glVertexArrayVertexBuffer(vaoId, 1, vboId,
-                                    offsetof(models::internal::VertexData, normal), stride);
+                                    offsetof(models::AmmoniteVertex, normal), stride);
           glVertexArrayAttribFormat(vaoId, 1, 3, GL_FLOAT, GL_FALSE, 0);
           glVertexArrayAttribBinding(vaoId, 1, 1);
 
           //Texture attribute
           glEnableVertexArrayAttrib(vaoId, 2);
           glVertexArrayVertexBuffer(vaoId, 2, vboId,
-                                    offsetof(models::internal::VertexData, texturePoint), stride);
+                                    offsetof(models::AmmoniteVertex, texturePoint), stride);
           glVertexArrayAttribFormat(vaoId, 2, 2, GL_FLOAT, GL_FALSE, 0);
           glVertexArrayAttribBinding(vaoId, 2, 2);
 
