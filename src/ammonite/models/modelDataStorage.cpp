@@ -48,13 +48,7 @@ namespace ammonite {
           */
           uintmax_t i = 0;
           while (true) {
-#if __GNUC__ == 14
-            std::string modelKey = "data:";
-            modelKey += std::to_string(i++);
-#else
             std::string modelKey = "data:" + std::to_string(i++);
-#endif
-
             if (!modelKeyDataMap.contains(modelKey)) {
               return modelKey;
             }
