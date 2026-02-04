@@ -152,7 +152,7 @@ $(BUILD_DIR)/mathsTest: $(BUILD_DIR)/$(LIBRARY_NAME) $(TEST_OBJECTS) $(OBJECT_DI
 	@mkdir -p "$(BUILD_DIR)"
 	$(CXX) -o "$(BUILD_DIR)/mathsTest" $(OBJECT_DIR)/mathsTest.o $(TEST_OBJECTS) $(CLIENT_CXXFLAGS) $(CLIENT_LDFLAGS) $(MATHSTEST_EXTRA_LDFLAGS)
 
-$(OBJECT_DIR)/helper/%.o: ./src/helper/%.cpp $(HELPER_HEADERS_SOURCE)
+$(OBJECT_DIR)/helper/%.o: ./src/helper/%.cpp $(HELPER_HEADERS_SOURCE) $(AMMONITE_INCLUDE_HEADERS_SOURCE)
 	@mkdir -p "$$(dirname $@)"
 	$(EXTRACT) "$<" -c $(CLIENT_CXXFLAGS) -o "$@"
 $(OBJECT_DIR)/demos/%.o: ./src/demos/%.cpp $(DEMO_HEADERS_SOURCE) $(AMMONITE_INCLUDE_HEADERS_SOURCE)
