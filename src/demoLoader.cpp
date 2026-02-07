@@ -10,6 +10,7 @@
 
 #include "helper/argHandler.hpp"
 #include "helper/commands.hpp"
+#include "helper/modelPlacementMode.hpp"
 
 #include "demos/object-field.hpp"
 #include "demos/many-cubes.hpp"
@@ -87,9 +88,10 @@ namespace {
   };
 
   enum : unsigned char {
-    HAS_SETUP_ENGINE   = (1 << 0),
-    HAS_SETUP_CONTROLS = (1 << 1),
-    HAS_SETUP_PATHS    = (1 << 2)
+    HAS_SETUP_ENGINE    = (1 << 0),
+    HAS_SETUP_CONTROLS  = (1 << 1),
+    HAS_SETUP_PATHS     = (1 << 2),
+    HAS_SETUP_PLACEMENT = (1 << 3)
   };
 
   void inputFocusCallback(const std::vector<AmmoniteKeycode>&, KeyStateEnum, void*) {
@@ -198,6 +200,11 @@ namespace {
 
   //Clean up anything that was created
   void cleanEngine(unsigned char setupBits, std::vector<AmmoniteId>* keybindIdsPtr) {
+    if ((setupBits & HAS_SETUP_PLACEMENT) != 0) {
+      placement::unsetPlacementCallbacks();
+      placement::deletePlacedModels();
+    }
+
     if ((setupBits & HAS_SETUP_PATHS) != 0) {
       commands::deleteCameraPaths();
     }
@@ -345,9 +352,14 @@ int main(int argc, char** argv) noexcept(false) {
   ammonite::camera::setLinkedPath(cameraData.cameraIds[1], pathId);
   ammonite::camera::path::playPath(pathId);
 
-  //Register with the command system
+  //Register the path with the command system
   commands::registerCameraPath(pathId);
   setupBits |= HAS_SETUP_PATHS;
+
+  //Set up model placement mode
+  placement::resetPlacementDistance();
+  placement::setPlacementCallbacks();
+  setupBits |= HAS_SETUP_PLACEMENT;
 
   //Set keybinds
   std::vector<AmmoniteId> keybindIds;
@@ -455,6 +467,9 @@ int main(int argc, char** argv) noexcept(false) {
         ammonite::utils::status << "Finished recording camera path" << std::endl;
       }
     }
+
+    //Handle object placement mode
+    placement::updatePlacementPosition();
 
     //Call demo-specific main loop code
     if (rendererMainloop != nullptr) {
