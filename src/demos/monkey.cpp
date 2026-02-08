@@ -35,31 +35,34 @@ namespace monkeyDemo {
     const AmmoniteId screenId = ammonite::splash::getActiveSplashScreenId();
 
     //Load models from a set of objects and textures
-    const std::string models[][2] = {
-      {"assets/suzanne.obj", "assets/gradient.png"},
-      {"assets/cube.obj", "assets/flat.png"}
+    const std::string modelPaths[2] = {
+      "assets/suzanne.obj", "assets/cube.obj"
     };
-    unsigned int modelCount = sizeof(models) / sizeof(models[0]);
+    const ammonite::models::AmmoniteMaterial materials[2] = {
+      ammonite::models::createMaterial("assets/gradient.png", {0.5f, 0.5f, 0.5f}),
+      ammonite::models::createMaterial("assets/flat.png", {0.5f, 0.5f, 0.5f})
+    };
+    unsigned int modelCount = sizeof(modelPaths) / sizeof(modelPaths[0]);
 
     long unsigned int vertexCount = 0;
     for (unsigned int i = 0; i < modelCount; i++) {
       //Load model
-      const AmmoniteId modelId = ammonite::models::createModel(models[i][0]);
+      const AmmoniteId modelId = ammonite::models::createModel(modelPaths[i]);
       loadedModelIds.push_back(modelId);
 
       //Prevent total failure if a model fails
       if (modelId == 0) {
-        ammonite::utils::warning << "Failed to load '" << models[i][0] << "'" << std::endl;
+        ammonite::utils::warning << "Failed to load '" << modelPaths[i] << "'" << std::endl;
         continue;
       }
 
       //Sum vertices and load texture if given
       vertexCount += ammonite::models::getVertexCount(loadedModelIds[i]);
-      if (!models[i][1].empty()) {
-        if (!ammonite::models::applyTexture(loadedModelIds[i], AMMONITE_DIFFUSE_TEXTURE,
-                                           models[i][1], true)) {
-          ammonite::utils::warning << "Failed to apply texture '" << models[i][1] \
-                                   << "' to '" << models[i][0] << "'" << std::endl;
+      if (!materials[i].diffuse.textureInfo.texturePath->empty()) {
+        if (!ammonite::models::applyMaterial(loadedModelIds[i], materials[i])) {
+          ammonite::utils::warning << "Failed to apply texture '" \
+                                   << *materials[i].diffuse.textureInfo.texturePath \
+                                   << "' to '" << modelPaths[i] << "'" << std::endl;
         }
       }
 
@@ -67,6 +70,10 @@ namespace monkeyDemo {
       ammonite::splash::setSplashScreenProgress(screenId, float(i + 1) / float(modelCount + 1));
       ammonite::renderer::drawFrame();
     }
+
+    //Delete the materials
+    ammonite::models::deleteMaterial(materials[0]);
+    ammonite::models::deleteMaterial(materials[1]);
 
     //Copy last loaded model
     loadedModelIds.push_back(ammonite::models::copyModel(loadedModelIds[modelCount - 1], false));

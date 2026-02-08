@@ -127,9 +127,10 @@ namespace ammonite {
          - Colour materials will be uploaded immediately
         */
         GLuint loadMaterialComponent(const AmmoniteMaterialComponent& component,
-                                     bool isTexture, bool srgbTexture) {
+                                     bool isTexture) {
           if (isTexture) {
-            return queueTextureLoad(*component.texturePath, false, srgbTexture);
+            return queueTextureLoad(*component.textureInfo.texturePath, false,
+                                    component.textureInfo.isSrgbTexture);
           }
 
           return textures::internal::loadSolidTexture(component.colour);
@@ -142,10 +143,8 @@ namespace ammonite {
           for (unsigned int meshIndex = 0; meshIndex < meshCount; meshIndex++) {
             const AmmoniteMaterial& material = materials[meshIndex];
             modelData->textureIds.push_back({
-              loadMaterialComponent(material.diffuse, material.diffuseIsTexture,
-                                    material.diffuseIsSrgbTexture),
-              loadMaterialComponent(material.specular, material.specularIsTexture,
-                                    material.specularIsSrgbTexture)
+              loadMaterialComponent(material.diffuse, material.diffuseIsTexture),
+              loadMaterialComponent(material.specular, material.specularIsTexture)
             });
           }
         }

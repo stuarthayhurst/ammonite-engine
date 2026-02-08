@@ -36,15 +36,17 @@ namespace manyCubesDemo {
   bool postEngineInit() {
     const AmmoniteId screenId = ammonite::splash::getActiveSplashScreenId();
 
-    //Load models from a set of objects and textures
-    const std::string models[2] = {"assets/cube.obj", "assets/flat.png"};
+    //Load model from an object and a material
+    const ammonite::models::AmmoniteMaterial material =
+      ammonite::models::createMaterial("assets/flat.png", {0.5f, 0.5f, 0.5f});
+    const std::string modelPath = "assets/cube.obj";
     const unsigned int modelCount = 10000;
 
     //Load cube model
-    const AmmoniteId modelId = ammonite::models::createModel(models[0]);
+    const AmmoniteId modelId = ammonite::models::createModel(modelPath);
     loadedModelIds.push_back(modelId);
-    const bool applied = ammonite::models::applyTexture(loadedModelIds[0],
-      AMMONITE_DIFFUSE_TEXTURE, models[1], true);
+    const bool applied = ammonite::models::applyMaterial(loadedModelIds[0], material);
+    ammonite::models::deleteMaterial(material);
     long unsigned int vertexCount = ammonite::models::getVertexCount(loadedModelIds[0]);
     if (modelId == 0 || !applied) {
       demoExit();

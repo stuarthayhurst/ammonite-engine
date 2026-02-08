@@ -16,6 +16,7 @@ extern "C" {
 #include "../lighting/lighting.hpp"
 #include "../maths/matrix.hpp"
 #include "../maths/quaternion.hpp"
+#include "../maths/vector.hpp"
 #include "../utils/debug.hpp"
 #include "../utils/id.hpp"
 #include "../utils/logging.hpp"
@@ -409,47 +410,118 @@ namespace ammonite {
       }
     }
 
-    bool applyTexture(AmmoniteId modelId, AmmoniteTextureEnum textureType,
-                      const std::string& texturePath, bool srgbTexture) {
-      internal::ModelInfo* const modelInfoPtr = modelIdPtrMap[modelId];
-      if (modelInfoPtr == nullptr) {
-        return false;
-      }
-
-      //Apply texture to every mesh on the model
-      for (internal::TextureIdGroup& textureIdGroup : modelInfoPtr->textureIds) {
-        GLuint* textureIdPtr = nullptr;
-        if (textureType == AMMONITE_DIFFUSE_TEXTURE) {
-          textureIdPtr = &textureIdGroup.diffuseId;
-        } else if (textureType == AMMONITE_SPECULAR_TEXTURE) {
-          textureIdPtr = &textureIdGroup.specularId;
-        } else {
-          ammonite::utils::warning << "Invalid texture type specified" << std::endl;
-          return false;
-        }
-
-        //If a texture is already applied, remove it
+    namespace {
+      //Apply one component of a material to a mesh
+      bool applyMaterialComponent(GLuint* textureIdPtr, bool isTexture,
+                                  const AmmoniteMaterialComponent& component) {
+        //Remove any applied texture
         if (*textureIdPtr != 0) {
           ammonite::textures::internal::deleteTexture(*textureIdPtr);
           *textureIdPtr = 0;
         }
 
-        //Create new texture and apply to the mesh
-        const GLuint textureId = ammonite::textures::internal::loadTexture(texturePath,
-          false, srgbTexture);
-        if (textureId == 0) {
+        GLuint textureId = 0;
+        if (isTexture) {
+          //Create new texture
+          textureId = ammonite::textures::internal::loadTexture(
+            *component.textureInfo.texturePath, false,
+            component.textureInfo.isSrgbTexture);
+        } else {
+          //Create solid colour texture
+          textureId = textures::internal::loadSolidTexture(component.colour);
+        }
+
+        //Apply texture to the mesh
+        *textureIdPtr = textureId;
+        return (textureId != 0);
+      }
+    }
+
+    /*
+     - Apply a material to every mesh of a model
+     - Existing textures will have their reference counter reduced
+    */
+    bool applyMaterial(AmmoniteId modelId, const AmmoniteMaterial& material) {
+      internal::ModelInfo* const modelInfoPtr = modelIdPtrMap[modelId];
+      if (modelInfoPtr == nullptr) {
+        return false;
+      }
+
+      //Apply material to every mesh on the model
+      for (internal::TextureIdGroup& textureIdGroup : modelInfoPtr->textureIds) {
+        if (!applyMaterialComponent(&textureIdGroup.diffuseId,
+                                    material.diffuseIsTexture, material.diffuse)) {
+          ammonite::utils::warning << "Failed to apply diffuse material component" << std::endl;
           return false;
         }
 
-        *textureIdPtr = textureId;
+        if (!applyMaterialComponent(&textureIdGroup.specularId,
+                                    material.specularIsTexture, material.specular)) {
+          ammonite::utils::warning << "Failed to apply specular material component" << std::endl;
+          return false;
+        }
       }
 
       return true;
     }
 
-    bool applyTexture(AmmoniteId modelId, AmmoniteTextureEnum textureType,
-                      const std::string& texturePath) {
-      return applyTexture(modelId, textureType, texturePath, ASSUME_SRGB_TEXTURES);
+    AmmoniteMaterial createMaterial(const std::string& diffusePath,
+                                    const std::string& specularPath) {
+      std::string* diffusePathPtr = new std::string(diffusePath);
+      std::string* specularPathPtr = new std::string(specularPath);
+      return {
+        .diffuse = {.textureInfo = {diffusePathPtr, ASSUME_SRGB_TEXTURES}},
+        .specular = {.textureInfo = {specularPathPtr, ASSUME_SRGB_TEXTURES}},
+        .diffuseIsTexture = true,
+        .specularIsTexture = true
+      };
+    }
+
+    AmmoniteMaterial createMaterial(const ammonite::Vec<float, 3>& diffuseColour,
+                                    const ammonite::Vec<float, 3>& specularColour) {
+      return {
+        .diffuse = {.colour = {diffuseColour[0], diffuseColour[1], diffuseColour[2]}},
+        .specular = {.colour = {specularColour[0], specularColour[1], specularColour[2]}},
+        .diffuseIsTexture = false,
+        .specularIsTexture = false
+      };
+    }
+
+    AmmoniteMaterial createMaterial(const std::string& diffusePath,
+                                    const ammonite::Vec<float, 3>& specularColour) {
+      std::string* diffusePathPtr = new std::string(diffusePath);
+      return {
+        .diffuse = {.textureInfo = {diffusePathPtr, ASSUME_SRGB_TEXTURES}},
+        .specular = {.colour = {specularColour[0], specularColour[1], specularColour[2]}},
+        .diffuseIsTexture = true,
+        .specularIsTexture = false
+      };
+    }
+
+    AmmoniteMaterial createMaterial(const ammonite::Vec<float, 3>& diffuseColour,
+                                    const std::string& specularPath) {
+      std::string* specularPathPtr = new std::string(specularPath);
+      return {
+        .diffuse = {.colour = {diffuseColour[0], diffuseColour[1], diffuseColour[2]}},
+        .specular = {.textureInfo = {specularPathPtr, ASSUME_SRGB_TEXTURES}},
+        .diffuseIsTexture = true,
+        .specularIsTexture = false
+      };
+    }
+
+    /*
+     - Delete a material created by createMaterial()
+     - Only necessary if the material involves a texture
+     - Materials can be deleted as soon as they're no longer needed to load new models
+    */
+    void deleteMaterial(const AmmoniteMaterial& material) {
+      if (material.diffuseIsTexture) {
+        delete material.diffuse.textureInfo.texturePath;
+      }
+
+      if (material.specularIsTexture) {
+        delete material.specular.textureInfo.texturePath;
+      }
     }
 
     //Return the number of indices on a model

@@ -10,12 +10,6 @@
 
 static constexpr bool ASSUME_FLIP_MODEL_UVS = true;
 
-//Texture type enums
-enum AmmoniteTextureEnum : unsigned char {
-  AMMONITE_DIFFUSE_TEXTURE,
-  AMMONITE_SPECULAR_TEXTURE
-};
-
 //Model drawing mode enums
 enum AmmoniteDrawEnum : unsigned char {
   AMMONITE_DRAW_INACTIVE,
@@ -57,15 +51,17 @@ namespace AMMONITE_EXPOSED ammonite {
     /*
      - Store data for a single material
      - Set each union to the desired material component source
-       - Set the booleans describing how to use that component
+       - isSrgbTexture determines whether to treat the texture as sRGB or not
      - *isTexture determines whether to treat the corresponding union as a texture
        or a colour
-     - *isSrgbTexture determines whether to treat corresponding texture as sRGB or not
     */
     //NOLINTBEGIN(cppcoreguidelines-avoid-const-or-ref-data-members)
     union AmmoniteMaterialComponent {
       const ammonite::Vec<float, 3> colour;
-      const std::string* texturePath;
+      struct AmmoniteTextureInfo {
+        const std::string* texturePath;
+        bool isSrgbTexture = ASSUME_SRGB_TEXTURES;
+      } textureInfo;
     };
 
     struct AmmoniteMaterial {
@@ -74,9 +70,6 @@ namespace AMMONITE_EXPOSED ammonite {
 
       const bool diffuseIsTexture;
       const bool specularIsTexture;
-
-      bool diffuseIsSrgbTexture = ASSUME_SRGB_TEXTURES;
-      bool specularIsSrgbTexture = ASSUME_SRGB_TEXTURES;
     };
     //NOLINTEND(cppcoreguidelines-avoid-const-or-ref-data-members)
 
@@ -106,9 +99,17 @@ namespace AMMONITE_EXPOSED ammonite {
     void deleteModel(AmmoniteId modelId);
     AmmoniteId copyModel(AmmoniteId modelId, bool preserveDrawMode);
 
-    bool applyTexture(AmmoniteId modelId, AmmoniteTextureEnum textureType, const std::string& texturePath);
-    bool applyTexture(AmmoniteId modelId, AmmoniteTextureEnum textureType, const std::string& texturePath,
-                      bool srgbTexture);
+    bool applyMaterial(AmmoniteId modelId, const AmmoniteMaterial& material);
+    AmmoniteMaterial createMaterial(const std::string& diffusePath,
+                                    const std::string& specularPath);
+    AmmoniteMaterial createMaterial(const ammonite::Vec<float, 3>& diffuseColour,
+                                    const ammonite::Vec<float, 3>& specularColour);
+    AmmoniteMaterial createMaterial(const std::string& diffusePath,
+                                    const ammonite::Vec<float, 3>& specularColour);
+    AmmoniteMaterial createMaterial(const ammonite::Vec<float, 3>& diffuseColour,
+                                    const std::string& specularPath);
+    void deleteMaterial(const AmmoniteMaterial& material);
+
     unsigned int getIndexCount(AmmoniteId modelId);
     unsigned int getVertexCount(AmmoniteId modelId);
     void setDrawMode(AmmoniteId modelId, AmmoniteDrawEnum drawMode);

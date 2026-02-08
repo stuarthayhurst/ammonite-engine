@@ -350,11 +350,12 @@ namespace objectFieldDemo {
     ammonite::Vec<float, 3> cubeData[cubeCount][3];
     genRandomPosData(&cubeData[0][0], cubeCount);
 
-    //Load models from a set of objects and textures
-    const std::string models[][2] = {
-      {"assets/sphere.obj", "assets/flat.png"},
-      {"assets/cube.obj", "assets/flat.png"}
+    //Load models from a set of objects and materials
+    const std::string modelPaths[2] = {
+      "assets/sphere.obj", "assets/cube.obj"
     };
+    const ammonite::models::AmmoniteMaterial material =
+      ammonite::models::createMaterial("assets/flat.png", {0.5f, 0.5f, 0.5f});
     const unsigned int totalModels = lightCount + cubeCount + 1;
 
     //Load light models
@@ -362,11 +363,10 @@ namespace objectFieldDemo {
     long unsigned int vertexCount = 0;
     for (unsigned int i = 0; i < lightCount; i++) {
       //Load model
-      const AmmoniteId modelId = ammonite::models::createModel(models[0][0]);
+      const AmmoniteId modelId = ammonite::models::createModel(modelPaths[0]);
       loadedModelIds.push_back(modelId);
       vertexCount += ammonite::models::getVertexCount(loadedModelIds[i]);
-      success &= ammonite::models::applyTexture(loadedModelIds[i],
-        AMMONITE_DIFFUSE_TEXTURE, models[0][1], true);
+      success &= ammonite::models::applyMaterial(loadedModelIds[i], material);
 
       if (modelId == 0) {
         success = false;
@@ -380,12 +380,14 @@ namespace objectFieldDemo {
     }
 
     //Load the floor
-    floorId = ammonite::models::createModel(models[1][0]);
+    floorId = ammonite::models::createModel(modelPaths[1]);
     loadedModelIds.push_back(floorId);
     vertexCount += ammonite::models::getVertexCount(floorId);
-    success &= ammonite::models::applyTexture(floorId, AMMONITE_DIFFUSE_TEXTURE,
-                                              models[1][1], true);
     modelCount++;
+
+    //Apply the material
+    success &= ammonite::models::applyMaterial(floorId, material);
+    ammonite::models::deleteMaterial(material);
 
     if (floorId == 0 || !success) {
       demoExit();

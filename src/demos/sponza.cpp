@@ -30,45 +30,49 @@ namespace sponzaDemo {
   bool postEngineInit() {
     const AmmoniteId screenId = ammonite::splash::getActiveSplashScreenId();
 
-    //Load models from a set of objects and textures
-    const std::string models[][4] = {
-      {"assets-experimental/intel-assets/main_sponza/NewSponza_Main_glTF_003.gltf", ""},
-      {"assets-experimental/intel-assets/pkg_a_curtains/NewSponza_Curtains_glTF.gltf", ""},
-      {"assets-experimental/intel-assets/pkg_b_ivy/NewSponza_IvyGrowth_glTF.gltf", ""},
-      {"assets/cube.obj", "assets/flat.png"}
+    //Load models from a set of objects and materials
+    const std::string modelPaths[4] = {
+      "assets-experimental/intel-assets/main_sponza/NewSponza_Main_glTF_003.gltf",
+      "assets-experimental/intel-assets/pkg_a_curtains/NewSponza_Curtains_glTF.gltf",
+      "assets-experimental/intel-assets/pkg_b_ivy/NewSponza_IvyGrowth_glTF.gltf",
+      "assets/cube.obj"
     };
-    const unsigned int modelCount = sizeof(models) / sizeof(models[0]);
+    const ammonite::models::AmmoniteMaterial material =
+      ammonite::models::createMaterial("assets/flat.png", {0.5f, 0.5f, 0.5f});
+    const unsigned int modelCount = sizeof(modelPaths) / sizeof(modelPaths[0]);
+    const unsigned int cubeIndex = 3;
 
     long unsigned int vertexCount = 0;
     for (unsigned int i = 0; i < modelCount; i++) {
       //Load model
-      const AmmoniteId modelId = ammonite::models::createModel(models[i][0]);
+      const AmmoniteId modelId = ammonite::models::createModel(modelPaths[i]);
       loadedModelIds.push_back(modelId);
 
       //Prevent total failure if a model fails
       if (modelId == 0) {
-        ammonite::utils::warning << "Failed to load '" << models[i][0] << "'" << std::endl;
+        ammonite::utils::warning << "Failed to load '" << modelPaths[i] << "'" << std::endl;
         continue;
       }
 
-      //Sum vertices and load texture if given
+      //Sum vertices
       vertexCount += ammonite::models::getVertexCount(loadedModelIds[i]);
-      if (!models[i][1].empty()) {
-        if (!ammonite::models::applyTexture(loadedModelIds[i], AMMONITE_DIFFUSE_TEXTURE,
-                                           models[i][1], true)) {
-          ammonite::utils::warning << "Failed to apply texture '" << models[i][1] \
-                                   << "' to '" << models[i][0] << "'" << std::endl;
-        }
-      }
 
       //Update splash screen
       ammonite::splash::setSplashScreenProgress(screenId, float(i + 1) / float(modelCount + 1));
       ammonite::renderer::drawFrame();
     }
 
-    //Copy last loaded model
-    ammonite::models::position::setPosition(loadedModelIds[modelCount - 1], lightModelPosition);
-    ammonite::models::position::scaleModel(loadedModelIds[modelCount - 1], 0.25f);
+    //Apply the cube's material
+    if (!ammonite::models::applyMaterial(loadedModelIds[cubeIndex], material)) {
+      ammonite::utils::warning << "Failed to apply texture '" \
+                               << *material.diffuse.textureInfo.texturePath \
+                               << "' to '" << modelPaths[cubeIndex] << "'" << std::endl;
+    }
+    ammonite::models::deleteMaterial(material);
+
+    //Position the light cube
+    ammonite::models::position::setPosition(loadedModelIds[cubeIndex], lightModelPosition);
+    ammonite::models::position::scaleModel(loadedModelIds[cubeIndex], 0.25f);
 
     const AmmoniteId skyboxId = ammonite::skybox::loadDirectory("assets-experimental/skybox/");
     if (skyboxId != 0) {
