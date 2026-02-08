@@ -462,6 +462,8 @@ namespace ammonite {
 
             if (drawObjectInfo->textureIds[i].specularId != 0) {
               glBindTextureUnit(1, drawObjectInfo->textureIds[i].specularId);
+            } else {
+              glBindTextureUnit(1, 0);
             }
           }
 
