@@ -18,9 +18,9 @@ namespace ammonite {
     namespace {
       struct Camera {
         ammonite::Vec<float, 3> position = {0};
-        double horizontalAngle = ammonite::pi<double>();
+        double horizontalAngle = ammonite::pi<double>;
         double verticalAngle = 0.0f;
-        float fov = ammonite::pi<float>() / 4.0f;
+        float fov = ammonite::pi<float> / 4.0f;
         AmmoniteId linkedCameraPathId = 0;
       } defaultCamera;
 
@@ -60,9 +60,9 @@ namespace ammonite {
 
         //Right vector, relative to the camera
         const ammonite::Vec<float, 3> right = {
-          std::sin((float)activeCamera->horizontalAngle - (ammonite::pi<float>() / 2.0f)),
+          std::sin((float)activeCamera->horizontalAngle - (ammonite::pi<float> / 2.0f)),
           0.0f,
-          std::cos((float)activeCamera->horizontalAngle - (ammonite::pi<float>() / 2.0f))
+          std::cos((float)activeCamera->horizontalAngle - (ammonite::pi<float> / 2.0f))
         };
 
         //Up vector, relative to the camera
@@ -218,7 +218,7 @@ namespace ammonite {
       if (!cameraTrackerMap.contains(cameraId)) {
         ammonite::utils::warning << "Couldn't find camera with ID '" << cameraId \
                                  << "'" << std::endl;
-        return ammonite::pi<float>() / 4.0f;
+        return ammonite::pi<float> / 4.0f;
       }
 
       return cameraTrackerMap[cameraId].fov;

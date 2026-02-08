@@ -60,7 +60,7 @@ namespace torus {
 
     //Generate the mesh vertices and normals
     for (unsigned int widthNode = 0; widthNode < widthNodes; widthNode++) {
-      const float ringRadians = ((float)widthNode / (float)widthNodes) * 2.0f * ammonite::pi<float>();
+      const float ringRadians = ((float)widthNode / (float)widthNodes) * 2.0f * ammonite::pi<float>;
 
       //Calculate the origin for the current ring
       ammonite::Vec<float, 3> ringOrigin = {
@@ -70,7 +70,7 @@ namespace torus {
 
       //Calculate the vertices and normals of the current ring
       for (unsigned int heightNode = 0; heightNode < heightNodes; heightNode++) {
-        const float volumeRadians = ((float)heightNode / (float)heightNodes) * 2.0f * ammonite::pi<float>();
+        const float volumeRadians = ((float)heightNode / (float)heightNodes) * 2.0f * ammonite::pi<float>;
         const float localRadius = std::sin(volumeRadians) * volumeDiameter;
 
         //Calculate the vertex position

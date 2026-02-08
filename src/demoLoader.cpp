@@ -334,7 +334,7 @@ int main(int argc, char** argv) noexcept(false) {
 
     //Calculate the node's coordinates
     const double progress = (double)(i) / (double)(nodeCount - 1);
-    const float angle = (float)progress * 2.0f * ammonite::pi<float>();
+    const float angle = (float)progress * 2.0f * ammonite::pi<float>;
     position[0] = pathRadius * std::sin(angle);
     position[1] = pathHeight;
     position[2] = pathRadius * std::cos(angle);

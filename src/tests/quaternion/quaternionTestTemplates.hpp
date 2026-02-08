@@ -92,16 +92,16 @@ namespace {
       {(T)0.0, (T)0.0, (T)0.0, {{(T)0.0, (T)0.0, (T)0.0, (T)1.0}}},
 
       //Complete rotation in each axis
-      {(T)2.0 * ammonite::pi<T>(), (T)0.0, (T)0.0, {{(T)0.0, (T)0.0, (T)0.0, (T)-1.0}}},
-      {(T)0.0, (T)2.0 * ammonite::pi<T>(), (T)0.0, {{(T)0.0, (T)0.0, (T)0.0, (T)-1.0}}},
-      {(T)0.0, (T)0.0, (T)2.0 * ammonite::pi<T>(), {{(T)0.0, (T)0.0, (T)0.0, (T)-1.0}}},
-      {(T)2.0 * ammonite::pi<T>(), (T)2.0 * ammonite::pi<T>(), (T)2.0 * ammonite::pi<T>(), {{(T)0.0, (T)0.0, (T)0.0, (T)-1.0}}},
+      {(T)2.0 * ammonite::pi<T>, (T)0.0, (T)0.0, {{(T)0.0, (T)0.0, (T)0.0, (T)-1.0}}},
+      {(T)0.0, (T)2.0 * ammonite::pi<T>, (T)0.0, {{(T)0.0, (T)0.0, (T)0.0, (T)-1.0}}},
+      {(T)0.0, (T)0.0, (T)2.0 * ammonite::pi<T>, {{(T)0.0, (T)0.0, (T)0.0, (T)-1.0}}},
+      {(T)2.0 * ammonite::pi<T>, (T)2.0 * ammonite::pi<T>, (T)2.0 * ammonite::pi<T>, {{(T)0.0, (T)0.0, (T)0.0, (T)-1.0}}},
 
       //Half rotation in each axis
-      {ammonite::pi<T>(), (T)0.0, (T)0.0, {{(T)1.0, (T)0.0, (T)0.0, (T)0.0}}},
-      {(T)0.0, ammonite::pi<T>(), (T)0.0, {{(T)0.0, (T)1.0, (T)0.0, (T)0.0}}},
-      {(T)0.0, (T)0.0, ammonite::pi<T>(), {{(T)0.0, (T)0.0, (T)1.0, (T)0.0}}},
-      {ammonite::pi<T>(), ammonite::pi<T>(), ammonite::pi<T>(), {{(T)0.0, (T)0.0, (T)0.0, (T)1.0}}}
+      {ammonite::pi<T>, (T)0.0, (T)0.0, {{(T)1.0, (T)0.0, (T)0.0, (T)0.0}}},
+      {(T)0.0, ammonite::pi<T>, (T)0.0, {{(T)0.0, (T)1.0, (T)0.0, (T)0.0}}},
+      {(T)0.0, (T)0.0, ammonite::pi<T>, {{(T)0.0, (T)0.0, (T)1.0, (T)0.0}}},
+      {ammonite::pi<T>, ammonite::pi<T>, ammonite::pi<T>, {{(T)0.0, (T)0.0, (T)0.0, (T)1.0}}}
     };
 
     const int totalTests = sizeof(tests) / sizeof(TestData);
@@ -150,7 +150,7 @@ namespace {
       ammonite::Quat<T> aQuat = {{0}};
       ammonite::Vec<T, 3> aVec = {0};
       ammonite::Vec<T, 3> angleVec = {0};
-      randomFillVector(angleVec, (T)2.0 * ammonite::pi<T>());
+      randomFillVector(angleVec, (T)2.0 * ammonite::pi<T>);
 
       //Initialise a quaternion using the angles
       ammonite::fromEuler(aQuat, angleVec);
@@ -184,8 +184,8 @@ namespace {
     ammonite::Quat<T> bQuat = {{0}};
     ammonite::Vec<T, 3> angleVecA = {0};
     ammonite::Vec<T, 3> angleVecB = {0};
-    randomFillVector(angleVecA, (T)2.0 * ammonite::pi<T>());
-    randomFillVector(angleVecB, (T)2.0 * ammonite::pi<T>());
+    randomFillVector(angleVecA, (T)2.0 * ammonite::pi<T>);
+    randomFillVector(angleVecB, (T)2.0 * ammonite::pi<T>);
 
     ammonite::fromEuler(aQuat, angleVecA);
     ammonite::fromEuler(bQuat, angleVecB);
@@ -214,7 +214,7 @@ namespace {
     ammonite::Quat<T> bQuat = {{0}};
     ammonite::Quat<T> cQuat = {{0}};
     ammonite::Vec<T, 3> angleVec = {0};
-    randomFillVector(angleVec, (T)2.0 * ammonite::pi<T>());
+    randomFillVector(angleVec, (T)2.0 * ammonite::pi<T>);
     ammonite::fromEuler(aQuat, angleVec);
 
     //Test conjugate calculation
@@ -256,7 +256,7 @@ namespace {
   bool testLength() {
     ammonite::Quat<T> aQuat = {{0}};
     ammonite::Vec<T, 3> angleVec = {0};
-    randomFillVector(angleVec, (T)2.0 * ammonite::pi<T>());
+    randomFillVector(angleVec, (T)2.0 * ammonite::pi<T>);
     ammonite::fromEuler(aQuat, angleVec);
 
     T sum = (T)0;
@@ -283,7 +283,7 @@ namespace {
     ammonite::Quat<T> aQuat = {{0}};
     ammonite::Quat<T> bQuat = {{0}};
     ammonite::Vec<T, 3> angleVec = {0};
-    randomFillVector(angleVec, (T)2.0 * ammonite::pi<T>());
+    randomFillVector(angleVec, (T)2.0 * ammonite::pi<T>);
     ammonite::fromEuler(aQuat, angleVec);
 
     //Skip (effectively) zero length quaternions
@@ -330,8 +330,8 @@ namespace {
     ammonite::Quat<T> dQuat = {{0}};
     ammonite::Vec<T, 3> angleVecA = {0};
     ammonite::Vec<T, 3> angleVecB = {0};
-    randomFillVector(angleVecA, (T)2.0 * ammonite::pi<T>());
-    randomFillVector(angleVecB, (T)2.0 * ammonite::pi<T>());
+    randomFillVector(angleVecA, (T)2.0 * ammonite::pi<T>);
+    randomFillVector(angleVecB, (T)2.0 * ammonite::pi<T>);
 
     ammonite::fromEuler(aQuat, angleVecA);
     ammonite::fromEuler(bQuat, angleVecB);
@@ -377,7 +377,7 @@ namespace {
     ammonite::Quat<T> eQuat = {{0}};
     ammonite::Quat<T> fQuat = {{0}};
     ammonite::Vec<T, 3> angleVec = {0};
-    randomFillVector(angleVec, (T)2.0 * ammonite::pi<T>());
+    randomFillVector(angleVec, (T)2.0 * ammonite::pi<T>);
 
     //Initialise quaternions using the angles
     ammonite::fromEuler(aQuat, angleVec[0], (T)0.0, (T)0.0);
@@ -426,39 +426,39 @@ namespace {
 
     TestData tests[8] = {
       { //Convert between axes
-        {-ammonite::pi<T>() / 2, (T)0.0, (T)0.0},
+        {-ammonite::pi<T> / 2, (T)0.0, (T)0.0},
         {(T)0.0, (T)0.0, (T)1.0},
         {(T)0.0, (T)1.0, (T)0.0}
       }, {
-        {(T)0.0, -ammonite::pi<T>() / 2, (T)0.0},
+        {(T)0.0, -ammonite::pi<T> / 2, (T)0.0},
         {(T)1.0, (T)0.0, (T)0.0},
         {(T)0.0, (T)0.0, (T)1.0}
       }, {
-        {(T)0.0, (T)0.0, -ammonite::pi<T>() / 2},
+        {(T)0.0, (T)0.0, -ammonite::pi<T> / 2},
         {(T)0.0, (T)1.0, (T)0.0},
         {(T)1.0, (T)0.0, (T)0.0}
       },
 
       { //Complete turns
-        {ammonite::pi<T>() * 2, ammonite::pi<T>() * 2, ammonite::pi<T>() * 2},
+        {ammonite::pi<T> * 2, ammonite::pi<T> * 2, ammonite::pi<T> * 2},
         {(T)1.0, (T)0.0, (T)0.0},
         {(T)1.0, (T)0.0, (T)0.0}
       }, {
-        {ammonite::pi<T>() * 2, ammonite::pi<T>() * 2, ammonite::pi<T>() * 2},
+        {ammonite::pi<T> * 2, ammonite::pi<T> * 2, ammonite::pi<T> * 2},
         {(T)0.0, (T)1.0, (T)0.0},
         {(T)0.0, (T)1.0, (T)0.0}
       }, {
-        {ammonite::pi<T>() * 2, ammonite::pi<T>() * 2, ammonite::pi<T>() * 2},
+        {ammonite::pi<T> * 2, ammonite::pi<T> * 2, ammonite::pi<T> * 2},
         {(T)0.0, (T)0.0, (T)1.0},
         {(T)0.0, (T)0.0, (T)1.0}
       },
 
       { //Recover x and z from xz
-        {(T)0.0, ammonite::pi<T>() / 4, (T)0.0},
+        {(T)0.0, ammonite::pi<T> / 4, (T)0.0},
         {(T)1.0, (T)0.0, (T)1.0},
         {(T)1.0, (T)0.0, (T)0.0}
       }, {
-        {(T)0.0, -ammonite::pi<T>() / 4, (T)0.0},
+        {(T)0.0, -ammonite::pi<T> / 4, (T)0.0},
         {(T)1.0, (T)0.0, (T)1.0},
         {(T)0.0, (T)0.0, (T)1.0}
       }
@@ -547,7 +547,7 @@ namespace {
     ammonite::Vec<T, 4> bVec = {0};
     ammonite::Vec<T, 4> cVec = {0};
     ammonite::Vec<T, 3> angleVec = {0};
-    randomFillVector(angleVec, (T)2.0 * ammonite::pi<T>());
+    randomFillVector(angleVec, (T)2.0 * ammonite::pi<T>);
     randomFillVector(aVec);
     ammonite::fromEuler(aQuat, angleVec);
 

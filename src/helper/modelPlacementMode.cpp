@@ -74,7 +74,7 @@ namespace placement {
             resetPlacementDistance();
           } else {
             ammonite::camera::setFieldOfView(ammonite::camera::getActiveCamera(),
-                                             ammonite::pi<float>() / 4.0f);
+                                             ammonite::pi<float> / 4.0f);
           }
         }
       }
