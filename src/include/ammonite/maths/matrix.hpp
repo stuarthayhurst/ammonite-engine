@@ -322,8 +322,8 @@ namespace AMMONITE_INTERNAL ammonite {
 
     //Transpose a square matrix in-place
     template <typename T, unsigned int size>
-              requires validMatrix<T, size, size>
-    inline Mat<T, size, size>& transpose(Mat<T, size, size>& src) {
+              requires validMatrix<T, size>
+    inline Mat<T, size>& transpose(Mat<T, size>& src) {
       return transpose(src, src);
     }
 
@@ -357,8 +357,8 @@ namespace AMMONITE_INTERNAL ammonite {
        - The scalar and elements must have the same type
     */
     template <typename T, unsigned int size>
-              requires validMatrix<T, size, size>
-    inline Mat<T, size, size>& multiply(Mat<T, size, size>& a, const Mat<T, size, size>& b) {
+              requires validMatrix<T, size>
+    inline Mat<T, size>& multiply(Mat<T, size>& a, const Mat<T, size>& b) {
       return multiply(a, b, a);
     }
 
@@ -389,8 +389,8 @@ namespace AMMONITE_INTERNAL ammonite {
        - The scalar and elements must have the same type
     */
     template <typename T, unsigned int size>
-              requires validMatrix<T, size, size> && validVector<T, size>
-    inline Vec<T, size>& multiply(const Mat<T, size, size>& a, Vec<T, size>& b) {
+              requires validMatrix<T, size> && validVector<T, size>
+    inline Vec<T, size>& multiply(const Mat<T, size>& a, Vec<T, size>& b) {
       return multiply(a, b, b);
     }
 
@@ -423,11 +423,11 @@ namespace AMMONITE_INTERNAL ammonite {
     //TODO: Implement with <simd>
     //Calculate the determinant for a square matrix
     template <typename T, unsigned int size>
-              requires validMatrix<T, size, size>
-    inline T determinant(const Mat<T, size, size>& a) {
+              requires validMatrix<T, size>
+    inline T determinant(const Mat<T, size>& a) {
       glm::mat<size, size, T, glm::defaultp> aMat;
 
-      std::memcpy(glm::value_ptr(aMat), &a[0], sizeof(Mat<T, size, size>));
+      std::memcpy(glm::value_ptr(aMat), &a[0], sizeof(Mat<T, size>));
 
       return (T)glm::determinant(aMat);
     }
@@ -438,15 +438,15 @@ namespace AMMONITE_INTERNAL ammonite {
      - This doesn't check for invertibility first
     */
     template <typename T, unsigned int size>
-              requires validMatrix<T, size, size>
-    inline Mat<T, size, size>& inverse(const Mat<T, size, size>& a, Mat<T, size, size>& dest) {
+              requires validMatrix<T, size>
+    inline Mat<T, size>& inverse(const Mat<T, size>& a, Mat<T, size>& dest) {
       glm::mat<size, size, T, glm::defaultp> aMat;
       glm::mat<size, size, T, glm::defaultp> destMat;
 
-      std::memcpy(glm::value_ptr(aMat), &a[0], sizeof(Mat<T, size, size>));
+      std::memcpy(glm::value_ptr(aMat), &a[0], sizeof(Mat<T, size>));
 
       destMat = glm::inverse(aMat);
-      std::memcpy(&dest[0], glm::value_ptr(destMat), sizeof(Mat<T, size, size>));
+      std::memcpy(&dest[0], glm::value_ptr(destMat), sizeof(Mat<T, size>));
 
       return dest;
     }

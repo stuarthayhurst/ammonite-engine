@@ -19,7 +19,7 @@ namespace AMMONITE_INTERNAL ammonite {
     concept matrixSize = size >= 2 && size <= 4;
 
     //Allowed vector element type and size combinations
-    template <typename T, unsigned int cols, unsigned int rows>
+    template <typename T, unsigned int cols, unsigned int rows = cols>
     concept validMatrix = matrixType<T> && matrixSize<cols> && matrixSize<rows>;
 
 

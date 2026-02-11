@@ -259,7 +259,7 @@ namespace AMMONITE_INTERNAL ammonite {
     //TODO: Implement with <simd>
     //Convert quaternion a to a rotation matrix, storing the result in dest
     template <typename T, unsigned int size>
-              requires validQuaternion<T> && validMatrix<T, size, size> && (size >= 3)
+              requires validQuaternion<T> && validMatrix<T, size> && (size >= 3)
     inline Mat<T, size>& toMatrix(const Quat<T>& a, Mat<T, size>& dest) {
       const glm::qua<T> glmQuat(a[0][3], a[0][0], a[0][1], a[0][2]);
       glm::mat<size, size, T, glm::defaultp> destMat;
