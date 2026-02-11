@@ -471,7 +471,7 @@ namespace AMMONITE_INTERNAL ammonite {
      - Store the result in dest
      - The axis to rotate around must be normalised
     */
-    template <typename T> requires validMatrix<T, 4, 4> && validVector<T, 3>
+    template <typename T> requires validMatrix<T, 4> && validVector<T, 3>
     inline Mat<T, 4>& rotate(const Mat<T, 4>& a, T angle, const Vec<T, 3> b,
                              Mat<T, 4>& dest) {
       glm::mat<4, 4, T, glm::defaultp> aMat;
@@ -492,7 +492,7 @@ namespace AMMONITE_INTERNAL ammonite {
      - Store the result in the same matrix
      - The axis to rotate around must be normalised
     */
-    template <typename T> requires validMatrix<T, 4, 4> && validVector<T, 3>
+    template <typename T> requires validMatrix<T, 4> && validVector<T, 3>
     inline Mat<T, 4>& rotate(Mat<T, 4>& a, T angle, const Vec<T, 3> b) {
       return rotate(a, angle, b, a);
     }
@@ -502,7 +502,7 @@ namespace AMMONITE_INTERNAL ammonite {
      - Calculate a scale matrix from an existing matrix and a vector of scaling ratios
      - Store the result in dest
     */
-    template <typename T> requires validMatrix<T, 4, 4> && validVector<T, 3>
+    template <typename T> requires validMatrix<T, 4> && validVector<T, 3>
     inline Mat<T, 4>& scale(const Mat<T, 4>& a, const Vec<T, 3> b, Mat<T, 4>& dest) {
       glm::mat<4, 4, T, glm::defaultp> aMat;
       glm::vec<3, T, glm::defaultp> bVec;
@@ -521,7 +521,7 @@ namespace AMMONITE_INTERNAL ammonite {
      - Calculate a scale matrix from an existing matrix and a vector of scaling ratios
      - Store the result in the same matrix
     */
-    template <typename T> requires validMatrix<T, 4, 4> && validVector<T, 3>
+    template <typename T> requires validMatrix<T, 4> && validVector<T, 3>
     inline Mat<T, 4>& scale(Mat<T, 4>& a, const Vec<T, 3> b) {
       return scale(a, b, a);
     }
@@ -531,7 +531,7 @@ namespace AMMONITE_INTERNAL ammonite {
      - Calculate a translation matrix from an existing matrix and a translation vector
      - Store the result in dest
     */
-    template <typename T> requires validMatrix<T, 4, 4> && validVector<T, 3>
+    template <typename T> requires validMatrix<T, 4> && validVector<T, 3>
     inline Mat<T, 4>& translate(const Mat<T, 4>& a, const Vec<T, 3> b,
                                 Mat<T, 4>& dest) {
       glm::mat<4, 4, T, glm::defaultp> aMat;
@@ -551,7 +551,7 @@ namespace AMMONITE_INTERNAL ammonite {
      - Calculate a translation matrix from an existing matrix and a translation vector
      - Store the result in the same matrix
     */
-    template <typename T> requires validMatrix<T, 4, 4> && validVector<T, 3>
+    template <typename T> requires validMatrix<T, 4> && validVector<T, 3>
     inline Mat<T, 4>& translate(Mat<T, 4>& a, const Vec<T, 3> b) {
       return translate(a, b, a);
     }
@@ -561,7 +561,7 @@ namespace AMMONITE_INTERNAL ammonite {
      - Calculate a view matrix from a camera position, camera target and an up vector
      - Store the result in dest
     */
-    template <typename T> requires validMatrix<T, 4, 4> && validVector<T, 3>
+    template <typename T> requires validMatrix<T, 4> && validVector<T, 3>
     inline Mat<T, 4>& lookAt(const Vec<T, 3>& camera, const Vec<T, 3>& target,
                              const Vec<T, 3>& up, Mat<T, 4>& dest) {
       glm::vec<3, T, glm::defaultp> cameraVec;
@@ -585,7 +585,7 @@ namespace AMMONITE_INTERNAL ammonite {
        a near plane and a far plane
      - Store the result in dest
     */
-    template <typename T> requires validMatrix<T, 4, 4>
+    template <typename T> requires validMatrix<T, 4>
     inline Mat<T, 4>& perspective(T fov, T aspectRatio, T nearPlane,
                                   T farPlane, Mat<T, 4>& dest) {
       glm::mat<4, 4, T, glm::defaultp> destMat;
