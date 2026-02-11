@@ -62,7 +62,8 @@ namespace AMMONITE_INTERNAL ammonite {
      - Copy from src to dest
      - Additionally, cast each element during the copy
     */
-    template <typename T, typename S> requires validQuaternion<T> && validQuaternion<S>
+    template <typename T, typename S>
+              requires validQuaternion<T> && validQuaternion<S>
     constexpr Quat<S>& copyCast(const Quat<T>& src, Quat<S>& dest) {
       if constexpr (std::is_same_v<T, S>) {
         //Faster runtime copies for equal types
@@ -95,7 +96,10 @@ namespace AMMONITE_INTERNAL ammonite {
     }
 
     //TODO: Implement with <simd>
-    //Convert the quaternion src to Euler angles x, y and z, storing them in the vector dest
+    /*
+     - Convert the quaternion src to Euler angles x, y and z,
+       storing them in the vector dest
+    */
     template <typename T> requires validQuaternion<T>
     inline Vec<T, 3>& toEuler(const Quat<T>& src, Vec<T, 3>& dest) {
       const glm::qua<T> glmQuat(src[0][3], src[0][0], src[0][1], src[0][2]);
@@ -126,7 +130,8 @@ namespace AMMONITE_INTERNAL ammonite {
     }
 
     /*
-     - Convert the quaternion src to pitch, yaw and roll, storing them in the vector dest
+     - Convert the quaternion src to pitch, yaw and roll,
+       storing them in the vector dest
      - This is identical to toEuler()
     */
     template <typename T> requires validQuaternion<T>
@@ -155,7 +160,10 @@ namespace AMMONITE_INTERNAL ammonite {
       return dest;
     }
 
-    //Calculate the conjugate of a quaternion, storing the result in the same quaternion
+    /*
+     - Calculate the conjugate of a quaternion,
+       storing the result in the same quaternion
+    */
     template <typename T> requires validQuaternion<T>
     inline Quat<T>& conjugate(Quat<T>& a) {
       return conjugate(a, a);
@@ -227,7 +235,10 @@ namespace AMMONITE_INTERNAL ammonite {
       return dest;
     }
 
-    //Multiply quaternion a by quaternion b, storing the result in the first quaternion
+    /*
+     - Multiply quaternion a by quaternion b,
+       storing the result in the first quaternion
+    */
     template <typename T> requires validQuaternion<T>
     inline Quat<T>& multiply(Quat<T>& a, const Quat<T>& b) {
       return multiply(a, b, a);
@@ -237,7 +248,8 @@ namespace AMMONITE_INTERNAL ammonite {
     //Multiply a quaternion by a vector, storing the result in dest
     template <typename T, unsigned int size>
               requires validQuaternion<T> && validVector<T, size> && (size >= 3)
-    inline Vec<T, size>& multiply(const Quat<T>& a, const Vec<T, size>& b, Vec<T, size>& dest) {
+    inline Vec<T, size>& multiply(const Quat<T>& a, const Vec<T, size>& b,
+                                  Vec<T, size>& dest) {
       const glm::qua<T> glmQuat(a[0][3], a[0][0], a[0][1], a[0][2]);
       glm::vec<size, T, glm::defaultp> glmVec;
 

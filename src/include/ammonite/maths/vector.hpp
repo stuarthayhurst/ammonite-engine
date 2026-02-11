@@ -146,7 +146,8 @@ namespace AMMONITE_INTERNAL ammonite {
 
     //Add two vectors of the same size and type, storing the result in dest
     template <typename T, unsigned int size> requires validVector<T, size>
-    inline Vec<T, size>& add(const Vec<T, size>& a, const Vec<T, size>& b, Vec<T, size>& dest) {
+    inline Vec<T, size>& add(const Vec<T, size>& a, const Vec<T, size>& b,
+                             Vec<T, size>& dest) {
       std::experimental::fixed_size_simd<T, size> aSimd(&a[0], std::experimental::element_aligned);
       const std::experimental::fixed_size_simd<T, size> bSimd(&b[0], std::experimental::element_aligned);
 
@@ -188,7 +189,8 @@ namespace AMMONITE_INTERNAL ammonite {
 
     //Subtract vector b from vector a of the same size and type, storing the result in dest
     template <typename T, unsigned int size> requires validVector<T, size>
-    inline Vec<T, size>& sub(const Vec<T, size>& a, const Vec<T, size>& b, Vec<T, size>& dest) {
+    inline Vec<T, size>& sub(const Vec<T, size>& a, const Vec<T, size>& b,
+                             Vec<T, size>& dest) {
       std::experimental::fixed_size_simd<T, size> aSimd(&a[0], std::experimental::element_aligned);
       const std::experimental::fixed_size_simd<T, size> bSimd(&b[0], std::experimental::element_aligned);
 
