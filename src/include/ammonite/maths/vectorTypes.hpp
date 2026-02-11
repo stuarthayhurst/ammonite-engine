@@ -36,6 +36,7 @@ namespace AMMONITE_INTERNAL ammonite {
          - However, this means "a" won't be modified
        - Prefer "add(a, b, x); add(x, b, a)" to "add(a, b, a); add(a, b, a)"
      - Effectively, avoid writing to an external reference until the end, if at all
+     - Functions returning references will return references the operand written to
     */
     template <typename T, unsigned int size> requires validVector<T, size>
     using Vec = T[size];

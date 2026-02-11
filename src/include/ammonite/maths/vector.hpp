@@ -43,7 +43,7 @@ namespace AMMONITE_INTERNAL ammonite {
     //Copy from src to dest, using the size of the smaller vector as the size of the copy
     template <typename T, unsigned int sizeA, unsigned int sizeB>
               requires validVector<T, sizeA> && validVector<T, sizeB>
-    constexpr void copy(const Vec<T, sizeA>& src, Vec<T, sizeB>& dest) {
+    constexpr Vec<T, sizeB>& copy(const Vec<T, sizeA>& src, Vec<T, sizeB>& dest) {
       constexpr unsigned int minSize = std::min(sizeA, sizeB);
       if consteval {
         //Slower, constexpr-friendly copy
@@ -51,6 +51,8 @@ namespace AMMONITE_INTERNAL ammonite {
       } else {
         std::memcpy(&dest[0], &src[0], minSize * sizeof(src[0]));
       }
+
+      return dest;
     }
 
     /*
@@ -59,7 +61,7 @@ namespace AMMONITE_INTERNAL ammonite {
     */
     template <typename T, unsigned int sizeA, typename S, unsigned int sizeB>
               requires validVector<T, sizeA> && validVector<S, sizeB>
-    constexpr void copyCast(const Vec<T, sizeA>& src, Vec<S, sizeB>& dest) {
+    constexpr Vec<S, sizeB>& copyCast(const Vec<T, sizeA>& src, Vec<S, sizeB>& dest) {
       if constexpr (std::is_same_v<T, S>) {
         //Faster runtime copies for equal types
         ammonite::copy(src, dest);
@@ -67,6 +69,8 @@ namespace AMMONITE_INTERNAL ammonite {
         constexpr unsigned int minSize = std::min(sizeA, sizeB);
         std::copy(&src[0], &src[minSize], &dest[0]);
       }
+
+      return dest;
     }
 
     //TODO: Implement with <simd>
@@ -92,58 +96,70 @@ namespace AMMONITE_INTERNAL ammonite {
 
     //Set every element of the vector to a scalar
     template <typename T, unsigned int size> requires validVector<T, size>
-    constexpr void set(Vec<T, size>& a, T b) {
+    constexpr Vec<T, size>& set(Vec<T, size>& a, T b) {
       for (unsigned int i = 0; i < size; i++) {
         a[i] = b;
       }
+
+      return a;
     }
 
     //Set elements of vector a to the elements of vector b and a scalar
     template <typename T, unsigned int size>
               requires validVector<T, size> && validVector<T, size - 1>
-    constexpr void set(Vec<T, size>& a, const Vec<T, size - 1>& b, T c) {
+    constexpr Vec<T, size>& set(Vec<T, size>& a, const Vec<T, size - 1>& b, T c) {
       copy(b, a);
       a[size - 1] = c;
+
+      return a;
     }
 
     //Individually set each element of vector a of length 4 to scalars
     template <typename T> requires validVector<T, 4>
-    constexpr void set(Vec<T, 4>& a, T b, T c, T d, T e) {
+    constexpr Vec<T, 4>& set(Vec<T, 4>& a, T b, T c, T d, T e) {
       a[0] = b;
       a[1] = c;
       a[2] = d;
       a[3] = e;
+
+      return a;
     }
 
     //Individually set each element of vector a of length 3 to scalars
     template <typename T> requires validVector<T, 3>
-    constexpr void set(Vec<T, 3>& a, T b, T c, T d) {
+    constexpr Vec<T, 3>& set(Vec<T, 3>& a, T b, T c, T d) {
       a[0] = b;
       a[1] = c;
       a[2] = d;
+
+      return a;
     }
 
     //Individually set each element of vector a of length 2 to scalars
     template <typename T> requires validVector<T, 2>
-    constexpr void set(Vec<T, 2>& a, T b, T c) {
+    constexpr Vec<T, 2>& set(Vec<T, 2>& a, T b, T c) {
       a[0] = b;
       a[1] = c;
+
+      return a;
     }
 
     //Add two vectors of the same size and type, storing the result in dest
     template <typename T, unsigned int size> requires validVector<T, size>
-    inline void add(const Vec<T, size>& a, const Vec<T, size>& b, Vec<T, size>& dest) {
+    inline Vec<T, size>& add(const Vec<T, size>& a, const Vec<T, size>& b, Vec<T, size>& dest) {
       std::experimental::fixed_size_simd<T, size> aSimd(&a[0], std::experimental::element_aligned);
       const std::experimental::fixed_size_simd<T, size> bSimd(&b[0], std::experimental::element_aligned);
 
       aSimd += bSimd;
       aSimd.copy_to(&dest[0], std::experimental::element_aligned);
+
+      return dest;
     }
 
     //Add two vectors of the same size and type, storing the result in the first vector
     template <typename T, unsigned int size> requires validVector<T, size>
-    inline void add(Vec<T, size>& a, const Vec<T, size>& b) {
-      add(a, b, a);
+    inline Vec<T, size>& add(Vec<T, size>& a, const Vec<T, size>& b) {
+      return add(a, b, a);
     }
 
     /*
@@ -151,12 +167,14 @@ namespace AMMONITE_INTERNAL ammonite {
        - The scalar and elements must have the same type
     */
     template <typename T, unsigned int size> requires validVector<T, size>
-    inline void add(const Vec<T, size>& a, T b, Vec<T, size>& dest) {
+    inline Vec<T, size>& add(const Vec<T, size>& a, T b, Vec<T, size>& dest) {
       std::experimental::fixed_size_simd<T, size> aSimd(&a[0], std::experimental::element_aligned);
       const std::experimental::fixed_size_simd<T, size> bSimd = b;
 
       aSimd += bSimd;
       aSimd.copy_to(&dest[0], std::experimental::element_aligned);
+
+      return dest;
     }
 
     /*
@@ -164,24 +182,26 @@ namespace AMMONITE_INTERNAL ammonite {
        - The scalar and elements must have the same type
     */
     template <typename T, unsigned int size> requires validVector<T, size>
-    inline void add(Vec<T, size>& a, T b) {
-      add(a, b, a);
+    inline Vec<T, size>& add(Vec<T, size>& a, T b) {
+      return add(a, b, a);
     }
 
     //Subtract vector b from vector a of the same size and type, storing the result in dest
     template <typename T, unsigned int size> requires validVector<T, size>
-    inline void sub(const Vec<T, size>& a, const Vec<T, size>& b, Vec<T, size>& dest) {
+    inline Vec<T, size>& sub(const Vec<T, size>& a, const Vec<T, size>& b, Vec<T, size>& dest) {
       std::experimental::fixed_size_simd<T, size> aSimd(&a[0], std::experimental::element_aligned);
       const std::experimental::fixed_size_simd<T, size> bSimd(&b[0], std::experimental::element_aligned);
 
       aSimd -= bSimd;
       aSimd.copy_to(&dest[0], std::experimental::element_aligned);
+
+      return dest;
     }
 
     //Subtract vector b from vector a of the same size and type, storing the result in vector a
     template <typename T, unsigned int size> requires validVector<T, size>
-    inline void sub(Vec<T, size>& a, const Vec<T, size>& b) {
-      sub(a, b, a);
+    inline Vec<T, size>& sub(Vec<T, size>& a, const Vec<T, size>& b) {
+      return sub(a, b, a);
     }
 
     /*
@@ -189,12 +209,14 @@ namespace AMMONITE_INTERNAL ammonite {
        - The scalar and elements must have the same type
     */
     template <typename T, unsigned int size> requires validVector<T, size>
-    inline void sub(const Vec<T, size>& a, T b, Vec<T, size>& dest) {
+    inline Vec<T, size>& sub(const Vec<T, size>& a, T b, Vec<T, size>& dest) {
       std::experimental::fixed_size_simd<T, size> aSimd(&a[0], std::experimental::element_aligned);
       const std::experimental::fixed_size_simd<T, size> bSimd = b;
 
       aSimd -= bSimd;
       aSimd.copy_to(&dest[0], std::experimental::element_aligned);
+
+      return dest;
     }
 
     /*
@@ -202,8 +224,8 @@ namespace AMMONITE_INTERNAL ammonite {
        - The scalar and elements must have the same type
     */
     template <typename T, unsigned int size> requires validVector<T, size>
-    inline void sub(Vec<T, size>& a, T b) {
-      sub(a, b, a);
+    inline Vec<T, size>& sub(Vec<T, size>& a, T b) {
+      return sub(a, b, a);
     }
 
     /*
@@ -211,12 +233,14 @@ namespace AMMONITE_INTERNAL ammonite {
        - The scalar and elements must have the same type
     */
     template <typename T, unsigned int size> requires validVector<T, size>
-    inline void scale(const Vec<T, size>& a, T b, Vec<T, size>& dest) {
+    inline Vec<T, size>& scale(const Vec<T, size>& a, T b, Vec<T, size>& dest) {
       std::experimental::fixed_size_simd<T, size> aSimd(&a[0], std::experimental::element_aligned);
       const std::experimental::fixed_size_simd<T, size> bSimd = b;
 
       aSimd *= bSimd;
       aSimd.copy_to(&dest[0], std::experimental::element_aligned);
+
+      return dest;
     }
 
     /*
@@ -224,8 +248,8 @@ namespace AMMONITE_INTERNAL ammonite {
        - The scalar and elements must have the same type
     */
     template <typename T, unsigned int size> requires validVector<T, size>
-    inline void scale(Vec<T, size>& a, T b) {
-      scale(a, b, a);
+    inline Vec<T, size>& scale(Vec<T, size>& a, T b) {
+      return scale(a, b, a);
     }
 
     /*
@@ -233,12 +257,14 @@ namespace AMMONITE_INTERNAL ammonite {
        - The scalar and elements must have the same type
     */
     template <typename T, unsigned int size> requires validVector<T, size>
-    inline void divide(const Vec<T, size>& a, T b, Vec<T, size>& dest) {
+    inline Vec<T, size>& divide(const Vec<T, size>& a, T b, Vec<T, size>& dest) {
       std::experimental::fixed_size_simd<T, size> aSimd(&a[0], std::experimental::element_aligned);
       const std::experimental::fixed_size_simd<T, size> bSimd = b;
 
       aSimd /= bSimd;
       aSimd.copy_to(&dest[0], std::experimental::element_aligned);
+
+      return dest;
     }
 
     /*
@@ -246,8 +272,8 @@ namespace AMMONITE_INTERNAL ammonite {
        - The scalar and elements must have the same type
     */
     template <typename T, unsigned int size> requires validVector<T, size>
-    inline void divide(Vec<T, size>& a, T b) {
-      divide(a, b, a);
+    inline Vec<T, size>& divide(Vec<T, size>& a, T b) {
+      return divide(a, b, a);
     }
 
     /*
@@ -255,11 +281,13 @@ namespace AMMONITE_INTERNAL ammonite {
        - The vector's type must be signed
     */
     template <typename T, unsigned int size> requires validVector<T, size>
-    inline void negate(const Vec<T, size>& a, Vec<T, size>& dest) {
+    inline Vec<T, size>& negate(const Vec<T, size>& a, Vec<T, size>& dest) {
       std::experimental::fixed_size_simd<T, size> aSimd(&a[0], std::experimental::element_aligned);
 
       aSimd = -aSimd;
       aSimd.copy_to(&dest[0], std::experimental::element_aligned);
+
+      return dest;
     }
 
     /*
@@ -267,8 +295,8 @@ namespace AMMONITE_INTERNAL ammonite {
        - The vector's type must be signed
     */
     template <typename T, unsigned int size> requires validVector<T, size>
-    inline void negate(Vec<T, size>& a) {
-      negate(a, a);
+    inline Vec<T, size>& negate(Vec<T, size>& a) {
+      return negate(a, a);
     }
 
     /*
@@ -289,13 +317,15 @@ namespace AMMONITE_INTERNAL ammonite {
        - This may give strange results for integral types
     */
     template <typename T, unsigned int size> requires validVector<T, size>
-    inline void normalise(const Vec<T, size>& a, Vec<T, size>& dest) {
+    inline Vec<T, size>& normalise(const Vec<T, size>& a, Vec<T, size>& dest) {
       std::experimental::fixed_size_simd<T, size> aSimd(&a[0], std::experimental::element_aligned);
 
       T sum = std::experimental::reduce(aSimd * aSimd, std::plus{});
       aSimd /= (T)std::sqrt(sum);
 
       aSimd.copy_to(&dest[0], std::experimental::element_aligned);
+
+      return dest;
     }
 
     /*
@@ -304,8 +334,8 @@ namespace AMMONITE_INTERNAL ammonite {
        - This may give strange results for integral types
     */
     template <typename T, unsigned int size> requires validVector<T, size>
-    inline void normalise(Vec<T, size>& a) {
-      normalise(a, a);
+    inline Vec<T, size>& normalise(Vec<T, size>& a) {
+      return normalise(a, a);
     }
 
     //Calculate the dot product a vector
@@ -322,11 +352,13 @@ namespace AMMONITE_INTERNAL ammonite {
        - Store the result in dest
     */
     template <typename T> requires vectorType<T>
-    constexpr void cross(const Vec<T, 3>& a, const Vec<T, 3>& b, Vec<T, 3>& dest) {
+    constexpr Vec<T, 3>& cross(const Vec<T, 3>& a, const Vec<T, 3>& b, Vec<T, 3>& dest) {
       //TODO: Make use of scatter / gather / permute instructions, when available
       dest[0] = (a[1] * b[2]) - (a[2] * b[1]);
       dest[1] = (a[2] * b[0]) - (a[0] * b[2]);
       dest[2] = (a[0] * b[1]) - (a[1] * b[0]);
+
+      return dest;
     }
 
     /*

@@ -47,13 +47,15 @@ namespace AMMONITE_INTERNAL ammonite {
 
     //Copy from src to dest
     template <typename T> requires validQuaternion<T>
-    constexpr void copy(const Quat<T>& src, Quat<T>& dest) {
+    constexpr Quat<T>& copy(const Quat<T>& src, Quat<T>& dest) {
       if consteval {
         //Slower, constexpr-friendly copy
         std::copy(&src[0][0], &src[0][4], &dest[0][0]);
       } else {
         std::memcpy(&dest[0], &src[0], sizeof(Quat<T>));
       }
+
+      return dest;
     }
 
     /*
@@ -61,42 +63,48 @@ namespace AMMONITE_INTERNAL ammonite {
      - Additionally, cast each element during the copy
     */
     template <typename T, typename S> requires validQuaternion<T> && validQuaternion<S>
-    constexpr void copyCast(const Quat<T>& src, Quat<S>& dest) {
+    constexpr Quat<S>& copyCast(const Quat<T>& src, Quat<S>& dest) {
       if constexpr (std::is_same_v<T, S>) {
         //Faster runtime copies for equal types
         ammonite::copy(src, dest);
       } else {
         std::copy(&src[0][0], &src[0][4], &dest[0][0]);
       }
+
+      return dest;
     }
 
     //TODO: Implement with <simd>
     //Initialise the quaternion dest with Euler angles x, y and z
     template <typename T> requires validQuaternion<T>
-    inline void fromEuler(Quat<T>& dest, T x, T y, T z) {
+    inline Quat<T>& fromEuler(Quat<T>& dest, T x, T y, T z) {
       const glm::vec<3, T, glm::defaultp> angles(x, y, z);
       const glm::qua<T> glmQuat(angles);
       dest[0][0] = glmQuat.x;
       dest[0][1] = glmQuat.y;
       dest[0][2] = glmQuat.z;
       dest[0][3] = glmQuat.w;
+
+      return dest;
     }
 
     //Initialise the quaternion dest with a vector of Euler angles x, y and z
     template <typename T> requires validQuaternion<T>
-    inline void fromEuler(Quat<T>& dest, const Vec<T, 3>& angles) {
-      fromEuler(dest, angles[0], angles[1], angles[2]);
+    inline Quat<T>& fromEuler(Quat<T>& dest, const Vec<T, 3>& angles) {
+      return fromEuler(dest, angles[0], angles[1], angles[2]);
     }
 
     //TODO: Implement with <simd>
     //Convert the quaternion src to Euler angles x, y and z, storing them in the vector dest
     template <typename T> requires validQuaternion<T>
-    inline void toEuler(const Quat<T>& src, Vec<T, 3>& dest) {
+    inline Vec<T, 3>& toEuler(const Quat<T>& src, Vec<T, 3>& dest) {
       const glm::qua<T> glmQuat(src[0][3], src[0][0], src[0][1], src[0][2]);
       const glm::vec<3, T, glm::defaultp> glmAngles = glm::eulerAngles(glmQuat);
       dest[0] = glmAngles.x;
       dest[1] = glmAngles.y;
       dest[2] = glmAngles.z;
+
+      return dest;
     }
 
     /*
@@ -104,8 +112,8 @@ namespace AMMONITE_INTERNAL ammonite {
      - This is identical to fromEuler()
     */
     template <typename T> requires validQuaternion<T>
-    inline void fromPitchYawRoll(Quat<T>& dest, T pitch, T yaw, T roll) {
-      fromEuler(dest, pitch, yaw, roll);
+    inline Quat<T>& fromPitchYawRoll(Quat<T>& dest, T pitch, T yaw, T roll) {
+      return fromEuler(dest, pitch, yaw, roll);
     }
 
     /*
@@ -113,8 +121,8 @@ namespace AMMONITE_INTERNAL ammonite {
      - This is identical to fromEuler()
     */
     template <typename T> requires validQuaternion<T>
-    inline void fromPitchYawRoll(Quat<T>& dest, const Vec<T, 3>& angles) {
-      fromEuler(dest, angles[0], angles[1], angles[2]);
+    inline Quat<T>& fromPitchYawRoll(Quat<T>& dest, const Vec<T, 3>& angles) {
+      return fromEuler(dest, angles[0], angles[1], angles[2]);
     }
 
     /*
@@ -122,8 +130,8 @@ namespace AMMONITE_INTERNAL ammonite {
      - This is identical to toEuler()
     */
     template <typename T> requires validQuaternion<T>
-    inline void toPitchYawRoll(const Quat<T>& src, Vec<T, 3>& dest) {
-      toEuler(src, dest);
+    inline Vec<T, 3>& toPitchYawRoll(const Quat<T>& src, Vec<T, 3>& dest) {
+      return toEuler(src, dest);
     }
 
     //Calculate the dot product of a quaternion
@@ -137,18 +145,20 @@ namespace AMMONITE_INTERNAL ammonite {
 
     //Calculate the conjugate of a quaternion, storing the result in dest
     template <typename T> requires validQuaternion<T>
-    inline void conjugate(const Quat<T>& a, Quat<T>& dest) {
+    inline Quat<T>& conjugate(const Quat<T>& a, Quat<T>& dest) {
       std::experimental::fixed_size_simd<T, 3> aSimd(&a[0][0], std::experimental::element_aligned);
 
       aSimd = -aSimd;
       aSimd.copy_to(&dest[0][0], std::experimental::element_aligned);
       dest[0][3] = a[0][3];
+
+      return dest;
     }
 
     //Calculate the conjugate of a quaternion, storing the result in the same quaternion
     template <typename T> requires validQuaternion<T>
-    inline void conjugate(Quat<T>& a) {
-      conjugate(a, a);
+    inline Quat<T>& conjugate(Quat<T>& a) {
+      return conjugate(a, a);
     }
 
     //Calculate the length of a quaternion
@@ -161,24 +171,26 @@ namespace AMMONITE_INTERNAL ammonite {
 
     //Normalise a quaternion, storing the result in dest
     template <typename T> requires validQuaternion<T>
-    inline void normalise(const Quat<T>& a, Quat<T>& dest) {
+    inline Quat<T>& normalise(const Quat<T>& a, Quat<T>& dest) {
       std::experimental::fixed_size_simd<T, 4> aSimd(&a[0][0], std::experimental::element_aligned);
 
       T sum = std::experimental::reduce(aSimd * aSimd, std::plus{});
       aSimd /= (T)std::sqrt(sum);
 
       aSimd.copy_to(&dest[0][0], std::experimental::element_aligned);
+
+      return dest;
     }
 
     //Normalise a quaternion, storing the result in the same quaternion
     template <typename T> requires validQuaternion<T>
-    inline void normalise(Quat<T>& a) {
-      normalise(a, a);
+    inline Quat<T>& normalise(Quat<T>& a) {
+      return normalise(a, a);
     }
 
     //Calculate the inverse of a quaternion, storing the result in dest
     template <typename T> requires validQuaternion<T>
-    inline void inverse(const Quat<T>& a, Quat<T>& dest) {
+    inline Quat<T>& inverse(const Quat<T>& a, Quat<T>& dest) {
       std::experimental::fixed_size_simd<T, 4> aSimd(&a[0][0], std::experimental::element_aligned);
       const T negData[4] = {(T)-1, (T)-1, (T)-1, (T)1};
       const std::experimental::fixed_size_simd<T, 4> negSimd(&negData[0], std::experimental::element_aligned);
@@ -188,18 +200,20 @@ namespace AMMONITE_INTERNAL ammonite {
       aSimd *= negSimd;
 
       aSimd.copy_to(&dest[0][0], std::experimental::element_aligned);
+
+      return dest;
     }
 
     //Calculate the inverse of a quaternion, storing the result in the same quaternion
     template <typename T> requires validQuaternion<T>
-    inline void inverse(Quat<T>& a) {
-      inverse(a, a);
+    inline Quat<T>& inverse(Quat<T>& a) {
+      return inverse(a, a);
     }
 
     //TODO: Implement with <simd>
     //Multiply quaternion a by quaternion b, storing the result in dest
     template <typename T> requires validQuaternion<T>
-    inline void multiply(const Quat<T>& a, const Quat<T>& b, Quat<T>& dest) {
+    inline Quat<T>& multiply(const Quat<T>& a, const Quat<T>& b, Quat<T>& dest) {
       const glm::qua<T> glmQuatA(a[0][3], a[0][0], a[0][1], a[0][2]);
       const glm::qua<T> glmQuatB(b[0][3], b[0][0], b[0][1], b[0][2]);
 
@@ -209,19 +223,21 @@ namespace AMMONITE_INTERNAL ammonite {
       dest[0][1] = glmResult.y;
       dest[0][2] = glmResult.z;
       dest[0][3] = glmResult.w;
+
+      return dest;
     }
 
     //Multiply quaternion a by quaternion b, storing the result in the first quaternion
     template <typename T> requires validQuaternion<T>
-    inline void multiply(Quat<T>& a, const Quat<T>& b) {
-      multiply(a, b, a);
+    inline Quat<T>& multiply(Quat<T>& a, const Quat<T>& b) {
+      return multiply(a, b, a);
     }
 
     //TODO: Implement with <simd>
     //Multiply a quaternion by a vector, storing the result in dest
     template <typename T, unsigned int size>
               requires validQuaternion<T> && validVector<T, size> && (size >= 3)
-    inline void multiply(const Quat<T>& a, const Vec<T, size>& b, Vec<T, size>& dest) {
+    inline Vec<T, size>& multiply(const Quat<T>& a, const Vec<T, size>& b, Vec<T, size>& dest) {
       const glm::qua<T> glmQuat(a[0][3], a[0][0], a[0][1], a[0][2]);
       glm::vec<size, T, glm::defaultp> glmVec;
 
@@ -229,20 +245,22 @@ namespace AMMONITE_INTERNAL ammonite {
 
       glm::vec<size, T, glm::defaultp> glmDestVec = glmQuat * glmVec;
       std::memcpy(&dest[0], glm::value_ptr(glmDestVec), sizeof(Vec<T, size>));
+
+      return dest;
     }
 
     //Multiply a quaternion by a vector, storing the result in the first quaternion
     template <typename T, unsigned int size>
               requires validQuaternion<T> && validVector<T, size> && (size >= 3)
-    inline void multiply(const Quat<T>& a, Vec<T, size>& b) {
-      multiply(a, b, b);
+    inline Vec<T, size>& multiply(const Quat<T>& a, Vec<T, size>& b) {
+      return multiply(a, b, b);
     }
 
     //TODO: Implement with <simd>
     //Convert quaternion a to a rotation matrix, storing the result in dest
     template <typename T, unsigned int size>
               requires validQuaternion<T> && validMatrix<T, size, size> && (size >= 3)
-    inline void toMatrix(const Quat<T>& a, Mat<T, size>& dest) {
+    inline Mat<T, size>& toMatrix(const Quat<T>& a, Mat<T, size>& dest) {
       const glm::qua<T> glmQuat(a[0][3], a[0][0], a[0][1], a[0][2]);
       glm::mat<size, size, T, glm::defaultp> destMat;
 
@@ -253,6 +271,8 @@ namespace AMMONITE_INTERNAL ammonite {
       }
 
       std::memcpy(&dest[0], glm::value_ptr(destMat), sizeof(Mat<T, size>));
+
+      return dest;
     }
   }
 
