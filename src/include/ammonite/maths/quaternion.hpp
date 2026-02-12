@@ -29,6 +29,7 @@ namespace AMMONITE_INTERNAL ammonite {
     /*
      - Return the address of the first element
      - Guaranteed to be the same as the quaternion, with a different type
+     - Avoids the extra [0] to avoid being used as a Vec<T, 4>
     */
     template <typename T> requires validQuaternion<T>
     constexpr T* data(Quat<T>& a) {
@@ -38,6 +39,7 @@ namespace AMMONITE_INTERNAL ammonite {
     /*
      - Return the address of the first element
      - Guaranteed to be the same as the quaternion, with a different type
+     - Avoids the extra [0] to avoid being used as a Vec<T, 4>
      - const version of the above
     */
     template <typename T> requires validQuaternion<const T>
