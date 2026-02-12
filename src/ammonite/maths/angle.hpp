@@ -14,14 +14,15 @@
 namespace AMMONITE_INTERNAL ammonite {
   inline namespace maths {
     template <typename T> requires std::is_floating_point_v<T> && validVector<T, 3>
-    inline void calculateDirection(T horizontal, T vertical, ammonite::Vec<T, 3>& dest) {
+    inline ammonite::Vec<T, 3>& calculateDirection(T horizontal, T vertical,
+                                                   ammonite::Vec<T, 3>& dest) {
       const ammonite::Vec<T, 3> direction = {
         std::cos(vertical) * std::sin(horizontal),
         std::sin(vertical),
         std::cos(vertical) * std::cos(horizontal)
       };
 
-      ammonite::normalise(direction, dest);
+      return ammonite::normalise(direction, dest);
     }
 
     template <typename T> requires std::is_floating_point_v<T> && validVector<T, 3>

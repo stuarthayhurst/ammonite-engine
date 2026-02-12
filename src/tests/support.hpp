@@ -20,7 +20,8 @@ T randomScalar(double limit = 10000.0) {
 
 template <typename T, unsigned int size>
          requires ammonite::validVector<T, size>
-void randomFillVector(ammonite::Vec<T, size>& vec, double limit = 10000.0) {
+ammonite::Vec<T, size>& randomFillVector(ammonite::Vec<T, size>& vec,
+                                              double limit = 10000.0) {
   for (unsigned int i = 0; i < size; i++) {
     if constexpr (std::is_unsigned_v<T>) {
       vec[i] = (T)ammonite::utils::randomUInt(std::numeric_limits<T>::max());
@@ -30,23 +31,31 @@ void randomFillVector(ammonite::Vec<T, size>& vec, double limit = 10000.0) {
       vec[i] = (T)ammonite::utils::randomDouble((T)limit);
     }
   }
+
+  return vec;
 }
 
 template <typename T, unsigned int cols, unsigned int rows>
           requires ammonite::validMatrix<T, cols, rows>
-void randomFillMatrix(ammonite::Mat<T, cols, rows>& mat, double limit = 10000.0) {
+ammonite::Mat<T, cols, rows>& randomFillMatrix(ammonite::Mat<T, cols, rows>& mat,
+                                               double limit = 10000.0) {
   for (unsigned int col = 0; col < cols; col++) {
     for (unsigned int row = 0; row < rows; row++) {
       mat[col][row] = (T)ammonite::utils::randomDouble((T)limit);
     }
   }
+
+  return mat;
 }
 
 template <typename T> requires ammonite::validQuaternion<T>
-void randomFillQuaternion(ammonite::Quat<T>& quat, double limit = 10000.0) {
+ammonite::Quat<T>& randomFillQuaternion(ammonite::Quat<T>& quat,
+                                        double limit = 10000.0) {
   for (unsigned int i = 0; i < 4; i++) {
     quat[0][i] = (T)ammonite::utils::randomDouble((T)limit);
   }
+
+  return quat;
 }
 
 template <typename T>
