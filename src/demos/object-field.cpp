@@ -63,9 +63,9 @@ namespace objectFieldDemo {
 
         //Rotation
         ammonite::set(objectData[(i * 3) + 1],
-                      (float)ammonite::utils::randomDouble(0.0, ammonite::pi<float> * 2.0f),
-                      (float)ammonite::utils::randomDouble(0.0, ammonite::pi<float> * 2.0f),
-                      (float)ammonite::utils::randomDouble(0.0, ammonite::pi<float> * 2.0f));
+                      (float)ammonite::utils::randomDouble(0.0, ammonite::twoPi<float>),
+                      (float)ammonite::utils::randomDouble(0.0, ammonite::twoPi<float>),
+                      (float)ammonite::utils::randomDouble(0.0, ammonite::twoPi<float>));
 
         //Scale
         ammonite::set(objectData[(i * 3) + 2], (float)ammonite::utils::randomDouble(0.0, 1.2));
@@ -126,10 +126,10 @@ namespace objectFieldDemo {
     //Return the position of an orbit's centre, so that each orbit in a shape meets the next
     constexpr void calculateOrbitPosition(unsigned int orbitCount, unsigned int orbitIndex,
                                           float radius, ammonite::Vec<float, 2>& dest) {
-      const float nucleusAngle = (ammonite::pi<float> * 2.0f * (float)orbitIndex) / (float)orbitCount;
+      const float nucleusAngle = (ammonite::twoPi<float> * (float)orbitIndex) / (float)orbitCount;
 
       //Correct for overlapping orbits
-      const float indexOffsetAngle = (ammonite::pi<float> / 2.0f) - (ammonite::pi<float> / (float)orbitCount);
+      const float indexOffsetAngle = ammonite::halfPi<float> - (ammonite::pi<float> / (float)orbitCount);
       const float opp = ammonite::pi<float> - (2.0f * indexOffsetAngle);
       const float nucleusDistance = radius * 2.0f * std::sin(indexOffsetAngle) / std::sin(opp);
 
@@ -145,8 +145,8 @@ namespace objectFieldDemo {
        - The second index has the angle to the next index
     */
     float* calculateSwapAngles(unsigned int orbitCount) {
-      const float down = ammonite::pi<float> / 2.0f;
-      const float indexOffsetAngle = (ammonite::pi<float> / 2.0f) - (ammonite::pi<float> / (float)orbitCount);
+      const float down = ammonite::halfPi<float>;
+      const float indexOffsetAngle = ammonite::halfPi<float> - (ammonite::pi<float> / (float)orbitCount);
 
       float* const swapAngles = new float[(std::size_t)(orbitCount) * 2];
       for (unsigned int orbit = 0; orbit < orbitCount; orbit++) {
@@ -158,11 +158,11 @@ namespace objectFieldDemo {
           swapAngles[writeIndex] = down - (indexOffsetAngle * (float)sign);
 
           //Rotate the angle to match index position
-          swapAngles[writeIndex] += ((float)orbit / (float)orbitCount) * ammonite::pi<float> * 2.0f;
-          if (swapAngles[writeIndex] >= ammonite::pi<float> * 2.0f) {
-            swapAngles[writeIndex] -= ammonite::pi<float> * 2.0f;
+          swapAngles[writeIndex] += ((float)orbit / (float)orbitCount) * ammonite::twoPi<float>;
+          if (swapAngles[writeIndex] >= ammonite::twoPi<float>) {
+            swapAngles[writeIndex] -= ammonite::twoPi<float>;
           } else if (swapAngles[writeIndex] <= 0.0f) {
-            swapAngles[writeIndex] += ammonite::pi<float> * 2.0f;
+            swapAngles[writeIndex] += ammonite::twoPi<float>;
           }
 
           writeIndex++;
@@ -367,7 +367,7 @@ namespace objectFieldDemo {
       }
 
       //Decide where the light source's angle, in radians
-      const float targetAngle = (orbitTime / lightData[i].orbitPeriod) * ammonite::pi<float> * 2.0f;
+      const float targetAngle = (orbitTime / lightData[i].orbitPeriod) * ammonite::twoPi<float>;
 
       //Decide if the light is within the region to swap orbits
       unsigned int swapTarget = 0;
@@ -394,10 +394,10 @@ namespace objectFieldDemo {
             //Set timer for new angle
             float newAngle = orbitSwapAngles[swapTarget][1 - swapDirection];
             if (!lightData[i].isOrbitClockwise) {
-              newAngle = (ammonite::pi<float> * 2.0f) - newAngle;
+              newAngle = ammonite::twoPi<float> - newAngle;
             }
-            lightData[i].orbitTimer.setTime((newAngle / (ammonite::pi<float> * 2.0f)) * \
-              lightData[i].orbitPeriod);
+            lightData[i].orbitTimer.setTime((newAngle / ammonite::twoPi<float>) * \
+                                            lightData[i].orbitPeriod);
 
             //Set new orbit and flip direction
             lightData[i].orbitIndex = swapTarget;

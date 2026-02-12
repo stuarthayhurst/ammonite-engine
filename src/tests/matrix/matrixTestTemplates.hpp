@@ -748,9 +748,9 @@ namespace {
 
       const TestData tests[11] = {
         //Convert between axes
-        {y, x, z, -ammonite::pi<T> / 2},
-        {z, y, x, -ammonite::pi<T> / 2},
-        {x, z, y, -ammonite::pi<T> / 2},
+        {y, x, z, -ammonite::halfPi<T>},
+        {z, y, x, -ammonite::halfPi<T>},
+        {x, z, y, -ammonite::halfPi<T>},
 
         //Reflect axes
         {xz, x, z, ammonite::pi<T>},
@@ -758,13 +758,13 @@ namespace {
         {xz, y, negY, ammonite::pi<T>},
 
         //Roll axes
-        {xyz, y, z, (ammonite::pi<T> * 2) / 3},
-        {xyz, z, x, (ammonite::pi<T> * 2) / 3},
-        {xyz, x, y, (ammonite::pi<T> * 2) / 3},
+        {xyz, y, z, ammonite::twoPi<T> / (T)3.0},
+        {xyz, z, x, ammonite::twoPi<T> / (T)3.0},
+        {xyz, x, y, ammonite::twoPi<T> / (T)3.0},
 
         //Recover x and z from xz
-        {y, xz, x, ammonite::pi<T> / 4},
-        {y, xz, z, -ammonite::pi<T> / 4}
+        {y, xz, x, ammonite::pi<T> / (T)4.0},
+        {y, xz, z, -ammonite::pi<T> / (T)4.0}
       };
 
       const int totalTests = sizeof(tests) / sizeof(TestData);

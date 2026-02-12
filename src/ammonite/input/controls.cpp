@@ -37,7 +37,7 @@ namespace ammonite {
         } multipliers;
 
         //Default to a 120 degree field of view limit
-        float fovLimit = (2.0f * ammonite::pi<float>) / 3.0f;
+        float fovLimit = ammonite::twoPi<float> / 3.0f;
 
         //Final sensitivities
         float movementSpeed = baseSettings.movementSpeed;
@@ -159,7 +159,7 @@ namespace ammonite {
         };
 
         //Right vector, relative to the camera
-        const float angleRight = horizontalAngle - (ammonite::pi<float> / 2.0f);
+        const float angleRight = horizontalAngle - ammonite::halfPi<float>;
         const ammonite::Vec<float, 3> right = {
           std::sin(angleRight), 0.0f, std::cos(angleRight)
         };

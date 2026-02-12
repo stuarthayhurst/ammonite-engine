@@ -60,9 +60,9 @@ namespace ammonite {
 
         //Right vector, relative to the camera
         const ammonite::Vec<float, 3> right = {
-          std::sin((float)activeCamera->horizontalAngle - (ammonite::pi<float> / 2.0f)),
+          std::sin((float)activeCamera->horizontalAngle - ammonite::halfPi<float>),
           0.0f,
-          std::cos((float)activeCamera->horizontalAngle - (ammonite::pi<float> / 2.0f))
+          std::cos((float)activeCamera->horizontalAngle - ammonite::halfPi<float>)
         };
 
         //Up vector, relative to the camera
