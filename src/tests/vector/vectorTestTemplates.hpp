@@ -416,7 +416,6 @@ namespace {
     T c = randomScalar<T>();
     randomFillVector(aVec);
 
-
     //Avoid division by zero
     if (c == (T)0) {
       c++;

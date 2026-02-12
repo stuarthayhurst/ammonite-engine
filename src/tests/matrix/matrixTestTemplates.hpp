@@ -799,8 +799,7 @@ namespace {
 
         //Create the rotation matrix in-place, then verify it
         ammonite::Mat<T, 4> newRotMat = {{0}};
-        ammonite::identity(newRotMat);
-        ammonite::rotate(newRotMat, tests[testIndex].angle, axis);
+        ammonite::rotate(ammonite::identity(newRotMat), tests[testIndex].angle, axis);
         if (!ammonite::equal(newRotMat, rotMat)) {
           ammonite::utils::error << "In-place matrix rotate failed" << std::endl;
           ammonite::utils::normal << "  Result:\n" << ammonite::formatMatrix(newRotMat) \
@@ -830,8 +829,7 @@ namespace {
       //Create the scale matrix
       ammonite::Mat<T, 4> identityMat = {{0}};
       ammonite::Mat<T, 4> scaleMat = {{0}};
-      ammonite::identity(identityMat);
-      ammonite::scale(identityMat, scaleVec, scaleMat);
+      ammonite::scale(ammonite::identity(identityMat), scaleVec, scaleMat);
 
       //Scale the point and verify it
       ammonite::multiply(scaleMat, inVec, outVec);
@@ -850,8 +848,7 @@ namespace {
 
       //Create the scale matrix in-place, then verify it
       ammonite::Mat<T, 4> newScaleMat = {{0}};
-      ammonite::identity(newScaleMat);
-      ammonite::scale(newScaleMat, scaleVec);
+      ammonite::scale(ammonite::identity(newScaleMat), scaleVec);
       if (!ammonite::equal(newScaleMat, scaleMat)) {
         ammonite::utils::error << "In-place matrix scale failed" << std::endl;
         ammonite::utils::normal << "  Result:\n" << ammonite::formatMatrix(newScaleMat) \
@@ -880,8 +877,7 @@ namespace {
       //Create the translation matrix
       ammonite::Mat<T, 4> identityMat = {{0}};
       ammonite::Mat<T, 4> translationMat = {{0}};
-      ammonite::identity(identityMat);
-      ammonite::translate(identityMat, translationVec, translationMat);
+      ammonite::translate(ammonite::identity(identityMat), translationVec, translationMat);
 
       //Translate the point and verify it
       ammonite::multiply(translationMat, inVec, outVec);
@@ -900,8 +896,7 @@ namespace {
 
       //Create the translation matrix in-place, then verify it
       ammonite::Mat<T, 4> newTranslationMat = {{0}};
-      ammonite::identity(newTranslationMat);
-      ammonite::translate(newTranslationMat, translationVec);
+      ammonite::translate(ammonite::identity(newTranslationMat), translationVec);
       if (!ammonite::equal(newTranslationMat, translationMat)) {
         ammonite::utils::error << "In-place matrix translation failed" << std::endl;
         ammonite::utils::normal << "  Result:\n" << ammonite::formatMatrix(newTranslationMat) \
@@ -925,13 +920,11 @@ namespace {
       ammonite::Vec<T, 3> upVec = {0};
       randomFillVector(cameraVec, (T)10.0);
       randomFillVector(targetVec, (T)10.0);
-      randomFillVector(upVec, (T)10.0);
-      ammonite::normalise(upVec);
+      ammonite::normalise(randomFillVector(upVec, (T)10.0));
 
       //Filter out scenarios where the camera is exactly up or down
       ammonite::Vec<T, 3> cameraDirectionVec = {0};
-      ammonite::sub(targetVec, cameraVec, cameraDirectionVec);
-      ammonite::normalise(cameraDirectionVec);
+      ammonite::normalise(ammonite::sub(targetVec, cameraVec, cameraDirectionVec));
       for (unsigned int i = 0; i < 3; i++) {
         if (roughly(cameraDirectionVec[i], upVec[i])) {
           return true;

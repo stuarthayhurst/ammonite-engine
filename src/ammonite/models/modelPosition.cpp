@@ -23,8 +23,7 @@ namespace ammonite {
 
         //Normal matrix
         ammonite::Mat<float, 4> inverseModelMatrix = {{0}};
-        ammonite::inverse(positionData->modelMatrix, inverseModelMatrix);
-        ammonite::transpose(inverseModelMatrix);
+        ammonite::transpose(ammonite::inverse(positionData->modelMatrix, inverseModelMatrix));
         ammonite::copy(inverseModelMatrix, positionData->normalMatrix);
       }
     }
@@ -83,8 +82,8 @@ namespace ammonite {
 
         //Set the position
         ammonite::Mat<float, 4> identityMat = {{0}};
-        ammonite::identity(identityMat);
-        ammonite::translate(identityMat, position, modelInfo->positionData.translationMatrix);
+        ammonite::translate(ammonite::identity(identityMat), position,
+                            modelInfo->positionData.translationMatrix);
 
         if (modelInfo->lightEmitterId != 0) {
           ammonite::lighting::internal::setLightSourcesChanged();
@@ -103,8 +102,8 @@ namespace ammonite {
 
         //Set the scale
         ammonite::Mat<float, 4> identityMat = {{0}};
-        ammonite::identity(identityMat);
-        ammonite::scale(identityMat, scale, modelInfo->positionData.scaleMatrix);
+        ammonite::scale(ammonite::identity(identityMat), scale,
+                        modelInfo->positionData.scaleMatrix);
 
         if (modelInfo->lightEmitterId != 0) {
           ammonite::lighting::internal::setLightSourcesChanged();

@@ -150,10 +150,9 @@ namespace {
       ammonite::Quat<T> aQuat = {{0}};
       ammonite::Vec<T, 3> aVec = {0};
       ammonite::Vec<T, 3> angleVec = {0};
-      randomFillVector(angleVec, (T)2.0 * ammonite::pi<T>);
 
-      //Initialise a quaternion using the angles
-      ammonite::fromEuler(aQuat, angleVec);
+      //Initialise a random angle vector and corresponding quaternion
+      ammonite::fromEuler(aQuat, randomFillVector(angleVec, (T)2.0 * ammonite::pi<T>));
 
       //Get angles out of the quaternion
       ammonite::toEuler(aQuat, aVec);
@@ -184,11 +183,10 @@ namespace {
     ammonite::Quat<T> bQuat = {{0}};
     ammonite::Vec<T, 3> angleVecA = {0};
     ammonite::Vec<T, 3> angleVecB = {0};
-    randomFillVector(angleVecA, (T)2.0 * ammonite::pi<T>);
-    randomFillVector(angleVecB, (T)2.0 * ammonite::pi<T>);
 
-    ammonite::fromEuler(aQuat, angleVecA);
-    ammonite::fromEuler(bQuat, angleVecB);
+    //Initialise two pairs of random angle vectors and corresponding quaternions
+    ammonite::fromEuler(aQuat, randomFillVector(angleVecA, (T)2.0 * ammonite::pi<T>));
+    ammonite::fromEuler(bQuat, randomFillVector(angleVecB, (T)2.0 * ammonite::pi<T>));
 
     T sum = (T)0;
     for (int i = 0; i < 4; i++) {
@@ -214,8 +212,7 @@ namespace {
     ammonite::Quat<T> bQuat = {{0}};
     ammonite::Quat<T> cQuat = {{0}};
     ammonite::Vec<T, 3> angleVec = {0};
-    randomFillVector(angleVec, (T)2.0 * ammonite::pi<T>);
-    ammonite::fromEuler(aQuat, angleVec);
+    ammonite::fromEuler(aQuat, randomFillVector(angleVec, (T)2.0 * ammonite::pi<T>));
 
     //Test conjugate calculation
     ammonite::conjugate(aQuat, bQuat);
@@ -256,8 +253,7 @@ namespace {
   bool testLength() {
     ammonite::Quat<T> aQuat = {{0}};
     ammonite::Vec<T, 3> angleVec = {0};
-    randomFillVector(angleVec, (T)2.0 * ammonite::pi<T>);
-    ammonite::fromEuler(aQuat, angleVec);
+    ammonite::fromEuler(aQuat, randomFillVector(angleVec, (T)2.0 * ammonite::pi<T>));
 
     T sum = (T)0;
     for (int i = 0; i < 4; i++) {
@@ -283,8 +279,7 @@ namespace {
     ammonite::Quat<T> aQuat = {{0}};
     ammonite::Quat<T> bQuat = {{0}};
     ammonite::Vec<T, 3> angleVec = {0};
-    randomFillVector(angleVec, (T)2.0 * ammonite::pi<T>);
-    ammonite::fromEuler(aQuat, angleVec);
+    ammonite::fromEuler(aQuat, randomFillVector(angleVec, (T)2.0 * ammonite::pi<T>));
 
     //Skip (effectively) zero length quaternions
     T length = ammonite::length(aQuat);
@@ -330,11 +325,9 @@ namespace {
     ammonite::Quat<T> dQuat = {{0}};
     ammonite::Vec<T, 3> angleVecA = {0};
     ammonite::Vec<T, 3> angleVecB = {0};
-    randomFillVector(angleVecA, (T)2.0 * ammonite::pi<T>);
-    randomFillVector(angleVecB, (T)2.0 * ammonite::pi<T>);
 
-    ammonite::fromEuler(aQuat, angleVecA);
-    ammonite::fromEuler(bQuat, angleVecB);
+    ammonite::fromEuler(aQuat, randomFillVector(angleVecA, (T)2.0 * ammonite::pi<T>));
+    ammonite::fromEuler(bQuat, randomFillVector(angleVecB, (T)2.0 * ammonite::pi<T>));
 
     ammonite::inverse(aQuat, cQuat);
 
@@ -385,8 +378,7 @@ namespace {
     ammonite::fromEuler(cQuat, (T)0.0, (T)0.0, angleVec[2]);
 
     //Multiply each axis quaternion together
-    ammonite::multiply(bQuat, aQuat, dQuat);
-    ammonite::multiply(cQuat, dQuat, eQuat);
+    ammonite::multiply(cQuat, ammonite::multiply(bQuat, aQuat, dQuat), eQuat);
 
     //Test multiplied quaternion matches initialised quaternion
     ammonite::fromEuler(fQuat, angleVec);
@@ -399,8 +391,7 @@ namespace {
     }
 
     //Test the in-place variant matches the regular variant
-    ammonite::multiply(bQuat, aQuat);
-    ammonite::multiply(cQuat, bQuat);
+    ammonite::multiply(cQuat, ammonite::multiply(bQuat, aQuat));
     for (int i = 0; i < 4; i++) {
       if (cQuat[0][i] != eQuat[0][i]) {
         ammonite::utils::error << "In-place quaternion-quaternion multiplication failed" << std::endl;
@@ -547,17 +538,15 @@ namespace {
     ammonite::Vec<T, 4> bVec = {0};
     ammonite::Vec<T, 4> cVec = {0};
     ammonite::Vec<T, 3> angleVec = {0};
-    randomFillVector(angleVec, (T)2.0 * ammonite::pi<T>);
     randomFillVector(aVec);
-    ammonite::fromEuler(aQuat, angleVec);
+    ammonite::fromEuler(aQuat, randomFillVector(angleVec, (T)2.0 * ammonite::pi<T>));
 
     //Apply the quaternion to a point
     ammonite::multiply(aQuat, aVec, bVec);
 
     //Calculate rotation matrix equivalent, apply to another point
     ammonite::Mat<T, 4> aMat = {{0}};
-    ammonite::toMatrix(aQuat, aMat);
-    ammonite::multiply(aMat, aVec, cVec);
+    ammonite::multiply(ammonite::toMatrix(aQuat, aMat), aVec, cVec);
 
     //Check 4x4 matrix conversion results
     for (int i = 0; i < 4; i++) {

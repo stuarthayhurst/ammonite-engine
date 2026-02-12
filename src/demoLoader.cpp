@@ -340,8 +340,7 @@ int main(int argc, char** argv) noexcept(false) {
     position[2] = pathRadius * std::cos(angle);
 
     //Look towards the origin
-    ammonite::negate(position, direction);
-    ammonite::normalise(direction);
+    ammonite::normalise(ammonite::negate(position, direction));
 
     const double time = progress * pathDuration;
     ammonite::camera::path::addPathNode(pathId, position, direction, time);

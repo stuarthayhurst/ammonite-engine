@@ -84,9 +84,9 @@ namespace torus {
         ammonite::add(meshVertices[skeletonIndex].vertex, ringOrigin);
 
         //Calculate the normal direction
-        ammonite::sub(meshVertices[skeletonIndex].vertex, ringOrigin,
-                      meshVertices[skeletonIndex].normal);
-        ammonite::normalise(meshVertices[skeletonIndex].normal);
+        ammonite::normalise(ammonite::sub(meshVertices[skeletonIndex].vertex,
+                                          ringOrigin,
+                                          meshVertices[skeletonIndex].normal));
 
         //Fill the texture point with blank data
         ammonite::set(meshVertices[skeletonIndex].texturePoint, 0.0f);
