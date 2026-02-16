@@ -295,7 +295,7 @@ namespace ammonite {
         //Fetch and validate binary format
         GLenum binaryFormat = 0;
         if (cacheState == AMMONITE_CACHE_HIT && userDataSize != 0) {
-          const long long rawFormat = std::atoll((char*)userData);
+          const long long rawFormat = std::strtoll((char*)userData, nullptr, 10);
           binaryFormat = rawFormat;
 
           if (binaryFormat == 0) {
