@@ -1,41 +1,22 @@
+#include <chrono>
 #include <ctime>
-#include <typeinfo>
 
 #include "timer.hpp"
 
-static_assert(typeid(std::time_t) == typeid(signed long), "expected time_t to be signed");
-
 namespace ammonite {
   namespace utils {
-    namespace {
-      //Add nanoseconds to *time, account for wrap-around
-      void addNanoseconds(std::timespec* time, std::time_t nanoseconds) {
-        static_assert(typeid(time->tv_nsec) == typeid(signed long),
-                      "expected tv_nsec to be signed");
-
-        //Handle negative nanoseconds
-        time->tv_nsec += nanoseconds;
-        while (time->tv_nsec < 0) {
-          time->tv_nsec += 1000000000;
-          time->tv_sec -= 1;
-        }
-
-        //Handle more than 1 billion nanoseconds
-        while (time->tv_nsec >= 1000000000) {
-          time->tv_nsec -= 1000000000;
-          time->tv_sec += 1;
-        }
-      }
-    }
-
     //Creates a new, running timer
     Timer::Timer() {
-      std::timespec_get(&startTime, TIME_UTC);
+      startTime = std::chrono::steady_clock::now();
+      setOffset = std::chrono::seconds(0);
+      pauseOffset = std::chrono::seconds(0);
     }
 
     //Creates a new, optionally running timer
     Timer::Timer(bool startRunning) {
-      std::timespec_get(&startTime, TIME_UTC);
+      startTime = std::chrono::steady_clock::now();
+      setOffset = std::chrono::seconds(0);
+      pauseOffset = std::chrono::seconds(0);
 
       if (!startRunning) {
         this->pause();
@@ -45,21 +26,30 @@ namespace ammonite {
 
     //Writes the length of time the timer has been active
     void Timer::getTime(std::time_t* seconds, std::time_t* nanoseconds) const {
-      std::timespec now;
+      std::chrono::time_point<std::chrono::steady_clock> now;
 
       if (timerRunning) {
-        std::timespec_get(&now, TIME_UTC);
+        now = std::chrono::steady_clock::now();
       } else {
         now = stopTime;
       }
 
-      //Handle seconds and wrap around nanoseconds
-      now.tv_sec -= startTime.tv_sec;
-      addNanoseconds(&now, -startTime.tv_nsec);
+      /*
+       - Find the length of time between setting the timer and the measurement point
+       - Apply a positive offset to handle the time it was initialised to
+       - Apply a negative offset to handle paused durations
+         - This offset can't grow faster than stopTime or real time
+      */
+      auto deltaTime = (now - startTime) + setOffset - pauseOffset;
+
+      //Convert the time to seconds and nanoseconds
+      const auto deltaTimeSeconds = std::chrono::duration_cast<std::chrono::seconds>(deltaTime);
+      deltaTime -= deltaTimeSeconds;
+      const auto remainderNano = std::chrono::duration_cast<std::chrono::nanoseconds>(deltaTime);
 
       //Write out times
-      *seconds = now.tv_sec;
-      *nanoseconds = now.tv_nsec;
+      *seconds = deltaTimeSeconds.count();
+      *nanoseconds = remainderNano.count();
     }
 
     //Returns the length of time the timer has been active
@@ -74,20 +64,19 @@ namespace ammonite {
 
     //Set the active time on the timer, without changing pause state
     void Timer::setTime(std::time_t seconds, std::time_t nanoseconds) {
-      std::timespec now;
-      std::timespec_get(&now, TIME_UTC);
+      const std::chrono::time_point<std::chrono::steady_clock> now = std::chrono::steady_clock::now();
 
       //Pretend the timer was just stopped right now
       if (!timerRunning) {
         stopTime = now;
       }
 
-      //Handle seconds and wrap around nanoseconds
-      now.tv_sec -= seconds;
-      addNanoseconds(&now, -nanoseconds);
-
-      //Save adjusted start time
+      //Pretend the timer was just started right now
       startTime = now;
+
+      //Apply the target time as a positive offset
+      setOffset = std::chrono::seconds(seconds) + std::chrono::nanoseconds(nanoseconds);
+      pauseOffset = std::chrono::seconds(0);
     }
 
     //Set the active time on the timer, without changing pause state
@@ -106,10 +95,7 @@ namespace ammonite {
 
     //Reset the active time to 0, without changing pause state
     void Timer::reset() {
-      std::timespec_get(&startTime, TIME_UTC);
-      if (!timerRunning) {
-        stopTime = startTime;
-      }
+      setTime(0, 0);
     }
 
     //Pause the timer
@@ -118,7 +104,8 @@ namespace ammonite {
         return;
       }
 
-      std::timespec_get(&stopTime, TIME_UTC);
+      //Record the time it stopped
+      stopTime = std::chrono::steady_clock::now();
       timerRunning = false;
     }
 
@@ -128,14 +115,8 @@ namespace ammonite {
         return;
       }
 
-      std::timespec now;
-      std::timespec_get(&now, TIME_UTC);
-
-      //Handle seconds and wrap around nanoseconds
-      startTime.tv_sec += now.tv_sec - stopTime.tv_sec;
-      const std::time_t nDiff = now.tv_nsec - stopTime.tv_nsec;
-      addNanoseconds(&startTime, nDiff);
-
+      //Record the length of time it was paused for
+      pauseOffset += std::chrono::steady_clock::now() - stopTime;
       timerRunning = true;
     }
   }

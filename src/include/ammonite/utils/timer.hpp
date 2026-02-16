@@ -1,6 +1,7 @@
 #ifndef AMMONITETIMER
 #define AMMONITETIMER
 
+#include <chrono>
 #include <ctime>
 
 #include "../visibility.hpp"
@@ -10,8 +11,10 @@ namespace AMMONITE_EXPOSED ammonite {
     class Timer {
     private:
       bool timerRunning = true;
-      std::timespec startTime;
-      std::timespec stopTime;
+      std::chrono::time_point<std::chrono::steady_clock> startTime;
+      std::chrono::time_point<std::chrono::steady_clock> stopTime;
+      std::chrono::steady_clock::duration setOffset;
+      std::chrono::steady_clock::duration pauseOffset;
 
     public:
       Timer();
