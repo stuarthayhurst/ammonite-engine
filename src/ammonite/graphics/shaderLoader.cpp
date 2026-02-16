@@ -322,7 +322,10 @@ namespace ammonite {
                                    << "'" << std::endl;
           ammonite::utils::status << "Clearing '" << cacheFilePath << "'" << std::endl;
           glDeleteProgram(programId);
-          ammonite::utils::files::deleteFile(cacheFilePath);
+          if (!ammonite::utils::files::deleteFile(cacheFilePath)) {
+            ammonite::utils::warning << "Failed to clean broken cache '" \
+                                     << cacheFilePath << "'" << std::endl;
+          }
         }
       }
 
