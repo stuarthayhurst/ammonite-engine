@@ -18,7 +18,7 @@ enum AmmoniteCacheEnum : unsigned char {
 namespace AMMONITE_EXPOSED ammonite {
   namespace utils {
     namespace files {
-      void deleteFile(const std::string& filePath);
+      bool deleteFile(const std::string& filePath);
       bool getFileMetadata(const std::string& filePath, std::size_t* filesize, std::time_t* timestamp);
 
       bool useDataCache(const std::string& targetCachePath);

@@ -120,13 +120,15 @@ namespace ammonite {
 
             //Check token matches file size
             nestedToken = parseToken(nullptr, ';', &nestedState);
-            if ((nestedToken == nullptr) || std::cmp_not_equal(std::atoll(nestedToken), filesize)) {
+            if ((nestedToken == nullptr) ||
+                std::cmp_not_equal(std::strtoll(nestedToken, nullptr, 10), filesize)) {
               break;
             }
 
             //Check token matches timestamp
             nestedToken = parseToken(nullptr, ';', &nestedState);
-            if ((nestedToken == nullptr) || (std::atoll(nestedToken) != modificationTime)) {
+            if ((nestedToken == nullptr) ||
+                (std::strtoll(nestedToken, nullptr, 10) != modificationTime)) {
               break;
             }
 
@@ -143,16 +145,27 @@ namespace ammonite {
           return result;
         }
 
-        void deleteCacheFile(const std::string& filePath) {
+        bool deleteCacheFile(const std::string& filePath) {
           ammonite::utils::status << "Clearing '" << filePath << "'" << std::endl;
-          deleteFile(filePath);
+
+          //Succeed if the cache doesn't even exist
+          if (!std::filesystem::exists(filePath)) {
+            return true;
+          }
+
+          return deleteFile(filePath);
         }
       }
 
-      void deleteFile(const std::string& filePath) {
+      bool deleteFile(const std::string& filePath) {
         if (std::filesystem::exists(filePath)) {
-          std::remove(filePath.c_str());
+          if (std::remove(filePath.c_str()) != 0) {
+            ammonite::utils::warning << "Failed to delete '" << filePath << "'" << std::endl;
+            return false;
+          }
         }
+
+        return true;
       }
 
       bool getFileMetadata(const std::string& filePath, std::size_t* filesize, std::time_t* timestamp) {
@@ -419,8 +432,9 @@ namespace ammonite {
 
         //Clean up after a failure
         if (failed) {
-          ammonite::utils::status << "Clearing '" << *cacheFilePath << "'" << std::endl;
-          deleteFile(*cacheFilePath);
+          if (!deleteCacheFile(*cacheFilePath)) {
+            ammonite::utils::warning << "Failed to clean broken cache '" << cacheFilePath << "'" << std::endl;
+          }
 
           delete [] cacheData;
           *cacheState = AMMONITE_CACHE_INVALID;
@@ -478,7 +492,10 @@ namespace ammonite {
         //Write the data, user data and cache info to the cache file
         if (!ammonite::utils::files::writeFile(cacheFilePath, fileData, totalDataSize)) {
           ammonite::utils::warning << "Failed to cache '" << cacheFilePath << "'" << std::endl;
-          deleteCacheFile(cacheFilePath);
+          if (!deleteCacheFile(cacheFilePath)) {
+            ammonite::utils::warning << "Failed to clean broken cache '" << cacheFilePath << "'" << std::endl;
+          }
+
           delete [] fileData;
           return false;
         }
