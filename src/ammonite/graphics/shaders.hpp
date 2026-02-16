@@ -18,6 +18,7 @@ namespace ammonite {
         virtual void setUniformLocations() {};
 
       public:
+        virtual ~Shader() = default;
         bool loadShader(const std::string& shaderDirectory);
         void destroyShader();
         void useShader() const;
