@@ -118,9 +118,10 @@ namespace ammonite {
       ammonite::utils::thread::submitWork(doCacheWork, data, nullptr);
     }
 
-    bool checkObject(GLuint objectId, const char* actionString, GLenum statusEnum,
-                            void (*objectQuery)(GLuint, GLenum, GLint*),
-                            void (*objectLog)(GLuint, GLsizei, GLsizei*, GLchar*)) {
+    bool checkObject(GLuint objectId, const std::string& actionString,
+                     const std::string& objectName, GLenum statusEnum,
+                     void (*objectQuery)(GLuint, GLenum, GLint*),
+                     void (*objectLog)(GLuint, GLsizei, GLsizei*, GLchar*)) {
       //Test whether the program linked
       GLint success = GL_FALSE;
       objectQuery(objectId, statusEnum, &success);
@@ -134,7 +135,8 @@ namespace ammonite {
       GLsizei maxLength = 0;
       objectQuery(objectId, GL_INFO_LOG_LENGTH, &maxLength);
       if (maxLength == 0) {
-        ammonite::utils::warning << "Failed to " << actionString << " (ID " << objectId \
+        ammonite::utils::warning << "Failed to " << actionString << " " \
+                                 << objectName << " (ID " << objectId \
                                  << "), no log available" << std::endl;
         return false;
       }
@@ -146,7 +148,8 @@ namespace ammonite {
       GLchar* const errorLogBuffer = new GLchar[maxLength + 1];
       objectLog(objectId, maxLength, nullptr, errorLogBuffer);
       errorLogBuffer[maxLength] = '\0';
-      ammonite::utils::warning << "Failed to " << actionString << " (ID " << objectId \
+      ammonite::utils::warning << "Failed to " << actionString << " " \
+                               << objectName << " (ID " << objectId \
                                << "):\n" << (char*)errorLogBuffer << std::endl;
 
       delete [] errorLogBuffer;
@@ -154,13 +157,14 @@ namespace ammonite {
     }
 
     bool checkProgram(GLuint programId, bool isCached) {
-      return checkObject(programId, isCached ? "upload shader program" : "link shader program",
-                         GL_LINK_STATUS, glGetProgramiv, glGetProgramInfoLog);
+      return checkObject(programId, isCached ? "upload shader" : "link shader",
+                         "program", GL_LINK_STATUS, glGetProgramiv, glGetProgramInfoLog);
     }
 
-    bool checkShader(GLuint shaderId) {
-      return checkObject(shaderId, "compile shader stage", GL_COMPILE_STATUS,
-                         glGetShaderiv, glGetShaderInfoLog);
+    bool checkShader(GLuint shaderId, const std::string& shaderPath) {
+      const std::string quotedPath = '\'' + shaderPath + '\'';
+      return checkObject(shaderId, "compile shader stage", quotedPath,
+                         GL_COMPILE_STATUS, glGetShaderiv, glGetShaderInfoLog);
     }
 
     GLenum identifyShaderType(std::string shaderPath) {
@@ -202,7 +206,7 @@ namespace ammonite {
       delete [] shaderCodePtr;
 
       //Check whether the shader compiled, log if relevant
-      if (!checkShader(shaderId)) {
+      if (!checkShader(shaderId, shaderPath)) {
         glDeleteShader(shaderId);
         return 0;
       }
