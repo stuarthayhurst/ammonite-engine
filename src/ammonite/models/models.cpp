@@ -264,10 +264,10 @@ namespace ammonite {
       //Generate info required to load model
       const internal::ModelLoadInfo modelLoadInfo = {
         .fileInfo = {
-          objectPath.substr(0, objectPath.find_last_of('/')),
-          objectPath,
-          flipTexCoords,
-          srgbTextures
+          .modelDirectory = objectPath.substr(0, objectPath.find_last_of('/')),
+          .objectPath = objectPath,
+          .flipTexCoords = flipTexCoords,
+          .srgbTextures = srgbTextures
         },
         .isFileBased = true
       };
@@ -295,8 +295,9 @@ namespace ammonite {
                            const unsigned int* indexCounts) {
       //Generate info required to load model
       const internal::ModelLoadInfo modelLoadInfo = {
-        .memoryInfo = {meshArray, indicesArray, materials,
-                       meshCount, vertexCounts, indexCounts},
+        .memoryInfo = {.meshArray = meshArray, .indicesArray = indicesArray,
+                       .materials = materials, .meshCount = meshCount,
+                       .vertexCounts = vertexCounts, .indexCounts = indexCounts},
         .isFileBased = false,
       };
 
@@ -467,11 +468,11 @@ namespace ammonite {
 
     AmmoniteMaterial createMaterial(const std::string& diffusePath,
                                     const std::string& specularPath) {
-      std::string* diffusePathPtr = new std::string(diffusePath);
-      std::string* specularPathPtr = new std::string(specularPath);
       return {
-        .diffuse = {.textureInfo = {diffusePathPtr, ASSUME_SRGB_TEXTURES}},
-        .specular = {.textureInfo = {specularPathPtr, ASSUME_SRGB_TEXTURES}},
+        .diffuse = {.textureInfo = {.texturePath = new std::string(diffusePath),
+                                    .isSrgbTexture = ASSUME_SRGB_TEXTURES}},
+        .specular = {.textureInfo = {.texturePath = new std::string(specularPath),
+                                     .isSrgbTexture = ASSUME_SRGB_TEXTURES}},
         .diffuseIsTexture = true,
         .specularIsTexture = true
       };
@@ -489,9 +490,9 @@ namespace ammonite {
 
     AmmoniteMaterial createMaterial(const std::string& diffusePath,
                                     const ammonite::Vec<float, 3>& specularColour) {
-      std::string* diffusePathPtr = new std::string(diffusePath);
       return {
-        .diffuse = {.textureInfo = {diffusePathPtr, ASSUME_SRGB_TEXTURES}},
+        .diffuse = {.textureInfo = {.texturePath = new std::string(diffusePath),
+                                    .isSrgbTexture = ASSUME_SRGB_TEXTURES}},
         .specular = {.colour = {specularColour[0], specularColour[1], specularColour[2]}},
         .diffuseIsTexture = true,
         .specularIsTexture = false
@@ -500,10 +501,10 @@ namespace ammonite {
 
     AmmoniteMaterial createMaterial(const ammonite::Vec<float, 3>& diffuseColour,
                                     const std::string& specularPath) {
-      std::string* specularPathPtr = new std::string(specularPath);
       return {
         .diffuse = {.colour = {diffuseColour[0], diffuseColour[1], diffuseColour[2]}},
-        .specular = {.textureInfo = {specularPathPtr, ASSUME_SRGB_TEXTURES}},
+        .specular = {.textureInfo = {.texturePath = new std::string(specularPath),
+                                     .isSrgbTexture = ASSUME_SRGB_TEXTURES}},
         .diffuseIsTexture = true,
         .specularIsTexture = false
       };

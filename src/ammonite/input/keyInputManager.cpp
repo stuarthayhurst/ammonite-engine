@@ -219,7 +219,8 @@ namespace ammonite {
         const AmmoniteId keybindId = utils::internal::setNextId(&lastKeybindId, keybindIdDataMap);
         const std::vector<AmmoniteKeycode> keycodeVec = {keycodes, keycodes + count};
         keybindIdDataMap[keybindId] = {
-          keycodeVec, overrideMode, toggle, callback, userPtr
+          .keycodes = keycodeVec, .overrideMode = overrideMode,
+          .toggle = toggle, .callback = callback, .userPtr = userPtr
         };
 
         return keybindId;

@@ -183,7 +183,7 @@ namespace ammonite {
                                    << ") already exists, not reserving texture" << std::endl;
           return 0;
         }
-        idTextureMap[textureId] = {textureId, 1, ""};
+        idTextureMap[textureId] = {.id = textureId, .refCount = 1, .textureKey = ""};
 
         //Connect the texture string to the ID and info
         connectTextureCache(textureId, textureKey);
@@ -353,7 +353,7 @@ namespace ammonite {
                                    << ") already exists, not creating texture" << std::endl;
           return 0;
         }
-        idTextureMap[textureId] = {textureId, 1, ""};
+        idTextureMap[textureId] = {.id = textureId, .refCount = 1, .textureKey = ""};
 
         return textureId;
       }

@@ -26,6 +26,7 @@ namespace ammonite {
     bool isBinaryCacheSupported = false;
 
     //Identify shader types by extensions / contained strings
+    //NOLINTBEGIN(modernize-use-designated-initializers)
     const struct {
       std::string match;
       GLenum shaderType;
@@ -46,6 +47,7 @@ namespace ammonite {
       {"tesse", GL_TESS_EVALUATION_SHADER}, {"eval", GL_TESS_EVALUATION_SHADER},
       {"compute", GL_COMPUTE_SHADER}
     };
+    //NOLINTEND(modernize-use-designated-initializers)
 
     //Data required by cache worker
     struct CacheWorkerData {

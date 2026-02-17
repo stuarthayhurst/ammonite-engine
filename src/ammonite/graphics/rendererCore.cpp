@@ -105,6 +105,7 @@ namespace ammonite {
 
         //Check for essential GPU capabilities
         bool checkGPUCapabilities(unsigned int* failureCount) {
+          //NOLINTBEGIN(modernize-use-designated-initializers)
           const struct {
             const char* extension;
             int major;
@@ -117,6 +118,7 @@ namespace ammonite {
             {"GL_ARB_shading_language_420pack", 4, 2, "GLSL shader version 4.20"},
             {"GL_ARB_texture_cube_map_array", 4, 2, "Cubemap arrays"}
           };
+          //NOLINTEND(modernize-use-designated-initializers)
 
           bool success = true;
           for (const auto& extension : extensions) {

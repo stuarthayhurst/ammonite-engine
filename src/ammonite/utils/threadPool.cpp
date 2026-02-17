@@ -109,7 +109,7 @@ namespace ammonite {
             ammoniteInternalDebug << "Started worker thread (ID " << gettid() \
                                   << ")" << std::endl;
 
-            WorkItem workItem = {nullptr, nullptr, nullptr};
+            WorkItem workItem = {.work = nullptr, .userPtr = nullptr, .group = nullptr};
             while (stayAlive) {
               //Wait for a job to be available, then return it
               const uintmax_t targetQueue = (nextJobRead++) & laneAssignMask;
@@ -212,7 +212,9 @@ namespace ammonite {
         void submitMultiple(AmmoniteWork work, void* userBuffer, int stride,
                             AmmoniteGroup* group, unsigned int newJobs,
                             AmmoniteGroup* submitGroup) {
-          SubmitData* const dataPtr = new SubmitData{work, userBuffer, group, stride, newJobs};
+          SubmitData* const dataPtr = new SubmitData{
+            .work = work, .userBuffer = userBuffer, .group = group,
+            .stride = stride, .jobCount = newJobs};
           internal::submitWork(submitMultipleJob, dataPtr, submitGroup);
         }
 
@@ -220,7 +222,9 @@ namespace ammonite {
         void submitMultipleSync(AmmoniteWork work, void* userBuffer, int stride,
                                 AmmoniteGroup* group, unsigned int newJobs) {
           //Pack the data into the expected format and just execute the job immediately
-          SubmitData* const dataPtr = new SubmitData{work, userBuffer, group, stride, newJobs};
+          SubmitData* const dataPtr = new SubmitData{
+            .work = work, .userBuffer = userBuffer, .group = group,
+            .stride = stride, .jobCount = newJobs};
           submitMultipleJob(dataPtr);
         }
 

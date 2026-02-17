@@ -38,7 +38,7 @@ namespace {
   double matrixTime = 0.0;
   double quatTime = 0.0;
 
-  //NOLINTBEGIN(cppcoreguidelines-avoid-const-or-ref-data-members)
+  //NOLINTBEGIN(cppcoreguidelines-avoid-const-or-ref-data-members, modernize-use-designated-initializers)
   struct TestGroup {
     TestFunction function;
     double& typeTime;
@@ -92,7 +92,7 @@ namespace {
     {tests::testFloatQuat, floatTime, quatTime},
     {tests::testDoubleQuat, doubleTime, quatTime}
   };
-  //NOLINTEND(cppcoreguidelines-avoid-const-or-ref-data-members)
+  //NOLINTEND(cppcoreguidelines-avoid-const-or-ref-data-members, modernize-use-designated-initializers)
 }
 
 int main() {

@@ -663,8 +663,9 @@ namespace {
           batchInfo.waitCount = batchSize;
           batchInfo.group = new AmmoniteGroup{0};
 
-          ChainData* const chainData = new ChainData{1, batchSize, chainTask,
-                                               offsetValues, batchInfo.group};
+          ChainData* const chainData = new ChainData{
+            .totalSubmitted = 1, .targetSubmitted = batchSize, .work = chainTask,
+            .values = offsetValues, .syncPtr = batchInfo.group};
           chainDataVector.push_back(chainData);
           ammonite::utils::thread::submitWork(chainTask, chainData, batchInfo.group);
           break;

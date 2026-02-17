@@ -88,9 +88,10 @@ namespace ammonite {
         TextureIdGroup processMaterial(const aiMaterial* materialPtr,
                                        const ModelLoadInfo& modelLoadInfo,
                                        const std::string& modelKey) {
-          TextureIdGroup textureGroup = {0};
+          TextureIdGroup textureGroup = {.diffuseId = 0, .specularId = 0};
 
           //Array of info required to fill the texture group by texture type
+          //NOLINTBEGIN(modernize-use-designated-initializers)
           const unsigned int textureTypeCount = 2;
           const struct TextureLoadInfo {
             aiTextureType textureType;
@@ -101,6 +102,7 @@ namespace ammonite {
             {aiTextureType_DIFFUSE, {AI_MATKEY_COLOR_DIFFUSE}, &textureGroup.diffuseId, true},
             {aiTextureType_SPECULAR, {AI_MATKEY_COLOR_SPECULAR}, &textureGroup.specularId, false}
           };
+          //NOLINTEND(modernize-use-designated-initializers)
 
           //Load each texture type of the material, according to its parameters
           bool missing = false;
