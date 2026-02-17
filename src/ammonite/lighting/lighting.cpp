@@ -67,7 +67,7 @@ namespace ammonite {
           ammonite::models::position::getPosition(lightSource->modelId, lightSource->geometry);
 
           //Update lightIndex for rendering light emitting models
-          auto modelPtr = ammonite::models::internal::getModelPtr(lightSource->modelId);
+          auto* modelPtr = ammonite::models::internal::getModelPtr(lightSource->modelId);
           modelPtr->lightIndex = lightSource->lightIndex;
         }
 
