@@ -35,7 +35,7 @@ namespace ammonite {
           }
 
           //Track all updated keys
-          updatedKeys.push_back({keycode, action});
+          updatedKeys.push_back({.keycode = keycode, .state = action});
 
           //Filter out unmapped keys
           KeyStateEnum* const keycodeStatePtr = getKeycodeStatePtr(keycode);

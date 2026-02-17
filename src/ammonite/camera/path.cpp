@@ -311,8 +311,9 @@ namespace ammonite {
         }
 
         //Add the camera path node
-        pathTrackerMap[pathId].pathNodes.push_back(
-          {{position[0], position[1], position[2]}, horizontal, vertical, time});
+        pathTrackerMap[pathId].pathNodes.push_back({
+          .position = {position[0], position[1], position[2]},
+          .horizontalAngle = horizontal, .verticalAngle = vertical, .time = time});
 
         //Return its index
         return pathTrackerMap[pathId].pathNodes.size() - 1;

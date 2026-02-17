@@ -143,8 +143,10 @@ namespace ammonite {
           for (unsigned int meshIndex = 0; meshIndex < meshCount; meshIndex++) {
             const AmmoniteMaterial& material = materials[meshIndex];
             modelData->textureIds.push_back({
-              loadMaterialComponent(material.diffuse, material.diffuseIsTexture),
-              loadMaterialComponent(material.specular, material.specularIsTexture)
+              .diffuseId = loadMaterialComponent(material.diffuse,
+                                                 material.diffuseIsTexture),
+              .specularId = loadMaterialComponent(material.specular,
+                                                  material.specularIsTexture)
             });
           }
         }

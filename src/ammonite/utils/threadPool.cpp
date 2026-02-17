@@ -40,7 +40,7 @@ namespace {
     void push(AmmoniteWork work, void* userPtr, AmmoniteGroup* group) {
       queueLock.lock();
 
-      queue.push({work, userPtr, group});
+      queue.push({.work = work, .userPtr = userPtr, .group = group});
 
       queueLock.unlock();
       jobCount.release();
@@ -52,7 +52,8 @@ namespace {
 
       //Add multiple jobs in a single pass
       for (std::size_t i = 0; i < count; i++) {
-        queue.push({work, (char*)userBuffer + (i * stride), group});
+        queue.push({.work = work, .userPtr = (char*)userBuffer + (i * stride),
+                    .group = group});
       }
 
       queueLock.unlock();
