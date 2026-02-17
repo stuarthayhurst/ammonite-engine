@@ -63,7 +63,8 @@ namespace ammonite {
         */
         void storeWindowGeometry(GLFWwindow* windowPtr, WindowGeom* storage,
                                  bool useDecoratedSize, bool useDecoratedPos) {
-          int bufferWidth = 0, bufferHeight = 0;
+          int bufferWidth = 0;
+          int bufferHeight = 0;
           glfwGetFramebufferSize(windowPtr, &bufferWidth, &bufferHeight);
           storage->bufferWidth = bufferWidth;
           storage->bufferHeight = bufferHeight;
@@ -86,11 +87,19 @@ namespace ammonite {
             return;
           }
 
-          //Get window frame size, content size and position
-          int frameLeft = 0, frameRight = 0, frameTop = 0, frameBottom = 0;
+          //Get window frame size
+          int frameLeft = 0;
+          int frameRight = 0;
+          int frameTop = 0;
+          int frameBottom = 0;
           glfwGetWindowFrameSize(windowPtr, &frameLeft, &frameTop,
                                  &frameRight, &frameBottom);
-          int width = 0, height = 0, xPos = 0, yPos = 0;
+
+          //Get content size and position
+          int width = 0;
+          int height = 0;
+          int xPos = 0;
+          int yPos = 0;
           glfwGetWindowSize(windowPtr, &width, &height);
           glfwGetWindowPos(windowPtr, &xPos, &yPos);
           storage->width = width;
@@ -115,7 +124,10 @@ namespace ammonite {
           GLFWmonitor* const* const monitors = glfwGetMonitors(&monitorCount);
 
           //Get window position and size
-          int wx = 0, wy = 0, ww = 0, wh = 0;
+          int wx = 0;
+          int wy = 0;
+          int ww = 0;
+          int wh = 0;
           glfwGetWindowPos(windowPtr, &wx, &wy);
           glfwGetWindowSize(windowPtr, &ww, &wh);
 
@@ -123,11 +135,13 @@ namespace ammonite {
           int bestOverlap = 0;
           GLFWmonitor* bestMonitor = nullptr;
           for (int i = 0; i < monitorCount; i++) {
-            int mx = 0, my = 0, mw = 0, mh = 0;
             const GLFWvidmode* const mode = glfwGetVideoMode(monitors[i]);
+            const int mw = mode->width;
+            const int mh = mode->height;
+
+            int mx = 0;
+            int my = 0;
             glfwGetMonitorPos(monitors[i], &mx, &my);
-            mw = mode->width;
-            mh = mode->height;
 
             const int overlap =
               std::max(0, std::min(wx + ww, mx + mw) - std::max(wx, mx)) *
@@ -283,7 +297,10 @@ namespace ammonite {
                              unsigned int xPos, unsigned int yPos, bool useDecoratedSize,
                              bool useDecoratedPos) {
         //Get window frame size
-        int frameLeft = 0, frameRight = 0, frameTop = 0, frameBottom = 0;
+        int frameLeft = 0;
+        int frameRight = 0;
+        int frameTop = 0;
+        int frameBottom = 0;
         glfwGetWindowFrameSize(windowPtr, &frameLeft, &frameTop,
                                &frameRight, &frameBottom);
 

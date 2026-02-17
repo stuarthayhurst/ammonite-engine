@@ -211,7 +211,8 @@ namespace ammonite {
         }
 
         //Decide the format of the texture and data
-        GLenum textureFormat = 0, dataFormat = 0;
+        GLenum textureFormat = 0;
+        GLenum dataFormat = 0;
         if (!decideTextureFormat(textureData.numChannels, textureData.srgbTexture,
                                  &textureFormat, &dataFormat)) {
           ammonite::utils::warning << "Failed to upload texture (ID " \
@@ -376,7 +377,8 @@ namespace ammonite {
           }
 
           //Decide the format of the texture and data
-          GLenum textureFormat = 0, dataFormat = 0;
+          GLenum textureFormat = 0;
+          GLenum dataFormat = 0;
           if (!decideTextureFormat(components, false, &textureFormat, &dataFormat)) {
             ammonite::utils::warning << "Failed to load texture from colour" << std::endl;
             return 0;
@@ -482,7 +484,9 @@ namespace ammonite {
           }
 
           //Read the image data
-          int width = 0, height = 0, nChannels = 0;
+          int width = 0;
+          int height = 0;
+          int nChannels = 0;
           unsigned char* const imageData = stbi_load(texturePaths[i].c_str(), &width,
                                                      &height, &nChannels, 0);
 
@@ -492,7 +496,8 @@ namespace ammonite {
           }
 
           //Decide the format of the texture and data
-          GLenum internalFormat = 0, dataFormat = 0;
+          GLenum internalFormat = 0;
+          GLenum dataFormat = 0;
           if (!decideTextureFormat(nChannels, srgbTextures,
               &internalFormat, &dataFormat)) {
             //Free image data, destroy texture and return
