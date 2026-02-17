@@ -117,13 +117,12 @@ namespace ammonite {
             {"GL_ARB_shading_language_420pack", 4, 2, "GLSL shader version 4.20"},
             {"GL_ARB_texture_cube_map_array", 4, 2, "Cubemap arrays"}
           };
-          const unsigned int extensionCount = sizeof(extensions) / sizeof(extensions[0]);
 
           bool success = true;
-          for (unsigned int i = 0; i < extensionCount; i++) {
-            if (!graphics::internal::checkExtension(extensions[i].extension,
-                extensions[i].major, extensions[i].minor)) {
-              ammonite::utils::error << extensions[i].prettyName << " unsupported" << std::endl;
+          for (const auto& extension : extensions) {
+            if (!graphics::internal::checkExtension(extension.extension,
+                extension.major, extension.minor)) {
+              ammonite::utils::error << extension.prettyName << " unsupported" << std::endl;
               success = false;
               (*failureCount)++;
             }

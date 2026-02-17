@@ -212,8 +212,8 @@ namespace {
     if ((setupBits & HAS_SETUP_CONTROLS) != 0) {
       ammonite::controls::releaseFreeCamera();
       if (keybindIdsPtr != nullptr) {
-        for (unsigned int i = 0; i < keybindIdsPtr->size(); i++) {
-          ammonite::input::unregisterKeybind((*keybindIdsPtr)[i]);
+        for (const AmmoniteId& keybindId : *keybindIdsPtr) {
+          ammonite::input::unregisterKeybind(keybindId);
         }
       }
     }

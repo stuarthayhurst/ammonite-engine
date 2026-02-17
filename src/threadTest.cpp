@@ -677,16 +677,15 @@ namespace {
     finishSubmitTimer(timers);
 
     //Wait for each batch to finish
-    for (unsigned int i = 0; i < batchInfoVector.size(); i++) {
-      const BatchInfo& batchInfo = batchInfoVector[i];
+    for (const BatchInfo& batchInfo : batchInfoVector) {
       ammonite::utils::thread::waitGroupComplete(batchInfo.group,
                                                  batchInfo.waitCount);
       delete batchInfo.group;
     }
 
     //Clean up chain data
-    for (unsigned int i = 0; i < chainDataVector.size(); i++) {
-      delete chainDataVector[i];
+    for (ChainData* const& chainData : chainDataVector) {
+      delete chainData;
     }
 
     ammonite::utils::thread::finishWork();

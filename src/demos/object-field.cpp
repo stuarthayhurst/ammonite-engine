@@ -203,8 +203,8 @@ namespace objectFieldDemo {
       ammonite::input::unregisterKeybind(shuffleKeybindId);
     }
 
-    for (unsigned int i = 0; i < loadedModelIds.size(); i++) {
-      ammonite::models::deleteModel(loadedModelIds[i]);
+    for (const AmmoniteId& modelId : loadedModelIds) {
+      ammonite::models::deleteModel(modelId);
     }
 
     if (lightData != nullptr) {
@@ -296,15 +296,15 @@ namespace objectFieldDemo {
     ammonite::models::position::setPosition(floorId, floorPosition);
     ammonite::models::position::setScale(floorId, floorScale);
 
-    for (unsigned int i = 0; i < cubeCount; i++) {
+    for (const auto& cubeVectors : cubeData) {
       //Load the cube
       loadedModelIds.push_back(ammonite::models::copyModel(floorId, false));
       vertexCount += ammonite::models::getVertexCount(loadedModelIds[modelCount]);
 
       //Position the cube
-      ammonite::models::position::setPosition(loadedModelIds[modelCount], cubeData[i][0]);
-      ammonite::models::position::setRotation(loadedModelIds[modelCount], cubeData[i][1]);
-      ammonite::models::position::setScale(loadedModelIds[modelCount], cubeData[i][2]);
+      ammonite::models::position::setPosition(loadedModelIds[modelCount], cubeVectors[0]);
+      ammonite::models::position::setRotation(loadedModelIds[modelCount], cubeVectors[1]);
+      ammonite::models::position::setScale(loadedModelIds[modelCount], cubeVectors[2]);
 
       //Update splash screen
       modelCount++;

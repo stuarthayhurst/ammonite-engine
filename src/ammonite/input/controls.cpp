@@ -285,10 +285,10 @@ namespace ammonite {
 
     void releaseFreeCamera() {
       //Clean up keybinds
-      for (int i = 0; i < 6; i++) {
-        if (keybindIds[i] != 0) {
-          ammonite::input::internal::unregisterKeybind(keybindIds[i]);
-          keybindIds[i] = 0;
+      for (AmmoniteId& keybindId : keybindIds) {
+        if (keybindId != 0) {
+          ammonite::input::internal::unregisterKeybind(keybindId);
+          keybindId = 0;
         }
       }
 

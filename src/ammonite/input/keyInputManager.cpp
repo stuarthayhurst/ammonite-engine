@@ -105,8 +105,8 @@ namespace ammonite {
           auto& keybindData = keybindEntry.second;
           //Determine keybind state
           KeyStateEnum keybindState = AMMONITE_PRESSED;
-          for (unsigned int i = 0; i < keybindData.keycodes.size(); i++) {
-            if (keycodeStateMap[keybindData.keycodes[i]].state == AMMONITE_RELEASED) {
+          for (const AmmoniteKeycode& keycode : keybindData.keycodes) {
+            if (keycodeStateMap[keycode].state == AMMONITE_RELEASED) {
               keybindState = AMMONITE_RELEASED;
               break;
             }
@@ -254,9 +254,8 @@ namespace ammonite {
             bool found = false;
 
             //Search keybind's keycodes for current keycode
-            const std::vector<AmmoniteKeycode>& keybindKeycodes = keybindData.second.keycodes;
-            for (unsigned int j = 0; j < keybindKeycodes.size(); j++) {
-              if (keybindKeycodes[j] == keycodes[i]) {
+            for (const AmmoniteKeycode& keybindKeycode : keybindData.second.keycodes) {
+              if (keybindKeycode == keycodes[i]) {
                 found = true;
                 break;
               }

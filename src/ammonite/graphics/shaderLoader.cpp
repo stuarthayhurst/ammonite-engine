@@ -46,8 +46,6 @@ namespace ammonite {
       {"tesse", GL_TESS_EVALUATION_SHADER}, {"eval", GL_TESS_EVALUATION_SHADER},
       {"compute", GL_COMPUTE_SHADER}
     };
-    const unsigned int shaderMatchCount = sizeof(shaderMatches) / sizeof(shaderMatches[0]);
-
 
     //Data required by cache worker
     struct CacheWorkerData {
@@ -167,16 +165,16 @@ namespace ammonite {
                          GL_COMPILE_STATUS, glGetShaderiv, glGetShaderInfoLog);
     }
 
-    GLenum identifyShaderType(std::string shaderPath) {
+    GLenum identifyShaderType(const std::string& shaderPath) {
       std::string lowerShaderPath;
-      for (unsigned int i = 0; i < shaderPath.size(); i++) {
-        lowerShaderPath += (char)std::tolower((unsigned char)shaderPath[i]);
+      for (const char& character : shaderPath) {
+        lowerShaderPath += (char)std::tolower((unsigned char)character);
       }
 
       //Try and match the filename to a supported shader type
-      for (unsigned int i = 0; i < shaderMatchCount; i++) {
-        if (lowerShaderPath.contains(shaderMatches[i].match)) {
-          return shaderMatches[i].shaderType;
+      for (const auto& extensionTypePair : shaderMatches) {
+        if (lowerShaderPath.contains(extensionTypePair.match)) {
+          return extensionTypePair.shaderType;
         }
       }
 

@@ -16,8 +16,8 @@ namespace sponzaDemo {
   }
 
   bool demoExit() {
-    for (unsigned int i = 0; i < loadedModelIds.size(); i++) {
-      ammonite::models::deleteModel(loadedModelIds[i]);
+    for (const AmmoniteId& modelId : loadedModelIds) {
+      ammonite::models::deleteModel(modelId);
     }
 
     return true;
