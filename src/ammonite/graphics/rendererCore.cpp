@@ -577,7 +577,8 @@ namespace ammonite {
       void internalDrawFrame() {
         const unsigned int width = ammonite::window::internal::getGraphicsWidth();
         const unsigned int height = ammonite::window::internal::getGraphicsHeight();
-        static unsigned int lastWidth = 0, lastHeight = 0;
+        static unsigned int lastWidth = 0;
+        static unsigned int lastHeight = 0;
 
         static float lastRenderResMultiplier = 0.0f;
         const float renderResMultiplier = settings::getRenderResMultiplier();
@@ -585,7 +586,8 @@ namespace ammonite {
         static unsigned int lastSamples = 0;
         unsigned int sampleCount = settings::getAntialiasingSamples();
 
-        static unsigned int renderWidth = 0, renderHeight = 0;
+        static unsigned int renderWidth = 0;
+        static unsigned int renderHeight = 0;
 
         //Recreate the framebuffer if the width, height, resolution multiplier or sample count changes
         static GLuint targetBufferId = 0;

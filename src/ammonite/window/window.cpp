@@ -107,7 +107,8 @@ namespace ammonite {
       //Read image data
       internal::ImageData* const images = new internal::ImageData[iconCount];
       for (unsigned int i = 0; i < iconCount; i++) {
-        int width = 0, height = 0;
+        int width = 0;
+        int height = 0;
         images[i].data = stbi_load(iconPaths[i].c_str(), &width, &height, nullptr, 4);
         images[i].width = (unsigned int)width;
         images[i].height = (unsigned int)height;

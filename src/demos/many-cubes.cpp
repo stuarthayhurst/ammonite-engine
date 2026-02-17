@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cmath>
 #include <cstddef>
 #include <iostream>
@@ -109,24 +110,20 @@ namespace manyCubesDemo {
   bool rendererMainloop() {
     //Update light source positions
     for (unsigned int i = 0; i < lightCount; i++) {
-      bool invalid = true;
-      const AmmoniteId currLightSourceId = lightSourceIds[i];
-      float x = 0.0f, z = 0.0f;
-      while (invalid) {
-        x = (float)ammonite::utils::randomDouble(-1.0, 1.0);
-        z = (float)ammonite::utils::randomDouble(-1.0, 1.0);
+      //Apply random offset
+      const ammonite::Vec<float, 3> offset = {
+        (float)ammonite::utils::randomDouble(-1.0, 1.0),
+        0.0f,
+        (float)ammonite::utils::randomDouble(-1.0, 1.0)
+      };
+      ammonite::add(lightSourcePositions[i], offset);
 
-        x += lightSourcePositions[i][0];
-        z += lightSourcePositions[i][2];
-        if (x >= 0.0f && x <= (float)sideLength) {
-          if (z >= 0.0f && z <= (float)sideLength) {
-            invalid = false;
-          }
-        }
-      }
+      //Clamp to bounds
+      lightSourcePositions[i][0] = std::clamp(lightSourcePositions[i][0], 0.0f, (float)sideLength);
+      lightSourcePositions[i][1] = 4.0f;
+      lightSourcePositions[i][2] = std::clamp(lightSourcePositions[i][2], 0.0f, (float)sideLength);
 
-      ammonite::set(lightSourcePositions[i], x, 4.0f, z);
-      ammonite::lighting::properties::setGeometry(currLightSourceId, lightSourcePositions[i]);
+      ammonite::lighting::properties::setGeometry(lightSourceIds[i], lightSourcePositions[i]);
     }
 
     ammonite::renderer::drawFrame();
