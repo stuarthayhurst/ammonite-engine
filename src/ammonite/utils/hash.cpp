@@ -44,7 +44,7 @@ namespace ammonite {
           }
 
           if (pathSize > 0) {
-            const __mmask64 mask = _bzhi_u64(0xFFFFFFFF, pathSize);
+            const __mmask64 mask = _bzhi_u64(0xFFFFFFFFFFFFFFFF, pathSize);
             const __m512i a = _mm512_maskz_loadu_epi8(mask, filePath);
             last = _mm512_aesenc_epi128(last, a);
           }
