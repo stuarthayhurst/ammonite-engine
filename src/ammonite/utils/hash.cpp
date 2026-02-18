@@ -11,6 +11,10 @@ extern "C" {
   #endif
 }
 
+#ifndef USE_VAES_AVX512
+  #include <cstddef>
+#endif
+
 #include "hash.hpp"
 
 namespace ammonite {
@@ -85,22 +89,20 @@ namespace ammonite {
          - Repeat this process for every character of every path
         */
         for (unsigned int i = 0; i < fileCount; i++) {
-          const uint8_t* const filePath = (uint8_t*)filePaths[i].c_str();
-          const unsigned int pathLength = filePaths[i].length();
-          for (unsigned int i = 0; i < pathLength; i++) {
-            output[0] ^= filePath[i];
-            for (unsigned int j = 0; j < sizeof(output); j++) {
-              output[j] ^= prev;
-              prev = output[j];
+          for (const char& pathCharacter : filePaths[i]) {
+            output[0] ^= pathCharacter;
+            for (unsigned char& outputByte : output) {
+              outputByte ^= prev;
+              prev = outputByte;
             }
           }
         }
 
         //Split upper and lower half of each byte, add to 'A' and store
         std::string outputString(sizeof(output) * 2, 0);
-        for (unsigned int i = 0; i < sizeof(output) * 2; i++) {
-          const char value = (char)((output[i / 2] >> ((i % 2) * 4)) & 0xF);
-          outputString[i] = (char)('A' + value);
+        for (std::size_t i = 0; i < sizeof(output); i++) {
+          outputString[(i * 2) + 0] = (char)('A' + (char)(output[i] & 0xF));
+          outputString[(i * 2) + 1] = (char)('A' + (char)((output[i] >> 4) & 0xF));
         }
 
         return outputString;
