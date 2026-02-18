@@ -29,7 +29,7 @@ namespace ammonite {
       */
 #ifdef USE_VAES_AVX512
 #pragma message("Using AVX512 + AVX2 + VAES + SSE2 optimised hashing")
-      std::string hashStrings(std::string* filePaths, unsigned int fileCount) {
+      std::string hashStrings(const std::string* filePaths, unsigned int fileCount) {
         __m512i last = _mm512_setzero_epi32();
         for (unsigned int i = 0; i < fileCount; i++) {
           const uint8_t* filePath = (uint8_t*)filePaths[i].c_str();
@@ -77,7 +77,7 @@ namespace ammonite {
         return output;
       }
 #else
-      std::string hashStrings(std::string* filePaths, unsigned int fileCount) {
+      std::string hashStrings(const std::string* filePaths, unsigned int fileCount) {
         constexpr unsigned int hashWidth = 8;
         alignas(uintmax_t) uint8_t output[hashWidth] = {0};
         uint8_t prev = 0;

@@ -8,7 +8,7 @@
 namespace ammonite {
   namespace utils {
     namespace AMMONITE_INTERNAL internal {
-      std::string hashStrings(std::string* filePaths, unsigned int fileCount);
+      std::string hashStrings(const std::string* filePaths, unsigned int fileCount);
     }
   }
 }
