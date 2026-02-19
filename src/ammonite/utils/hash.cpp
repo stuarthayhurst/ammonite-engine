@@ -21,7 +21,7 @@ namespace ammonite {
   namespace utils {
     namespace internal {
       /*
-       - Hash together fileCount paths from filePaths
+       - Hash together inputCount paths from inputs
          - Use an AVX-512 + VAES implementation, if supported
          - The AVX-512 + VAES and generic versions produce different results, but both work
            - On a Ryzen 7 7700X, the AVX-512 + VAES accelerated version is around 40x faster
@@ -29,23 +29,23 @@ namespace ammonite {
       */
 #ifdef USE_VAES_AVX512
 #pragma message("Using AVX512 + AVX2 + VAES + SSE2 optimised hashing")
-      std::string hashStrings(const std::string* filePaths, unsigned int fileCount) {
+      std::string hashStrings(const std::string* inputs, unsigned int inputCount) {
         __m512i last = _mm512_setzero_epi32();
-        for (unsigned int i = 0; i < fileCount; i++) {
-          const uint8_t* filePath = (uint8_t*)filePaths[i].c_str();
-          unsigned int pathSize = filePaths[i].length();
+        for (unsigned int i = 0; i < inputCount; i++) {
+          const uint8_t* input = (uint8_t*)inputs[i].c_str();
+          unsigned int inputSize = inputs[i].length();
 
-          while (pathSize >= 64) {
-            const __m512i a = _mm512_loadu_epi8(filePath);
+          while (inputSize >= 64) {
+            const __m512i a = _mm512_loadu_epi8(input);
             last = _mm512_aesenc_epi128(last, a);
 
-            pathSize -= 64;
-            filePath += 64;
+            inputSize -= 64;
+            input += 64;
           }
 
-          if (pathSize > 0) {
-            const __mmask64 mask = _bzhi_u64(0xFFFFFFFFFFFFFFFF, pathSize);
-            const __m512i a = _mm512_maskz_loadu_epi8(mask, filePath);
+          if (inputSize > 0) {
+            const __mmask64 mask = _bzhi_u64(0xFFFFFFFFFFFFFFFF, inputSize);
+            const __m512i a = _mm512_maskz_loadu_epi8(mask, input);
             last = _mm512_aesenc_epi128(last, a);
           }
         }
@@ -77,20 +77,20 @@ namespace ammonite {
         return output;
       }
 #else
-      std::string hashStrings(const std::string* filePaths, unsigned int fileCount) {
+      std::string hashStrings(const std::string* inputs, unsigned int inputCount) {
         constexpr unsigned int hashWidth = 8;
         alignas(uintmax_t) uint8_t output[hashWidth] = {0};
         uint8_t prev = 0;
 
         /*
-         - XOR the first byte of the hash with the first character of the first path
+         - XOR the first byte of the hash with the first character of the first input
          - Sequentially XOR every byte of the hash with the result of the previous
            operation of this stage
-         - Repeat this process for every character of every path
+         - Repeat this process for every character of every input
         */
-        for (unsigned int i = 0; i < fileCount; i++) {
-          for (const char& pathCharacter : filePaths[i]) {
-            output[0] ^= pathCharacter;
+        for (unsigned int i = 0; i < inputCount; i++) {
+          for (const char& character : inputs[i]) {
+            output[0] ^= character;
             for (unsigned char& outputByte : output) {
               outputByte ^= prev;
               prev = outputByte;
