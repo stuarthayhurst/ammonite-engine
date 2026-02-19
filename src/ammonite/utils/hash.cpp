@@ -50,17 +50,22 @@ namespace ammonite {
           }
         }
 
-        const uint64_t* const values = (uint64_t*)&last;
-        uint64_t result = 0;
-        for (int i = 0; i < 8; i++) {
-          result += values[i];
-        }
+        /*
+         - Rotate and sum until every element contains the sum of all elements
+         - Effectively, a horizontal add
+        */
+        __m512i rotateOne = _mm512_alignr_epi64(last, last, 1);
+        __m512i sumRotateOne = _mm512_add_epi64(last, rotateOne);
+        __m512i rotateTwo = _mm512_alignr_epi64(sumRotateOne, sumRotateOne, 2);
+        __m512i sumRotateTwo = _mm512_add_epi64(rotateTwo, sumRotateOne);
+        __m512i rotateFour = _mm512_alignr_epi64(sumRotateTwo, sumRotateTwo, 4);
+        __m512i sumRotateFour = _mm512_add_epi64(rotateFour, sumRotateTwo);
 
         //Spread the result out over 128 bits, adjust the range to ['A', 'P']
         std::string output(16, 0);
 
         //Load result into the vector
-        const __m128i resultVec = _mm_set1_epi64((__m64)result);
+        const __m128i resultVec = _mm512_castsi512_si128(sumRotateFour);
 
         //Shift the result 4 bits right
         const __m128i shift = _mm_set_epi64((__m64)0ull, (__m64)4ull);
