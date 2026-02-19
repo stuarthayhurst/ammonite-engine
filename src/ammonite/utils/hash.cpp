@@ -32,7 +32,7 @@ namespace ammonite {
       std::string hashStrings(const std::string* inputs, unsigned int inputCount) {
         __m512i last = _mm512_setzero_epi32();
         for (unsigned int i = 0; i < inputCount; i++) {
-          const uint8_t* input = (uint8_t*)inputs[i].c_str();
+          const uint8_t* input = (uint8_t*)inputs[i].data();
           unsigned int inputSize = inputs[i].length();
 
           while (inputSize >= 64) {
