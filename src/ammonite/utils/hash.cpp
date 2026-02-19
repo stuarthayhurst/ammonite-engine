@@ -3,8 +3,7 @@
 
 extern "C" {
   #if defined(__AVX512F__) && defined(__AVX512BW__) && defined(__AVX512VL__) && \
-      defined(__VAES__) && defined(__AVX2__) && defined(__SSE2__) && \
-      defined(__BMI2__) && defined(UINT64_MAX)
+      defined(__VAES__) && defined(__AVX2__) && defined(__SSE2__) && defined(__BMI2__)
     #define USE_VAES_AVX512
     #include <immintrin.h>
     #include <emmintrin.h>
@@ -84,7 +83,7 @@ namespace ammonite {
 #else
       std::string hashStrings(const std::string* inputs, unsigned int inputCount) {
         constexpr unsigned int hashWidth = 8;
-        alignas(uintmax_t) uint8_t output[hashWidth] = {0};
+        uint8_t output[hashWidth] = {0};
         uint8_t prev = 0;
 
         /*
