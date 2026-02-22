@@ -86,13 +86,14 @@ namespace manyCubesDemo {
     for (unsigned int i = 0; i < lightCount; i++) {
       lightSourceIds[i] = ammonite::lighting::createLightSource();
       ammonite::set(lightSourcePositions[i],
-        (float)ammonite::utils::randomDouble((double)sideLength), 4.0f,
-        (float)ammonite::utils::randomDouble((double)sideLength));
+        ammonite::utils::random<float>((float)sideLength),
+        4.0f,
+        ammonite::utils::random<float>((float)sideLength));
 
       const ammonite::Vec<float, 3> colour = {
-        (float)ammonite::utils::randomDouble(1.0),
-        (float)ammonite::utils::randomDouble(1.0),
-        (float)ammonite::utils::randomDouble(1.0)
+        ammonite::utils::random<float>(1.0f),
+        ammonite::utils::random<float>(1.0f),
+        ammonite::utils::random<float>(1.0f)
       };
 
       ammonite::lighting::properties::setPower(lightSourceIds[i], 50.0f);
@@ -112,9 +113,9 @@ namespace manyCubesDemo {
     for (unsigned int i = 0; i < lightCount; i++) {
       //Apply random offset
       const ammonite::Vec<float, 3> offset = {
-        (float)ammonite::utils::randomDouble(-1.0, 1.0),
+        ammonite::utils::random<float>(-1.0f, 1.0f),
         0.0f,
-        (float)ammonite::utils::randomDouble(-1.0, 1.0)
+        ammonite::utils::random<float>(-1.0f, 1.0f)
       };
       ammonite::add(lightSourcePositions[i], offset);
 

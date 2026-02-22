@@ -579,7 +579,7 @@ namespace {
       const unsigned int jobTypeCount = 7;
       unsigned int* const offsetValues = values + (testIndex * batchSize);
 
-      switch (ammonite::utils::randomUInt(jobTypeCount - 1)) {
+      switch (ammonite::utils::random<unsigned int>(jobTypeCount - 1)) {
       case 0:
         ammonite::utils::normal << "  " << testIndex \
                                 << ": Testing regular submit, with explicit sync" \

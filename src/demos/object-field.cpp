@@ -57,18 +57,18 @@ namespace objectFieldDemo {
       for (unsigned int i = 0; i < objectCount; i++) {
         //Position;
         ammonite::set(objectData[(i * 3) + 0],
-                      (float)ammonite::utils::randomDouble(-10.0, 10.0),
-                      (float)ammonite::utils::randomDouble(-2.0, 1.0),
-                      (float)ammonite::utils::randomDouble(-10.0, 10.0));
+                      ammonite::utils::random<float>(-10.0f, 10.0f),
+                      ammonite::utils::random<float>(-2.0f, 1.0f),
+                      ammonite::utils::random<float>(-10.0f, 10.0f));
 
         //Rotation
         ammonite::set(objectData[(i * 3) + 1],
-                      (float)ammonite::utils::randomDouble(ammonite::twoPi<float>),
-                      (float)ammonite::utils::randomDouble(ammonite::twoPi<float>),
-                      (float)ammonite::utils::randomDouble(ammonite::twoPi<float>));
+                      ammonite::utils::random<float>(ammonite::twoPi<float>),
+                      ammonite::utils::random<float>(ammonite::twoPi<float>),
+                      ammonite::utils::random<float>(ammonite::twoPi<float>));
 
         //Scale
-        ammonite::set(objectData[(i * 3) + 2], (float)ammonite::utils::randomDouble(1.2));
+        ammonite::set(objectData[(i * 3) + 2], ammonite::utils::random(1.2f));
       }
     }
 
@@ -218,10 +218,10 @@ namespace objectFieldDemo {
 
   bool preEngineInit() {
     //Pick number of orbits
-    totalOrbits = ammonite::utils::randomInt(3, 8);
+    totalOrbits = ammonite::utils::random<unsigned int>(3, 8);
 
     //Pick number of lights
-    lightCount = ammonite::utils::randomInt(2, totalOrbits);
+    lightCount = ammonite::utils::random<unsigned int>(2, totalOrbits);
 
     //Allocate and set light data
     lightData = new LightData[lightCount];

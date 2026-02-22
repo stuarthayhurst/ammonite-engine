@@ -10,25 +10,25 @@
 template <typename T>
 T randomScalar(double limit = 10000.0) {
   if constexpr (std::is_unsigned_v<T>) {
-    return (T)ammonite::utils::randomUInt(std::numeric_limits<T>::max());
+    return ammonite::utils::random<T>();
   } else if constexpr (std::is_integral_v<T>) {
-    return (T)ammonite::utils::randomInt((T)std::sqrt(std::numeric_limits<T>::max()));
+    return ammonite::utils::random<T>((T)std::sqrt(std::numeric_limits<T>::max()));
   } else {
-    return (T)ammonite::utils::randomDouble((T)limit);
+    return ammonite::utils::random<T>((T)limit);
   }
 }
 
 template <typename T, unsigned int size>
          requires ammonite::validVector<T, size>
 ammonite::Vec<T, size>& randomFillVector(ammonite::Vec<T, size>& vec,
-                                              double limit = 10000.0) {
+                                         double limit = 10000.0) {
   for (unsigned int i = 0; i < size; i++) {
     if constexpr (std::is_unsigned_v<T>) {
-      vec[i] = (T)ammonite::utils::randomUInt(std::numeric_limits<T>::max());
+      vec[i] = ammonite::utils::random<T>();
     } else if constexpr (std::is_integral_v<T>) {
-      vec[i] = (T)ammonite::utils::randomInt((T)std::sqrt(std::numeric_limits<T>::max() / size));
+      vec[i] = ammonite::utils::random<T>((T)std::sqrt(std::numeric_limits<T>::max() / size));
     } else {
-      vec[i] = (T)ammonite::utils::randomDouble((T)limit);
+      vec[i] = ammonite::utils::random<T>((T)limit);
     }
   }
 
@@ -41,7 +41,7 @@ ammonite::Mat<T, cols, rows>& randomFillMatrix(ammonite::Mat<T, cols, rows>& mat
                                                double limit = 10000.0) {
   for (unsigned int col = 0; col < cols; col++) {
     for (unsigned int row = 0; row < rows; row++) {
-      mat[col][row] = (T)ammonite::utils::randomDouble((T)limit);
+      mat[col][row] = ammonite::utils::random<T>((T)limit);
     }
   }
 
@@ -52,7 +52,7 @@ template <typename T> requires ammonite::validQuaternion<T>
 ammonite::Quat<T>& randomFillQuaternion(ammonite::Quat<T>& quat,
                                         double limit = 10000.0) {
   for (unsigned int i = 0; i < 4; i++) {
-    quat[0][i] = (T)ammonite::utils::randomDouble((T)limit);
+    quat[0][i] = ammonite::utils::random<T>((T)limit);
   }
 
   return quat;
