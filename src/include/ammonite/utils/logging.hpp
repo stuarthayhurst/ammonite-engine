@@ -32,9 +32,10 @@ namespace AMMONITE_EXPOSED ammonite {
     */
     class OutputHelper {
     private:
-      //NOLINTNEXTLINE(cppcoreguidelines-avoid-const-or-ref-data-members)
+      //NOLINTBEGIN(cppcoreguidelines-avoid-const-or-ref-data-members)
       std::ostream& outputStream;
-      std::string prefix;
+      const std::string prefix;
+      //NOLINTEND(cppcoreguidelines-avoid-const-or-ref-data-members)
 
       static thread_local std::stringstream storageStream;
 
