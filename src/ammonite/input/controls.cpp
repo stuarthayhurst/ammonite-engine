@@ -1,5 +1,4 @@
 #include <algorithm>
-#include <cmath>
 #include <vector>
 
 #include "controls.hpp"
@@ -154,15 +153,13 @@ namespace ammonite {
 
         //Vector for current direction, without vertical component
         const float horizontalAngle = (float)ammonite::camera::getHorizontal(activeCameraId);
-        const ammonite::Vec<float, 3> horizontalDirection = {
-          std::sin(horizontalAngle), 0.0f, std::cos(horizontalAngle)
-        };
+        ammonite::Vec<float, 3> horizontalDirection = {0};
+        ammonite::calculateHorizontalDirection(horizontalAngle, horizontalDirection);
 
         //Right vector, relative to the camera
         const float angleRight = horizontalAngle - ammonite::halfPi<float>;
-        const ammonite::Vec<float, 3> right = {
-          std::sin(angleRight), 0.0f, std::cos(angleRight)
-        };
+        ammonite::Vec<float, 3> right = {0};
+        ammonite::calculateHorizontalDirection(angleRight, right);
 
         //Up vector, relative to the world
         const ammonite::Vec<float, 3> worldUp = {0.0f, 1.0f, 0.0f};

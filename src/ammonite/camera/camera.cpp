@@ -1,4 +1,3 @@
-#include <cmath>
 #include <iostream>
 #include <unordered_map>
 
@@ -59,11 +58,9 @@ namespace ammonite {
                                      (float)activeCamera->verticalAngle, direction);
 
         //Right vector, relative to the camera
-        const ammonite::Vec<float, 3> right = {
-          std::sin((float)activeCamera->horizontalAngle - ammonite::halfPi<float>),
-          0.0f,
-          std::cos((float)activeCamera->horizontalAngle - ammonite::halfPi<float>)
-        };
+        ammonite::Vec<float, 3> right = {0};
+        const float angleRight = (float)activeCamera->horizontalAngle - ammonite::halfPi<float>;
+        ammonite::calculateHorizontalDirection(angleRight, right);
 
         //Up vector, relative to the camera
         ammonite::Vec<float, 3> up = {0};

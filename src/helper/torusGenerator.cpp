@@ -63,10 +63,9 @@ namespace torus {
       const float ringRadians = ((float)widthNode / (float)widthNodes) * ammonite::twoPi<float>;
 
       //Calculate the origin for the current ring
-      ammonite::Vec<float, 3> ringOrigin = {
-        std::sin(ringRadians), 0.0f, std::cos(ringRadians)
-      };
-      ammonite::scale(ringOrigin, ringRadius);
+      ammonite::Vec<float, 3> ringOrigin = {0};
+      ammonite::scale(ammonite::calculateHorizontalDirection(ringRadians, ringOrigin),
+                      ringRadius);
 
       //Calculate the vertices and normals of the current ring
       for (unsigned int heightNode = 0; heightNode < heightNodes; heightNode++) {
