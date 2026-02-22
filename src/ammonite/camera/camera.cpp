@@ -60,7 +60,7 @@ namespace ammonite {
         //Right vector, relative to the camera
         ammonite::Vec<float, 3> right = {0};
         const float angleRight = (float)activeCamera->horizontalAngle - ammonite::halfPi<float>;
-        ammonite::calculateHorizontalDirection(angleRight, right);
+        ammonite::calculateDirection(angleRight, right);
 
         //Up vector, relative to the camera
         ammonite::Vec<float, 3> up = {0};

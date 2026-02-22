@@ -64,7 +64,7 @@ namespace torus {
 
       //Calculate the origin for the current ring
       ammonite::Vec<float, 3> ringOrigin = {0};
-      ammonite::scale(ammonite::calculateHorizontalDirection(ringRadians, ringOrigin),
+      ammonite::scale(ammonite::calculateDirection(ringRadians, ringOrigin),
                       ringRadius);
 
       //Calculate the vertices and normals of the current ring

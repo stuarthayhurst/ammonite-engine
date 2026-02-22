@@ -154,12 +154,12 @@ namespace ammonite {
         //Vector for current direction, without vertical component
         const float horizontalAngle = (float)ammonite::camera::getHorizontal(activeCameraId);
         ammonite::Vec<float, 3> horizontalDirection = {0};
-        ammonite::calculateHorizontalDirection(horizontalAngle, horizontalDirection);
+        ammonite::calculateDirection(horizontalAngle, horizontalDirection);
 
         //Right vector, relative to the camera
         const float angleRight = horizontalAngle - ammonite::halfPi<float>;
         ammonite::Vec<float, 3> right = {0};
-        ammonite::calculateHorizontalDirection(angleRight, right);
+        ammonite::calculateDirection(angleRight, right);
 
         //Up vector, relative to the world
         const ammonite::Vec<float, 3> worldUp = {0.0f, 1.0f, 0.0f};

@@ -24,10 +24,10 @@ namespace AMMONITE_INTERNAL ammonite {
     }
 
     template <typename T> requires std::is_floating_point_v<T> && validVector<T, 3>
-    constexpr ammonite::Vec<T, 3>& calculateHorizontalDirection(T horizontal,
-                                                                ammonite::Vec<T, 3>& dest) {
+    constexpr ammonite::Vec<T, 3>& calculateDirection(T horizontalAngle,
+                                                      ammonite::Vec<T, 3>& dest) {
       const ammonite::Vec<T, 3> direction = {
-        std::sin(horizontal), 0.0f, std::cos(horizontal)
+        std::sin(horizontalAngle), 0.0f, std::cos(horizontalAngle)
       };
 
       return ammonite::copy(direction, dest);
