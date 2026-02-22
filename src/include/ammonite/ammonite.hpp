@@ -11,6 +11,7 @@
 #include "input/keycodes.hpp"
 #include "lighting/lighting.hpp"
 #include "maths/angle.hpp"
+#include "maths/angleVector.hpp"
 #include "maths/matrix.hpp"
 #include "maths/matrixTypes.hpp"
 #include "maths/quaternion.hpp"
