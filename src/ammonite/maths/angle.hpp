@@ -22,7 +22,7 @@ namespace AMMONITE_INTERNAL ammonite {
         std::cos(vertical) * std::cos(horizontal)
       };
 
-      return ammonite::normalise(direction, dest);
+      return ammonite::copy(direction, dest);
     }
 
     template <typename T> requires std::is_floating_point_v<T> && validVector<T, 3>
