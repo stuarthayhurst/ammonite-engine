@@ -26,6 +26,16 @@ namespace AMMONITE_INTERNAL ammonite {
     }
 
     template <typename T> requires std::is_floating_point_v<T> && validVector<T, 3>
+    inline ammonite::Vec<T, 3>& calculateHorizontalDirection(T horizontal,
+                                                   ammonite::Vec<T, 3>& dest) {
+      const ammonite::Vec<T, 3> direction = {
+        std::sin(horizontal), 0.0f, std::cos(horizontal)
+      };
+
+      return ammonite::copy(direction, dest);
+    }
+
+    template <typename T> requires std::is_floating_point_v<T> && validVector<T, 3>
     inline T calculateVerticalAngle(const ammonite::Vec<T, 3>& direction) {
       ammonite::Vec<T, 3> normalisedDirection = {0};
       ammonite::normalise(direction, normalisedDirection);
