@@ -55,21 +55,21 @@
     - Scroll to adjust zoom
     - Middle-click to reset zoom
     - `B` to switch camera
-    - `G` to record a camera path
+    - `G` to record a camera path, replayable through commands
     - `C` to release input
     - `ESC` to close the demo
     - `V` to open the command prompt
     - `F11` to toggle fullscreen
+    - `P` to toggle model (torus) placement mode
+      - Left-click to confirm placement
+      - Scroll to adjust distance
+      - Middle-click to reset distance
     - Up or down arrow to adjust the framerate limit
     - `Z` to toggle focal depth
     - `[` or `]` to adjust focal depth
   - The `object-field` demo additionally supports the following keybinds:
     - `F` to place a new cube at the camera's position
-    - `P` to toggle model placement mode
-      - Left-click to confirm placement
-      - Scroll to adjust distance
-      - Middle-click to reset distance
-    - `R` to shuffle placed objects
+    - `R` to shuffle placed cubes
 
 ## Options:
   - Compiled demos have a few arguments supported:
