@@ -73,7 +73,7 @@ namespace ammonite {
      return totalFrames;
     }
 
-    double getFrameTime() {
+    double getAverageFrameTime() {
       return frameTime;
     }
 

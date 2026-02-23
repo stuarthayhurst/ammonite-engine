@@ -46,7 +46,7 @@ namespace AMMONITE_EXPOSED ammonite {
     }
 
     uintmax_t getTotalFrames();
-    double getFrameTime();
+    double getAverageFrameTime();
     void drawFrame();
   }
 }
