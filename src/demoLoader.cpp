@@ -437,6 +437,9 @@ int main(int argc, char** argv) noexcept(false) {
 
     //Swap to command prompt if requested
     if (commandPromptRequested) {
+      //Pause the engine timer to avoid jumps
+      ammonite::pauseEngineTime();
+
       //Release input focus
       const bool hadInputFocus = ammonite::input::getInputFocus();
       ammonite::input::setInputFocus(false);
@@ -448,6 +451,7 @@ int main(int argc, char** argv) noexcept(false) {
 
       //Swap input back to window
       ammonite::input::setInputFocus(hadInputFocus);
+      ammonite::unpauseEngineTime();
       commandPromptRequested = false;
     }
 

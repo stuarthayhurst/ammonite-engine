@@ -92,6 +92,24 @@ namespace ammonite {
   }
 
   /*
+   - Pause the engine timer
+   - The frame time delta set by updateFrameTime() won't include the time
+     the engine timer was paused for
+   - Use this for long operations that shouldn't be counted in the frame time
+  */
+  void pauseEngineTime() {
+    engineTimer->pause();
+  }
+
+  void unpauseEngineTime() {
+    engineTimer->unpause();
+  }
+
+  bool getEnginePaused() {
+    return !engineTimer->isRunning();
+  }
+
+  /*
    - Record the current time for use with frame-specific timings internally
    - Reset the timer
   */

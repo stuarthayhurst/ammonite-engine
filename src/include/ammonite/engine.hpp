@@ -17,6 +17,10 @@ namespace AMMONITE_EXPOSED ammonite {
                    unsigned int height);
   void destroyEngine();
 
+  void pauseEngineTime();
+  void unpauseEngineTime();
+  bool getEnginePaused();
+
   void updateFrameTime();
   void getFrameTime(std::time_t* seconds, std::time_t* nanoseconds);
   double getFrameTime();
