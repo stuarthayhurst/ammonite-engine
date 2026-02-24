@@ -417,15 +417,18 @@ int main(int argc, char** argv) noexcept(false) {
 
   //Create and reset timers for performance metrics
   utilityTimer.reset();
-  ammonite::utils::Timer frameTimer;
+  ammonite::utils::Timer secondTimer;
   ammonite::utils::Timer pathTimer(false);
 
   //Draw frames until window closed
   while(!closeWindow && !ammonite::window::shouldWindowClose()) {
+    //Update the engine timer for the new frame
+    ammonite::updateFrameTime();
+
     //Every second, output the framerate
-    if (frameTimer.getTime() >= 1.0f) {
-      ammonite::utils::status << formatMetrics(ammonite::renderer::getFrameTime()) << std::endl;
-      frameTimer.reset();
+    if (secondTimer.getTime() >= 1.0f) {
+      ammonite::utils::status << formatMetrics(ammonite::renderer::getAverageFrameTime()) << std::endl;
+      secondTimer.reset();
     }
 
     //Process new input since last frame

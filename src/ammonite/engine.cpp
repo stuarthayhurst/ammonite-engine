@@ -1,3 +1,4 @@
+#include <ctime>
 #include <iostream>
 #include <string>
 #include <string_view>
@@ -19,6 +20,10 @@ namespace ammonite {
   namespace {
     const char* engineName = "Ammonite Engine";
     const char* engineVersion = EXPAND_MACRO_STRING(AMMONITE_VERSION);
+
+    ammonite::utils::Timer* engineTimer = nullptr;
+    std::time_t engineSeconds = 0;
+    std::time_t engineNanoseconds = 0;
   }
 
   std::string_view getEngineName() {
@@ -66,6 +71,9 @@ namespace ammonite {
       return false;
     }
 
+    //Create the engine's main timer
+    engineTimer = new ammonite::utils::Timer;
+
     ammonite::utils::status << "Loaded engine in " << loadTimer.getTime() << "s" << std::endl;
     return true;
   }
@@ -79,5 +87,35 @@ namespace ammonite {
     ammonite::utils::thread::destroyThreadPool();
     ammonite::renderer::setup::destroyRenderer();
     ammonite::window::destroyWindow();
+
+    delete engineTimer;
+  }
+
+  /*
+   - Record the current time for use with frame-specific timings internally
+   - Reset the timer
+  */
+  void updateFrameTime() {
+    engineTimer->getTime(&engineSeconds, &engineNanoseconds);
+    engineTimer->reset();
+  }
+
+  /*
+   - Get the frame time as of the last call to updateFrameTime()
+   - Pointers may be nullptr
+  */
+  void getFrameTime(std::time_t* seconds, std::time_t* nanoseconds) {
+    if (seconds != nullptr) {
+      *seconds = engineSeconds;
+    }
+
+    if (nanoseconds != nullptr) {
+      *nanoseconds = engineNanoseconds;
+    }
+  }
+
+  //Get the frame time as of the last call to updateFrameTime()
+  double getFrameTime() {
+    return (double)engineSeconds + ((double)engineNanoseconds / 1000000000.0);
   }
 }

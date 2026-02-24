@@ -1,6 +1,7 @@
 #ifndef AMMONITEENGINE
 #define AMMONITEENGINE
 
+#include <ctime>
 #include <string>
 #include <string_view>
 
@@ -15,6 +16,10 @@ namespace AMMONITE_EXPOSED ammonite {
   bool setupEngine(const std::string& shaderPath, unsigned int width,
                    unsigned int height);
   void destroyEngine();
+
+  void updateFrameTime();
+  void getFrameTime(std::time_t* seconds, std::time_t* nanoseconds);
+  double getFrameTime();
 }
 
 #endif
