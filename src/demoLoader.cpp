@@ -424,6 +424,7 @@ int main(int argc, char** argv) noexcept(false) {
   while(!closeWindow && !ammonite::window::shouldWindowClose()) {
     //Update the engine timer for the new frame
     ammonite::updateFrameTime();
+    ammonite::camera::path::updatePathProgress();
 
     //Every second, output the framerate
     if (secondTimer.getTime() >= 1.0f) {

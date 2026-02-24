@@ -6,12 +6,12 @@
 
 #include "camera.hpp"
 
+#include "../engine.hpp"
 #include "../maths/angle.hpp"
 #include "../maths/vector.hpp"
 #include "../utils/debug.hpp"
 #include "../utils/id.hpp"
 #include "../utils/logging.hpp"
-#include "../utils/timer.hpp"
 
 namespace ammonite {
   namespace camera {
@@ -25,7 +25,8 @@ namespace ammonite {
 
       struct Path {
         AmmoniteId linkedCameraId = 0;
-        ammonite::utils::Timer pathTimer;
+        double currentTime = 0.0;
+        bool isPathPlaying = false;
         std::vector<PathNode> pathNodes;
         unsigned int selectedIndex = 0; //Used for performance, not config
         AmmonitePathMode pathMode = AMMONITE_PATH_FORWARD;
@@ -36,6 +37,41 @@ namespace ammonite {
     }
 
     namespace path {
+      namespace {
+        /*
+         - Reset the time and node if looping and restarting
+         - Return the time written to the path
+        */
+        double loopPathTime(Path& cameraPath, double currentTime) {
+          const unsigned int nodeCount = cameraPath.pathNodes.size();
+          const double maxNodeTime = cameraPath.pathNodes[nodeCount - 1].time;
+
+          //Don't do anything if the path is paused
+          if (!cameraPath.isPathPlaying) {
+            return currentTime;
+          }
+
+          /*
+           - If the path is a loop and needs to restart:
+             - Reset the index to the start
+             - Set the time to however far the loop overshot
+          */
+          double newTime = currentTime;
+          if (cameraPath.pathMode == AMMONITE_PATH_LOOP) {
+            if (newTime >= maxNodeTime) {
+              //Reset the time, preserving the overshoot
+              cameraPath.currentTime = std::fmod(newTime, maxNodeTime);
+              newTime = cameraPath.currentTime;
+
+              //Return to the first node
+              cameraPath.selectedIndex = 0;
+            }
+          }
+
+          return newTime;
+        }
+      }
+
       namespace internal {
         //Update the stored link for pathId, optionally unlink the existing camera
         bool setLinkedCamera(AmmoniteId pathId, AmmoniteId cameraId,
@@ -71,30 +107,24 @@ namespace ammonite {
         /*
          - Calculate the new position, direction and path state for the mode
          - Write it to the linked camera
+         - This may modify the path time for looped paths
         */
         void updateCamera(AmmoniteId pathId) {
           Path& cameraPath = pathTrackerMap[pathId];
           const unsigned int nodeCount = cameraPath.pathNodes.size();
           const double maxNodeTime = cameraPath.pathNodes[nodeCount - 1].time;
-          double currentTime = cameraPath.pathTimer.getTime();
 
           //Skip 0 length paths
           if (nodeCount == 0) {
             return;
           }
 
-          //Reset the time if looping and restarting
-          if (cameraPath.pathMode == AMMONITE_PATH_LOOP) {
-            if (currentTime >= maxNodeTime) {
-              //Reset the time, preserving the overshoot
-              const double extraTime = std::fmod(currentTime, maxNodeTime);
-              cameraPath.pathTimer.setTime(extraTime);
-              currentTime = extraTime;
-
-              //Return to the first node
-              cameraPath.selectedIndex = 0;
-            }
-          }
+          /*
+           - Handle time resets for looping paths
+           - Generally, this would be handled by updatePathProgress(), but
+             the path mode may have changed since the call
+          */
+          const double currentTime = loopPathTime(cameraPath, cameraPath.currentTime);
 
           //Check the node still exists
           if (cameraPath.selectedIndex >= nodeCount) {
@@ -244,6 +274,42 @@ namespace ammonite {
         }
       }
 
+      namespace {
+        void updatePathTime(AmmoniteId pathId, double timeDelta) {
+          Path& cameraPath = pathTrackerMap[pathId];
+          double newTime = cameraPath.currentTime + timeDelta;
+
+          //Don't modify the time if the path is paused
+          if (!cameraPath.isPathPlaying) {
+            return;
+          }
+
+          /*
+           - Handle time resets for looping paths
+           - This already updates the time if it changed, but set it again
+             to keep the code path simple
+          */
+          newTime = loopPathTime(cameraPath, newTime);
+
+          //Save the time
+          cameraPath.currentTime = newTime;
+        }
+      }
+
+      /*
+       - Update the time for all registered paths
+       - Only call this once per frame
+      */
+      void updatePathProgress() {
+        //Get the time since the last frame
+        const double frameTime = ammonite::getFrameTime();
+
+        //Apply the time to every path
+        for (auto& pathData : pathTrackerMap) {
+          updatePathTime(pathData.first, frameTime);
+        }
+      }
+
       //Create a new camera, reserving 'size' nodes
       AmmoniteId createCameraPath(unsigned int size) {
         //Get an ID for the new path
@@ -251,7 +317,6 @@ namespace ammonite {
 
         //Add a new path to the tracker
         pathTrackerMap[pathId] = {};
-        pathTrackerMap[pathId].pathTimer = ammonite::utils::Timer(false);
 
         if (size != 0) {
           pathTrackerMap[pathId].pathNodes.reserve(size);
@@ -393,7 +458,7 @@ namespace ammonite {
         }
 
         Path& cameraPath = pathTrackerMap[pathId];
-        cameraPath.pathTimer.unpause();
+        cameraPath.isPathPlaying = true;
       }
 
       void pausePath(AmmoniteId pathId) {
@@ -404,7 +469,7 @@ namespace ammonite {
         }
 
         Path& cameraPath = pathTrackerMap[pathId];
-        cameraPath.pathTimer.pause();
+        cameraPath.isPathPlaying = false;
       }
 
       bool getPathPaused(AmmoniteId pathId) {
@@ -414,7 +479,7 @@ namespace ammonite {
           return false;
         }
 
-        return pathTrackerMap[pathId].pathTimer.isRunning();
+        return pathTrackerMap[pathId].isPathPlaying;
       }
 
       //Jump to a given node
@@ -427,7 +492,7 @@ namespace ammonite {
 
         Path& cameraPath = pathTrackerMap[pathId];
         nodeIndex = std::min(nodeIndex, (unsigned int)cameraPath.pathNodes.size() - 1);
-        cameraPath.pathTimer.setTime(cameraPath.pathNodes[nodeIndex].time);
+        cameraPath.currentTime = cameraPath.pathNodes[nodeIndex].time;
       }
 
       //Jump to a given point in time
@@ -439,7 +504,7 @@ namespace ammonite {
         }
 
         Path& cameraPath = pathTrackerMap[pathId];
-        cameraPath.pathTimer.setTime(time);
+        cameraPath.currentTime = time;
       }
 
       //Jump to a point in time, relative to 1.0 as the end
@@ -452,7 +517,7 @@ namespace ammonite {
 
         Path& cameraPath = pathTrackerMap[pathId];
         const PathNode& maxNode = cameraPath.pathNodes[(cameraPath.pathNodes.size() - 1)];
-        cameraPath.pathTimer.setTime(maxNode.time * progress);
+        cameraPath.currentTime = maxNode.time * progress;
       }
 
       //Return the current point in time
@@ -465,7 +530,7 @@ namespace ammonite {
 
         const Path& cameraPath = pathTrackerMap[pathId];
         const PathNode& maxNode = cameraPath.pathNodes[(cameraPath.pathNodes.size() - 1)];
-        return std::min(cameraPath.pathTimer.getTime(), maxNode.time);
+        return std::min(cameraPath.currentTime, maxNode.time);
       }
 
       //Return the current progress, relative to 1.0 as the end
@@ -478,7 +543,7 @@ namespace ammonite {
 
         const Path& cameraPath = pathTrackerMap[pathId];
         const PathNode& maxNode = cameraPath.pathNodes[(cameraPath.pathNodes.size() - 1)];
-        const double progress = cameraPath.pathTimer.getTime() / maxNode.time;
+        const double progress = cameraPath.currentTime / maxNode.time;
         return std::min(progress, 1.0);
       }
 
@@ -495,7 +560,7 @@ namespace ammonite {
         }
 
         Path& cameraPath = pathTrackerMap[pathId];
-        cameraPath.pathTimer.reset();
+        cameraPath.currentTime = 0.0;
         cameraPath.selectedIndex = 0;
       }
     }
