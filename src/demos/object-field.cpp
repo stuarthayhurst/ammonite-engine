@@ -24,7 +24,7 @@ namespace objectFieldDemo {
       float power = 30.0f;
 
       //Light/ orbit save data
-      ammonite::utils::Timer orbitTimer;
+      double currentTime = 0.0;
       bool isOrbitClockwise = false;
       bool lastWindowState = false;
       unsigned int orbitIndex;
@@ -348,20 +348,21 @@ namespace objectFieldDemo {
   }
 
   bool rendererMainloop() {
+    //Update light times
+    const double frameTimeDelta = ammonite::getFrameTime();
+    for (unsigned int i = 0; i < lightCount; i++) {
+      const double newTime = lightData[i].currentTime + frameTimeDelta;
+      lightData[i].currentTime = std::fmod(newTime, lightData[i].orbitPeriod);
+    }
+
     //Handle orbits
     for (unsigned int i = 0; i < lightCount; i++) {
       ammonite::Vec<float, 2> lightOrbitPosition = {0};
       calculateOrbitPosition(totalOrbits, lightData[i].orbitIndex,
                              lightData[i].orbitRadius, lightOrbitPosition);
 
-      //Snapshot the time, reset timer if it has overrun
-      float orbitTime = (float)lightData[i].orbitTimer.getTime();
-      if (orbitTime >= lightData[i].orbitPeriod) {
-        orbitTime = std::fmod(orbitTime, lightData[i].orbitPeriod);
-        lightData[i].orbitTimer.setTime(orbitTime);
-      }
-
       //Use inverse of the time if orbiting backwards
+      float orbitTime = (float)lightData[i].currentTime;
       if (lightData[i].isOrbitClockwise) {
         orbitTime = lightData[i].orbitPeriod - orbitTime;
       }
@@ -396,8 +397,9 @@ namespace objectFieldDemo {
             if (!lightData[i].isOrbitClockwise) {
               newAngle = ammonite::twoPi<float> - newAngle;
             }
-            lightData[i].orbitTimer.setTime((newAngle / ammonite::twoPi<float>) * \
-                                            lightData[i].orbitPeriod);
+
+            //Update the time to match the angle
+            lightData[i].currentTime = (newAngle / ammonite::twoPi<float>) * lightData[i].orbitPeriod;
 
             //Set new orbit and flip direction
             lightData[i].orbitIndex = swapTarget;
