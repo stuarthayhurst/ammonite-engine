@@ -422,9 +422,11 @@ int main(int argc, char** argv) noexcept(false) {
 
   //Draw frames until window closed
   while(!closeWindow && !ammonite::window::shouldWindowClose()) {
-    //Update the engine timer for the new frame
-    ammonite::updateFrameTime();
-    ammonite::camera::path::updatePathProgress();
+    /*
+     - Update the engine timer for the new frame
+     - Update the active camera, if it's on a path
+    */
+    ammonite::beginFrame(true);
 
     //Every second, output the framerate
     if (secondTimer.getTime() >= 1.0f) {
@@ -475,7 +477,7 @@ int main(int argc, char** argv) noexcept(false) {
       }
     }
 
-    //Handle object placement mode
+    //Handle object placement mode, after camera position updates
     placement::updatePlacementPosition();
 
     //Call demo-specific main loop code

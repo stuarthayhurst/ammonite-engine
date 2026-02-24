@@ -24,6 +24,8 @@ namespace AMMONITE_EXPOSED ammonite {
   void updateFrameTime();
   void getFrameTime(std::time_t* seconds, std::time_t* nanoseconds);
   double getFrameTime();
+
+  void beginFrame(bool updateActiveCameraPath);
 }
 
 #endif

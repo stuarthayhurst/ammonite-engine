@@ -5,6 +5,7 @@
 
 #include "engine.hpp"
 
+#include "camera/camera.hpp"
 #include "graphics/renderer.hpp"
 #include "utils/debug.hpp"
 #include "utils/logging.hpp"
@@ -135,5 +136,20 @@ namespace ammonite {
   //Get the frame time as of the last call to updateFrameTime()
   double getFrameTime() {
     return (double)engineSeconds + ((double)engineNanoseconds / 1000000000.0);
+  }
+
+  /*
+   - Helper function to call anything that should be done at the start of a frame
+     - Update the frame time delta
+     - Update the progress of camera paths using this
+     - Optionally update the position of the active camera, if it's on a path
+  */
+  void beginFrame(bool updateActiveCameraPath) {
+    updateFrameTime();
+    camera::path::updatePathProgress();
+
+    if (updateActiveCameraPath) {
+      camera::path::updateActiveCameraOnPath();
+    }
   }
 }
