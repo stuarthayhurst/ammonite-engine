@@ -7,10 +7,10 @@
 #include "keycodes.hpp"
 
 #include "../camera/camera.hpp"
+#include "../engine.hpp"
 #include "../maths/angle.hpp"
 #include "../maths/vector.hpp"
 #include "../utils/id.hpp"
-#include "../utils/timer.hpp"
 
 /*
  - This file provides some ready-made camera controls, built on the input layer
@@ -112,11 +112,16 @@ namespace ammonite {
         DIRECTION_LEFT
       };
 
-      //Data to handle independent camera directions
-      struct DirectionData {
-        ammonite::utils::Timer directionTimer;
-        DirectionEnum directionEnum;
-      } directionData[6];
+      //Keyboards controls setup
+      DirectionEnum directions[6] = {
+        directions[0] = DIRECTION_FORWARD,
+        directions[1] = DIRECTION_BACK,
+        directions[2] = DIRECTION_UP,
+        directions[3] = DIRECTION_DOWN,
+        directions[4] = DIRECTION_RIGHT,
+        directions[5] = DIRECTION_LEFT
+      };
+
       AmmoniteId keybindIds[6] = {0};
 
       bool isCameraActive = true;
@@ -126,27 +131,19 @@ namespace ammonite {
     namespace {
       void keyboardCameraCallback(const std::vector<AmmoniteKeycode>&,
                                   KeyStateEnum action, void* userPtr) {
-        DirectionData* const directionData = (DirectionData*)userPtr;
-        ammonite::utils::Timer* directionTimer = &directionData->directionTimer;
-        //If it's an initial key press, start the timer and return
-        if (action == AMMONITE_PRESSED) {
-          directionTimer->reset();
-          directionTimer->unpause();
+        DirectionEnum* const directionEnum = (DirectionEnum*)userPtr;
+
+        //Do nothing if the button was released
+        if (action == AMMONITE_RELEASED) {
           return;
         }
 
-        //Get active camera
+        //Account for frame rate in movement distance
+        const float frameTimeDelta = (float)ammonite::getFrameTime();
+        const float unitDelta = frameTimeDelta * controlSettings.movementSpeed;
+
+        //Get active camera, skip if the camera is inactive
         const AmmoniteId activeCameraId = ammonite::camera::getActiveCamera();
-
-        //Reset time between inputs
-        const float unitDelta = (float)directionTimer->getTime() * controlSettings.movementSpeed;
-        if (action == AMMONITE_RELEASED) {
-          //If it's a key release, stop the timer
-          directionTimer->pause();
-        }
-        directionTimer->reset();
-
-        //Skip if the camera is inactive
         if (!isCameraActive) {
           return;
         }
@@ -170,7 +167,7 @@ namespace ammonite {
 
         //Determine movement direction
         ammonite::Vec<float, 3> movementDirection = {0};
-        switch (directionData->directionEnum) {
+        switch (*directionEnum) {
         case DIRECTION_FORWARD:
           ammonite::copy(horizontalDirection, movementDirection);
           break;
@@ -257,20 +254,12 @@ namespace ammonite {
     void setupFreeCamera(AmmoniteKeycode forwardKey, AmmoniteKeycode backKey,
                          AmmoniteKeycode upKey, AmmoniteKeycode downKey,
                          AmmoniteKeycode rightKey, AmmoniteKeycode leftKey) {
-      //Keyboards controls setup
-      directionData[0].directionEnum = DIRECTION_FORWARD;
-      directionData[1].directionEnum = DIRECTION_BACK;
-      directionData[2].directionEnum = DIRECTION_UP;
-      directionData[3].directionEnum = DIRECTION_DOWN;
-      directionData[4].directionEnum = DIRECTION_RIGHT;
-      directionData[5].directionEnum = DIRECTION_LEFT;
-
       //Set keyboard callbacks
       const AmmoniteKeycode keycodes[6] = {forwardKey, backKey, upKey, downKey, rightKey, leftKey};
       for (int i = 0; i < 6; i++) {
         if (keycodes[i] != 0) {
           keybindIds[i] = ammonite::input::internal::registerRawKeybind(&keycodes[i], 1,
-            AMMONITE_FORCE_RELEASE, false, keyboardCameraCallback, &directionData[i]);
+            AMMONITE_FORCE_RELEASE, false, keyboardCameraCallback, &directions[i]);
         }
       }
 
