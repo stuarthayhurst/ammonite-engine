@@ -2,6 +2,7 @@
 #include <cmath>
 #include <iostream>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 #include "camera.hpp"
@@ -34,6 +35,9 @@ namespace ammonite {
 
       AmmoniteId lastPathId = 1;
       std::unordered_map<AmmoniteId, Path> pathTrackerMap;
+
+      //Store the IDs of paths with cameras updated since the last automatic update
+      std::unordered_set<AmmoniteId> updatedPaths;
     }
 
     namespace path {
@@ -70,6 +74,26 @@ namespace ammonite {
 
           return newTime;
         }
+
+        void updatePathTime(AmmoniteId pathId, double timeDelta) {
+          Path& cameraPath = pathTrackerMap[pathId];
+          double newTime = cameraPath.currentTime + timeDelta;
+
+          //Don't modify the time if the path is paused
+          if (!cameraPath.isPathPlaying) {
+            return;
+          }
+
+          /*
+           - Handle time resets for looping paths
+           - This already updates the time if it changed, but set it again
+             to keep the code path simple
+          */
+          newTime = loopPathTime(cameraPath, newTime);
+
+          //Save the time
+          cameraPath.currentTime = newTime;
+        }
       }
 
       namespace internal {
@@ -105,194 +129,15 @@ namespace ammonite {
         }
 
         /*
-         - Calculate the new position, direction and path state for the mode
-         - Write it to the linked camera
-         - This may modify the path time for looped paths
+         - Update the camera for the path, if it hasn't been done manually
+         - Called once per frame
         */
         void updateCamera(AmmoniteId pathId) {
-          Path& cameraPath = pathTrackerMap[pathId];
-          const unsigned int nodeCount = cameraPath.pathNodes.size();
-          const double maxNodeTime = cameraPath.pathNodes[nodeCount - 1].time;
-
-          //Skip 0 length paths
-          if (nodeCount == 0) {
-            return;
+          if (!updatedPaths.contains(pathId)) {
+            ammonite::camera::path::updateCameraForPath(pathId);
           }
 
-          /*
-           - Handle time resets for looping paths
-           - Generally, this would be handled by updatePathProgress(), but
-             the path mode may have changed since the call
-          */
-          const double currentTime = loopPathTime(cameraPath, cameraPath.currentTime);
-
-          //Check the node still exists
-          if (cameraPath.selectedIndex >= nodeCount) {
-            ammoniteInternalDebug << "Selected camera path node no longer exists, resetting" << std::endl;
-            cameraPath.selectedIndex = 0;
-          }
-
-          //Find the last reached node
-          unsigned int selectedIndex = cameraPath.selectedIndex;
-          while (true) {
-            //Select the next node, according to the mode
-            unsigned int nextSelectedIndex = 0;
-            bool isLastNode = false;
-            switch (cameraPath.pathMode) {
-            case AMMONITE_PATH_FORWARD:
-            case AMMONITE_PATH_REVERSE:
-              nextSelectedIndex = selectedIndex + 1;
-              if (nextSelectedIndex >= nodeCount) {
-                isLastNode = true;
-              }
-              break;
-            case AMMONITE_PATH_LOOP:
-              nextSelectedIndex = (selectedIndex + 1) % nodeCount;
-              break;
-            }
-
-            //No more nodes to try for linear modes
-            if (isLastNode) {
-              break;
-            }
-
-            //Use corresponding index from the other end in reverse mode
-            unsigned int realNextIndex = nextSelectedIndex;
-            if (cameraPath.pathMode == AMMONITE_PATH_REVERSE) {
-              realNextIndex = nodeCount - (nextSelectedIndex + 1);
-            }
-
-            //Determine the node's time
-            const PathNode& nextNode = cameraPath.pathNodes[realNextIndex];
-
-            //Find the time this node occurs at
-            double nodeTime = 0.0;
-            switch (cameraPath.pathMode) {
-            case AMMONITE_PATH_FORWARD:
-            case AMMONITE_PATH_LOOP:
-              nodeTime = nextNode.time;
-              break;
-            case AMMONITE_PATH_REVERSE:
-              //Subtract the node time from the final node's time
-              nodeTime = maxNodeTime - nextNode.time;
-              break;
-            }
-
-            //Store the new index or break
-            if (nodeTime <= currentTime) {
-              //Node has been reached, try the next
-              selectedIndex = nextSelectedIndex;
-            } else {
-              //Node hasn't been reached yet
-              break;
-            }
-          }
-
-          //Use corresponding index from the other end in reverse mode
-          unsigned int realSelectedIndex = selectedIndex;
-          if (cameraPath.pathMode == AMMONITE_PATH_REVERSE) {
-            realSelectedIndex = nodeCount - (selectedIndex + 1);
-          }
-
-          //Store the selected index and fetch the node
-          cameraPath.selectedIndex = selectedIndex;
-          const PathNode& currentNode = cameraPath.pathNodes[realSelectedIndex];
-
-          //Select the next node and detect the end
-          bool isEnd = false;
-          unsigned int nextIndex = 0;
-          switch (cameraPath.pathMode) {
-          case AMMONITE_PATH_FORWARD:
-          case AMMONITE_PATH_REVERSE:
-            nextIndex = selectedIndex + 1;
-            isEnd = (nextIndex >= nodeCount);
-            break;
-          case AMMONITE_PATH_LOOP:
-            nextIndex = (selectedIndex + 1) % nodeCount;
-            break;
-          }
-
-          //Reuse the current node if the next node is past the end
-          nextIndex = isEnd ? selectedIndex : nextIndex;
-
-          //Use corresponding index from the other end in reverse mode
-          unsigned int realNextIndex = nextIndex;
-          if (cameraPath.pathMode == AMMONITE_PATH_REVERSE) {
-            realNextIndex = nodeCount - (nextIndex + 1);
-          }
-
-          //Fetch the next node
-          const PathNode& nextNode = cameraPath.pathNodes[realNextIndex];
-
-          //Find the node time delta and the time between now and the current node
-          double nodeTimeDelta = 0.0;
-          double timeDelta = 0.0;
-          if (cameraPath.pathMode != AMMONITE_PATH_REVERSE) {
-            nodeTimeDelta = nextNode.time - currentNode.time;
-            timeDelta = currentTime - currentNode.time;
-          } else {
-            nodeTimeDelta = currentNode.time - nextNode.time;
-            timeDelta = currentNode.time - (maxNodeTime - currentTime);
-          }
-
-          //Override time deltas for loop end
-          if (cameraPath.pathMode == AMMONITE_PATH_LOOP) {
-            if (nextIndex == 0) {
-              nodeTimeDelta = 0.0;
-              timeDelta = 0.0;
-            }
-          }
-
-          //Find the progress between the nodes
-          double nodeProgress = 0.0;
-          if (nodeTimeDelta != 0.0) {
-            nodeProgress = timeDelta / nodeTimeDelta;
-          }
-
-          //Find vector between the nodes
-          ammonite::Vec<float, 3> nodePositionDelta;
-          ammonite::sub(nextNode.position, currentNode.position, nodePositionDelta);
-
-          //Find position between the nodes along the vector
-          ammonite::Vec<float, 3> newPosition;
-          ammonite::scale(nodePositionDelta, (float)nodeProgress, newPosition);
-          ammonite::add(newPosition, currentNode.position);
-
-          //Find smallest delta between node angles
-          const double horizontalDelta =
-            ammonite::smallestAngleDelta(nextNode.horizontalAngle, currentNode.horizontalAngle);
-          const double verticalDelta =
-            ammonite::smallestAngleDelta(nextNode.verticalAngle, currentNode.verticalAngle);
-
-          //Apply the deltas
-          const double newHorizontal = currentNode.horizontalAngle + (horizontalDelta * nodeProgress);
-          const double newVertical = currentNode.verticalAngle + (verticalDelta * nodeProgress);
-
-          //Apply the new position and direction
-          ammonite::camera::setPosition(cameraPath.linkedCameraId, newPosition);
-          ammonite::camera::setAngle(cameraPath.linkedCameraId, newHorizontal, newVertical);
-        }
-      }
-
-      namespace {
-        void updatePathTime(AmmoniteId pathId, double timeDelta) {
-          Path& cameraPath = pathTrackerMap[pathId];
-          double newTime = cameraPath.currentTime + timeDelta;
-
-          //Don't modify the time if the path is paused
-          if (!cameraPath.isPathPlaying) {
-            return;
-          }
-
-          /*
-           - Handle time resets for looping paths
-           - This already updates the time if it changed, but set it again
-             to keep the code path simple
-          */
-          newTime = loopPathTime(cameraPath, newTime);
-
-          //Save the time
-          cameraPath.currentTime = newTime;
+          updatedPaths.clear();
         }
       }
 
@@ -308,6 +153,194 @@ namespace ammonite {
         for (auto& pathData : pathTrackerMap) {
           updatePathTime(pathData.first, frameTime);
         }
+      }
+
+      /*
+       - Call updateCameraForPath() with the path ID of the active camera
+       - If the active camera isn't on a path, do nothing
+      */
+      void updateActiveCameraOnPath() {
+        const AmmoniteId activeCameraId = camera::getActiveCamera();
+        const AmmoniteId pathId = camera::getLinkedPath(activeCameraId);
+        if (pathId != 0) {
+          updateCameraForPath(pathId);
+        }
+      }
+
+      /*
+       - Calculate the new position, direction and path state for the mode
+         - Write it to the linked camera
+         - This may modify the path time for looped paths
+       - This function will automatically be called during rendering, only if
+         it hasn't already been manually called for that frame
+       - Call this early if the camera's values need to be queried,
+         after path movements have been applied
+      */
+      void updateCameraForPath(AmmoniteId pathId) {
+        Path& cameraPath = pathTrackerMap[pathId];
+        const unsigned int nodeCount = cameraPath.pathNodes.size();
+        const double maxNodeTime = cameraPath.pathNodes[nodeCount - 1].time;
+
+        //Record that the camera was updated
+        updatedPaths.insert(pathId);
+
+        //Skip 0 length paths
+        if (nodeCount == 0) {
+          return;
+        }
+
+        /*
+         - Handle time resets for looping paths
+         - Generally, this would be handled by updatePathProgress(), but
+           the path mode may have changed since the call
+        */
+        const double currentTime = loopPathTime(cameraPath, cameraPath.currentTime);
+
+        //Check the node still exists
+        if (cameraPath.selectedIndex >= nodeCount) {
+          ammoniteInternalDebug << "Selected camera path node no longer exists, resetting" << std::endl;
+          cameraPath.selectedIndex = 0;
+        }
+
+        //Find the last reached node
+        unsigned int selectedIndex = cameraPath.selectedIndex;
+        while (true) {
+          //Select the next node, according to the mode
+          unsigned int nextSelectedIndex = 0;
+          bool isLastNode = false;
+          switch (cameraPath.pathMode) {
+          case AMMONITE_PATH_FORWARD:
+          case AMMONITE_PATH_REVERSE:
+            nextSelectedIndex = selectedIndex + 1;
+            if (nextSelectedIndex >= nodeCount) {
+              isLastNode = true;
+            }
+            break;
+          case AMMONITE_PATH_LOOP:
+            nextSelectedIndex = (selectedIndex + 1) % nodeCount;
+            break;
+          }
+
+          //No more nodes to try for linear modes
+          if (isLastNode) {
+            break;
+          }
+
+          //Use corresponding index from the other end in reverse mode
+          unsigned int realNextIndex = nextSelectedIndex;
+          if (cameraPath.pathMode == AMMONITE_PATH_REVERSE) {
+            realNextIndex = nodeCount - (nextSelectedIndex + 1);
+          }
+
+          //Determine the node's time
+          const PathNode& nextNode = cameraPath.pathNodes[realNextIndex];
+
+          //Find the time this node occurs at
+          double nodeTime = 0.0;
+          switch (cameraPath.pathMode) {
+          case AMMONITE_PATH_FORWARD:
+          case AMMONITE_PATH_LOOP:
+            nodeTime = nextNode.time;
+            break;
+          case AMMONITE_PATH_REVERSE:
+            //Subtract the node time from the final node's time
+            nodeTime = maxNodeTime - nextNode.time;
+            break;
+          }
+
+          //Store the new index or break
+          if (nodeTime <= currentTime) {
+            //Node has been reached, try the next
+            selectedIndex = nextSelectedIndex;
+          } else {
+            //Node hasn't been reached yet
+            break;
+          }
+        }
+
+        //Use corresponding index from the other end in reverse mode
+        unsigned int realSelectedIndex = selectedIndex;
+        if (cameraPath.pathMode == AMMONITE_PATH_REVERSE) {
+          realSelectedIndex = nodeCount - (selectedIndex + 1);
+        }
+
+        //Store the selected index and fetch the node
+        cameraPath.selectedIndex = selectedIndex;
+        const PathNode& currentNode = cameraPath.pathNodes[realSelectedIndex];
+
+        //Select the next node and detect the end
+        bool isEnd = false;
+        unsigned int nextIndex = 0;
+        switch (cameraPath.pathMode) {
+        case AMMONITE_PATH_FORWARD:
+        case AMMONITE_PATH_REVERSE:
+          nextIndex = selectedIndex + 1;
+          isEnd = (nextIndex >= nodeCount);
+          break;
+        case AMMONITE_PATH_LOOP:
+          nextIndex = (selectedIndex + 1) % nodeCount;
+          break;
+        }
+
+        //Reuse the current node if the next node is past the end
+        nextIndex = isEnd ? selectedIndex : nextIndex;
+
+        //Use corresponding index from the other end in reverse mode
+        unsigned int realNextIndex = nextIndex;
+        if (cameraPath.pathMode == AMMONITE_PATH_REVERSE) {
+          realNextIndex = nodeCount - (nextIndex + 1);
+        }
+
+        //Fetch the next node
+        const PathNode& nextNode = cameraPath.pathNodes[realNextIndex];
+
+        //Find the node time delta and the time between now and the current node
+        double nodeTimeDelta = 0.0;
+        double timeDelta = 0.0;
+        if (cameraPath.pathMode != AMMONITE_PATH_REVERSE) {
+          nodeTimeDelta = nextNode.time - currentNode.time;
+          timeDelta = currentTime - currentNode.time;
+        } else {
+          nodeTimeDelta = currentNode.time - nextNode.time;
+          timeDelta = currentNode.time - (maxNodeTime - currentTime);
+        }
+
+        //Override time deltas for loop end
+        if (cameraPath.pathMode == AMMONITE_PATH_LOOP) {
+          if (nextIndex == 0) {
+            nodeTimeDelta = 0.0;
+            timeDelta = 0.0;
+          }
+        }
+
+        //Find the progress between the nodes
+        double nodeProgress = 0.0;
+        if (nodeTimeDelta != 0.0) {
+          nodeProgress = timeDelta / nodeTimeDelta;
+        }
+
+        //Find vector between the nodes
+        ammonite::Vec<float, 3> nodePositionDelta;
+        ammonite::sub(nextNode.position, currentNode.position, nodePositionDelta);
+
+        //Find position between the nodes along the vector
+        ammonite::Vec<float, 3> newPosition;
+        ammonite::scale(nodePositionDelta, (float)nodeProgress, newPosition);
+        ammonite::add(newPosition, currentNode.position);
+
+        //Find smallest delta between node angles
+        const double horizontalDelta =
+          ammonite::smallestAngleDelta(nextNode.horizontalAngle, currentNode.horizontalAngle);
+        const double verticalDelta =
+          ammonite::smallestAngleDelta(nextNode.verticalAngle, currentNode.verticalAngle);
+
+        //Apply the deltas
+        const double newHorizontal = currentNode.horizontalAngle + (horizontalDelta * nodeProgress);
+        const double newVertical = currentNode.verticalAngle + (verticalDelta * nodeProgress);
+
+        //Apply the new position and direction
+        ammonite::camera::setPosition(cameraPath.linkedCameraId, newPosition);
+        ammonite::camera::setAngle(cameraPath.linkedCameraId, newHorizontal, newVertical);
       }
 
       //Create a new camera, reserving 'size' nodes

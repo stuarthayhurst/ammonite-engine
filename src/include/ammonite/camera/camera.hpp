@@ -41,6 +41,8 @@ namespace AMMONITE_EXPOSED ammonite {
       void reserveCameraPath(AmmoniteId pathId, unsigned int size);
 
       void updatePathProgress();
+      void updateCameraForPath(AmmoniteId pathId);
+      void updateActiveCameraOnPath();
 
       unsigned int addPathNode(AmmoniteId pathId,
                                const ammonite::Vec<float, 3>& position,
