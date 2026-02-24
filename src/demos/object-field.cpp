@@ -357,7 +357,7 @@ namespace objectFieldDemo {
       //Snapshot the time, reset timer if it has overrun
       float orbitTime = (float)lightData[i].orbitTimer.getTime();
       if (orbitTime >= lightData[i].orbitPeriod) {
-        orbitTime -= lightData[i].orbitPeriod;
+        orbitTime = std::fmod(orbitTime, lightData[i].orbitPeriod);
         lightData[i].orbitTimer.setTime(orbitTime);
       }
 
