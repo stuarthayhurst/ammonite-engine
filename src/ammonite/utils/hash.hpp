@@ -5,9 +5,9 @@
 
 #include "../visibility.hpp"
 
-namespace ammonite {
+namespace AMMONITE_INTERNAL ammonite {
   namespace utils {
-    namespace AMMONITE_INTERNAL internal {
+    namespace internal {
       std::string hashStrings(const std::string* inputs, unsigned int inputCount);
     }
   }

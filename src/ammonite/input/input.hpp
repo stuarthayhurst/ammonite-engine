@@ -15,9 +15,9 @@ extern "C" {
 //Include public interface
 #include "../../include/ammonite/input/input.hpp" // IWYU pragma: export
 
-namespace ammonite {
+namespace AMMONITE_INTERNAL ammonite {
   namespace input {
-    namespace AMMONITE_INTERNAL internal {
+    namespace internal {
       struct KeycodeStatePair {
         AmmoniteKeycode keycode;
         KeyStateEnum state;

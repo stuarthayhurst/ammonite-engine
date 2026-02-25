@@ -5,9 +5,9 @@
 
 #include "../visibility.hpp"
 
-namespace ammonite {
+namespace AMMONITE_INTERNAL ammonite {
   namespace models {
-    namespace AMMONITE_INTERNAL internal {
+    namespace internal {
       //Calculate matrices from position, scale and rotation
       void calcModelMatrices(PositionData* positionData);
     }

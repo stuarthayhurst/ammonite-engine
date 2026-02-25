@@ -8,9 +8,9 @@
 //Include public interface
 #include "../../include/ammonite/utils/id.hpp" // IWYU pragma: export
 
-namespace ammonite {
+namespace AMMONITE_INTERNAL ammonite {
   namespace utils {
-    namespace AMMONITE_INTERNAL internal {
+    namespace internal {
       /*
        - Find the next unused ID in tracker, starting with lastId + 1
        - Write the result back to lastId, and return it

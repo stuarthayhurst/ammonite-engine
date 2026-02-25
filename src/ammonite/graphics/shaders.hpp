@@ -9,9 +9,9 @@ extern "C" {
 
 #include "../visibility.hpp"
 
-namespace ammonite {
+namespace AMMONITE_INTERNAL ammonite {
   namespace renderer {
-    namespace AMMONITE_INTERNAL internal {
+    namespace internal {
       class Shader {
       protected:
         GLuint shaderId = 0;

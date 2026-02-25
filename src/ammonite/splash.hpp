@@ -8,9 +8,9 @@
 //Include public interface
 #include "../include/ammonite/splash.hpp" // IWYU pragma: export
 
-namespace ammonite {
+namespace AMMONITE_INTERNAL ammonite {
   namespace splash {
-    namespace AMMONITE_INTERNAL internal {
+    namespace internal {
       struct SplashScreen {
         float progress = 0.0f;
         float width = 0.85f;

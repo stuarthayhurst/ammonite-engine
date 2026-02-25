@@ -13,9 +13,9 @@ extern "C" {
 //Include public interface
 #include "../../include/ammonite/window/window.hpp" // IWYU pragma: export
 
-namespace ammonite {
+namespace AMMONITE_INTERNAL ammonite {
   namespace window {
-    namespace AMMONITE_INTERNAL internal {
+    namespace internal {
       struct ImageData {
         unsigned char* data;
         unsigned int width;

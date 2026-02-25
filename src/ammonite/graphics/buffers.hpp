@@ -6,9 +6,9 @@
 #include "../models/models.hpp"
 #include "../visibility.hpp"
 
-namespace ammonite {
+namespace AMMONITE_INTERNAL ammonite {
   namespace graphics {
-    namespace AMMONITE_INTERNAL internal {
+    namespace internal {
       void createModelBuffers(models::internal::ModelData* modelData,
                               std::vector<models::internal::RawMeshData>* rawMeshDataVec);
       void deleteModelBuffers(models::internal::ModelData* modelData);

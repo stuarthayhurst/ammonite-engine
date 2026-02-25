@@ -23,9 +23,9 @@ enum AMMONITE_INTERNAL ModelTypeEnum : unsigned char {
   AMMONITE_LIGHT_EMITTER = 1
 };
 
-namespace ammonite {
+namespace AMMONITE_INTERNAL ammonite {
   namespace models {
-    namespace AMMONITE_INTERNAL internal {
+    namespace internal {
       /*
        - Store information for each vertex and index in a single mesh
        - Only exists to be uploaded to the GPU

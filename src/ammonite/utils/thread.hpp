@@ -6,10 +6,10 @@
 //Include public interface
 #include "../../include/ammonite/utils/thread.hpp" // IWYU pragma: export
 
-namespace ammonite {
+namespace AMMONITE_INTERNAL ammonite {
   namespace utils {
     namespace thread {
-      namespace AMMONITE_INTERNAL internal {
+      namespace internal {
         unsigned int getHardwareThreadCount();
         unsigned int getThreadPoolSize();
 

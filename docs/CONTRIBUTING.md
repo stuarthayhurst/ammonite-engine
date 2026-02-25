@@ -80,5 +80,6 @@
     - Internal headers at a higher level than the current file
     - For headers, the header with the corresponding public interface
   - Within each category the headers should be ordered alphabetically
-  - Any internal symbols should be placed in a `namespace AMMONITE_INTERNAL internal {}`
-  - Any exposed symbols should be placed in a `namespace AMMONITE_EXPOSED ... {}`
+  - Any internal symbols should be placed in a `namespace AMMONITE_INTERNAL ammonite {}`
+    - Symbol declarations should happen inside a nested `namespace internal {}`
+  - Any exposed symbols should be placed in a `namespace AMMONITE_EXPOSED ammonite {}`

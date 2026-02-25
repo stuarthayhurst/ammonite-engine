@@ -7,9 +7,9 @@
 #include "../modelTypes.hpp"
 #include "../../visibility.hpp"
 
-namespace ammonite {
+namespace AMMONITE_INTERNAL ammonite {
   namespace models {
-    namespace AMMONITE_INTERNAL internal {
+    namespace internal {
       //Model loaders
       bool loadFileObject(ModelData* modelData,
                           std::vector<RawMeshData>* rawMeshDataVec,

@@ -13,9 +13,9 @@
 //Include public interface
 #include "../../include/ammonite/models/models.hpp" // IWYU pragma: export
 
-namespace ammonite {
+namespace AMMONITE_INTERNAL ammonite {
   namespace models {
-    namespace AMMONITE_INTERNAL internal {
+    namespace internal {
       //Model info retrieval
       unsigned int getModelCount(ModelTypeEnum modelType);
       void getModels(ModelTypeEnum modelType, unsigned int modelCount,

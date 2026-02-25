@@ -13,10 +13,10 @@ extern "C" {
 //Include public interface
 #include "../../include/ammonite/graphics/renderer.hpp" // IWYU pragma: export
 
-namespace ammonite {
+namespace AMMONITE_INTERNAL ammonite {
   namespace renderer {
     namespace setup {
-      namespace AMMONITE_INTERNAL internal {
+      namespace internal {
         bool checkGPUCapabilities(unsigned int* failureCount);
         bool createShaders(const std::string& shaderPath);
         void setupOpenGLObjects();
@@ -26,7 +26,7 @@ namespace ammonite {
       }
     }
 
-    namespace AMMONITE_INTERNAL internal {
+    namespace internal {
       void internalDrawFrame();
       void internalDrawSplashScreen(AmmoniteId splashScreenId);
 

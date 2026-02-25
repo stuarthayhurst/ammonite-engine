@@ -8,9 +8,9 @@
 //Include public interface
 #include "../../include/ammonite/camera/camera.hpp" // IWYU pragma: export
 
-namespace ammonite {
+namespace AMMONITE_INTERNAL ammonite {
   namespace camera {
-    namespace AMMONITE_INTERNAL internal {
+    namespace internal {
       ammonite::Mat<float, 4>* getViewMatrixPtr();
       ammonite::Mat<float, 4>* getProjectionMatrixPtr();
       void updateMatrices();
@@ -20,7 +20,7 @@ namespace ammonite {
     }
 
     namespace path {
-      namespace AMMONITE_INTERNAL internal {
+      namespace internal {
         bool setLinkedCamera(AmmoniteId pathId, AmmoniteId cameraId,
                              bool unlinkExisting);
 

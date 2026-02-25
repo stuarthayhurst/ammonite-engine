@@ -9,9 +9,9 @@
 #include "../utils/id.hpp"
 #include "../visibility.hpp"
 
-namespace ammonite {
+namespace AMMONITE_INTERNAL ammonite {
   namespace models {
-    namespace AMMONITE_INTERNAL internal {
+    namespace internal {
       //Model data storage management
       ModelData* addModelData(const ModelLoadInfo& modelLoadInfo,
                               AmmoniteId modelId);

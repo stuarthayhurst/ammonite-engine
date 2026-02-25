@@ -12,9 +12,9 @@ extern "C" {
 //Include public interface
 #include "../../include/ammonite/lighting/lighting.hpp" // IWYU pragma: export
 
-namespace ammonite {
+namespace AMMONITE_INTERNAL ammonite {
   namespace lighting {
-    namespace AMMONITE_INTERNAL internal {
+    namespace internal {
       struct LightSource {
         ammonite::Vec<float, 3> geometry = {0.0f, 0.0f, 0.0f};
         ammonite::Vec<float, 3> diffuse = {1.0f, 1.0f, 1.0f};
