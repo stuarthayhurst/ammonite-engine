@@ -60,6 +60,7 @@
     - It'll also enable graphics API debug warnings, messages and errors
       - This will use a debug graphics context, if available
     - Each object is compiled with debugging symbols, and `strip` is skipped
+      - `-Og` is used as the optimisation level
   - Run `make clean` whenever swapping between regular and debug builds
   - `DEBUG=true make ...` can be used on any target, and only rebuilds changed objects
     - If an initial `make clean` isn't used, the build may fail or produce broken results

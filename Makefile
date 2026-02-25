@@ -49,7 +49,7 @@ ROOT_OBJECTS = $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.o,$(ROOT_OBJECTS_SOURCE
 
 #Global arguments
 CXXFLAGS += -Wall -Wextra -Werror -Wpedantic -std=c++23
-CXXFLAGS += -fno-math-errno -flto=auto -O3
+CXXFLAGS += -fno-math-errno -flto=auto
 
 ifndef ARCH
   CXXFLAGS += -march=native
@@ -68,7 +68,7 @@ endif
 
 
 ifeq ($(DEBUG),true)
-  CXXFLAGS += -DAMMONITE_DEBUG -g -fno-omit-frame-pointer
+  CXXFLAGS += -DAMMONITE_DEBUG -g -Og -fno-omit-frame-pointer
 
   #Enable ASan and UBSan by default in debug mode if nothing incompatible is enabled
   ifeq (,$(filter true,$(CHECK_THREADS) $(CHECK_TYPES) $(CHECK_MEMORY)))
@@ -79,6 +79,8 @@ ifeq ($(DEBUG),true)
       CHECK_UNDEFINED = true
     endif
   endif
+else
+  CXXFLAGS += -O3
 endif
 
 ifeq ($(CHECK_ADDRESS),true)
