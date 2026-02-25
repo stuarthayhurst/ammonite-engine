@@ -149,6 +149,7 @@ namespace ammonite {
       /*
        - Update the time for all registered paths
        - Only call this once per frame
+         - Calling beginFrame() at the start of each frame will handle this
       */
       void updatePathProgress() {
         //Get the time since the last frame
