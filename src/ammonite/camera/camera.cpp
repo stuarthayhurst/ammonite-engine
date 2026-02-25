@@ -315,6 +315,10 @@ namespace ammonite {
       return cameraTrackerMap[cameraId].linkedCameraPathId;
     }
 
+    bool isCameraLinked(AmmoniteId cameraId) {
+      return (getLinkedPath(cameraId) != 0);
+    }
+
     void removeLinkedPath(AmmoniteId cameraId) {
       //Check the camera exists
       if (!cameraTrackerMap.contains(cameraId)) {
