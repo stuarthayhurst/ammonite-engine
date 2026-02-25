@@ -123,6 +123,11 @@ namespace ammonite {
             }
           }
 
+          //If the path was marked as updated, forget it
+          if (updatedPaths.contains(pathId)) {
+            updatedPaths.erase(pathId);
+          }
+
           //Set the camera on the path
           pathTrackerMap[pathId].linkedCameraId = cameraId;
           return true;
