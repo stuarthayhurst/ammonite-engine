@@ -434,6 +434,13 @@ int main(int argc, char** argv) noexcept(false) {
       secondTimer.reset();
     }
 
+    //Disable manual camera input when following a path
+    if (ammonite::camera::isCameraLinked(ammonite::camera::getActiveCamera())) {
+      ammonite::controls::setCameraActive(false, true);
+    } else {
+      ammonite::controls::setCameraActive(true);
+    }
+
     //Process new input since last frame
     ammonite::input::updateInput();
 
