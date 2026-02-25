@@ -24,7 +24,7 @@ namespace ammonite {
         bool setLinkedCamera(AmmoniteId pathId, AmmoniteId cameraId,
                              bool unlinkExisting);
 
-        void updateCamera(AmmoniteId pathId);
+        void ensureCameraUpdatedForPath(AmmoniteId pathId);
       }
     }
   }

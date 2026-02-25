@@ -47,10 +47,11 @@ namespace ammonite {
         //Get the active camera
         Camera* const activeCamera = &cameraTrackerMap[activeCameraId];
 
-        //If the camera is on a path, update it
-        if (activeCamera->linkedCameraPathId != 0) {
-          ammonite::camera::path::internal::updateCamera(activeCamera->linkedCameraPathId);
-        }
+        /*
+         - If the camera is on a path, update it if the user hasn't
+         - If the camera isn't on a path, clear the cached set of updated cameras
+        */
+        camera::path::internal::ensureCameraUpdatedForPath(activeCamera->linkedCameraPathId);
 
         //Calculate the direction vector
         ammonite::Vec<float, 3> direction = {0};

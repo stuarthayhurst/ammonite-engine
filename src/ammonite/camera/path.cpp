@@ -135,13 +135,24 @@ namespace ammonite {
 
         /*
          - Update the camera for the path, if it hasn't been done manually
+         - Calling this with 0 will clear the updated paths
+           - This avoids caches from the last time a path was used causing
+             the first frame of the path to be skipped
          - Called once per frame
         */
-        void updateCamera(AmmoniteId pathId) {
+        void ensureCameraUpdatedForPath(AmmoniteId pathId) {
+          //Clear the caches
+          if (pathId == 0) {
+            updatedPaths.clear();
+            return;
+          }
+
+          //Update the linked camera's values if it hasn't already been done
           if (!updatedPaths.contains(pathId)) {
             ammonite::camera::path::updateCameraForPath(pathId);
           }
 
+          //Forget the paths with an updated camera
           updatedPaths.clear();
         }
       }
@@ -150,6 +161,7 @@ namespace ammonite {
        - Update the time for all registered paths
        - Only call this once per frame
          - Calling beginFrame() at the start of each frame will handle this
+       - This must be called by something if camera paths are being used
       */
       void updatePathProgress() {
         //Get the time since the last frame
@@ -164,6 +176,7 @@ namespace ammonite {
       /*
        - Call updateCameraForPath() with the path ID of the active camera
        - If the active camera isn't on a path, do nothing
+       - Calling beginFrame() will also handle this
       */
       void updateActiveCameraOnPath() {
         const AmmoniteId activeCameraId = camera::getActiveCamera();
@@ -174,13 +187,13 @@ namespace ammonite {
       }
 
       /*
-       - Calculate the new position, direction and path state for the mode
-         - Write it to the linked camera
+       - Move the camera linked with the path to its new position and direction
+       - Calculate its new path state and store it
          - This may modify the path time for looped paths
-       - This function will automatically be called during rendering, only if
-         it hasn't already been manually called for that frame
-       - Call this early if the camera's values need to be queried,
-         after path movements have been applied
+       - This will be automatically called when rendering, if it hasn't already
+         been called manually for that frame
+       - Call this manually if the camera's values need updating before the
+         frame is drawn
       */
       void updateCameraForPath(AmmoniteId pathId) {
         Path& cameraPath = pathTrackerMap[pathId];
