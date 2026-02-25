@@ -83,7 +83,7 @@ namespace {
 //Callbacks and definitions
 namespace {
   struct CameraData {
-    int cameraIndex;
+    unsigned int cameraIndex;
     std::vector<AmmoniteId> cameraIds;
   };
 
@@ -120,7 +120,7 @@ namespace {
 
   void cameraCycleCallback(const std::vector<AmmoniteKeycode>&, KeyStateEnum, void* userPtr) {
     CameraData* const cameraData = (CameraData*)userPtr;
-    cameraData->cameraIndex = (int)((cameraData->cameraIndex + 1) % cameraData->cameraIds.size());
+    cameraData->cameraIndex = (cameraData->cameraIndex + 1) % cameraData->cameraIds.size();
     ammonite::camera::setActiveCamera(cameraData->cameraIds[cameraData->cameraIndex]);
   }
 
