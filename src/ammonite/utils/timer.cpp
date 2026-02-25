@@ -7,16 +7,16 @@ namespace ammonite {
   namespace utils {
     //Creates a new, running timer
     Timer::Timer() {
-      startTime = std::chrono::steady_clock::now();
-      setOffset = std::chrono::seconds(0);
-      pauseOffset = std::chrono::seconds(0);
+      this->startTime = std::chrono::steady_clock::now();
+      this->setOffset = std::chrono::seconds(0);
+      this->pauseOffset = std::chrono::seconds(0);
     }
 
     //Creates a new, optionally running timer
     Timer::Timer(bool startRunning) {
-      startTime = std::chrono::steady_clock::now();
-      setOffset = std::chrono::seconds(0);
-      pauseOffset = std::chrono::seconds(0);
+      this->startTime = std::chrono::steady_clock::now();
+      this->setOffset = std::chrono::seconds(0);
+      this->pauseOffset = std::chrono::seconds(0);
 
       if (!startRunning) {
         this->pause();
@@ -28,7 +28,7 @@ namespace ammonite {
     void Timer::getTime(std::time_t* seconds, std::time_t* nanoseconds) const {
       std::chrono::time_point<std::chrono::steady_clock> now;
 
-      if (timerRunning) {
+      if (this->timerRunning) {
         now = std::chrono::steady_clock::now();
       } else {
         now = stopTime;
@@ -40,7 +40,7 @@ namespace ammonite {
        - Apply a negative offset to handle paused durations
          - This offset can't grow faster than stopTime or real time
       */
-      auto deltaTime = (now - startTime) + setOffset - pauseOffset;
+      auto deltaTime = (now - this->startTime) + this->setOffset - this->pauseOffset;
 
       //Convert the time to seconds and nanoseconds
       const auto deltaTimeSeconds = std::chrono::duration_cast<std::chrono::seconds>(deltaTime);
@@ -58,7 +58,7 @@ namespace ammonite {
       std::time_t nanoseconds = 0;
 
       //Get the time and convert it to a double
-      getTime(&seconds, &nanoseconds);
+      this->getTime(&seconds, &nanoseconds);
       return (double)seconds + ((double)nanoseconds / 1000000000.0);
     }
 
@@ -67,16 +67,16 @@ namespace ammonite {
       const std::chrono::time_point<std::chrono::steady_clock> now = std::chrono::steady_clock::now();
 
       //Pretend the timer was just stopped right now
-      if (!timerRunning) {
-        stopTime = now;
+      if (!this->timerRunning) {
+        this->stopTime = now;
       }
 
       //Pretend the timer was just started right now
-      startTime = now;
+      this->startTime = now;
 
       //Apply the target time as a positive offset
-      setOffset = std::chrono::seconds(seconds) + std::chrono::nanoseconds(nanoseconds);
-      pauseOffset = std::chrono::seconds(0);
+      this->setOffset = std::chrono::seconds(seconds) + std::chrono::nanoseconds(nanoseconds);
+      this->pauseOffset = std::chrono::seconds(0);
     }
 
     //Set the active time on the timer, without changing pause state
@@ -85,39 +85,39 @@ namespace ammonite {
       const std::time_t nanoseconds = (std::time_t)((newTime - (double)seconds) * 1000000000.0);
 
       //Set the time using seconds and nanoseconds
-      setTime(seconds, nanoseconds);
+      this->setTime(seconds, nanoseconds);
     }
 
     //Returns whether the timer is running or not
     bool Timer::isRunning() const {
-      return timerRunning;
+      return this->timerRunning;
     }
 
     //Reset the active time to 0, without changing pause state
     void Timer::reset() {
-      setTime(0, 0);
+      this->setTime(0, 0);
     }
 
     //Pause the timer
     void Timer::pause() {
-      if (!timerRunning) {
+      if (!this->timerRunning) {
         return;
       }
 
       //Record the time it stopped
-      stopTime = std::chrono::steady_clock::now();
-      timerRunning = false;
+      this->stopTime = std::chrono::steady_clock::now();
+      this->timerRunning = false;
     }
 
     //Unpause the timer
     void Timer::unpause() {
-      if (timerRunning) {
+      if (this->timerRunning) {
         return;
       }
 
       //Record the length of time it was paused for
-      pauseOffset += std::chrono::steady_clock::now() - stopTime;
-      timerRunning = true;
+      this->pauseOffset += std::chrono::steady_clock::now() - this->stopTime;
+      this->timerRunning = true;
     }
   }
 }

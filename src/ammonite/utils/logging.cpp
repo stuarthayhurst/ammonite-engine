@@ -21,19 +21,19 @@ namespace ammonite {
     OutputHelper& OutputHelper::operator << (std::ostream& (*newStream)(std::ostream&)) {
       //Safely output the prefix, buffered string and new line
       outputLock.lock();
-      outputStream << prefix << storageStream.str() << newStream;
+      this->outputStream << this->prefix << this->storageStream.str() << newStream;
       outputLock.unlock();
 
       //Clear the storage
-      storageStream.clear();
-      storageStream.str(std::string());
+      this->storageStream.clear();
+      this->storageStream.str(std::string());
 
       return *this;
     }
 
     void OutputHelper::printEmptyLine() {
       outputLock.lock();
-      outputStream << std::endl;
+      this->outputStream << std::endl;
       outputLock.unlock();
     }
 

@@ -12,72 +12,72 @@ namespace ammonite {
   namespace renderer {
     namespace internal {
       bool Shader::loadShader(const std::string& shaderDirectory) {
-        shaderId = ammonite::shaders::internal::loadDirectory(shaderDirectory);
-        if (shaderId == 0) {
+        this->shaderId = ammonite::shaders::internal::loadDirectory(shaderDirectory);
+        if (this->shaderId == 0) {
           return false;
         }
 
-        setUniformLocations();
+        this->setUniformLocations();
         return true;
       }
 
       void Shader::destroyShader() {
-        if (shaderId != 0) {
-          glDeleteProgram(shaderId);
-          shaderId = 0;
+        if (this->shaderId != 0) {
+          glDeleteProgram(this->shaderId);
+          this->shaderId = 0;
         }
       }
 
       void Shader::useShader() const {
-        glUseProgram(shaderId);
+        glUseProgram(this->shaderId);
       }
 
       void ModelShader::setUniformLocations() {
-        matrixId = glGetUniformLocation(shaderId, "MVP");
-        modelMatrixId = glGetUniformLocation(shaderId, "modelMatrix");
-        normalMatrixId = glGetUniformLocation(shaderId, "normalMatrix");
-        ambientLightId = glGetUniformLocation(shaderId, "ambientLight");
-        cameraPosId = glGetUniformLocation(shaderId, "cameraPos");
-        shadowFarPlaneId = glGetUniformLocation(shaderId, "shadowFarPlane");
-        lightCountId = glGetUniformLocation(shaderId, "lightCount");
-        diffuseSamplerId = glGetUniformLocation(shaderId, "diffuseSampler");
-        specularSamplerId = glGetUniformLocation(shaderId, "specularSampler");
-        shadowCubeMapId = glGetUniformLocation(shaderId, "shadowCubeMap");
+        this->matrixId = glGetUniformLocation(this->shaderId, "MVP");
+        this->modelMatrixId = glGetUniformLocation(this->shaderId, "modelMatrix");
+        this->normalMatrixId = glGetUniformLocation(this->shaderId, "normalMatrix");
+        this->ambientLightId = glGetUniformLocation(this->shaderId, "ambientLight");
+        this->cameraPosId = glGetUniformLocation(this->shaderId, "cameraPos");
+        this->shadowFarPlaneId = glGetUniformLocation(this->shaderId, "shadowFarPlane");
+        this->lightCountId = glGetUniformLocation(this->shaderId, "lightCount");
+        this->diffuseSamplerId = glGetUniformLocation(this->shaderId, "diffuseSampler");
+        this->specularSamplerId = glGetUniformLocation(this->shaderId, "specularSampler");
+        this->shadowCubeMapId = glGetUniformLocation(this->shaderId, "shadowCubeMap");
       }
 
       void LightShader::setUniformLocations() {
-        lightMatrixId = glGetUniformLocation(shaderId, "MVP");
-        lightIndexId = glGetUniformLocation(shaderId, "lightIndex");
+        this->lightMatrixId = glGetUniformLocation(this->shaderId, "MVP");
+        this->lightIndexId = glGetUniformLocation(this->shaderId, "lightIndex");
       }
 
       void DepthShader::setUniformLocations() {
-        modelMatrixId = glGetUniformLocation(shaderId, "modelMatrix");
-        shadowFarPlaneId = glGetUniformLocation(shaderId, "shadowFarPlane");
-        shadowMatrixId = glGetUniformLocation(shaderId, "shadowMatrices");
-        depthShadowIndexId = glGetUniformLocation(shaderId, "shadowMapIndex");
+        this->modelMatrixId = glGetUniformLocation(this->shaderId, "modelMatrix");
+        this->shadowFarPlaneId = glGetUniformLocation(this->shaderId, "shadowFarPlane");
+        this->shadowMatrixId = glGetUniformLocation(this->shaderId, "shadowMatrices");
+        this->depthShadowIndexId = glGetUniformLocation(this->shaderId, "shadowMapIndex");
       }
 
       void SkyboxShader::setUniformLocations() {
-        viewMatrixId = glGetUniformLocation(shaderId, "viewMatrix");
-        projectionMatrixId = glGetUniformLocation(shaderId, "projectionMatrix");
-        skyboxSamplerId = glGetUniformLocation(shaderId, "skyboxSampler");
+        this->viewMatrixId = glGetUniformLocation(this->shaderId, "viewMatrix");
+        this->projectionMatrixId = glGetUniformLocation(this->shaderId, "projectionMatrix");
+        this->skyboxSamplerId = glGetUniformLocation(this->shaderId, "skyboxSampler");
       }
 
       void ScreenShader::setUniformLocations() {
-        screenSamplerId = glGetUniformLocation(shaderId, "screenSampler");
-        depthSamplerId = glGetUniformLocation(shaderId, "depthSampler");
-        focalDepthId = glGetUniformLocation(shaderId, "focalDepth");
-        focalDepthEnabledId = glGetUniformLocation(shaderId, "focalDepthEnabled");
-        blurStrengthId = glGetUniformLocation(shaderId, "blurStrength");
-        farPlaneId = glGetUniformLocation(shaderId, "farPlane");
+        this->screenSamplerId = glGetUniformLocation(this->shaderId, "screenSampler");
+        this->depthSamplerId = glGetUniformLocation(this->shaderId, "depthSampler");
+        this->focalDepthId = glGetUniformLocation(this->shaderId, "focalDepth");
+        this->focalDepthEnabledId = glGetUniformLocation(this->shaderId, "focalDepthEnabled");
+        this->blurStrengthId = glGetUniformLocation(this->shaderId, "blurStrength");
+        this->farPlaneId = glGetUniformLocation(this->shaderId, "farPlane");
       }
 
       void SplashShader::setUniformLocations() {
-        progressId = glGetUniformLocation(shaderId, "progress");
-        widthId = glGetUniformLocation(shaderId, "width");
-        heightId = glGetUniformLocation(shaderId, "height");
-        heightOffsetId = glGetUniformLocation(shaderId, "heightOffset");
-        progressColourId = glGetUniformLocation(shaderId, "progressColour");
+        this->progressId = glGetUniformLocation(this->shaderId, "progress");
+        this->widthId = glGetUniformLocation(this->shaderId, "width");
+        this->heightId = glGetUniformLocation(this->shaderId, "height");
+        this->heightOffsetId = glGetUniformLocation(this->shaderId, "heightOffset");
+        this->progressColourId = glGetUniformLocation(this->shaderId, "progressColour");
       }
     }
   }

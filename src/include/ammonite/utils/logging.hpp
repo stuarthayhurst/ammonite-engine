@@ -49,7 +49,7 @@ namespace AMMONITE_EXPOSED ammonite {
     };
 
     template<typename T> OutputHelper& OutputHelper::operator << (T&& input) {
-      storageStream << std::forward<T>(input);
+      this->storageStream << std::forward<T>(input);
       return *this;
     }
 
