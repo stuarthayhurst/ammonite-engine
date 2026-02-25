@@ -125,6 +125,7 @@ namespace ammonite {
       AmmoniteId keybindIds[6] = {0};
 
       bool isCameraActive = true;
+      bool isZoomActive = true;
     }
 
     //Keyboard control callbacks
@@ -216,7 +217,7 @@ namespace ammonite {
 
       //Reset field of view on middle click
       void zoomResetCallback(AmmoniteButton button, KeyStateEnum action, void*) {
-        if (isCameraActive) {
+        if (isZoomActive) {
           if (button == AMMONITE_MOUSE_BUTTON_MIDDLE && action == AMMONITE_PRESSED) {
             ammonite::camera::setFieldOfView(ammonite::camera::getActiveCamera(),
                                              ammonite::pi<float> / 4.0f);
@@ -243,12 +244,27 @@ namespace ammonite {
       }
     }
 
+    //Enable / disable camera position, direction and zoom
     void setCameraActive(bool active) {
       isCameraActive = active;
+      isZoomActive = active;
+    }
+
+    /*
+     - Enable / disable camera position, direction and zoom
+     - Give separate control over zoom
+    */
+    void setCameraActive(bool active, bool allowZoom) {
+      isCameraActive = active;
+      isZoomActive = allowZoom;
     }
 
     bool getCameraActive() {
       return isCameraActive;
+    }
+
+    bool getZoomActive() {
+      return isZoomActive;
     }
 
     void setupFreeCamera(AmmoniteKeycode forwardKey, AmmoniteKeycode backKey,

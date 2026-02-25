@@ -29,7 +29,9 @@ namespace AMMONITE_EXPOSED ammonite {
     void releaseFreeCamera();
 
     void setCameraActive(bool active);
+    void setCameraActive(bool active, bool allowZoom);
     bool getCameraActive();
+    bool getZoomActive();
   }
 }
 
