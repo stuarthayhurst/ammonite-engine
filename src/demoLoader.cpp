@@ -122,6 +122,12 @@ namespace {
     CameraData* const cameraData = (CameraData*)userPtr;
     cameraData->cameraIndex = (cameraData->cameraIndex + 1) % cameraData->cameraIds.size();
     ammonite::camera::setActiveCamera(cameraData->cameraIds[cameraData->cameraIndex]);
+
+    /*
+     - The engine will automatically update the active camera for its path
+     - Call it early to avoid keeping outdated camera values around
+    */
+    ammonite::camera::path::updateActiveCameraOnPath();
   }
 
   void pathRecordToggleCallback(const std::vector<AmmoniteKeycode>&,
