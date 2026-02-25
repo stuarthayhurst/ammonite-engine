@@ -68,7 +68,7 @@ namespace placement {
       }
 
       //Handle zoom reset logic
-      if (ammonite::controls::getCameraActive()) {
+      if (ammonite::controls::getZoomActive()) {
         if (button == AMMONITE_MOUSE_BUTTON_MIDDLE && action == AMMONITE_PRESSED) {
           if (modelPlacementModeEnabled) {
             resetPlacementDistance();
@@ -90,7 +90,7 @@ namespace placement {
       }
 
       //Handle usual zoom logic
-      if (ammonite::controls::getCameraActive()) {
+      if (ammonite::controls::getZoomActive()) {
         const AmmoniteId activeCameraId = ammonite::camera::getActiveCamera();
         const float fov = ammonite::camera::getFieldOfView(activeCameraId);
 

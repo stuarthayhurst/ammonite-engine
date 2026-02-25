@@ -204,7 +204,7 @@ namespace ammonite {
     namespace {
       //Increase / decrease field of view on scroll
       void scrollCallback(double, double yOffset, void*) {
-        if (isCameraActive) {
+        if (isZoomActive) {
           const AmmoniteId activeCameraId = ammonite::camera::getActiveCamera();
           const float fov = ammonite::camera::getFieldOfView(activeCameraId);
 
