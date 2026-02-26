@@ -26,10 +26,10 @@ jobs:
     - name: Install build dependencies
       run: |
         wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-        echo "deb http://apt.llvm.org/noble/ llvm-toolchain-noble-21 main" | sudo tee -a /etc/apt/sources.list
+        echo "deb http://apt.llvm.org/noble/ llvm-toolchain-noble-22 main" | sudo tee -a /etc/apt/sources.list
         sudo apt-get update
         sudo apt-get install --no-install-recommends make pkg-config build-essential
-        sudo apt-get install clang-tidy-21
+        sudo apt-get install clang-tidy-22
         sudo apt-get install --no-install-recommends libglm-dev libglfw3-dev libepoxy-dev libstb-dev libassimp-dev
 
     - name: Run the global linting target
