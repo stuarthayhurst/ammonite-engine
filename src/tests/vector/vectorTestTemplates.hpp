@@ -12,7 +12,7 @@
 
 #include "../support.hpp"
 
-namespace {
+namespace templates {
   template <typename T, unsigned int size> requires ammonite::validVector<T, size>
   bool testNamedVec() {
     ammonite::Vec<T, size> aVec = {0};
@@ -654,83 +654,83 @@ namespace tests {
     ammonite::utils::normal << "Testing " << size << "x " << typeName << " vectors" << std::endl;
 
     //Test NamedVec
-    if (!testNamedVec<T, size>()) {
+    if (!templates::testNamedVec<T, size>()) {
       return false;
     }
 
     //Test ammonite::data()
-    if (!testData<T, size>()) {
+    if (!templates::testData<T, size>()) {
       return false;
     }
 
     for (int i = 0; i < 10000; i++) {
       //Test ammonite::equal()
-      if (!testEqual<T, size>()) {
+      if (!templates::testEqual<T, size>()) {
         return false;
       }
 
       //Test ammonite::copy()
-      if (!testCopy<T, size>()) {
+      if (!templates::testCopy<T, size>()) {
         return false;
       }
 
       //Test ammonite::copyCast()
-      if (!testCopyCast<T, size>()) {
+      if (!templates::testCopyCast<T, size>()) {
         return false;
       }
 
       //Test ammonite::set()
-      if (!testSet<T, size>()) {
+      if (!templates::testSet<T, size>()) {
         return false;
       }
 
       //Test ammonite::add()
-      if (!testAdd<T, size>()) {
+      if (!templates::testAdd<T, size>()) {
         return false;
       }
 
       //Test ammonite::sub()
-      if (!testSub<T, size>()) {
+      if (!templates::testSub<T, size>()) {
         return false;
       }
 
       //Test ammonite::scale()
-      if (!testScale<T, size>()) {
+      if (!templates::testScale<T, size>()) {
         return false;
       }
 
       //Test ammonite::divide()
-      if (!testDivide<T, size>()) {
+      if (!templates::testDivide<T, size>()) {
         return false;
       }
 
       //Test ammonite::negate()
-      if (!testNegate<T, size>()) {
+      if (!templates::testNegate<T, size>()) {
         return false;
       }
 
       //Test ammonite::length()
-      if (!testLength<T, size>()) {
+      if (!templates::testLength<T, size>()) {
         return false;
       }
 
       //Test ammonite::normalise()
-      if (!testNormalise<T, size>()) {
+      if (!templates::testNormalise<T, size>()) {
         return false;
       }
 
       //Test ammonite::dot()
-      if (!testDot<T, size>()) {
+      if (!templates::testDot<T, size>()) {
         return false;
       }
 
       //Test ammonite::cross()
-      if (!testCross<T, size>()) {
+      if (!templates::testCross<T, size>()) {
         return false;
       }
 
       //Test ammonite::distance()
-      if (!testDistance<T, size>()) {
+      if (!templates::testDistance<T, size>()) {
         return false;
       }
     }

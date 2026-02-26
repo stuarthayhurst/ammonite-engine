@@ -11,7 +11,7 @@
 
 #include "../support.hpp"
 
-namespace {
+namespace templates {
   template <typename T, unsigned int cols, unsigned int rows>
             requires ammonite::validMatrix<T, cols, rows>
   bool testData() {
@@ -1056,95 +1056,95 @@ namespace tests {
                             << typeName << " matrices" << std::endl;
 
     //Test ammonite::data()
-    if (!testData<T, cols, rows>()) {
+    if (!templates::testData<T, cols, rows>()) {
       return false;
     }
 
     for (int i = 0; i < 10000; i++) {
       //Test ammonite::equal()
-      if (!testEqual<T, cols, rows>()) {
+      if (!templates::testEqual<T, cols, rows>()) {
         return false;
       }
 
       //Test ammonite::copy()
-      if (!testCopy<T, cols, rows>()) {
+      if (!templates::testCopy<T, cols, rows>()) {
         return false;
       }
 
       //Test ammonite::copyCast()
-      if (!testCopyCast<T, cols, rows>()) {
+      if (!templates::testCopyCast<T, cols, rows>()) {
         return false;
       }
 
       //Test ammonite::set()
-      if (!testSet<T, cols, rows>()) {
+      if (!templates::testSet<T, cols, rows>()) {
         return false;
       }
 
       //Test ammonite::diagonal() and ammonite::identity()
-      if (!testDiagonal<T, cols, rows>()) {
+      if (!templates::testDiagonal<T, cols, rows>()) {
         return false;
       }
 
       //Test ammonite::add()
-      if (!testAdd<T, cols, rows>()) {
+      if (!templates::testAdd<T, cols, rows>()) {
         return false;
       }
 
       //Test ammonite::sub()
-      if (!testSub<T, cols, rows>()) {
+      if (!templates::testSub<T, cols, rows>()) {
         return false;
       }
 
       //Test ammonite::transpose()
-      if (!testTranspose<T, cols, rows>()) {
+      if (!templates::testTranspose<T, cols, rows>()) {
         return false;
       }
 
       //Test ammonite::multiply()
-      if (!testMultiply<T, cols, rows, 2>()) {
+      if (!templates::testMultiply<T, cols, rows, 2>()) {
         return false;
       }
-      if (!testMultiply<T, cols, rows, 3>()) {
+      if (!templates::testMultiply<T, cols, rows, 3>()) {
         return false;
       }
-      if (!testMultiply<T, cols, rows, 4>()) {
+      if (!templates::testMultiply<T, cols, rows, 4>()) {
         return false;
       }
 
       //Test ammonite::determinant()
-      if (!testDeterminant<T, cols, rows>()) {
+      if (!templates::testDeterminant<T, cols, rows>()) {
         return false;
       }
 
       //Test ammonite::inverse()
-      if (!testInverse<T, cols, rows>()) {
+      if (!templates::testInverse<T, cols, rows>()) {
         return false;
       }
 
       //Test ammonite::scale()
-      if (!testScale<T, cols, rows>()) {
+      if (!templates::testScale<T, cols, rows>()) {
         return false;
       }
 
       //Test ammonite::translate()
-      if (!testTranslate<T, cols, rows>()) {
+      if (!templates::testTranslate<T, cols, rows>()) {
         return false;
       }
 
       //Test ammonite::lookAt()
-      if (!testLookAt<T, cols, rows>()) {
+      if (!templates::testLookAt<T, cols, rows>()) {
         return false;
       }
 
       //Test ammonite::perspective()
-      if (!testPerspective<T, cols, rows>()) {
+      if (!templates::testPerspective<T, cols, rows>()) {
         return false;
       }
     }
 
     //Test ammonite::rotate()
-    return testRotate<T, cols, rows>();
+    return templates::testRotate<T, cols, rows>();
   }
 }
 

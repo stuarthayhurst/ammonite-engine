@@ -9,7 +9,7 @@
 
 #include "../support.hpp"
 
-namespace {
+namespace templates {
   template <typename T> requires ammonite::validQuaternion<T>
   bool testData() {
     ammonite::Quat<T> aQuat = {{0}};
@@ -600,69 +600,69 @@ namespace tests {
     ammonite::utils::normal << "Testing " << typeName << " quaternions" << std::endl;
 
     //Test ammonite::data()
-    if (!testData<T>()) {
+    if (!templates::testData<T>()) {
       return false;
     }
 
     for (int i = 0; i < 10000; i++) {
       //Test ammonite::copy()
-      if (!testCopy<T>()) {
+      if (!templates::testCopy<T>()) {
         return false;
       }
 
       //Test ammonite::copyCast()
-      if (!testCopyCast<T>()) {
+      if (!templates::testCopyCast<T>()) {
         return false;
       }
 
       //Test ammonite::toEuler()
-      if (!testToEuler<T>()) {
+      if (!templates::testToEuler<T>()) {
         return false;
       }
 
       //Test ammonite::dot()
-      if (!testDot<T>()) {
+      if (!templates::testDot<T>()) {
         return false;
       }
 
       //Test ammonite::conjugate()
-      if (!testConjugate<T>()) {
+      if (!templates::testConjugate<T>()) {
         return false;
       }
 
       //Test ammonite::length()
-      if (!testLength<T>()) {
+      if (!templates::testLength<T>()) {
         return false;
       }
 
       //Test ammonite::normalise()
-      if (!testNormalise<T>()) {
+      if (!templates::testNormalise<T>()) {
         return false;
       }
 
       //Test ammonite::inverse()
-      if (!testInverse<T>()) {
+      if (!templates::testInverse<T>()) {
         return false;
       }
 
       //Test ammonite::multiply() for quaternion-quaternion
-      if (!testMultiplyQuat<T>()) {
+      if (!templates::testMultiplyQuat<T>()) {
         return false;
       }
 
       //Test ammonite::toMatrix()
-      if (!testToMatrix<T>()) {
+      if (!templates::testToMatrix<T>()) {
         return false;
       }
     }
 
     //Test ammonite::multiply() for quaternion-vector
-    if (!testMultiplyVec<T>()) {
+    if (!templates::testMultiplyVec<T>()) {
       return false;
     }
 
     //Test ammonite::fromEuler()
-    return testInit<T>();
+    return templates::testInit<T>();
   }
 }
 
