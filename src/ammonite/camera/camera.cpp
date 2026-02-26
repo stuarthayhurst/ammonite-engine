@@ -45,22 +45,22 @@ namespace ammonite {
 
       void updateMatrices() {
         //Get the active camera
-        Camera* const activeCamera = &cameraTrackerMap[activeCameraId];
+        const Camera& activeCamera = cameraTrackerMap[activeCameraId];
 
         /*
          - If the camera is on a path, update it if the user hasn't
          - If the camera isn't on a path, clear the cached set of updated cameras
         */
-        camera::path::internal::ensureCameraUpdatedForPath(activeCamera->linkedCameraPathId);
+        camera::path::internal::ensureCameraUpdatedForPath(activeCamera.linkedCameraPathId);
 
         //Calculate the direction vector
         ammonite::Vec<float, 3> direction = {0};
-        ammonite::calculateDirection((float)activeCamera->horizontalAngle,
-                                     (float)activeCamera->verticalAngle, direction);
+        ammonite::calculateDirection((float)activeCamera.horizontalAngle,
+                                     (float)activeCamera.verticalAngle, direction);
 
         //Right vector, relative to the camera
         ammonite::Vec<float, 3> right = {0};
-        const float angleRight = (float)activeCamera->horizontalAngle - ammonite::halfPi<float>;
+        const float angleRight = (float)activeCamera.horizontalAngle - ammonite::halfPi<float>;
         ammonite::calculateDirection(angleRight, right);
 
         //Up vector, relative to the camera
@@ -70,13 +70,13 @@ namespace ammonite {
         //Calculate the projection matrix from FoV, aspect ratio and display range
         const float aspectRatio = ammonite::window::internal::getGraphicsAspectRatio();
         const float renderFarPlane = ammonite::renderer::settings::getRenderFarPlane();
-        ammonite::perspective(activeCamera->fov, aspectRatio, 0.1f,
+        ammonite::perspective(activeCamera.fov, aspectRatio, 0.1f,
                               renderFarPlane, projectionMatrix);
 
         //Calculate view matrix from position, where it's looking, and relative up
         ammonite::Vec<float, 3> cameraTarget = {0};
-        ammonite::add(activeCamera->position, direction, cameraTarget);
-        ammonite::lookAt(activeCamera->position, cameraTarget, up, viewMatrix);
+        ammonite::add(activeCamera.position, direction, cameraTarget);
+        ammonite::lookAt(activeCamera.position, cameraTarget, up, viewMatrix);
       }
 
       //Update the stored link for cameraId, optionally unlink the existing path
