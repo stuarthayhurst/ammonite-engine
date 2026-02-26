@@ -34,4 +34,4 @@ jobs:
 
     - name: Run the global linting target
       run: |
-        TIDY="clang-tidy-21" ${{ matrix.options }} make lint_all -j$(nproc)
+        TIDY="clang-tidy-22" ${{ matrix.options }} make lint_all -j$(nproc)
