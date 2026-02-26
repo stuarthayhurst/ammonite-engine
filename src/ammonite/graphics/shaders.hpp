@@ -25,7 +25,7 @@ namespace AMMONITE_INTERNAL ammonite {
       };
 
       class ModelShader : public Shader {
-      private:
+      protected:
         void setUniformLocations() override;
       public:
         GLint matrixId;
@@ -41,7 +41,7 @@ namespace AMMONITE_INTERNAL ammonite {
       };
 
       class LightShader : public Shader {
-      private:
+      protected:
         void setUniformLocations() override;
       public:
         GLint lightMatrixId;
@@ -49,7 +49,7 @@ namespace AMMONITE_INTERNAL ammonite {
       };
 
       class DepthShader : public Shader {
-      private:
+      protected:
         void setUniformLocations() override;
       public:
         GLint modelMatrixId;
@@ -59,7 +59,7 @@ namespace AMMONITE_INTERNAL ammonite {
       };
 
       class SkyboxShader : public Shader {
-      private:
+      protected:
         void setUniformLocations() override;
       public:
         GLint viewMatrixId;
@@ -68,7 +68,7 @@ namespace AMMONITE_INTERNAL ammonite {
       };
 
       class ScreenShader : public Shader {
-      private:
+      protected:
         void setUniformLocations() override;
       public:
         GLint screenSamplerId;
@@ -80,7 +80,7 @@ namespace AMMONITE_INTERNAL ammonite {
       };
 
       class SplashShader : public Shader {
-      private:
+      protected:
         void setUniformLocations() override;
       public:
         GLint progressId;
