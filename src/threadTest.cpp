@@ -62,7 +62,7 @@ namespace {
   }
 
   void blockingTask(void* userPtr) {
-    std::atomic_flag* const flagPtr = (std::atomic_flag*)userPtr;
+    const std::atomic_flag* const flagPtr = (std::atomic_flag*)userPtr;
     flagPtr->wait(false);
   }
 }
