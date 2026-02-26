@@ -76,7 +76,7 @@ namespace objectFieldDemo {
       //Hold data for randomised cube positions
       const unsigned int offset = lightCount + 1;
       const unsigned int cubeCount = loadedModelIds.size() - offset;
-      ammonite::Vec<float, 3>* const cubeData = new ammonite::Vec<float, 3>[(std::size_t)(cubeCount) * 3];
+      ammonite::Vec<float, 3>* const cubeData = new ammonite::Vec<float, 3>[(std::size_t)cubeCount * 3];
 
       //Generate random position, rotation and scales, skip first item
       genRandomPosData(cubeData, cubeCount);
@@ -148,7 +148,7 @@ namespace objectFieldDemo {
       const float down = ammonite::halfPi<float>;
       const float indexOffsetAngle = ammonite::halfPi<float> - (ammonite::pi<float> / (float)orbitCount);
 
-      float* const swapAngles = new float[(std::size_t)(orbitCount) * 2];
+      float* const swapAngles = new float[(std::size_t)orbitCount * 2];
       for (unsigned int orbit = 0; orbit < orbitCount; orbit++) {
         unsigned int writeIndex = orbit * 2;
 
@@ -178,7 +178,7 @@ namespace objectFieldDemo {
      - The second index of the pair points to the next swap target index
     */
     unsigned int* calculateSwapTargets(unsigned int orbitCount) {
-      unsigned int* const swapTargets = new unsigned int[(std::size_t)(orbitCount) * 2];
+      unsigned int* const swapTargets = new unsigned int[(std::size_t)orbitCount * 2];
       for (unsigned int orbit = 0; orbit < orbitCount; orbit++) {
         const unsigned int writeIndex = orbit * 2;
 

@@ -339,7 +339,7 @@ int main(int argc, char** argv) noexcept(false) {
     ammonite::Vec<float, 3> direction = {0};
 
     //Calculate the node's coordinates
-    const double progress = (double)(i) / (double)(nodeCount - 1);
+    const double progress = (double)i / (double)(nodeCount - 1);
     const float angle = (float)progress * ammonite::twoPi<float>;
     position[0] = pathRadius * std::sin(angle);
     position[1] = pathHeight;

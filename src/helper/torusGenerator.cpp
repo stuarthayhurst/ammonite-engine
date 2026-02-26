@@ -95,7 +95,7 @@ namespace torus {
     //Generate the indices for the mesh
     for (unsigned int i = 0; i < vertexCount; i++) {
       //Calculate the indices of the surrounding points for the triangle pair
-      const unsigned int nextRingSamePoint = (i + heightNodes) % (vertexCount);
+      const unsigned int nextRingSamePoint = (i + heightNodes) % vertexCount;
       const unsigned int prevPoint = previousPointWrapped(i, heightNodes);
       const unsigned int nextRingPrevPoint = previousPointWrapped(nextRingSamePoint, heightNodes);
 
