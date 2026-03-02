@@ -29,7 +29,11 @@ namespace {
     AmmoniteGroup* group;
   };
 
-  //Implements a thread-safe queue to store and retrieve jobs from
+  /*
+   - Implements a thread-safe queue to store and retrieve jobs from
+   - Job pushes and pops all use the mutex, job pops wait on the semaphore
+     for work to be available
+  */
   class WorkQueue {
   private:
     std::queue<WorkItem> queue;
@@ -38,26 +42,26 @@ namespace {
 
   public:
     void push(AmmoniteWork work, void* userPtr, AmmoniteGroup* group) {
-      queueLock.lock();
+      this->queueLock.lock();
 
-      queue.push({.work = work, .userPtr = userPtr, .group = group});
+      this->queue.push({.work = work, .userPtr = userPtr, .group = group});
 
-      queueLock.unlock();
-      jobCount.release();
+      this->queueLock.unlock();
+      this->jobCount.release();
     }
 
     void pushMultiple(AmmoniteWork work, void* userBuffer, int stride,
                       AmmoniteGroup* group, unsigned int count) {
-      queueLock.lock();
+      this->queueLock.lock();
 
       //Add multiple jobs in a single pass
       for (std::size_t i = 0; i < count; i++) {
-        queue.push({.work = work, .userPtr = (char*)userBuffer + (i * stride),
-                    .group = group});
+        this->queue.push({.work = work, .userPtr = (char*)userBuffer + (i * stride),
+                          .group = group});
       }
 
-      queueLock.unlock();
-      jobCount.release(count);
+      this->queueLock.unlock();
+      this->jobCount.release(count);
     }
 
     void pop(WorkItem* workItemPtr) {
@@ -68,13 +72,13 @@ namespace {
          shouldn't be too bad
        - Once this is fixed, just use 'jobCount.acquire();' instead
       */
-      while(!jobCount.try_acquire_for(std::chrono::milliseconds(1))) {}
-      queueLock.lock();
+      while(!this->jobCount.try_acquire_for(std::chrono::milliseconds(1))) {}
+      this->queueLock.lock();
 
-      *workItemPtr = queue.front();
-      queue.pop();
+      *workItemPtr = this->queue.front();
+      this->queue.pop();
 
-      queueLock.unlock();
+      this->queueLock.unlock();
     }
   };
 }
@@ -84,6 +88,7 @@ namespace ammonite {
     namespace thread {
       namespace internal {
         namespace {
+          //Data for the threads working from workQueues
           unsigned int poolThreadCount = 0;
           std::thread* threadPool;
           std::atomic<bool> stayAlive = false;
@@ -97,6 +102,11 @@ namespace ammonite {
           std::barrier<>* threadBlockBarrier;
           std::latch* threadUnblockLatch;
 
+          /*
+           - Data for the work queues
+           - Treat workQueues as a circular buffer, with separate heads
+             for job pushes and pops
+          */
           WorkQueue* workQueues;
           unsigned int queueLaneCount = 0;
           unsigned int laneAssignMask = 0;
@@ -261,7 +271,11 @@ namespace ammonite {
           return jobCount - finishedJobs;
         }
 
-        //Create a thread pool of the requested size, if one doesn't already exist
+        /*
+         - Create a thread pool of the requested size, if one doesn't already exist
+         - Use the number of threads rounded to the first power of 2 greater than or
+           equal to it then double it as the lane count
+        */
         bool createThreadPool(unsigned int threadCount) {
           //Exit if thread pool already exists
           if (poolThreadCount != 0) {
