@@ -18,3 +18,11 @@
       - `AMMONITE_DRAW_ACTIVE`: Default, model is drawn as normal
       - `AMMONITE_DRAW_WIREFRAME`: Draws the model as a mesh
       - `AMMONITE_DRAW_POINTS`: Draws the model as a set of vertices only
+
+## Drawing frames:
+  - At the start of the main loop, call `ammonite::beginFrame()`
+    - This updates the frame timer and any other per-frame internals that should be done before the frame starts
+    - Pass it `true` if you'd like to automatically handle camera path updates
+  - Call `ammonite::renderer::drawFrame()` to actually draw the frame
+  - Use `ammonite::splash::createSplashScreen()` and `ammonite::splash::setActiveSplashScreen()` to draw a loading screen instead
+    - Various functions exist to configure the splash screen, including a progress bar
