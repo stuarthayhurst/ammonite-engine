@@ -4,6 +4,7 @@
 #include <limits>
 #include <random>
 
+#include "../maths/vectorTypes.hpp"
 #include "../visibility.hpp"
 
 namespace AMMONITE_EXPOSED ammonite {
@@ -72,6 +73,38 @@ namespace AMMONITE_EXPOSED ammonite {
 
     bool randomBool(double probability);
     bool randomBool();
+
+    /*
+     - Fill a vector with random values of a given type from the closed interval [lower, upper]
+       - Negative numbers are supported
+    */
+    template <typename T, unsigned int size> requires ammonite::validVector<T, size>
+    inline ammonite::Vec<T, size>& random(ammonite::Vec<T, size>& dest, T lower, T upper) {
+      if constexpr (std::is_integral_v<T>) {
+        for (unsigned int i = 0; i < size; i++) {
+          dest[i] = std::uniform_int_distribution<T>{lower, upper}(internal::engine);
+        }
+      } else {
+        const T upperBoundClosed = std::nextafter(upper, std::numeric_limits<T>::max());
+        for (unsigned int i = 0; i < size; i++) {
+          dest[i] = std::uniform_real_distribution<T>{lower, upperBoundClosed}(internal::engine);
+        }
+      }
+
+      return dest;
+    }
+
+    //Fill a vector with random values of a given type from the closed interval [0, upper]
+    template <typename T, unsigned int size> requires ammonite::validVector<T, size>
+    inline ammonite::Vec<T, size>& random(ammonite::Vec<T, size>& dest, T upper) {
+      return random(dest, T(0.0), upper);
+    }
+
+    //Fill a vector with random values of a given type from the closed interval [0, max]
+    template <typename T, unsigned int size> requires ammonite::validVector<T, size>
+    inline ammonite::Vec<T, size>& random(ammonite::Vec<T, size>& dest) {
+      return random(dest, std::numeric_limits<T>::max());
+    }
   }
 }
 
