@@ -809,10 +809,10 @@ namespace templates {
           if (!roughly(result[i], tests[testIndex].out[i])) {
             ammonite::utils::error << "Matrix rotate failed" << std::endl;
             ammonite::utils::normal << "  Input axis:\n" << ammonite::formatVector(axis) \
-                                    << "\n  Input point:\n" << ammonite::formatVector(tests[testIndex].in) \
+                                    << "\n  Input vector:\n" << ammonite::formatVector(tests[testIndex].in) \
                                     << "\n  Rotation matrix:\n" << ammonite::formatMatrix(rotMat) \
-                                    << "\n  Output point:\n" << ammonite::formatVector(result) \
-                                    << "\n  Expected output point:\n" << ammonite::formatVector(tests[testIndex].out) \
+                                    << "\n  Output vector:\n" << ammonite::formatVector(result) \
+                                    << "\n  Expected output vector:\n" << ammonite::formatVector(tests[testIndex].out) \
                                     << std::endl;
             return false;
           }
@@ -865,10 +865,10 @@ namespace templates {
         if (!roughly(inVec[i] * wideScaleVec[i], outVec[i])) {
           ammonite::utils::error << "Matrix scale failed" << std::endl;
           ammonite::utils::normal << "  Input scale:\n" << ammonite::formatVector(scaleVec) \
-                                  << "\n  Input point:\n" << ammonite::formatVector(inVec) \
+                                  << "\n  Input vector:\n" << ammonite::formatVector(inVec) \
                                   << "\n  Scale matrix:\n" << ammonite::formatMatrix(scaleMat) \
-                                  << "\n  Output point:\n" << ammonite::formatVector(outVec) \
-                                  << "\n  Expected: " << inVec[i] * scaleVec[i] \
+                                  << "\n  Output vector:\n" << ammonite::formatVector(outVec) \
+                                  << "\n  Expected: " << inVec[i] * wideScaleVec[i] \
                                   << " at index " << i << std::endl;
           return false;
         }
@@ -891,7 +891,12 @@ namespace templates {
 
   template <typename T, unsigned int cols, unsigned int rows>
             requires ammonite::validMatrix<T, cols, rows>
-  bool testTranslate() {
+  bool testTranslate(bool isDirection) {
+    T wComponent = (T)0.0;
+    if (!isDirection) {
+      wComponent = (T)1.0;
+    }
+
     //Test translation matrix calculation
     if constexpr (cols == 4 && rows == 4) {
       //Prepare input and translation
@@ -900,7 +905,7 @@ namespace templates {
       ammonite::Vec<T, 3> translationVec = {0};
       randomFillVector(inVec);
       randomFillVector(translationVec);
-      inVec[3] = (T)1.0;
+      inVec[3] = wComponent;
 
       //Create the translation matrix
       ammonite::Mat<T, 4> identityMat = {{0}};
@@ -909,16 +914,38 @@ namespace templates {
 
       //Translate the point and verify it
       ammonite::multiply(translationMat, inVec, outVec);
-      for (unsigned int i = 0; i < 3; i++) {
-        if (!roughly(inVec[i] + translationVec[i], outVec[i])) {
-          ammonite::utils::error << "Matrix translation failed" << std::endl;
-          ammonite::utils::normal << "  Input translation:\n" << ammonite::formatVector(translationVec) \
-                                  << "\n  Input point:\n" << ammonite::formatVector(inVec) \
-                                  << "\n  Translation matrix:\n" << ammonite::formatMatrix(translationMat) \
-                                  << "\n  Output point:\n" << ammonite::formatVector(outVec) \
-                                  << "\n  Expected: " << inVec[i] + translationVec[i] \
-                                  << " at index " << i << std::endl;
-          return false;
+      ammonite::Vec<T, 4> wideTranslationVec = {0};
+      ammonite::copy(translationVec, wideTranslationVec);
+      for (unsigned int i = 0; i < 4; i++) {
+        if (!isDirection) {
+          /*
+           - Check that the point was translated by the vector
+           - The w component should remain unchanged
+          */
+          if (!roughly(inVec[i] + wideTranslationVec[i], outVec[i])) {
+            ammonite::utils::error << "Matrix translation failed" << std::endl;
+            ammonite::utils::normal << "  Input translation:\n" << ammonite::formatVector(translationVec) \
+                                    << "\n  Input point:\n" << ammonite::formatVector(inVec) \
+                                    << "\n  Translation matrix:\n" << ammonite::formatMatrix(translationMat) \
+                                    << "\n  Output point:\n" << ammonite::formatVector(outVec) \
+                                    << "\n  Expected: " << inVec[i] + wideTranslationVec[i] \
+                                    << " at index " << i << std::endl;
+            return false;
+          }
+        } else {
+          /*
+           - Check that the direction was unchanged
+          */
+          if (!roughly(inVec[i], outVec[i])) {
+            ammonite::utils::error << "Matrix translation failed" << std::endl;
+            ammonite::utils::normal << "  Input translation:\n" << ammonite::formatVector(translationVec) \
+                                    << "\n  Input vector:\n" << ammonite::formatVector(inVec) \
+                                    << "\n  Translation matrix:\n" << ammonite::formatMatrix(translationMat) \
+                                    << "\n  Output vector:\n" << ammonite::formatVector(outVec) \
+                                    << "\n  Expected output vector: " << ammonite::formatVector(inVec) \
+                                    << std::endl;
+            return false;
+          }
         }
       }
 
@@ -1160,8 +1187,13 @@ namespace tests {
         return false;
       }
 
-      //Test ammonite::translate()
-      if (!templates::testTranslate<T, cols, rows>()) {
+      //Test ammonite::translate() with directions
+      if (!templates::testTranslate<T, cols, rows>(true)) {
+        return false;
+      }
+
+      //Test ammonite::translate() with positions
+      if (!templates::testTranslate<T, cols, rows>(false)) {
         return false;
       }
 
