@@ -718,24 +718,45 @@ namespace templates {
 
   template <typename T, unsigned int cols, unsigned int rows>
             requires ammonite::validMatrix<T, cols, rows>
-  bool testRotate() {
+  bool testRotate(bool isDirection) {
+    T wComponent = (T)0.0;
+    if (!isDirection) {
+      wComponent = (T)1.0;
+    }
+
     //Test rotation matrix calculation
     if constexpr (cols == 4 && rows == 4) {
-      const ammonite::Vec<T, 4> x = {(T)1.0, (T)0.0, (T)0.0, (T)0.0};
-      const ammonite::Vec<T, 4> y = {(T)0.0, (T)1.0, (T)0.0, (T)0.0};
-      const ammonite::Vec<T, 4> z = {(T)0.0, (T)0.0, (T)1.0, (T)0.0};
-      const ammonite::Vec<T, 4> negY = {(T)0.0, (T)-1.0, (T)0.0, (T)0.0};
+      ammonite::Vec<T, 3> baseX = {(T)1.0, (T)0.0, (T)0.0};
+      ammonite::Vec<T, 3> baseY = {(T)0.0, (T)1.0, (T)0.0};
+      ammonite::Vec<T, 3> baseZ = {(T)0.0, (T)0.0, (T)1.0};
+      ammonite::Vec<T, 3> baseNegY = {(T)0.0, (T)-1.0, (T)0.0};
 
       //Calculate 3D normalised vector between x and z
-      ammonite::Vec<T, 4> xz = {0};
-      ammonite::add(x, z, xz);
-      ammonite::normalise(xz);
+      ammonite::Vec<T, 3> baseXz = {0};
+      ammonite::normalise(ammonite::add(baseX, baseZ, baseXz));
 
       //Calculate 3D normalised vector between x, y and z
+      ammonite::Vec<T, 3> baseXyz = {0};
+      ammonite::add(ammonite::add(baseX, baseY, baseXyz), baseZ, baseXyz);
+      ammonite::normalise(baseXyz);
+
+      /*
+       - Apply the w component
+       - This will be ignored if used as the axis
+      */
+      ammonite::Vec<T, 4> x = {0};
+      ammonite::Vec<T, 4> y = {0};
+      ammonite::Vec<T, 4> z = {0};
+      ammonite::Vec<T, 4> negY = {0};
+      ammonite::Vec<T, 4> xz = {0};
       ammonite::Vec<T, 4> xyz = {0};
-      ammonite::add(x, y, xyz);
-      ammonite::add(xyz, z, xyz);
-      ammonite::normalise(xyz);
+
+      ammonite::set(x, baseX, wComponent);
+      ammonite::set(y, baseY, wComponent);
+      ammonite::set(z, baseZ, wComponent);
+      ammonite::set(negY, baseNegY, wComponent);
+      ammonite::set(xz, baseXz, wComponent);
+      ammonite::set(xyz, baseXyz, wComponent);
 
       //NOLINTBEGIN(cppcoreguidelines-avoid-const-or-ref-data-members)
       struct TestData {
@@ -1143,8 +1164,13 @@ namespace tests {
       }
     }
 
-    //Test ammonite::rotate()
-    return templates::testRotate<T, cols, rows>();
+    //Test ammonite::rotate() with directions
+    if (!templates::testRotate<T, cols, rows>(true)) {
+      return false;
+    }
+
+    //Test ammonite::rotate() with positions
+    return templates::testRotate<T, cols, rows>(false);
   }
 }
 
