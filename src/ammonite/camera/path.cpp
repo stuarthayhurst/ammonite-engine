@@ -582,7 +582,14 @@ namespace ammonite {
 
         const Path& cameraPath = pathTrackerMap[pathId];
         const PathNode& maxNode = cameraPath.pathNodes[(cameraPath.pathNodes.size() - 1)];
-        return std::min(cameraPath.currentTime, maxNode.time);
+
+        //Loop the time value for the loop mod
+        double cameraPathTime = cameraPath.currentTime;
+        if (cameraPath.pathMode == AMMONITE_PATH_LOOP) {
+          cameraPathTime = std::fmod(cameraPathTime, maxNode.time);
+        }
+
+        return std::min(cameraPathTime, maxNode.time);
       }
 
       //Return the current progress, relative to 1.0 as the end
@@ -595,7 +602,14 @@ namespace ammonite {
 
         const Path& cameraPath = pathTrackerMap[pathId];
         const PathNode& maxNode = cameraPath.pathNodes[(cameraPath.pathNodes.size() - 1)];
-        const double progress = cameraPath.currentTime / maxNode.time;
+
+        //Loop the time value for the loop mod
+        double cameraPathTime = cameraPath.currentTime;
+        if (cameraPath.pathMode == AMMONITE_PATH_LOOP) {
+          cameraPathTime = std::fmod(cameraPathTime, maxNode.time);
+        }
+
+        const double progress = cameraPathTime / maxNode.time;
         return std::min(progress, 1.0);
       }
 
