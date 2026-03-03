@@ -39,7 +39,7 @@ namespace placement {
 
       //Material settings
       const ammonite::models::AmmoniteMaterial material =
-        ammonite::models::createMaterial({0.1f, 1.0f, 0.5f}, {0.5f, 0.5f, 0.5f});
+        ammonite::models::createMaterial({0.1f, 1.0f, 0.1f}, {0.5f, 0.5f, 0.5f});
 
       //Upload the torus
       const unsigned int torusId = ammonite::models::createModel(&meshData[0],
