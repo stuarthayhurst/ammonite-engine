@@ -154,6 +154,7 @@ $(BUILD_DIR)/mathsTest: $(BUILD_DIR)/$(LIBRARY_NAME) $(TEST_OBJECTS) $(OBJECT_DI
 	@mkdir -p "$(BUILD_DIR)"
 	$(CXX) -o "$(BUILD_DIR)/mathsTest" $(OBJECT_DIR)/mathsTest.o $(TEST_OBJECTS) $(CLIENT_CXXFLAGS) $(CLIENT_LDFLAGS) $(MATHSTEST_EXTRA_LDFLAGS)
 
+#Recipe dependencies need to be mirrored in the corresponding lint targets
 $(OBJECT_DIR)/helper/%.o: ./src/helper/%.cpp $(HELPER_HEADERS_SOURCE) $(AMMONITE_INCLUDE_HEADERS_SOURCE)
 	@mkdir -p "$$(dirname $@)"
 	$(EXTRACT) "$<" -c $(CLIENT_CXXFLAGS) -o "$@"
@@ -181,6 +182,7 @@ $(BUILD_DIR)/$(LIBRARY_NAME): $(BUILD_DIR)/libammonite.so
 	@rm -fv "$(BUILD_DIR)/$(LIBRARY_NAME)"
 	@ln -sv "libammonite.so" "$(BUILD_DIR)/$(LIBRARY_NAME)"
 
+#Recipe dependencies need to be mirrored in the corresponding lint targets
 $(OBJECT_DIR)/ammonite/%.o: ./src/ammonite/%.cpp $(AMMONITE_HEADERS_SOURCE) $(AMMONITE_INCLUDE_HEADERS_SOURCE)
 	@mkdir -p "$$(dirname $@)"
 	$(EXTRACT) "$<" -c $(LIBRARY_CXXFLAGS) -o "$@"
@@ -192,11 +194,36 @@ $(OBJECT_DIR)/ammonite/%.o: ./src/ammonite/%.cpp $(AMMONITE_HEADERS_SOURCE) $(AM
 
 $(BUILD_DIR)/compile_commands.json:
 	@DUMMY="true" $(MAKE) $(AMMONITE_OBJECTS) $(HELPER_OBJECTS) $(DEMO_OBJECTS) $(ROOT_OBJECTS) $(TEST_OBJECTS)
-$(OBJECT_DIR)/%.$(DEBUG_LINT_STRING): ./src/% .clang-tidy $(LINT_HEADERS_SOURCE)
+
+#Recipes should only differ in dependencies
+#demos/% recipes have been split to give more granular dependencies
+#include/% recipes are required, since headers can be linted individually
+$(OBJECT_DIR)/include/%.$(DEBUG_LINT_STRING): ./src/include/% .clang-tidy $(AMMONITE_INCLUDE_HEADERS_SOURCE)
+	$(TIDY) --quiet -p "$(BUILD_DIR)" "$<"
+	@mkdir -p "$$(dirname $@)"
+	@touch "$@"
+$(OBJECT_DIR)/helper/%.$(DEBUG_LINT_STRING): ./src/helper/% .clang-tidy $(HELPER_HEADERS_SOURCE) $(AMMONITE_INCLUDE_HEADERS_SOURCE)
+	$(TIDY) --quiet -p "$(BUILD_DIR)" "$<"
+	@mkdir -p "$$(dirname $@)"
+	@touch "$@"
+$(OBJECT_DIR)/demos/%.cpp.$(DEBUG_LINT_STRING): ./src/demos/%.cpp .clang-tidy ./src/demos/%.hpp $(AMMONITE_INCLUDE_HEADERS_SOURCE)
+	$(TIDY) --quiet -p "$(BUILD_DIR)" "$<"
+	@mkdir -p "$$(dirname $@)"
+	@touch "$@"
+$(OBJECT_DIR)/demos/%.hpp.$(DEBUG_LINT_STRING): ./src/demos/%.hpp .clang-tidy ./src/demos/%.hpp $(AMMONITE_INCLUDE_HEADERS_SOURCE)
 	$(TIDY) --quiet -p "$(BUILD_DIR)" "$<"
 	@mkdir -p "$$(dirname $@)"
 	@touch "$@"
 $(OBJECT_DIR)/tests/%.$(DEBUG_LINT_STRING): ./src/tests/% .clang-tidy $(TEST_HEADERS_SOURCE) $(AMMONITE_INCLUDE_HEADERS_SOURCE)
+	$(TIDY) --quiet -p "$(BUILD_DIR)" "$<"
+	@mkdir -p "$$(dirname $@)"
+	@touch "$@"
+$(OBJECT_DIR)/%.$(DEBUG_LINT_STRING): ./src/% .clang-tidy $(DEMO_HEADERS_SOURCE) $(HELPER_HEADERS_SOURCE) $(AMMONITE_INCLUDE_HEADERS_SOURCE)
+	$(TIDY) --quiet -p "$(BUILD_DIR)" "$<"
+	@mkdir -p "$$(dirname $@)"
+	@touch "$@"
+
+$(OBJECT_DIR)/ammonite/%.$(DEBUG_LINT_STRING): ./src/ammonite/% .clang-tidy $(AMMONITE_HEADERS_SOURCE) $(AMMONITE_INCLUDE_HEADERS_SOURCE)
 	$(TIDY) --quiet -p "$(BUILD_DIR)" "$<"
 	@mkdir -p "$$(dirname $@)"
 	@touch "$@"
