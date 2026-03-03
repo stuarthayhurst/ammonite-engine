@@ -10,6 +10,8 @@
 
 #include "commands.hpp"
 
+#include "modelPlacementMode.hpp"
+
 //Command helpers
 namespace {
   /*
@@ -197,7 +199,8 @@ namespace {
     RenderFarPlaneKey,
     ShadowFarPlaneKey,
     GammaCorrectionEnabledKey,
-    AmbientLightKey
+    AmbientLightKey,
+    PlacementColourKey
   };
 
   /*
@@ -216,7 +219,8 @@ namespace {
     {"renderFarPlane", RenderFarPlaneKey},
     {"shadowFarPlane", ShadowFarPlaneKey},
     {"gammaCorrection", GammaCorrectionEnabledKey},
-    {"ambientLight", AmbientLightKey}
+    {"ambientLight", AmbientLightKey},
+    {"placementColour", PlacementColourKey}
   };
 
   ReturnActionEnum getCommand(const std::vector<std::string>& arguments) {
@@ -266,6 +270,13 @@ namespace {
         ammonite::Vec<float, 3> lightVec = {0};
         ammonite::lighting::getAmbientLight(lightVec);
         result = ammonite::formatVector(lightVec);
+        break;
+      }
+    case PlacementColourKey:
+      {
+        ammonite::Vec<float, 3> colourVec = {0};
+        placement::getPlacementColour(colourVec);
+        result = ammonite::formatVector(colourVec);
         break;
       }
     }
@@ -326,6 +337,7 @@ namespace {
       };
       break;
     case AmbientLightKey:
+    case PlacementColourKey:
       valuePtr = new ammonite::Vec<float, 3>;
       if (!stringToFloatVector(&arguments[2], *((ammonite::Vec<float, 3>*)valuePtr))) {
         delete [] (ammonite::Vec<float, 3>*)valuePtr;
@@ -372,6 +384,9 @@ namespace {
     case AmbientLightKey:
       ammonite::lighting::setAmbientLight(*((ammonite::Vec<float, 3>*)valuePtr));
       break;
+    case PlacementColourKey:
+      placement::setPlacementColour(*((ammonite::Vec<float, 3>*)valuePtr));
+      break;
     }
 
     //Delete the value's memory
@@ -394,6 +409,7 @@ namespace {
       delete (unsigned int*)valuePtr;
       break;
     case AmbientLightKey:
+    case PlacementColourKey:
       delete [] (ammonite::Vec<float, 3>*)valuePtr;
       break;
     }
