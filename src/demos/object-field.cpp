@@ -62,10 +62,7 @@ namespace objectFieldDemo {
                       ammonite::utils::random<float>(-10.0f, 10.0f));
 
         //Rotation
-        ammonite::set(objectData[(i * 3) + 1],
-                      ammonite::utils::random<float>(ammonite::twoPi<float>),
-                      ammonite::utils::random<float>(ammonite::twoPi<float>),
-                      ammonite::utils::random<float>(ammonite::twoPi<float>));
+        ammonite::utils::random(objectData[(i * 3) + 1], ammonite::twoPi<float>);
 
         //Scale
         ammonite::set(objectData[(i * 3) + 2], ammonite::utils::random(1.2f));

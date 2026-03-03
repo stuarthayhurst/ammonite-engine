@@ -22,14 +22,12 @@ template <typename T, unsigned int size>
          requires ammonite::validVector<T, size>
 ammonite::Vec<T, size>& randomFillVector(ammonite::Vec<T, size>& vec,
                                          double limit = 10000.0) {
-  for (unsigned int i = 0; i < size; i++) {
-    if constexpr (std::is_unsigned_v<T>) {
-      vec[i] = ammonite::utils::random<T>();
-    } else if constexpr (std::is_integral_v<T>) {
-      vec[i] = ammonite::utils::random<T>((T)std::sqrt(std::numeric_limits<T>::max() / size));
-    } else {
-      vec[i] = ammonite::utils::random<T>((T)limit);
-    }
+  if constexpr (std::is_unsigned_v<T>) {
+    ammonite::utils::random<T>(vec);
+  } else if constexpr (std::is_integral_v<T>) {
+    ammonite::utils::random<T>(vec, (T)std::sqrt(std::numeric_limits<T>::max() / size));
+  } else {
+    ammonite::utils::random<T>(vec, (T)limit);
   }
 
   return vec;

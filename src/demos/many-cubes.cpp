@@ -85,16 +85,11 @@ namespace manyCubesDemo {
     ammonite::lighting::setAmbientLight(ambientLight);
     for (unsigned int i = 0; i < lightCount; i++) {
       lightSourceIds[i] = ammonite::lighting::createLightSource();
-      ammonite::set(lightSourcePositions[i],
-        ammonite::utils::random<float>((float)sideLength),
-        4.0f,
-        ammonite::utils::random<float>((float)sideLength));
+      ammonite::utils::random(lightSourcePositions[i], (float)sideLength);
+      lightSourcePositions[i][1] = 4.0f;
 
-      const ammonite::Vec<float, 3> colour = {
-        ammonite::utils::random<float>(1.0f),
-        ammonite::utils::random<float>(1.0f),
-        ammonite::utils::random<float>(1.0f)
-      };
+      ammonite::Vec<float, 3> colour = {0};
+      ammonite::utils::random(colour, 1.0f);
 
       ammonite::lighting::properties::setPower(lightSourceIds[i], 50.0f);
       ammonite::lighting::properties::setColour(lightSourceIds[i], colour);
@@ -112,11 +107,8 @@ namespace manyCubesDemo {
     //Update light source positions
     for (unsigned int i = 0; i < lightCount; i++) {
       //Apply random offset
-      const ammonite::Vec<float, 3> offset = {
-        ammonite::utils::random<float>(-1.0f, 1.0f),
-        0.0f,
-        ammonite::utils::random<float>(-1.0f, 1.0f)
-      };
+      ammonite::Vec<float, 3> offset = {0};
+      ammonite::utils::random(offset, -1.0f, 1.0f);
       ammonite::add(lightSourcePositions[i], offset);
 
       //Clamp to bounds
