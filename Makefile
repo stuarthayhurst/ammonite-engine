@@ -163,7 +163,7 @@ $(OBJECT_DIR)/demos/%.o: ./src/demos/%.cpp ./src/demos/%.hpp $(AMMONITE_INCLUDE_
 $(OBJECT_DIR)/tests/%.o: ./src/tests/%.cpp $(TEST_HEADERS_SOURCE) $(AMMONITE_INCLUDE_HEADERS_SOURCE)
 	@mkdir -p "$$(dirname $@)"
 	$(EXTRACT) "$<" -c $(CLIENT_CXXFLAGS) -o "$@"
-$(OBJECT_DIR)/%.o: ./src/%.cpp $(HELPER_HEADERS_SOURCE) $(AMMONITE_INCLUDE_HEADERS_SOURCE)
+$(OBJECT_DIR)/%.o: ./src/%.cpp $(DEMO_HEADERS_SOURCE) $(HELPER_HEADERS_SOURCE) $(AMMONITE_INCLUDE_HEADERS_SOURCE)
 	@mkdir -p "$(OBJECT_DIR)"
 	$(EXTRACT) "$<" -c $(CLIENT_CXXFLAGS) -o "$@"
 
