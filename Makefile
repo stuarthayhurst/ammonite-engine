@@ -158,7 +158,7 @@ $(BUILD_DIR)/mathsTest: $(BUILD_DIR)/$(LIBRARY_NAME) $(TEST_OBJECTS) $(OBJECT_DI
 $(OBJECT_DIR)/helper/%.o: ./src/helper/%.cpp $(HELPER_HEADERS_SOURCE) $(AMMONITE_INCLUDE_HEADERS_SOURCE)
 	@mkdir -p "$$(dirname $@)"
 	$(EXTRACT) "$<" -c $(CLIENT_CXXFLAGS) -o "$@"
-$(OBJECT_DIR)/demos/%.o: ./src/demos/%.cpp ./src/demos/%.hpp $(AMMONITE_INCLUDE_HEADERS_SOURCE)
+$(OBJECT_DIR)/demos/%.o: ./src/demos/%.cpp ./src/demos/%.hpp $(HELPER_HEADERS_SOURCE) $(AMMONITE_INCLUDE_HEADERS_SOURCE)
 	@mkdir -p "$$(dirname $@)"
 	$(EXTRACT) "$<" -c $(CLIENT_CXXFLAGS) -o "$@"
 $(OBJECT_DIR)/tests/%.o: ./src/tests/%.cpp $(TEST_HEADERS_SOURCE) $(AMMONITE_INCLUDE_HEADERS_SOURCE)
@@ -206,7 +206,7 @@ $(OBJECT_DIR)/helper/%.$(DEBUG_LINT_STRING): ./src/helper/% .clang-tidy $(HELPER
 	$(TIDY) --quiet -p "$(BUILD_DIR)" "$<"
 	@mkdir -p "$$(dirname $@)"
 	@touch "$@"
-$(OBJECT_DIR)/demos/%.cpp.$(DEBUG_LINT_STRING): ./src/demos/%.cpp .clang-tidy ./src/demos/%.hpp $(AMMONITE_INCLUDE_HEADERS_SOURCE)
+$(OBJECT_DIR)/demos/%.cpp.$(DEBUG_LINT_STRING): ./src/demos/%.cpp .clang-tidy ./src/demos/%.hpp $(HELPER_HEADERS_SOURCE) $(AMMONITE_INCLUDE_HEADERS_SOURCE)
 	$(TIDY) --quiet -p "$(BUILD_DIR)" "$<"
 	@mkdir -p "$$(dirname $@)"
 	@touch "$@"
