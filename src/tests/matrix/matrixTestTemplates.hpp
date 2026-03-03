@@ -836,7 +836,12 @@ namespace templates {
 
   template <typename T, unsigned int cols, unsigned int rows>
             requires ammonite::validMatrix<T, cols, rows>
-  bool testScale() {
+  bool testScale(bool isDirection) {
+    T wComponent = (T)0.0;
+    if (!isDirection) {
+      wComponent = (T)1.0;
+    }
+
     //Test scale matrix calculation
     if constexpr (cols == 4 && rows == 4) {
       //Prepare input and ratios
@@ -845,7 +850,7 @@ namespace templates {
       ammonite::Vec<T, 3> scaleVec = {0};
       randomFillVector(inVec);
       randomFillVector(scaleVec);
-      inVec[3] = (T)1.0;
+      inVec[3] = wComponent;
 
       //Create the scale matrix
       ammonite::Mat<T, 4> identityMat = {{0}};
@@ -854,8 +859,10 @@ namespace templates {
 
       //Scale the point and verify it
       ammonite::multiply(scaleMat, inVec, outVec);
-      for (unsigned int i = 0; i < 3; i++) {
-        if (!roughly(inVec[i] * scaleVec[i], outVec[i])) {
+      ammonite::Vec<T, 4> wideScaleVec = {0};
+      ammonite::set(wideScaleVec, scaleVec, (T)1.0);
+      for (unsigned int i = 0; i < 4; i++) {
+        if (!roughly(inVec[i] * wideScaleVec[i], outVec[i])) {
           ammonite::utils::error << "Matrix scale failed" << std::endl;
           ammonite::utils::normal << "  Input scale:\n" << ammonite::formatVector(scaleVec) \
                                   << "\n  Input point:\n" << ammonite::formatVector(inVec) \
@@ -1143,8 +1150,13 @@ namespace tests {
         return false;
       }
 
-      //Test ammonite::scale()
-      if (!templates::testScale<T, cols, rows>()) {
+      //Test ammonite::scale() with directions
+      if (!templates::testScale<T, cols, rows>(true)) {
+        return false;
+      }
+
+      //Test ammonite::scale() with positions
+      if (!templates::testScale<T, cols, rows>(false)) {
         return false;
       }
 
