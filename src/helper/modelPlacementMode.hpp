@@ -1,6 +1,8 @@
 #ifndef MODELPLACEMENTMODE
 #define MODELPLACEMENTMODE
 
+#include <ammonite/ammonite.hpp>
+
 namespace placement {
   void setPlacementCallbacks();
   void unsetPlacementCallbacks();
