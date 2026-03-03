@@ -17,6 +17,8 @@ namespace placement {
 
     AmmoniteId placementModeKeybindId;
     std::vector<AmmoniteId> placedModelIds;
+
+    ammonite::Vec<float, 3> modelColour = {0.1f, 1.0f, 0.1f};
   }
 
   namespace {
@@ -39,7 +41,7 @@ namespace placement {
 
       //Material settings
       const ammonite::models::AmmoniteMaterial material =
-        ammonite::models::createMaterial({0.1f, 1.0f, 0.1f}, {0.5f, 0.5f, 0.5f});
+        ammonite::models::createMaterial(modelColour, {0.5f, 0.5f, 0.5f});
 
       //Upload the torus
       const unsigned int torusId = ammonite::models::createModel(&meshData[0],
@@ -116,6 +118,9 @@ namespace placement {
       //Copy or load a torus
       if (!placedModelIds.empty()) {
         placementModelId = ammonite::models::copyModel(placedModelIds[0], true);
+        const ammonite::models::AmmoniteMaterial material =
+          ammonite::models::createMaterial(modelColour, {0.5f, 0.5f, 0.5f});
+        ammonite::models::applyMaterial(placementModelId, material);
       } else {
         placementModelId = createTorus();
       }
@@ -181,5 +186,13 @@ namespace placement {
     for (const AmmoniteId& modelId : placedModelIds) {
       ammonite::models::deleteModel(modelId);
     }
+  }
+
+  void getPlacementColour(ammonite::Vec<float, 3>& dest) {
+    ammonite::copy(modelColour, dest);
+  }
+
+  void setPlacementColour(const ammonite::Vec<float, 3>& colour) {
+    ammonite::copy(colour, modelColour);
   }
 }

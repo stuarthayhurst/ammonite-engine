@@ -8,6 +8,9 @@ namespace placement {
   void resetPlacementDistance();
   void updatePlacementPosition();
   void deletePlacedModels();
+
+  void getPlacementColour(ammonite::Vec<float, 3>& dest);
+  void setPlacementColour(const ammonite::Vec<float, 3>& colour);
 }
 
 #endif
