@@ -1028,7 +1028,7 @@ namespace templates {
         ammonite::Vec<T, 4> outVec = {0};
         ammonite::multiply(viewMat, tests[testIndex].in, outVec);
 
-        for (unsigned int i = 0; i < 3; i++) {
+        for (unsigned int i = 0; i < 4; i++) {
           if (!roughly(tests[testIndex].out[i], outVec[i])) {
             ammonite::utils::error << "View matrix calculation failed" << std::endl;
             ammonite::utils::normal << "  Input camera position:\n" << ammonite::formatVector(cameraVec) \
