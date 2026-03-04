@@ -726,10 +726,10 @@ namespace templates {
 
     //Test rotation matrix calculation
     if constexpr (cols == 4 && rows == 4) {
-      ammonite::Vec<T, 3> baseX = {(T)1.0, (T)0.0, (T)0.0};
-      ammonite::Vec<T, 3> baseY = {(T)0.0, (T)1.0, (T)0.0};
-      ammonite::Vec<T, 3> baseZ = {(T)0.0, (T)0.0, (T)1.0};
-      ammonite::Vec<T, 3> baseNegY = {(T)0.0, (T)-1.0, (T)0.0};
+      const ammonite::Vec<T, 3> baseX = {(T)1.0, (T)0.0, (T)0.0};
+      const ammonite::Vec<T, 3> baseY = {(T)0.0, (T)1.0, (T)0.0};
+      const ammonite::Vec<T, 3> baseZ = {(T)0.0, (T)0.0, (T)1.0};
+      const ammonite::Vec<T, 3> baseNegY = {(T)0.0, (T)-1.0, (T)0.0};
 
       //Calculate 3D normalised vector between x and z
       ammonite::Vec<T, 3> baseXz = {0};
