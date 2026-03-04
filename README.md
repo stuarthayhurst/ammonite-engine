@@ -11,6 +11,7 @@
 
 ## Features:
   - Multi-threaded model loading, using `libassimp` and a thread pool
+    - Includes support for raw mesh and material uploads, demoed with a torus
   - Shader program caching with a custom hash
   - Key binding and mouse input support
   - Camera path support
