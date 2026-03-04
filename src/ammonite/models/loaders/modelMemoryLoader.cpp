@@ -5,6 +5,7 @@
 #include "../models.hpp"
 
 #include "../../graphics/textures.hpp"
+#include "../../utils/thread.hpp"
 
 /*
  - Process a (memory-based) model into internal structures
@@ -17,6 +18,16 @@
 namespace ammonite {
   namespace models {
     namespace internal {
+      namespace {
+        //NOLINTBEGIN(cppcoreguidelines-avoid-const-or-ref-data-members)
+        struct IndexThreadData {
+          const unsigned int vertexCount;
+          const AmmoniteVertex* const mesh;
+          std::vector<RawMeshData>* rawMeshDataVec;
+        };
+        //NOLINTEND(cppcoreguidelines-avoid-const-or-ref-data-members)
+      }
+
       namespace {
         //Allow AmmoniteVertex as a map key, accounting for padding
         //NOLINTBEGIN(bugprone-suspicious-memory-comparison)
@@ -60,45 +71,58 @@ namespace ammonite {
           std::memcpy(newMesh.indices, indices, sizeof(unsigned int) * indexCount);
         }
 
-        //Index then copy mesh data into a vector of RawMeshData
-        void indexMeshes(const AmmoniteVertex** meshArray, unsigned int meshCount,
-                         const unsigned int* vertexCounts,
-                         std::vector<RawMeshData>* rawMeshDataVec) {
-          //Index and upload each mesh
-          for (unsigned int meshIndex = 0; meshIndex < meshCount; meshIndex++) {
-            const unsigned int vertexCount = vertexCounts[meshIndex];
-            const AmmoniteVertex* const mesh = meshArray[meshIndex];
+        void modelIndexJob(void* userPtr) {
+          const IndexThreadData* const dataPtr = (IndexThreadData*)userPtr;
 
-            //Store the generated indices and unique vertices
-            std::vector<AmmoniteVertex> uniqueVertices;
-            std::vector<unsigned int> indices;
-            indices.reserve(vertexCount);
+          //Store the generated indices and unique vertices
+          std::vector<AmmoniteVertex> uniqueVertices;
+          std::vector<unsigned int> indices;
+          indices.reserve(dataPtr->vertexCount);
 
-            //Generate indices and unique vertices for the mesh
-            std::map<AmmoniteVertex, unsigned int, VertexCompare> vertexIndexMap;
-            unsigned int nextIndex = 0;
-            for (unsigned int i = 0; i < vertexCount; i++) {
-              const AmmoniteVertex& vertexData = mesh[i];
+          //Generate indices and unique vertices for the mesh
+          std::map<AmmoniteVertex, unsigned int, VertexCompare> vertexIndexMap;
+          unsigned int nextIndex = 0;
+          for (unsigned int i = 0; i < dataPtr->vertexCount; i++) {
+            const AmmoniteVertex& vertexData = dataPtr->mesh[i];
 
-              //Fetch or generate an index for the vertex
-              unsigned int index = 0;
-              if (!vertexIndexMap.contains(vertexData)) {
-                //Generate a new index and save the vertex data
-                index = nextIndex++;
-                vertexIndexMap[vertexData] = index;
-                uniqueVertices.push_back(vertexData);
-              } else {
-                //Fetch the index for the vertex
-                index = vertexIndexMap[vertexData];
-              }
-
-              //Save the index in order
-              indices.push_back(index);
+            //Fetch or generate an index for the vertex
+            unsigned int index = 0;
+            if (!vertexIndexMap.contains(vertexData)) {
+              //Generate a new index and save the vertex data
+              index = nextIndex++;
+              vertexIndexMap[vertexData] = index;
+              uniqueVertices.push_back(vertexData);
+            } else {
+              //Fetch the index for the vertex
+              index = vertexIndexMap[vertexData];
             }
 
-            //Copy the vertices and indices to the data vector
-            applyMesh(rawMeshDataVec, uniqueVertices.size(), uniqueVertices.data(),
-                      indices.size(), indices.data());
+            //Save the index in order
+            indices.push_back(index);
+          }
+
+          //Copy the vertices and indices to the data vector
+          applyMesh(dataPtr->rawMeshDataVec, uniqueVertices.size(),
+                    uniqueVertices.data(), indices.size(), indices.data());
+        }
+
+        /*
+         - Index then copy mesh data into a vector of RawMeshData
+         - Must wait for meshCount jobs to complete on indexGroup
+        */
+        void indexMeshes(const AmmoniteVertex** meshArray, unsigned int meshCount,
+                         const unsigned int* vertexCounts,
+                         std::vector<RawMeshData>* rawMeshDataVec,
+                         AmmoniteGroup* indexGroupPtr) {
+          //Index and upload each mesh, using the thread pool
+          for (unsigned int meshIndex = 0; meshIndex < meshCount; meshIndex++) {
+            IndexThreadData data = {
+              .vertexCount = vertexCounts[meshIndex],
+              .mesh = meshArray[meshIndex],
+              .rawMeshDataVec = rawMeshDataVec
+            };
+
+            ammonite::utils::thread::submitWork(modelIndexJob, &data, indexGroupPtr);
           }
         }
 
@@ -161,9 +185,12 @@ namespace ammonite {
         applyMaterials(modelData, memoryInfo.materials, memoryInfo.meshCount);
 
         //Upload mesh data, indexing if necessary
+        AmmoniteGroup indexGroup{0};
+        unsigned int indexGroupSyncCount = 0;
         if (modelLoadInfo.memoryInfo.indicesArray == nullptr) {
+          indexGroupSyncCount = memoryInfo.meshCount;
           indexMeshes(memoryInfo.meshArray, memoryInfo.meshCount,
-                      memoryInfo.vertexCounts, rawMeshDataVec);
+                      memoryInfo.vertexCounts, rawMeshDataVec, &indexGroup);
         } else {
           copyIndexedMeshes(memoryInfo.meshArray, memoryInfo.indicesArray,
                             memoryInfo.meshCount, memoryInfo.vertexCounts,
@@ -172,6 +199,9 @@ namespace ammonite {
 
         //Sync the queued texture loads
         uploadQueuedTextures();
+
+        //Sync the mesh indexing
+        ammonite::utils::thread::waitGroupComplete(&indexGroup, indexGroupSyncCount);
 
         return true;
       }
