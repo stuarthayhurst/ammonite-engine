@@ -116,6 +116,7 @@ namespace placement {
       }
 
       //Copy or load a torus
+      ammonite::utils::Timer torusTimer;
       if (!placedModelIds.empty()) {
         placementModelId = ammonite::models::copyModel(placedModelIds[0], true);
         const ammonite::models::AmmoniteMaterial material =
@@ -125,12 +126,14 @@ namespace placement {
         placementModelId = createTorus();
       }
       placedModelIds.push_back(placementModelId);
+      torusTimer.pause();
 
       //Enter placement mode
       modelPlacementModeEnabled = true;
       resetPlacementDistance();
 
-      ammonite::utils::status << "Spawned object" << std::endl;
+      ammonite::utils::status << "Spawned object in " << torusTimer.getTime() \
+                              << "s" << std::endl;
     }
   }
 
