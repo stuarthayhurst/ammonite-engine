@@ -18,6 +18,10 @@ namespace AMMONITE_INTERNAL ammonite {
                             std::vector<RawMeshData>* rawMeshDataVec,
                             const ModelLoadInfo& modelLoadInfo);
 
+      bool reindexLoadMemoryObject(ModelData* modelData,
+                                   std::vector<RawMeshData>* rawMeshDataVec,
+                                   const ModelLoadInfo& modelLoadInfo);
+
       //Texture loaders
       GLuint queueTextureLoad(const std::string& texturePath, bool flipTexture,
                               bool srgbTexture);
