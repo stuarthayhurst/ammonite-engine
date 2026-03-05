@@ -64,7 +64,10 @@ namespace ammonite {
         };
         //NOLINTEND(bugprone-suspicious-memory-comparison)
 
-        //Copy the mesh data into the raw mesh data vector
+        /*
+         - Copy the mesh data into the raw mesh data vector
+         - This must be thread-safe
+        */
         void applyMesh(RawMeshData* rawMeshDataPtr, unsigned int vertexCount, const AmmoniteVertex* vertexData, unsigned int indexCount, const unsigned int* indices) {
           //Copy vertices
           rawMeshDataPtr->vertexCount = vertexCount;
@@ -131,12 +134,15 @@ namespace ammonite {
           //Reserve space in the vector of thread data
           indexThreadData.reserve(meshCount);
 
+          //Reserve space for the mesh data
+          rawMeshDataVec->resize(meshCount);
+
           //Prepare the data for indexing
           for (unsigned int meshIndex = 0; meshIndex < meshCount; meshIndex++) {
             indexThreadData.push_back({
               .vertexCount = vertexCounts[meshIndex],
               .mesh = meshArray[meshIndex],
-              .rawMeshDataPtr = &rawMeshDataVec->emplace_back()
+              .rawMeshDataPtr = &rawMeshDataVec->at(meshIndex)
             });
           }
 
