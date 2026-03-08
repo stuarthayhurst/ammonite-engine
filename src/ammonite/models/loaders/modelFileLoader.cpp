@@ -242,8 +242,8 @@ namespace ammonite {
         }
 
         Assimp::Importer importer;
-        const char* const objectString = modelLoadInfo.fileInfo.objectPath.c_str();
-        const aiScene* const scenePtr = importer.ReadFile(objectString, aiProcessFlags);
+        const aiScene* const scenePtr = importer.ReadFile(
+          modelLoadInfo.fileInfo.objectPath, aiProcessFlags);
 
         //Check model loaded correctly
         if (scenePtr == nullptr ||
