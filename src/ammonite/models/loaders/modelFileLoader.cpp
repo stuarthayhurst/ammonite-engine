@@ -139,11 +139,10 @@ namespace ammonite {
         bool processMesh(aiMesh* meshPtr, const aiScene* scenePtr,
                          ModelData* modelData, std::vector<RawMeshData>* rawMeshDataVec,
                          const ModelLoadInfo& modelLoadInfo) {
-          std::vector<models::internal::TextureIdGroup>* textureIds = &modelData->textureIds;
-
           //Process material into a texture ID group as early as possible
           const aiMaterial* const materialPtr = scenePtr->mMaterials[meshPtr->mMaterialIndex];
-          textureIds->push_back(processMaterial(materialPtr, modelLoadInfo, modelData->modelKey));
+          modelData->textureIds.push_back(processMaterial(materialPtr, modelLoadInfo,
+                                                          modelData->modelKey));
 
           //Add a new empty mesh to the mesh vector
           models::internal::RawMeshData* const newMesh = &rawMeshDataVec->emplace_back();
