@@ -125,6 +125,7 @@ namespace ammonite {
            - Use the thread pool
          - Call syncMeshIndexing() to wait for this to complete and clean up
          - Return the number of jobs to wait for
+         - This should only be called once per mesh data vector
         */
         unsigned int indexMeshes(const AmmoniteVertex** meshArray,
                                  unsigned int meshCount,
