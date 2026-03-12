@@ -1,6 +1,5 @@
 ## Basic usage:
-  - Some basic usage can be found here, with much better coverage planned in future
-  - This is mostly a staging ground for information that won't be automatically generated from source files
+  - This documents a few basic conventions that may not be obvious at first glance
 
 ## Return codes:
   - Successes return `true`
