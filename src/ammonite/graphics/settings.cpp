@@ -13,7 +13,7 @@ namespace ammonite {
         struct GraphicsSettings {
           bool vsyncEnabled = true;
           float frameLimit = 0.0f;
-          unsigned int shadowRes = 1024;
+          unsigned int shadowRes = 2048;
           float renderResMultiplier = 1.0f;
           unsigned int antialiasingSamples = 0;
           float renderFarPlane = 100.0f;
