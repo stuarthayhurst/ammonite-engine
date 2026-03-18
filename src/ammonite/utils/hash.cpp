@@ -12,6 +12,7 @@ extern "C" {
 
 #ifndef USE_VAES_AVX512
   #include <cstddef>
+  #include <functional>
 #endif
 
 #include "hash.hpp"
@@ -21,9 +22,7 @@ namespace ammonite {
     namespace internal {
       /*
        - Hash together inputCount paths from inputs
-         - Use an AVX-512 + VAES implementation, if supported
-         - The AVX-512 + VAES and generic versions produce different results, but both work
-           - On a Ryzen 7 7700X, the AVX-512 + VAES accelerated version is around 40x faster
+       - See https://github.com/stuarthayhurst/bad-hash-museum for details
        - Don't use this for security, you'll lose your job
       */
 #ifdef USE_VAES_AVX512
@@ -34,9 +33,15 @@ namespace ammonite {
           const uint8_t* input = (uint8_t*)inputs[i].data();
           unsigned int inputSize = inputs[i].length();
 
+          //Chosen by a fair dice roll, guaranteed to be random
+          const __m512i key = _mm512_setr_epi64(0x343B2F2F2063686F, 0x73656E2062792061,
+            0x2066616972206469, 0x636520726F6C6C2E, 0x0A2F2F2067756172,
+            0x616E746565642074, 0x6F2062652072616E, 0x646F6D2E0BAD1DEA);
+
           while (inputSize >= 64) {
-            const __m512i a = _mm512_loadu_epi8(input);
-            hash = _mm512_aesenc_epi128(hash, a);
+            __m512i a = _mm512_loadu_epi8(input);
+            a = _mm512_aesenc_epi128(a, key);
+            hash = _mm512_xor_si512(_mm512_aesenc_epi128(a, key), hash);
 
             inputSize -= 64;
             input += 64;
@@ -44,8 +49,9 @@ namespace ammonite {
 
           if (inputSize > 0) {
             const __mmask64 mask = _bzhi_u64(0xFFFFFFFFFFFFFFFF, inputSize);
-            const __m512i a = _mm512_maskz_loadu_epi8(mask, input);
-            hash = _mm512_aesenc_epi128(hash, a);
+            __m512i a = _mm512_maskz_loadu_epi8(mask, input);
+            a = _mm512_aesenc_epi128(a, key);
+            hash = _mm512_xor_si512(_mm512_aesenc_epi128(a, key), hash);
           }
         }
 
@@ -82,31 +88,17 @@ namespace ammonite {
       }
 #else
       std::string hashStrings(const std::string* inputs, unsigned int inputCount) {
-        constexpr unsigned int hashWidth = 8;
-        uint8_t output[hashWidth] = {0};
-        uint8_t prev = 0;
-
-        /*
-         - XOR the first byte of the hash with the first character of the first input
-         - Sequentially XOR every byte of the hash with the result of the previous
-           operation of this stage
-         - Repeat this process for every character of every input
-        */
+        uintmax_t total = 0;
         for (unsigned int i = 0; i < inputCount; i++) {
-          for (const char& character : inputs[i]) {
-            output[0] ^= character;
-            for (unsigned char& outputByte : output) {
-              outputByte ^= prev;
-              prev = outputByte;
-            }
-          }
+          total += std::hash<std::string>{}(inputs[i]);
         }
 
         //Split upper and lower half of each byte, add to 'A' and store
-        std::string outputString(sizeof(output) * 2, 0);
-        for (std::size_t i = 0; i < sizeof(output); i++) {
-          outputString[(i * 2) + 0] = (char)('A' + (char)(output[i] & 0xF));
-          outputString[(i * 2) + 1] = (char)('A' + (char)((output[i] >> 4) & 0xF));
+        constexpr unsigned int outputSize = sizeof(total) * 2;
+        std::string outputString(outputSize, 0);
+        for (std::size_t i = 0; i < outputSize; i++) {
+          //Map from output bits to elements, filling half a byte each time
+          outputString[i] = (char)('A' + (char)((total >> (i * 4)) & 0xF));
         }
 
         return outputString;
