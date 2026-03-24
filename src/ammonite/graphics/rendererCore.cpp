@@ -219,7 +219,10 @@ namespace ammonite {
           };
 
           //Create vertex and element buffers for the skybox and screen quad
-          glCreateBuffers(4, &bufferIds.skybox);
+          glCreateBuffers(1, &bufferIds.skybox);
+          glCreateBuffers(1, &bufferIds.skyboxElement);
+          glCreateBuffers(1, &bufferIds.screenQuad);
+          glCreateBuffers(1, &bufferIds.screenQuadElement);
 
           //Fill vertex and element buffers for the skybox
           glNamedBufferData(bufferIds.skybox, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
@@ -253,7 +256,11 @@ namespace ammonite {
           glDeleteFramebuffers(1, &screenQuadFBO);
           glDeleteRenderbuffers(1, &depthRenderBufferId);
 
-          glDeleteBuffers(4, &bufferIds.skybox);
+          glDeleteBuffers(1, &bufferIds.skybox);
+          glDeleteBuffers(1, &bufferIds.skyboxElement);
+          glDeleteBuffers(1, &bufferIds.screenQuad);
+          glDeleteBuffers(1, &bufferIds.screenQuadElement);
+
           glDeleteVertexArrays(1, &skyboxVertexArrayId);
           glDeleteVertexArrays(1, &screenQuadVertexArrayId);
 
