@@ -294,9 +294,15 @@ namespace {
 
     //Determine how many arguments are required
     const SettingKeyEnum settingKey = settingKeyMap.at(arguments[1]);
-    unsigned int requiredArgumentCount = 2;
-    if (settingKey == AmbientLightKey) {
+    unsigned int requiredArgumentCount = 0;
+    switch (settingKey) {
+    case AmbientLightKey:
+    case PlacementColourKey:
       requiredArgumentCount = 4;
+      break;
+    default:
+      requiredArgumentCount = 2;
+      break;
     }
 
     //Validate argument count
