@@ -14,7 +14,6 @@
 
 #include "demos/object-field.hpp"
 #include "demos/many-cubes.hpp"
-#include "demos/monkey.hpp"
 #include "demos/sponza.hpp"
 
 //NOLINTBEGIN(cppcoreguidelines-macro-usage)
@@ -41,7 +40,6 @@ namespace {
   std::unordered_map<std::string, DemoFunctions> demoFunctionMap = {
     EXPAND_DEMO("object-field", objectFieldDemo),
     EXPAND_DEMO("many-cubes", manyCubesDemo),
-    EXPAND_DEMO("monkey", monkeyDemo),
     EXPAND_DEMO("sponza", sponzaDemo)
   };
 }
