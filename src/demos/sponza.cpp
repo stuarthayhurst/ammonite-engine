@@ -30,15 +30,13 @@ namespace sponzaDemo {
   bool postEngineInit() {
     const AmmoniteId screenId = ammonite::splash::getActiveSplashScreenId();
 
-    //Load models from a set of objects and materials
+    //Load models from a set of objects
     const std::string modelPaths[4] = {
       "assets-experimental/intel-assets/main_sponza/NewSponza_Main_glTF_003.gltf",
       "assets-experimental/intel-assets/pkg_a_curtains/NewSponza_Curtains_glTF.gltf",
       "assets-experimental/intel-assets/pkg_b_ivy/NewSponza_IvyGrowth_glTF.gltf",
       "assets/cube.obj"
     };
-    const ammonite::models::AmmoniteMaterial material =
-      ammonite::models::createMaterial("assets/flat.png", {0.5f, 0.5f, 0.5f});
     const unsigned int modelCount = sizeof(modelPaths) / sizeof(modelPaths[0]);
     const unsigned int cubeIndex = 3;
 
@@ -61,14 +59,6 @@ namespace sponzaDemo {
       ammonite::splash::setSplashScreenProgress(screenId, float(i + 1) / float(modelCount + 1));
       ammonite::renderer::drawFrame();
     }
-
-    //Apply the cube's material
-    if (!ammonite::models::applyMaterial(loadedModelIds[cubeIndex], material)) {
-      ammonite::utils::warning << "Failed to apply texture '" \
-                               << *material.diffuse.textureInfo.texturePath \
-                               << "' to '" << modelPaths[cubeIndex] << "'" << std::endl;
-    }
-    ammonite::models::deleteMaterial(material);
 
     //Position the light cube
     ammonite::models::position::setPosition(loadedModelIds[cubeIndex], lightModelPosition);
