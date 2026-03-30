@@ -245,12 +245,10 @@ namespace objectFieldDemo {
     ammonite::Vec<float, 3> cubeData[cubeCount][3];
     genRandomPosData(&cubeData[0][0], cubeCount);
 
-    //Load models from a set of objects and materials
+    //Load models from a set of objects
     const std::string modelPaths[2] = {
       "assets/sphere.obj", "assets/cube.obj"
     };
-    const ammonite::models::AmmoniteMaterial material =
-      ammonite::models::createMaterial("assets/flat.png", {0.5f, 0.5f, 0.5f});
     const unsigned int totalModels = lightCount + cubeCount + 1;
 
     //Load light models
@@ -261,7 +259,6 @@ namespace objectFieldDemo {
       const AmmoniteId modelId = ammonite::models::createModel(modelPaths[0]);
       loadedModelIds.push_back(modelId);
       vertexCount += ammonite::models::getVertexCount(loadedModelIds[i]);
-      success &= ammonite::models::applyMaterial(loadedModelIds[i], material);
 
       if (modelId == 0) {
         success = false;
@@ -279,10 +276,6 @@ namespace objectFieldDemo {
     loadedModelIds.push_back(floorId);
     vertexCount += ammonite::models::getVertexCount(floorId);
     modelCount++;
-
-    //Apply the material
-    success &= ammonite::models::applyMaterial(floorId, material);
-    ammonite::models::deleteMaterial(material);
 
     if (floorId == 0 || !success) {
       demoExit();
