@@ -128,10 +128,10 @@
 </p>
 
 ## Credits:
- - Some models in `assets/` may have been created by third parties, attribution can be found in `docs/CREDITS.md`
- - Reference materials:
-   - [OpenGL Tutorial](https://www.opengl-tutorial.org/)
-   - [Learn OpenGL](https://learnopengl.com/Introduction)
+  - Some models in `assets/` may have been created by third parties, attribution can be found in `docs/CREDITS.md`
+  - Reference materials:
+    - [OpenGL Tutorial](https://www.opengl-tutorial.org/)
+    - [Learn OpenGL](https://learnopengl.com/Introduction)
 
 ## Licence:
   - This project is available under the terms of the MIT License
