@@ -7,7 +7,7 @@ PREFIX_DIR ?= /usr/local
 INSTALL_DIR ?= $(PREFIX_DIR)/lib
 HEADER_DIR ?= $(PREFIX_DIR)/include
 PKG_CONF_DIR ?= $(INSTALL_DIR)/pkgconfig
-LIBRARY_VERSION = $(shell pkg-config --modversion ammonite.pc)
+LIBRARY_VERSION = $(shell pkg-config --modversion data/ammonite.pc)
 LIBRARY_NAME = libammonite.so.$(LIBRARY_VERSION)
 
 AMMONITE_OBJECTS_SOURCE = $(shell ls ./src/ammonite/**/*.cpp)
@@ -108,9 +108,9 @@ ifeq ($(CHECK_LEAKS),true)
 endif
 
 #Fetch library dependencies and flags from ammonite.pc
-REQUIRES_PRIVATE = $(shell sed -ne 's/^.*Requires.private: //p' ammonite.pc)
-LDFLAGS_PRIVATE = $(shell sed -ne 's/^.*Libs.private: //p' ammonite.pc)
-CFLAGS_PRIVATE = $(shell sed -ne 's/^.*Cflags.private: //p' ammonite.pc)
+REQUIRES_PRIVATE = $(shell sed -ne 's/^.*Requires.private: //p' data/ammonite.pc)
+LDFLAGS_PRIVATE = $(shell sed -ne 's/^.*Libs.private: //p' data/ammonite.pc)
+CFLAGS_PRIVATE = $(shell sed -ne 's/^.*Cflags.private: //p' data/ammonite.pc)
 
 #Library arguments
 LIBRARY_CXXFLAGS := $(CXXFLAGS) -fpic $(CFLAGS_PRIVATE) -DAMMONITE_VERSION=$(LIBRARY_VERSION)
@@ -123,7 +123,7 @@ ifneq ($(USE_SYSTEM),true)
   PKG_CONF_ARGS = "--define-variable=libdir=$(BUILD_DIR)" \
                   "--define-variable=includedir=$(PROJECT_ROOT)src/include" \
                   "--with-path=$(PROJECT_ROOT)"
-  PKG_CONF_FILE = ammonite.pc
+  PKG_CONF_FILE = data/ammonite.pc
 else
   PKG_CONF_FILE = ammonite
 endif
@@ -271,8 +271,8 @@ headers:
 	@mkdir -p "$(HEADER_DIR)"
 	@cp -rv "src/include/ammonite" "$(HEADER_DIR)/ammonite"
 	@mkdir -p "$(PKG_CONF_DIR)"
-	install "ammonite.pc" "$(PKG_CONF_DIR)/ammonite.pc"
-	sed -e "s|prefix=/usr/local|prefix=$(PREFIX_DIR)|" "ammonite.pc" > "$(PKG_CONF_DIR)/ammonite.pc"
+	install "data/ammonite.pc" "$(PKG_CONF_DIR)/ammonite.pc"
+	sed -e "s|prefix=/usr/local|prefix=$(PREFIX_DIR)|" "data/ammonite.pc" > "$(PKG_CONF_DIR)/ammonite.pc"
 install:
 	@mkdir -p "$(INSTALL_DIR)/ammonite"
 	install "$(BUILD_DIR)/libammonite.so" "$(INSTALL_DIR)/ammonite/$(LIBRARY_NAME)"
