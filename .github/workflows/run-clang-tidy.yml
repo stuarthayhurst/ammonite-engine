@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-24.04, ubuntu-24.04-arm]
+        os: [ubuntu-26.04, ubuntu-26.04-arm]
         options: [DEBUG="false" FAST="false", DEBUG="true" FAST="true"]
     runs-on: ${{ matrix.os }}
 
@@ -25,8 +25,6 @@ jobs:
 
     - name: Install build dependencies
       run: |
-        wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-        echo "deb https://apt.llvm.org/noble/ llvm-toolchain-noble-22 main" | sudo tee -a /etc/apt/sources.list
         sudo apt-get update
         sudo apt-get install --no-install-recommends make pkg-config build-essential
         sudo apt-get install clang-tidy-22
