@@ -671,7 +671,7 @@ namespace ammonite {
         }
 
         //Depth mapping render passes
-        ammonite::lighting::internal::finishUpdateLightSources();
+        lighting::internal::updateLightSources();
         const unsigned int activeLights = std::min(lightCount, maxLightCount);
         for (unsigned int shadowCount = 0; shadowCount < activeLights; shadowCount++) {
           //Check framebuffer status

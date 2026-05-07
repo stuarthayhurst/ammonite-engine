@@ -27,8 +27,7 @@ namespace AMMONITE_INTERNAL ammonite {
 
       void unlinkByModel(AmmoniteId modelId);
 
-      void startUpdateLightSources();
-      void finishUpdateLightSources();
+      void updateLightSources();
       void setLightSourcesChanged();
       void destroyLightSystem();
     }

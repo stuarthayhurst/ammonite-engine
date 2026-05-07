@@ -82,7 +82,6 @@ namespace ammonite {
       static int unsigned frameCount = 0;
       const AmmoniteId splashScreenId = ammonite::splash::getActiveSplashScreenId();
       if (splashScreenId == 0) {
-        ammonite::lighting::internal::startUpdateLightSources();
         totalFrames++;
         frameCount++;
       }

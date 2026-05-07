@@ -17,7 +17,6 @@ extern "C" {
 #include "../models/models.hpp"
 #include "../utils/debug.hpp"
 #include "../utils/id.hpp"
-#include "../utils/thread.hpp"
 
 namespace ammonite {
   namespace lighting {
@@ -35,31 +34,20 @@ namespace ammonite {
       bool lightSourcesChanged = false;
       AmmoniteId lastLightId = 0;
 
-      //Data structure to match shader light sources in shader
+      //Data structures to match shader light sources in shader
       using ShaderLightSource = ammonite::Vec<float, 4>[3];
       using ShaderShadowTransform = ammonite::Mat<float, 4>[6];
-
-      //Data used by the light worker
-      struct LightWorkerData {
-        unsigned int i;
-      };
-      ammonite::Mat<float, 4> shadowProj = {{0}};
-
       ShaderLightSource* shaderLightData = nullptr;
       ShaderShadowTransform* shaderShadowData = nullptr;
-      LightWorkerData* workerData = nullptr;
-      AmmoniteGroup group{0};
     }
 
     namespace {
-      void lightWork(void* userPtr) {
-        const unsigned int i = ((LightWorkerData*)userPtr)->i;
-
+      void packLight(unsigned int index, const ammonite::Mat<float, 4>& shadowProj) {
         //Repacking light sources
         auto lightIt = lightTrackerMap.begin();
-        std::advance(lightIt, i);
-        lighting::internal::LightSource* const lightSource = &lightIt->second;
-        lightSource->lightIndex = i;
+        std::advance(lightIt, index);
+        internal::LightSource* const lightSource = &lightIt->second;
+        lightSource->lightIndex = index;
 
         //Override position for light emitting models, and add to tracker
         if (lightSource->modelId != 0) {
@@ -72,9 +60,9 @@ namespace ammonite {
         }
 
         //Repack lighting information
-        ammonite::set(shaderLightData[i][0], lightSource->geometry, 0.0f);
-        ammonite::set(shaderLightData[i][1], lightSource->diffuse, 0.0f);
-        ammonite::set(shaderLightData[i][2], lightSource->specular, lightSource->power);
+        ammonite::set(shaderLightData[index][0], lightSource->geometry, 0.0f);
+        ammonite::set(shaderLightData[index][1], lightSource->diffuse, 0.0f);
+        ammonite::set(shaderLightData[index][2], lightSource->specular, lightSource->power);
 
         const ammonite::Vec<float, 3> targetVectors[6] = {
           {1.0f, 0.0f, 0.0f}, {-1.0f, 0.0f, 0.0f},
@@ -123,7 +111,6 @@ namespace ammonite {
         if (shaderLightData != nullptr) {
           delete [] shaderLightData;
           delete [] shaderShadowData;
-          delete [] workerData;
         }
       }
 
@@ -142,8 +129,8 @@ namespace ammonite {
         lightSourcesChanged = true;
       }
 
-      //Dispatch workers if the lighting buffers need rebuilding
-      void startUpdateLightSources() {
+      //Rebuild the lighting buffers if required
+      void updateLightSources() {
         //If lights haven't changed, skip
         if (!lightSourcesChanged) {
           return;
@@ -165,46 +152,32 @@ namespace ammonite {
           return;
         }
 
+        ammonite::Mat<float, 4> shadowProj = {{0}};
         const float shadowFarPlane = renderer::settings::getShadowFarPlane();
         ammonite::perspective(ammonite::radians(90.0f), 1.0f, 0.0f, shadowFarPlane, shadowProj);
 
-        //Resize buffers
-        if (prevLightCount != lightCount) {
+        //Resize buffers if the size has changed
+        const bool resizeBuffers = (prevLightCount != lightCount);
+        if (resizeBuffers) {
           if (shaderLightData != nullptr) {
             delete [] shaderLightData;
             delete [] shaderShadowData;
-            delete [] workerData;
           }
 
           shaderLightData = new ShaderLightSource[lightCount];
           shaderShadowData = new ShaderShadowTransform[lightCount];
-          workerData = new LightWorkerData[lightCount];
         }
 
         //Repack light sources into buffers (uses vec4s for OpenGL)
         for (unsigned int i = 0; i < lightCount; i++) {
-          workerData[i].i = i;
+          packLight(i, shadowProj);
         }
 
-        ammonite::utils::thread::submitMultiple(lightWork, &workerData[0],
-          sizeof(LightWorkerData), &group, lightCount, nullptr);
-      }
-
-      //Wait for the workers to finish and upload the lighting buffers
-      void finishUpdateLightSources() {
-        //If lights haven't changed, skip
-        if (!lightSourcesChanged) {
-          return;
-        }
-
-        const unsigned int lightCount = lightTrackerMap.size();
         const std::size_t shaderLightDataSize = sizeof(ShaderLightSource) * lightCount;
         const std::size_t shaderShadowDataSize = sizeof(ShaderShadowTransform) * lightCount;
 
-        ammonite::utils::thread::waitGroupComplete(&group, lightCount);
-
-        //If the light count hasn't changed, sub the data instead of recreating the buffer
-        if (prevLightCount == lightTrackerMap.size()) {
+        //Sub the data or resize the buffers
+        if (!resizeBuffers) {
           glNamedBufferSubData(lightDataId, 0, (GLsizeiptr)shaderLightDataSize, shaderLightData);
           glNamedBufferSubData(shadowDataId, 0, (GLsizeiptr)shaderShadowDataSize, shaderShadowData);
         } else {
@@ -298,12 +271,10 @@ namespace ammonite {
         if (shaderLightData != nullptr) {
           delete [] shaderLightData;
           delete [] shaderShadowData;
-          delete [] workerData;
         }
 
         shaderLightData = nullptr;
         shaderShadowData = nullptr;
-        workerData = nullptr;
       }
 
       lightSourcesChanged = true;
