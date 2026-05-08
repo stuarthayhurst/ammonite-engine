@@ -96,6 +96,9 @@ namespace ammonite {
         if (shaderLightData != nullptr) {
           delete [] shaderLightData;
           delete [] shaderShadowData;
+
+          shaderLightData = nullptr;
+          shaderShadowData = nullptr;
         }
       }
     }
