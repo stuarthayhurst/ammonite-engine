@@ -226,7 +226,11 @@ namespace objectFieldDemo {
       lightData[i].orbitPeriod = 2.0f;
       lightData[i].orbitRadius = 18.0f / (float)totalOrbits;
     }
-    lightData[0].orbitPeriod = 8.0f;
+
+    //Hard-code the first orbit to be slower, if present
+    if (lightCount >= 1) {
+      lightData[0].orbitPeriod = 8.0f;
+    }
 
     //Fill orbit calculation structures
     orbitSwapTargets = (unsigned int(*)[2])calculateSwapTargets(totalOrbits);
