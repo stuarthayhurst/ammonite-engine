@@ -12,6 +12,14 @@ extern "C" {
 namespace ammonite {
   namespace graphics {
     namespace internal {
+      namespace {
+        //Lighting shader storage buffer IDs
+        GLuint lightDataId = 0;
+        GLuint shadowDataId = 0;
+
+        unsigned int lastLightDataSize = 0;
+      }
+
       void createModelBuffers(models::internal::ModelData* modelData,
                               std::vector<models::internal::RawMeshData>* rawMeshDataVec) {
         //Generate buffers for every mesh
@@ -78,6 +86,51 @@ namespace ammonite {
           glDeleteBuffers(1, &meshInfo.elementBufferId);
           glDeleteVertexArrays(1, &meshInfo.vertexArrayId);
         }
+      }
+
+      //Unbind and delete the lighting data buffers
+      void deleteLightBuffers() {
+        if (lightDataId != 0) {
+          glDeleteBuffers(1, &lightDataId);
+          glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, 0);
+          lightDataId = 0;
+
+          glDeleteBuffers(1, &shadowDataId);
+          glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, 0);
+          shadowDataId = 0;
+        }
+      }
+
+      //Replace the lighting data buffers, creating them if necessary
+      void uploadLightBuffers(void* lightData, unsigned int lightDataSize,
+                              void* shadowData, unsigned int shadowDataSize){
+        const bool resizeBuffers = (lightDataSize != lastLightDataSize);
+
+        //Sub the data or resize the buffers
+        if (!resizeBuffers) {
+          glNamedBufferSubData(lightDataId, 0, (GLsizeiptr)lightDataSize, lightData);
+          glNamedBufferSubData(shadowDataId, 0, (GLsizeiptr)shadowDataSize, shadowData);
+        } else {
+          //If the buffers already exist, destroy them
+          if (lightDataId != 0) {
+            glDeleteBuffers(1, &lightDataId);
+            glDeleteBuffers(1, &shadowDataId);
+          }
+
+          //Record the buffer size
+          lastLightDataSize = lightDataSize;
+
+          //Add the shader data to a shader storage buffer object
+          glCreateBuffers(1, &lightDataId);
+          glNamedBufferData(lightDataId, (GLsizeiptr)lightDataSize, lightData, GL_DYNAMIC_DRAW);
+
+          glCreateBuffers(1, &shadowDataId);
+          glNamedBufferData(shadowDataId, (GLsizeiptr)shadowDataSize, shadowData, GL_DYNAMIC_DRAW);
+        }
+
+        //Use the lighting and shadow shader storage buffer
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, lightDataId);
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, shadowDataId);
       }
     }
   }
