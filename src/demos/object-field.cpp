@@ -314,7 +314,7 @@ namespace objectFieldDemo {
     ammonite::renderer::drawFrame();
 
     //Setup each light and model
-    ammonite::lighting::setAmbientLight(ambientLight);
+    ammonite::lighting::properties::setAmbientLight(ambientLight);
     for (unsigned int i = 0; i < lightCount; i++) {
       const AmmoniteId lightId = ammonite::lighting::createLightSource();
       ammonite::models::position::setScale(loadedModelIds[i], lightData[i].scale);

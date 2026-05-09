@@ -20,9 +20,6 @@ extern "C" {
 namespace ammonite {
   namespace lighting {
     namespace {
-      //Default ambient light
-      ammonite::Vec<float, 3> ambientLight {0.0f, 0.0f, 0.0f};
-
       //Track light sources
       std::unordered_map<AmmoniteId, lighting::internal::LightSource> lightTrackerMap;
       unsigned int prevLightCount = 0;
@@ -82,16 +79,6 @@ namespace ammonite {
         }
       }
 
-      //Pointer is only valid until lightTrackerMap is modified
-      internal::LightSource* getLightSourcePtr(AmmoniteId lightId) {
-        //Check the light source exists, and return a pointer
-        if (lightTrackerMap.contains(lightId)) {
-          return &lightTrackerMap[lightId];
-        }
-
-        return nullptr;
-      }
-
       void freeLightBuffers() {
         if (shaderLightData != nullptr) {
           delete [] shaderLightData;
@@ -105,6 +92,16 @@ namespace ammonite {
 
     //Internally exposed light handling methods
     namespace internal {
+      //Pointer is only valid until lightTrackerMap is modified
+      LightSource* getLightSourcePtr(AmmoniteId lightId) {
+        //Check the light source exists, and return a pointer
+        if (lightTrackerMap.contains(lightId)) {
+          return &lightTrackerMap[lightId];
+        }
+
+        return nullptr;
+      }
+
       void destroyLightSystem() {
         //Destroy the GPU buffers
         graphics::internal::deleteLightBuffers();
@@ -242,71 +239,6 @@ namespace ammonite {
       }
 
       lightSourcesChanged = true;
-    }
-
-    void setAmbientLight(const ammonite::Vec<float, 3>& ambient) {
-      ammonite::copy(ambient, ambientLight);
-    }
-
-    void getAmbientLight(ammonite::Vec<float, 3>& ambient) {
-      ammonite::copy(ambientLight, ambient);
-    }
-
-
-    //Exposed functions to modify light properties
-    namespace properties {
-      void getGeometry(AmmoniteId lightId, ammonite::Vec<float, 3>& geometry) {
-        const internal::LightSource* const lightSource = getLightSourcePtr(lightId);
-        if (lightSource == nullptr) {
-          ammonite::set(geometry, 0.0f);
-          return;
-        }
-
-        ammonite::copy(lightSource->geometry, geometry);
-      }
-
-      void getColour(AmmoniteId lightId, ammonite::Vec<float, 3>& colour) {
-        const internal::LightSource* const lightSource = getLightSourcePtr(lightId);
-        if (lightSource == nullptr) {
-          ammonite::set(colour, 0.0f);
-          return;
-        }
-
-        ammonite::copy(lightSource->diffuse, colour);
-      }
-
-      float getPower(AmmoniteId lightId) {
-        const internal::LightSource* const lightSource = getLightSourcePtr(lightId);
-        if (lightSource == nullptr) {
-          return 0.0f;
-        }
-
-        return lightSource->power;
-      }
-
-      void setGeometry(AmmoniteId lightId, const ammonite::Vec<float, 3>& geometry) {
-        internal::LightSource* const lightSource = getLightSourcePtr(lightId);
-        if (lightSource != nullptr) {
-          ammonite::copy(geometry, lightSource->geometry);
-          lightSourcesChanged = true;
-        }
-      }
-
-      void setColour(AmmoniteId lightId, const ammonite::Vec<float, 3>& colour) {
-        internal::LightSource* const lightSource = getLightSourcePtr(lightId);
-        if (lightSource != nullptr) {
-          ammonite::copy(colour, lightSource->diffuse);
-          lightSourcesChanged = true;
-        }
-      }
-
-      void setPower(AmmoniteId lightId, float power) {
-        internal::LightSource* const lightSource = getLightSourcePtr(lightId);
-        if (lightSource != nullptr) {
-          lightSource->power = power;
-          lightSourcesChanged = true;
-        }
-      }
     }
   }
 }

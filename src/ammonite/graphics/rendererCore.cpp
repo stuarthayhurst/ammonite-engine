@@ -704,7 +704,7 @@ namespace ammonite {
         //Get ambient light and camera position
         ammonite::Vec<float, 3> ambientLight = {0};
         ammonite::Vec<float, 3> cameraPosition = {0};
-        ammonite::lighting::getAmbientLight(ambientLight);
+        ammonite::lighting::properties::getAmbientLight(ambientLight);
         ammonite::camera::getPosition(ammonite::camera::getActiveCamera(), cameraPosition);
 
         //Pass uniforms and render regular models

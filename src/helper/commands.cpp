@@ -268,7 +268,7 @@ namespace {
     case AmbientLightKey:
       {
         ammonite::Vec<float, 3> lightVec = {0};
-        ammonite::lighting::getAmbientLight(lightVec);
+        ammonite::lighting::properties::getAmbientLight(lightVec);
         result = ammonite::formatVector(lightVec);
         break;
       }
@@ -388,7 +388,7 @@ namespace {
       ammonite::renderer::settings::setGammaCorrection(*((bool*)valuePtr));
       break;
     case AmbientLightKey:
-      ammonite::lighting::setAmbientLight(*((ammonite::Vec<float, 3>*)valuePtr));
+      ammonite::lighting::properties::setAmbientLight(*((ammonite::Vec<float, 3>*)valuePtr));
       break;
     case PlacementColourKey:
       placement::setPlacementColour(*((ammonite::Vec<float, 3>*)valuePtr));

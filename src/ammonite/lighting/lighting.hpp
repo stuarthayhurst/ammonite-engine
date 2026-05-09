@@ -30,6 +30,8 @@ namespace AMMONITE_INTERNAL ammonite {
       void updateLightSources();
       void setLightSourcesChanged();
       void destroyLightSystem();
+
+      LightSource* getLightSourcePtr(AmmoniteId lightId);
     }
   }
 }

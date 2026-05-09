@@ -81,7 +81,7 @@ namespace sponzaDemo {
     const AmmoniteId lightId = ammonite::lighting::createLightSource();
     ammonite::lighting::properties::setPower(lightId, 50.0f);
     ammonite::lighting::linkModel(lightId, loadedModelIds[modelCount - 1]);
-    ammonite::lighting::setAmbientLight(ambientLight);
+    ammonite::lighting::properties::setAmbientLight(ambientLight);
 
     //Set the camera position
     const AmmoniteId cameraId = ammonite::camera::getActiveCamera();

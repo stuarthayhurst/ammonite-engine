@@ -78,7 +78,7 @@ namespace manyCubesDemo {
     }
 
     //Create light sources
-    ammonite::lighting::setAmbientLight(ambientLight);
+    ammonite::lighting::properties::setAmbientLight(ambientLight);
     for (unsigned int i = 0; i < lightCount; i++) {
       lightSourceIds[i] = ammonite::lighting::createLightSource();
       ammonite::utils::random(lightSourcePositions[i], (float)sideLength);
