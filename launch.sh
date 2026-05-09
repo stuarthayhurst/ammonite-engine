@@ -22,9 +22,25 @@ else
   target="$buildDir/demo"
 fi
 
+#Pick a path to valgrind
+USE_VALGRIND_PATH=""
+for arg in "$@"; do
+ if [[ "$arg" == "--valgrind" ]]; then
+   if [[ "$VALGRIND" != "" ]]; then
+     USE_VALGRIND_PATH="$VALGRIND"
+   else
+     USE_VALGRIND_PATH="valgrind"
+   fi
+ fi
+done
+
 if [[ ! -f "$target" ]]; then
   echo "$target doesn't exist, did you forget to build the demo?" > /dev/stderr
   exit 1
 fi
 
-LD_LIBRARY_PATH="$NEW_LD_LIBRARY_PATH" "$target" "$@"
+if [[ "$USE_VALGRIND_PATH" == "" ]]; then
+  LD_LIBRARY_PATH="$NEW_LD_LIBRARY_PATH" "$target" "$@"
+else
+  LD_LIBRARY_PATH="$NEW_LD_LIBRARY_PATH" "$USE_VALGRIND_PATH" --leak-check=full "$target" "$@"
+fi

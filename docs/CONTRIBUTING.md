@@ -45,6 +45,9 @@
     - `CHECK_TYPES`: `true / false` - Enables `-fsanitize=type` for runtime type aliasing violation checking
     - `CHECK_MEMORY`: `true / false` - Enables `-fsanitize=memory` for runtime uninitialised read checking
     - `CHECK_LEAKS`: `true / false` - Enables `-fsanitize=leak` for runtime leak checking
+    - `VALGRIND_SAFE`: `true / false` - Disable arguments that cause issues for valgrind
+      - Use `./launch.sh [OPTIONS] --valgrind` to run the engine through valgrind
+      - Use `VALGRIND` to choose a different path for the `valgrind` binary
     - `BUILD_DIR` - Use a different directory for temporary build system files
     - `PREFIX_DIR` - Change the base install path
       - `INSTALL_DIR` - Install `libammonite.so` and `ammonite.pc` to a different location

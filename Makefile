@@ -83,28 +83,30 @@ else
   CXXFLAGS += -O3
 endif
 
-ifeq ($(CHECK_ADDRESS),true)
-  CXXFLAGS += -fsanitize=address
-endif
+ifneq ($(VALGRIND_SAFE),true)
+  ifeq ($(CHECK_ADDRESS),true)
+    CXXFLAGS += -fsanitize=address
+  endif
 
-ifeq ($(CHECK_UNDEFINED),true)
-  CXXFLAGS += -fsanitize=undefined
-endif
+  ifeq ($(CHECK_UNDEFINED),true)
+    CXXFLAGS += -fsanitize=undefined
+  endif
 
-ifeq ($(CHECK_THREADS),true)
-  CXXFLAGS += -fsanitize=thread
-endif
+  ifeq ($(CHECK_THREADS),true)
+    CXXFLAGS += -fsanitize=thread
+  endif
 
-ifeq ($(CHECK_TYPES),true)
-  CXXFLAGS += -fsanitize=type
-endif
+  ifeq ($(CHECK_TYPES),true)
+    CXXFLAGS += -fsanitize=type
+  endif
 
-ifeq ($(CHECK_MEMORY),true)
-  CXXFLAGS += -fsanitize=memory
-endif
+  ifeq ($(CHECK_MEMORY),true)
+    CXXFLAGS += -fsanitize=memory
+  endif
 
-ifeq ($(CHECK_LEAKS),true)
-  LDFLAGS += -fsanitize=leak
+  ifeq ($(CHECK_LEAKS),true)
+    LDFLAGS += -fsanitize=leak
+  endif
 endif
 
 #Fetch library dependencies and flags from ammonite.pc
