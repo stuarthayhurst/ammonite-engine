@@ -44,7 +44,7 @@ namespace ammonite {
         //Override position for light emitting models, and add to tracker
         if (lightSource->modelId != 0) {
           //Override light position, using linked model
-          ammonite::models::position::getPosition(lightSource->modelId, lightSource->geometry);
+          ammonite::models::position::getPosition(lightSource->modelId, lightSource->position);
 
           //Update lightIndex for rendering light emitting models
           auto* modelPtr = ammonite::models::internal::getModelPtr(lightSource->modelId);
@@ -52,7 +52,7 @@ namespace ammonite {
         }
 
         //Repack lighting information
-        ammonite::set(shaderLightData[index][0], lightSource->geometry, 0.0f);
+        ammonite::set(shaderLightData[index][0], lightSource->position, 0.0f);
         ammonite::set(shaderLightData[index][1], lightSource->diffuse, 0.0f);
         ammonite::set(shaderLightData[index][2], lightSource->specular, lightSource->power);
 
@@ -71,10 +71,10 @@ namespace ammonite {
         //Calculate shadow transform matrices
         for (int matIndex = 0; matIndex < 6; matIndex++) {
           ammonite::Vec<float, 3> targetPosition = {0};
-          ammonite::add(lightSource->geometry, targetVectors[matIndex], targetPosition);
+          ammonite::add(lightSource->position, targetVectors[matIndex], targetPosition);
 
           ammonite::Mat<float, 4> transformMat = {{0}};
-          ammonite::lookAt(lightSource->geometry, targetPosition, upVectors[matIndex], transformMat);
+          ammonite::lookAt(lightSource->position, targetPosition, upVectors[matIndex], transformMat);
           ammonite::multiply(shadowProj, transformMat, shaderShadowData[lightSource->lightIndex][matIndex]);
         }
       }

@@ -9,12 +9,12 @@ namespace AMMONITE_EXPOSED ammonite {
   namespace lighting {
     namespace properties {
       //Per-light getters
-      void getGeometry(AmmoniteId lightId, ammonite::Vec<float, 3>& geometry);
+      void getPosition(AmmoniteId lightId, ammonite::Vec<float, 3>& position);
       void getColour(AmmoniteId lightId, ammonite::Vec<float, 3>& colour);
       float getPower(AmmoniteId lightId);
 
       //Per-light setters
-      void setGeometry(AmmoniteId lightId, const ammonite::Vec<float, 3>& geometry);
+      void setPosition(AmmoniteId lightId, const ammonite::Vec<float, 3>& position);
       void setColour(AmmoniteId lightId, const ammonite::Vec<float, 3>& colour);
       void setPower(AmmoniteId lightId, float power);
 

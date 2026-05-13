@@ -3,7 +3,7 @@
 //Data structure to handle input from shader storage buffer object
 //specular.w is actually power
 struct LightSource {
-  vec3 geometry;
+  vec3 position;
   vec3 diffuse;
   vec4 specular;
 };

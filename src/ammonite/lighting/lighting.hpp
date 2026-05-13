@@ -16,7 +16,8 @@ namespace AMMONITE_INTERNAL ammonite {
   namespace lighting {
     namespace internal {
       struct LightSource {
-        ammonite::Vec<float, 3> geometry = {0.0f, 0.0f, 0.0f};
+        //Position is ignored during rendering when linked to a model
+        ammonite::Vec<float, 3> position = {0.0f, 0.0f, 0.0f};
         ammonite::Vec<float, 3> diffuse = {1.0f, 1.0f, 1.0f};
         ammonite::Vec<float, 3> specular = {0.3f, 0.3f, 0.3f};
         float power = 1.0f;

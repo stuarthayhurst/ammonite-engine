@@ -3,7 +3,7 @@
 //Data structure to handle input from shader storage buffer object
 //specular.w is actually power
 struct LightSource {
-  vec3 geometry;
+  vec3 position;
   vec3 diffuse;
   vec4 specular;
 };
@@ -57,7 +57,7 @@ vec3 calcLight(LightSource lightSource, vec3 normal, vec3 fragPos, vec3 lightDir
   }
 
   //Attenuation of the source
-  float dist = distance(lightSource.geometry, fragPos);
+  float dist = distance(lightSource.position, fragPos);
   float attenuation = lightSource.specular.w / (dist * dist);
 
   return (diffuse + specular) * attenuation;
@@ -75,10 +75,10 @@ void main() {
 
   //Calculate lighting influence from each light source
   for (uint i = 0; i < lightCount; i++) {
-    vec3 lightDir = normalize(lightSources[i].geometry - fragData.fragPos);
+    vec3 lightDir = normalize(lightSources[i].position - fragData.fragPos);
 
     //Final contribution from the current light source
-    float shadow = calcShadow(i, fragData.fragPos, lightSources[i].geometry);
+    float shadow = calcShadow(i, fragData.fragPos, lightSources[i].position);
     vec3 light = calcLight(lightSources[i], fragData.normal, fragData.fragPos, lightDir);
     lightColour += (1.0f - shadow) * light;
   }

@@ -112,7 +112,7 @@ namespace manyCubesDemo {
       lightSourcePositions[i][1] = 4.0f;
       lightSourcePositions[i][2] = std::clamp(lightSourcePositions[i][2], 0.0f, (float)sideLength);
 
-      ammonite::lighting::properties::setGeometry(lightSourceIds[i], lightSourcePositions[i]);
+      ammonite::lighting::properties::setPosition(lightSourceIds[i], lightSourcePositions[i]);
     }
 
     ammonite::renderer::drawFrame();
