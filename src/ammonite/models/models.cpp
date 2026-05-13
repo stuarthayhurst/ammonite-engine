@@ -189,6 +189,11 @@ namespace ammonite {
         return &haveModelsMoved;
       }
 
+      /*
+       - Set the ID of the attached light source
+         - This doesn't unlink an existing source first
+       - Change the model's type to match
+      */
       void setLightEmitterId(AmmoniteId modelId, AmmoniteId lightEmitterId) {
         //Select the right tracker
         ModelTracker* selectedTracker = &inactiveModelTracker;

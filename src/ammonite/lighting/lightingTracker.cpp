@@ -16,6 +16,7 @@ extern "C" {
 #include "../models/models.hpp"
 #include "../utils/debug.hpp"
 #include "../utils/id.hpp"
+#include "../utils/logging.hpp"
 
 namespace ammonite {
   namespace lighting {
@@ -112,10 +113,18 @@ namespace ammonite {
         freeLightBuffers();
       }
 
-      //Unlink a light source from a model, using only the model ID (doesn't touch the model)
+      /*
+       - Unlink a light source from a model, using only the model ID
+       - This doesn't touch the model's structures
+         - Only use this when the model will be immediately destroyed after,
+           or when a new light will be manually linked
+         - This is behaviour useful for model destruction, since the model's data
+           won't be shuffled around to match its state change
+      */
       void unlinkByModel(AmmoniteId modelId) {
         //Get the ID of the light attached to the model
         const AmmoniteId lightId = ammonite::models::internal::getLightEmitterId(modelId);
+
         //Unlink if a light was attached
         if (lightId != 0) {
           lightTrackerMap[lightId].modelId = 0;
@@ -196,27 +205,44 @@ namespace ammonite {
     }
 
     void linkModel(AmmoniteId lightId, AmmoniteId modelId) {
+      //Check that the light source exists
+      if (!lightTrackerMap.contains(lightId)) {
+        ammonite::utils::warning << "Can't link light ID '" << lightId \
+                                 << "', it doesn't exist" << std::endl;
+      }
+
+      //Check that the model exists
+      if (models::internal::getModelPtr(modelId) == nullptr) {
+        ammonite::utils::warning << "Can't link to model ID '" << modelId \
+                                 << "', it doesn't exist" << std::endl;
+      }
+
       //Remove any light source's attachment to the model
       ammonite::lighting::internal::unlinkByModel(modelId);
 
-      //If the light source is already linked to another model, reset the linked model
-      internal::LightSource* const lightSource = &lightTrackerMap[lightId];
-      if (lightSource->modelId != 0) {
-        ammonite::models::internal::setLightEmitterId(lightSource->modelId, 0);
-      }
+      //Remove any model attached to the light source
+      unlinkModel(lightId);
 
       //Link the light source and model together
-      lightSource->modelId = modelId;
+      lightTrackerMap[lightId].modelId = modelId;
       ammonite::models::internal::setLightEmitterId(modelId, lightId);
       lightSourcesChanged = true;
     }
 
     void unlinkModel(AmmoniteId lightId) {
-      //Unlink the attached model from the light source
+      //Check that the light source exists, then fetch it
+      if (!lightTrackerMap.contains(lightId)) {
+        ammonite::utils::warning << "Can't unlink light ID '" << lightId \
+                                 << "', it doesn't exist" << std::endl;
+      }
       internal::LightSource* const lightSource = &lightTrackerMap[lightId];
-      ammonite::models::internal::setLightEmitterId(lightSource->modelId, 0);
-      lightSource->modelId = 0;
-      lightSourcesChanged = true;
+
+      //Unlink any attached model from the light source
+      if (lightSource->modelId != 0) {
+        ammonite::models::internal::setLightEmitterId(lightSource->modelId, 0);
+        lightSource->modelId = 0;
+        lightSourcesChanged = true;
+      }
     }
 
     void deleteLightSource(AmmoniteId lightId) {

@@ -95,6 +95,8 @@ namespace AMMONITE_INTERNAL ammonite {
         ModelTypeEnum modelType = AMMONITE_MODEL;
         AmmoniteDrawEnum drawMode = AMMONITE_DRAW_ACTIVE;
         AmmoniteId lightEmitterId = 0;
+
+        //Linked light index is filled in by the lighting system
         unsigned int lightIndex;
       };
 
