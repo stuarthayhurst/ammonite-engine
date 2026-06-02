@@ -9,30 +9,25 @@ targetArgs=()
 loopRequested="false"
 valgrindRequested="false"
 
-#Process arguments, filtering out arguments handled by launch.sh
+#Match arguments, filtering out arguments handled by launch.sh
 for arg in "$@"; do
-  #Pick a target binary
-  if [[ "$arg" == "--threads" ]]; then
-    target="$buildDir/threadTest"
-    continue
-  elif [[ "$arg" == "--maths" ]]; then
-    target="$buildDir/mathsTest"
-    continue
-  fi
-
-  #Enable looping the target
-  if [[ "$arg" == "--loop" ]]; then
-    loopRequested="true"
-    continue
-  fi
-
-  #Run the target with valgrind
-  if [[ "$arg" == "--valgrind" ]]; then
-    valgrindRequested="true"
-    continue
-  fi
-
-  targetArgs+=("$arg")
+  case "$arg" in
+    --threads)
+      target="$buildDir/threadTest"
+      ;;
+    --maths)
+      target="$buildDir/mathsTest"
+      ;;
+    --loop)
+      loopRequested="true"
+      ;;
+    --valgrind)
+      valgrindRequested="true"
+      ;;
+    *)
+      targetArgs+=("$arg")
+      ;;
+  esac
 done
 
 #Default to running the demo, disable loop mode if triggered
