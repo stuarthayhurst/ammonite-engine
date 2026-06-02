@@ -24,9 +24,9 @@ A clear and concise description of what you expected to happen
 If applicable, add screenshots and logs to help explain your problem
 
 **System information (please complete the following information):**
- - Distro: [e.g. Debian 11]
- - GPU: [e.g. Nvidia RTX 3060ti]
- - C++ Compiler + version: [e.g. g++ 12]
+ - Distro: [e.g. Debian 13]
+ - GPU: [e.g. Nvidia RTX 3060 Ti]
+ - C++ Compiler + version: [e.g. g++ 16]
  - GPU driver vendor: (Run `glxinfo |grep "OpenGL vendor string"`)
    - GPU driver version: (Method differs by driver)
 
