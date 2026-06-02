@@ -10,7 +10,7 @@ assignees: ''
 **Describe the issue**
 A clear and concise description of what the bug is
 
-**To Reproduce**
+**Reproduction steps**
 Steps to reproduce the behaviour:
 1. Go to '...'
 2. Click on '....'
