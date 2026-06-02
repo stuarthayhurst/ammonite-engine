@@ -1,5 +1,15 @@
 #!/bin/bash
 
+#Run a built object using the locally built library
+#Use --threads to run the thread tests
+#Use --maths to run the maths tests
+#Don't specify either of the above to run the graphical demo
+
+#Use --loop to repeatedly run a target (ignored for the default demo)
+#Use --valgrind to run the selected target through valgrind (ignored for loop mode)
+#  - Set USE_VALGRIND_PATH to use a specific path to the valgrind binary
+#Any unrecognised arguments will be passed to the target
+
 buildDir="build"
 NEW_LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$buildDir"
 
