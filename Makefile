@@ -178,7 +178,7 @@ $(BUILD_DIR)/libammonite.so: $(AMMONITE_OBJECTS)
 	@mkdir -p "$(OBJECT_DIR)"
 	$(CXX) -shared -o "$@" $(AMMONITE_OBJECTS) $(LIBRARY_CXXFLAGS) $(LIBRARY_LDFLAGS)
 	@if [[ "$(DEBUG)" != "true" ]]; then \
-	  strip --strip-unneeded "$(BUILD_DIR)/libammonite.so"; \
+	  strip --strip-unneeded "$@"; \
 	fi
 $(BUILD_DIR)/$(LIBRARY_NAME): $(BUILD_DIR)/libammonite.so
 	@rm -fv "$(BUILD_DIR)/$(LIBRARY_NAME)"
@@ -243,15 +243,15 @@ tests: threads maths
 all: demo tests
 demo: $(BUILD_DIR)/demo
 	@if [[ "$(DEBUG)" != "true" ]]; then \
-	  strip --strip-unneeded "$(BUILD_DIR)/demo"; \
+	  strip --strip-unneeded "$<"; \
 	fi
 threads: $(BUILD_DIR)/threadTest
 	@if [[ "$(DEBUG)" != "true" ]]; then \
-	  strip --strip-unneeded "$(BUILD_DIR)/threadTest"; \
+	  strip --strip-unneeded "$<"; \
 	fi
 maths: $(BUILD_DIR)/mathsTest
 	@if [[ "$(DEBUG)" != "true" ]]; then \
-	  strip --strip-unneeded "$(BUILD_DIR)/mathsTest"; \
+	  strip --strip-unneeded "$<"; \
 	fi
 debug:
 	@DEBUG="true" $(MAKE) --no-print-directory build
