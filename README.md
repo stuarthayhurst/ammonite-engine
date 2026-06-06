@@ -37,6 +37,7 @@
 ## Building + installing libammonite:
   - `make library`
   - `sudo make install`
+  - Optionally, run `sudo make headers` to install the headers
 
 ## Running a demo:
   - `make build` will compile the library and all demos on the current branch
