@@ -17,6 +17,7 @@
     - `make all` - Builds the demo and the tests
     - `make tests` - Builds the tests
     - `make debug` - Runs `make build` in debug mode
+    - `make debug-all` - Runs `make all` in debug mode
     - `make library` - Builds `build/libammonite.so`
     - `make demo` - Builds a demo binary, a working demonstration of the renderer
     - `make threads` - Builds a test program for the thread pool

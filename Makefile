@@ -255,6 +255,8 @@ maths: $(BUILD_DIR)/mathsTest
 	fi
 debug:
 	@DEBUG="true" $(MAKE) --no-print-directory build
+debug-all:
+	@DEBUG="true" $(MAKE) --no-print-directory all
 
 
 # --------------------------------
