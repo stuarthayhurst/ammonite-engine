@@ -54,7 +54,9 @@ CXXFLAGS += -fno-math-errno -flto=auto
 ifndef ARCH
   CXXFLAGS += -march=native
 else
-  CXXFLAGS += -march=$(ARCH)
+  ifneq ($(ARCH),unset)
+    CXXFLAGS += -march=$(ARCH)
+  endif
 endif
 
 ifeq ($(FAST),true)
