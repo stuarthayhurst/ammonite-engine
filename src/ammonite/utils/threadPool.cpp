@@ -4,7 +4,6 @@
 #include <cstddef>
 #include <cstdint>
 #include <iostream>
-#include <latch>
 #include <limits>
 #include <mutex>
 #include <queue>
@@ -92,7 +91,7 @@ namespace ammonite {
           std::atomic<bool> threadBlockTrigger = false;
           bool threadsBlocked = false;
           std::barrier<>* threadBlockBarrier;
-          std::latch* threadUnblockLatch;
+          std::barrier<>* threadUnblockBarrier;
 
           /*
            - Data for the work queues
@@ -124,7 +123,7 @@ namespace ammonite {
                 threadBlockTrigger.wait(true);
 
                 //Mark thread as unblocked as it resumes
-                threadUnblockLatch->count_down();
+                (void)threadUnblockBarrier->arrive();
               }
 
               /*
@@ -301,6 +300,7 @@ namespace ammonite {
 
           //Prepare thread block syncs
           threadBlockBarrier = new std::barrier{threadCount + 1};
+          threadUnblockBarrier = new std::barrier{threadCount + 1};
           threadsBlocked = false;
           threadBlockTrigger = false;
 
@@ -339,17 +339,13 @@ namespace ammonite {
         */
         void unblockThreads() {
           if (threadsBlocked) {
-            //Prepare a latch for synchronising unblocking
-            threadUnblockLatch = new std::latch{poolThreadCount + 1};
-
             //Instruct threads to unblock
             threadBlockTrigger = false;
             threadBlockTrigger.notify_all();
 
             //Wait for all thread to unblock, then clean up and return
-            threadUnblockLatch->arrive_and_wait();
+            threadUnblockBarrier->arrive_and_wait();
             threadsBlocked = false;
-            delete threadUnblockLatch;
           }
         }
 
@@ -398,6 +394,7 @@ namespace ammonite {
           delete [] threadPool;
           delete threadSyncBarrier;
           delete threadBlockBarrier;
+          delete threadUnblockBarrier;
           poolThreadCount = 0;
           queueLaneCount = 0;
           laneAssignMask = 0;
