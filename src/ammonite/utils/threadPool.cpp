@@ -1,7 +1,6 @@
 #include <atomic>
 #include <barrier>
 #include <bit>
-#include <chrono>
 #include <cstddef>
 #include <cstdint>
 #include <iostream>
