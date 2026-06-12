@@ -123,14 +123,14 @@ namespace {
   }
 
   void submitShortJobs(unsigned int jobCount, unsigned int* values) {
-    for (unsigned int i = 0; i < jobCount; i++) { \
-      ammonite::utils::thread::submitWork(shortTask, &values[i], nullptr); \
+    for (unsigned int i = 0; i < jobCount; i++) {
+      ammonite::utils::thread::submitWork(shortTask, &values[i], nullptr);
     }
   }
 
   void submitShortSyncJobs(unsigned int jobCount, unsigned int* values, AmmoniteGroup* group) {
-    for (unsigned int i = 0; i < jobCount; i++) { \
-      ammonite::utils::thread::submitWork(shortTask, &values[i], group); \
+    for (unsigned int i = 0; i < jobCount; i++) {
+      ammonite::utils::thread::submitWork(shortTask, &values[i], group);
     }
   }
 
