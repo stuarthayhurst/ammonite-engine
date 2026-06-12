@@ -36,4 +36,3 @@ namespace AMMONITE_INTERNAL ammonite {
 }
 
 #endif
-
