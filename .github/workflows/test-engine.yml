@@ -12,10 +12,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [{runner: ubuntu-26.04, arch: x86-64}, {runner: ubuntu-26.04-arm, arch: unset}]
+        os: [ubuntu-26.04, ubuntu-26.04-arm]
         compiler: [{package: g++-16, command: g++-16}, {package: clang-19, command: clang++-19}]
         stdlib: [libstdc++-16-dev]
-    runs-on: ${{ matrix.os.runner }}
+    runs-on: ${{ matrix.os }}
 
     steps:
     - uses: actions/checkout@v6
@@ -34,7 +34,7 @@ jobs:
     - name: (DEBUG + ASan + UBSan) Build tests
       run: |
         make clean
-        ARCH="${{ matrix.os.arch }}" CXX="${{ matrix.compiler.command }}" DEBUG="true" make tests -j$(nproc)
+        CXX="${{ matrix.compiler.command }}" DEBUG="true" make tests -j$(nproc)
 
     - name: (DEBUG + ASan + UBSan) Run maths tester
       run: |
@@ -47,7 +47,7 @@ jobs:
     - name: (DEBUG + TSan) Build thread tester
       run: |
         make clean
-        ARCH="${{ matrix.os.arch }}" CXX="${{ matrix.compiler.command }}" CHECK_THREADS="true" DEBUG="true" make threads -j$(nproc)
+        CXX="${{ matrix.compiler.command }}" CHECK_THREADS="true" DEBUG="true" make threads -j$(nproc)
 
     - name: (DEBUG + TSan) Run thread tester
       run: |

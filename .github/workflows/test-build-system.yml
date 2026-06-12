@@ -12,10 +12,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [{runner: ubuntu-26.04, arch: x86-64}, {runner: ubuntu-26.04-arm, arch: unset}]
+        os: [ubuntu-26.04, ubuntu-26.04-arm]
         compiler: [{package: g++-16, command: g++-16}, {package: clang-19, command: clang++-19}]
         stdlib: [libstdc++-16-dev]
-    runs-on: ${{ matrix.os.runner }}
+    runs-on: ${{ matrix.os }}
 
     steps:
     - uses: actions/checkout@v6
@@ -33,15 +33,15 @@ jobs:
 
     - name: Test shared library build target
       run: |
-        ARCH="${{ matrix.os.arch }}" CXX="${{ matrix.compiler.command }}" make library -j$(nproc)
+        CXX="${{ matrix.compiler.command }}" make library -j$(nproc)
 
     - name: Test demo build target
       run: |
-        ARCH="${{ matrix.os.arch }}" CXX="${{ matrix.compiler.command }}" make build -j$(nproc)
+        CXX="${{ matrix.compiler.command }}" make build -j$(nproc)
 
     - name: Test threads and maths build targets
       run: |
-        ARCH="${{ matrix.os.arch }}" CXX="${{ matrix.compiler.command }}" make threads maths -j$(nproc)
+        CXX="${{ matrix.compiler.command }}" make threads maths -j$(nproc)
 
     - name: Verify built objects
       run: |
