@@ -131,6 +131,7 @@
 ## Related projects
   - [Bad Hash Museum](https://github.com/stuarthayhurst/bad-hash-museum): Tools and hashes written for the shader cache hash used here
   - [Crystal Assembly Viewer](https://github.com/stuarthayhurst/crystal-assembly-viewer): A tool to locally inspect compiler output, written to optimise the maths functions
+  - [libtangle](https://github.com/stuarthayhurst/libtangle): A C++ thread pool created from the thread pool written for this project
 
 ## Credits:
   - Some models in `assets/` may have been created by third parties, attribution can be found in `docs/CREDITS.md`
