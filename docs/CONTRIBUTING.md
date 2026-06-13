@@ -40,6 +40,7 @@
     - `ARCH`: `[microarchitecture]` - Target a specific microarchitecture, defaults to `native`
     - `USE_LLVM_CPP`: `true / false` - Link against `libc++` instead of `libstdc++`
     - `USE_SYSTEM`: `true / false` - Use the system copy of Ammonite's headers, library and package config for the client code
+      - Additionally, use the system's copy of `libtangle` for the library and client code
     - `CHECK_ADDRESS`: `true / false` - Enables `-fsanitize=address` for runtime memory error checking
     - `CHECK_UNDEFINED`: `true / false` - Enables `-fsanitize=undefined` for runtime undefined behaviour checking
     - `CHECK_THREADS`: `true / false` - Enables `-fsanitize=thread` for runtime data race checking 

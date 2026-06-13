@@ -117,23 +117,29 @@ LDFLAGS_PRIVATE = $(shell sed -ne 's/^.*Libs.private: //p' data/ammonite.pc)
 CFLAGS_PRIVATE = $(shell sed -ne 's/^.*Cflags.private: //p' data/ammonite.pc)
 
 #Library arguments
-LIBRARY_CXXFLAGS := $(CXXFLAGS) -fpic $(CFLAGS_PRIVATE) -DAMMONITE_VERSION=$(LIBRARY_VERSION)
+ifneq ($(USE_SYSTEM),true)
+  PROJECT_ROOT = $(dir $(realpath $(firstword $(MAKEFILE_LIST))))
+  PKG_CONF_TANGLE_ARGS = "--define-variable=tanglelibdir=$(PROJECT_ROOT)/libtangle/build" \
+                         "--define-variable=tangleincludedir=$(PROJECT_ROOT)/libtangle/src/include" \
+                         "--with-path=$(PROJECT_ROOT)/libtangle/data"
+endif
+
+LIBRARY_CXXFLAGS := $(CXXFLAGS) -fpic $(CFLAGS_PRIVATE) -DAMMONITE_VERSION=$(LIBRARY_VERSION) \
+                    $(shell pkg-config $(PKG_CONF_TANGLE_ARGS) --cflags $(REQUIRES_PRIVATE))
 LIBRARY_LDFLAGS := $(LDFLAGS) "-Wl,-soname,$(LIBRARY_NAME)" $(LDFLAGS_PRIVATE) \
-                   $(shell pkg-config --libs $(REQUIRES_PRIVATE))
+                   $(shell pkg-config $(PKG_CONF_TANGLE_ARGS) --libs $(REQUIRES_PRIVATE))
 
 #Client arguments
 ifneq ($(USE_SYSTEM),true)
   PROJECT_ROOT = $(dir $(realpath $(firstword $(MAKEFILE_LIST))))
   PKG_CONF_ARGS = "--define-variable=libdir=$(BUILD_DIR)" \
-                  "--define-variable=includedir=$(PROJECT_ROOT)src/include" \
-                  "--with-path=$(PROJECT_ROOT)"
-  PKG_CONF_FILE = data/ammonite.pc
-else
-  PKG_CONF_FILE = ammonite
+                  "--define-variable=includedir=$(PROJECT_ROOT)/src/include" \
+                  "--with-path=$(PROJECT_ROOT)/data"
 endif
+PKG_CONF_FILE = ammonite
 
-CLIENT_CXXFLAGS := $(CXXFLAGS) $(shell pkg-config $(PKG_CONF_ARGS) --cflags $(PKG_CONF_FILE))
-CLIENT_LDFLAGS := $(LDFLAGS) $(shell pkg-config $(PKG_CONF_ARGS) --libs $(PKG_CONF_FILE))
+CLIENT_CXXFLAGS := $(CXXFLAGS) $(shell pkg-config $(PKG_CONF_ARGS) $(PKG_CONF_TANGLE_ARGS) --cflags $(PKG_CONF_FILE))
+CLIENT_LDFLAGS := $(LDFLAGS) $(shell pkg-config $(PKG_CONF_ARGS) $(PKG_CONF_TANGLE_ARGS) --libs $(PKG_CONF_FILE))
 
 #Recipe-specific client arguments
 THREADTEST_EXTRA_LDFLAGS := -latomic
