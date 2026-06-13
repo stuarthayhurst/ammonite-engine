@@ -233,7 +233,7 @@ $(OBJECT_DIR)/ammonite/%.$(DEBUG_LINT_STRING): ./src/ammonite/% .clang-tidy $(AM
 	@touch "$@"
 
 
-.PHONY: build tests all demo threads maths debug library headers install uninstall lint_compile_commands run_lint run_lint_tests lint lint_tests lint_all clean cache icons
+.PHONY: build tests all demo threads maths debug debug-all library headers install uninstall lint_compile_commands run_lint run_lint_tests lint lint_tests lint_all clean cache icons
 
 
 # --------------------------------
