@@ -1,0 +1,3 @@
+[submodule "libtangle"]
+	path = libtangle
+	url = https://github.com/stuarthayhurst/libtangle.git
