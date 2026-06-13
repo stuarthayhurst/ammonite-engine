@@ -122,6 +122,9 @@ ifneq ($(USE_SYSTEM),true)
   PKG_CONF_TANGLE_ARGS = "--define-variable=tanglelibdir=$(PROJECT_ROOT)/libtangle/build" \
                          "--define-variable=tangleincludedir=$(PROJECT_ROOT)/libtangle/src/include" \
                          "--with-path=$(PROJECT_ROOT)/libtangle/data"
+  PKG_CONF_FILE = $(PROJECT_ROOT)/libtangle/data/tangle.pc
+else
+  PKG_CONF_FILE = tangle
 endif
 
 LIBRARY_CXXFLAGS := $(CXXFLAGS) -fpic $(CFLAGS_PRIVATE) -DAMMONITE_VERSION=$(LIBRARY_VERSION) \
@@ -135,8 +138,10 @@ ifneq ($(USE_SYSTEM),true)
   PKG_CONF_ARGS = "--define-variable=ammonitelibdir=$(BUILD_DIR)" \
                   "--define-variable=ammoniteincludedir=$(PROJECT_ROOT)/src/include" \
                   "--with-path=$(PROJECT_ROOT)/data"
+  PKG_CONF_FILE = data/ammonite.pc
+else
+  PKG_CONF_FILE = ammonite
 endif
-PKG_CONF_FILE = ammonite
 
 CLIENT_CXXFLAGS := $(CXXFLAGS) $(shell pkg-config $(PKG_CONF_ARGS) $(PKG_CONF_TANGLE_ARGS) --cflags $(PKG_CONF_FILE))
 CLIENT_LDFLAGS := $(LDFLAGS) $(shell pkg-config $(PKG_CONF_ARGS) $(PKG_CONF_TANGLE_ARGS) --libs $(PKG_CONF_FILE))
