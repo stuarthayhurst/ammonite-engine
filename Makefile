@@ -132,8 +132,8 @@ LIBRARY_LDFLAGS := $(LDFLAGS) "-Wl,-soname,$(LIBRARY_NAME)" $(LDFLAGS_PRIVATE) \
 #Client arguments
 ifneq ($(USE_SYSTEM),true)
   PROJECT_ROOT = $(dir $(realpath $(firstword $(MAKEFILE_LIST))))
-  PKG_CONF_ARGS = "--define-variable=libdir=$(BUILD_DIR)" \
-                  "--define-variable=includedir=$(PROJECT_ROOT)/src/include" \
+  PKG_CONF_ARGS = "--define-variable=ammonitelibdir=$(BUILD_DIR)" \
+                  "--define-variable=ammoniteincludedir=$(PROJECT_ROOT)/src/include" \
                   "--with-path=$(PROJECT_ROOT)/data"
 endif
 PKG_CONF_FILE = ammonite

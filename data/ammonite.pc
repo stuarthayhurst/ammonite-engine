@@ -1,6 +1,6 @@
 prefix=/usr/local
-libdir=${prefix}/lib/ammonite
-includedir=${prefix}/include
+ammonitelibdir=${prefix}/lib/ammonite
+ammoniteincludedir=${prefix}/include
 
 Name: Ammonite
 Description: Ammonite, a simple graphics engine for experimentation
@@ -9,8 +9,8 @@ Version: 0.0.1
 License: MIT
 Maintainer: Stuart Hayhurst (https://github.com/stuarthayhurst/ammonite-engine)
 Requires: glm
-Requires.private: glm glfw3 epoxy stb assimp
-Cflags: -I${includedir}
-Libs: -L${libdir} -lammonite -lm
+Requires.private: glm glfw3 epoxy stb assimp tangle
+Cflags: -I${ammoniteincludedir}
+Libs: -L${ammonitelibdir} -lammonite -lm
 Cflags.private: -pthread
 Libs.private: -lm -latomic -lpthread
