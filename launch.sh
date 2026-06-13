@@ -52,6 +52,16 @@ if [[ ! -f "$target" ]]; then
   exit 1
 fi
 
+#Find libtangle
+if ! ldconfig -p |grep libtangle.so &> /dev/null; then
+  if [[ ! -f "libtangle/build/libtangle.so" ]]; then
+    echo "libtangle couldn't be found, did you forget to build it?" > /dev/stderr
+    exit 1
+  else
+    NEW_LD_LIBRARY_PATH="$NEW_LD_LIBRARY_PATH:libtangle/build"
+  fi
+fi
+
 #Pick a path to valgrind, if requested
 USE_VALGRIND_PATH=""
 if [[ "$valgrindRequested" == "true" ]]; then
