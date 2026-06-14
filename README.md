@@ -35,6 +35,7 @@
   - No error contexts are supported with `KHR_no_error`
 
 ## Building + installing libammonite:
+  - Set up `libtangle`, optionally using the [submodule](#libtangle)
   - `make library`
   - `sudo make install`
   - Optionally, run `sudo make headers` to install the headers
@@ -102,6 +103,9 @@
   - `coreutils`
   - `sed`
   - `python3`
+  - `libtangle`
+    - This can be provided by the system or used in-place
+    - The [submodule](#libtangle) can be used to provide both options
   - `g++` **OR** `clang++`
     - If using clang++, use `CXX="clang++" make [TARGET]`
       - `USE_LLVM_CPP=true` might be useful for systems without (a new enough) GCC
@@ -113,6 +117,14 @@
     - `clang-tidy (22+)`
   - ### Icons:
     - `inkscape optipng`
+
+## libtangle:
+  - Run `git submodule update --init`
+    - Alternatively, pass `--recurse-submodules` when cloning this repository
+  - Build `libtangle` with `make -C libtangle build -j$(nproc)`
+  - To use `libtangle` as part of the system instead of in-place:
+    - Run `sudo make -C libtangle install headers`
+    - Pass `USE_SYSTEM=true` to any `make` commands to use the system copy of `libtangle`
 
 ## Issues:
   - Due to the small size of this project, only a small range of hardware can be tested
