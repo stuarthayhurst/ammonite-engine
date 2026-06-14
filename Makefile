@@ -300,6 +300,7 @@ uninstall:
 	@rm -fv "$(PKG_CONF_DIR)/ammonite.pc"
 	@if [[ -d "$(INSTALL_DIR)/ammonite" ]]; then rm -di "$(INSTALL_DIR)/ammonite"; fi
 	@if [[ -d "$(HEADER_DIR)/ammonite" ]]; then rm -rf "$(HEADER_DIR)/ammonite"; fi
+	ldconfig
 
 
 # --------------------------------
