@@ -3,6 +3,8 @@
 #include <string>
 #include <string_view>
 
+#include <tangle/tangle.hpp>
+
 #include "engine.hpp"
 
 #include "camera/camera.hpp"
@@ -39,9 +41,16 @@ namespace ammonite {
                    unsigned int height, const std::string& title) {
     const ammonite::utils::Timer loadTimer;
 
-    //Create a thread pool
+    //TODO: Remove
+    //Create a thread pool (legacy)
     if (!ammonite::utils::thread::createThreadPool(0)) {
       ammonite::utils::error << "Failed to create thread pool" << std::endl;
+      return false;
+    }
+
+    //Create a thread pool
+    if (!tangle::thread::createThreadPool(0)) {
+      tangle::utils::error << "Failed to create thread pool" << std::endl;
       return false;
     }
 
@@ -86,6 +95,7 @@ namespace ammonite {
 
   void destroyEngine() {
     ammonite::utils::thread::destroyThreadPool();
+    tangle::thread::destroyThreadPool();
     ammonite::renderer::setup::destroyRenderer();
     ammonite::window::destroyWindow();
 
