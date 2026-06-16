@@ -1,6 +1,7 @@
 #!/bin/bash
 
-#Run a built object using the locally built library
+#Run a built object using the locally built libraries
+#  - To run using the system libraries, just execute the binary directly
 #Use --threads to run the thread tests
 #Use --maths to run the maths tests
 #Don't specify either of the above to run the graphical demo
