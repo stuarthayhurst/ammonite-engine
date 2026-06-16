@@ -119,19 +119,20 @@ CFLAGS_PRIVATE := $(shell sed -ne 's/^.*Cflags.private: //p' data/ammonite.pc)
 #Determine where to look for libtangle
 ifneq ($(USE_SYSTEM),true)
   TANGLE_ROOT := $(dir $(realpath $(firstword $(MAKEFILE_LIST))))/libtangle
-  PKG_CONF_TANGLE_ARGS := "--define-variable=tanglelibdir=$(PROJECT_ROOT)/build" \
-                          "--define-variable=tangleincludedir=$(PROJECT_ROOT)/src/include" \
-                          "--with-path=$(PROJECT_ROOT)/data"
-  PKG_CONF_FILE := $(PROJECT_ROOT)/data/tangle.pc
-else
-  PKG_CONF_FILE := tangle
+  TANGLE_PKG_CONF_ARGS := "--define-variable=tanglelibdir=$(TANGLE_ROOT)/build" \
+                          "--define-variable=tangleincludedir=$(TANGLE_ROOT)/src/include" \
+                          "--with-path=$(TANGLE_ROOT)/data"
+  TANGLE_PKG_CONF_FILE := $(TANGLE_ROOT)/data/tangle.pc
+
+  #Substitute tangle for the local tangle.pc file
+  REQUIRES_PRIVATE := $(subst tangle,$(TANGLE_PKG_CONF_FILE),$(REQUIRES_PRIVATE))
 endif
 
 #Library arguments
 LIBRARY_CXXFLAGS := $(CXXFLAGS) -fpic $(CFLAGS_PRIVATE) -DAMMONITE_VERSION=$(LIBRARY_VERSION) \
-                    $(shell pkg-config $(PKG_CONF_TANGLE_ARGS) --cflags $(REQUIRES_PRIVATE))
+                    $(shell pkg-config $(TANGLE_PKG_CONF_ARGS) --cflags $(REQUIRES_PRIVATE))
 LIBRARY_LDFLAGS := $(LDFLAGS) "-Wl,-soname,$(LIBRARY_NAME)" $(LDFLAGS_PRIVATE) \
-                   $(shell pkg-config $(PKG_CONF_TANGLE_ARGS) --libs $(REQUIRES_PRIVATE))
+                   $(shell pkg-config $(TANGLE_PKG_CONF_ARGS) --libs $(REQUIRES_PRIVATE))
 
 #Client arguments
 ifneq ($(USE_SYSTEM),true)
@@ -145,8 +146,8 @@ else
 endif
 
 #Only evaluate client arguments when used, to avoid errors when building libammonite for system installation
-CLIENT_CXXFLAGS = $(CXXFLAGS) $(shell pkg-config $(CLIENT_PKG_CONF_ARGS) $(PKG_CONF_TANGLE_ARGS) --cflags $(CLIENT_PKG_CONF_FILE))
-CLIENT_LDFLAGS = $(LDFLAGS) $(shell pkg-config $(CLIENT_PKG_CONF_ARGS) $(PKG_CONF_TANGLE_ARGS) --libs $(CLIENT_PKG_CONF_FILE))
+CLIENT_CXXFLAGS = $(CXXFLAGS) $(shell pkg-config $(CLIENT_PKG_CONF_ARGS) $(TANGLE_PKG_CONF_ARGS) --cflags $(CLIENT_PKG_CONF_FILE))
+CLIENT_LDFLAGS = $(LDFLAGS) $(shell pkg-config $(CLIENT_PKG_CONF_ARGS) $(TANGLE_PKG_CONF_ARGS) --libs $(CLIENT_PKG_CONF_FILE))
 
 #Recipe-specific client arguments
 THREADTEST_EXTRA_LDFLAGS := -latomic
