@@ -2,7 +2,7 @@ SHELL := bash -O globstar
 TIDY ?= clang-tidy
 
 BUILD_DIR ?= build
-CACHE_DIR := cache
+CACHE_DIR ?= cache
 PREFIX_DIR ?= /usr/local
 INSTALL_DIR ?= $(PREFIX_DIR)/lib
 HEADER_DIR ?= $(PREFIX_DIR)/include

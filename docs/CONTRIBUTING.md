@@ -51,6 +51,7 @@
       - Use `./launch.sh [OPTIONS] --valgrind` to run the engine through valgrind
       - Use `VALGRIND` to choose a different path for the `valgrind` binary
     - `BUILD_DIR` - Use a different directory for temporary build system files
+    - `CACHE_DIR` - Use a different directory for cleaning engine cache files
     - `PREFIX_DIR` - Change the base install path
       - `INSTALL_DIR` - Install `libammonite.so` and `ammonite.pc` to a different location
       - `HEADER_DIR` - Install Ammonite headers to a different location
