@@ -145,9 +145,14 @@ else
   CLIENT_PKG_CONF_FILE := ammonite
 endif
 
+#Look in libtangle/build for libtangle when linking the client code against libammonite
+ifneq ($(USE_SYSTEM),true)
+  LOCAL_TANGLE_FLAG := -Wl,-rpath=libtangle/build
+endif
+
 #Only evaluate client arguments when used, to avoid errors when building libammonite for system installation
 CLIENT_CXXFLAGS = $(CXXFLAGS) $(shell pkg-config $(CLIENT_PKG_CONF_ARGS) $(TANGLE_PKG_CONF_ARGS) --cflags $(CLIENT_PKG_CONF_FILE))
-CLIENT_LDFLAGS = $(LDFLAGS) $(shell pkg-config $(CLIENT_PKG_CONF_ARGS) $(TANGLE_PKG_CONF_ARGS) --libs $(CLIENT_PKG_CONF_FILE))
+CLIENT_LDFLAGS = $(LDFLAGS) $(shell pkg-config $(CLIENT_PKG_CONF_ARGS) $(TANGLE_PKG_CONF_ARGS) --libs $(CLIENT_PKG_CONF_FILE)) $(LOCAL_TANGLE_FLAG)
 
 #Recipe-specific client arguments
 THREADTEST_EXTRA_LDFLAGS := -latomic
