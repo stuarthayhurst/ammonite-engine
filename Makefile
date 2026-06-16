@@ -7,7 +7,7 @@ CACHE_DIR ?= cache
 PREFIX_DIR ?= /usr/local
 INSTALL_DIR ?= $(PREFIX_DIR)/lib
 HEADER_DIR ?= $(PREFIX_DIR)/include
-PKG_CONF_DIR ?= $(INSTALL_DIR)/pkgconfig
+PKG_CONF_INSTALL_DIR ?= $(INSTALL_DIR)/pkgconfig
 LIBRARY_VERSION := $(shell pkg-config --modversion data/ammonite.pc)
 LIBRARY_NAME := libammonite.so.$(LIBRARY_VERSION)
 
@@ -116,17 +116,18 @@ REQUIRES_PRIVATE := $(shell sed -ne 's/^.*Requires.private: //p' data/ammonite.p
 LDFLAGS_PRIVATE := $(shell sed -ne 's/^.*Libs.private: //p' data/ammonite.pc)
 CFLAGS_PRIVATE := $(shell sed -ne 's/^.*Cflags.private: //p' data/ammonite.pc)
 
-#Library arguments
+#Determine where to look for libtangle
 ifneq ($(USE_SYSTEM),true)
-  PROJECT_ROOT := $(dir $(realpath $(firstword $(MAKEFILE_LIST))))
-  PKG_CONF_TANGLE_ARGS := "--define-variable=tanglelibdir=$(PROJECT_ROOT)/libtangle/build" \
-                          "--define-variable=tangleincludedir=$(PROJECT_ROOT)/libtangle/src/include" \
-                          "--with-path=$(PROJECT_ROOT)/libtangle/data"
-  PKG_CONF_FILE := $(PROJECT_ROOT)/libtangle/data/tangle.pc
+  TANGLE_ROOT := $(dir $(realpath $(firstword $(MAKEFILE_LIST))))/libtangle
+  PKG_CONF_TANGLE_ARGS := "--define-variable=tanglelibdir=$(PROJECT_ROOT)/build" \
+                          "--define-variable=tangleincludedir=$(PROJECT_ROOT)/src/include" \
+                          "--with-path=$(PROJECT_ROOT)/data"
+  PKG_CONF_FILE := $(PROJECT_ROOT)/data/tangle.pc
 else
   PKG_CONF_FILE := tangle
 endif
 
+#Library arguments
 LIBRARY_CXXFLAGS := $(CXXFLAGS) -fpic $(CFLAGS_PRIVATE) -DAMMONITE_VERSION=$(LIBRARY_VERSION) \
                     $(shell pkg-config $(PKG_CONF_TANGLE_ARGS) --cflags $(REQUIRES_PRIVATE))
 LIBRARY_LDFLAGS := $(LDFLAGS) "-Wl,-soname,$(LIBRARY_NAME)" $(LDFLAGS_PRIVATE) \
@@ -135,16 +136,17 @@ LIBRARY_LDFLAGS := $(LDFLAGS) "-Wl,-soname,$(LIBRARY_NAME)" $(LDFLAGS_PRIVATE) \
 #Client arguments
 ifneq ($(USE_SYSTEM),true)
   PROJECT_ROOT := $(dir $(realpath $(firstword $(MAKEFILE_LIST))))
-  PKG_CONF_ARGS := "--define-variable=ammonitelibdir=$(BUILD_DIR)" \
-                   "--define-variable=ammoniteincludedir=$(PROJECT_ROOT)/src/include" \
-                   "--with-path=$(PROJECT_ROOT)/data"
-  PKG_CONF_FILE := data/ammonite.pc
+  CLIENT_PKG_CONF_ARGS := "--define-variable=ammonitelibdir=$(BUILD_DIR)" \
+                          "--define-variable=ammoniteincludedir=$(PROJECT_ROOT)/src/include" \
+                          "--with-path=$(PROJECT_ROOT)/data"
+  CLIENT_PKG_CONF_FILE := data/ammonite.pc
 else
-  PKG_CONF_FILE := ammonite
+  CLIENT_PKG_CONF_FILE := ammonite
 endif
 
-CLIENT_CXXFLAGS := $(CXXFLAGS) $(shell pkg-config $(PKG_CONF_ARGS) $(PKG_CONF_TANGLE_ARGS) --cflags $(PKG_CONF_FILE))
-CLIENT_LDFLAGS := $(LDFLAGS) $(shell pkg-config $(PKG_CONF_ARGS) $(PKG_CONF_TANGLE_ARGS) --libs $(PKG_CONF_FILE))
+#Only evaluate client arguments when used, to avoid errors when building libammonite for system installation
+CLIENT_CXXFLAGS = $(CXXFLAGS) $(shell pkg-config $(CLIENT_PKG_CONF_ARGS) $(PKG_CONF_TANGLE_ARGS) --cflags $(CLIENT_PKG_CONF_FILE))
+CLIENT_LDFLAGS = $(LDFLAGS) $(shell pkg-config $(CLIENT_PKG_CONF_ARGS) $(PKG_CONF_TANGLE_ARGS) --libs $(CLIENT_PKG_CONF_FILE))
 
 #Recipe-specific client arguments
 THREADTEST_EXTRA_LDFLAGS := -latomic
@@ -287,9 +289,9 @@ headers:
 	@rm -rf "$(HEADER_DIR)/ammonite"
 	@mkdir -p "$(HEADER_DIR)"
 	@cp -rv "src/include/ammonite" "$(HEADER_DIR)/ammonite"
-	@mkdir -p "$(PKG_CONF_DIR)"
-	install "data/ammonite.pc" "$(PKG_CONF_DIR)/ammonite.pc"
-	sed -e "s|prefix=/usr/local|prefix=$(PREFIX_DIR)|" "data/ammonite.pc" > "$(PKG_CONF_DIR)/ammonite.pc"
+	@mkdir -p "$(PKG_CONF_INSTALL_DIR)"
+	install "data/ammonite.pc" "$(PKG_CONF_INSTALL_DIR)/ammonite.pc"
+	sed -e "s|prefix=/usr/local|prefix=$(PREFIX_DIR)|" "data/ammonite.pc" > "$(PKG_CONF_INSTALL_DIR)/ammonite.pc"
 install:
 	@mkdir -p "$(INSTALL_DIR)/ammonite"
 	install "$(BUILD_DIR)/libammonite.so" "$(INSTALL_DIR)/ammonite/$(LIBRARY_NAME)"
@@ -297,7 +299,7 @@ install:
 	ldconfig "$(INSTALL_DIR)/ammonite"
 uninstall:
 	@rm -fv "$(INSTALL_DIR)/ammonite/libammonite.so"*
-	@rm -fv "$(PKG_CONF_DIR)/ammonite.pc"
+	@rm -fv "$(PKG_CONF_INSTALL_DIR)/ammonite.pc"
 	@if [[ -d "$(INSTALL_DIR)/ammonite" ]]; then rm -div "$(INSTALL_DIR)/ammonite"; fi
 	@if [[ -d "$(HEADER_DIR)/ammonite" ]]; then rm -rv "$(HEADER_DIR)/ammonite"; fi
 	ldconfig
