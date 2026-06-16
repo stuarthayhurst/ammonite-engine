@@ -1,51 +1,51 @@
-SHELL = bash -O globstar
+SHELL := bash -O globstar
 TIDY ?= clang-tidy
 
 BUILD_DIR ?= build
-CACHE_DIR = cache
+CACHE_DIR := cache
 PREFIX_DIR ?= /usr/local
 INSTALL_DIR ?= $(PREFIX_DIR)/lib
 HEADER_DIR ?= $(PREFIX_DIR)/include
 PKG_CONF_DIR ?= $(INSTALL_DIR)/pkgconfig
-LIBRARY_VERSION = $(shell pkg-config --modversion data/ammonite.pc)
-LIBRARY_NAME = libammonite.so.$(LIBRARY_VERSION)
+LIBRARY_VERSION := $(shell pkg-config --modversion data/ammonite.pc)
+LIBRARY_NAME := libammonite.so.$(LIBRARY_VERSION)
 
-AMMONITE_OBJECTS_SOURCE = $(shell ls ./src/ammonite/**/*.cpp)
-AMMONITE_HEADERS_SOURCE = $(shell ls ./src/ammonite/**/*.hpp)
+AMMONITE_OBJECTS_SOURCE := $(shell ls ./src/ammonite/**/*.cpp)
+AMMONITE_HEADERS_SOURCE := $(shell ls ./src/ammonite/**/*.hpp)
 AMMONITE_INCLUDE_HEADERS_SOURCE += $(shell ls ./src/include/ammonite/**/*.hpp)
 
-HELPER_OBJECTS_SOURCE = $(shell ls ./src/helper/**/*.cpp)
-HELPER_HEADERS_SOURCE = $(shell ls ./src/helper/**/*.hpp)
+HELPER_OBJECTS_SOURCE := $(shell ls ./src/helper/**/*.cpp)
+HELPER_HEADERS_SOURCE := $(shell ls ./src/helper/**/*.hpp)
 
-DEMO_OBJECTS_SOURCE = $(shell ls ./src/demos/**/*.cpp)
-DEMO_HEADERS_SOURCE = $(shell ls ./src/demos/**/*.hpp)
+DEMO_OBJECTS_SOURCE := $(shell ls ./src/demos/**/*.cpp)
+DEMO_HEADERS_SOURCE := $(shell ls ./src/demos/**/*.hpp)
 
-TEST_OBJECTS_SOURCE = $(shell ls ./src/tests/**/*.cpp)
-TEST_HEADERS_SOURCE = $(shell ls ./src/tests/**/*.hpp)
+TEST_OBJECTS_SOURCE := $(shell ls ./src/tests/**/*.cpp)
+TEST_HEADERS_SOURCE := $(shell ls ./src/tests/**/*.hpp)
 
-ROOT_OBJECTS_SOURCE = $(shell ls ./src/*.cpp)
+ROOT_OBJECTS_SOURCE := $(shell ls ./src/*.cpp)
 
-LINT_OBJECTS_SOURCE = $(ROOT_OBJECTS_SOURCE) $(AMMONITE_OBJECTS_SOURCE) \
-                      $(HELPER_OBJECTS_SOURCE) $(DEMO_OBJECTS_SOURCE)
-LINT_HEADERS_SOURCE = $(AMMONITE_HEADERS_SOURCE) $(AMMONITE_INCLUDE_HEADERS_SOURCE) \
-                      $(HELPER_HEADERS_SOURCE) $(DEMO_HEADERS_SOURCE)
+LINT_OBJECTS_SOURCE := $(ROOT_OBJECTS_SOURCE) $(AMMONITE_OBJECTS_SOURCE) \
+                       $(HELPER_OBJECTS_SOURCE) $(DEMO_OBJECTS_SOURCE)
+LINT_HEADERS_SOURCE := $(AMMONITE_HEADERS_SOURCE) $(AMMONITE_INCLUDE_HEADERS_SOURCE) \
+                       $(HELPER_HEADERS_SOURCE) $(DEMO_HEADERS_SOURCE)
 
-DEBUG_LINT_STRING = linted
+DEBUG_LINT_STRING := linted
 ifeq ($(DEBUG),true)
-  DEBUG_LINT_STRING = debug.linted
+  DEBUG_LINT_STRING := debug.linted
 endif
 
-LINT_FILES = $(subst ./src,$(OBJECT_DIR),$(subst .hpp,.hpp.$(DEBUG_LINT_STRING),$(LINT_HEADERS_SOURCE)))
+LINT_FILES := $(subst ./src,$(OBJECT_DIR),$(subst .hpp,.hpp.$(DEBUG_LINT_STRING),$(LINT_HEADERS_SOURCE)))
 LINT_FILES += $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.cpp.$(DEBUG_LINT_STRING),$(LINT_OBJECTS_SOURCE)))
-TEST_LINT_FILES = $(subst ./src,$(OBJECT_DIR),$(subst .hpp,.hpp.$(DEBUG_LINT_STRING),$(TEST_HEADERS_SOURCE)))
+TEST_LINT_FILES := $(subst ./src,$(OBJECT_DIR),$(subst .hpp,.hpp.$(DEBUG_LINT_STRING),$(TEST_HEADERS_SOURCE)))
 TEST_LINT_FILES += $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.cpp.$(DEBUG_LINT_STRING),$(TEST_OBJECTS_SOURCE)))
 
-OBJECT_DIR = $(BUILD_DIR)/objects
-AMMONITE_OBJECTS = $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.o,$(AMMONITE_OBJECTS_SOURCE)))
-HELPER_OBJECTS = $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.o,$(HELPER_OBJECTS_SOURCE)))
-DEMO_OBJECTS = $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.o,$(DEMO_OBJECTS_SOURCE)))
-TEST_OBJECTS = $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.o,$(TEST_OBJECTS_SOURCE)))
-ROOT_OBJECTS = $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.o,$(ROOT_OBJECTS_SOURCE)))
+OBJECT_DIR := $(BUILD_DIR)/objects
+AMMONITE_OBJECTS := $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.o,$(AMMONITE_OBJECTS_SOURCE)))
+HELPER_OBJECTS := $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.o,$(HELPER_OBJECTS_SOURCE)))
+DEMO_OBJECTS := $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.o,$(DEMO_OBJECTS_SOURCE)))
+TEST_OBJECTS := $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.o,$(TEST_OBJECTS_SOURCE)))
+ROOT_OBJECTS := $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.o,$(ROOT_OBJECTS_SOURCE)))
 
 #Global arguments
 CXXFLAGS += -Wall -Wextra -Werror -Wpedantic -std=c++23
@@ -75,10 +75,10 @@ ifeq ($(DEBUG),true)
   #Enable ASan and UBSan by default in debug mode if nothing incompatible is enabled
   ifeq (,$(filter true,$(CHECK_THREADS) $(CHECK_TYPES) $(CHECK_MEMORY)))
     ifndef CHECK_ADDRESS
-      CHECK_ADDRESS = true
+      CHECK_ADDRESS := true
     endif
     ifndef CHECK_UNDEFINED
-      CHECK_UNDEFINED = true
+      CHECK_UNDEFINED := true
     endif
   endif
 else
@@ -112,19 +112,19 @@ ifneq ($(VALGRIND_SAFE),true)
 endif
 
 #Fetch library dependencies and flags from ammonite.pc
-REQUIRES_PRIVATE = $(shell sed -ne 's/^.*Requires.private: //p' data/ammonite.pc)
-LDFLAGS_PRIVATE = $(shell sed -ne 's/^.*Libs.private: //p' data/ammonite.pc)
-CFLAGS_PRIVATE = $(shell sed -ne 's/^.*Cflags.private: //p' data/ammonite.pc)
+REQUIRES_PRIVATE := $(shell sed -ne 's/^.*Requires.private: //p' data/ammonite.pc)
+LDFLAGS_PRIVATE := $(shell sed -ne 's/^.*Libs.private: //p' data/ammonite.pc)
+CFLAGS_PRIVATE := $(shell sed -ne 's/^.*Cflags.private: //p' data/ammonite.pc)
 
 #Library arguments
 ifneq ($(USE_SYSTEM),true)
-  PROJECT_ROOT = $(dir $(realpath $(firstword $(MAKEFILE_LIST))))
-  PKG_CONF_TANGLE_ARGS = "--define-variable=tanglelibdir=$(PROJECT_ROOT)/libtangle/build" \
-                         "--define-variable=tangleincludedir=$(PROJECT_ROOT)/libtangle/src/include" \
-                         "--with-path=$(PROJECT_ROOT)/libtangle/data"
-  PKG_CONF_FILE = $(PROJECT_ROOT)/libtangle/data/tangle.pc
+  PROJECT_ROOT := $(dir $(realpath $(firstword $(MAKEFILE_LIST))))
+  PKG_CONF_TANGLE_ARGS := "--define-variable=tanglelibdir=$(PROJECT_ROOT)/libtangle/build" \
+                          "--define-variable=tangleincludedir=$(PROJECT_ROOT)/libtangle/src/include" \
+                          "--with-path=$(PROJECT_ROOT)/libtangle/data"
+  PKG_CONF_FILE := $(PROJECT_ROOT)/libtangle/data/tangle.pc
 else
-  PKG_CONF_FILE = tangle
+  PKG_CONF_FILE := tangle
 endif
 
 LIBRARY_CXXFLAGS := $(CXXFLAGS) -fpic $(CFLAGS_PRIVATE) -DAMMONITE_VERSION=$(LIBRARY_VERSION) \
@@ -134,13 +134,13 @@ LIBRARY_LDFLAGS := $(LDFLAGS) "-Wl,-soname,$(LIBRARY_NAME)" $(LDFLAGS_PRIVATE) \
 
 #Client arguments
 ifneq ($(USE_SYSTEM),true)
-  PROJECT_ROOT = $(dir $(realpath $(firstword $(MAKEFILE_LIST))))
-  PKG_CONF_ARGS = "--define-variable=ammonitelibdir=$(BUILD_DIR)" \
-                  "--define-variable=ammoniteincludedir=$(PROJECT_ROOT)/src/include" \
-                  "--with-path=$(PROJECT_ROOT)/data"
-  PKG_CONF_FILE = data/ammonite.pc
+  PROJECT_ROOT := $(dir $(realpath $(firstword $(MAKEFILE_LIST))))
+  PKG_CONF_ARGS := "--define-variable=ammonitelibdir=$(BUILD_DIR)" \
+                   "--define-variable=ammoniteincludedir=$(PROJECT_ROOT)/src/include" \
+                   "--with-path=$(PROJECT_ROOT)/data"
+  PKG_CONF_FILE := data/ammonite.pc
 else
-  PKG_CONF_FILE = ammonite
+  PKG_CONF_FILE := ammonite
 endif
 
 CLIENT_CXXFLAGS := $(CXXFLAGS) $(shell pkg-config $(PKG_CONF_ARGS) $(PKG_CONF_TANGLE_ARGS) --cflags $(PKG_CONF_FILE))
@@ -152,8 +152,8 @@ MATHSTEST_EXTRA_LDFLAGS := -lm
 DEMO_EXTRA_LDFLAGS := -lm
 
 #Helper to run the compiler or extract the command
-EXTRACT_SCRIPT = python3 extract-command.py
-EXTRACT = @function inline() { if [[ "$(DUMMY)" != "true" ]]; then echo "$(CXX) $$@"; $(CXX) $$@; else $(EXTRACT_SCRIPT) "$(BUILD_DIR)" $(CXX) $$@; fi }; inline
+EXTRACT_SCRIPT := python3 extract-command.py
+EXTRACT := @function inline() { if [[ "$(DUMMY)" != "true" ]]; then echo "$(CXX) $$@"; $(CXX) $$@; else $(EXTRACT_SCRIPT) "$(BUILD_DIR)" $(CXX) $$@; fi }; inline
 
 # --------------------------------
 # Client build recipes
