@@ -11,7 +11,7 @@
 #Any unrecognised arguments will be passed to the target
 
 buildDir="build"
-NEW_LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$buildDir"
+NEW_LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$buildDir:libtangle/build"
 
 target=""
 targetArgs=()
@@ -52,13 +52,11 @@ if [[ ! -f "$target" ]]; then
   exit 1
 fi
 
-#Find libtangle
+#Check for libtangle
 if ! ldconfig -p |grep libtangle.so &> /dev/null; then
   if [[ ! -f "libtangle/build/libtangle.so" ]]; then
     echo "'libtangle.so' couldn't be found, did you forget to build it?" > /dev/stderr
     exit 1
-  else
-    NEW_LD_LIBRARY_PATH="$NEW_LD_LIBRARY_PATH:libtangle/build"
   fi
 fi
 
