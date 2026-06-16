@@ -299,14 +299,13 @@ headers:
 	install "data/ammonite.pc" "$(PKG_CONF_INSTALL_DIR)/ammonite.pc"
 	sed -e "s|prefix=/usr/local|prefix=$(PREFIX_DIR)|" "data/ammonite.pc" > "$(PKG_CONF_INSTALL_DIR)/ammonite.pc"
 install:
-	@mkdir -p "$(INSTALL_DIR)/ammonite"
-	install "$(BUILD_DIR)/libammonite.so" "$(INSTALL_DIR)/ammonite/$(LIBRARY_NAME)"
-	@ln -sfv "$(LIBRARY_NAME)" "$(INSTALL_DIR)/ammonite/libammonite.so"
-	ldconfig "$(INSTALL_DIR)/ammonite"
+	@mkdir -p "$(INSTALL_DIR)"
+	install "$(BUILD_DIR)/libammonite.so" "$(INSTALL_DIR)/$(LIBRARY_NAME)"
+	@ln -sfv "$(LIBRARY_NAME)" "$(INSTALL_DIR)/libammonite.so"
+	ldconfig "$(INSTALL_DIR)"
 uninstall:
-	@rm -fv "$(INSTALL_DIR)/ammonite/libammonite.so"*
+	@rm -fv "$(INSTALL_DIR)/libammonite.so"*
 	@rm -fv "$(PKG_CONF_INSTALL_DIR)/ammonite.pc"
-	@if [[ -d "$(INSTALL_DIR)/ammonite" ]]; then rm -div "$(INSTALL_DIR)/ammonite"; fi
 	@if [[ -d "$(HEADER_DIR)/ammonite" ]]; then rm -rv "$(HEADER_DIR)/ammonite"; fi
 	ldconfig
 
