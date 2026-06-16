@@ -298,8 +298,8 @@ install:
 uninstall:
 	@rm -fv "$(INSTALL_DIR)/ammonite/libammonite.so"*
 	@rm -fv "$(PKG_CONF_DIR)/ammonite.pc"
-	@if [[ -d "$(INSTALL_DIR)/ammonite" ]]; then rm -di "$(INSTALL_DIR)/ammonite"; fi
-	@if [[ -d "$(HEADER_DIR)/ammonite" ]]; then rm -rf "$(HEADER_DIR)/ammonite"; fi
+	@if [[ -d "$(INSTALL_DIR)/ammonite" ]]; then rm -div "$(INSTALL_DIR)/ammonite"; fi
+	@if [[ -d "$(HEADER_DIR)/ammonite" ]]; then rm -rv "$(HEADER_DIR)/ammonite"; fi
 	ldconfig
 
 
