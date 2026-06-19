@@ -26,7 +26,6 @@
 #include "utils/id.hpp"
 #include "utils/logging.hpp"
 #include "utils/random.hpp"
-#include "utils/thread.hpp"
 #include "utils/timer.hpp"
 #include "window/window.hpp"
 // IWYU pragma: end_exports
