@@ -12,5 +12,4 @@ Requires: glm
 Requires.private: glm glfw3 epoxy stb assimp tangle
 Cflags: -I${ammoniteincludedir}
 Libs: -L${ammonitelibdir} -lammonite -lm
-Cflags.private: -pthread
-Libs.private: -lm -latomic -lpthread
+Libs.private: -lm -latomic
