@@ -1,10 +1,10 @@
 #include <iostream>
 
+#include <tangle/tangle.hpp>
+
 extern "C" {
   #include <GLFW/glfw3.h>
 }
-
-#include <tangle/tangle.hpp>
 
 #include "input.hpp"
 

@@ -1,10 +1,10 @@
 #include <iostream>
 
+#include <tangle/tangle.hpp>
+
 extern "C" {
   #include <epoxy/gl.h>
 }
-
-#include <tangle/tangle.hpp>
 
 #include "debug.hpp"
 

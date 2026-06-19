@@ -4,12 +4,12 @@
 #include <unordered_set>
 #include <vector>
 
+#include <tangle/tangle.hpp>
+
 extern "C" {
   #include <epoxy/gl.h>
   #include <stb/stb_image.h>
 }
-
-#include <tangle/tangle.hpp>
 
 #include "skybox.hpp"
 

@@ -6,13 +6,13 @@
 #include <string>
 #include <unordered_map>
 
+#include <tangle/tangle.hpp>
+
 extern "C" {
   #include <epoxy/gl.h>
   #define STB_IMAGE_IMPLEMENTATION
   #include <stb/stb_image.h>
 }
-
-#include <tangle/tangle.hpp>
 
 #include "textures.hpp"
 

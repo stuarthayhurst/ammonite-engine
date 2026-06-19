@@ -3,12 +3,12 @@
 #include <string>
 #include <vector>
 
+#include <tangle/tangle.hpp>
+
 extern "C" {
   #include <GLFW/glfw3.h>
   #include <stb/stb_image.h>
 }
-
-#include <tangle/tangle.hpp>
 
 #include "window.hpp"
 

@@ -4,11 +4,11 @@
 #include <utility>
 #include <vector>
 
+#include <tangle/tangle.hpp>
+
 extern "C" {
   #include <epoxy/gl.h>
 }
-
-#include <tangle/tangle.hpp>
 
 #include "renderer.hpp"
 

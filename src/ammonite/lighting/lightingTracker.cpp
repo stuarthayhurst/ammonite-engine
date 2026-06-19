@@ -2,11 +2,11 @@
 #include <iterator>
 #include <unordered_map>
 
+#include <tangle/tangle.hpp>
+
 extern "C" {
   #include <epoxy/gl.h>
 }
-
-#include <tangle/tangle.hpp>
 
 #include "lighting.hpp"
 
