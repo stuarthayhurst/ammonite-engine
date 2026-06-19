@@ -7,6 +7,7 @@
 #include <vector>
 
 #include <ammonite/ammonite.hpp>
+#include <tangle/tangle.hpp>
 
 #include "helper/argHandler.hpp"
 #include "helper/commands.hpp"
@@ -62,7 +63,7 @@ namespace {
 
     if (!demoFunctionMap.contains(demoName)) {
       if (!demoName.empty()) {
-        ammonite::utils::warning << "Invalid demo '" << demoName << "', using default instead" \
+        tangle::utils::warning << "Invalid demo '" << demoName << "', using default instead" \
                                  << std::endl;
       }
 
@@ -171,7 +172,7 @@ namespace {
       float frameRate = ammonite::renderer::settings::getFrameLimit();
 
       frameRate += frameTimeDelta * unitsPerSecond * sign;
-      ammonite::utils::status << "Set framerate to " << frameRate << " fps" << std::endl;
+      tangle::utils::status << "Set framerate to " << frameRate << " fps" << std::endl;
       ammonite::renderer::settings::setFrameLimit(frameRate);
       frameRateTimer.unpause();
     } else {
@@ -292,7 +293,7 @@ int main(int argc, char** argv) noexcept(false) {
   //Initialise the engine
   unsigned char setupBits = HAS_SETUP_ENGINE;
   if (!ammonite::setupEngine("shaders/", 1024, 768, "Ammonite Engine")) {
-    ammonite::utils::error << "Failed to initialise engine, exiting" << std::endl;
+    tangle::utils::error << "Failed to initialise engine, exiting" << std::endl;
     return EXIT_FAILURE;
   }
   ammonite::window::useIconDir("assets/icons/");
@@ -416,7 +417,7 @@ int main(int argc, char** argv) noexcept(false) {
   }
 
   //Engine loaded, delete the splash screen
-  ammonite::utils::status << "Loaded demo in " << utilityTimer.getTime() << "s\n" << std::endl;
+  tangle::utils::status << "Loaded demo in " << utilityTimer.getTime() << "s\n" << std::endl;
   ammonite::splash::deleteSplashScreen(screenId);
 
   //Create and reset timers for performance metrics
@@ -434,7 +435,7 @@ int main(int argc, char** argv) noexcept(false) {
 
     //Every second, output the framerate
     if (secondTimer.getTime() >= 1.0f) {
-      ammonite::utils::status << formatMetrics(ammonite::renderer::getAverageFrameTime()) << std::endl;
+      tangle::utils::status << formatMetrics(ammonite::renderer::getAverageFrameTime()) << std::endl;
       secondTimer.reset();
     }
 
@@ -475,7 +476,7 @@ int main(int argc, char** argv) noexcept(false) {
         pathTimer.unpause();
         pathTimer.reset();
 
-        ammonite::utils::status << "Recording camera path" << std::endl;
+        tangle::utils::status << "Recording camera path" << std::endl;
       }
 
       recordCameraPathNode(recordingCameraPathId, pathTimer);
@@ -484,7 +485,7 @@ int main(int argc, char** argv) noexcept(false) {
       if (pathTimer.isRunning()) {
         pathTimer.pause();
 
-        ammonite::utils::status << "Finished recording camera path" << std::endl;
+        tangle::utils::status << "Finished recording camera path" << std::endl;
       }
     }
 
@@ -504,10 +505,10 @@ int main(int argc, char** argv) noexcept(false) {
   //Output benchmark score
   if (useBenchmark) {
     const double frameTime = utilityTimer.getTime() / (double)ammonite::renderer::getTotalFrames();
-    ammonite::utils::status.printEmptyLine();
-    ammonite::utils::status << "Benchmark complete:" << std::endl;
-    ammonite::utils::status << "  Average fps: ";
-    ammonite::utils::status << formatMetrics(frameTime) << std::endl;
+    tangle::utils::status.printEmptyLine();
+    tangle::utils::status << "Benchmark complete:" << std::endl;
+    tangle::utils::status << "  Average fps: ";
+    tangle::utils::status << formatMetrics(frameTime) << std::endl;
   }
 
   //Clean up and exit
