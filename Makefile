@@ -151,8 +151,8 @@ ifneq ($(USE_SYSTEM),true)
 endif
 
 #Only evaluate client arguments when used, to avoid errors when building libammonite for system installation
-CLIENT_CXXFLAGS = $(CXXFLAGS) $(shell pkg-config $(CLIENT_PKG_CONF_ARGS) $(TANGLE_PKG_CONF_ARGS) --cflags $(CLIENT_PKG_CONF_FILE))
-CLIENT_LDFLAGS = $(LDFLAGS) $(shell pkg-config $(CLIENT_PKG_CONF_ARGS) $(TANGLE_PKG_CONF_ARGS) --libs $(CLIENT_PKG_CONF_FILE)) $(LOCAL_TANGLE_FLAG)
+CLIENT_CXXFLAGS = $(CXXFLAGS) $(shell pkg-config $(CLIENT_PKG_CONF_ARGS) $(TANGLE_PKG_CONF_ARGS) --cflags $(CLIENT_PKG_CONF_FILE) $(TANGLE_PKG_CONF_FILE))
+CLIENT_LDFLAGS = $(LDFLAGS) $(shell pkg-config $(CLIENT_PKG_CONF_ARGS) $(TANGLE_PKG_CONF_ARGS) --libs $(CLIENT_PKG_CONF_FILE) $(TANGLE_PKG_CONF_FILE)) $(LOCAL_TANGLE_FLAG)
 
 #Recipe-specific client arguments
 MATHSTEST_EXTRA_LDFLAGS := -lm
