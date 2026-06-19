@@ -3,13 +3,13 @@
 #include <map>
 #include <vector>
 
+#include <tangle/tangle.hpp>
+
 #include "../models.hpp"
 
 #include "../../graphics/textures.hpp"
 #include "../../utils/debug.hpp"
 #include "../../utils/logging.hpp"
-#include "../../utils/thread.hpp"
-
 
 /*
  - Process a (memory-based) model into internal structures
@@ -115,8 +115,8 @@ namespace ammonite {
                     uniqueVertices.data(), indices.size(), indices.data());
         }
 
-        void syncMeshIndexing(AmmoniteGroup* indexGroup, unsigned int meshCount) {
-          ammonite::utils::thread::waitGroupComplete(indexGroup, meshCount);
+        void syncMeshIndexing(TangleGroup* indexGroup, unsigned int meshCount) {
+          tangle::thread::waitGroupComplete(indexGroup, meshCount);
           indexThreadData.clear();
         }
 
@@ -131,7 +131,7 @@ namespace ammonite {
                                  unsigned int meshCount,
                                  const unsigned int* vertexCounts,
                                  std::vector<RawMeshData>* rawMeshDataVec,
-                                 AmmoniteGroup* indexGroupPtr) {
+                                 TangleGroup* indexGroupPtr) {
           //Reserve space in the vector of thread data
           indexThreadData.reserve(meshCount);
 
@@ -148,9 +148,9 @@ namespace ammonite {
           }
 
           //Index and upload each mesh, using the thread pool
-          ammonite::utils::thread::submitMultiple(modelIndexJob, indexThreadData.data(),
-                                                  sizeof(IndexThreadData), indexGroupPtr,
-                                                  meshCount, nullptr);
+          tangle::thread::submitMultiple(modelIndexJob, indexThreadData.data(),
+                                         sizeof(IndexThreadData), indexGroupPtr,
+                                         meshCount, nullptr);
           return meshCount;
         }
 
@@ -343,7 +343,7 @@ namespace ammonite {
         applyMaterials(modelData, memoryInfo.materials, memoryInfo.meshCount);
 
         //Upload mesh data, indexing if necessary
-        AmmoniteGroup indexGroup{0};
+        TangleGroup indexGroup{0};
         unsigned int jobSyncCount = 0;
         if (modelLoadInfo.memoryInfo.indicesArray == nullptr) {
           jobSyncCount = indexMeshes(memoryInfo.meshArray,
