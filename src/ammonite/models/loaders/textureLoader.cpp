@@ -2,11 +2,12 @@
 #include <list>
 #include <string>
 
+#include <tangle/tangle.hpp>
+
 #include "../models.hpp"
 
 #include "../../graphics/textures.hpp"
 #include "../../utils/logging.hpp"
-#include "../../utils/thread.hpp"
 
 namespace ammonite {
   namespace models {
@@ -25,7 +26,7 @@ namespace ammonite {
         struct TextureLoadData {
           TextureThreadData threadData;
           GLuint textureId;
-          AmmoniteGroup sync{0};
+          TangleGroup sync{0};
         };
 
         //Store the outstanding texture loads
@@ -79,8 +80,8 @@ namespace ammonite {
         textureLoadData.textureId = textureId;
 
         //Submit the texture load to the thread pool
-        ammonite::utils::thread::submitWork(textureLoadWorker,
-          &textureLoadData.threadData, &textureLoadData.sync);
+        tangle::thread::submitWork(textureLoadWorker, &textureLoadData.threadData,
+                                   &textureLoadData.sync);
 
         return textureId;
       }
@@ -94,7 +95,7 @@ namespace ammonite {
         //Wait for the texture loads to complete, and upload their data
         bool success = true;
         for (TextureLoadData& textureLoadData : textureQueue) {
-          ammonite::utils::thread::waitGroupComplete(&textureLoadData.sync, 1);
+          tangle::thread::waitGroupComplete(&textureLoadData.sync, 1);
 
           //Attempt to upload the texture data if the load was successful
           success &= textureLoadData.threadData.loadedTexture;
