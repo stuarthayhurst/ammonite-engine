@@ -12,13 +12,14 @@ extern "C" {
   #include <epoxy/gl.h>
 }
 
+#include <tangle/tangle.hpp>
+
 #include "shaderLoader.hpp"
 
 #include "extensions.hpp"
 #include "../utils/debug.hpp"
 #include "../utils/files.hpp"
 #include "../utils/logging.hpp"
-#include "../utils/thread.hpp"
 
 namespace ammonite {
   namespace {
@@ -115,7 +116,7 @@ namespace ammonite {
         data->shaderPaths[i] = shaderPaths[i];
       }
 
-      ammonite::utils::thread::submitWork(doCacheWork, data, nullptr);
+      tangle::thread::submitWork(doCacheWork, data, nullptr);
     }
 
     bool checkObject(GLuint objectId, const std::string& actionString,
