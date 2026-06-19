@@ -10,13 +10,13 @@
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
 #include <assimp/types.h>
+#include <tangle/tangle.hpp>
 
 #include "../models.hpp"
 
 #include "../../graphics/textures.hpp"
 #include "../../maths/vector.hpp"
 #include "../../utils/debug.hpp"
-#include "../../utils/logging.hpp"
 
 /*
  - Process a (file-based) model into internal structures
@@ -164,7 +164,7 @@ namespace ammonite {
                             meshPtr->mTextureCoords[0][i].y);
             } else {
               if (!hasWarnedMesh) {
-                ammonite::utils::warning << "Missing texture coordinate data for mesh" << std::endl;
+                tangle::utils::warning << "Missing texture coordinate data for mesh" << std::endl;
                 hasWarnedMesh = true;
               }
               ammonite::set(newMesh->vertexData[i].texturePoint, 0.0f);
@@ -248,7 +248,7 @@ namespace ammonite {
         if (scenePtr == nullptr ||
             (scenePtr->mFlags & AI_SCENE_FLAGS_INCOMPLETE) != 0 ||
             scenePtr->mRootNode == nullptr) {
-          ammonite::utils::warning << importer.GetErrorString() << std::endl;
+          tangle::utils::warning << importer.GetErrorString() << std::endl;
           return false;
         }
 

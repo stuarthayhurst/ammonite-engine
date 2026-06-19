@@ -9,13 +9,14 @@ extern "C" {
   #include <stb/stb_image.h>
 }
 
+#include <tangle/tangle.hpp>
+
 #include "skybox.hpp"
 
 #include "enums.hpp"
 #include "graphics/textures.hpp"
 #include "utils/debug.hpp"
 #include "utils/id.hpp"
-#include "utils/logging.hpp"
 
 namespace ammonite {
   namespace {
@@ -45,7 +46,7 @@ namespace ammonite {
     AmmoniteId createSkybox(std::string texturePaths[6], bool flipTextures, bool srgbTextures) {
       GLuint textureId = textures::internal::loadCubemap(texturePaths, flipTextures, srgbTextures);
       if (textureId == 0) {
-        ammonite::utils::warning << "Failed to create skybox" << std::endl;
+        tangle::utils::warning << "Failed to create skybox" << std::endl;
         return 0;
       }
 
@@ -74,7 +75,7 @@ namespace ammonite {
         const std::filesystem::path skyboxDir{directoryPath};
         it = std::filesystem::directory_iterator{skyboxDir};
       } catch (const std::filesystem::filesystem_error&) {
-        ammonite::utils::warning << "Failed to scan '" << directoryPath << "'" << std::endl;
+        tangle::utils::warning << "Failed to scan '" << directoryPath << "'" << std::endl;
         return 0;
       }
 
@@ -87,8 +88,8 @@ namespace ammonite {
 
       //Check we have at least 6 faces
       if (faces.size() < 6) {
-        ammonite::utils::warning << "Failed to load '" << directoryPath \
-                                 << "', needs at least 6 faces" << std::endl;
+        tangle::utils::warning << "Failed to load '" << directoryPath \
+                               << "', needs at least 6 faces" << std::endl;
         return 0;
       }
 
@@ -112,7 +113,7 @@ namespace ammonite {
           skyboxFaces[targetFace] = faces[foundIndex];
           targetFace++;
         } else {
-          ammonite::utils::warning << "Failed to load '" << directoryPath << "'" << std::endl;
+          tangle::utils::warning << "Failed to load '" << directoryPath << "'" << std::endl;
           return 0;
         }
       }

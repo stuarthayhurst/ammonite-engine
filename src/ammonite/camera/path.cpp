@@ -5,6 +5,8 @@
 #include <unordered_set>
 #include <vector>
 
+#include <tangle/tangle.hpp>
+
 #include "camera.hpp"
 
 #include "../engine.hpp"
@@ -12,7 +14,6 @@
 #include "../maths/vector.hpp"
 #include "../utils/debug.hpp"
 #include "../utils/id.hpp"
-#include "../utils/logging.hpp"
 
 namespace ammonite {
   namespace camera {
@@ -108,17 +109,17 @@ namespace ammonite {
 
           //Check the camera path exists
           if (!pathTrackerMap.contains(pathId)) {
-            ammonite::utils::warning << "Can't find camera path (ID " \
-                                     << cameraId << ") to unlink" << std::endl;
+            tangle::utils::warning << "Can't find camera path (ID " \
+                                   << cameraId << ") to unlink" << std::endl;
             return false;
           }
 
           //Reset the linked path on any already linked camera, if requested
           if (unlinkExisting) {
             if (!camera::internal::setLinkedPath(pathTrackerMap[pathId].linkedCameraId, 0, false)) {
-              ammonite::utils::warning << "Failed to unlink camera (ID " \
-                                       << pathTrackerMap[pathId].linkedCameraId \
-                                       << ") from path (ID " << pathId << ")" << std::endl;
+              tangle::utils::warning << "Failed to unlink camera (ID " \
+                                     << pathTrackerMap[pathId].linkedCameraId \
+                                     << ") from path (ID " << pathId << ")" << std::endl;
               return false;
             }
           }
@@ -386,8 +387,8 @@ namespace ammonite {
       void deleteCameraPath(AmmoniteId pathId) {
         //Check the path exists
         if (!pathTrackerMap.contains(pathId)) {
-          ammonite::utils::warning << "Couldn't find camera path with ID '" \
-                                   << pathId << "'" << std::endl;
+          tangle::utils::warning << "Couldn't find camera path with ID '" \
+                                 << pathId << "'" << std::endl;
           return;
         }
 
@@ -404,8 +405,8 @@ namespace ammonite {
       //Reserve space for path nodes, for performance
       void reserveCameraPath(AmmoniteId pathId, unsigned int size) {
         if (!pathTrackerMap.contains(pathId)) {
-          ammonite::utils::warning << "Couldn't find camera path with ID '" \
-                                   << pathId << "'" << std::endl;
+          tangle::utils::warning << "Couldn't find camera path with ID '" \
+                                 << pathId << "'" << std::endl;
           return;
         }
 
@@ -422,8 +423,8 @@ namespace ammonite {
                                double horizontal, double vertical,
                                double time) {
         if (!pathTrackerMap.contains(pathId)) {
-          ammonite::utils::warning << "Couldn't find camera path with ID '" \
-                                   << pathId << "'" << std::endl;
+          tangle::utils::warning << "Couldn't find camera path with ID '" \
+                                 << pathId << "'" << std::endl;
           return 0;
         }
 
@@ -453,16 +454,16 @@ namespace ammonite {
       */
       void removePathNode(AmmoniteId pathId, unsigned int nodeIndex) {
         if (!pathTrackerMap.contains(pathId)) {
-          ammonite::utils::warning << "Couldn't find camera path with ID '" \
-                                   << pathId << "'" << std::endl;
+          tangle::utils::warning << "Couldn't find camera path with ID '" \
+                                 << pathId << "'" << std::endl;
           return;
         }
 
         //Check the node exists in the path
         std::vector<PathNode>& pathNodes = pathTrackerMap[pathId].pathNodes;
         if (pathNodes.size() <= nodeIndex) {
-          ammonite::utils::warning << "Can't remove node index " << nodeIndex \
-                                   << " from a path of size " << pathNodes.size();
+          tangle::utils::warning << "Can't remove node index " << nodeIndex \
+                                 << " from a path of size " << pathNodes.size();
           return;
         }
 
@@ -472,8 +473,8 @@ namespace ammonite {
 
       unsigned int getPathNodeCount(AmmoniteId pathId) {
         if (!pathTrackerMap.contains(pathId)) {
-          ammonite::utils::warning << "Couldn't find camera path with ID '" \
-                                   << pathId << "'" << std::endl;
+          tangle::utils::warning << "Couldn't find camera path with ID '" \
+                                 << pathId << "'" << std::endl;
           return 0;
         }
 
@@ -483,8 +484,8 @@ namespace ammonite {
       //Set the node traversal mode
       void setPathMode(AmmoniteId pathId, AmmonitePathMode pathMode) {
         if (!pathTrackerMap.contains(pathId)) {
-          ammonite::utils::warning << "Couldn't find camera path with ID '" \
-                                   << pathId << "'" << std::endl;
+          tangle::utils::warning << "Couldn't find camera path with ID '" \
+                                 << pathId << "'" << std::endl;
           return;
         }
 
@@ -494,8 +495,8 @@ namespace ammonite {
 
       AmmonitePathMode getPathMode(AmmoniteId pathId) {
         if (!pathTrackerMap.contains(pathId)) {
-          ammonite::utils::warning << "Couldn't find camera path with ID '" \
-                                   << pathId << "'" << std::endl;
+          tangle::utils::warning << "Couldn't find camera path with ID '" \
+                                 << pathId << "'" << std::endl;
           return AMMONITE_PATH_FORWARD;
         }
 
@@ -504,8 +505,8 @@ namespace ammonite {
 
       void playPath(AmmoniteId pathId) {
         if (!pathTrackerMap.contains(pathId)) {
-          ammonite::utils::warning << "Couldn't find camera path with ID '" \
-                                   << pathId << "'" << std::endl;
+          tangle::utils::warning << "Couldn't find camera path with ID '" \
+                                 << pathId << "'" << std::endl;
           return;
         }
 
@@ -515,8 +516,8 @@ namespace ammonite {
 
       void pausePath(AmmoniteId pathId) {
         if (!pathTrackerMap.contains(pathId)) {
-          ammonite::utils::warning << "Couldn't find camera path with ID '" \
-                                   << pathId << "'" << std::endl;
+          tangle::utils::warning << "Couldn't find camera path with ID '" \
+                                 << pathId << "'" << std::endl;
           return;
         }
 
@@ -526,8 +527,8 @@ namespace ammonite {
 
       bool getPathPaused(AmmoniteId pathId) {
         if (!pathTrackerMap.contains(pathId)) {
-          ammonite::utils::warning << "Couldn't find camera path with ID '" \
-                                   << pathId << "'" << std::endl;
+          tangle::utils::warning << "Couldn't find camera path with ID '" \
+                                 << pathId << "'" << std::endl;
           return false;
         }
 
@@ -537,8 +538,8 @@ namespace ammonite {
       //Jump to a given node
       void setNode(AmmoniteId pathId, unsigned int nodeIndex) {
         if (!pathTrackerMap.contains(pathId)) {
-          ammonite::utils::warning << "Couldn't find camera path with ID '" \
-                                   << pathId << "'" << std::endl;
+          tangle::utils::warning << "Couldn't find camera path with ID '" \
+                                 << pathId << "'" << std::endl;
           return;
         }
 
@@ -550,8 +551,8 @@ namespace ammonite {
       //Jump to a given point in time
       void setTime(AmmoniteId pathId, double time) {
         if (!pathTrackerMap.contains(pathId)) {
-          ammonite::utils::warning << "Couldn't find camera path with ID '" \
-                                   << pathId << "'" << std::endl;
+          tangle::utils::warning << "Couldn't find camera path with ID '" \
+                                 << pathId << "'" << std::endl;
           return;
         }
 
@@ -562,8 +563,8 @@ namespace ammonite {
       //Jump to a point in time, relative to 1.0 as the end
       void setProgress(AmmoniteId pathId, double progress) {
         if (!pathTrackerMap.contains(pathId)) {
-          ammonite::utils::warning << "Couldn't find camera path with ID '" \
-                                   << pathId << "'" << std::endl;
+          tangle::utils::warning << "Couldn't find camera path with ID '" \
+                                 << pathId << "'" << std::endl;
           return;
         }
 
@@ -575,8 +576,8 @@ namespace ammonite {
       //Return the current point in time
       double getTime(AmmoniteId pathId) {
         if (!pathTrackerMap.contains(pathId)) {
-          ammonite::utils::warning << "Couldn't find camera path with ID '" \
-                                   << pathId << "'" << std::endl;
+          tangle::utils::warning << "Couldn't find camera path with ID '" \
+                                 << pathId << "'" << std::endl;
           return 0.0;
         }
 
@@ -595,8 +596,8 @@ namespace ammonite {
       //Return the current progress, relative to 1.0 as the end
       double getProgress(AmmoniteId pathId) {
         if (!pathTrackerMap.contains(pathId)) {
-          ammonite::utils::warning << "Couldn't find camera path with ID '" \
-                                   << pathId << "'" << std::endl;
+          tangle::utils::warning << "Couldn't find camera path with ID '" \
+                                 << pathId << "'" << std::endl;
           return 0.0;
         }
 
@@ -620,8 +621,8 @@ namespace ammonite {
       //Reset a path back to the start
       void restartPath(AmmoniteId pathId) {
         if (!pathTrackerMap.contains(pathId)) {
-          ammonite::utils::warning << "Couldn't find camera path with ID '" \
-                                   << pathId << "'" << std::endl;
+          tangle::utils::warning << "Couldn't find camera path with ID '" \
+                                 << pathId << "'" << std::endl;
           return;
         }
 

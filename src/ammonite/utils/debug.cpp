@@ -4,23 +4,24 @@ extern "C" {
   #include <epoxy/gl.h>
 }
 
+#include <tangle/tangle.hpp>
+
 #include "debug.hpp"
 
-#include "logging.hpp"
 #include "../graphics/extensions.hpp"
 
 #ifdef AMMONITE_DEBUG
 //NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables, cppcoreguidelines-interfaces-global-init)
-ammonite::utils::OutputHelper ammoniteInternalDebug(std::cout, "DEBUG: ",
-                                                    ammonite::utils::colour::magenta);
+tangle::utils::OutputHelper ammoniteInternalDebug(std::cout, "DEBUG: ",
+                                                  tangle::utils::colour::magenta);
 #endif
 
 namespace ammonite {
   namespace utils {
     namespace {
       //NOLINTNEXTLINE(cppcoreguidelines-interfaces-global-init)
-      ammonite::utils::OutputHelper glDebugLogger(std::cerr, "\nGL MESSAGE: ",
-                                                  ammonite::utils::colour::cyan);
+      tangle::utils::OutputHelper glDebugLogger(std::cerr, "\nGL MESSAGE: ",
+                                                tangle::utils::colour::cyan);
 
       void GLAPIENTRY debugMessageCallback(GLenum, GLenum type, GLuint, GLenum severity,
                                            GLsizei, const GLchar* message, const void*) {
@@ -53,7 +54,7 @@ namespace ammonite {
       void enableDebug() {
         //Check support for OpenGL debugging
         if (!graphics::internal::checkExtension("GL_KHR_debug", 4, 3)) {
-          ammonite::utils::error << "OpenGL debugging unsupported" << std::endl;
+          tangle::utils::error << "OpenGL debugging unsupported" << std::endl;
           return;
         }
 
@@ -75,9 +76,9 @@ namespace ammonite {
         glGetIntegerv(GL_MAJOR_VERSION, &majorVersion);
         glGetIntegerv(GL_MAJOR_VERSION, &minorVersion);
 
-        ammonite::utils::status << "OpenGL version: " << majorVersion << "." << minorVersion << std::endl;
-        ammonite::utils::status << "OpenGL renderer: " << glGetString(GL_RENDERER) << std::endl;
-        ammonite::utils::status << "OpenGL vendor: " << glGetString(GL_VENDOR) << "\n" << std::endl;
+        tangle::utils::status << "OpenGL version: " << majorVersion << "." << minorVersion << std::endl;
+        tangle::utils::status << "OpenGL renderer: " << glGetString(GL_RENDERER) << std::endl;
+        tangle::utils::status << "OpenGL vendor: " << glGetString(GL_VENDOR) << "\n" << std::endl;
       }
     }
   }

@@ -17,11 +17,12 @@ extern "C" {
   #include <unistd.h>
 }
 
+#include <tangle/tangle.hpp>
+
 #include "files.hpp"
 
 #include "debug.hpp"
 #include "hash.hpp"
-#include "logging.hpp"
 
 static constexpr unsigned int MAX_LOAD_ATTEMPTS = 10;
 
@@ -146,7 +147,7 @@ namespace ammonite {
         }
 
         bool deleteCacheFile(const std::string& filePath) {
-          ammonite::utils::status << "Clearing '" << filePath << "'" << std::endl;
+          tangle::utils::status << "Clearing '" << filePath << "'" << std::endl;
 
           //Succeed if the cache doesn't even exist
           if (!std::filesystem::exists(filePath)) {
@@ -160,7 +161,7 @@ namespace ammonite {
       bool deleteFile(const std::string& filePath) {
         if (std::filesystem::exists(filePath)) {
           if (std::remove(filePath.c_str()) != 0) {
-            ammonite::utils::warning << "Failed to delete '" << filePath << "'" << std::endl;
+            tangle::utils::warning << "Failed to delete '" << filePath << "'" << std::endl;
             return false;
           }
         }
@@ -195,13 +196,13 @@ namespace ammonite {
       bool useDataCache(const std::string& targetCachePath) {
         //Attempt to create the cache directory if it doesn't already exist
         if (!std::filesystem::is_directory(targetCachePath)) {
-          ammonite::utils::warning << "Couldn't find cache directory '" << targetCachePath \
-                                   << "', creating it instead" << std::endl;
+          tangle::utils::warning << "Couldn't find cache directory '" << targetCachePath \
+                                 << "', creating it instead" << std::endl;
           try {
             std::filesystem::create_directory(targetCachePath);
           } catch (const std::filesystem::filesystem_error&) {
-            ammonite::utils::warning << "Failed to create cache directory '" \
-                                     << targetCachePath << "'" << std::endl;
+            tangle::utils::warning << "Failed to create cache directory '" \
+                                   << targetCachePath << "'" << std::endl;
             cacheEnabled = false;
             dataCachePath = std::string("");
             return false;
@@ -210,8 +211,8 @@ namespace ammonite {
 
         //Check for read and write permissions
         if ((access(targetCachePath.c_str(), R_OK | W_OK)) != 0) {
-          ammonite::utils::warning << "Insufficient permissions to use cache directory '" \
-                                   << targetCachePath << "'" << std::endl;
+          tangle::utils::warning << "Insufficient permissions to use cache directory '" \
+                                 << targetCachePath << "'" << std::endl;
           return false;
         }
 
@@ -221,7 +222,7 @@ namespace ammonite {
           dataCachePath.push_back('/');
         }
 
-        ammonite::utils::status << "Data caching enabled ('" << dataCachePath << "')" << std::endl;
+        tangle::utils::status << "Data caching enabled ('" << dataCachePath << "')" << std::endl;
         cacheEnabled = true;
         return true;
       }
@@ -241,8 +242,8 @@ namespace ammonite {
         unsigned char* data = nullptr;
         const int descriptor = open(filePath.c_str(), O_RDONLY);
         if (descriptor == -1) {
-          ammonite::utils::warning << "Error while opening '" << filePath \
-                                   << "' (" << -errno << ")" << std::endl;
+          tangle::utils::warning << "Error while opening '" << filePath \
+                                 << "' (" << -errno << ")" << std::endl;
           return nullptr;
         }
 
@@ -252,7 +253,7 @@ namespace ammonite {
         data = new unsigned char[statBuf.st_size];
 
         if ((posix_fadvise(descriptor, 0, 0, POSIX_FADV_SEQUENTIAL)) != 0) {
-          ammonite::utils::warning << "Error while advising kernel, continuing" << std::endl;
+          tangle::utils::warning << "Error while advising kernel, continuing" << std::endl;
         }
 
         intmax_t bytesRead = 0;
@@ -264,8 +265,8 @@ namespace ammonite {
           }
 
           if (newBytesRead < 0) {
-            ammonite::utils::warning << "Error while reading '" << filePath \
-                                     << "' (" << -errno << ")" << std::endl;
+            tangle::utils::warning << "Error while reading '" << filePath \
+                                   << "' (" << -errno << ")" << std::endl;
             close(descriptor);
             delete [] data;
             return nullptr;
@@ -278,8 +279,8 @@ namespace ammonite {
         }
 
         if (bytesRead != statBuf.st_size) {
-            ammonite::utils::warning << "Unexpected file size while reading '" << filePath \
-                                     << "'" << std::endl;
+            tangle::utils::warning << "Unexpected file size while reading '" << filePath \
+                                   << "'" << std::endl;
             close(descriptor);
             delete [] data;
             return nullptr;
@@ -298,13 +299,13 @@ namespace ammonite {
       bool writeFile(const std::string& filePath, unsigned char* data, std::size_t size) {
         const int descriptor = creat(filePath.c_str(), S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH);
         if (descriptor == -1) {
-          ammonite::utils::warning << "Error while opening '" << filePath \
-                                   << "' (" << -errno << ")" << std::endl;
+          tangle::utils::warning << "Error while opening '" << filePath \
+                                 << "' (" << -errno << ")" << std::endl;
           return false;
         }
 
         if ((posix_fadvise(descriptor, 0, 0, POSIX_FADV_SEQUENTIAL)) != 0) {
-          ammonite::utils::warning << "Error while advising kernel, continuing" << std::endl;
+          tangle::utils::warning << "Error while advising kernel, continuing" << std::endl;
         }
 
         std::size_t bytesWritten = 0;
@@ -316,8 +317,8 @@ namespace ammonite {
           }
 
           if (newBytesWritten < 0) {
-            ammonite::utils::warning << "Error while writing to '" << filePath \
-                                     << "' (" << -errno << ")" << std::endl;
+            tangle::utils::warning << "Error while writing to '" << filePath \
+                                   << "' (" << -errno << ")" << std::endl;
             close(descriptor);
             return false;
           }
@@ -329,8 +330,8 @@ namespace ammonite {
         }
 
         if (bytesWritten != size) {
-            ammonite::utils::warning << "Unexpected file size while writing to '" << filePath \
-                                     << "'" << std::endl;
+            tangle::utils::warning << "Unexpected file size while writing to '" << filePath \
+                                   << "'" << std::endl;
             close(descriptor);
             return false;
         }
@@ -378,7 +379,7 @@ namespace ammonite {
           std::size_t blockSizes[3];
           cacheData = loadFile(*cacheFilePath, &size);
           if (cacheData == nullptr || size < sizeof(blockSizes)) {
-            ammonite::utils::warning << "Failed to read '" << *cacheFilePath << "'" << std::endl;
+            tangle::utils::warning << "Failed to read '" << *cacheFilePath << "'" << std::endl;
             *cacheState = AMMONITE_CACHE_MISS;
 
             //Cache data may or may not have been returned, due to size check
@@ -399,8 +400,8 @@ namespace ammonite {
 
           //Check size of data is as expected, then validate the loaded cache
           if (blockSizes[0] + blockSizes[1] + blockSizes[2] != size) {
-            ammonite::utils::warning << "Incorrect size information for '" << *cacheFilePath \
-                                     << "'" << std::endl;
+            tangle::utils::warning << "Incorrect size information for '" << *cacheFilePath \
+                                   << "'" << std::endl;
             failed = true;
           } else {
             const AmmoniteCacheEnum result = validateInputs(
@@ -413,8 +414,8 @@ namespace ammonite {
                                 std::string(".cache");
 
             } else if (result != AMMONITE_CACHE_HIT) {
-              ammonite::utils::warning << "Failed to validate '" << *cacheFilePath \
-                                       << "'" << std::endl;
+              tangle::utils::warning << "Failed to validate '" << *cacheFilePath \
+                                     << "'" << std::endl;
               failed = true;
             }
           }
@@ -425,15 +426,15 @@ namespace ammonite {
 
         //Handle too many collision resolution attempts
         if (attempts >= MAX_LOAD_ATTEMPTS && collision) {
-          ammonite::utils::warning << "Maximum number of collision resolution attempts reached" \
-                                   << std::endl;
+          tangle::utils::warning << "Maximum number of collision resolution attempts reached" \
+                                 << std::endl;
           failed = true;
         }
 
         //Clean up after a failure
         if (failed) {
           if (!deleteCacheFile(*cacheFilePath)) {
-            ammonite::utils::warning << "Failed to clean broken cache '" << cacheFilePath << "'" << std::endl;
+            tangle::utils::warning << "Failed to clean broken cache '" << cacheFilePath << "'" << std::endl;
           }
 
           delete [] cacheData;
@@ -491,9 +492,9 @@ namespace ammonite {
 
         //Write the data, user data and cache info to the cache file
         if (!ammonite::utils::files::writeFile(cacheFilePath, fileData, totalDataSize)) {
-          ammonite::utils::warning << "Failed to cache '" << cacheFilePath << "'" << std::endl;
+          tangle::utils::warning << "Failed to cache '" << cacheFilePath << "'" << std::endl;
           if (!deleteCacheFile(cacheFilePath)) {
-            ammonite::utils::warning << "Failed to clean broken cache '" << cacheFilePath << "'" << std::endl;
+            tangle::utils::warning << "Failed to clean broken cache '" << cacheFilePath << "'" << std::endl;
           }
 
           delete [] fileData;

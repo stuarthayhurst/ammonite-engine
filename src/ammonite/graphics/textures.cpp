@@ -12,11 +12,12 @@ extern "C" {
   #include <stb/stb_image.h>
 }
 
+#include <tangle/tangle.hpp>
+
 #include "textures.hpp"
 
 #include "../maths/vector.hpp"
 #include "../utils/debug.hpp"
-#include "../utils/logging.hpp"
 
 namespace ammonite {
   namespace textures {
@@ -145,7 +146,7 @@ namespace ammonite {
       */
       GLuint acquireTextureKeyId(const std::string& textureKey) {
         if (!textureKeyInfoPtrMap.contains(textureKey)) {
-          ammonite::utils::warning << "Requested ID for unreserved texture" << std::endl;
+          tangle::utils::warning << "Requested ID for unreserved texture" << std::endl;
           return 0;
         }
 
@@ -164,8 +165,8 @@ namespace ammonite {
         //Check the cache for the texture
         if (textureKeyInfoPtrMap.contains(textureKey)) {
           const GLuint textureId = textureKeyInfoPtrMap[textureKey]->id;
-          ammonite::utils::warning << "Attempted to reserve an existing texture (ID " \
-                                   << textureId << ")" << std::endl;
+          tangle::utils::warning << "Attempted to reserve an existing texture (ID " \
+                                 << textureId << ")" << std::endl;
           return 0;
         }
 
@@ -173,14 +174,14 @@ namespace ammonite {
         GLuint textureId = 0;
         glCreateTextures(GL_TEXTURE_2D, 1, &textureId);
         if (textureId == 0) {
-          ammonite::utils::warning << "Failed to create texture" << std::endl;
+          tangle::utils::warning << "Failed to create texture" << std::endl;
           return 0;
         }
 
         //Add the texture to the tracker
         if (idTextureMap.contains(textureId)) {
-          ammonite::utils::warning << "Texture ID (" << textureId \
-                                   << ") already exists, not reserving texture" << std::endl;
+          tangle::utils::warning << "Texture ID (" << textureId \
+                                 << ") already exists, not reserving texture" << std::endl;
           return 0;
         }
         idTextureMap[textureId] = {.id = textureId, .refCount = 1, .textureKey = ""};
@@ -204,9 +205,9 @@ namespace ammonite {
         GLint maxTextureSize = 0;
         glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
         if (textureData.width > maxTextureSize || textureData.height > maxTextureSize) {
-          ammonite::utils::warning << "Attempted to create a texture of unsupported size (" \
-                                   << textureData.width << " x " << textureData.height \
-                                   << ")" << std::endl;
+          tangle::utils::warning << "Attempted to create a texture of unsupported size (" \
+                                 << textureData.width << " x " << textureData.height \
+                                 << ")" << std::endl;
           return false;
         }
 
@@ -215,8 +216,8 @@ namespace ammonite {
         GLenum dataFormat = 0;
         if (!decideTextureFormat(textureData.numChannels, textureData.srgbTexture,
                                  &textureFormat, &dataFormat)) {
-          ammonite::utils::warning << "Failed to upload texture (ID " \
-                                   << textureId << ")" << std::endl;
+          tangle::utils::warning << "Failed to upload texture (ID " \
+                                 << textureId << ")" << std::endl;
           stbi_image_free(textureData.data);
           return false;
         }
@@ -262,8 +263,8 @@ namespace ammonite {
         }
 
         if (textureData->data == nullptr) {
-          ammonite::utils::warning << "Failed to load texture '" << texturePath \
-                                   << "'" << std::endl;
+          tangle::utils::warning << "Failed to load texture '" << texturePath \
+                                 << "'" << std::endl;
           return false;
         }
 
@@ -281,8 +282,8 @@ namespace ammonite {
       void deleteTexture(GLuint textureId) {
         //Fetch the texture info, if it exists
         if (!idTextureMap.contains(textureId)) {
-          ammonite::utils::warning << "Not deleting texture (ID " << textureId \
-                                   << "), it doesn't exist" << std::endl;
+          tangle::utils::warning << "Not deleting texture (ID " << textureId \
+                                 << "), it doesn't exist" << std::endl;
           return;
         }
         TextureInfo* const textureInfoPtr = &idTextureMap[textureId];
@@ -316,8 +317,8 @@ namespace ammonite {
       //Increase the reference count of a texture by its ID
       void copyTexture(GLuint textureId) {
         if (!idTextureMap.contains(textureId)) {
-          ammonite::utils::warning << "Texture ID (" << textureId \
-                                   << ") doesn't exist, not copying texture" << std::endl;
+          tangle::utils::warning << "Texture ID (" << textureId \
+                                 << ") doesn't exist, not copying texture" << std::endl;
           return;
         }
 
@@ -336,8 +337,8 @@ namespace ammonite {
         GLint maxTextureSize = 0;
         glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
         if (width > maxTextureSize || height > maxTextureSize) {
-          ammonite::utils::warning << "Attempted to create a texture of unsupported size (" \
-                                   << width << " x " << height << ")" << std::endl;
+          tangle::utils::warning << "Attempted to create a texture of unsupported size (" \
+                                 << width << " x " << height << ")" << std::endl;
           return 0;
         }
 
@@ -350,8 +351,8 @@ namespace ammonite {
 
         //Add the texture to the tracker
         if (idTextureMap.contains(textureId)) {
-          ammonite::utils::warning << "Texture ID (" << textureId \
-                                   << ") already exists, not creating texture" << std::endl;
+          tangle::utils::warning << "Texture ID (" << textureId \
+                                 << ") already exists, not creating texture" << std::endl;
           return 0;
         }
         idTextureMap[textureId] = {.id = textureId, .refCount = 1, .textureKey = ""};
@@ -380,7 +381,7 @@ namespace ammonite {
           GLenum textureFormat = 0;
           GLenum dataFormat = 0;
           if (!decideTextureFormat(components, false, &textureFormat, &dataFormat)) {
-            ammonite::utils::warning << "Failed to load texture from colour" << std::endl;
+            tangle::utils::warning << "Failed to load texture from colour" << std::endl;
             return 0;
           }
 
@@ -401,7 +402,7 @@ namespace ammonite {
           const GLuint textureId = createTexture(1, 1, data, dataFormat, textureFormat,
                                                  (GLint)mipmapLevels);
           if (textureId == 0) {
-            ammonite::utils::warning << "Failed to load texture from colour" << std::endl;
+            tangle::utils::warning << "Failed to load texture from colour" << std::endl;
             return 0;
           }
 
@@ -444,7 +445,7 @@ namespace ammonite {
         //Reserve the texture key before loading
         const GLuint textureId = textures::internal::reserveTextureKey(textureKey);
         if (textureId == 0) {
-          ammonite::utils::warning << "Failed to reserve texture ID" << std::endl;
+          tangle::utils::warning << "Failed to reserve texture ID" << std::endl;
           return 0;
         }
 
@@ -501,8 +502,8 @@ namespace ammonite {
           if (!decideTextureFormat(nChannels, srgbTextures,
               &internalFormat, &dataFormat)) {
             //Free image data, destroy texture and return
-            ammonite::utils::warning << "Failed to load '" << texturePaths[i] \
-                                     << "'" << std::endl;
+            tangle::utils::warning << "Failed to load '" << texturePaths[i] \
+                                   << "'" << std::endl;
             stbi_image_free(imageData);
             glDeleteTextures(1, &textureId);
 
@@ -524,8 +525,8 @@ namespace ammonite {
             stbi_image_free(imageData);
           } else {
             //Free image data, destroy texture and return
-            ammonite::utils::warning << "Failed to load '" << texturePaths[i] \
-                                     << "'" << std::endl;
+            tangle::utils::warning << "Failed to load '" << texturePaths[i] \
+                                   << "'" << std::endl;
             stbi_image_free(imageData);
             glDeleteTextures(1, &textureId);
 

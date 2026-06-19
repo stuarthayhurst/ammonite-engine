@@ -10,7 +10,6 @@
 #include "camera/camera.hpp"
 #include "graphics/renderer.hpp"
 #include "utils/debug.hpp"
-#include "utils/logging.hpp"
 #include "utils/timer.hpp"
 #include "window/window.hpp"
 
@@ -46,9 +45,9 @@ namespace ammonite {
       return false;
     }
 
-    ammonite::utils::status << "Created thread pool with " \
-                            << tangle::thread::getThreadPoolSize() \
-                            << " thread(s)" << std::endl;
+    tangle::utils::status << "Created thread pool with " \
+                          << tangle::thread::getThreadPoolSize() \
+                          << " thread(s)" << std::endl;
 
     if (!title.empty()) {
       if (!ammonite::window::createWindow(width, height, title)) {
@@ -68,7 +67,7 @@ namespace ammonite {
     ammonite::utils::debug::printDriverInfo();
 
     if (!ammonite::renderer::setup::setupRenderer(shaderPath)) {
-      ammonite::utils::error << "Failed to initialise renderer" << std::endl;
+      tangle::utils::error << "Failed to initialise renderer" << std::endl;
       ammonite::window::destroyWindow();
       return false;
     }
@@ -76,7 +75,7 @@ namespace ammonite {
     //Create the engine's main timer
     engineTimer = new ammonite::utils::Timer;
 
-    ammonite::utils::status << "Loaded engine in " << loadTimer.getTime() << "s" << std::endl;
+    tangle::utils::status << "Loaded engine in " << loadTimer.getTime() << "s" << std::endl;
     return true;
   }
 

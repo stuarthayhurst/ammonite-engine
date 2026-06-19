@@ -8,6 +8,8 @@ extern "C" {
   #include <epoxy/gl.h>
 }
 
+#include <tangle/tangle.hpp>
+
 #include "renderer.hpp"
 
 #include "extensions.hpp"
@@ -21,7 +23,6 @@ extern "C" {
 #include "../skybox.hpp"
 #include "../splash.hpp"
 #include "../utils/debug.hpp"
-#include "../utils/logging.hpp"
 #include "../utils/id.hpp"
 #include "../window/window.hpp"
 
@@ -124,7 +125,7 @@ namespace ammonite {
           for (const auto& extension : extensions) {
             if (!graphics::internal::checkExtension(extension.extension,
                 extension.major, extension.minor)) {
-              ammonite::utils::error << extension.prettyName << " unsupported" << std::endl;
+              tangle::utils::error << extension.prettyName << " unsupported" << std::endl;
               success = false;
               (*failureCount)++;
             }
@@ -132,7 +133,7 @@ namespace ammonite {
 
           //Check minimum OpenGL version is supported
           if (!graphics::internal::checkGlVersion(3, 2)) {
-            ammonite::utils::error << "OpenGL 3.2 unsupported" << std::endl;
+            tangle::utils::error << "OpenGL 3.2 unsupported" << std::endl;
             success = false;
             (*failureCount)++;
           }
@@ -356,7 +357,7 @@ namespace ammonite {
         if (sampleCount != 0) {
           if (glCheckNamedFramebufferStatus(colourBufferMultisampleFBO, GL_FRAMEBUFFER) !=
               GL_FRAMEBUFFER_COMPLETE) {
-            ammonite::utils::warning << "Incomplete multisampled render framebuffer" << std::endl;
+            tangle::utils::warning << "Incomplete multisampled render framebuffer" << std::endl;
           } else {
             ammoniteInternalDebug << "Created new multisampled render framebuffer (" << renderWidth \
                                   << " x " << renderHeight << "), samples: x" << sampleCount << std::endl;
@@ -366,7 +367,7 @@ namespace ammonite {
         //Check regular framebuffer
         if (glCheckNamedFramebufferStatus(screenQuadFBO, GL_FRAMEBUFFER) !=
             GL_FRAMEBUFFER_COMPLETE) {
-          ammonite::utils::warning << "Incomplete render framebuffer" << std::endl;
+          tangle::utils::warning << "Incomplete render framebuffer" << std::endl;
         } else {
           ammoniteInternalDebug << "Created new render framebuffer (" << renderWidth << " x " \
                                 << renderHeight << ")" << std::endl;
@@ -456,7 +457,7 @@ namespace ammonite {
           break;
         case AMMONITE_DATA_REFRESH:
           //How did we get here?
-          ammonite::utils::error << "drawModel() called with AMMONITE_DATA_REFRESH" << std::endl;
+          tangle::utils::error << "drawModel() called with AMMONITE_DATA_REFRESH" << std::endl;
           std::unreachable();
           break;
         }
@@ -612,7 +613,7 @@ namespace ammonite {
           sampleCount = std::min(requestedSamples, (unsigned int)maxSampleCount);
 
           if (sampleCount < requestedSamples) {
-            ammonite::utils::warning << "Ignoring request for " << requestedSamples \
+            tangle::utils::warning << "Ignoring request for " << requestedSamples \
                                      << " samples, using implementation limit of " \
                                      << maxSampleCount << std::endl;
             settings::setAntialiasingSamples(sampleCount);
@@ -676,7 +677,7 @@ namespace ammonite {
         for (unsigned int shadowCount = 0; shadowCount < activeLights; shadowCount++) {
           //Check framebuffer status
           if (glCheckNamedFramebufferStatus(depthMapFBO, GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-            ammonite::utils::warning << "Incomplete depth framebuffer" << std::endl;
+            tangle::utils::warning << "Incomplete depth framebuffer" << std::endl;
           }
 
           //Pass light source specific uniforms

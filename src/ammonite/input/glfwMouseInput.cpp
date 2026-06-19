@@ -4,11 +4,11 @@ extern "C" {
   #include <GLFW/glfw3.h>
 }
 
+#include <tangle/tangle.hpp>
+
 #include "input.hpp"
 
 #include "keycodes.hpp"
-
-#include "../utils/logging.hpp"
 
 /*
  - This file implements GLFW-specific mouse handling, used by the input layer
@@ -79,8 +79,8 @@ namespace ammonite {
         ignoreNextCursor = true;
 
         if (windowPtr == nullptr) {
-          ammonite::utils::warning << "Can't set mouse input focus before the window exists" \
-                                   << std::endl;
+          tangle::utils::warning << "Can't set mouse input focus before the window exists" \
+                                 << std::endl;
           return;
         }
 

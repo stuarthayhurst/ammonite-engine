@@ -9,6 +9,8 @@ extern "C" {
   #include <epoxy/gl.h>
 }
 
+#include <tangle/tangle.hpp>
+
 #include "models.hpp"
 
 #include "../enums.hpp"
@@ -19,7 +21,6 @@ extern "C" {
 #include "../maths/vector.hpp"
 #include "../utils/debug.hpp"
 #include "../utils/id.hpp"
-#include "../utils/logging.hpp"
 
 /*
  - Exposes functions to load models, apply textures and set the draw mode
@@ -404,14 +405,14 @@ namespace ammonite {
         } else if (inactiveModelTracker.hasModel(modelId)) {
           inactiveModelTracker.deleteModelInfo(modelId);
         } else {
-          ammonite::utils::warning << "Failed to delete model info (ID " \
-                                   << modelId << ")" << std::endl;
+          tangle::utils::warning << "Failed to delete model info (ID " \
+                                 << modelId << ")" << std::endl;
         }
 
         //Reduce reference count and possibly delete model data
         if (!internal::deleteModelData(modelKey, modelId)) {
-          ammonite::utils::warning << "Failed to delete model data (ID " \
-                                   << modelId << ")" << std::endl;
+          tangle::utils::warning << "Failed to delete model data (ID " \
+                                 << modelId << ")" << std::endl;
         }
       }
     }
@@ -457,13 +458,13 @@ namespace ammonite {
       for (internal::TextureIdGroup& textureIdGroup : modelInfoPtr->textureIds) {
         if (!applyMaterialComponent(&textureIdGroup.diffuseId,
                                     material.diffuseIsTexture, material.diffuse)) {
-          ammonite::utils::warning << "Failed to apply diffuse material component" << std::endl;
+          tangle::utils::warning << "Failed to apply diffuse material component" << std::endl;
           return false;
         }
 
         if (!applyMaterialComponent(&textureIdGroup.specularId,
                                     material.specularIsTexture, material.specular)) {
-          ammonite::utils::warning << "Failed to apply specular material component" << std::endl;
+          tangle::utils::warning << "Failed to apply specular material component" << std::endl;
           return false;
         }
       }

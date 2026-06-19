@@ -6,6 +6,8 @@ extern "C" {
   #include <epoxy/gl.h>
 }
 
+#include <tangle/tangle.hpp>
+
 #include "lighting.hpp"
 
 #include "../graphics/buffers.hpp"
@@ -16,7 +18,6 @@ extern "C" {
 #include "../models/models.hpp"
 #include "../utils/debug.hpp"
 #include "../utils/id.hpp"
-#include "../utils/logging.hpp"
 
 namespace ammonite {
   namespace lighting {
@@ -207,14 +208,14 @@ namespace ammonite {
     void linkModel(AmmoniteId lightId, AmmoniteId modelId) {
       //Check that the light source exists
       if (!lightTrackerMap.contains(lightId)) {
-        ammonite::utils::warning << "Can't link light ID '" << lightId \
-                                 << "', it doesn't exist" << std::endl;
+        tangle::utils::warning << "Can't link light ID '" << lightId \
+                               << "', it doesn't exist" << std::endl;
       }
 
       //Check that the model exists
       if (models::internal::getModelPtr(modelId) == nullptr) {
-        ammonite::utils::warning << "Can't link to model ID '" << modelId \
-                                 << "', it doesn't exist" << std::endl;
+        tangle::utils::warning << "Can't link to model ID '" << modelId \
+                               << "', it doesn't exist" << std::endl;
       }
 
       //Remove any light source's attachment to the model
@@ -232,8 +233,8 @@ namespace ammonite {
     void unlinkModel(AmmoniteId lightId) {
       //Check that the light source exists, then fetch it
       if (!lightTrackerMap.contains(lightId)) {
-        ammonite::utils::warning << "Can't unlink light ID '" << lightId \
-                                 << "', it doesn't exist" << std::endl;
+        tangle::utils::warning << "Can't unlink light ID '" << lightId \
+                               << "', it doesn't exist" << std::endl;
       }
       internal::LightSource* const lightSource = &lightTrackerMap[lightId];
 

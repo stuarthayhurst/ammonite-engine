@@ -8,11 +8,12 @@ extern "C" {
   #include <stb/stb_image.h>
 }
 
+#include <tangle/tangle.hpp>
+
 #include "window.hpp"
 
 #include "../enums.hpp"
 #include "../input/input.hpp"
-#include "../utils/logging.hpp"
 
 static constexpr std::string DEFAULT_TITLE = "Ammonite Window";
 
@@ -30,7 +31,7 @@ namespace ammonite {
 
       void setContextType(AmmoniteContextEnum contextType) {
         if (windowPtr != nullptr) {
-          ammonite::utils::warning << "Window already created, ignoring context type request" << std::endl;
+          tangle::utils::warning << "Window already created, ignoring context type request" << std::endl;
           return;
         }
 
@@ -41,14 +42,14 @@ namespace ammonite {
     bool createWindow(unsigned int width, unsigned int height, const std::string& title) {
       //Setup GLFW
       if (!internal::setupGlfw(requestedContextType)) {
-        ammonite::utils::error << "Failed to initialise GLFW" << std::endl;
+        tangle::utils::error << "Failed to initialise GLFW" << std::endl;
         return false;
       }
 
       //Create window
       windowPtr = internal::createWindow(width, height);
       if (windowPtr == nullptr) {
-        ammonite::utils::error << "Failed to open window" << std::endl;
+        tangle::utils::error << "Failed to open window" << std::endl;
         return false;
       }
 
@@ -73,7 +74,7 @@ namespace ammonite {
 
     void setWindowResizable(bool resizable) {
       if (windowPtr == nullptr) {
-        ammonite::utils::warning << "No window to set resizability for" << std::endl;
+        tangle::utils::warning << "No window to set resizability for" << std::endl;
         return;
       }
 
@@ -82,7 +83,7 @@ namespace ammonite {
 
     bool getWindowResizable() {
       if (windowPtr == nullptr) {
-        ammonite::utils::warning << "No window to get resizability for" << std::endl;
+        tangle::utils::warning << "No window to get resizability for" << std::endl;
         return false;
       }
 
@@ -91,7 +92,7 @@ namespace ammonite {
 
     void setTitle(const std::string& title) {
       if (windowPtr == nullptr) {
-        ammonite::utils::warning << "No window to set icon for" << std::endl;
+        tangle::utils::warning << "No window to set icon for" << std::endl;
         return;
       }
 
@@ -100,7 +101,7 @@ namespace ammonite {
 
     void useIcons(const std::string* iconPaths, unsigned int iconCount) {
       if (iconPaths == nullptr || iconCount == 0) {
-        ammonite::utils::warning << "Failed to load icons (none specified)" << std::endl;
+        tangle::utils::warning << "Failed to load icons (none specified)" << std::endl;
         return;
       }
 
@@ -114,7 +115,7 @@ namespace ammonite {
         images[i].height = (unsigned int)height;
 
         if (images[i].data == nullptr) {
-          ammonite::utils::warning << "Failed to load '" << iconPaths[i] << "'" << std::endl;
+          tangle::utils::warning << "Failed to load '" << iconPaths[i] << "'" << std::endl;
 
           //Free already loaded images
           for (unsigned int j = 0; j < i; j++) {
@@ -153,7 +154,7 @@ namespace ammonite {
           }
         }
       } catch (const std::filesystem::filesystem_error&) {
-        ammonite::utils::warning << "Couldn't open '" << iconDirPath << "'" << std::endl;
+        tangle::utils::warning << "Couldn't open '" << iconDirPath << "'" << std::endl;
         return;
       }
 
@@ -165,14 +166,14 @@ namespace ammonite {
     void setWindowGeometry(unsigned int width, unsigned int height, unsigned int xPos,
                            unsigned int yPos, bool useDecoratedSize, bool useDecoratedPos) {
       if (windowPtr == nullptr) {
-        ammonite::utils::warning << "No window to set geometry for" << std::endl;
+        tangle::utils::warning << "No window to set geometry for" << std::endl;
         return;
       }
 
       //Don't allow setting window geometry for fullscreen windows
       if (getFullscreen()) {
-        ammonite::utils::warning << "Ignoring window geometry request for fullscreen window" \
-                                 << std::endl;
+        tangle::utils::warning << "Ignoring window geometry request for fullscreen window" \
+                               << std::endl;
         return;
       }
 
@@ -183,7 +184,7 @@ namespace ammonite {
     void getWindowGeometry(unsigned int* width, unsigned int* height, unsigned int* xPos,
                            unsigned int* yPos, bool useDecoratedSize, bool useDecoratedPos) {
       if (windowPtr == nullptr) {
-        ammonite::utils::warning << "No window to get geometry for" << std::endl;
+        tangle::utils::warning << "No window to get geometry for" << std::endl;
         return;
       }
 
@@ -201,13 +202,13 @@ namespace ammonite {
     */
     void changeFullscreenMonitor(unsigned int monitorIndex) {
       if (windowPtr == nullptr) {
-        ammonite::utils::warning << "Window system hasn't been initialised" << std::endl;
+        tangle::utils::warning << "Window system hasn't been initialised" << std::endl;
         return;
       }
 
       //Ignore requests for non-fullscreen windows
       if (!getFullscreen()) {
-        ammonite::utils::warning << "Can't set monitor for non-fullscreen window" << std::endl;
+        tangle::utils::warning << "Can't set monitor for non-fullscreen window" << std::endl;
         return;
       }
 
@@ -220,7 +221,7 @@ namespace ammonite {
     */
     void setFullscreen(bool shouldFullscreen, unsigned int monitorIndex) {
       if (windowPtr == nullptr) {
-        ammonite::utils::warning << "Window system hasn't been initialised" << std::endl;
+        tangle::utils::warning << "Window system hasn't been initialised" << std::endl;
         return;
       }
 
@@ -238,7 +239,7 @@ namespace ammonite {
     */
     void setFullscreen(bool shouldFullscreen) {
       if (windowPtr == nullptr) {
-        ammonite::utils::warning << "Window system hasn't been initialised" << std::endl;
+        tangle::utils::warning << "Window system hasn't been initialised" << std::endl;
         return;
       }
 
@@ -248,7 +249,7 @@ namespace ammonite {
     //Return the fullscreen monitor, or the closest matched when windowed
     unsigned int getCurrentMonitorIndex() {
       if (windowPtr == nullptr) {
-        ammonite::utils::warning << "No window to get monitor for" << std::endl;
+        tangle::utils::warning << "No window to get monitor for" << std::endl;
         return 0;
       }
 
@@ -261,7 +262,7 @@ namespace ammonite {
     */
     unsigned int getMonitorCount() {
       if (windowPtr == nullptr) {
-        ammonite::utils::warning << "Window system hasn't been initialised" << std::endl;
+        tangle::utils::warning << "Window system hasn't been initialised" << std::endl;
         return 0;
       }
 
@@ -270,7 +271,7 @@ namespace ammonite {
 
     bool getFullscreen() {
       if (windowPtr == nullptr) {
-        ammonite::utils::warning << "No window to get fullscreen state for" << std::endl;
+        tangle::utils::warning << "No window to get fullscreen state for" << std::endl;
         return false;
       }
 
@@ -279,7 +280,7 @@ namespace ammonite {
 
     bool shouldWindowClose() {
       if (windowPtr == nullptr) {
-        ammonite::utils::warning << "No window that could be closed" << std::endl;
+        tangle::utils::warning << "No window that could be closed" << std::endl;
         return false;
       }
 

@@ -1,12 +1,13 @@
 #include <iostream>
 #include <unordered_map>
 
+#include <tangle/tangle.hpp>
+
 #include "splash.hpp"
 
 #include "maths/vector.hpp"
 #include "utils/debug.hpp"
 #include "utils/id.hpp"
-#include "utils/logging.hpp"
 
 namespace ammonite {
   namespace splash {
@@ -45,8 +46,8 @@ namespace ammonite {
         ammoniteInternalDebug << "Deleted storage for splash screen (ID " \
                               << targetScreenId << ")" << std::endl;
       } else {
-        ammonite::utils::warning << "Requested splash screen doesn't exist (ID " \
-                                 << targetScreenId << ")" << std::endl;
+        tangle::utils::warning << "Requested splash screen doesn't exist (ID " \
+                               << targetScreenId << ")" << std::endl;
       }
     }
 
@@ -57,8 +58,8 @@ namespace ammonite {
       } else if (targetScreenId == 0) {
         activeSplashScreenId = 0;
       } else {
-        ammonite::utils::warning << "Requested splash screen doesn't exist (ID " \
-                                 << targetScreenId << ")" << std::endl;
+        tangle::utils::warning << "Requested splash screen doesn't exist (ID " \
+                               << targetScreenId << ")" << std::endl;
       }
     }
 
@@ -70,8 +71,8 @@ namespace ammonite {
       if (splashScreenTracker.contains(targetScreenId)) {
         splashScreenTracker[targetScreenId].progress = progress;
       } else {
-        ammonite::utils::warning << "Requested splash screen doesn't exist (ID " \
-                                 << targetScreenId << ")" << std::endl;
+        tangle::utils::warning << "Requested splash screen doesn't exist (ID " \
+                               << targetScreenId << ")" << std::endl;
       }
     }
 
@@ -82,8 +83,8 @@ namespace ammonite {
         splashScreenTracker[targetScreenId].height = height;
         splashScreenTracker[targetScreenId].heightOffset = heightOffset;
       } else {
-           ammonite::utils::warning << "Requested splash screen doesn't exist (ID " \
-                                 << targetScreenId << ")" << std::endl;
+         tangle::utils::warning << "Requested splash screen doesn't exist (ID " \
+                                << targetScreenId << ")" << std::endl;
       }
     }
 
@@ -96,8 +97,8 @@ namespace ammonite {
         ammonite::copy(trackColour, splashScreenTracker[targetScreenId].trackColour);
         ammonite::copy(progressColour, splashScreenTracker[targetScreenId].progressColour);
       } else {
-           ammonite::utils::warning << "Requested splash screen doesn't exist (ID " \
-                                 << targetScreenId << ")" << std::endl;
+         tangle::utils::warning << "Requested splash screen doesn't exist (ID " \
+                                << targetScreenId << ")" << std::endl;
       }
     }
   }

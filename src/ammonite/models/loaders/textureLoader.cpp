@@ -7,7 +7,6 @@
 #include "../models.hpp"
 
 #include "../../graphics/textures.hpp"
-#include "../../utils/logging.hpp"
 
 namespace ammonite {
   namespace models {
@@ -65,7 +64,7 @@ namespace ammonite {
         //Reserve the texture key before loading
         const GLuint textureId = textures::internal::reserveTextureKey(textureKey);
         if (textureId == 0) {
-          ammonite::utils::warning << "Failed to reserve texture" << std::endl;
+          tangle::utils::warning << "Failed to reserve texture" << std::endl;
           return 0;
         }
 

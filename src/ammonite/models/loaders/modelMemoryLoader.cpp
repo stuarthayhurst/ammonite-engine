@@ -9,7 +9,6 @@
 
 #include "../../graphics/textures.hpp"
 #include "../../utils/debug.hpp"
-#include "../../utils/logging.hpp"
 
 /*
  - Process a (memory-based) model into internal structures
@@ -229,9 +228,9 @@ namespace ammonite {
 
           //Check that no meshes were dropped
           if (indexedInfo.meshCount != deindexedInfo.meshCount) {
-            ammonite::utils::warning << "Mesh count changed from " \
-                                     << indexedInfo.meshCount << " to " \
-                                     << deindexedInfo.meshCount << std::endl;
+            tangle::utils::warning << "Mesh count changed from " \
+                                   << indexedInfo.meshCount << " to " \
+                                   << deindexedInfo.meshCount << std::endl;
           }
         }
       }

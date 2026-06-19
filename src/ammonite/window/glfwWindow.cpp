@@ -11,13 +11,14 @@ extern "C" {
   #include <GLFW/glfw3.h>
 }
 
+#include <tangle/tangle.hpp>
+
 #include "window.hpp"
 
 #include "../camera/camera.hpp"
 #include "../enums.hpp"
 #include "../input/input.hpp"
 #include "../utils/debug.hpp"
-#include "../utils/logging.hpp"
 #include "../utils/timer.hpp"
 
 //GLFW-specific implementations to support window.hpp
@@ -76,7 +77,7 @@ namespace ammonite {
           if (isWindowFullscreen) {
             GLFWmonitor* const monitorPtr = glfwGetWindowMonitor(windowPtr);
             if (monitorPtr == nullptr) {
-              ammonite::utils::warning << "Couldn't determine monitor, window geometry may be incorrect" << std::endl;
+              tangle::utils::warning << "Couldn't determine monitor, window geometry may be incorrect" << std::endl;
             }
 
             const GLFWvidmode* const mode = glfwGetVideoMode(monitorPtr);
@@ -167,8 +168,8 @@ namespace ammonite {
             }
           }
 
-          ammonite::utils::warning << "Failed to find monitor for pointer '" \
-                                   << monitorPtr << "'" << std::endl;
+          tangle::utils::warning << "Failed to find monitor for pointer '" \
+                                 << monitorPtr << "'" << std::endl;
           return 0;
         }
 
@@ -177,8 +178,9 @@ namespace ammonite {
           GLFWmonitor* const* const monitorPtrs = glfwGetMonitors(&glfwMonitorCount);
 
           if (std::cmp_greater_equal(monitorIndex, glfwMonitorCount)) {
-            ammonite::utils::warning << "Unknown monitor index '" << monitorIndex << \
-              "', only found " << glfwMonitorCount << " monitors" << std::endl;
+            tangle::utils::warning << "Unknown monitor index '" << monitorIndex \
+                                   << "', only found " << glfwMonitorCount \
+                                   << " monitors" << std::endl;
             monitorIndex = (unsigned int)(glfwMonitorCount - 1);
           }
 

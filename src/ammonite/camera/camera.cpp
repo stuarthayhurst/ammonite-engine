@@ -1,6 +1,8 @@
 #include <iostream>
 #include <unordered_map>
 
+#include <tangle/tangle.hpp>
+
 #include "camera.hpp"
 
 #include "../graphics/renderer.hpp"
@@ -9,7 +11,6 @@
 #include "../maths/vector.hpp"
 #include "../utils/debug.hpp"
 #include "../utils/id.hpp"
-#include "../utils/logging.hpp"
 #include "../window/window.hpp"
 
 namespace ammonite {
@@ -90,17 +91,17 @@ namespace ammonite {
 
         //Check the camera exists
         if (!cameraTrackerMap.contains(cameraId)) {
-          ammonite::utils::warning << "Can't find camera (ID " \
-                                   << cameraId << ") to unlink" << std::endl;
+          tangle::utils::warning << "Can't find camera (ID " << cameraId \
+                                 << ") to unlink" << std::endl;
           return false;
         }
 
         //Reset the linked camera on any already linked path, if requested
         if (unlinkExisting) {
           if (!path::internal::setLinkedCamera(cameraTrackerMap[cameraId].linkedCameraPathId, 0, false)) {
-            ammonite::utils::warning << "Failed to unlink path (ID " \
-                                     << cameraTrackerMap[cameraId].linkedCameraPathId \
-                                     << ") from camera (ID " << cameraId << ")" << std::endl;
+            tangle::utils::warning << "Failed to unlink path (ID " \
+                                   << cameraTrackerMap[cameraId].linkedCameraPathId \
+                                   << ") from camera (ID " << cameraId << ")" << std::endl;
             return false;
           }
         }
@@ -120,8 +121,8 @@ namespace ammonite {
       if (cameraTrackerMap.contains(cameraId)) {
         activeCameraId = cameraId;
       } else {
-        ammonite::utils::warning << "Couldn't find camera with ID '" << cameraId \
-                                 << "'" << std::endl;
+        tangle::utils::warning << "Couldn't find camera with ID '" << cameraId \
+                               << "'" << std::endl;
       }
     }
 
@@ -138,16 +139,15 @@ namespace ammonite {
     void deleteCamera(AmmoniteId cameraId) {
       //Check the camera exists
       if (!cameraTrackerMap.contains(cameraId)) {
-        ammonite::utils::warning << "Couldn't find camera with ID '" << cameraId \
-                                 << "'" << std::endl;
+        tangle::utils::warning << "Couldn't find camera with ID '" << cameraId << "'" << std::endl;
         return;
       }
 
       //Reset any camera path link
       const AmmoniteId linkedPathId = cameraTrackerMap[cameraId].linkedCameraPathId;
       if (!path::internal::setLinkedCamera(linkedPathId, 0, false)) {
-        ammonite::utils::warning << "Failed to unlink camera path (ID " \
-                                 << linkedPathId << ")" << std::endl;
+        tangle::utils::warning << "Failed to unlink camera path (ID " << linkedPathId \
+                               << ")" << std::endl;
       }
 
       //Delete the camera, if it's not the default
@@ -166,8 +166,7 @@ namespace ammonite {
     //Get position
     void getPosition(AmmoniteId cameraId, ammonite::Vec<float, 3>& position) {
       if (!cameraTrackerMap.contains(cameraId)) {
-        ammonite::utils::warning << "Couldn't find camera with ID '" << cameraId \
-                                 << "'" << std::endl;
+        tangle::utils::warning << "Couldn't find camera with ID '" << cameraId << "'" << std::endl;
         ammonite::set(position, 0.0f);
         return;
       }
@@ -177,8 +176,7 @@ namespace ammonite {
 
     void getDirection(AmmoniteId cameraId, ammonite::Vec<float, 3>& direction) {
       if (!cameraTrackerMap.contains(cameraId)) {
-        ammonite::utils::warning << "Couldn't find camera with ID '" << cameraId \
-                                 << "'" << std::endl;
+        tangle::utils::warning << "Couldn't find camera with ID '" << cameraId << "'" << std::endl;
         ammonite::set(direction, 0.0f);
         return;
       }
@@ -191,8 +189,7 @@ namespace ammonite {
     //Get horizontal angle (radians)
     double getHorizontal(AmmoniteId cameraId) {
       if (!cameraTrackerMap.contains(cameraId)) {
-        ammonite::utils::warning << "Couldn't find camera with ID '" << cameraId \
-                                 << "'" << std::endl;
+        tangle::utils::warning << "Couldn't find camera with ID '" << cameraId << "'" << std::endl;
         return 0.0;
       }
 
@@ -203,8 +200,7 @@ namespace ammonite {
     //Get vertical angle (radians)
     double getVertical(AmmoniteId cameraId) {
       if (!cameraTrackerMap.contains(cameraId)) {
-        ammonite::utils::warning << "Couldn't find camera with ID '" << cameraId \
-                                 << "'" << std::endl;
+        tangle::utils::warning << "Couldn't find camera with ID '" << cameraId << "'" << std::endl;
         return 0.0;
       }
 
@@ -214,8 +210,7 @@ namespace ammonite {
     //Get field of view (radians)
     float getFieldOfView(AmmoniteId cameraId) {
       if (!cameraTrackerMap.contains(cameraId)) {
-        ammonite::utils::warning << "Couldn't find camera with ID '" << cameraId \
-                                 << "'" << std::endl;
+        tangle::utils::warning << "Couldn't find camera with ID '" << cameraId << "'" << std::endl;
         return ammonite::pi<float> / 4.0f;
       }
 
@@ -226,8 +221,7 @@ namespace ammonite {
     void setPosition(AmmoniteId cameraId, const ammonite::Vec<float, 3>& position) {
       //Check the camera exists
       if (!cameraTrackerMap.contains(cameraId)) {
-        ammonite::utils::warning << "Couldn't find camera with ID '" << cameraId \
-                                 << "'" << std::endl;
+        tangle::utils::warning << "Couldn't find camera with ID '" << cameraId << "'" << std::endl;
         return;
       }
 
@@ -239,8 +233,7 @@ namespace ammonite {
     void setDirection(AmmoniteId cameraId, const ammonite::Vec<float, 3>& direction) {
       //Check the camera exists
       if (!cameraTrackerMap.contains(cameraId)) {
-        ammonite::utils::warning << "Couldn't find camera with ID '" << cameraId \
-                                 << "'" << std::endl;
+        tangle::utils::warning << "Couldn't find camera with ID '" << cameraId << "'" << std::endl;
         return;
       }
 
@@ -254,8 +247,7 @@ namespace ammonite {
     void setAngle(AmmoniteId cameraId, double horizontal, double vertical) {
       //Check the camera exists
       if (!cameraTrackerMap.contains(cameraId)) {
-        ammonite::utils::warning << "Couldn't find camera with ID '" << cameraId \
-                                 << "'" << std::endl;
+        tangle::utils::warning << "Couldn't find camera with ID '" << cameraId << "'" << std::endl;
         return;
       }
 
@@ -268,8 +260,7 @@ namespace ammonite {
     void setFieldOfView(AmmoniteId cameraId, float fov) {
       //Check the camera exists
       if (!cameraTrackerMap.contains(cameraId)) {
-        ammonite::utils::warning << "Couldn't find camera with ID '" << cameraId \
-                                 << "'" << std::endl;
+        tangle::utils::warning << "Couldn't find camera with ID '" << cameraId << "'" << std::endl;
         return;
       }
 
@@ -285,8 +276,7 @@ namespace ammonite {
     void setLinkedPath(AmmoniteId cameraId, AmmoniteId pathId) {
       //Check the camera exists
       if (!cameraTrackerMap.contains(cameraId)) {
-        ammonite::utils::warning << "Couldn't find camera with ID '" << cameraId \
-                                 << "'" << std::endl;
+        tangle::utils::warning << "Couldn't find camera with ID '" << cameraId << "'" << std::endl;
         return;
       }
 
@@ -298,9 +288,8 @@ namespace ammonite {
       const bool success = internal::setLinkedPath(cameraId, pathId, true) &&
                            path::internal::setLinkedCamera(pathId, cameraId, true);
       if (!success) {
-        ammonite::utils::warning << "Failed to link camera (ID " << cameraId \
-                                 << ") and path (ID " << pathId \
-                                 << ")" << std::endl;
+        tangle::utils::warning << "Failed to link camera (ID " << cameraId \
+                               << ") and path (ID " << pathId << ")" << std::endl;
         return;
       }
     }
@@ -308,8 +297,7 @@ namespace ammonite {
     AmmoniteId getLinkedPath(AmmoniteId cameraId) {
       //Check the camera exists
       if (!cameraTrackerMap.contains(cameraId)) {
-        ammonite::utils::warning << "Couldn't find camera with ID '" << cameraId \
-                                 << "'" << std::endl;
+        tangle::utils::warning << "Couldn't find camera with ID '" << cameraId << "'" << std::endl;
         return 0;
       }
 
@@ -323,17 +311,15 @@ namespace ammonite {
     void removeLinkedPath(AmmoniteId cameraId) {
       //Check the camera exists
       if (!cameraTrackerMap.contains(cameraId)) {
-        ammonite::utils::warning << "Couldn't find camera with ID '" << cameraId \
-                                 << "'" << std::endl;
+        tangle::utils::warning << "Couldn't find camera with ID '" << cameraId << "'" << std::endl;
         return;
       }
 
       //Instruct the path system to unlink
       const AmmoniteId pathId = cameraTrackerMap[cameraId].linkedCameraPathId;
       if (!path::internal::setLinkedCamera(pathId, 0, true)) {
-        ammonite::utils::warning << "Failed to unlink camera (ID " << cameraId \
-                                 << ") and path (ID " << pathId \
-                                 << ")" << std::endl;
+        tangle::utils::warning << "Failed to unlink camera (ID " << cameraId \
+                               << ") and path (ID " << pathId << ")" << std::endl;
       }
     }
   }

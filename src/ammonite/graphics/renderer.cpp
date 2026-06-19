@@ -2,6 +2,8 @@
 #include <iostream>
 #include <string>
 
+#include <tangle/tangle.hpp>
+
 #include "renderer.hpp"
 
 #include "../camera/camera.hpp"
@@ -9,7 +11,6 @@
 #include "../lighting/lighting.hpp"
 #include "../splash.hpp"
 #include "../utils/id.hpp"
-#include "../utils/logging.hpp"
 #include "../utils/timer.hpp"
 #include "../window/window.hpp"
 
@@ -32,7 +33,7 @@ namespace ammonite {
         //Check GPU supported required extensions
         unsigned int failureCount = 0;
         if (!internal::checkGPUCapabilities(&failureCount)) {
-          ammonite::utils::error << failureCount << " required extension(s) unsupported" << std::endl;
+          tangle::utils::error << failureCount << " required extension(s) unsupported" << std::endl;
           return false;
         }
 
@@ -43,7 +44,7 @@ namespace ammonite {
         internal::setupOpenGLObjects();
 
         //Output time taken to load renderer and return
-        ammonite::utils::status << "Loaded renderer in " << loadTimer.getTime() << "s" << std::endl;
+        tangle::utils::status << "Loaded renderer in " << loadTimer.getTime() << "s" << std::endl;
         return true;
       }
 
@@ -62,8 +63,8 @@ namespace ammonite {
           ammonite::window::internal::setContextType(contextType);
           return;
         default:
-          ammonite::utils::warning << "Unknown context type '" << (unsigned int)contextType \
-                                   << "' requested" << std::endl;
+          tangle::utils::warning << "Unknown context type '" << (unsigned int)contextType \
+                                 << "' requested" << std::endl;
           return;
         }
       }
