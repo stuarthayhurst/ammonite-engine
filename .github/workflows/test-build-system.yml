@@ -33,6 +33,10 @@ jobs:
         sudo apt-get install ${{ matrix.compiler.package }} ${{ matrix.stdlib }}
         sudo apt-get install --no-install-recommends libglm-dev libglfw3-dev libepoxy-dev libstb-dev libassimp-dev
 
+    - name: Set up libtangle
+      run: |
+        make -C libtangle build -j$(nproc)
+
     - name: Test shared library build target
       run: |
         ARCH="${{ matrix.os.arch }}" CXX="${{ matrix.compiler.command }}" make library -j$(nproc)
