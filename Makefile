@@ -155,7 +155,6 @@ CLIENT_CXXFLAGS = $(CXXFLAGS) $(shell pkg-config $(CLIENT_PKG_CONF_ARGS) $(TANGL
 CLIENT_LDFLAGS = $(LDFLAGS) $(shell pkg-config $(CLIENT_PKG_CONF_ARGS) $(TANGLE_PKG_CONF_ARGS) --libs $(CLIENT_PKG_CONF_FILE)) $(LOCAL_TANGLE_FLAG)
 
 #Recipe-specific client arguments
-THREADTEST_EXTRA_LDFLAGS := -latomic
 MATHSTEST_EXTRA_LDFLAGS := -lm
 DEMO_EXTRA_LDFLAGS := -lm
 
@@ -170,9 +169,6 @@ EXTRACT := @function inline() { if [[ "$(DUMMY)" != "true" ]]; then echo "$(CXX)
 $(BUILD_DIR)/demo: $(BUILD_DIR)/$(LIBRARY_NAME) $(HELPER_OBJECTS) $(DEMO_OBJECTS) $(OBJECT_DIR)/demoLoader.o
 	@mkdir -p "$(BUILD_DIR)"
 	$(CXX) -o "$(BUILD_DIR)/demo" $(HELPER_OBJECTS) $(DEMO_OBJECTS) $(OBJECT_DIR)/demoLoader.o $(CLIENT_CXXFLAGS) $(CLIENT_LDFLAGS) $(DEMO_EXTRA_LDFLAGS)
-$(BUILD_DIR)/threadTest: $(BUILD_DIR)/$(LIBRARY_NAME) $(OBJECT_DIR)/threadTest.o
-	@mkdir -p "$(BUILD_DIR)"
-	$(CXX) -o "$(BUILD_DIR)/threadTest" $(OBJECT_DIR)/threadTest.o $(CLIENT_CXXFLAGS) $(CLIENT_LDFLAGS) $(THREADTEST_EXTRA_LDFLAGS)
 $(BUILD_DIR)/mathsTest: $(BUILD_DIR)/$(LIBRARY_NAME) $(TEST_OBJECTS) $(OBJECT_DIR)/mathsTest.o
 	@mkdir -p "$(BUILD_DIR)"
 	$(CXX) -o "$(BUILD_DIR)/mathsTest" $(OBJECT_DIR)/mathsTest.o $(TEST_OBJECTS) $(CLIENT_CXXFLAGS) $(CLIENT_LDFLAGS) $(MATHSTEST_EXTRA_LDFLAGS)
@@ -252,7 +248,7 @@ $(OBJECT_DIR)/ammonite/%.$(DEBUG_LINT_STRING): ./src/ammonite/% .clang-tidy $(AM
 	@touch "$@"
 
 
-.PHONY: build tests all demo threads maths debug debug-all library headers install uninstall lint_compile_commands run_lint run_lint_tests lint lint_tests lint_all clean cache icons
+.PHONY: build tests all demo maths debug debug-all library headers install uninstall lint_compile_commands run_lint run_lint_tests lint lint_tests lint_all clean cache icons
 
 
 # --------------------------------
@@ -260,13 +256,9 @@ $(OBJECT_DIR)/ammonite/%.$(DEBUG_LINT_STRING): ./src/ammonite/% .clang-tidy $(AM
 # --------------------------------
 
 build: demo
-tests: threads maths
+tests: maths
 all: demo tests
 demo: $(BUILD_DIR)/demo
-	@if [[ "$(DEBUG)" != "true" ]]; then \
-	  strip --strip-unneeded "$<"; \
-	fi
-threads: $(BUILD_DIR)/threadTest
 	@if [[ "$(DEBUG)" != "true" ]]; then \
 	  strip --strip-unneeded "$<"; \
 	fi

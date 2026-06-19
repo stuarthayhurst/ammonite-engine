@@ -12,7 +12,7 @@
 
 ## Build system:
   - ### Targets:
-    - `build`, `all`, `tests`, `debug`, `library`, `demo`, `threads`, `maths` and `lint*` support `-j[CORE COUNT]`
+    - `build`, `all`, `tests`, `debug`, `library`, `demo`, `maths` and `lint*` support `-j[CORE COUNT]`
     - `make build` - Builds the demo
     - `make all` - Builds the demo and the tests
     - `make tests` - Builds the tests
@@ -20,7 +20,6 @@
     - `make debug-all` - Runs `make all` in debug mode
     - `make library` - Builds `build/libammonite.so`
     - `make demo` - Builds a demo binary, a working demonstration of the renderer
-    - `make threads` - Builds a test program for the thread pool
     - `make maths` - Builds a test program for the maths
     - `make install` - Installs `libammonite.so` to the system
       - The install path can be configured, by setting the environment variable `INSTALL_DIR`

@@ -11,7 +11,6 @@
 #include "graphics/renderer.hpp"
 #include "utils/debug.hpp"
 #include "utils/logging.hpp"
-#include "utils/thread.hpp"
 #include "utils/timer.hpp"
 #include "window/window.hpp"
 
@@ -41,13 +40,6 @@ namespace ammonite {
                    unsigned int height, const std::string& title) {
     const ammonite::utils::Timer loadTimer;
 
-    //TODO: Remove
-    //Create a thread pool (legacy)
-    if (!ammonite::utils::thread::createThreadPool(0)) {
-      ammonite::utils::error << "Failed to create thread pool" << std::endl;
-      return false;
-    }
-
     //Create a thread pool
     if (!tangle::thread::createThreadPool(0)) {
       tangle::utils::error << "Failed to create thread pool" << std::endl;
@@ -55,7 +47,7 @@ namespace ammonite {
     }
 
     ammonite::utils::status << "Created thread pool with " \
-                            << ammonite::utils::thread::getThreadPoolSize() \
+                            << tangle::thread::getThreadPoolSize() \
                             << " thread(s)" << std::endl;
 
     if (!title.empty()) {
@@ -94,7 +86,6 @@ namespace ammonite {
   }
 
   void destroyEngine() {
-    ammonite::utils::thread::destroyThreadPool();
     tangle::thread::destroyThreadPool();
     ammonite::renderer::setup::destroyRenderer();
     ammonite::window::destroyWindow();

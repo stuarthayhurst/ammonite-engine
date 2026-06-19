@@ -39,16 +39,3 @@ jobs:
     - name: (DEBUG + ASan + UBSan) Run maths tester
       run: |
         ./launch.sh --maths
-
-    - name: (DEBUG + ASan + UBSan) Run thread tester
-      run: |
-        ASAN_OPTIONS=detect_odr_violation=0 ./launch.sh --threads
-
-    - name: (DEBUG + TSan) Build thread tester
-      run: |
-        make clean
-        ARCH="${{ matrix.os.arch }}" CXX="${{ matrix.compiler.command }}" CHECK_THREADS="true" DEBUG="true" make threads -j$(nproc)
-
-    - name: (DEBUG + TSan) Run thread tester
-      run: |
-        ./launch.sh --threads

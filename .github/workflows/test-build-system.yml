@@ -39,13 +39,13 @@ jobs:
       run: |
         ARCH="${{ matrix.os.arch }}" CXX="${{ matrix.compiler.command }}" make build -j$(nproc)
 
-    - name: Test threads and maths build targets
+    - name: Test maths build target
       run: |
-        ARCH="${{ matrix.os.arch }}" CXX="${{ matrix.compiler.command }}" make threads maths -j$(nproc)
+        ARCH="${{ matrix.os.arch }}" CXX="${{ matrix.compiler.command }}" make maths -j$(nproc)
 
     - name: Verify built objects
       run: |
-        ls build/demo build/threadTest build/mathsTest build/libammonite.so
+        ls build/demo build/mathsTest build/libammonite.so
 
     - name: Test library install target
       run: |

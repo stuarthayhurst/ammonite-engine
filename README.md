@@ -10,7 +10,7 @@
     - If you found this project interesting, any donations are greatly appreciated :)
 
 ## Features:
-  - Multi-threaded model loading, using `libassimp` and a thread pool
+  - Multi-threaded model loading, using `libtangle` and `libassimp`
     - Includes support for raw mesh and material uploads, demoed with a torus
   - Shader program caching with a custom hash
   - Key binding and mouse input support
