@@ -6,9 +6,9 @@
  - Expressions won't even be evaluated, logging to debug is free in production
 */
 #ifdef AMMONITE_DEBUG
-  #include "logging.hpp"
+  #include <tangle/tangle.hpp>
   //NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
-  extern ammonite::utils::OutputHelper ammoniteInternalDebug;
+  extern tangle::utils::OutputHelper ammoniteInternalDebug;
 #else
   //NOLINTNEXTLINE(misc-include-cleaner)
   #include <iostream>
