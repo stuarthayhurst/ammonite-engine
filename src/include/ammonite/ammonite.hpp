@@ -24,7 +24,6 @@
 #include "utils/debug.hpp"
 #include "utils/files.hpp"
 #include "utils/id.hpp"
-#include "utils/logging.hpp"
 #include "utils/random.hpp"
 #include "utils/timer.hpp"
 #include "window/window.hpp"
