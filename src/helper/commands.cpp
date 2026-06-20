@@ -7,6 +7,7 @@
 #include <vector>
 
 #include <ammonite/ammonite.hpp>
+#include <tangle/tangle.hpp>
 
 #include "commands.hpp"
 
@@ -25,8 +26,8 @@ namespace {
     }
 
     if (showMessage) {
-      ammonite::utils::warning << "At least " << count << " argument(s) expected, " \
-                               << arguments.size() - 1 << " received" << std::endl;
+      tangle::utils::warning << "At least " << count << " argument(s) expected, " \
+                             << arguments.size() - 1 << " received" << std::endl;
     }
 
     return false;
@@ -40,7 +41,7 @@ namespace {
   bool checkKeyValid(const std::unordered_map<std::string, T>& map,
                      const std::string& key) {
     if (!map.contains(key)) {
-      ammonite::utils::warning << "'" << key << "' isn't a valid key " << std::endl;
+      tangle::utils::warning << "'" << key << "' isn't a valid key " << std::endl;
       return false;
     }
 
@@ -50,19 +51,19 @@ namespace {
   //Dump the keys of an unordered_map with string keys
   template <typename T>
   void dumpKeys(const std::unordered_map<std::string, T>& map) {
-    ammonite::utils::normal << "Supported keys: ";
+    tangle::utils::normal << "Supported keys: ";
     bool isStart = true;
     for (const auto& entry : map) {
       if (isStart) {
         isStart = false;
       } else {
-        ammonite::utils::normal << ", ";
+        tangle::utils::normal << ", ";
       }
 
-      ammonite::utils::normal << entry.first;
+      tangle::utils::normal << entry.first;
     }
 
-    ammonite::utils::normal << std::endl;
+    tangle::utils::normal << std::endl;
   }
 
   /*
@@ -101,7 +102,7 @@ namespace {
     } else if (string == "false") {
       *value = false;
     } else {
-      ammonite::utils::warning << "Expected a boolean, got '" << string << "'" << std::endl;
+      tangle::utils::warning << "Expected a boolean, got '" << string << "'" << std::endl;
       return false;
     }
 
@@ -116,7 +117,7 @@ namespace {
     try {
       *value = std::stof(string);
     } catch (const std::exception&) {
-      ammonite::utils::warning << "Expected a float, got '" << string << "'" << std::endl;
+      tangle::utils::warning << "Expected a float, got '" << string << "'" << std::endl;
       return false;
     }
 
@@ -131,7 +132,7 @@ namespace {
     try {
       *value = (unsigned int)std::stoul(string);
     } catch (const std::exception&) {
-      ammonite::utils::warning << "Expected an unsigned int, got '" << string << "'" << std::endl;
+      tangle::utils::warning << "Expected an unsigned int, got '" << string << "'" << std::endl;
       return false;
     }
 
@@ -171,16 +172,16 @@ namespace {
 
 namespace {
   ReturnActionEnum helpCommand(const std::vector<std::string>&) {
-    ammonite::utils::normal << "Command help:" << std::endl;
-    ammonite::utils::normal << "  'help'                        : Display this help page" << std::endl;
-    ammonite::utils::normal << "  'get [key]'                   : Get the value of a setting key" << std::endl;
-    ammonite::utils::normal << "  'set [key] [value]'           : Set the value of a setting key" << std::endl;
-    ammonite::utils::normal << "  'camera' [mode] [key] [value] : Get / set camera properties" << std::endl;
-    ammonite::utils::normal << "  'path' [action] [id] [option] : Manage recorded camera paths" << std::endl;
-    ammonite::utils::normal << "  'models'                      : Dump model system data (debug mode)" << std::endl;
-    ammonite::utils::normal << "  'exit'                        : Exit the command system" << std::endl;
-    ammonite::utils::normal << "  'stop'                        : Stop the program" << std::endl;
-    ammonite::utils::normal << " - Leave [key] blank to list keys" << std::endl;
+    tangle::utils::normal << "Command help:" << std::endl;
+    tangle::utils::normal << "  'help'                        : Display this help page" << std::endl;
+    tangle::utils::normal << "  'get [key]'                   : Get the value of a setting key" << std::endl;
+    tangle::utils::normal << "  'set [key] [value]'           : Set the value of a setting key" << std::endl;
+    tangle::utils::normal << "  'camera' [mode] [key] [value] : Get / set camera properties" << std::endl;
+    tangle::utils::normal << "  'path' [action] [id] [option] : Manage recorded camera paths" << std::endl;
+    tangle::utils::normal << "  'models'                      : Dump model system data (debug mode)" << std::endl;
+    tangle::utils::normal << "  'exit'                        : Exit the command system" << std::endl;
+    tangle::utils::normal << "  'stop'                        : Stop the program" << std::endl;
+    tangle::utils::normal << " - Leave [key] blank to list keys" << std::endl;
 
     return CONTINUE;
   }
@@ -282,7 +283,7 @@ namespace {
     }
 
     //Print the key and return
-    ammonite::utils::normal << result << std::endl;
+    tangle::utils::normal << result << std::endl;
     return CONTINUE;
   }
 
@@ -451,27 +452,27 @@ namespace {
     const AmmoniteId cameraId = ammonite::camera::getActiveCamera();
     switch (cameraKeyMap.at(arguments[2])) {
     case FieldOfViewKey:
-      ammonite::utils::normal << ammonite::camera::getFieldOfView(cameraId) << std::endl;
+      tangle::utils::normal << ammonite::camera::getFieldOfView(cameraId) << std::endl;
       break;
     case PositionKey:
       {
         ammonite::Vec<float, 3> positionVec = {0};
         ammonite::camera::getPosition(cameraId, positionVec);
-        ammonite::utils::normal << ammonite::formatVector(positionVec) << std::endl;
+        tangle::utils::normal << ammonite::formatVector(positionVec) << std::endl;
       }
       break;
     case DirectionKey:
       {
         ammonite::Vec<float, 3> directionVec = {0};
         ammonite::camera::getDirection(cameraId, directionVec);
-        ammonite::utils::normal << ammonite::formatVector(directionVec) << std::endl;
+        tangle::utils::normal << ammonite::formatVector(directionVec) << std::endl;
       }
       break;
     case HorizontalKey:
-      ammonite::utils::normal << ammonite::camera::getHorizontal(cameraId) << std::endl;
+      tangle::utils::normal << ammonite::camera::getHorizontal(cameraId) << std::endl;
       break;
     case VerticalKey:
-      ammonite::utils::normal << ammonite::camera::getVertical(cameraId) << std::endl;
+      tangle::utils::normal << ammonite::camera::getVertical(cameraId) << std::endl;
       break;
     }
   }
@@ -541,7 +542,7 @@ namespace {
   ReturnActionEnum cameraCommand(const std::vector<std::string>& arguments) {
     //Ignore empty commands
     if (!checkArgumentCount(arguments, 1, false)) {
-      ammonite::utils::warning << "No mode specified, use 'get' or 'set'" << std::endl;
+      tangle::utils::warning << "No mode specified, use 'get' or 'set'" << std::endl;
       return CONTINUE;
     }
 
@@ -551,8 +552,8 @@ namespace {
     } else if (arguments[1] == "set") {
       cameraSetCommand(arguments);
     } else {
-      ammonite::utils::warning << "'" << arguments[1] \
-                               << "' isn't a valid mode, use 'get' or 'set'" << std::endl;
+      tangle::utils::warning << "'" << arguments[1] \
+                             << "' isn't a valid mode, use 'get' or 'set'" << std::endl;
     }
 
     return CONTINUE;
@@ -572,14 +573,14 @@ namespace {
 
   void pathListCommand() {
     for (const AmmoniteId cameraPathId : cameraPathIds) {
-      ammonite::utils::normal << " - " << cameraPathId << std::endl;
+      tangle::utils::normal << " - " << cameraPathId << std::endl;
     }
   }
 
   void pathSetCommand(const std::vector<std::string>& arguments) {
     //Handle missing ID
     if (!checkArgumentCount(arguments, 2, false)) {
-      ammonite::utils::warning << "No path ID specified" << std::endl;
+      tangle::utils::warning << "No path ID specified" << std::endl;
       return;
     }
 
@@ -591,7 +592,7 @@ namespace {
 
     //Check the ID is valid
     if (pathId != 0 && !cameraPathIds.contains(pathId)) {
-      ammonite::utils::warning << "No path found with ID '" << pathId << "'" << std::endl;
+      tangle::utils::warning << "No path found with ID '" << pathId << "'" << std::endl;
       return;
     }
 
@@ -606,7 +607,7 @@ namespace {
   void pathStateCommand(const std::vector<std::string>& arguments, PlayStateEnum state) {
     //Handle missing ID
     if (!checkArgumentCount(arguments, 2, false)) {
-      ammonite::utils::warning << "No path ID specified" << std::endl;
+      tangle::utils::warning << "No path ID specified" << std::endl;
       return;
     }
 
@@ -633,7 +634,7 @@ namespace {
   void pathDeleteCommand(const std::vector<std::string>& arguments) {
     //Handle missing ID
     if (!checkArgumentCount(arguments, 2, false)) {
-      ammonite::utils::warning << "No path ID specified" << std::endl;
+      tangle::utils::warning << "No path ID specified" << std::endl;
       return;
     }
 
@@ -645,7 +646,7 @@ namespace {
 
     //Check the ID is valid
     if (!cameraPathIds.contains(pathId)) {
-      ammonite::utils::warning << "No path found with ID '" << pathId << "'" << std::endl;
+      tangle::utils::warning << "No path found with ID '" << pathId << "'" << std::endl;
       return;
     }
 
@@ -659,7 +660,7 @@ namespace {
   void pathModeCommand(const std::vector<std::string>& arguments) {
     //Handle missing ID
     if (!checkArgumentCount(arguments, 2, false)) {
-      ammonite::utils::warning << "No path ID specified" << std::endl;
+      tangle::utils::warning << "No path ID specified" << std::endl;
       return;
     }
 
@@ -671,7 +672,7 @@ namespace {
 
     //Handle missing path mode
     if (!checkArgumentCount(arguments, 3, false)) {
-      ammonite::utils::warning << "No path mode specified, use 'forward', 'reverse' or 'loop'" << std::endl;
+      tangle::utils::warning << "No path mode specified, use 'forward', 'reverse' or 'loop'" << std::endl;
       return;
     }
 
@@ -683,15 +684,15 @@ namespace {
     } else if (arguments[3] == "loop") {
       ammonite::camera::path::setPathMode(pathId, AMMONITE_PATH_LOOP);
     } else {
-      ammonite::utils::warning << "'" << arguments[3] \
-                               << "' isn't a valid mode, use 'forward', 'reverse' or 'loop'" << std::endl;
+      tangle::utils::warning << "'" << arguments[3] \
+                             << "' isn't a valid mode, use 'forward', 'reverse' or 'loop'" << std::endl;
     }
   }
 
   ReturnActionEnum pathCommand(const std::vector<std::string>& arguments) {
     //Ignore empty commands
     if (!checkArgumentCount(arguments, 1, false)) {
-      ammonite::utils::warning << "No action specified, use 'list', 'set', 'play', 'pause', 'restart', 'delete' or 'mode'" << std::endl;
+      tangle::utils::warning << "No action specified, use 'list', 'set', 'play', 'pause', 'restart', 'delete' or 'mode'" << std::endl;
       return CONTINUE;
     }
 
@@ -711,8 +712,8 @@ namespace {
     } else if (arguments[1] == "mode") {
       pathModeCommand(arguments);
     } else {
-      ammonite::utils::warning << "'" << arguments[1] \
-                               << "' isn't a valid action, use 'list', 'set', 'play', 'pause', 'restart', 'delete' or 'mode'" << std::endl;
+      tangle::utils::warning << "'" << arguments[1] \
+                             << "' isn't a valid action, use 'list', 'set', 'play', 'pause', 'restart', 'delete' or 'mode'" << std::endl;
     }
 
     return CONTINUE;
@@ -722,7 +723,7 @@ namespace {
 namespace {
   ReturnActionEnum modelDumpCommand(const std::vector<std::string>&) {
     if (!ammonite::models::dumpModelStorageDebug()) {
-      ammonite::utils::warning << "Model storage querying is unavailable" << std::endl;
+      tangle::utils::warning << "Model storage querying is unavailable" << std::endl;
     }
 
     return CONTINUE;
@@ -767,7 +768,7 @@ namespace commands {
   */
   bool commandPrompt() {
     while (true) {
-      ammonite::utils::normal << PROMPT_STRING << std::flush;
+      tangle::utils::normal << PROMPT_STRING << std::flush;
 
       //Take a command input
       std::string commandLine;
@@ -789,7 +790,7 @@ namespace commands {
       //Check the command exists
       const std::string& command = commandLineVec[0];
       if (!commandMap.contains(command)) {
-        ammonite::utils::warning << "'" << command << "' isn't a valid command" << std::endl;
+        tangle::utils::warning << "'" << command << "' isn't a valid command" << std::endl;
         continue;
       }
 

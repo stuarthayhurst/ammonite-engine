@@ -409,7 +409,7 @@ int main(int argc, char** argv) noexcept(false) {
   //Call main demo setup
   if (postEngineInit != nullptr) {
     if (!postEngineInit()) {
-      ammonite::utils::error << "Failed to set up demo, exiting" << std::endl;
+      tangle::utils::error << "Failed to set up demo, exiting" << std::endl;
       ammonite::splash::deleteSplashScreen(screenId);
       cleanEngine(setupBits, nullptr);
       return EXIT_FAILURE;
@@ -495,7 +495,7 @@ int main(int argc, char** argv) noexcept(false) {
     //Call demo-specific main loop code
     if (rendererMainloop != nullptr) {
       if (!rendererMainloop()) {
-        ammonite::utils::error << "Failed to run mainloop, exiting" << std::endl;
+        tangle::utils::error << "Failed to run mainloop, exiting" << std::endl;
         cleanEngine(setupBits, &keybindIds);
         return EXIT_FAILURE;
       }
@@ -516,7 +516,7 @@ int main(int argc, char** argv) noexcept(false) {
   if (demoExit != nullptr) {
     if (!demoExit()) {
       cleanExit = false;
-      ammonite::utils::error << "Failed to clean up, exiting" << std::endl;
+      tangle::utils::error << "Failed to clean up, exiting" << std::endl;
     }
   }
 

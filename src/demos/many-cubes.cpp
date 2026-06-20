@@ -6,6 +6,7 @@
 #include <vector>
 
 #include <ammonite/ammonite.hpp>
+#include <tangle/tangle.hpp>
 
 #include "many-cubes.hpp"
 
@@ -61,7 +62,7 @@ namespace manyCubesDemo {
       ammonite::renderer::drawFrame();
     }
 
-    ammonite::utils::status << "Loaded " << vertexCount << " vertices" << std::endl;
+    tangle::utils::status << "Loaded " << vertexCount << " vertices" << std::endl;
 
     //Update splash screen
     ammonite::splash::setSplashScreenProgress(screenId, 1.0f);

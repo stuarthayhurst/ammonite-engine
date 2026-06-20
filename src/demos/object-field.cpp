@@ -5,6 +5,7 @@
 #include <vector>
 
 #include <ammonite/ammonite.hpp>
+#include <tangle/tangle.hpp>
 
 #include "object-field.hpp"
 
@@ -89,7 +90,7 @@ namespace objectFieldDemo {
       }
 
       delete [] cubeData;
-      ammonite::utils::status << "Shuffled cubes" << std::endl;
+      tangle::utils::status << "Shuffled cubes" << std::endl;
     }
 
     void spawnCubeCallback(const std::vector<AmmoniteKeycode>&, KeyStateEnum, void*) {
@@ -108,7 +109,7 @@ namespace objectFieldDemo {
       ammonite::models::position::setScale(modelId, 0.25f);
       ammonite::models::position::setPosition(modelId, cubePosition);
 
-      ammonite::utils::status << "Spawned object" << std::endl;
+      tangle::utils::status << "Spawned object" << std::endl;
     }
   }
 
@@ -236,8 +237,8 @@ namespace objectFieldDemo {
     orbitSwapTargets = (unsigned int(*)[2])calculateSwapTargets(totalOrbits);
     orbitSwapAngles = (float(*)[2])calculateSwapAngles(totalOrbits);
 
-    ammonite::utils::status << "Chose " << totalOrbits << " orbits and " << lightCount \
-                            << " lights" << std::endl;
+    tangle::utils::status << "Chose " << totalOrbits << " orbits and " << lightCount \
+                          << " lights" << std::endl;
 
     return true;
   }
@@ -307,7 +308,7 @@ namespace objectFieldDemo {
       ammonite::renderer::drawFrame();
     }
 
-    ammonite::utils::status << "Loaded " << vertexCount << " vertices" << std::endl;
+    tangle::utils::status << "Loaded " << vertexCount << " vertices" << std::endl;
 
     //Update splash screen
     ammonite::splash::setSplashScreenProgress(screenId, 1.0f);

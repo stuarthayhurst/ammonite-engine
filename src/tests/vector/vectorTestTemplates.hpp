@@ -9,6 +9,7 @@
 #include <type_traits>
 
 #include <ammonite/ammonite.hpp>
+#include <tangle/tangle.hpp>
 
 #include "../support.hpp"
 
@@ -19,9 +20,9 @@ namespace templates {
     ammonite::NamedVec<T, size> namedAVec(aVec);
 
     if (&namedAVec.x != &aVec[0]) {
-      ammonite::utils::error << "Named vector has a different address to its underlying vector" << std::endl;
-      ammonite::utils::normal << "  Result:   " << (void*)&namedAVec.x \
-                              << "\n  Expected: " << (void*)&aVec[0] << std::endl;
+      tangle::utils::error << "Named vector has a different address to its underlying vector" << std::endl;
+      tangle::utils::normal << "  Result:   " << (void*)&namedAVec.x \
+                            << "\n  Expected: " << (void*)&aVec[0] << std::endl;
       return false;
     }
 
@@ -33,9 +34,9 @@ namespace templates {
     ammonite::Vec<T, size> aVec = {0};
 
     if ((void*)ammonite::data(aVec) != (void*)&aVec) {
-      ammonite::utils::error << "Data pointer has a different address to the vector" << std::endl;
-      ammonite::utils::normal << "  Result:   " << (void*)ammonite::data(aVec) \
-                              << "\n  Expected: " << (void*)&aVec << std::endl;
+      tangle::utils::error << "Data pointer has a different address to the vector" << std::endl;
+      tangle::utils::normal << "  Result:   " << (void*)ammonite::data(aVec) \
+                            << "\n  Expected: " << (void*)&aVec << std::endl;
       return false;
     }
 
@@ -55,10 +56,10 @@ namespace templates {
 
     //Check ammonite::equal() on equal vectors
     if (!ammonite::equal(aVec, bVec)) {
-      ammonite::utils::error << "Equal vector comparison failed" << std::endl;
-      ammonite::utils::normal << "  Input: " << ammonite::formatVector(aVec) \
-                              << "\n  Input: " << ammonite::formatVector(bVec) \
-                              << std::endl;
+      tangle::utils::error << "Equal vector comparison failed" << std::endl;
+      tangle::utils::normal << "  Input: " << ammonite::formatVector(aVec) \
+                            << "\n  Input: " << ammonite::formatVector(bVec) \
+                            << std::endl;
       return false;
     }
 
@@ -71,10 +72,10 @@ namespace templates {
 
       //Check ammonite::equal() on unequal vectors
       if (ammonite::equal(aVec, bVec)) {
-        ammonite::utils::error << "Unequal vector comparison failed" << std::endl;
-        ammonite::utils::normal << "  Input: " << ammonite::formatVector(aVec) \
-                                << "\n  Input: " << ammonite::formatVector(bVec) \
-                                << std::endl;
+        tangle::utils::error << "Unequal vector comparison failed" << std::endl;
+        tangle::utils::normal << "  Input: " << ammonite::formatVector(aVec) \
+                              << "\n  Input: " << ammonite::formatVector(bVec) \
+                              << std::endl;
         return false;
       }
 
@@ -93,10 +94,10 @@ namespace templates {
 
     ammonite::copy(aVec, bVec);
     if (!ammonite::equal(aVec, bVec)) {
-      ammonite::utils::error << "Vector copy failed" << std::endl;
-      ammonite::utils::normal << "  Result:   " << ammonite::formatVector(bVec) \
-                              << "\n  Expected: " << ammonite::formatVector(aVec) \
-                              << std::endl;
+      tangle::utils::error << "Vector copy failed" << std::endl;
+      tangle::utils::normal << "  Result:   " << ammonite::formatVector(bVec) \
+                            << "\n  Expected: " << ammonite::formatVector(aVec) \
+                            << std::endl;
       return false;
     }
 
@@ -106,10 +107,10 @@ namespace templates {
     ammonite::copy(aVec, cVec);
     ammonite::copy(cVec, aVec);
     if (!ammonite::equal(aVec, bVec)) {
-      ammonite::utils::error << "Vector grow copy failed" << std::endl;
-      ammonite::utils::normal << "  Result:   " << ammonite::formatVector(aVec) \
-                              << "\n  Expected: " << ammonite::formatVector(bVec) \
-                              << std::endl;
+      tangle::utils::error << "Vector grow copy failed" << std::endl;
+      tangle::utils::normal << "  Result:   " << ammonite::formatVector(aVec) \
+                            << "\n  Expected: " << ammonite::formatVector(bVec) \
+                            << std::endl;
       return false;
     }
 
@@ -117,10 +118,10 @@ namespace templates {
     ammonite::Vec<T, 2> dVec = {0};
     ammonite::copy(aVec, dVec);
     if (aVec[0] != dVec[0] || aVec[1] != dVec[1]) {
-      ammonite::utils::error << "Vector shrink copy failed" << std::endl;
-      ammonite::utils::normal << "  Result:   " << ammonite::formatVector(dVec) \
-                              << "\n  Expected: " << ammonite::formatVector(aVec)
-                              << std::endl;
+      tangle::utils::error << "Vector shrink copy failed" << std::endl;
+      tangle::utils::normal << "  Result:   " << ammonite::formatVector(dVec) \
+                            << "\n  Expected: " << ammonite::formatVector(aVec)
+                            << std::endl;
       return false;
     }
 
@@ -136,10 +137,10 @@ namespace templates {
     ammonite::copyCast(aVec, bVec);
     for (unsigned int i = 0; i < size; i++) {
       if ((double)aVec[i] != bVec[i]) {
-        ammonite::utils::error << "Vector copy cast failed" << std::endl;
-        ammonite::utils::normal << "  Result:   " << ammonite::formatVector(bVec) \
-                                << "\n  Expected: " << ammonite::formatVector(aVec)
-                                << std::endl;
+        tangle::utils::error << "Vector copy cast failed" << std::endl;
+        tangle::utils::normal << "  Result:   " << ammonite::formatVector(bVec) \
+                              << "\n  Expected: " << ammonite::formatVector(aVec)
+                              << std::endl;
         return false;
       }
     }
@@ -149,10 +150,10 @@ namespace templates {
     ammonite::copyCast(aVec, cVec);
     for (unsigned int i = 0; i < size; i++) {
       if ((double)aVec[i] != cVec[i]) {
-        ammonite::utils::error << "Vector grow copy cast failed" << std::endl;
-        ammonite::utils::normal << "  Result:   " << ammonite::formatVector(cVec) \
-                                << "\n  Expected: " << ammonite::formatVector(aVec)
-                                << std::endl;
+        tangle::utils::error << "Vector grow copy cast failed" << std::endl;
+        tangle::utils::normal << "  Result:   " << ammonite::formatVector(cVec) \
+                              << "\n  Expected: " << ammonite::formatVector(aVec)
+                              << std::endl;
         return false;
       }
     }
@@ -161,10 +162,10 @@ namespace templates {
     ammonite::Vec<double, 2> dVec = {0};
     ammonite::copyCast(aVec, dVec);
     if ((double)aVec[0] != dVec[0] || (double)aVec[1] != dVec[1]) {
-      ammonite::utils::error << "Vector shrink copy cast failed" << std::endl;
-      ammonite::utils::normal << "  Result:   " << ammonite::formatVector(dVec) \
-                              << "\n  Expected: " << ammonite::formatVector(aVec)
-                              << std::endl;
+      tangle::utils::error << "Vector shrink copy cast failed" << std::endl;
+      tangle::utils::normal << "  Result:   " << ammonite::formatVector(dVec) \
+                            << "\n  Expected: " << ammonite::formatVector(aVec)
+                            << std::endl;
       return false;
     }
 
@@ -181,10 +182,10 @@ namespace templates {
     ammonite::set(aVec, b);
     for (unsigned int i = 0; i < size; i++) {
       if (aVec[i] != b) {
-        ammonite::utils::error << "Vector set failed" << std::endl;
-        ammonite::utils::normal << "  Result:   " << ammonite::formatVector(aVec) \
-                                << "\n  Expected: " << b \
-                                << " at index " << i << std::endl;
+        tangle::utils::error << "Vector set failed" << std::endl;
+        tangle::utils::normal << "  Result:   " << ammonite::formatVector(aVec) \
+                              << "\n  Expected: " << b \
+                              << " at index " << i << std::endl;
         return false;
       }
     }
@@ -197,19 +198,19 @@ namespace templates {
       ammonite::set(aVec, bVec, b);
       for (unsigned int i = 0; i < size - 1; i++) {
         if (aVec[i] != bVec[i]) {
-          ammonite::utils::error << "Vector-scalar set failed" << std::endl;
-          ammonite::utils::normal << "  Result:   " << ammonite::formatVector(aVec) \
-                                  << "\n  Expected: " << bVec[i] \
-                                  << " at index " << i << std::endl;
+          tangle::utils::error << "Vector-scalar set failed" << std::endl;
+          tangle::utils::normal << "  Result:   " << ammonite::formatVector(aVec) \
+                                << "\n  Expected: " << bVec[i] \
+                                << " at index " << i << std::endl;
           return false;
         }
       }
 
       if (aVec[size - 1] != b) {
-        ammonite::utils::error << "Individual scalar set failed" << std::endl;
-        ammonite::utils::normal << "  Result:   " << ammonite::formatVector(aVec) \
-                                << "\n  Expected: " << b \
-                                << " at index " << size - 1 << std::endl;
+        tangle::utils::error << "Individual scalar set failed" << std::endl;
+        tangle::utils::normal << "  Result:   " << ammonite::formatVector(aVec) \
+                              << "\n  Expected: " << b \
+                              << " at index " << size - 1 << std::endl;
         return false;
       }
     }
@@ -227,10 +228,10 @@ namespace templates {
 
     for (unsigned int i = 0; i < size - 1; i++) {
       if (aVec[i] != cVec[i]) {
-        ammonite::utils::error << "Vector set failed" << std::endl;
-        ammonite::utils::normal << "  Result:   " << ammonite::formatVector(aVec) \
-                                << "\n  Expected: " << ammonite::formatVector(cVec) \
-                                << std::endl;
+        tangle::utils::error << "Vector set failed" << std::endl;
+        tangle::utils::normal << "  Result:   " << ammonite::formatVector(aVec) \
+                              << "\n  Expected: " << ammonite::formatVector(cVec) \
+                              << std::endl;
         return false;
       }
     }
@@ -251,11 +252,11 @@ namespace templates {
     ammonite::add(aVec, bVec, cVec);
     for (unsigned int i = 0; i < size; i++) {
       if ((T)(aVec[i] + bVec[i]) != cVec[i]) {
-        ammonite::utils::error << "Vector addition failed" << std::endl;
-        ammonite::utils::normal << "  Input:  " << ammonite::formatVector(aVec) \
-                                << "\n  Input:  " << ammonite::formatVector(bVec) \
-                                << "\n  Result: " << ammonite::formatVector(cVec) \
-                                << std::endl;
+        tangle::utils::error << "Vector addition failed" << std::endl;
+        tangle::utils::normal << "  Input:  " << ammonite::formatVector(aVec) \
+                              << "\n  Input:  " << ammonite::formatVector(bVec) \
+                              << "\n  Result: " << ammonite::formatVector(cVec) \
+                              << std::endl;
         return false;
       }
     }
@@ -265,11 +266,11 @@ namespace templates {
     ammonite::add(cVec, bVec);
     for (unsigned int i = 0; i < size; i++) {
       if ((T)(aVec[i] + bVec[i]) != cVec[i]) {
-        ammonite::utils::error << "In-place vector addition failed" << std::endl;
-        ammonite::utils::normal << "  Input:  " << ammonite::formatVector(aVec) \
-                                << "\n  Input:  " << ammonite::formatVector(bVec) \
-                                << "\n  Result: " << ammonite::formatVector(cVec) \
-                                << std::endl;
+        tangle::utils::error << "In-place vector addition failed" << std::endl;
+        tangle::utils::normal << "  Input:  " << ammonite::formatVector(aVec) \
+                              << "\n  Input:  " << ammonite::formatVector(bVec) \
+                              << "\n  Result: " << ammonite::formatVector(cVec) \
+                              << std::endl;
         return false;
       }
     }
@@ -278,11 +279,11 @@ namespace templates {
     ammonite::add(aVec, d, cVec);
     for (unsigned int i = 0; i < size; i++) {
       if ((T)(aVec[i] + d) != cVec[i]) {
-        ammonite::utils::error << "Scalar vector addition failed" << std::endl;
-        ammonite::utils::normal << "  Input:  " << ammonite::formatVector(aVec) \
-                                << "\n  Input:  " << d \
-                                << "\n  Result: " << ammonite::formatVector(cVec) \
-                                << std::endl;
+        tangle::utils::error << "Scalar vector addition failed" << std::endl;
+        tangle::utils::normal << "  Input:  " << ammonite::formatVector(aVec) \
+                              << "\n  Input:  " << d \
+                              << "\n  Result: " << ammonite::formatVector(cVec) \
+                              << std::endl;
         return false;
       }
     }
@@ -292,11 +293,11 @@ namespace templates {
     ammonite::add(cVec, d);
     for (unsigned int i = 0; i < size; i++) {
       if ((T)(aVec[i] + d) != cVec[i]) {
-        ammonite::utils::error << "In-place scalar vector addition failed" << std::endl;
-        ammonite::utils::normal << "  Input:  " << ammonite::formatVector(aVec) \
-                                << "\n  Input:  " << d \
-                                << "\n  Result: " << ammonite::formatVector(cVec) \
-                                << std::endl;
+        tangle::utils::error << "In-place scalar vector addition failed" << std::endl;
+        tangle::utils::normal << "  Input:  " << ammonite::formatVector(aVec) \
+                              << "\n  Input:  " << d \
+                              << "\n  Result: " << ammonite::formatVector(cVec) \
+                              << std::endl;
         return false;
       }
     }
@@ -317,11 +318,11 @@ namespace templates {
     ammonite::sub(aVec, bVec, cVec);
     for (unsigned int i = 0; i < size; i++) {
       if ((T)(aVec[i] - bVec[i]) != cVec[i]) {
-        ammonite::utils::error << "Vector subtraction failed" << std::endl;
-        ammonite::utils::normal << "  Input:  " << ammonite::formatVector(aVec) \
-                                << "\n  Input:  " << ammonite::formatVector(bVec) \
-                                << "\n  Result: " << ammonite::formatVector(cVec) \
-                                << std::endl;
+        tangle::utils::error << "Vector subtraction failed" << std::endl;
+        tangle::utils::normal << "  Input:  " << ammonite::formatVector(aVec) \
+                              << "\n  Input:  " << ammonite::formatVector(bVec) \
+                              << "\n  Result: " << ammonite::formatVector(cVec) \
+                              << std::endl;
         return false;
       }
     }
@@ -331,11 +332,11 @@ namespace templates {
     ammonite::sub(cVec, bVec);
     for (unsigned int i = 0; i < size; i++) {
       if ((T)(aVec[i] - bVec[i]) != cVec[i]) {
-        ammonite::utils::error << "In-place vector subtraction failed" << std::endl;
-        ammonite::utils::normal << "  Input:  " << ammonite::formatVector(aVec) \
-                                << "\n  Input:  " << ammonite::formatVector(bVec) \
-                                << "\n  Result: " << ammonite::formatVector(cVec) \
-                                << std::endl;
+        tangle::utils::error << "In-place vector subtraction failed" << std::endl;
+        tangle::utils::normal << "  Input:  " << ammonite::formatVector(aVec) \
+                              << "\n  Input:  " << ammonite::formatVector(bVec) \
+                              << "\n  Result: " << ammonite::formatVector(cVec) \
+                              << std::endl;
         return false;
       }
     }
@@ -344,11 +345,11 @@ namespace templates {
     ammonite::sub(aVec, d, cVec);
     for (unsigned int i = 0; i < size; i++) {
       if ((T)(aVec[i] - d) != cVec[i]) {
-        ammonite::utils::error << "Scalar vector subtraction failed" << std::endl;
-        ammonite::utils::normal << "  Input:  " << ammonite::formatVector(aVec) \
-                                << "\n  Input:  " << d \
-                                << "\n  Result: " << ammonite::formatVector(cVec) \
-                                << std::endl;
+        tangle::utils::error << "Scalar vector subtraction failed" << std::endl;
+        tangle::utils::normal << "  Input:  " << ammonite::formatVector(aVec) \
+                              << "\n  Input:  " << d \
+                              << "\n  Result: " << ammonite::formatVector(cVec) \
+                              << std::endl;
         return false;
       }
     }
@@ -358,11 +359,11 @@ namespace templates {
     ammonite::sub(cVec, d);
     for (unsigned int i = 0; i < size; i++) {
       if ((T)(aVec[i] - d) != cVec[i]) {
-        ammonite::utils::error << "In-place scalar vector subtraction failed" << std::endl;
-        ammonite::utils::normal << "  Input:  " << ammonite::formatVector(aVec) \
-                                << "\n  Input:  " << d \
-                                << "\n  Result: " << ammonite::formatVector(cVec) \
-                                << std::endl;
+        tangle::utils::error << "In-place scalar vector subtraction failed" << std::endl;
+        tangle::utils::normal << "  Input:  " << ammonite::formatVector(aVec) \
+                              << "\n  Input:  " << d \
+                              << "\n  Result: " << ammonite::formatVector(cVec) \
+                              << std::endl;
         return false;
       }
     }
@@ -383,11 +384,11 @@ namespace templates {
     ammonite::scale(aVec, d, cVec);
     for (unsigned int i = 0; i < size; i++) {
       if ((T)(aVec[i] * d) != cVec[i]) {
-        ammonite::utils::error << "Vector scaling failed" << std::endl;
-        ammonite::utils::normal << "  Input:  " << ammonite::formatVector(aVec) \
-                                << "\n  Input:  " << d \
-                                << "\n  Result: " << ammonite::formatVector(cVec) \
-                                << std::endl;
+        tangle::utils::error << "Vector scaling failed" << std::endl;
+        tangle::utils::normal << "  Input:  " << ammonite::formatVector(aVec) \
+                              << "\n  Input:  " << d \
+                              << "\n  Result: " << ammonite::formatVector(cVec) \
+                              << std::endl;
         return false;
       }
     }
@@ -397,11 +398,11 @@ namespace templates {
     ammonite::scale(cVec, d);
     for (unsigned int i = 0; i < size; i++) {
       if ((T)(aVec[i] * d) != cVec[i]) {
-        ammonite::utils::error << "In-place vector scaling failed" << std::endl;
-        ammonite::utils::normal << "  Input:  " << ammonite::formatVector(aVec) \
-                                << "\n  Input:  " << d \
-                                << "\n  Result: " << ammonite::formatVector(cVec) \
-                                << std::endl;
+        tangle::utils::error << "In-place vector scaling failed" << std::endl;
+        tangle::utils::normal << "  Input:  " << ammonite::formatVector(aVec) \
+                              << "\n  Input:  " << d \
+                              << "\n  Result: " << ammonite::formatVector(cVec) \
+                              << std::endl;
         return false;
       }
     }
@@ -425,11 +426,11 @@ namespace templates {
     ammonite::divide(aVec, c, bVec);
     for (unsigned int i = 0; i < size; i++) {
       if ((T)(aVec[i] / c) != bVec[i]) {
-        ammonite::utils::error << "Vector division failed" << std::endl;
-        ammonite::utils::normal << "  Input:  " << ammonite::formatVector(aVec) \
-                                << "\n  Input:  " << c \
-                                << "\n  Result: " << ammonite::formatVector(bVec) \
-                                << std::endl;
+        tangle::utils::error << "Vector division failed" << std::endl;
+        tangle::utils::normal << "  Input:  " << ammonite::formatVector(aVec) \
+                              << "\n  Input:  " << c \
+                              << "\n  Result: " << ammonite::formatVector(bVec) \
+                              << std::endl;
         return false;
       }
     }
@@ -439,11 +440,11 @@ namespace templates {
     ammonite::divide(bVec, c);
     for (unsigned int i = 0; i < size; i++) {
       if ((T)(aVec[i] / c) != bVec[i]) {
-        ammonite::utils::error << "In-place vector division failed" << std::endl;
-        ammonite::utils::normal << "  Input:  " << ammonite::formatVector(aVec) \
-                                << "\n  Input:  " << c \
-                                << "\n  Result: " << ammonite::formatVector(bVec) \
-                                << std::endl;
+        tangle::utils::error << "In-place vector division failed" << std::endl;
+        tangle::utils::normal << "  Input:  " << ammonite::formatVector(aVec) \
+                              << "\n  Input:  " << c \
+                              << "\n  Result: " << ammonite::formatVector(bVec) \
+                              << std::endl;
         return false;
       }
     }
@@ -462,10 +463,10 @@ namespace templates {
       ammonite::negate(aVec, bVec);
       for (unsigned int i = 0; i < size; i++) {
         if (aVec[i] != -bVec[i]) {
-          ammonite::utils::error << "Vector negation failed" << std::endl;
-          ammonite::utils::normal << "  Input:  " << ammonite::formatVector(aVec) \
-                                  << "\n  Result: " << ammonite::formatVector(bVec) \
-                                  << std::endl;
+          tangle::utils::error << "Vector negation failed" << std::endl;
+          tangle::utils::normal << "  Input:  " << ammonite::formatVector(aVec) \
+                                << "\n  Result: " << ammonite::formatVector(bVec) \
+                                << std::endl;
           return false;
         }
       }
@@ -475,10 +476,10 @@ namespace templates {
       ammonite::negate(aVec);
       for (unsigned int i = 0; i < size; i++) {
         if (aVec[i] != -bVec[i]) {
-          ammonite::utils::error << "In-place vector negation failed" << std::endl;
-          ammonite::utils::normal << "  Input:  " << ammonite::formatVector(bVec) \
-                                  << "\n  Result: " << ammonite::formatVector(aVec) \
-                                  << std::endl;
+          tangle::utils::error << "In-place vector negation failed" << std::endl;
+          tangle::utils::normal << "  Input:  " << ammonite::formatVector(bVec) \
+                                << "\n  Result: " << ammonite::formatVector(aVec) \
+                                << std::endl;
           return false;
         }
       }
@@ -500,10 +501,10 @@ namespace templates {
 
     //Test vector length
     if (!roughly(ammonite::length(aVec), length)) {
-      ammonite::utils::error << "Vector length calculation failed" << std::endl;
-      ammonite::utils::normal << "  Input:    " << ammonite::formatVector(aVec) \
-                              << "\n  Result:   " << ammonite::length(aVec) \
-                              << "\n  Expected: " << length << std::endl;
+      tangle::utils::error << "Vector length calculation failed" << std::endl;
+      tangle::utils::normal << "  Input:    " << ammonite::formatVector(aVec) \
+                            << "\n  Result:   " << ammonite::length(aVec) \
+                            << "\n  Expected: " << length << std::endl;
 
       return false;
     }
@@ -527,11 +528,11 @@ namespace templates {
     ammonite::normalise(aVec, bVec);
     for (unsigned int i = 0; i < size; i++) {
       if (!roughly((T)(aVec[i] / length), bVec[i])) {
-        ammonite::utils::error << "Vector normalisation failed" << std::endl;
-        ammonite::utils::normal << "  Input:    " << ammonite::formatVector(aVec) \
-                                << "\n  Result:   " << ammonite::formatVector(bVec) \
-                                << "\n  Expected: " << (T)(aVec[i] / length) \
-                                << " at index " << i << std::endl;
+        tangle::utils::error << "Vector normalisation failed" << std::endl;
+        tangle::utils::normal << "  Input:    " << ammonite::formatVector(aVec) \
+                              << "\n  Result:   " << ammonite::formatVector(bVec) \
+                              << "\n  Expected: " << (T)(aVec[i] / length) \
+                              << " at index " << i << std::endl;
         return false;
       }
     }
@@ -541,11 +542,11 @@ namespace templates {
     ammonite::normalise(bVec);
     for (unsigned int i = 0; i < size; i++) {
       if (!roughly((T)(aVec[i] / length), bVec[i])) {
-        ammonite::utils::error << "In-place vector normalisation failed" << std::endl;
-        ammonite::utils::normal << "  Input:    " << ammonite::formatVector(aVec) \
-                                << "\n  Result:   " << ammonite::formatVector(bVec) \
-                                << "\n  Expected: " << (T)(aVec[i] / length) \
-                                << " at index " << i << std::endl;
+        tangle::utils::error << "In-place vector normalisation failed" << std::endl;
+        tangle::utils::normal << "  Input:    " << ammonite::formatVector(aVec) \
+                              << "\n  Result:   " << ammonite::formatVector(bVec) \
+                              << "\n  Expected: " << (T)(aVec[i] / length) \
+                              << " at index " << i << std::endl;
         return false;
       }
     }
@@ -567,11 +568,11 @@ namespace templates {
 
     //Test dot product
     if (!roughly(ammonite::dot(aVec, bVec), sum)) {
-      ammonite::utils::error << "Vector dot product failed" << std::endl;
-      ammonite::utils::normal << "  Input:    " << ammonite::formatVector(aVec) \
-                              << "\n  Input:    " << ammonite::formatVector(bVec) \
-                              << "\n  Result:   " << ammonite::dot(aVec, bVec) \
-                              << "\n  Expected: " << sum << std::endl;
+      tangle::utils::error << "Vector dot product failed" << std::endl;
+      tangle::utils::normal << "  Input:    " << ammonite::formatVector(aVec) \
+                            << "\n  Input:    " << ammonite::formatVector(bVec) \
+                            << "\n  Result:   " << ammonite::dot(aVec, bVec) \
+                            << "\n  Expected: " << sum << std::endl;
       return false;
     }
 
@@ -594,12 +595,12 @@ namespace templates {
         const unsigned int twoOffset = (i + 2) % 3;
         T component = (aVec[oneOffset] * bVec[twoOffset]) - (aVec[twoOffset] * bVec[oneOffset]);
         if (cVec[i] != component) {
-          ammonite::utils::error << "Vector cross product failed" << std::endl;
-          ammonite::utils::normal << "  Input:    " << ammonite::formatVector(aVec) \
-                                  << "\n  Input:    " << ammonite::formatVector(bVec) \
-                                  << "\n  Result:   " << ammonite::formatVector(cVec) \
-                                  << "\n  Expected: " << component \
-                                  << " at index " << i << std::endl;
+          tangle::utils::error << "Vector cross product failed" << std::endl;
+          tangle::utils::normal << "  Input:    " << ammonite::formatVector(aVec) \
+                                << "\n  Input:    " << ammonite::formatVector(bVec) \
+                                << "\n  Result:   " << ammonite::formatVector(cVec) \
+                                << "\n  Expected: " << component \
+                                << " at index " << i << std::endl;
 
           return false;
         }
@@ -636,11 +637,11 @@ namespace templates {
 
     //Test vector distance
     if (!roughly(ammonite::distance(aVec, bVec), distance)) {
-      ammonite::utils::error << "Vector distance failed" << std::endl;
-      ammonite::utils::normal << "  Input:    " << ammonite::formatVector(aVec) \
-                              << "\n  Input:    " << ammonite::formatVector(bVec) \
-                              << "\n  Result:   " << ammonite::distance(aVec, bVec) \
-                              << "\n  Expected: " << distance << std::endl;
+      tangle::utils::error << "Vector distance failed" << std::endl;
+      tangle::utils::normal << "  Input:    " << ammonite::formatVector(aVec) \
+                            << "\n  Input:    " << ammonite::formatVector(bVec) \
+                            << "\n  Result:   " << ammonite::distance(aVec, bVec) \
+                            << "\n  Expected: " << distance << std::endl;
       return false;
     }
 
@@ -651,7 +652,7 @@ namespace templates {
 namespace tests {
   template <typename T, unsigned int size> requires ammonite::validVector<T, size>
   bool testVector(std::string_view typeName) {
-    ammonite::utils::normal << "Testing " << size << "x " << typeName << " vectors" << std::endl;
+    tangle::utils::normal << "Testing " << size << "x " << typeName << " vectors" << std::endl;
 
     //Test NamedVec
     if (!templates::testNamedVec<T, size>()) {

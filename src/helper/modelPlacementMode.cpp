@@ -3,6 +3,7 @@
 #include <vector>
 
 #include <ammonite/ammonite.hpp>
+#include <tangle/tangle.hpp>
 
 #include "modelPlacementMode.hpp"
 
@@ -110,7 +111,7 @@ namespace placement {
         ammonite::models::deleteModel(placementModelId);
         placedModelIds.erase(std::ranges::find(placedModelIds, placementModelId));
 
-        ammonite::utils::status << "Destroyed object" << std::endl;
+        tangle::utils::status << "Destroyed object" << std::endl;
         modelPlacementModeEnabled = false;
         return;
       }
@@ -132,7 +133,7 @@ namespace placement {
       modelPlacementModeEnabled = true;
       resetPlacementDistance();
 
-      ammonite::utils::status << "Spawned object in " << torusTimer.getTime() \
+      tangle::utils::status << "Spawned object in " << torusTimer.getTime() \
                               << "s" << std::endl;
     }
   }

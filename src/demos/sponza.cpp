@@ -3,6 +3,7 @@
 #include <vector>
 
 #include <ammonite/ammonite.hpp>
+#include <tangle/tangle.hpp>
 
 #include "sponza.hpp"
 
@@ -48,7 +49,7 @@ namespace sponzaDemo {
 
       //Prevent total failure if a model fails
       if (modelId == 0) {
-        ammonite::utils::warning << "Failed to load '" << modelPaths[i] << "'" << std::endl;
+        tangle::utils::warning << "Failed to load '" << modelPaths[i] << "'" << std::endl;
         continue;
       }
 
@@ -68,10 +69,10 @@ namespace sponzaDemo {
     if (skyboxId != 0) {
       ammonite::skybox::setActiveSkybox(skyboxId);
     } else {
-      ammonite::utils::warning << "Skybox failed to load" << std::endl;
+      tangle::utils::warning << "Skybox failed to load" << std::endl;
     }
 
-    ammonite::utils::status << "Loaded " << vertexCount << " vertices" << std::endl;
+    tangle::utils::status << "Loaded " << vertexCount << " vertices" << std::endl;
 
     //Update splash screen
     ammonite::splash::setSplashScreenProgress(screenId, 1.0f);

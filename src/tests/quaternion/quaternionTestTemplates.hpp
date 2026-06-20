@@ -6,6 +6,7 @@
 #include <string_view>
 
 #include <ammonite/ammonite.hpp>
+#include <tangle/tangle.hpp>
 
 #include "../support.hpp"
 
@@ -15,9 +16,9 @@ namespace templates {
     ammonite::Quat<T> aQuat = {{0}};
 
     if ((void*)ammonite::data(aQuat) != (void*)&aQuat) {
-      ammonite::utils::error << "Data pointer has a different address to the quaternion" << std::endl;
-      ammonite::utils::normal << "  Result:   " << (void*)ammonite::data(aQuat) \
-                              << "\n  Expected: " << (void*)&aQuat << std::endl;
+      tangle::utils::error << "Data pointer has a different address to the quaternion" << std::endl;
+      tangle::utils::normal << "  Result:   " << (void*)ammonite::data(aQuat) \
+                            << "\n  Expected: " << (void*)&aQuat << std::endl;
       return false;
     }
 
@@ -33,10 +34,10 @@ namespace templates {
     ammonite::copy(aQuat, bQuat);
     for (unsigned int i = 0; i < 4; i++) {
       if (aQuat[0][i] != bQuat[0][i]) {
-        ammonite::utils::error << "Quaternion copy failed" << std::endl;
-        ammonite::utils::normal << "  Result:   " << ammonite::formatQuaternion(bQuat) \
-                                << "\n  Expected: " << ammonite::formatQuaternion(aQuat) \
-                                << std::endl;
+        tangle::utils::error << "Quaternion copy failed" << std::endl;
+        tangle::utils::normal << "  Result:   " << ammonite::formatQuaternion(bQuat) \
+                              << "\n  Expected: " << ammonite::formatQuaternion(aQuat) \
+                              << std::endl;
         return false;
       }
     }
@@ -54,10 +55,10 @@ namespace templates {
     ammonite::copyCast(aQuat, bQuat);
     for (unsigned int i = 0; i < 4; i++) {
       if ((float)aQuat[0][i] != bQuat[0][i]) {
-        ammonite::utils::error << "Quaternion copy cast failed" << std::endl;
-        ammonite::utils::normal << "  Result:   " << ammonite::formatQuaternion(bQuat) \
-                                << "\n  Expected: " << ammonite::formatQuaternion(aQuat) \
-                                << std::endl;
+        tangle::utils::error << "Quaternion copy cast failed" << std::endl;
+        tangle::utils::normal << "  Result:   " << ammonite::formatQuaternion(bQuat) \
+                              << "\n  Expected: " << ammonite::formatQuaternion(aQuat) \
+                              << std::endl;
         return false;
       }
     }
@@ -65,10 +66,10 @@ namespace templates {
     ammonite::copyCast(aQuat, cQuat);
     for (unsigned int i = 0; i < 4; i++) {
       if ((double)aQuat[0][i] != cQuat[0][i]) {
-        ammonite::utils::error << "Quaternion copy cast failed" << std::endl;
-        ammonite::utils::normal << "  Result:   " << ammonite::formatQuaternion(cQuat) \
-                                << "\n  Expected: " << ammonite::formatQuaternion(aQuat) \
-                                << std::endl;
+        tangle::utils::error << "Quaternion copy cast failed" << std::endl;
+        tangle::utils::normal << "  Result:   " << ammonite::formatQuaternion(cQuat) \
+                              << "\n  Expected: " << ammonite::formatQuaternion(aQuat) \
+                              << std::endl;
         return false;
       }
     }
@@ -116,10 +117,10 @@ namespace templates {
       //Compare the result to the expected
       for (int i = 0; i < 4; i++) {
         if (!roughly(outQuat[0][i], tests[testIndex].out[0][i])) {
-          ammonite::utils::error << "Quaternion Euler angle initialisation failed" << std::endl;
-          ammonite::utils::normal << "  Result:   " << ammonite::formatQuaternion(outQuat) \
-                                  << "\n  Expected: " << ammonite::formatQuaternion(tests[testIndex].out) \
-                                  << std::endl;
+          tangle::utils::error << "Quaternion Euler angle initialisation failed" << std::endl;
+          tangle::utils::normal << "  Result:   " << ammonite::formatQuaternion(outQuat) \
+                                << "\n  Expected: " << ammonite::formatQuaternion(tests[testIndex].out) \
+                                << std::endl;
           return false;
         }
       }
@@ -132,10 +133,10 @@ namespace templates {
       ammonite::fromEuler(outQuatAlt, angleVec);
       for (int i = 0; i < 3; i++) {
         if (outQuatAlt[0][i] != outQuat[0][i]) {
-          ammonite::utils::error << "Quaternion Euler angle vector initialisation failed" << std::endl;
-          ammonite::utils::normal << "  Result:   " << ammonite::formatQuaternion(outQuatAlt) \
-                                  << "\n  Expected: " << ammonite::formatQuaternion(outQuat) \
-                                  << std::endl;
+          tangle::utils::error << "Quaternion Euler angle vector initialisation failed" << std::endl;
+          tangle::utils::normal << "  Result:   " << ammonite::formatQuaternion(outQuatAlt) \
+                                << "\n  Expected: " << ammonite::formatQuaternion(outQuat) \
+                                << std::endl;
           return false;
         }
       }
@@ -166,10 +167,10 @@ namespace templates {
       }
 
       if (!roughly(sumA, sumB)) {
-        ammonite::utils::error << "Quaternion Euler angle recovery failed" << std::endl;
-        ammonite::utils::normal << "  Result:   " << ammonite::formatVector(aVec) \
-                                << "\n  Expected: " << ammonite::formatVector(angleVec) \
-                                << std::endl;
+        tangle::utils::error << "Quaternion Euler angle recovery failed" << std::endl;
+        tangle::utils::normal << "  Result:   " << ammonite::formatVector(aVec) \
+                              << "\n  Expected: " << ammonite::formatVector(angleVec) \
+                              << std::endl;
         return false;
       }
     }
@@ -195,11 +196,11 @@ namespace templates {
 
     //Test dot product
     if (!roughly(ammonite::dot(aQuat, bQuat), sum)) {
-      ammonite::utils::error << "Quaternion dot product failed" << std::endl;
-      ammonite::utils::normal << "  Input:    " << ammonite::formatQuaternion(aQuat) \
-                              << "\n  Input:    " << ammonite::formatQuaternion(bQuat) \
-                              << "\n  Result:   " << ammonite::dot(aQuat, bQuat) \
-                              << "\n  Expected: " << sum << std::endl;
+      tangle::utils::error << "Quaternion dot product failed" << std::endl;
+      tangle::utils::normal << "  Input:    " << ammonite::formatQuaternion(aQuat) \
+                            << "\n  Input:    " << ammonite::formatQuaternion(bQuat) \
+                            << "\n  Result:   " << ammonite::dot(aQuat, bQuat) \
+                            << "\n  Expected: " << sum << std::endl;
       return false;
     }
 
@@ -225,10 +226,10 @@ namespace templates {
     }
 
     if (!valid || aQuat[0][3] != bQuat[0][3]) {
-      ammonite::utils::error << "Quaternion conjugate calculation failed" << std::endl;
-      ammonite::utils::normal << "  Input:  " << ammonite::formatQuaternion(aQuat) \
-                              << "\n  Result: " << ammonite::formatQuaternion(bQuat) \
-                              << std::endl;
+      tangle::utils::error << "Quaternion conjugate calculation failed" << std::endl;
+      tangle::utils::normal << "  Input:  " << ammonite::formatQuaternion(aQuat) \
+                            << "\n  Result: " << ammonite::formatQuaternion(bQuat) \
+                            << std::endl;
       return false;
     }
 
@@ -237,11 +238,11 @@ namespace templates {
     ammonite::conjugate(aQuat);
     for (int i = 0; i < 4; i++) {
       if (aQuat[0][i] != bQuat[0][i]) {
-        ammonite::utils::error << "In-place quaternion conjugate calculation failed" << std::endl;
-        ammonite::utils::normal << "  Input:    " << ammonite::formatQuaternion(cQuat) \
-                                << "\n  Result:   " << ammonite::formatQuaternion(aQuat) \
-                                << "\n  Expected: " << ammonite::formatQuaternion(bQuat) \
-                                << std::endl;
+        tangle::utils::error << "In-place quaternion conjugate calculation failed" << std::endl;
+        tangle::utils::normal << "  Input:    " << ammonite::formatQuaternion(cQuat) \
+                              << "\n  Result:   " << ammonite::formatQuaternion(aQuat) \
+                              << "\n  Expected: " << ammonite::formatQuaternion(bQuat) \
+                              << std::endl;
         return false;
       }
     }
@@ -263,10 +264,10 @@ namespace templates {
 
     //Test vector length
     if (!roughly(ammonite::length(aQuat), length)) {
-      ammonite::utils::error << "Quaternion length calculation failed" << std::endl;
-      ammonite::utils::normal << "  Input:    " << ammonite::formatQuaternion(aQuat) \
-                              << "\n  Result:   " << ammonite::length(aQuat) \
-                              << "\n  Expected: " << length << std::endl;
+      tangle::utils::error << "Quaternion length calculation failed" << std::endl;
+      tangle::utils::normal << "  Input:    " << ammonite::formatQuaternion(aQuat) \
+                            << "\n  Result:   " << ammonite::length(aQuat) \
+                            << "\n  Expected: " << length << std::endl;
 
       return false;
     }
@@ -291,11 +292,11 @@ namespace templates {
     ammonite::normalise(aQuat, bQuat);
     for (int i = 0; i < 4; i++) {
       if (!roughly((T)(aQuat[0][i] / length), bQuat[0][i])) {
-        ammonite::utils::error << "Quaternion normalisation failed" << std::endl;
-        ammonite::utils::normal << "  Input:    " << ammonite::formatQuaternion(aQuat) \
-                                << "\n  Result:   " << ammonite::formatQuaternion(bQuat) \
-                                << "\n  Expected: " << (T)(aQuat[0][i] / length) \
-                                << " at index " << i << std::endl;
+        tangle::utils::error << "Quaternion normalisation failed" << std::endl;
+        tangle::utils::normal << "  Input:    " << ammonite::formatQuaternion(aQuat) \
+                              << "\n  Result:   " << ammonite::formatQuaternion(bQuat) \
+                              << "\n  Expected: " << (T)(aQuat[0][i] / length) \
+                              << " at index " << i << std::endl;
         return false;
       }
     }
@@ -305,11 +306,11 @@ namespace templates {
     ammonite::normalise(bQuat);
     for (int i = 0; i < 4; i++) {
       if (!roughly((T)(aQuat[0][i] / length), bQuat[0][i])) {
-        ammonite::utils::error << "In-place quaternion normalisation failed" << std::endl;
-        ammonite::utils::normal << "  Input:    " << ammonite::formatQuaternion(aQuat) \
-                                << "\n  Result:   " << ammonite::formatQuaternion(bQuat) \
-                                << "\n  Expected: " << (T)(aQuat[0][i] / length) \
-                                << " at index " << i << std::endl;
+        tangle::utils::error << "In-place quaternion normalisation failed" << std::endl;
+        tangle::utils::normal << "  Input:    " << ammonite::formatQuaternion(aQuat) \
+                              << "\n  Result:   " << ammonite::formatQuaternion(bQuat) \
+                              << "\n  Expected: " << (T)(aQuat[0][i] / length) \
+                              << " at index " << i << std::endl;
         return false;
       }
     }
@@ -336,10 +337,10 @@ namespace templates {
     const ammonite::Quat<T> expectedQuat = {{(T)0.0, (T)0.0, (T)0.0, (T)1.0}};
     for (int i = 0; i < 4; i++) {
       if (!roughly(dQuat[0][i], expectedQuat[0][i])) {
-        ammonite::utils::error << "Quaternion inverse failed" << std::endl;
-        ammonite::utils::normal << "  Input:  " << ammonite::formatQuaternion(aQuat) \
-                                << "\n  Result: " << ammonite::formatQuaternion(cQuat) \
-                                << std::endl;
+        tangle::utils::error << "Quaternion inverse failed" << std::endl;
+        tangle::utils::normal << "  Input:  " << ammonite::formatQuaternion(aQuat) \
+                              << "\n  Result: " << ammonite::formatQuaternion(cQuat) \
+                              << std::endl;
         return false;
       }
     }
@@ -349,11 +350,11 @@ namespace templates {
     ammonite::inverse(aQuat);
     for (int i = 0; i < 4; i++) {
       if (!roughly(aQuat[0][i], cQuat[0][i])) {
-        ammonite::utils::error << "In-place quaternion inverse failed" << std::endl;
-        ammonite::utils::normal << "  Input:    " << ammonite::formatQuaternion(bQuat) \
-                                << "\n  Result:   " << ammonite::formatQuaternion(aQuat) \
-                                << "\n  Expected: " << ammonite::formatQuaternion(cQuat) \
-                                << std::endl;
+        tangle::utils::error << "In-place quaternion inverse failed" << std::endl;
+        tangle::utils::normal << "  Input:    " << ammonite::formatQuaternion(bQuat) \
+                              << "\n  Result:   " << ammonite::formatQuaternion(aQuat) \
+                              << "\n  Expected: " << ammonite::formatQuaternion(cQuat) \
+                              << std::endl;
         return false;
       }
     }
@@ -383,10 +384,10 @@ namespace templates {
     //Test multiplied quaternion matches initialised quaternion
     ammonite::fromEuler(fQuat, angleVec);
     if (!roughly(std::abs(ammonite::dot(fQuat, eQuat)), (T)1.0)) {
-      ammonite::utils::error << "Quaternion-quaternion multiplication failed" << std::endl;
-      ammonite::utils::normal << "  Result:   " << ammonite::formatQuaternion(eQuat) \
-                              << "\n  Expected: " << ammonite::formatQuaternion(fQuat) \
-                              << std::endl;
+      tangle::utils::error << "Quaternion-quaternion multiplication failed" << std::endl;
+      tangle::utils::normal << "  Result:   " << ammonite::formatQuaternion(eQuat) \
+                            << "\n  Expected: " << ammonite::formatQuaternion(fQuat) \
+                            << std::endl;
       return false;
     }
 
@@ -394,10 +395,10 @@ namespace templates {
     ammonite::multiply(cQuat, ammonite::multiply(bQuat, aQuat));
     for (int i = 0; i < 4; i++) {
       if (cQuat[0][i] != eQuat[0][i]) {
-        ammonite::utils::error << "In-place quaternion-quaternion multiplication failed" << std::endl;
-        ammonite::utils::normal << "  Result:   " << ammonite::formatQuaternion(cQuat) \
-                                << "\n  Expected: " << ammonite::formatQuaternion(eQuat) \
-                                << std::endl;
+        tangle::utils::error << "In-place quaternion-quaternion multiplication failed" << std::endl;
+        tangle::utils::normal << "  Result:   " << ammonite::formatQuaternion(cQuat) \
+                              << "\n  Expected: " << ammonite::formatQuaternion(eQuat) \
+                              << std::endl;
         return false;
       }
     }
@@ -472,11 +473,11 @@ namespace templates {
       //Check the rotated point matches the expected
       for (int i = 0; i < 3; i++) {
         if (!roughly(outVec[i], tests[testIndex].out[i])) {
-          ammonite::utils::error << "Quaternion-vector multiplication failed" << std::endl;
-          ammonite::utils::normal << "  Quaternion: " << ammonite::formatQuaternion(aQuat) \
-                                  << "\n  Result:     " << ammonite::formatVector(outVec) \
-                                  << "\n  Expected:   " << ammonite::formatVector(tests[testIndex].out) \
-                                  << std::endl;
+          tangle::utils::error << "Quaternion-vector multiplication failed" << std::endl;
+          tangle::utils::normal << "  Quaternion: " << ammonite::formatQuaternion(aQuat) \
+                                << "\n  Result:     " << ammonite::formatVector(outVec) \
+                                << "\n  Expected:   " << ammonite::formatVector(tests[testIndex].out) \
+                                << std::endl;
           return false;
         }
       }
@@ -492,11 +493,11 @@ namespace templates {
       ammonite::set(expectedOutVecWide, tests[testIndex].out, (T)1.0);
       for (int i = 0; i < 4; i++) {
         if (!roughly(outVecWide[i], expectedOutVecWide[i])) {
-          ammonite::utils::error << "Quaternion-vector multiplication failed" << std::endl;
-          ammonite::utils::normal << "  Quaternion: " << ammonite::formatQuaternion(aQuat) \
-                                  << "\n  Result:     " << ammonite::formatVector(outVecWide) \
-                                  << "\n  Expected:   " << ammonite::formatVector(expectedOutVecWide) \
-                                  << std::endl;
+          tangle::utils::error << "Quaternion-vector multiplication failed" << std::endl;
+          tangle::utils::normal << "  Quaternion: " << ammonite::formatQuaternion(aQuat) \
+                                << "\n  Result:     " << ammonite::formatVector(outVecWide) \
+                                << "\n  Expected:   " << ammonite::formatVector(expectedOutVecWide) \
+                                << std::endl;
           return false;
         }
       }
@@ -506,11 +507,11 @@ namespace templates {
       ammonite::copy(tests[testIndex].in, inVec);
       ammonite::multiply(aQuat, inVec);
       if (!ammonite::equal(inVec, outVec)) {
-        ammonite::utils::error << "Quaternion-vector multiplication failed" << std::endl;
-        ammonite::utils::normal << "  Quaternion: " << ammonite::formatQuaternion(aQuat) \
-                                << "\n  Result:     " << ammonite::formatVector(inVec) \
-                                << "\n  Expected:   " << ammonite::formatVector(outVec) \
-                                << std::endl;
+        tangle::utils::error << "Quaternion-vector multiplication failed" << std::endl;
+        tangle::utils::normal << "  Quaternion: " << ammonite::formatQuaternion(aQuat) \
+                              << "\n  Result:     " << ammonite::formatVector(inVec) \
+                              << "\n  Expected:   " << ammonite::formatVector(outVec) \
+                              << std::endl;
         return false;
       }
 
@@ -519,11 +520,11 @@ namespace templates {
       ammonite::copy(inVecWide, inVecWideInplace);
       ammonite::multiply(aQuat, inVecWideInplace);
       if (!ammonite::equal(inVecWideInplace, outVecWide)) {
-        ammonite::utils::error << "Quaternion-vector multiplication failed" << std::endl;
-        ammonite::utils::normal << "  Quaternion: " << ammonite::formatQuaternion(aQuat) \
-                                << "\n  Result:     " << ammonite::formatVector(inVecWideInplace) \
-                                << "\n  Expected:   " << ammonite::formatVector(outVecWide) \
-                                << std::endl;
+        tangle::utils::error << "Quaternion-vector multiplication failed" << std::endl;
+        tangle::utils::normal << "  Quaternion: " << ammonite::formatQuaternion(aQuat) \
+                              << "\n  Result:     " << ammonite::formatVector(inVecWideInplace) \
+                              << "\n  Expected:   " << ammonite::formatVector(outVecWide) \
+                              << std::endl;
         return false;
       }
     }
@@ -551,13 +552,13 @@ namespace templates {
     //Check 4x4 matrix conversion results
     for (int i = 0; i < 4; i++) {
       if (!roughly(bVec[i], cVec[i], (T)0.01)) {
-        ammonite::utils::error << "Quaternion to 4x4 matrix conversion failed" << std::endl;
-        ammonite::utils::normal << "  Quaternion: " << ammonite::formatQuaternion(aQuat) \
-                                << "\n  Matrix result:\n" << ammonite::formatMatrix(aMat) \
-                                << "\n  Input vector:\n" << ammonite::formatVector(aVec) \
-                                << "\n  Quaternion output vector:\n" << ammonite::formatVector(bVec) \
-                                << "\n  Matrix output vector:\n" << ammonite::formatVector(cVec) \
-                                << std::endl;
+        tangle::utils::error << "Quaternion to 4x4 matrix conversion failed" << std::endl;
+        tangle::utils::normal << "  Quaternion: " << ammonite::formatQuaternion(aQuat) \
+                              << "\n  Matrix result:\n" << ammonite::formatMatrix(aMat) \
+                              << "\n  Input vector:\n" << ammonite::formatVector(aVec) \
+                              << "\n  Quaternion output vector:\n" << ammonite::formatVector(bVec) \
+                              << "\n  Matrix output vector:\n" << ammonite::formatVector(cVec) \
+                              << std::endl;
         return false;
       }
     }
@@ -579,13 +580,13 @@ namespace templates {
     //Check 3x3 matrix conversion results
     for (int i = 0; i < 3; i++) {
       if (!roughly(bVecShort[i], cVecShort[i], (T)0.01)) {
-        ammonite::utils::error << "Quaternion to 3x3 matrix conversion failed" << std::endl;
-        ammonite::utils::normal << "  Quaternion: " << ammonite::formatQuaternion(aQuat) \
-                                << "\n  Matrix result:\n" << ammonite::formatMatrix(bMat) \
-                                << "\n  Input vector:\n" << ammonite::formatVector(aVecShort) \
-                                << "\n  Quaternion output vector:\n" << ammonite::formatVector(bVecShort) \
-                                << "\n  Matrix output vector:\n" << ammonite::formatVector(cVecShort) \
-                                << std::endl;
+        tangle::utils::error << "Quaternion to 3x3 matrix conversion failed" << std::endl;
+        tangle::utils::normal << "  Quaternion: " << ammonite::formatQuaternion(aQuat) \
+                              << "\n  Matrix result:\n" << ammonite::formatMatrix(bMat) \
+                              << "\n  Input vector:\n" << ammonite::formatVector(aVecShort) \
+                              << "\n  Quaternion output vector:\n" << ammonite::formatVector(bVecShort) \
+                              << "\n  Matrix output vector:\n" << ammonite::formatVector(cVecShort) \
+                              << std::endl;
         return false;
       }
     }
@@ -597,7 +598,7 @@ namespace templates {
 namespace tests {
   template <typename T> requires ammonite::validQuaternion<T>
   bool testQuaternion(std::string_view typeName) {
-    ammonite::utils::normal << "Testing " << typeName << " quaternions" << std::endl;
+    tangle::utils::normal << "Testing " << typeName << " quaternions" << std::endl;
 
     //Test ammonite::data()
     if (!templates::testData<T>()) {

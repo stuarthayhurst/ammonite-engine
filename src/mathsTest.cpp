@@ -2,6 +2,7 @@
 #include <iostream>
 
 #include <ammonite/ammonite.hpp>
+#include <tangle/tangle.hpp>
 
 #include "tests/matrix/matrixTestTemplates.hpp"
 #include "tests/quaternion/quaternionTestTemplates.hpp"
@@ -17,7 +18,7 @@ namespace {
     const bool passed = testFunction();
     const double testTime = testTimer.getTime();
 
-    ammonite::utils::normal << "  Completed in " << testTime << "s" << std::endl;
+    tangle::utils::normal << "  Completed in " << testTime << "s" << std::endl;
     typeTime += testTime;
     structTime += testTime;
 
@@ -103,30 +104,30 @@ int main() {
   }
 
   if (!passed) {
-    ammonite::utils::normal << std::endl;
-    ammonite::utils::error << "Vector / matrix / quaternion tests failed" << std::endl;
+    tangle::utils::normal << std::endl;
+    tangle::utils::error << "Vector / matrix / quaternion tests failed" << std::endl;
     return EXIT_FAILURE;
   }
 
   //Print data type accumulated times
-  ammonite::utils::normal << std::endl;
-  ammonite::utils::normal << "int32_t total time: " << int32Time << "s" << std::endl;
-  ammonite::utils::normal << "int64_t total time: " << int64Time << "s" << std::endl;
-  ammonite::utils::normal << "uint32_t total time: " << uint32Time << "s" << std::endl;
-  ammonite::utils::normal << "uint64_t total time: " << uint64Time << "s" << std::endl;
-  ammonite::utils::normal << "float total time: " << floatTime << "s" << std::endl;
-  ammonite::utils::normal << "double total time: " << doubleTime << "s" << std::endl;
+  tangle::utils::normal << std::endl;
+  tangle::utils::normal << "int32_t total time: " << int32Time << "s" << std::endl;
+  tangle::utils::normal << "int64_t total time: " << int64Time << "s" << std::endl;
+  tangle::utils::normal << "uint32_t total time: " << uint32Time << "s" << std::endl;
+  tangle::utils::normal << "uint64_t total time: " << uint64Time << "s" << std::endl;
+  tangle::utils::normal << "float total time: " << floatTime << "s" << std::endl;
+  tangle::utils::normal << "double total time: " << doubleTime << "s" << std::endl;
 
   //Print structure type accumulated times
-  ammonite::utils::normal << std::endl;
-  ammonite::utils::normal << "Vector total time: " << vectorTime << "s" << std::endl;
-  ammonite::utils::normal << "Matrix total time: " << matrixTime << "s" << std::endl;
-  ammonite::utils::normal << "Quaternion total time: " << quatTime << "s" << std::endl;
+  tangle::utils::normal << std::endl;
+  tangle::utils::normal << "Vector total time: " << vectorTime << "s" << std::endl;
+  tangle::utils::normal << "Matrix total time: " << matrixTime << "s" << std::endl;
+  tangle::utils::normal << "Quaternion total time: " << quatTime << "s" << std::endl;
 
   //Print final totals
-  ammonite::utils::normal << std::endl;
-  ammonite::utils::normal << "Total time: " << vectorTime + matrixTime + quatTime \
-                          << "s" << std::endl;
+  tangle::utils::normal << std::endl;
+  tangle::utils::normal << "Total time: " << vectorTime + matrixTime + quatTime \
+                        << "s" << std::endl;
 
   return EXIT_SUCCESS;
 }
