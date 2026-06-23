@@ -8,8 +8,17 @@ PREFIX_DIR ?= /usr/local
 INSTALL_DIR ?= $(PREFIX_DIR)/lib
 HEADER_DIR ?= $(PREFIX_DIR)/include
 PKG_CONF_INSTALL_DIR ?= $(INSTALL_DIR)/pkgconfig
+
 LIBRARY_VERSION := $(shell pkg-config --modversion data/ammonite.pc)
-LIBRARY_NAME := libammonite.so.$(LIBRARY_VERSION)
+
+LIBRARY_NAME_FULL := libammonite.so.$(LIBRARY_VERSION)
+LIBRARY_NAME_MINOR := $(basename $(LIBRARY_NAME_FULL))
+LIBRARY_NAME_MAJOR := $(basename $(LIBRARY_NAME_MINOR))
+LIBRARY_NAME_BASE := $(basename $(LIBRARY_NAME_MAJOR))
+
+#Names and files that link to the build library
+LIBRARY_LINK_NAMES := $(LIBRARY_NAME_BASE) $(LIBRARY_NAME_MAJOR) $(LIBRARY_NAME_MINOR)
+LIBRARY_LINK_FILES := $(addprefix $(BUILD_DIR)/,$(LIBRARY_LINK_NAMES))
 
 AMMONITE_OBJECTS_SOURCE := $(shell ls ./src/ammonite/**/*.cpp)
 AMMONITE_HEADERS_SOURCE := $(shell ls ./src/ammonite/**/*.hpp)
@@ -131,7 +140,7 @@ endif
 #Library arguments
 LIBRARY_CXXFLAGS := $(CXXFLAGS) -fpic $(CFLAGS_PRIVATE) -DAMMONITE_VERSION=$(LIBRARY_VERSION) \
                     $(shell pkg-config $(TANGLE_PKG_CONF_ARGS) --cflags $(REQUIRES_PRIVATE))
-LIBRARY_LDFLAGS := $(LDFLAGS) "-Wl,-soname,$(LIBRARY_NAME)" $(LDFLAGS_PRIVATE) \
+LIBRARY_LDFLAGS := $(LDFLAGS) "-Wl,-soname,$(LIBRARY_NAME_MINOR)" $(LDFLAGS_PRIVATE) \
                    $(shell pkg-config $(TANGLE_PKG_CONF_ARGS) --libs $(REQUIRES_PRIVATE))
 
 #Client arguments
@@ -161,10 +170,10 @@ EXTRACT := @function inline() { if [[ "$(DUMMY)" != "true" ]]; then echo "$(CXX)
 # Client build recipes
 # --------------------------------
 
-$(BUILD_DIR)/demo: $(BUILD_DIR)/$(LIBRARY_NAME) $(HELPER_OBJECTS) $(DEMO_OBJECTS) $(OBJECT_DIR)/demoLoader.o
+$(BUILD_DIR)/demo: $(BUILD_DIR)/$(LIBRARY_NAME_FULL) $(HELPER_OBJECTS) $(DEMO_OBJECTS) $(OBJECT_DIR)/demoLoader.o
 	@mkdir -p "$(BUILD_DIR)"
 	$(CXX) -o "$(BUILD_DIR)/demo" $(HELPER_OBJECTS) $(DEMO_OBJECTS) $(OBJECT_DIR)/demoLoader.o $(CLIENT_CXXFLAGS) $(CLIENT_LDFLAGS) $(DEMO_EXTRA_LDFLAGS)
-$(BUILD_DIR)/mathsTest: $(BUILD_DIR)/$(LIBRARY_NAME) $(TEST_OBJECTS) $(OBJECT_DIR)/mathsTest.o
+$(BUILD_DIR)/mathsTest: $(BUILD_DIR)/$(LIBRARY_NAME_FULL) $(TEST_OBJECTS) $(OBJECT_DIR)/mathsTest.o
 	@mkdir -p "$(BUILD_DIR)"
 	$(CXX) -o "$(BUILD_DIR)/mathsTest" $(OBJECT_DIR)/mathsTest.o $(TEST_OBJECTS) $(CLIENT_CXXFLAGS) $(CLIENT_LDFLAGS) $(MATHSTEST_EXTRA_LDFLAGS)
 
@@ -186,15 +195,15 @@ $(OBJECT_DIR)/%.o: ./src/%.cpp $(DEMO_HEADERS_SOURCE) $(HELPER_HEADERS_SOURCE) $
 # Library build recipes
 # --------------------------------
 
-$(BUILD_DIR)/libammonite.so: $(AMMONITE_OBJECTS)
+$(LIBRARY_LINK_FILES):
+	@ln -sfv "$(LIBRARY_NAME_FULL)" "$@"
+$(BUILD_DIR)/$(LIBRARY_NAME_FULL): $(AMMONITE_OBJECTS)
 	@mkdir -p "$(OBJECT_DIR)"
 	$(CXX) -shared -o "$@" $(AMMONITE_OBJECTS) $(LIBRARY_CXXFLAGS) $(LIBRARY_LDFLAGS)
 	@if [[ "$(DEBUG)" != "true" ]]; then \
 	  strip --strip-unneeded "$@"; \
 	fi
-$(BUILD_DIR)/$(LIBRARY_NAME): $(BUILD_DIR)/libammonite.so
-	@rm -fv "$(BUILD_DIR)/$(LIBRARY_NAME)"
-	@ln -sv "libammonite.so" "$(BUILD_DIR)/$(LIBRARY_NAME)"
+	$(MAKE) $(LIBRARY_LINK_FILES)
 
 #Recipe dependencies need to be mirrored in the corresponding lint targets
 $(OBJECT_DIR)/ammonite/%.o: ./src/ammonite/%.cpp $(AMMONITE_HEADERS_SOURCE) $(AMMONITE_INCLUDE_HEADERS_SOURCE)
@@ -271,7 +280,7 @@ debug-all:
 # Library phony recipes
 # --------------------------------
 
-library: $(BUILD_DIR)/$(LIBRARY_NAME)
+library: $(BUILD_DIR)/$(LIBRARY_NAME_FULL)
 
 
 # --------------------------------
@@ -287,8 +296,10 @@ headers:
 	sed -e "s|prefix=/usr/local|prefix=$(PREFIX_DIR)|" "data/ammonite.pc" > "$(PKG_CONF_INSTALL_DIR)/ammonite.pc"
 install:
 	@mkdir -p "$(INSTALL_DIR)"
-	install "$(BUILD_DIR)/libammonite.so" "$(INSTALL_DIR)/$(LIBRARY_NAME)"
-	@ln -sfv "$(LIBRARY_NAME)" "$(INSTALL_DIR)/libammonite.so"
+	@cp -Pv "$(BUILD_DIR)/$(LIBRARY_NAME_FULL)" "$(INSTALL_DIR)/$(LIBRARY_NAME_FULL)"
+	@cp -Pv "$(BUILD_DIR)/$(LIBRARY_NAME_MINOR)" "$(INSTALL_DIR)/$(LIBRARY_NAME_MINOR)"
+	@cp -Pv "$(BUILD_DIR)/$(LIBRARY_NAME_MAJOR)" "$(INSTALL_DIR)/$(LIBRARY_NAME_MAJOR)"
+	@cp -Pv "$(BUILD_DIR)/$(LIBRARY_NAME_BASE)" "$(INSTALL_DIR)/$(LIBRARY_NAME_BASE)"
 	ldconfig "$(INSTALL_DIR)"
 uninstall:
 	@rm -fv "$(INSTALL_DIR)/libammonite.so"*
