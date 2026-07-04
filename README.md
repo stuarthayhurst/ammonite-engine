@@ -119,12 +119,15 @@
     - `inkscape optipng`
 
 ## libtangle:
-  - Run `git submodule update --init`
+  - Run `git submodule update --init` to clone the `libtangle` submodule
     - Alternatively, pass `--recurse-submodules` when cloning this repository
-  - Build `libtangle` with `make -C libtangle build -j$(nproc)`
+  - Run `make -C libtangle build -j$(nproc)` to build `libtangle`
   - To use `libtangle` as part of the system instead of in-place:
     - Run `sudo make -C libtangle install headers`
     - Pass `USE_SYSTEM=true` to any `make` commands to use the system copy of `libtangle`
+      - For client code compilation recipes, this will also attempt to use the system copy of Ammonite
+      - Make sure Ammonite is installed to the system before using `USE_SYSTEM=true make build`
+      - The library can be built separately using `make library`, then installed with `sudo make install headers`
 
 ## Issues:
   - Due to the small size of this project, only a small range of hardware can be tested
