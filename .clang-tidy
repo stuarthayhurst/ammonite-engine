@@ -1,4 +1,5 @@
 #Up-to-date for clang-tidy-22
+#Changes must by copied to libtangle (https://github.com/stuarthayhurst/libtangle)
 
 ---
 Checks: [
