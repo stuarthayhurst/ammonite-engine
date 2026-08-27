@@ -304,7 +304,7 @@ namespace ammonite {
         .memoryInfo = {.meshArray = meshArray, .indicesArray = indicesArray,
                        .materials = materials, .meshCount = meshCount,
                        .vertexCounts = vertexCounts, .indexCounts = indexCounts},
-        .isFileBased = false,
+        .isFileBased = false
       };
 
       return createModel(modelLoadInfo);
