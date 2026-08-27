@@ -605,7 +605,7 @@ namespace AMMONITE_INTERNAL ammonite {
       std::string result;
       for (unsigned int row = 0; row < rows; row++) {
         if (row != 0) {
-          result += "\n";
+          result += '\n';
         }
 
         for (unsigned int col = 0; col < cols; col++) {
