@@ -249,6 +249,7 @@ Checks: [
   'readability-redundant-string-cstr',
   'readability-redundant-string-init',
   'readability-reference-to-constructed-temporary',
+  'readability-trailing-comma',
   'readability-redundant-typename',
   'readability-simplify-boolean-expr',
   'readability-simplify-subscript-expr',
@@ -276,6 +277,8 @@ CheckOptions:
     value: '&&;&=;&;|;~;!;!=;||;|=;^;^='
   - key: readability-operators-representation.OverloadedOperators
     value: '&&;&=;&;|;~;!;!=;||;|=;^;^='
+  - key: readability-trailing-comma.MultiLineCommaPolicy
+    value: Remove
 WarningsAsErrors: 'true,*'
 SystemHeaders: 'false'
 ---
