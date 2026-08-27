@@ -169,7 +169,7 @@ namespace ammonite {
         const double frameTime = ammonite::getFrameTime();
 
         //Apply the time to every path
-        for (auto& pathData : pathTrackerMap) {
+        for (const auto& pathData : pathTrackerMap) {
           updatePathTime(pathData.first, frameTime);
         }
       }

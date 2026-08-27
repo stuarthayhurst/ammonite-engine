@@ -58,7 +58,7 @@ namespace ammonite {
         void getModels(ModelTypeEnum modelType, unsigned int modelCount,
                        internal::ModelInfo* modelInfoArray[]) {
           //Select the right model tracker
-          ModelInfoMap* modelMapPtr = &modelInfoMapSelector[modelType];
+          ModelInfoMap* const modelMapPtr = &modelInfoMapSelector[modelType];
 
           //Fill model info array with first modelCount of items
           auto it = modelMapPtr->begin();
@@ -86,7 +86,7 @@ namespace ammonite {
         void deleteModelInfo(AmmoniteId modelId) {
           //Get the type of model, so the right tracker can be selected
           const ModelTypeEnum modelType = modelIdPtrMap[modelId]->modelType;
-          ModelInfoMap* targetMapPtr = &modelInfoMapSelector[modelType];
+          ModelInfoMap* const targetMapPtr = &modelInfoMapSelector[modelType];
 
           ammoniteInternalDebug << "Deleted storage for model info (ID " \
                                 << modelId << ", '" \
@@ -109,7 +109,7 @@ namespace ammonite {
           }
 
           //Select current and target trackers
-          ModelInfoMap* currentMapPtr = &modelInfoMapSelector[modelType];
+          ModelInfoMap* const currentMapPtr = &modelInfoMapSelector[modelType];
           ModelInfoMap* const targetMapPtr = &modelInfoMapSelector[targetType];
 
           if (currentMapPtr->contains(modelId)) {
