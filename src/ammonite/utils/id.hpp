@@ -16,7 +16,7 @@ namespace AMMONITE_INTERNAL ammonite {
        - Write the result back to lastId, and return it
       */
       template <typename T>
-      static AmmoniteId setNextId(AmmoniteId* lastId,
+      inline AmmoniteId setNextId(AmmoniteId* lastId,
                                   const std::unordered_map<AmmoniteId, T>& tracker) {
         (*lastId)++;
         while (tracker.contains(*lastId) || *lastId == 0) {
