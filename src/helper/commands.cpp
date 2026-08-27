@@ -795,7 +795,7 @@ namespace commands {
       }
 
       //Call the handler with the command, then continue or return
-      const ReturnActionEnum action = (commandMap.at(command))(commandLineVec);
+      const ReturnActionEnum action = commandMap.at(command)(commandLineVec);
       if (action != CONTINUE) {
         return (action == EXIT_PROGRAM);
       }
