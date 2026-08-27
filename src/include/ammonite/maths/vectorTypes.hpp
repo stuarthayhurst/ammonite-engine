@@ -55,7 +55,7 @@ namespace AMMONITE_INTERNAL ammonite {
       T& x;
       T& y;
 
-      NamedVec(Vec<T, 2>& vector): x(vector[0]), y(vector[1]) {};
+      explicit NamedVec(Vec<T, 2>& vector): x(vector[0]), y(vector[1]) {};
     };
 
     template <typename T> requires vectorType<T>
@@ -64,7 +64,7 @@ namespace AMMONITE_INTERNAL ammonite {
       T& y;
       T& z;
 
-      NamedVec(Vec<T, 3>& vector): x(vector[0]), y(vector[1]), z(vector[2]) {};
+      explicit NamedVec(Vec<T, 3>& vector): x(vector[0]), y(vector[1]), z(vector[2]) {};
     };
 
     template <typename T> requires vectorType<T>
@@ -74,7 +74,7 @@ namespace AMMONITE_INTERNAL ammonite {
       T& z;
       T& w;
 
-      NamedVec(Vec<T, 4>& vector): x(vector[0]), y(vector[1]), z(vector[2]), w(vector[3]) {};
+      explicit NamedVec(Vec<T, 4>& vector): x(vector[0]), y(vector[1]), z(vector[2]), w(vector[3]) {};
     };
     //NOLINTEND(cppcoreguidelines-avoid-const-or-ref-data-members)
   }

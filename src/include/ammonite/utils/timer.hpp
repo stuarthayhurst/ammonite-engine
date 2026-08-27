@@ -18,7 +18,7 @@ namespace AMMONITE_EXPOSED ammonite {
 
     public:
       Timer();
-      Timer(bool startRunning);
+      explicit Timer(bool startRunning);
       void getTime(std::time_t* seconds, std::time_t* nanoseconds) const;
       double getTime() const;
       void setTime(std::time_t seconds, std::time_t nanoseconds);
