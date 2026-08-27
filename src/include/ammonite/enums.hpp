@@ -12,7 +12,7 @@ static constexpr bool ASSUME_SRGB_TEXTURES = true;
 enum AmmoniteContextEnum : unsigned char {
   AMMONITE_DEFAULT_CONTEXT,
   AMMONITE_NO_ERROR_CONTEXT,
-  AMMONITE_DEBUG_CONTEXT,
+  AMMONITE_DEBUG_CONTEXT
 };
 
 #endif
