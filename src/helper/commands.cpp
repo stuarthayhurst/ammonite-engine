@@ -174,7 +174,7 @@ namespace {
 namespace {
   ReturnActionEnum helpCommand(const std::vector<std::string>&) {
     tangle::utils::normal << "Command help:" << std::endl;
-    tangle::utils::normal << "  'help'                        : Display this help page" << std::endl;
+    tangle::utils::normal << "  'help / ?'                    : Display this help page" << std::endl;
     tangle::utils::normal << "  'get [key]'                   : Get the value of a setting key" << std::endl;
     tangle::utils::normal << "  'set [key] [value]'           : Set the value of a setting key" << std::endl;
     tangle::utils::normal << "  'camera' [mode] [key] [value] : Get / set camera properties" << std::endl;
@@ -750,7 +750,7 @@ namespace {
 namespace commands {
   namespace {
     const std::unordered_map<std::string, CommandHandler> commandMap = {
-      {"help", {helpCommand}},
+      {"help", {helpCommand}}, {"?", {helpCommand}},
       {"get", {getCommand}},
       {"set", {setCommand}},
       {"camera", {cameraCommand}},
