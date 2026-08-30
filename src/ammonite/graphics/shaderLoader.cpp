@@ -115,7 +115,7 @@ namespace ammonite {
         data->shaderPaths[i] = shaderPaths[i];
       }
 
-      tangle::thread::submitWork(doCacheWork, data, (TangleGroup*)nullptr);
+      tangle::thread::submitWork(doCacheWork, data, NO_GROUP);
     }
 
     bool checkObject(GLuint objectId, const std::string& actionString,
