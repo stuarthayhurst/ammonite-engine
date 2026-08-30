@@ -249,7 +249,6 @@ Checks: [
   'readability-redundant-string-cstr',
   'readability-redundant-string-init',
   'readability-reference-to-constructed-temporary',
-  'readability-trailing-comma',
   'readability-redundant-typename',
   'readability-simplify-boolean-expr',
   'readability-simplify-subscript-expr',
@@ -257,6 +256,7 @@ Checks: [
   'readability-static-definition-in-anonymous-namespace',
   'readability-string-compare',
   'readability-suspicious-call-argument',
+  'readability-trailing-comma',
   'readability-uniqueptr-delete-release',
   'readability-use-concise-preprocessor-directives'
 ]
