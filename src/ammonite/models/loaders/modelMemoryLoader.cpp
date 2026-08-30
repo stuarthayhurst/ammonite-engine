@@ -151,7 +151,7 @@ namespace ammonite {
           //Index and upload each mesh, using the thread pool
           tangle::thread::submitMultiple(modelIndexJob, indexThreadData.data(),
                                          sizeof(IndexThreadData), indexGroupPtr,
-                                         meshCount, nullptr);
+                                         meshCount, (TangleGroup*)nullptr);
           return meshCount;
         }
 
