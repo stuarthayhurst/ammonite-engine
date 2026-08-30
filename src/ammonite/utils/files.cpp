@@ -36,7 +36,8 @@ namespace ammonite {
       }
 
       namespace {
-        std::string getCachedFilePath(std::string* filePaths, unsigned int fileCount) {
+        std::string getCachedFilePath(const std::string* const filePaths,
+                                      unsigned int fileCount) {
           return dataCachePath + internal::hashStrings(filePaths, fileCount).append(".cache");
         }
 
@@ -45,7 +46,7 @@ namespace ammonite {
          - Unsafe if called with both input and (save or *save) as nullptr / undefined
          - save must never be nullptr
         */
-        char* parseToken(char* input, char delim, char** save) {
+        char* parseToken(char* input, char delim, char** const save) {
           //Restore from next byte to search
           if (input == nullptr) {
             input = *save;
@@ -74,8 +75,10 @@ namespace ammonite {
         }
 
         //Check paths, times and file sizes are correct
-        AmmoniteCacheEnum validateInputs(std::string* filePaths, unsigned int fileCount,
-                                         unsigned char* extraData, std::size_t extraDataSize) {
+        AmmoniteCacheEnum validateInputs(const std::string* const filePaths,
+                                         unsigned int fileCount,
+                                         const unsigned char* const extraData,
+                                         std::size_t extraDataSize) {
           unsigned char* const extraDataCopy = new unsigned char[extraDataSize + 1];
           std::memcpy(extraDataCopy, extraData, extraDataSize);
           extraDataCopy[extraDataSize] = '\0';
@@ -169,7 +172,8 @@ namespace ammonite {
         return true;
       }
 
-      bool getFileMetadata(const std::string& filePath, std::size_t* filesize, std::time_t* timestamp) {
+      bool getFileMetadata(const std::string& filePath,
+                           std::size_t* const filesize, std::time_t* timestamp) {
         //Give up if the file doesn't exist
         const std::filesystem::path filesystemPath = filePath;
         if (!std::filesystem::exists(filesystemPath)) {
@@ -238,7 +242,7 @@ namespace ammonite {
        - If the read fails, return null
          - In this case, nothing needs to be freed
       */
-      unsigned char* loadFile(const std::string& filePath, std::size_t* size) {
+      unsigned char* loadFile(const std::string& filePath, std::size_t* const size) {
         unsigned char* data = nullptr;
         const int descriptor = open(filePath.c_str(), O_RDONLY);
         if (descriptor == -1) {
@@ -296,7 +300,8 @@ namespace ammonite {
          - Erase the file if present
        - Returns true on success, false on failure
       */
-      bool writeFile(const std::string& filePath, unsigned char* data, std::size_t size) {
+      bool writeFile(const std::string& filePath, const unsigned char* const data,
+                     std::size_t size) {
         const int descriptor = creat(filePath.c_str(), S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH);
         if (descriptor == -1) {
           tangle::utils::warning << "Error while opening '" << filePath \
@@ -352,10 +357,11 @@ namespace ammonite {
          - *userData doesn't need to be freed, it's part of the return value's allocation
        - The (expected) cache path is written to cacheFilePath
       */
-      unsigned char* getCachedFile(std::string* cacheFilePath, std::string* filePaths,
-                                   unsigned int fileCount, std::size_t* dataSize,
-                                   unsigned char** userData, std::size_t* userDataSize,
-                                   AmmoniteCacheEnum* cacheState) {
+      unsigned char* getCachedFile(std::string* const cacheFilePath,
+                                   const std::string* const filePaths,
+                                   unsigned int fileCount, std::size_t* const dataSize,
+                                   unsigned char** const userData, std::size_t* const userDataSize,
+                                   AmmoniteCacheEnum* const cacheState) {
         //Generate a cache string
         *cacheFilePath = getCachedFilePath(filePaths, fileCount);
 
@@ -395,7 +401,7 @@ namespace ammonite {
           *dataSize = blockSizes[0];
           *userData = cacheData + blockSizes[0];
           *userDataSize = blockSizes[1];
-          unsigned char* const extraData = *userData + *userDataSize;
+          const unsigned char* const extraData = *userData + *userDataSize;
           const std::size_t extraDataSize = blockSizes[2] - sizeof(blockSizes);
 
           //Check size of data is as expected, then validate the loaded cache
@@ -452,9 +458,10 @@ namespace ammonite {
        - Also write userDataSize bytes of userData to the cache file
        - Returns true on success, false on failure
       */
-      bool writeCacheFile(const std::string& cacheFilePath, std::string* filePaths,
-                          unsigned int fileCount, unsigned char* data, std::size_t dataSize,
-                          unsigned char* userData, std::size_t userDataSize) {
+      bool writeCacheFile(const std::string& cacheFilePath,
+                          const std::string* const filePaths, unsigned int fileCount,
+                          const unsigned char* const data, std::size_t dataSize,
+                          const unsigned char* const userData, std::size_t userDataSize) {
         //Generate data to write
         std::string extraData;
         std::size_t blockSizes[3];

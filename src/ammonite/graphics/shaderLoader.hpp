@@ -12,7 +12,7 @@ extern "C" {
 namespace AMMONITE_INTERNAL ammonite {
   namespace shaders {
     namespace internal {
-      GLuint createProgram(std::string* shaderPaths, unsigned int shaderCount);
+      GLuint createProgram(const std::string* shaderPaths, unsigned int shaderCount);
       GLuint loadDirectory(const std::string& directoryPath);
       void updateCacheSupport();
     }

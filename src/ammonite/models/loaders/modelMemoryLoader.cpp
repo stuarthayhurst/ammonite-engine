@@ -67,7 +67,9 @@ namespace ammonite {
          - Copy the mesh data into the raw mesh data vector
          - This must be thread-safe
         */
-        void applyMesh(RawMeshData* rawMeshDataPtr, unsigned int vertexCount, const AmmoniteVertex* vertexData, unsigned int indexCount, const unsigned int* indices) {
+        void applyMesh(RawMeshData* const rawMeshDataPtr,
+                       unsigned int vertexCount, const AmmoniteVertex* const vertexData,
+                       unsigned int indexCount, const unsigned int* const indices) {
           //Copy vertices
           rawMeshDataPtr->vertexCount = vertexCount;
           rawMeshDataPtr->vertexData = new AmmoniteVertex[vertexCount];
@@ -79,7 +81,7 @@ namespace ammonite {
           std::memcpy(rawMeshDataPtr->indices, indices, sizeof(unsigned int) * indexCount);
         }
 
-        void modelIndexJob(void* userPtr) {
+        void modelIndexJob(void* const userPtr) {
           const IndexThreadData* const dataPtr = (IndexThreadData*)userPtr;
 
           //Store the generated indices and unique vertices
@@ -114,7 +116,7 @@ namespace ammonite {
                     uniqueVertices.data(), indices.size(), indices.data());
         }
 
-        void syncMeshIndexing(TangleGroup* indexGroup, unsigned int meshCount) {
+        void syncMeshIndexing(TangleGroup* const indexGroup, unsigned int meshCount) {
           tangle::thread::waitGroupComplete(indexGroup, meshCount);
           indexThreadData.clear();
         }
@@ -126,11 +128,11 @@ namespace ammonite {
          - Return the number of jobs to wait for
          - This should only be called once per mesh data vector
         */
-        unsigned int indexMeshes(const AmmoniteVertex** meshArray,
+        unsigned int indexMeshes(const AmmoniteVertex* const* const meshArray,
                                  unsigned int meshCount,
-                                 const unsigned int* vertexCounts,
-                                 std::vector<RawMeshData>* rawMeshDataVec,
-                                 TangleGroup* indexGroupPtr) {
+                                 const unsigned int* const vertexCounts,
+                                 std::vector<RawMeshData>* const rawMeshDataVec,
+                                 TangleGroup* const indexGroupPtr) {
           //Reserve space in the vector of thread data
           indexThreadData.reserve(meshCount);
 
@@ -154,12 +156,12 @@ namespace ammonite {
         }
 
         //Copy indexed mesh data into a vector of RawMeshData
-        unsigned int copyIndexedMeshes(const AmmoniteVertex** indexedMeshArray,
-                                       const unsigned int** indicesArray,
+        unsigned int copyIndexedMeshes(const AmmoniteVertex* const* const indexedMeshArray,
+                                       const unsigned int* const* const indicesArray,
                                        unsigned int meshCount,
-                                       const unsigned int* vertexCounts,
-                                       const unsigned int* indexCounts,
-                                       std::vector<RawMeshData>* rawMeshDataVec) {
+                                       const unsigned int* const vertexCounts,
+                                       const unsigned int* const indexCounts,
+                                       std::vector<RawMeshData>* const rawMeshDataVec) {
           //Copy vertices and indices of already indexed mesh
           for (unsigned int meshIndex = 0; meshIndex < meshCount; meshIndex++) {
             const unsigned int vertexCount = vertexCounts[meshIndex];
@@ -192,7 +194,8 @@ namespace ammonite {
 
 
         //Load and apply each component of each material to its mesh
-        void applyMaterials(ModelData* modelData, const AmmoniteMaterial* materials,
+        void applyMaterials(ModelData* const modelData,
+                            const AmmoniteMaterial* const materials,
                             unsigned int meshCount) {
           for (unsigned int meshIndex = 0; meshIndex < meshCount; meshIndex++) {
             const AmmoniteMaterial& material = materials[meshIndex];
@@ -239,7 +242,7 @@ namespace ammonite {
       namespace {
         //Allocate space for a deindexed mesh, using an indexed mesh
         AmmoniteVertex** allocateDeindexedMesh(unsigned int meshCount,
-                                               const unsigned int* indexCounts) {
+                                               const unsigned int* const indexCounts) {
           //Allocate an array for the meshes
           AmmoniteVertex** const meshArray = new AmmoniteVertex*[meshCount];
 
@@ -252,7 +255,8 @@ namespace ammonite {
         }
 
         //Free a deindexed mesh
-        void freeDeindexedMesh(AmmoniteVertex** meshArray, unsigned int meshCount) {
+        void freeDeindexedMesh(AmmoniteVertex* const* const meshArray,
+                               unsigned int meshCount) {
           for (unsigned int meshIndex = 0; meshIndex < meshCount; meshIndex++) {
             delete [] meshArray[meshIndex];
           }
@@ -264,11 +268,11 @@ namespace ammonite {
          - Deindex an indexed mesh array
          - Use allocateDeindexedMesh() to allocate space for the output
         */
-        void deindexMesh(const AmmoniteVertex** indexedMeshArray,
-                         const unsigned int** indicesArray,
+        void deindexMesh(const AmmoniteVertex* const* const indexedMeshArray,
+                         const unsigned int* const* const indicesArray,
                          unsigned int meshCount,
-                         const unsigned int* indexCounts,
-                         AmmoniteVertex** meshArray) {
+                         const unsigned int* const indexCounts,
+                         AmmoniteVertex* const* const meshArray) {
           for (unsigned int meshIndex = 0; meshIndex < meshCount; meshIndex++) {
             const unsigned int indexCount = indexCounts[meshIndex];
             const AmmoniteVertex* const indexedMesh = indexedMeshArray[meshIndex];
@@ -288,9 +292,9 @@ namespace ammonite {
        - Use this for debugging the mesh indexing, or checking the quality of
          indexed meshes in memory
       */
-      bool reindexLoadMemoryObject(ModelData* modelData,
-                                  std::vector<RawMeshData>* rawMeshDataVec,
-                                  const ModelLoadInfo& modelLoadInfo) {
+      bool reindexLoadMemoryObject(ModelData* const modelData,
+                                   std::vector<RawMeshData>* const rawMeshDataVec,
+                                   const ModelLoadInfo& modelLoadInfo) {
         const ModelMemoryInfo& memoryInfo = modelLoadInfo.memoryInfo;
 
         //Pass data through if it isn't indexed
@@ -333,8 +337,8 @@ namespace ammonite {
        - Meshes will be indexed if not supplied as indexed meshes
        - Materials will be loaded
       */
-      bool loadMemoryObject(ModelData* modelData,
-                            std::vector<RawMeshData>* rawMeshDataVec,
+      bool loadMemoryObject(ModelData* const modelData,
+                            std::vector<RawMeshData>* const rawMeshDataVec,
                             const ModelLoadInfo& modelLoadInfo) {
         const ModelMemoryInfo& memoryInfo = modelLoadInfo.memoryInfo;
 

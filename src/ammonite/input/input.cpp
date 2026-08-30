@@ -17,7 +17,7 @@ namespace ammonite {
     //Hands off to core
     AmmoniteId registerKeybind(AmmoniteKeycode keycodes[], int count,
                                AmmoniteReleaseEnum overrideMode,
-                               AmmoniteKeyCallback callback, void* userPtr) {
+                               AmmoniteKeyCallback callback, void* const userPtr) {
       return internal::registerRawKeybind(keycodes, count, overrideMode, false, callback, userPtr);
     }
 
@@ -25,49 +25,49 @@ namespace ammonite {
     //Hands off to core
     AmmoniteId registerToggleKeybind(AmmoniteKeycode keycodes[], int count,
                                      AmmoniteReleaseEnum overrideMode,
-                                     AmmoniteKeyCallback callback, void* userPtr) {
+                                     AmmoniteKeyCallback callback, void* const userPtr) {
       return internal::registerRawKeybind(keycodes, count, overrideMode, true, callback, userPtr);
     }
 
     //C: Multi-key, no override mode, no toggle
     //Hands off to A
     AmmoniteId registerKeybind(AmmoniteKeycode keycodes[], int count,
-                               AmmoniteKeyCallback callback, void* userPtr) {
+                               AmmoniteKeyCallback callback, void* const userPtr) {
       return registerKeybind(keycodes, count, OVERRIDE_MODE_DEFAULT, callback, userPtr);
     }
 
     //D: Multi-key, no override mode, toggle
     //Hands off to B
     AmmoniteId registerToggleKeybind(AmmoniteKeycode keycodes[], int count,
-                                     AmmoniteKeyCallback callback, void* userPtr) {
+                                     AmmoniteKeyCallback callback, void* const userPtr) {
       return registerToggleKeybind(keycodes, count, OVERRIDE_MODE_DEFAULT, callback, userPtr);
     }
 
     //E: Single key, override mode, no toggle
     //Hands off to C
     AmmoniteId registerKeybind(AmmoniteKeycode keycode, AmmoniteReleaseEnum overrideMode,
-                               AmmoniteKeyCallback callback, void* userPtr) {
+                               AmmoniteKeyCallback callback, void* const userPtr) {
       return registerKeybind(&keycode, 1, overrideMode, callback, userPtr);
     }
 
     //F: Single key, override mode, toggle
     //Hands off to D
     AmmoniteId registerToggleKeybind(AmmoniteKeycode keycode, AmmoniteReleaseEnum overrideMode,
-                                     AmmoniteKeyCallback callback, void* userPtr) {
+                                     AmmoniteKeyCallback callback, void* const userPtr) {
       return registerToggleKeybind(&keycode, 1, overrideMode, callback, userPtr);
     }
 
     //G: Single key, no override mode, no toggle
     //Hands off to E
     AmmoniteId registerKeybind(AmmoniteKeycode keycode, AmmoniteKeyCallback callback,
-                               void* userPtr) {
+                               void* const userPtr) {
       return registerKeybind(keycode, OVERRIDE_MODE_DEFAULT, callback, userPtr);
     }
 
     //H: Single key, no override mode, toggle
     //Hands off to F
     AmmoniteId registerToggleKeybind(AmmoniteKeycode keycode, AmmoniteKeyCallback callback,
-                                     void* userPtr) {
+                                     void* const userPtr) {
       return registerToggleKeybind(keycode, OVERRIDE_MODE_DEFAULT, callback, userPtr);
     }
 
@@ -93,19 +93,19 @@ namespace ammonite {
       return internal::changeKeybindKeycodes(keybindId, &keycode, 1);
     }
 
-    void setAnykeyCallback(AmmoniteKeyCallback callback, void* userPtr) {
+    void setAnykeyCallback(AmmoniteKeyCallback callback, void* const userPtr) {
       internal::setAnykeyCallback(callback, userPtr);
     }
 
-    void setCursorPositionCallback(AmmoniteCursorCallback callback, void* userPtr) {
+    void setCursorPositionCallback(AmmoniteCursorCallback callback, void* const userPtr) {
       internal::setCursorPositionCallback(callback, userPtr);
     }
 
-    void setMouseButtonCallback(AmmoniteButtonCallback callback, void* userPtr) {
+    void setMouseButtonCallback(AmmoniteButtonCallback callback, void* const userPtr) {
       internal::setMouseButtonCallback(callback, userPtr);
     }
 
-    void setScrollWheelCallback(AmmoniteScrollCallback callback, void* userPtr) {
+    void setScrollWheelCallback(AmmoniteScrollCallback callback, void* const userPtr) {
       internal::setScrollWheelCallback(callback, userPtr);
     }
 

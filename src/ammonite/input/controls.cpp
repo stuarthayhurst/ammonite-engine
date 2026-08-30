@@ -131,7 +131,7 @@ namespace ammonite {
     //Keyboard control callbacks
     namespace {
       void keyboardCameraCallback(const std::vector<AmmoniteKeycode>&,
-                                  KeyStateEnum action, void* userPtr) {
+                                  KeyStateEnum action, void* const userPtr) {
         const DirectionEnum* const directionEnum = (DirectionEnum*)userPtr;
 
         //Do nothing if the button was released

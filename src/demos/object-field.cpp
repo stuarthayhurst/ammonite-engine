@@ -54,7 +54,8 @@ namespace objectFieldDemo {
 
   //Non-orbit internal functions
   namespace {
-    void genRandomPosData(ammonite::Vec<float, 3>* objectData, unsigned int objectCount) {
+    void genRandomPosData(ammonite::Vec<float, 3>* const objectData,
+                          unsigned int objectCount) {
       for (unsigned int i = 0; i < objectCount; i++) {
         //Position;
         ammonite::set(objectData[(i * 3) + 0],

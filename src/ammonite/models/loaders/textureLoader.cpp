@@ -34,7 +34,7 @@ namespace ammonite {
 
       //Thread workers
       namespace {
-        void textureLoadWorker(void* userPtr) {
+        void textureLoadWorker(void* const userPtr) {
           TextureThreadData* const threadData = (TextureThreadData*)userPtr;
 
           const bool prepared = textures::internal::prepareTextureData(

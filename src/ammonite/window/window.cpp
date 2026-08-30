@@ -99,7 +99,7 @@ namespace ammonite {
       internal::setTitle(windowPtr, title);
     }
 
-    void useIcons(const std::string* iconPaths, unsigned int iconCount) {
+    void useIcons(const std::string* const iconPaths, unsigned int iconCount) {
       if (iconPaths == nullptr || iconCount == 0) {
         tangle::utils::warning << "Failed to load icons (none specified)" << std::endl;
         return;
@@ -181,8 +181,9 @@ namespace ammonite {
     }
 
     //Return geometry information for the active window
-    void getWindowGeometry(unsigned int* width, unsigned int* height, unsigned int* xPos,
-                           unsigned int* yPos, bool useDecoratedSize, bool useDecoratedPos) {
+    void getWindowGeometry(unsigned int* const width, unsigned int* const height,
+                           unsigned int* const xPos, unsigned int* const yPos,
+                           bool useDecoratedSize, bool useDecoratedPos) {
       if (windowPtr == nullptr) {
         tangle::utils::warning << "No window to get geometry for" << std::endl;
         return;

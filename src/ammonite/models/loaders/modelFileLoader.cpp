@@ -36,16 +36,17 @@ namespace ammonite {
       }
 
       namespace {
-        bool materialHasTexture(const aiMaterial* materialPtr, aiTextureType textureType) {
+        bool materialHasTexture(const aiMaterial* const materialPtr,
+                                aiTextureType textureType) {
           return (materialPtr->GetTextureCount(textureType) > 0);
         }
 
-        bool materialHasMultipleTextures(const aiMaterial* materialPtr,
+        bool materialHasMultipleTextures(const aiMaterial* const materialPtr,
                                          aiTextureType textureType) {
           return (materialPtr->GetTextureCount(textureType) > 1);
         }
 
-        GLuint processTexture(const aiMaterial* materialPtr, aiTextureType textureType,
+        GLuint processTexture(const aiMaterial* const materialPtr, aiTextureType textureType,
                               const ModelLoadInfo& modelLoadInfo, const std::string& modelKey) {
           //Bail if we don't have any of this type
           if (!materialHasTexture(materialPtr, textureType)) {
@@ -62,12 +63,13 @@ namespace ammonite {
           return queueTextureLoad(fullTexturePath, false, modelLoadInfo.fileInfo.srgbTextures);
         }
 
-        bool materialHasColour(const aiMaterial* materialPtr, const MatKey& colourKey) {
+        bool materialHasColour(const aiMaterial* const materialPtr,
+                               const MatKey& colourKey) {
           aiColor3D aiColour(0.0f, 0.0f, 0.0f);
           return (materialPtr->Get(colourKey.key, colourKey.type, colourKey.index, aiColour) == AI_SUCCESS);
         }
 
-        GLuint processColour(const aiMaterial* materialPtr,
+        GLuint processColour(const aiMaterial* const materialPtr,
                              const MatKey& colourKey, const std::string& modelKey) {
           //Bail if we don't have any of this type
           if (!materialHasColour(materialPtr, colourKey)) {
@@ -85,7 +87,7 @@ namespace ammonite {
         }
 
         //Load all components of a material into a TextureIdGroup
-        TextureIdGroup processMaterial(const aiMaterial* materialPtr,
+        TextureIdGroup processMaterial(const aiMaterial* const materialPtr,
                                        const ModelLoadInfo& modelLoadInfo,
                                        const std::string& modelKey) {
           TextureIdGroup textureGroup = {.diffuseId = 0, .specularId = 0};
@@ -136,8 +138,9 @@ namespace ammonite {
           return textureGroup;
         }
 
-        bool processMesh(aiMesh* meshPtr, const aiScene* scenePtr,
-                         ModelData* modelData, std::vector<RawMeshData>* rawMeshDataVec,
+        bool processMesh(const aiMesh* const meshPtr, const aiScene* const scenePtr,
+                         ModelData* const modelData,
+                         std::vector<RawMeshData>* const rawMeshDataVec,
                          const ModelLoadInfo& modelLoadInfo) {
           //Process material into a texture ID group as early as possible
           const aiMaterial* const materialPtr = scenePtr->mMaterials[meshPtr->mMaterialIndex];
@@ -191,8 +194,8 @@ namespace ammonite {
           return true;
         }
 
-        bool processNodes(const aiScene* scenePtr, ModelData* modelData,
-                          std::vector<RawMeshData>* rawMeshDataVec,
+        bool processNodes(const aiScene* const scenePtr, ModelData* const modelData,
+                          std::vector<RawMeshData>* const rawMeshDataVec,
                           const ModelLoadInfo& modelLoadInfo) {
           std::queue<aiNode*> nodePtrQueue;
           nodePtrQueue.push(scenePtr->mRootNode);
@@ -223,8 +226,8 @@ namespace ammonite {
        - Load an object from objectPath, using the settings from modelLoadInfo
        - Store the model's mesh data to rawMeshDataVec and texture data to modelData
       */
-      bool loadFileObject(ModelData* modelData,
-                          std::vector<RawMeshData>* rawMeshDataVec,
+      bool loadFileObject(ModelData* const modelData,
+                          std::vector<RawMeshData>* const rawMeshDataVec,
                           const ModelLoadInfo& modelLoadInfo) {
         //Generate post-processing flags
         auto aiProcessFlags = aiProcess_Triangulate |

@@ -62,7 +62,8 @@ namespace ammonite {
          - Conditionally account for decoration
          - isWindowFullscreen must be set correctly
         */
-        void storeWindowGeometry(GLFWwindow* windowPtr, WindowGeom* storage,
+        void storeWindowGeometry(GLFWwindow* const windowPtr,
+                                 WindowGeom* const storage,
                                  bool useDecoratedSize, bool useDecoratedPos) {
           int bufferWidth = 0;
           int bufferHeight = 0;
@@ -120,7 +121,7 @@ namespace ammonite {
           }
         }
 
-        GLFWmonitor* getClosestMonitor(GLFWwindow* windowPtr) {
+        GLFWmonitor* getClosestMonitor(GLFWwindow* const windowPtr) {
           int monitorCount = 0;
           GLFWmonitor* const* const monitors = glfwGetMonitors(&monitorCount);
 
@@ -157,7 +158,7 @@ namespace ammonite {
           return bestMonitor;
         }
 
-        unsigned int getMonitorIndex(GLFWmonitor* monitorPtr) {
+        unsigned int getMonitorIndex(GLFWmonitor* const monitorPtr) {
           int glfwMonitorCount = 0;
           GLFWmonitor* const* const monitorPtrs = glfwGetMonitors(&glfwMonitorCount);
 
@@ -188,7 +189,7 @@ namespace ammonite {
         }
 
         //Callback to update height and width on window resize
-        void framebufferSizeCallback(GLFWwindow* windowPtr, int, int) {
+        void framebufferSizeCallback(GLFWwindow* const windowPtr, int, int) {
           storeWindowGeometry(windowPtr, &activeWindowGeom, false, true);
           ammonite::camera::internal::updateMatrices();
         }
@@ -235,7 +236,7 @@ namespace ammonite {
         glfwTerminate();
       }
 
-      void setFocusCallback(GLFWwindow* windowPtr) {
+      void setFocusCallback(GLFWwindow* const windowPtr) {
         //Set callback to update input state on window focus
         glfwSetWindowFocusCallback(windowPtr, windowFocusCallback);
       }
@@ -271,19 +272,20 @@ namespace ammonite {
         return windowPtr;
       }
 
-      void setWindowResizable(GLFWwindow* windowPtr, bool resizable) {
+      void setWindowResizable(GLFWwindow* const windowPtr, bool resizable) {
         glfwSetWindowAttrib(windowPtr, GLFW_RESIZABLE, (int)resizable);
       }
 
-      bool getWindowResizable(GLFWwindow* windowPtr) {
+      bool getWindowResizable(GLFWwindow* const windowPtr) {
         return glfwGetWindowAttrib(windowPtr, GLFW_RESIZABLE) != 0;
       }
 
-      void setTitle(GLFWwindow* windowPtr, const std::string& title) {
+      void setTitle(GLFWwindow* const windowPtr, const std::string& title) {
         glfwSetWindowTitle(windowPtr, title.c_str());
       }
 
-      void setIcons(GLFWwindow* windowPtr, ImageData* iconData, unsigned int iconCount) {
+      void setIcons(GLFWwindow* const windowPtr, const ImageData* const iconData,
+                    unsigned int iconCount) {
         GLFWimage* const images = new GLFWimage[iconCount];
         for (unsigned int i = 0; i < iconCount; i++) {
           images[i].pixels = iconData[i].data;
@@ -295,9 +297,10 @@ namespace ammonite {
         delete [] images;
       }
 
-      void setWindowGeometry(GLFWwindow* windowPtr, unsigned int width, unsigned int height,
-                             unsigned int xPos, unsigned int yPos, bool useDecoratedSize,
-                             bool useDecoratedPos) {
+      void setWindowGeometry(GLFWwindow* const windowPtr,
+                             unsigned int width, unsigned int height,
+                             unsigned int xPos, unsigned int yPos,
+                             bool useDecoratedSize, bool useDecoratedPos) {
         //Get window frame size
         int frameLeft = 0;
         int frameRight = 0;
@@ -324,9 +327,10 @@ namespace ammonite {
         storeWindowGeometry(windowPtr, &activeWindowGeom, false, true);
       }
 
-      void getWindowGeometry(GLFWwindow* windowPtr, unsigned int* width, unsigned int* height,
-                             unsigned int* xPos, unsigned int* yPos, bool useDecoratedSize,
-                             bool useDecoratedPos) {
+      void getWindowGeometry(GLFWwindow* const windowPtr,
+                             unsigned int* const width, unsigned int* const height,
+                             unsigned int* const xPos, unsigned int* const yPos,
+                             bool useDecoratedSize, bool useDecoratedPos) {
         WindowGeom tempStorage;
         storeWindowGeometry(windowPtr, &tempStorage, useDecoratedSize, useDecoratedPos);
 
@@ -336,7 +340,8 @@ namespace ammonite {
         *yPos = tempStorage.yPos;
       }
 
-      void setFullscreenMonitor(GLFWwindow* windowPtr, unsigned int monitorIndex) {
+      void setFullscreenMonitor(GLFWwindow* const windowPtr,
+                                unsigned int monitorIndex) {
         //Convert index to pointer
         GLFWmonitor* const monitorPtr = getMonitorPtr(monitorIndex);
 
@@ -349,7 +354,8 @@ namespace ammonite {
         storeWindowGeometry(windowPtr, &activeWindowGeom, false, true);
       }
 
-      void setFullscreen(GLFWwindow* windowPtr, bool shouldFullscreen, unsigned int monitorIndex) {
+      void setFullscreen(GLFWwindow* const windowPtr, bool shouldFullscreen,
+                         unsigned int monitorIndex) {
         //Handle new window mode
         if (shouldFullscreen) {
           //Store windowed geometry and then fullscreen
@@ -377,7 +383,7 @@ namespace ammonite {
         }
       }
 
-      unsigned int getCurrentMonitorIndex(GLFWwindow* windowPtr) {
+      unsigned int getCurrentMonitorIndex(GLFWwindow* const windowPtr) {
         GLFWmonitor* monitorPtr = nullptr;
         if (isWindowFullscreen) {
           monitorPtr = glfwGetWindowMonitor(windowPtr);
@@ -399,7 +405,7 @@ namespace ammonite {
         return isWindowFullscreen;
       }
 
-      bool shouldWindowClose(GLFWwindow* windowPtr) {
+      bool shouldWindowClose(GLFWwindow* const windowPtr) {
         return glfwWindowShouldClose(windowPtr) != 0;
       }
 
@@ -419,7 +425,7 @@ namespace ammonite {
        - Display the rendered frame
        - Waits for vertical sync and / or a frame limiter, if set
       */
-      void showFrame(GLFWwindow* windowPtr, bool vsync, float frameLimit) {
+      void showFrame(GLFWwindow* const windowPtr, bool vsync, float frameLimit) {
         //Set correct vertical sync state
         static bool lastVsync = !vsync;
         if (vsync != lastVsync) {

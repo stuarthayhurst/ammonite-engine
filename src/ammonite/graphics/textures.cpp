@@ -41,7 +41,7 @@ namespace ammonite {
          - Writes the format of the final texture to textureFormat
         */
         bool decideTextureFormat(int channels, bool srgbTexture,
-                                 GLenum* textureFormat, GLenum* dataFormat) {
+                                 GLenum* const textureFormat, GLenum* const dataFormat) {
           if (channels == 3) {
             *dataFormat = GL_RGB;
             if (srgbTexture) {
@@ -95,7 +95,7 @@ namespace ammonite {
       //Calculate the cache key to use for a texture and load settings
       void calculateTextureKey(const std::string& texturePath,
                                bool flipTexture, bool srgbTexture,
-                               std::string* textureKey) {
+                               std::string* const textureKey) {
         //Prepare the key's storage
         const unsigned int colourLength = maxColourKeySize;
         const unsigned int texturePathLength = texturePath.size();
@@ -114,7 +114,7 @@ namespace ammonite {
       namespace {
         template <unsigned int components>
         void calculateTextureKeyTemplate(const ammonite::Vec<float, components>& colour,
-                                         std::string* stringPtr) {
+                                         std::string* const stringPtr) {
           //Only set the colour component
           const unsigned int colourLength = sizeof(float) * components;
           stringPtr->resize(colourLength);
@@ -124,13 +124,13 @@ namespace ammonite {
 
       //Calculate the cache key to use for a 3-component colour
       void calculateTextureKey(const ammonite::Vec<float, 3>& colour,
-                               std::string* textureKey) {
+                               std::string* const textureKey) {
         calculateTextureKeyTemplate(colour, textureKey);
       }
 
       //Calculate the cache key to use for a 4-component colour
       void calculateTextureKey(const ammonite::Vec<float, 4>& colour,
-                               std::string* textureKey) {
+                               std::string* const textureKey) {
         calculateTextureKeyTemplate(colour, textureKey);
       }
 
@@ -248,7 +248,7 @@ namespace ammonite {
        - Returns true on success, false on failure
       */
       bool prepareTextureData(const std::string& texturePath, bool flipTexture,
-                              bool srgbTexture, TextureData* textureData) {
+                              bool srgbTexture, TextureData* const textureData) {
 
         //Handle texture flips
         if (flipTexture) {
@@ -331,7 +331,7 @@ namespace ammonite {
        - Makes no attempt at caching / deduplicating it
        - Returns 0 on failure
       */
-      GLuint createTexture(int width, int height, unsigned char* data,
+      GLuint createTexture(int width, int height, const unsigned char* const data,
                            GLenum dataFormat, GLenum textureFormat, GLint textureLevels) {
         //Check texture size is within limits
         GLint maxTextureSize = 0;

@@ -64,7 +64,7 @@ namespace ammonite {
         }
       }
 
-      void setupInputCallback(GLFWwindow* newWindowPtr) {
+      void setupInputCallback(GLFWwindow* const newWindowPtr) {
         windowPtr = newWindowPtr;
         glfwSetKeyCallback(windowPtr, keyCallbackHandler);
       }

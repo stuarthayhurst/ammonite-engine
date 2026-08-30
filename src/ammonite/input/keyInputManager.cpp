@@ -205,7 +205,7 @@ namespace ammonite {
       //Register a keybind
       AmmoniteId registerRawKeybind(const AmmoniteKeycode keycodes[], int count,
                                     AmmoniteReleaseEnum overrideMode, bool toggle,
-                                    AmmoniteKeyCallback callback, void* userPtr) {
+                                    AmmoniteKeyCallback callback, void* const userPtr) {
         //Validate override mode
         if (overrideMode < AMMONITE_ALLOW_OVERRIDE || overrideMode > AMMONITE_RESPECT_BLOCK) {
           ammoniteInternalDebug << "Invalid override mode passed" << std::endl;
@@ -298,7 +298,7 @@ namespace ammonite {
         return true;
       }
 
-      void setAnykeyCallback(AmmoniteKeyCallback callback, void* userPtr) {
+      void setAnykeyCallback(AmmoniteKeyCallback callback, void* const userPtr) {
         anykeyCallback = callback;
         anykeyCallbackData = userPtr;
       }

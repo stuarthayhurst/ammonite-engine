@@ -52,8 +52,8 @@ namespace torus {
   */
   void generateTorus(float ringRadius, float volumeDiameter,
                      unsigned int widthNodes, unsigned int heightNodes,
-                     ammonite::models::AmmoniteVertex** meshVerticesPtr,
-                     unsigned int** meshIndicesPtr) {
+                     ammonite::models::AmmoniteVertex** const meshVerticesPtr,
+                     unsigned int** const meshIndicesPtr) {
     const unsigned int vertexCount = widthNodes * heightNodes;
     ammonite::models::AmmoniteVertex* const meshVertices = new ammonite::models::AmmoniteVertex[vertexCount];
     unsigned int* const meshIndices = new unsigned int[vertexCount * 6ul];

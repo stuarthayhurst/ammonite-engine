@@ -35,7 +35,7 @@ namespace AMMONITE_INTERNAL ammonite {
       void setWindowResizable(GLFWwindow* windowPtr, bool resizable);
       bool getWindowResizable(GLFWwindow* windowPtr);
       void setTitle(GLFWwindow* windowPtr, const std::string& title);
-      void setIcons(GLFWwindow* windowPtr, ImageData* iconData, unsigned int iconCount);
+      void setIcons(GLFWwindow* windowPtr, const ImageData* iconData, unsigned int iconCount);
       void setWindowGeometry(GLFWwindow* windowPtr, unsigned int width, unsigned int height,
                              unsigned int xPos, unsigned int yPos, bool useDecoratedSize,
                              bool useDecoratedPos);

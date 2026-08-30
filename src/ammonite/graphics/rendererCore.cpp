@@ -105,7 +105,7 @@ namespace ammonite {
         }
 
         //Check for essential GPU capabilities
-        bool checkGPUCapabilities(unsigned int* failureCount) {
+        bool checkGPUCapabilities(unsigned int* const failureCount) {
           //NOLINTBEGIN(modernize-use-designated-initializers)
           const struct {
             const char* extension;
@@ -292,8 +292,8 @@ namespace ammonite {
       */
 
       //Setup framebuffers for rendering
-      void recreateFramebuffers(GLuint* targetBufferIdPtr, unsigned int sampleCount,
-                                       unsigned int renderWidth, unsigned int renderHeight) {
+      void recreateFramebuffers(GLuint* const targetBufferIdPtr, unsigned int sampleCount,
+                                unsigned int renderWidth, unsigned int renderHeight) {
         //Delete regular colour and depth storage textures
         if (screenQuadTextureId != 0) {
           glDeleteTextures(1, &screenQuadTextureId);
@@ -410,8 +410,8 @@ namespace ammonite {
       /*
        - Helper functions to draw / wrap components
       */
-      void drawModel(ammonite::models::internal::ModelInfo* drawObjectInfo,
-                            AmmoniteRenderMode renderMode) {
+      void drawModel(const models::internal::ModelInfo* const drawObjectInfo,
+                     AmmoniteRenderMode renderMode) {
         //Get model draw data
         ammonite::models::internal::ModelData* const drawObjectData = drawObjectInfo->modelData;
 
@@ -491,7 +491,7 @@ namespace ammonite {
        - Draw models of a given type, from a cache
        - Update the cache when given AMMONITE_DATA_REFRESH or a pointer to a null pointer
       */
-      void drawModelsCached(ammonite::models::internal::ModelInfo*** modelPtrsPtr,
+      void drawModelsCached(ammonite::models::internal::ModelInfo*** const modelPtrsPtr,
                             ModelTypeEnum modelType, AmmoniteRenderMode renderMode) {
         const unsigned int modelCount = ammonite::models::internal::getModelCount(modelType);
 

@@ -149,7 +149,8 @@ namespace ammonite {
 
     //Model movement helpers
     namespace {
-      void moveModelToActive(AmmoniteId modelId, internal::ModelInfo* modelPtr) {
+      void moveModelToActive(AmmoniteId modelId,
+                             const internal::ModelInfo* const modelPtr) {
         //Move from inactive to active tracker, update model pointer map
         const internal::ModelInfo modelInfo = *modelPtr;
         inactiveModelTracker.deleteModelInfo(modelId);
@@ -157,7 +158,8 @@ namespace ammonite {
         internal::setModelInfoActive(modelId, true);
       }
 
-      void moveModelToInactive(AmmoniteId modelId, internal::ModelInfo* modelPtr) {
+      void moveModelToInactive(AmmoniteId modelId,
+                               const internal::ModelInfo* const modelPtr) {
         //Move from active to inactive tracker, update model pointer map
         const internal::ModelInfo modelInfo = *modelPtr;
         activeModelTracker.deleteModelInfo(modelId);
@@ -296,9 +298,10 @@ namespace ammonite {
     */
     AmmoniteId createModel(const AmmoniteVertex* meshArray[],
                            const unsigned int* indicesArray[],
-                           const AmmoniteMaterial* materials,
-                           unsigned int meshCount, const unsigned int* vertexCounts,
-                           const unsigned int* indexCounts) {
+                           const AmmoniteMaterial* const materials,
+                           unsigned int meshCount,
+                           const unsigned int* const vertexCounts,
+                           const unsigned int* const indexCounts) {
       //Generate info required to load model
       const internal::ModelLoadInfo modelLoadInfo = {
         .memoryInfo = {.meshArray = meshArray, .indicesArray = indicesArray,
@@ -312,8 +315,9 @@ namespace ammonite {
 
     //Map model creation for multiple non-indexed meshes onto createModel()
     AmmoniteId createModel(const AmmoniteVertex* meshArray[],
-                           const AmmoniteMaterial* materials,
-                           unsigned int meshCount, const unsigned int* vertexCounts) {
+                           const AmmoniteMaterial* const materials,
+                           unsigned int meshCount,
+                           const unsigned int* const vertexCounts) {
       return createModel(meshArray, nullptr, materials, meshCount, vertexCounts, nullptr);
     }
 
@@ -419,7 +423,7 @@ namespace ammonite {
 
     namespace {
       //Apply one component of a material to a mesh
-      bool applyMaterialComponent(GLuint* textureIdPtr, bool isTexture,
+      bool applyMaterialComponent(GLuint* const textureIdPtr, bool isTexture,
                                   const AmmoniteMaterialComponent& component) {
         //Remove any applied texture
         if (*textureIdPtr != 0) {
@@ -564,7 +568,7 @@ namespace ammonite {
     }
 
     void setDrawMode(AmmoniteId modelId, AmmoniteDrawEnum drawMode) {
-      internal::ModelInfo* const modelPtr = modelIdPtrMap[modelId];
+      const internal::ModelInfo* const modelPtr = modelIdPtrMap[modelId];
       if (modelPtr != nullptr) {
         if (modelPtr->drawMode == AMMONITE_DRAW_INACTIVE &&
             drawMode != AMMONITE_DRAW_INACTIVE) {

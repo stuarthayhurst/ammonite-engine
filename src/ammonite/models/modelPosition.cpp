@@ -13,7 +13,7 @@
 namespace ammonite {
   namespace models {
     namespace internal {
-      void calcModelMatrices(PositionData* positionData) {
+      void calcModelMatrices(PositionData* const positionData) {
         //Recalculate the model matrix when a component changes
         ammonite::Mat<float, 4> rotationScaleMatrix = {{0}};
         ammonite::multiply(positionData->rotationMatrix, positionData->scaleMatrix,

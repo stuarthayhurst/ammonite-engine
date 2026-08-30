@@ -15,7 +15,7 @@ namespace ammonite {
         return (epoxy_gl_version() >= ((majorVersion * 10) + minorVersion));
       }
 
-      bool checkExtension(const char* extension, int major, int minor) {
+      bool checkExtension(const char* const extension, int major, int minor) {
         if (epoxy_has_gl_extension(extension) || checkGlVersion(major, minor)) {
           //Extension supported, either explicitly or by version
           ammoniteInternalDebug << extension << " supported (" << major << "." \
@@ -30,7 +30,7 @@ namespace ammonite {
       }
 
       //Allow checking for extensions without a fallback version
-      bool checkExtension(const char* extension) {
+      bool checkExtension(const char* const extension) {
         if (epoxy_has_gl_extension(extension)) {
           //Extension supported
           ammoniteInternalDebug << extension << " supported" << std::endl;

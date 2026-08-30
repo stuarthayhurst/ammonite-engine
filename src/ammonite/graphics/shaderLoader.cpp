@@ -60,7 +60,7 @@ namespace ammonite {
     };
 
     //Thread pool work to cache a program
-    void doCacheWork(void* userPtr) {
+    void doCacheWork(void* const userPtr) {
       const CacheWorkerData* const data = (CacheWorkerData*)userPtr;
 
       //Prepare user data required to load the cache again
@@ -80,8 +80,8 @@ namespace ammonite {
       delete data;
     }
 
-    void cacheProgram(const GLuint programId, std::string* shaderPaths,
-                      unsigned int shaderCount, std::string* cacheFilePath) {
+    void cacheProgram(const GLuint programId, const std::string* const shaderPaths,
+                      unsigned int shaderCount, const std::string* const cacheFilePath) {
       CacheWorkerData* const data = new CacheWorkerData;
       data->shaderCount = shaderCount;
 
@@ -120,8 +120,8 @@ namespace ammonite {
 
     bool checkObject(GLuint objectId, const std::string& actionString,
                      const std::string& objectName, GLenum statusEnum,
-                     void (*objectQuery)(GLuint, GLenum, GLint*),
-                     void (*objectLog)(GLuint, GLsizei, GLsizei*, GLchar*)) {
+                     void (* const objectQuery)(GLuint, GLenum, GLint*),
+                     void (* const objectLog)(GLuint, GLsizei, GLsizei*, GLchar*)) {
       //Test whether the program linked
       GLint success = GL_FALSE;
       objectQuery(objectId, statusEnum, &success);
@@ -215,7 +215,7 @@ namespace ammonite {
     }
 
     //Take multiple shader objects and create a program
-    GLuint createProgramObject(GLuint* shaderIds, unsigned int shaderCount) {
+    GLuint createProgramObject(const GLuint* const shaderIds, unsigned int shaderCount) {
       //Create the program
       const GLuint programId = glCreateProgram();
 
@@ -241,8 +241,9 @@ namespace ammonite {
     }
 
     //Create a program from shader source with loadShader() and createProgramObject()
-    GLuint createProgramUncached(std::string* shaderPaths, GLenum* shaderTypes,
-                                        unsigned int shaderCount) {
+    GLuint createProgramUncached(const std::string* const shaderPaths,
+                                 const GLenum* const shaderTypes,
+                                 unsigned int shaderCount) {
       //Since cache wasn't available, generate fresh shaders
       GLuint* const shaderIds = new GLuint[shaderCount];
       bool hasCreatedShaders = true;
@@ -276,8 +277,9 @@ namespace ammonite {
     }
 
     //Attempt to use a cached program or hand off to createProgramUncached()
-    GLuint createProgramCached(std::string* shaderPaths, GLenum* shaderTypes,
-                                      unsigned int shaderCount) {
+    GLuint createProgramCached(const std::string* const shaderPaths,
+                               const GLenum* const shaderTypes,
+                               unsigned int shaderCount) {
       //Check for OpenGL and engine cache support
       bool isCacheSupported = ammonite::utils::files::getCacheEnabled();
       isCacheSupported = isCacheSupported && isBinaryCacheSupported;
@@ -372,7 +374,8 @@ namespace ammonite {
          - If possible, load and store a cache
        - Returns 0 on failure
       */
-      GLuint createProgram(std::string* inputShaderPaths, unsigned int inputShaderCount) {
+      GLuint createProgram(const std::string* const inputShaderPaths,
+                           unsigned int inputShaderCount) {
         //Don't attempt to load 0 shaders
         if (inputShaderCount == 0) {
           return 0;

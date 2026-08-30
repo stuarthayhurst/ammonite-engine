@@ -98,7 +98,7 @@ namespace ammonite {
         return mouseInputBlocked;
       }
 
-      void setupMouseCallback(GLFWwindow* newWindowPtr) {
+      void setupMouseCallback(GLFWwindow* const newWindowPtr) {
         windowPtr = newWindowPtr;
 
         //Disable mouse input block
@@ -109,17 +109,17 @@ namespace ammonite {
         glfwSetScrollCallback(windowPtr, scrollWheelCallbackWrapper);
       }
 
-      void setCursorPositionCallback(AmmoniteCursorCallback callback, void* userPtr) {
+      void setCursorPositionCallback(AmmoniteCursorCallback callback, void* const userPtr) {
         cursorPositionCallback = callback;
         cursorUserPtr = userPtr;
       }
 
-      void setMouseButtonCallback(AmmoniteButtonCallback callback, void* userPtr) {
+      void setMouseButtonCallback(AmmoniteButtonCallback callback, void* const userPtr) {
         mouseButtonCallback = callback;
         mouseUserPtr = userPtr;
       }
 
-      void setScrollWheelCallback(AmmoniteScrollCallback callback, void* userPtr) {
+      void setScrollWheelCallback(AmmoniteScrollCallback callback, void* const userPtr) {
         scrollWheelCallback = callback;
         scrollUserPtr = userPtr;
       }

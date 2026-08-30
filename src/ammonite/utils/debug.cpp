@@ -24,7 +24,7 @@ namespace ammonite {
                                                 tangle::utils::colour::cyan);
 
       void GLAPIENTRY debugMessageCallback(GLenum, GLenum type, GLuint, GLenum severity,
-                                           GLsizei, const GLchar* message, const void*) {
+                                           GLsizei, const GLchar* const message, const void*) {
         switch (severity) {
           case GL_DEBUG_SEVERITY_HIGH: glDebugLogger << "(High priority): "; break;
           case GL_DEBUG_SEVERITY_MEDIUM: glDebugLogger << "(Medium priority): "; break;

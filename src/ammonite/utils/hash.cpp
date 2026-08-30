@@ -27,7 +27,7 @@ namespace ammonite {
       */
 #ifdef USE_VAES_AVX512
 #pragma message("Using AVX512 + AVX2 + VAES + SSE2 optimised hashing")
-      std::string hashStrings(const std::string* inputs, unsigned int inputCount) {
+      std::string hashStrings(const std::string* const inputs, unsigned int inputCount) {
         __m512i hash = _mm512_setzero_epi32();
         for (unsigned int i = 0; i < inputCount; i++) {
           const uint8_t* input = (uint8_t*)inputs[i].data();
@@ -87,7 +87,7 @@ namespace ammonite {
         return output;
       }
 #else
-      std::string hashStrings(const std::string* inputs, unsigned int inputCount) {
+      std::string hashStrings(const std::string* const inputs, unsigned int inputCount) {
         uintmax_t total = 0;
         for (unsigned int i = 0; i < inputCount; i++) {
           total += std::hash<std::string>{}(inputs[i]);

@@ -47,7 +47,7 @@ namespace {
 
 //Helpers for demo loading
 namespace {
-  bool setDemo(int argc, char** argv) {
+  bool setDemo(int argc, const char* const* const argv) {
     //Fetch demo, list options and validate the chosen demo
     std::string demoName;
     if (arguments::searchArgument(argc, argv, "--demo", &demoName) != 0) {
@@ -117,7 +117,8 @@ namespace {
     ammonite::controls::settings::setMovementSpeed(movementSpeed);
   }
 
-  void cameraCycleCallback(const std::vector<AmmoniteKeycode>&, KeyStateEnum, void* userPtr) {
+  void cameraCycleCallback(const std::vector<AmmoniteKeycode>&, KeyStateEnum,
+                           void* const userPtr) {
     CameraData* const cameraData = (CameraData*)userPtr;
     cameraData->cameraIndex = (cameraData->cameraIndex + 1) % cameraData->cameraIds.size();
     ammonite::camera::setActiveCamera(cameraData->cameraIds[cameraData->cameraIndex]);
@@ -130,7 +131,7 @@ namespace {
   }
 
   void pathRecordToggleCallback(const std::vector<AmmoniteKeycode>&,
-                                KeyStateEnum action, void* userPtr) {
+                                KeyStateEnum action, void* const userPtr) {
     AmmoniteId* const pathIdPtr = (AmmoniteId*)userPtr;
 
     //Create and register path to record
@@ -145,7 +146,7 @@ namespace {
   }
 
   void changeFocalDepthCallback(const std::vector<AmmoniteKeycode>&,
-                                KeyStateEnum action, void* userPtr) {
+                                KeyStateEnum action, void* const userPtr) {
     static ammonite::utils::Timer focalDepthTimer;
     if (action != AMMONITE_RELEASED) {
       const float sign = *(float*)userPtr;
@@ -163,7 +164,7 @@ namespace {
   }
 
   void changeFrameRateCallback(const std::vector<AmmoniteKeycode>&,
-                               KeyStateEnum action, void* userPtr) {
+                               KeyStateEnum action, void* const userPtr) {
     static ammonite::utils::Timer frameRateTimer;
     if (action != AMMONITE_RELEASED) {
       const float sign = *(float*)userPtr;
@@ -182,12 +183,13 @@ namespace {
   }
 
   void enableCommandPromptCallback(const std::vector<AmmoniteKeycode>&,
-                                   KeyStateEnum, void* userPtr) {
+                                   KeyStateEnum, void* const userPtr) {
     bool* const commandsEnabledPtr = (bool*)userPtr;
     *commandsEnabledPtr = true;
   }
 
-  void closeWindowCallback(const std::vector<AmmoniteKeycode>&, KeyStateEnum, void* userPtr) {
+  void closeWindowCallback(const std::vector<AmmoniteKeycode>&, KeyStateEnum,
+                           void* const userPtr) {
     *(bool*)userPtr = true;
   }
 }
@@ -204,7 +206,8 @@ namespace {
   }
 
   //Clean up anything that was created
-  void cleanEngine(unsigned char setupBits, std::vector<AmmoniteId>* keybindIdsPtr) {
+  void cleanEngine(unsigned char setupBits,
+                   const std::vector<AmmoniteId>* const keybindIdsPtr) {
     if ((setupBits & HAS_SETUP_PLACEMENT) != 0) {
       placement::unsetPlacementCallbacks();
       placement::deletePlacedModels();
@@ -242,7 +245,7 @@ namespace {
   }
 }
 
-int main(int argc, char** argv) noexcept(false) {
+int main(int argc, const char* const* argv) noexcept(false) {
   //Handle arguments
   argc--;
   argv++;

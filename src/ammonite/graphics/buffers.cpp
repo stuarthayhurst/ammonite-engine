@@ -20,8 +20,8 @@ namespace ammonite {
         unsigned int lastLightDataSize = 0;
       }
 
-      void createModelBuffers(models::internal::ModelData* modelData,
-                              std::vector<models::internal::RawMeshData>* rawMeshDataVec) {
+      void createModelBuffers(models::internal::ModelData* const modelData,
+                              const std::vector<models::internal::RawMeshData>* const rawMeshDataVec) {
         //Generate buffers for every mesh
         for (const models::internal::RawMeshData& rawMeshData : *rawMeshDataVec) {
           models::internal::MeshInfoGroup& meshInfo = modelData->meshInfo.emplace_back();
@@ -79,7 +79,7 @@ namespace ammonite {
         }
       }
 
-      void deleteModelBuffers(models::internal::ModelData* modelData) {
+      void deleteModelBuffers(const models::internal::ModelData* const modelData) {
         //Delete created buffers and the VAO
         for (const models::internal::MeshInfoGroup& meshInfo : modelData->meshInfo) {
           glDeleteBuffers(1, &meshInfo.vertexBufferId);
@@ -102,8 +102,8 @@ namespace ammonite {
       }
 
       //Replace the lighting data buffers, creating them if necessary
-      void uploadLightBuffers(void* lightData, unsigned int lightDataSize,
-                              void* shadowData, unsigned int shadowDataSize){
+      void uploadLightBuffers(const void* const lightData, unsigned int lightDataSize,
+                              const void* const shadowData, unsigned int shadowDataSize){
         const bool resizeBuffers = (lightDataSize != lastLightDataSize);
 
         //Sub the data or resize the buffers

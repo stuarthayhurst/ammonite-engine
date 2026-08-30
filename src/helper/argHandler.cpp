@@ -11,10 +11,10 @@ namespace arguments {
      - Additionally, write its value to argValuePtr
      - If there isn't a value to save, return -1
   */
-  int searchArgument(int argc, char** argv, const std::string& identifier,
-                     std::string* argValuePtr) {
+  int searchArgument(int argc, const char* const* const argv, const std::string& identifier,
+                     std::string* const argValuePtr) {
     for (int i = 0; i < argc; i++) {
-      if (argv[i] == std::string(identifier)) {
+      if (argv[i] == identifier) {
         //If argument is found and it's a toggle, return true
         if (argValuePtr == nullptr) {
           return 1;

@@ -25,14 +25,17 @@ namespace AMMONITE_EXPOSED ammonite {
       bool getCacheEnabled();
 
       unsigned char* loadFile(const std::string& filePath, std::size_t* size);
-      bool writeFile(const std::string& filePath, unsigned char* data, std::size_t size);
-      unsigned char* getCachedFile(std::string* cacheFilePath, std::string* filePaths,
-                                   unsigned int fileCount, std::size_t* dataSize,
+      bool writeFile(const std::string& filePath, const unsigned char* data,
+                     std::size_t size);
+      unsigned char* getCachedFile(std::string* cacheFilePath,
+                                   const std::string* filePaths, unsigned int fileCount,
+                                   std::size_t* dataSize,
                                    unsigned char** userData, std::size_t* userDataSize,
                                    AmmoniteCacheEnum* cacheState);
-      bool writeCacheFile(const std::string& cacheFilePath, std::string* filePaths,
-                          unsigned int fileCount, unsigned char* data, std::size_t dataSize,
-                          unsigned char* userData, std::size_t userDataSize);
+      bool writeCacheFile(const std::string& cacheFilePath,
+                          const std::string* filePaths, unsigned int fileCount,
+                          const unsigned char* data, std::size_t dataSize,
+                          const unsigned char* userData, std::size_t userDataSize);
     }
   }
 }

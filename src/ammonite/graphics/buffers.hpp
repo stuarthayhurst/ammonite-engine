@@ -10,12 +10,12 @@ namespace AMMONITE_INTERNAL ammonite {
   namespace graphics {
     namespace internal {
       void createModelBuffers(models::internal::ModelData* modelData,
-                              std::vector<models::internal::RawMeshData>* rawMeshDataVec);
-      void deleteModelBuffers(models::internal::ModelData* modelData);
+                              const std::vector<models::internal::RawMeshData>* rawMeshDataVec);
+      void deleteModelBuffers(const models::internal::ModelData* modelData);
 
       void deleteLightBuffers();
-      void uploadLightBuffers(void* lightData, unsigned int lightDataSize,
-                              void* shadowData, unsigned int shadowDataSize);
+      void uploadLightBuffers(const void* lightData, unsigned int lightDataSize,
+                              const void* shadowData, unsigned int shadowDataSize);
     }
   }
 }

@@ -96,7 +96,7 @@ namespace {
    - Convert a string to a boolean in *value
    - Return true on success, otherwise return false and send a warning
   */
-  bool stringToBool(const std::string& string, bool* value) {
+  bool stringToBool(const std::string& string, bool* const value) {
     if (string == "true") {
       *value = true;
     } else if (string == "false") {
@@ -113,7 +113,7 @@ namespace {
    - Convert a string to a float in *value
    - Return true on success, otherwise return false and send a warning
   */
-  bool stringToFloat(const std::string& string, float* value) {
+  bool stringToFloat(const std::string& string, float* const value) {
     try {
       *value = std::stof(string);
     } catch (const std::exception&) {
@@ -128,7 +128,7 @@ namespace {
    - Convert a string to an unsigned int in *value
    - Return true on success, otherwise return false and send a warning
   */
-  bool stringToUInt(const std::string& string, unsigned int* value) {
+  bool stringToUInt(const std::string& string, unsigned int* const value) {
     try {
       *value = (unsigned int)std::stoul(string);
     } catch (const std::exception&) {
@@ -143,7 +143,8 @@ namespace {
    - Convert an array of strings to a vector of floats in value
    - Return true on success, otherwise return false and send a warning
   */
-  bool stringToFloatVector(const std::string* string, ammonite::Vec<float, 3>& value) {
+  bool stringToFloatVector(const std::string* const string,
+                           ammonite::Vec<float, 3>& value) {
     bool success = true;
     for (unsigned int i = 0; i < 3; i++) {
       success &= stringToFloat(string[i], &value[i]);
