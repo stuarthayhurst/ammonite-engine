@@ -268,8 +268,6 @@ CheckOptions:
     value: true
   - key: misc-const-correctness.WarnPointersAsValues
     value: true
-  - key: misc-const-correctness.AnalyzeParameters
-    value: false
   - key: misc-include-cleaner.IgnoreHeaders
     value: glm/.*;epoxy/.*;experimental/.*
   - key: readability-operators-representation.BinaryOperators
