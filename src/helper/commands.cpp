@@ -180,7 +180,7 @@ namespace {
     tangle::utils::normal << "  'camera' [mode] [key] [value] : Get / set camera properties" << std::endl;
     tangle::utils::normal << "  'path' [action] [id] [option] : Manage recorded camera paths" << std::endl;
     tangle::utils::normal << "  'models'                      : Dump model system data (debug mode)" << std::endl;
-    tangle::utils::normal << "  'exit'                        : Exit the command system" << std::endl;
+    tangle::utils::normal << "  'exit / resume'               : Exit the command system" << std::endl;
     tangle::utils::normal << "  'stop'                        : Stop the program" << std::endl;
     tangle::utils::normal << " - Leave [key] blank to list keys" << std::endl;
 
@@ -756,7 +756,7 @@ namespace commands {
       {"camera", {cameraCommand}},
       {"path", {pathCommand}},
       {"models", {modelDumpCommand}},
-      {"exit", {exitCommand}},
+      {"exit", {exitCommand}}, {"resume", {exitCommand}},
       {"stop", {stopCommand}}
     };
 
