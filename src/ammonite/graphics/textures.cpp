@@ -99,16 +99,19 @@ namespace ammonite {
         //Prepare the key's storage
         const unsigned int colourLength = maxColourKeySize;
         const unsigned int texturePathLength = texturePath.size();
-        const unsigned int keyLength = colourLength + texturePathLength + 1;
+        const unsigned int keyLength = colourLength + texturePathLength + 1 + 1;
         textureKey->resize(keyLength);
 
         //Set the colour component with zeros to avoid collisions
         std::memset(textureKey->data(), 0, colourLength);
 
-        //Set the string and load data components
+        //Set the texture path component and delimiter
         std::memcpy(textureKey->data() + colourLength, texturePath.data(), texturePathLength);
+        *(textureKey->data() + colourLength + texturePathLength) = ':';
+
+        //Set texture load data component
         const unsigned char extraData = ((int)flipTexture << 0) | ((int)srgbTexture << 1);
-        *(textureKey->data() + colourLength + texturePathLength) = std::to_string(extraData)[0];
+        *(textureKey->data() + colourLength + texturePathLength + 1) = std::to_string(extraData)[0];
       }
 
       namespace {

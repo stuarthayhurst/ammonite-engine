@@ -39,7 +39,7 @@ namespace ammonite {
           if (modelLoadInfo.isFileBased) {
             const unsigned char extraData = ((int)modelLoadInfo.fileInfo.flipTexCoords << 0) |
                                             ((int)modelLoadInfo.fileInfo.srgbTextures << 1);
-            return "file:" + modelLoadInfo.fileInfo.objectPath + std::to_string(extraData);
+            return "file:" + modelLoadInfo.fileInfo.objectPath + ':' + std::to_string(extraData);
           }
 
           /*
