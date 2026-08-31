@@ -6,6 +6,7 @@
 
 #include "../models.hpp"
 
+#include "../../engine.hpp"
 #include "../../graphics/textures.hpp"
 
 namespace ammonite {
@@ -79,8 +80,9 @@ namespace ammonite {
         textureLoadData.textureId = textureId;
 
         //Submit the texture load to the thread pool
+        void* const threadPool = ammonite::internal::getThreadPoolInstance();
         tangle::thread::submitWork(textureLoadWorker, &textureLoadData.threadData,
-                                   &textureLoadData.sync);
+                                   &textureLoadData.sync, threadPool);
 
         return textureId;
       }

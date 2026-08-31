@@ -22,9 +22,21 @@ namespace ammonite {
     const char* engineName = "Ammonite Engine";
     const char* engineVersion = EXPAND_MACRO_STRING(AMMONITE_VERSION);
 
+    void* threadPool = nullptr;
+
     ammonite::utils::Timer* engineTimer = nullptr;
     std::time_t engineSeconds = 0;
     std::time_t engineNanoseconds = 0;
+  }
+
+  namespace internal {
+    void* getThreadPoolInstance() {
+      if (threadPool == nullptr) {
+        ammoniteInternalDebug << "Requested thread pool instance before creation" << std::endl;
+      }
+
+      return threadPool;
+    }
   }
 
   std::string_view getEngineName() {
@@ -40,13 +52,14 @@ namespace ammonite {
     const ammonite::utils::Timer loadTimer;
 
     //Create a thread pool
-    if (!tangle::thread::createThreadPool(0)) {
+    threadPool = tangle::thread::createThreadPoolInstance(0);
+    if (threadPool == nullptr) {
       tangle::utils::error << "Failed to create thread pool" << std::endl;
       return false;
     }
 
     tangle::utils::status << "Created thread pool with " \
-                          << tangle::thread::getThreadPoolSize() \
+                          << tangle::thread::getThreadPoolSize(threadPool) \
                           << " thread(s)" << std::endl;
 
     if (!title.empty()) {
@@ -85,7 +98,9 @@ namespace ammonite {
   }
 
   void destroyEngine() {
-    tangle::thread::destroyThreadPool();
+    tangle::thread::destroyThreadPool(threadPool);
+    threadPool = nullptr;
+
     ammonite::renderer::setup::destroyRenderer();
     ammonite::window::destroyWindow();
 

@@ -7,6 +7,7 @@
 
 #include "../models.hpp"
 
+#include "../../engine.hpp"
 #include "../../graphics/textures.hpp"
 #include "../../utils/debug.hpp"
 
@@ -149,9 +150,10 @@ namespace ammonite {
           }
 
           //Index and upload each mesh, using the thread pool
+          void* const threadPool = ammonite::internal::getThreadPoolInstance();
           tangle::thread::submitMultiple(modelIndexJob, indexThreadData.data(),
                                          sizeof(IndexThreadData), indexGroupPtr,
-                                         meshCount, NO_GROUP);
+                                         meshCount, NO_GROUP, threadPool);
           return meshCount;
         }
 

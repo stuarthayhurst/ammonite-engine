@@ -17,6 +17,7 @@ extern "C" {
 #include "shaderLoader.hpp"
 
 #include "extensions.hpp"
+#include "../engine.hpp"
 #include "../utils/debug.hpp"
 #include "../utils/files.hpp"
 
@@ -115,7 +116,8 @@ namespace ammonite {
         data->shaderPaths[i] = shaderPaths[i];
       }
 
-      tangle::thread::submitWork(doCacheWork, data, NO_GROUP);
+      void* const threadPool = ammonite::internal::getThreadPoolInstance();
+      tangle::thread::submitWork(doCacheWork, data, NO_GROUP, threadPool);
     }
 
     bool checkObject(GLuint objectId, const std::string& actionString,
