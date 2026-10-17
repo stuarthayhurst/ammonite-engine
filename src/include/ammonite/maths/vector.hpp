@@ -340,7 +340,7 @@ namespace AMMONITE_INTERNAL ammonite {
       return normalise(a, a);
     }
 
-    //Calculate the dot product a vector
+    //Calculate the dot product of a vector
     template <typename T, unsigned int size> requires validVector<T, size>
     inline T dot(const Vec<T, size>& a, const Vec<T, size>& b) {
       const std::experimental::fixed_size_simd<T, size> aSimd(&a[0], std::experimental::element_aligned);
