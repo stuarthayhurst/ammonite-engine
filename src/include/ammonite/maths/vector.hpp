@@ -5,6 +5,7 @@
 #include <cmath>
 #include <cstring>
 #include <functional>
+#include <simd>
 #include <string>
 #include <type_traits>
 
@@ -148,11 +149,11 @@ namespace AMMONITE_INTERNAL ammonite {
     template <typename T, unsigned int size> requires validVector<T, size>
     inline Vec<T, size>& add(const Vec<T, size>& a, const Vec<T, size>& b,
                              Vec<T, size>& dest) {
-      std::experimental::fixed_size_simd<T, size> aSimd(&a[0], std::experimental::element_aligned);
-      const std::experimental::fixed_size_simd<T, size> bSimd(&b[0], std::experimental::element_aligned);
+      const std::simd::vec<T> aSimd = std::simd::unchecked_load(&a[0], &a[size]);
+      const std::simd::vec<T> bSimd = std::simd::unchecked_load(&b[0], &b[size]);
 
-      aSimd += bSimd;
-      aSimd.copy_to(&dest[0], std::experimental::element_aligned);
+      const std::simd::vec<T> cSimd = aSimd + bSimd;
+      std::simd::partial_store(cSimd, &dest[0], size);
 
       return dest;
     }
