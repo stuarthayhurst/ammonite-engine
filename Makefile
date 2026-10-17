@@ -57,7 +57,7 @@ TEST_OBJECTS := $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.o,$(TEST_OBJECTS_SOURC
 ROOT_OBJECTS := $(subst ./src,$(OBJECT_DIR),$(subst .cpp,.o,$(ROOT_OBJECTS_SOURCE)))
 
 #Global arguments
-CXXFLAGS += -Wall -Wextra -Werror -Wpedantic -std=c++23
+CXXFLAGS += -Wall -Wextra -Werror -Wpedantic -std=c++26
 CXXFLAGS += -fno-math-errno -flto=auto
 
 ifndef ARCH
