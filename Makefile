@@ -163,7 +163,7 @@ MATHSTEST_EXTRA_LDFLAGS := -lm
 DEMO_EXTRA_LDFLAGS := -lm
 
 #Helper to run the compiler or extract the command
-EXTRACT_SCRIPT := python3 extract-command.py
+EXTRACT_SCRIPT := python3 scripts/extract-command.py
 EXTRACT := @function inline() { if [[ "$(DUMMY)" != "true" ]]; then echo "$(CXX) $$@"; $(CXX) $$@; else $(EXTRACT_SCRIPT) "$(BUILD_DIR)" $(CXX) $$@; fi }; inline
 
 # --------------------------------
