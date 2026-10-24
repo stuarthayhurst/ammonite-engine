@@ -30,9 +30,9 @@ outputObject = {
 #Open the compile command file, create if missing and lock it
 compileCommands = None
 try:
-  compileCommands = open(outputPath, 'x+')
+  compileCommands = open(outputPath, "x+")
 except FileExistsError:
-  compileCommands = open(outputPath, 'r+')
+  compileCommands = open(outputPath, "r+")
 fcntl.flock(compileCommands, fcntl.LOCK_EX)
 
 #Read the current contents as JSON
