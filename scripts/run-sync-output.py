@@ -35,26 +35,44 @@ lockedPrint(commandString, "\n", syncFile)
 master, slave = pty.openpty()
 process = subprocess.Popen(commandString, shell=True, stdout=slave,
                            stdin=slave, stderr=slave, close_fds=True)
-try:
-  process.wait()
-except KeyboardInterrupt:
-  exit(1)
-exitCode = process.returncode
 os.close(slave)
 
 #Extract command's output
 output = []
+finished = False
 while True:
   try:
     data = os.read(master, 1024).decode()
-  except OSError:
+  except OSError as e:
+    #Quit when the process finishes and the buffer has been consumed
     break
   except KeyboardInterrupt:
-    break
+    #Quit when cancelled
+    exit(1)
+
   if not data:
-    break
+    #Quit if no data remains and the process had already finished
+    if finished:
+      break
+
+    #If the process finished, consume the rest of the buffer, then quit
+    if process.poll():
+      finished = True
+
   output.append(data)
+
 output = "".join(output)
+
+#Get the return code
+finished = False
+while not finished:
+  try:
+    process.wait(timeout = 10)
+    finished = True
+  except TimeoutExpired:
+    print("Process didn't exit after 10 seconds", file = sys.stderr)
+
+exitCode = process.returncode
 
 #Print the output and exit
 lockedPrint(output, "", syncFile)
