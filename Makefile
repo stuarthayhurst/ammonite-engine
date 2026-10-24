@@ -164,7 +164,9 @@ DEMO_EXTRA_LDFLAGS := -lm
 
 #Helper to run the compiler or extract the command
 EXTRACT_SCRIPT := python3 scripts/extract-command.py
-EXTRACT := @function inline() { if [[ "$(DUMMY)" != "true" ]]; then echo "$(CXX) $$@"; $(CXX) $$@; else $(EXTRACT_SCRIPT) "$(BUILD_DIR)" $(CXX) $$@; fi }; inline
+SYNC_FILE := $(BUILD_DIR)/compiler-sync
+SYNC_SCRIPT := python3 scripts/run-sync-output.py $(SYNC_FILE)
+EXTRACT := @function inline() { if [[ "$(DUMMY)" != "true" ]]; then $(SYNC_SCRIPT) $(CXX) $$@; else $(EXTRACT_SCRIPT) "$(BUILD_DIR)" $(CXX) $$@; fi }; inline
 
 # --------------------------------
 # Client build recipes
@@ -172,10 +174,10 @@ EXTRACT := @function inline() { if [[ "$(DUMMY)" != "true" ]]; then echo "$(CXX)
 
 $(BUILD_DIR)/demo: $(BUILD_DIR)/$(LIBRARY_NAME_FULL) $(HELPER_OBJECTS) $(DEMO_OBJECTS) $(OBJECT_DIR)/demoLoader.o
 	@mkdir -p "$(BUILD_DIR)"
-	$(CXX) -o "$(BUILD_DIR)/demo" $(HELPER_OBJECTS) $(DEMO_OBJECTS) $(OBJECT_DIR)/demoLoader.o $(CLIENT_CXXFLAGS) $(CLIENT_LDFLAGS) $(DEMO_EXTRA_LDFLAGS)
+	@$(SYNC_SCRIPT) $(CXX) -o "$(BUILD_DIR)/demo" $(HELPER_OBJECTS) $(DEMO_OBJECTS) $(OBJECT_DIR)/demoLoader.o $(CLIENT_CXXFLAGS) $(CLIENT_LDFLAGS) $(DEMO_EXTRA_LDFLAGS)
 $(BUILD_DIR)/mathsTest: $(BUILD_DIR)/$(LIBRARY_NAME_FULL) $(TEST_OBJECTS) $(OBJECT_DIR)/mathsTest.o
 	@mkdir -p "$(BUILD_DIR)"
-	$(CXX) -o "$(BUILD_DIR)/mathsTest" $(OBJECT_DIR)/mathsTest.o $(TEST_OBJECTS) $(CLIENT_CXXFLAGS) $(CLIENT_LDFLAGS) $(MATHSTEST_EXTRA_LDFLAGS)
+	@$(SYNC_SCRIPT) $(CXX) -o "$(BUILD_DIR)/mathsTest" $(OBJECT_DIR)/mathsTest.o $(TEST_OBJECTS) $(CLIENT_CXXFLAGS) $(CLIENT_LDFLAGS) $(MATHSTEST_EXTRA_LDFLAGS)
 
 #Recipe dependencies need to be mirrored in the corresponding lint targets
 $(OBJECT_DIR)/helper/%.o: ./src/helper/%.cpp $(HELPER_HEADERS_SOURCE) $(AMMONITE_INCLUDE_HEADERS_SOURCE)
@@ -199,7 +201,7 @@ $(LIBRARY_LINK_FILES):
 	@ln -sfv "$(LIBRARY_NAME_FULL)" "$@"
 $(BUILD_DIR)/$(LIBRARY_NAME_FULL): $(AMMONITE_OBJECTS)
 	@mkdir -p "$(OBJECT_DIR)"
-	$(CXX) -shared -o "$@" $(AMMONITE_OBJECTS) $(LIBRARY_CXXFLAGS) $(LIBRARY_LDFLAGS)
+	@$(SYNC_SCRIPT) $(CXX) -shared -o "$@" $(AMMONITE_OBJECTS) $(LIBRARY_CXXFLAGS) $(LIBRARY_LDFLAGS)
 	@if [[ "$(DEBUG)" != "true" ]]; then \
 	  strip --strip-unneeded "$@"; \
 	fi
@@ -222,32 +224,32 @@ $(BUILD_DIR)/compile_commands.json:
 #demos/% recipes have been split to give more granular dependencies
 #include/% recipes are required, since headers can be linted individually
 $(OBJECT_DIR)/include/%.$(DEBUG_LINT_STRING): ./src/include/% .clang-tidy $(AMMONITE_INCLUDE_HEADERS_SOURCE)
-	$(TIDY) --quiet -p "$(BUILD_DIR)" "$<"
+	@$(SYNC_SCRIPT) $(TIDY) --quiet -p "$(BUILD_DIR)" "$<"
 	@mkdir -p "$$(dirname $@)"
 	@touch "$@"
 $(OBJECT_DIR)/helper/%.$(DEBUG_LINT_STRING): ./src/helper/% .clang-tidy $(HELPER_HEADERS_SOURCE) $(AMMONITE_INCLUDE_HEADERS_SOURCE)
-	$(TIDY) --quiet -p "$(BUILD_DIR)" "$<"
+	@$(SYNC_SCRIPT) $(TIDY) --quiet -p "$(BUILD_DIR)" "$<"
 	@mkdir -p "$$(dirname $@)"
 	@touch "$@"
 $(OBJECT_DIR)/demos/%.cpp.$(DEBUG_LINT_STRING): ./src/demos/%.cpp .clang-tidy ./src/demos/%.hpp $(HELPER_HEADERS_SOURCE) $(AMMONITE_INCLUDE_HEADERS_SOURCE)
-	$(TIDY) --quiet -p "$(BUILD_DIR)" "$<"
+	@$(SYNC_SCRIPT) $(TIDY) --quiet -p "$(BUILD_DIR)" "$<"
 	@mkdir -p "$$(dirname $@)"
 	@touch "$@"
 $(OBJECT_DIR)/demos/%.hpp.$(DEBUG_LINT_STRING): ./src/demos/%.hpp .clang-tidy ./src/demos/%.hpp $(AMMONITE_INCLUDE_HEADERS_SOURCE)
-	$(TIDY) --quiet -p "$(BUILD_DIR)" "$<"
+	@$(SYNC_SCRIPT) $(TIDY) --quiet -p "$(BUILD_DIR)" "$<"
 	@mkdir -p "$$(dirname $@)"
 	@touch "$@"
 $(OBJECT_DIR)/tests/%.$(DEBUG_LINT_STRING): ./src/tests/% .clang-tidy $(TEST_HEADERS_SOURCE) $(AMMONITE_INCLUDE_HEADERS_SOURCE)
-	$(TIDY) --quiet -p "$(BUILD_DIR)" "$<"
+	@$(SYNC_SCRIPT) $(TIDY) --quiet -p "$(BUILD_DIR)" "$<"
 	@mkdir -p "$$(dirname $@)"
 	@touch "$@"
 $(OBJECT_DIR)/%.$(DEBUG_LINT_STRING): ./src/% .clang-tidy $(DEMO_HEADERS_SOURCE) $(HELPER_HEADERS_SOURCE) $(AMMONITE_INCLUDE_HEADERS_SOURCE)
-	$(TIDY) --quiet -p "$(BUILD_DIR)" "$<"
+	@$(SYNC_SCRIPT) $(TIDY) --quiet -p "$(BUILD_DIR)" "$<"
 	@mkdir -p "$$(dirname $@)"
 	@touch "$@"
 
 $(OBJECT_DIR)/ammonite/%.$(DEBUG_LINT_STRING): ./src/ammonite/% .clang-tidy $(AMMONITE_HEADERS_SOURCE) $(AMMONITE_INCLUDE_HEADERS_SOURCE)
-	$(TIDY) --quiet -p "$(BUILD_DIR)" "$<"
+	@$(SYNC_SCRIPT) $(TIDY) --quiet -p "$(BUILD_DIR)" "$<"
 	@mkdir -p "$$(dirname $@)"
 	@touch "$@"
 
