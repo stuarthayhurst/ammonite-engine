@@ -36,7 +36,7 @@ jobs:
 
     - name: Set up libtangle
       run: |
-        make -C libtangle build -j$(nproc)
+        ./scripts/build-libtangle.sh
 
     - name: (DEBUG + ASan + UBSan) Build tests
       run: |
